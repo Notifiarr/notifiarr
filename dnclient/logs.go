@@ -46,9 +46,12 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 
 // setupLogging splits log write into a file and/or stdout.
 func (c *Client) setupLogging() {
-	c.Logger.debug = c.Config.Debug
+	c.Logger = &Logger{
+		debug:  c.Config.Debug,
+		Logger: log.New(ioutil.Discard, "", log.LstdFlags),
+	}
 
-	if c.Logger.Logger.SetFlags(log.LstdFlags); c.Config.Debug {
+	if c.Config.Debug {
 		c.Logger.Logger.SetFlags(log.Lshortfile | log.Lmicroseconds | log.Ldate)
 	}
 
@@ -79,6 +82,7 @@ func (c *Client) logStartupInfo() {
 	c.logLidarr()
 	c.logReadarr()
 	c.Print(" => Debug / Quiet:", c.Config.Debug, "/", c.Config.Quiet)
+	c.Print(" => Web HTTP Listen:", c.Config.BindAddr)
 
 	if c.Config.LogFile != "" {
 		msg := "no rotation"

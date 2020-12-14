@@ -53,21 +53,22 @@ type Logger struct {
 
 // Client stores all the running data.
 type Client struct {
-	Flags   *Flags
-	sigChan chan os.Signal
+	Flags *Flags
 	*Config
 	*Logger
 }
 
 // IncomingPayload is the data we expect to get from discord notifier.
 type IncomingPayload struct {
-	Key  string `json:"api_key"`
-	App  string `json:"application"`
-	Name string `json:"name"`
-	ID   int    `json:"id"`
-	TMDB string `json:"tmdb"`
-	TVDB string `json:"tvdb"`
-	GRID string `json:"grid"`
+	Root  string `json:"root_folder"` // optional
+	Key   string `json:"api_key"`     // required
+	App   string `json:"application"` // required
+	Title string `json:"title"`       // required
+	Year  int    `json:"year"`        // required
+	ID    int    `json:"id"`          // default: 0 (configured instance)
+	TMDB  int    `json:"tmdb"`        // required if App = radarr
+	TVDB  int    `json:"tvdb"`        // required if App = sonarr
+	GRID  int    `json:"grid"`        // required if App = readarr
 }
 
 // OutgoingPayload is the response structure for API requests.
@@ -78,18 +79,24 @@ type OutgoingPayload struct {
 
 func new() *Client {
 	return &Client{
-		sigChan: make(chan os.Signal),
 		Config: &Config{
 			LogFiles:  defaultLogFiles,
 			LogFileMb: defaultLogFileMb,
 			BindAddr:  defaultBindAddr,
 			Timeout:   cnfg.Duration{Duration: defaultTimeout},
-		}, Flags: &Flags{
-			FlagSet: flag.NewFlagSet("discordnotifier-client", flag.ContinueOnError),
-		},
+		}, Flags: &Flags{FlagSet: flag.NewFlagSet("dnclient", flag.ContinueOnError)},
 	}
 }
 
+func (f *Flags) parse(args []string) {
+	f.StringVarP(&f.ConfigFile, "config", "c", defaultConfFile, "App Config File (TOML Format)")
+	f.StringVarP(&f.EnvPrefix, "prefix", "p", "UN", "Environment Variable Prefix")
+	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
+
+	_ = f.Parse(args)
+}
+
+// Start runs the app.
 func Start() error {
 	log.SetFlags(log.LstdFlags) // in case we throw an error for main.go before logging is setup.
 
@@ -108,21 +115,23 @@ func Start() error {
 		return fmt.Errorf("environment variables: %w", err)
 	}
 
+	if c.APIKey == "" {
+		return fmt.Errorf("API key cannot be empty")
+	}
+
 	c.setupLogging()
+	c.fixSonarrConfig()
+	c.fixReadarrConfig()
+	c.fixLidarrConfig()
+	c.fixRadarrConfig()
 	c.Printf("%s v%s Starting! (PID: %v) %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
 	c.logStartupInfo()
 
-	// go c.Run()
-	signal.Notify(c.sigChan, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-c.sigChan)
+	go c.RunWebServer()
+
+	sig := make(chan os.Signal)
+	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-sig)
 
 	return nil
-}
-
-func (f *Flags) parse(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", defaultConfFile, "App Config File (TOML Format)")
-	f.StringVarP(&f.EnvPrefix, "prefix", "p", "UN", "Environment Variable Prefix")
-	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
-
-	_ = f.Parse(args)
 }

@@ -3,5 +3,5 @@
 package dnclient
 
 const (
-	defaultConfFile = "/usr/local/etc/unpackerr/unpackerr.conf"
+	defaultConfFile = "/usr/local/etc/discordnotifier-client/dnclient.conf"
 )

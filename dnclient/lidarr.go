@@ -1,10 +1,21 @@
 package dnclient
 
 import (
+	"fmt"
 	"sync"
 
 	"golift.io/starr"
 )
+
+var errNoLidarr = fmt.Errorf("lidarr is not yet supported")
+
+func (c *Config) fixLidarrConfig() {
+	for i := range c.Lidarr {
+		if c.Lidarr[i].Timeout.Duration == 0 {
+			c.Lidarr[i].Timeout.Duration = c.Timeout.Duration
+		}
+	}
+}
 
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
@@ -15,7 +26,7 @@ type LidarrConfig struct {
 
 func (c *Client) logLidarr() {
 	if count := len(c.Lidarr); count == 1 {
-		c.Printf(" => Lidarr Config: 1 server: %s / %s, apikey:%v, timeout:%v, verify ssl:%v,",
+		c.Printf(" => Lidarr Config: 1 server: %s / %s, apikey:%v, timeout:%v, verify ssl:%v",
 			c.Lidarr[0].Name, c.Lidarr[0].URL, c.Lidarr[0].APIKey != "", c.Lidarr[0].Timeout, c.Lidarr[0].ValidSSL)
 	} else {
 		c.Print(" => Lidarr Config:", count, "servers")
@@ -25,4 +36,8 @@ func (c *Client) logLidarr() {
 				f.Name, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
 		}
 	}
+}
+
+func (c *Client) handleLidarr(p *IncomingPayload) (string, error) {
+	return "", errNoLidarr
 }
