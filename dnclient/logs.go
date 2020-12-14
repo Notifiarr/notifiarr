@@ -1,11 +1,15 @@
 package dnclient
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -92,4 +96,15 @@ func (c *Client) logStartupInfo() {
 
 		c.Printf(" => Log File: %s (%s)", c.Config.LogFile, msg)
 	}
+}
+
+func (c *Client) logExitInfo() error {
+	sig := make(chan os.Signal)
+	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-sig)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	return c.server.Shutdown(ctx)
 }

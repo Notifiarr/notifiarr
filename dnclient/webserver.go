@@ -4,14 +4,24 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // RunWebServer starts the web server.
 func (c *Client) RunWebServer() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/add", c.Handle)
+	mux.HandleFunc("/", c.notFound)
 
-	if err := http.ListenAndServe(c.Config.BindAddr, mux); err != nil && err != http.ErrServerClosed {
+	c.server = &http.Server{
+		Handler:      mux,
+		Addr:         c.Config.BindAddr,
+		IdleTimeout:  time.Second,
+		WriteTimeout: time.Second,
+		ReadTimeout:  time.Second,
+		ErrorLog:     c.Logger.Logger,
+	}
+	if err := c.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		c.Printf("[ERROR] HTTP Server: %v", err)
 	}
 }
@@ -37,7 +47,7 @@ func (c *Client) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch payload.App {
+	switch s := strings.ToLower(payload.App); s {
 	case "radarr":
 		msg, err := c.handleRadarr(payload)
 		c.respond(w, r, payload, msg, err)
@@ -51,7 +61,8 @@ func (c *Client) Handle(w http.ResponseWriter, r *http.Request) {
 		msg, err := c.handleLidarr(payload)
 		c.respond(w, r, payload, msg, err)
 	default:
-		w.WriteHeader(http.StatusNotFound)
+		c.Printf("HTTP [%s] %s %s: %s: %s", r.RemoteAddr, r.Method, r.RequestURI, http.StatusText(http.StatusNotFound), s)
+		w.WriteHeader(http.StatusUnprocessableEntity)
 	}
 }
 
@@ -63,7 +74,14 @@ func (c *Client) respond(w http.ResponseWriter, r *http.Request, p *IncomingPayl
 	c.Printf("HTTP [%s] %s %s: %s: %s", r.RemoteAddr, r.Method, r.RequestURI, http.StatusText(http.StatusOK), msg)
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("content-type", "application/json")
+
 	b, _ := json.Marshal(&OutgoingPayload{Status: err == nil, Message: msg})
 	_, _ = w.Write(b)
 	_, _ = w.Write([]byte("\n"))
+}
+
+// notFound is the handler for paths that are not found: 404s.
+func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
+	c.Printf("HTTP [%s] %s %s: %s", r.RemoteAddr, r.Method, r.RequestURI, http.StatusText(http.StatusNotFound))
+	w.WriteHeader(http.StatusNotFound)
 }

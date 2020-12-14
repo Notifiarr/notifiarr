@@ -3,9 +3,8 @@ package dnclient
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	flag "github.com/spf13/pflag"
@@ -15,9 +14,9 @@ import (
 )
 
 const (
-	defaultLogFileMb = 10
-	defaultLogFiles  = 10
-	defaultTimeout   = 10 * time.Second
+	defaultLogFileMb = 100
+	defaultLogFiles  = 0 // delete none
+	defaultTimeout   = 5 * time.Second
 	defaultBindAddr  = ":5454"
 )
 
@@ -56,6 +55,7 @@ type Client struct {
 	Flags *Flags
 	*Config
 	*Logger
+	server *http.Server
 }
 
 // IncomingPayload is the data we expect to get from discord notifier.
@@ -84,7 +84,7 @@ func new() *Client {
 			LogFileMb: defaultLogFileMb,
 			BindAddr:  defaultBindAddr,
 			Timeout:   cnfg.Duration{Duration: defaultTimeout},
-		}, Flags: &Flags{FlagSet: flag.NewFlagSet("dnclient", flag.ContinueOnError)},
+		}, Flags: &Flags{FlagSet: flag.NewFlagSet("dnclient", flag.ExitOnError)},
 	}
 }
 
@@ -92,8 +92,7 @@ func (f *Flags) parse(args []string) {
 	f.StringVarP(&f.ConfigFile, "config", "c", defaultConfFile, "App Config File (TOML Format)")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", "UN", "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
-
-	_ = f.Parse(args)
+	f.Parse(args) // nolint: errcheck
 }
 
 // Start runs the app.
@@ -103,35 +102,25 @@ func Start() error {
 	c := new()
 	if c.Flags.parse(os.Args[1:]); c.Flags.verReq {
 		fmt.Println(version.Print(c.Flags.Name()))
-
 		return nil
-	}
-
-	if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
+	} else if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
 		return fmt.Errorf("config file: %w", err)
-	}
-
-	if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
+	} else if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
 		return fmt.Errorf("environment variables: %w", err)
-	}
-
-	if c.APIKey == "" {
+	} else if c.APIKey == "" {
 		return fmt.Errorf("API key cannot be empty")
 	}
 
 	c.setupLogging()
+	c.Printf("%s v%s Starting! (PID: %v) %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
+	go c.RunWebServer()
+
 	c.fixSonarrConfig()
 	c.fixReadarrConfig()
 	c.fixLidarrConfig()
 	c.fixRadarrConfig()
-	c.Printf("%s v%s Starting! (PID: %v) %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
+
 	c.logStartupInfo()
 
-	go c.RunWebServer()
-
-	sig := make(chan os.Signal)
-	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-sig)
-
-	return nil
+	return c.logExitInfo()
 }
