@@ -1,6 +1,7 @@
 package dnclient
 
 import (
+	"Strconv"
 	"sync"
 
 	"golift.io/starr"
@@ -50,6 +51,22 @@ func (c *Client) logReadarr() {
 				f.Name, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
 		}
 	}
+}
+
+// getReadarr finds a Readarr based on the passed-in ID.
+// Every Readarr handler calls this.
+func (c *Client) getReadarr(id string) *LidarrConfig {
+	j, _ := strconv.Atoi(id)
+
+	for i, app := range c.Readarr {
+		if i != j-1 { // discordnotifier wants 1-indexes
+			continue
+		}
+
+		return app
+	}
+
+	return nil
 }
 
 func (c *Client) handleReadarr(p *ReadarrAddBook) (string, error) {

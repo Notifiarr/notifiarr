@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -24,11 +25,18 @@ var (
 	ErrOnlyGET   = fmt.Errorf("only GET is allowed to this endpoint")
 )
 
+// Response formats all content-containing replies to client web requests.
+type Response struct {
+	Status  string      `json:"status"`
+	Message interface{} `json:"message"`
+}
+
 // RunWebServer starts the web server.
 func (c *Client) RunWebServer() {
 	r := mux.NewRouter()
 	r.Handle("/api/radarr/add/{id:[0-9]+}", c.checkAPIKey(c.responseWrapper(c.radarrAddMovie))).Methods("POST")
-	r.Handle("/api/radarr/profile/{id:[0-9]+}", c.checkAPIKey(c.responseWrapper(c.radarrProfiles))).Methods("GET")
+	r.Handle("/api/radarr/profiles/{id:[0-9]+}", c.checkAPIKey(c.responseWrapper(c.radarrProfiles))).Methods("GET")
+	r.Handle("/api/radarr/folders/{id:[0-9]+}", c.checkAPIKey(c.responseWrapper(c.radarrRootFolders))).Methods("GET")
 	// r.Handle("/api/sonarr/add/{id:[0-9]+}", c.checkAPIKey(c.responseWrapper(c.sonarrAddSeries))).Methods("POST")
 	// r.Handle("/api/readarr/add/{id:[0-9]+}", c.checkAPIKey(c.responseWrapper(c.readarrAddBook))).Methods("POST")
 	r.PathPrefix("/").Handler(http.HandlerFunc(c.notFound))
@@ -46,6 +54,7 @@ func (c *Client) RunWebServer() {
 	}
 }
 
+// checkAPIKey drops a 403 if the API key doesn't match.
 func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-Key") != c.APIKey {
@@ -57,26 +66,27 @@ func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 	})
 }
 
-type Response struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
-}
-
-func (c *Client) responseWrapper(next func(r *http.Request) (int, string)) http.Handler {
+// responseWrapper formats all content-containing replies to clients.
+func (c *Client) responseWrapper(next func(r *http.Request) (int, interface{})) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		stat, msg := next(r)
-		statusTxt := http.StatusText(stat)
+		statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+
+		if m, ok := msg.(error); ok {
+			msg = m.Error()
+		}
+
+		if s, ok := msg.(string); ok {
+			c.Printf("HTTP [%s] %s %s: %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt, s)
+		} else {
+			c.Printf("HTTP [%s] %s %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt)
+		}
 
 		w.WriteHeader(stat)
 
-		if len(msg) > 0 && (msg[0] == '{' || msg[0] == '[') {
-			c.Printf("HTTP [%s] %s %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt)
-		} else {
-			c.Printf("HTTP [%s] %s %s: %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt, msg)
-		}
-
 		b, _ := json.Marshal(&Response{Status: statusTxt, Message: msg})
 		_, _ = w.Write(b)
+		_, _ = w.Write([]byte("\n")) // curl likes new lines.
 	})
 }
 

@@ -59,6 +59,22 @@ func (c *Client) logSonarr() {
 	}
 }
 
+// getSonarr finds a Sonarr based on the passed-in ID.
+// Every Sonarr handler calls this.
+func (c *Client) getSonarr(id string) *LidarrConfig {
+	j, _ := strconv.Atoi(id)
+
+	for i, app := range c.Sonarr {
+		if i != j-1 { // discordnotifier wants 1-indexes
+			continue
+		}
+
+		return app
+	}
+
+	return nil
+}
+
 func (c *Client) handleSonarr(p *SonarrAddSeries) (string, error) {
 	return "", nil
 }

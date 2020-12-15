@@ -11,13 +11,6 @@ import (
 	"golift.io/starr"
 )
 
-// RadarrAddMovie is the data we expect to get from discord notifier when adding a Radarr Movie.
-type RadarrAddMovie struct {
-	Root string `json:"rootFolderPath"`   // optional
-	QID  int    `json:"qualityProfileId"` // required
-	TMDB int    `json:"tmdbId"`           // required if App = radarr
-}
-
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
 	//	Name      string `json:"name" toml:"name" xml:"name" yaml:"name"`
@@ -50,83 +43,109 @@ func (c *Client) logRadarr() {
 	}
 }
 
-func (c *Client) radarrProfiles(r *http.Request) (int, string) {
-	id, _ := strconv.Atoi(mux.Vars(r)["id"]) // defaults to 0
+// getRadarr finds a radar based on the passed-in ID.
+// Every Radarr handler calls this.
+func (c *Client) getRadarr(id string) *RadarrConfig {
+	j, _ := strconv.Atoi(id)
 
 	for i, radar := range c.Radarr {
-		if i != id {
+		if i != j-1 { // discordnotifier wants 1-indexes
 			continue
 		}
 
-		profiles, err := radar.Radarr3QualityProfiles()
-		if err != nil {
-			return http.StatusInternalServerError, err.Error()
-		}
-
-		b, err := json.Marshal(profiles)
-		if err != nil {
-			return http.StatusInternalServerError, err.Error()
-		}
-
-		return http.StatusOK, string(b)
+		return radar
 	}
 
-	return http.StatusUnprocessableEntity, ErrNoRadarr.Error()
+	return nil
 }
 
-func (c *Client) radarrAddMovie(r *http.Request) (int, string) {
-	payload := &RadarrAddMovie{}
-	id, _ := strconv.Atoi(mux.Vars(r)["id"])
-
-	if r.Method != "POST" {
-		return http.StatusMethodNotAllowed, ErrOnlyPOST.Error()
-	} else if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
-		return http.StatusBadRequest, err.Error()
-	} else if payload.TMDB == 0 {
-		return http.StatusUnprocessableEntity, ErrNoTMDB.Error()
+func (c *Client) radarrRootFolders(r *http.Request) (int, interface{}) {
+	// Make sure the provided radarr id exists.
+	radar := c.getRadarr(mux.Vars(r)["id"])
+	if radar == nil {
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
 	}
 
-	for i, radar := range c.Radarr {
-		if i != id-1 { // discordnotifier wants 1-indexes.
-			continue
-		}
-
-		if payload.Root == "" {
-			payload.Root = radar.Root
-		}
-
-		status, err := radar.addMovie(payload)
-		if err != nil {
-			return status, err.Error()
-		}
-
-		return status, fmt.Sprintf("added %d", payload.TMDB)
-	}
-
-	return http.StatusUnprocessableEntity, ErrNoRadarr.Error()
-}
-
-func (r *RadarrConfig) addMovie(p *RadarrAddMovie) (int, error) {
-	m, err := r.Radarr3Movie(p.TMDB)
+	// Get folder list from Radarr.
+	folders, err := radar.Radarr3RootFolders()
 	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
+	}
+
+	// Format folder list into a nice path=>freesSpace map.
+	p := make(map[string]int64)
+	for i := range folders {
+		p[folders[i].Path] = folders[i].FreeSpace
+	}
+
+	return http.StatusOK, p
+}
+
+func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
+	// Make sure the provided radarr id exists.
+	radar := c.getRadarr(mux.Vars(r)["id"])
+	if radar == nil {
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
+	}
+
+	// Get the profiles from radarr.
+	profiles, err := radar.Radarr3QualityProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	// Format profile ID=>Name into a nice map.
+	p := make(map[int]string)
+	for i := range profiles {
+		p[profiles[i].ID] = profiles[i].Name
+	}
+
+	return http.StatusOK, p
+}
+
+func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
+	// Make sure the provided radarr id exists.
+	radar := c.getRadarr(mux.Vars(r)["id"])
+	if radar == nil {
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
+	}
+
+	// Extract payload and check for TMDB ID.
+	payload := &starr.AddMovie{}
+	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	} else if payload.TmdbID == 0 {
+		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
+	}
+
+	// Check for existing movie.
+	if m, err := radar.Radarr3Movie(payload.TmdbID); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TmdbID, ErrExists)
 	}
 
-	if len(m) > 0 {
-		return http.StatusConflict, ErrExists
+	// Fix payload data.
+	payload.Monitored = true
+	payload.AddMovieOptions.SearchForMovie = radar.Search
+
+	if payload.RootFolderPath == "" {
+		payload.RootFolderPath = radar.Root
 	}
 
-	err = r.Radarr3AddMovie(&starr.AddMovie{
-		TmdbID:              p.TMDB,
-		Monitored:           true,
-		QualityProfileID:    p.QID,
-		MinimumAvailability: "released",
-		AddMovieOptions:     starr.AddMovieOptions{SearchForMovie: r.Search},
-		RootFolderPath:      p.Root,
-	})
-	if err != nil {
+	if payload.Title == "" {
+		// Title must exist, even if it's wrong.
+		payload.Title = strconv.Itoa(payload.TmdbID)
+	}
+
+	if payload.MinimumAvailability == "" {
+		payload.MinimumAvailability = "released"
+	}
+
+	// Add movie using fixed payload.
+	if err := radar.Radarr3AddMovie(payload); err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
 	}
 
-	return http.StatusOK, nil
+	return http.StatusCreated, fmt.Sprintf("added %d", payload.TmdbID)
 }

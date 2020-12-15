@@ -2,6 +2,7 @@ package dnclient
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 
 	"golift.io/starr"
@@ -43,6 +44,22 @@ func (c *Client) logLidarr() {
 				f.Name, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
 		}
 	}
+}
+
+// getLidarr finds a Lidarr based on the passed-in ID.
+// Every Lidarr handler calls this.
+func (c *Client) getLidarr(id string) *LidarrConfig {
+	j, _ := strconv.Atoi(id)
+
+	for i, app := range c.Lidarr {
+		if i != j-1 { // discordnotifier wants 1-indexes
+			continue
+		}
+
+		return app
+	}
+
+	return nil
 }
 
 func (c *Client) handleLidarr(p *LidarrAddArtist) (string, error) {
