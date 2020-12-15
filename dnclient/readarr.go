@@ -6,6 +6,23 @@ import (
 	"golift.io/starr"
 )
 
+/*
+$readarrPayload['foreignBookId']    = $work['id'];
+$readarrPayload['monitored']         = true;
+$readarrPayload['addOptions']        = array('searchForNewBook' => true);
+$readarrPayload['author']            = array('rootFolderPath' => $paths['books']['everyone'], 'qualityProfileId' => 1, 'metadataProfileId' => 2, 'foreignAuthorId' => $author['id'], 'monitored' => true);
+$readarrPayload['editions'][]        = array('foreignEditionId' => $grid, 'monitored' => true, 'manualAdd' => true);
+[3:23 PM] nitsua:
+curl_setopt($ch, CURLOPT_URL, 'http://10.1.0.63:8787/api/v1/book');
+*/
+
+// ReadarrAddBook is the data we expect to get from discord notifier.
+type ReadarrAddBook struct {
+	Root string `json:"root_folder"` // optional
+	ID   int    `json:"id"`          // default: 0 (configured instance)
+	GRID int    `json:"grid"`        // required if App = readarr
+}
+
 func (c *Config) fixReadarrConfig() {
 	for i := range c.Readarr {
 		if c.Readarr[i].Timeout.Duration == 0 {
@@ -35,6 +52,6 @@ func (c *Client) logReadarr() {
 	}
 }
 
-func (c *Client) handleReadarr(p *IncomingPayload) (string, error) {
+func (c *Client) handleReadarr(p *ReadarrAddBook) (string, error) {
 	return "", nil
 }

@@ -9,6 +9,13 @@ import (
 
 var errNoLidarr = fmt.Errorf("lidarr is not yet supported")
 
+// LidarrAddArtist is the data we expect to get from discord notifier.
+type LidarrAddArtist struct {
+	Root   string `json:"root_folder"` // optional
+	ID     int    `json:"id"`          // default: 0 (configured instance)
+	Artist string `json:"grid"`        // required if App = readarr
+}
+
 func (c *Config) fixLidarrConfig() {
 	for i := range c.Lidarr {
 		if c.Lidarr[i].Timeout.Duration == 0 {
@@ -38,6 +45,6 @@ func (c *Client) logLidarr() {
 	}
 }
 
-func (c *Client) handleLidarr(p *IncomingPayload) (string, error) {
+func (c *Client) handleLidarr(p *LidarrAddArtist) (string, error) {
 	return "", errNoLidarr
 }

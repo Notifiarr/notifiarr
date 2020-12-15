@@ -6,6 +6,30 @@ import (
 	"golift.io/starr"
 )
 
+/*
+$series                                                        = findSonarrSeries('', $id);
+$sonarrPayload['id']                                         = $series['id'];
+$sonarrPayload['tvdbId']                                     = $series['tvdbId'];
+$sonarrPayload['monitored']                                 = $series['monitored'];
+$sonarrPayload['qualityProfileId']                             = $series['qualityProfileId'];
+$sonarrPayload['path']                                        = $destination .'\\'. end(explode('\\', $series['path']));
+$sonarrPayload['title']                                        = $series['title'];
+$sonarrPayload['seasonFolder']                                = $series['seasonFolder'];
+$sonarrPayload['seriesType']                                = $series['seriesType'];
+$sonarrPayload['languageProfileId']                            = $series['languageProfileId'];
+$sonarrPayload['seasons']                                    = $series['seasons'];
+
+curl_setopt($ch, CURLOPT_URL, 'http://10.1.0.63:8989/api/v3/series/'. $id .'?moveFiles=true');
+
+*/
+
+// SonarrAddSeries is the data we expect to get from discord notifier.
+type SonarrAddSeries struct {
+	Root string `json:"root_folder"` // optional
+	ID   int    `json:"id"`          // default: 0 (configured instance)
+	TVDB int    `json:"tvdb"`        // required if App = sonarr
+}
+
 func (c *Config) fixSonarrConfig() {
 	for i := range c.Sonarr {
 		if c.Sonarr[i].Timeout.Duration == 0 {
@@ -35,6 +59,6 @@ func (c *Client) logSonarr() {
 	}
 }
 
-func (c *Client) handleSonarr(p *IncomingPayload) (string, error) {
+func (c *Client) handleSonarr(p *SonarrAddSeries) (string, error) {
 	return "", nil
 }

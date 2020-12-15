@@ -2,6 +2,8 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang/mock v1.4.4/go.mod h1:l3mdAwkq5BuhzHwde/uurv3sEJeZMXNpwsxVWU71h+4=
+github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
+github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 github.com/nwaples/rardecode v1.1.0 h1:vSxaY8vQhOcVr4mm5e8XllHWTiM4JF507A0Katqw7MQ=
 github.com/nwaples/rardecode v1.1.0/go.mod h1:5DzqNKiOdpKKBH87u8VlvAnPZMXcGRhxWkRpHbbfGS0=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
@@ -26,6 +28,8 @@ golift.io/starr v0.9.4 h1:lKs33b22mLOTwebqv1+Z5Vkv6BJ1oth8g16jlAZxHyk=
 golift.io/starr v0.9.4/go.mod h1:vc04EcdpqkBG7jCySmehqtlQEJ1nrEYeqZmDV1Xpj3k=
 golift.io/starr v0.9.5-0.20201214100742-b6294c69cb42 h1:CKSWUxrQ3FJDLKPDHzRWicYhyEF+QvDjseMWEHPWRPQ=
 golift.io/starr v0.9.5-0.20201214100742-b6294c69cb42/go.mod h1:vc04EcdpqkBG7jCySmehqtlQEJ1nrEYeqZmDV1Xpj3k=
+golift.io/starr v0.9.5-0.20201215015500-6d7656990095 h1:3SjJiJZRqarZprxE5m6vRog9lMLMVubWq50hwMIteGY=
+golift.io/starr v0.9.5-0.20201215015500-6d7656990095/go.mod h1:vc04EcdpqkBG7jCySmehqtlQEJ1nrEYeqZmDV1Xpj3k=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

@@ -58,24 +58,10 @@ type Client struct {
 	server *http.Server
 }
 
-// IncomingPayload is the data we expect to get from discord notifier.
-type IncomingPayload struct {
-	Root  string `json:"root_folder"` // optional
-	Key   string `json:"api_key"`     // required
-	App   string `json:"application"` // required
-	Title string `json:"title"`       // required
-	Year  int    `json:"year"`        // required
-	ID    int    `json:"id"`          // default: 0 (configured instance)
-	TMDB  int    `json:"tmdb"`        // required if App = radarr
-	TVDB  int    `json:"tvdb"`        // required if App = sonarr
-	GRID  int    `json:"grid"`        // required if App = readarr
-}
-
-// OutgoingPayload is the response structure for API requests.
-type OutgoingPayload struct {
-	Status  bool   `json:"status"`
-	Message string `json:"message"`
-}
+// Errors returned by this package.
+var (
+	ErrNilAPIKey = fmt.Errorf("API key cannot be empty")
+)
 
 func new() *Client {
 	return &Client{
@@ -102,24 +88,23 @@ func Start() error {
 	c := new()
 	if c.Flags.parse(os.Args[1:]); c.Flags.verReq {
 		fmt.Println(version.Print(c.Flags.Name()))
-		return nil
+		return nil // nolint: nlreturn
 	} else if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
 		return fmt.Errorf("config file: %w", err)
 	} else if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
 		return fmt.Errorf("environment variables: %w", err)
 	} else if c.APIKey == "" {
-		return fmt.Errorf("API key cannot be empty")
+		return ErrNilAPIKey
 	}
 
 	c.setupLogging()
 	c.Printf("%s v%s Starting! (PID: %v) %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
-	go c.RunWebServer()
-
 	c.fixSonarrConfig()
 	c.fixReadarrConfig()
 	c.fixLidarrConfig()
 	c.fixRadarrConfig()
 
+	go c.RunWebServer()
 	c.logStartupInfo()
 
 	return c.logExitInfo()
