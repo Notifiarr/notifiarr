@@ -10,6 +10,10 @@ import (
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
+	"golift.io/starr/lidarr"
+	"golift.io/starr/radarr"
+	"golift.io/starr/readarr"
+	"golift.io/starr/sonarr"
 	"golift.io/version"
 )
 
@@ -97,6 +101,7 @@ func Start() error {
 		return ErrNilAPIKey
 	}
 
+	c.setupArrApps()
 	c.setupLogging()
 	c.Printf("%s v%s Starting! (PID: %v) %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
 	c.fixSonarrConfig()
@@ -108,4 +113,22 @@ func Start() error {
 	c.logStartupInfo()
 
 	return c.logExitInfo()
+}
+
+func (c *Client) setupArrApps() {
+	for _, r := range c.Config.Radarr {
+		r.Radarr = radarr.New(r.Config)
+	}
+
+	for _, r := range c.Config.Readarr {
+		r.Readarr = readarr.New(r.Config)
+	}
+
+	for _, l := range c.Config.Lidarr {
+		l.Lidarr = lidarr.New(l.Config)
+	}
+
+	for _, s := range c.Config.Sonarr {
+		s.Sonarr = sonarr.New(s.Config)
+	}
 }

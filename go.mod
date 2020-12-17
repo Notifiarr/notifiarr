@@ -3,6 +3,8 @@ module github.com/Go-Lift-TV/discordnotifier-client
 go 1.15
 
 replace golift.io/starr => ../../../golift.io/starr
+replace golift.io/starr/readarr => ../../../golift.io/starr/readarr
+
 require (
 	github.com/gorilla/mux v1.8.0
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c

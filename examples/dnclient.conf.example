@@ -1,4 +1,4 @@
-api_key      = "supersecretapikey"
+api_key      = "api-key-from-discordnotifier.com"
 bind_addr    = ":5454"
 debug        = true
 quiet        = false
@@ -8,7 +8,9 @@ log_files_mb = 100
 timeout      = "15s"
 
 [[radarr]]
-  url                = "http://rzr.golift.tv:7878/radarr"
+  url                = "http://127.0.0.1:7878/radarr"
   api_key            = "XXX"
-  search             = false
-  root_folder        = "/movies/"
+
+[[readarr]]
+  url                = "http://127.0.0.1:8787/readarr"
+  api_key            = "XXX"

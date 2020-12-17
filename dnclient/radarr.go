@@ -9,16 +9,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"golift.io/starr"
+	"golift.io/starr/radarr"
 )
-
-// RadarrConfig represents the input data for a Radarr server.
-type RadarrConfig struct {
-	//	Name      string `json:"name" toml:"name" xml:"name" yaml:"name"`
-	Root   string `json:"root_folder" toml:"root_folder" xml:"root_folder" yaml:"root_folder"`
-	Search bool   `json:"search" toml:"search" xml:"search" yaml:"search"`
-	*starr.Config
-	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
-}
 
 func (c *Config) fixRadarrConfig() {
 	for i := range c.Radarr {
@@ -28,17 +20,23 @@ func (c *Config) fixRadarrConfig() {
 	}
 }
 
+// RadarrConfig represents the input data for a Radarr server.
+type RadarrConfig struct {
+	*starr.Config
+	*radarr.Radarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
 func (c *Client) logRadarr() {
 	if count := len(c.Radarr); count == 1 {
-		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, search:%v, root:%s",
-			c.Radarr[0].URL, c.Radarr[0].APIKey != "", c.Radarr[0].Timeout,
-			c.Radarr[0].ValidSSL, c.Radarr[0].Search, c.Radarr[0].Root)
+		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+			c.Radarr[0].URL, c.Radarr[0].APIKey != "", c.Radarr[0].Timeout, c.Radarr[0].ValidSSL)
 	} else {
 		c.Print(" => Radarr Config:", count, "servers")
 
 		for _, f := range c.Radarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, search:%v, root:%s",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Search, f.Root)
+			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
 		}
 	}
 }
@@ -67,7 +65,7 @@ func (c *Client) radarrRootFolders(r *http.Request) (int, interface{}) {
 	}
 
 	// Get folder list from Radarr.
-	folders, err := radar.Radarr3RootFolders()
+	folders, err := radar.GetRootFolders()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -89,7 +87,7 @@ func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	profiles, err := radar.Radarr3QualityProfiles()
+	profiles, err := radar.GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -111,7 +109,7 @@ func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
 	}
 
 	// Extract payload and check for TMDB ID.
-	payload := &starr.AddMovie{}
+	payload := &radarr.AddMovieInput{}
 	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	} else if payload.TmdbID == 0 {
@@ -119,18 +117,10 @@ func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
 	}
 
 	// Check for existing movie.
-	if m, err := radar.Radarr3Movie(payload.TmdbID); err != nil {
+	if m, err := radar.GetMovie(payload.TmdbID); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TmdbID, ErrExists)
-	}
-
-	// Fix payload data.
-	payload.Monitored = true
-	payload.AddMovieOptions.SearchForMovie = radar.Search
-
-	if payload.RootFolderPath == "" {
-		payload.RootFolderPath = radar.Root
 	}
 
 	if payload.Title == "" {
@@ -143,9 +133,10 @@ func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
 	}
 
 	// Add movie using fixed payload.
-	if err := radar.Radarr3AddMovie(payload); err != nil {
+	movie, err := radar.AddMovie(payload)
+	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
 	}
 
-	return http.StatusCreated, fmt.Sprintf("added %d", payload.TmdbID)
+	return http.StatusCreated, movie
 }
