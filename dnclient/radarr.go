@@ -12,6 +12,19 @@ import (
 	"golift.io/starr/radarr"
 )
 
+func (c *Client) radarrMethods(r *mux.Router) {
+	for _, r := range c.Config.Radarr {
+		r.Radarr = radarr.New(r.Config)
+	}
+
+	r.Handle("/api/radarr/add/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.radarrAddMovie))).Methods("POST")
+	r.Handle("/api/radarr/qualityProfiles/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.radarrProfiles))).Methods("GET")
+	r.Handle("/api/radarr/rootFolder/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.radarrRootFolders))).Methods("GET")
+}
+
 func (c *Config) fixRadarrConfig() {
 	for i := range c.Radarr {
 		if c.Radarr[i].Timeout.Duration == 0 {

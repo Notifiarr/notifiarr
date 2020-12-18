@@ -12,6 +12,21 @@ import (
 	"golift.io/starr/readarr"
 )
 
+func (c *Client) readarrMethods(r *mux.Router) {
+	for _, r := range c.Config.Readarr {
+		r.Readarr = readarr.New(r.Config)
+	}
+
+	r.Handle("/api/readarr/add/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.readarrAddBook))).Methods("POST")
+	r.Handle("/api/readarr/metadataProfiles/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.readarrMetaProfiles))).Methods("GET")
+	r.Handle("/api/readarr/qualityProfiles/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.readarrProfiles))).Methods("GET")
+	r.Handle("/api/readarr/rootFolder/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.readarrRootFolders))).Methods("GET")
+}
+
 func (c *Config) fixReadarrConfig() {
 	for i := range c.Readarr {
 		if c.Readarr[i].Timeout.Duration == 0 {

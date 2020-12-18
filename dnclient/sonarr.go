@@ -12,6 +12,21 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+func (c *Client) sonarrMethods(r *mux.Router) {
+	for _, s := range c.Config.Sonarr {
+		s.Sonarr = sonarr.New(s.Config)
+	}
+
+	r.Handle("/api/sonarr/add/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.sonarrAddSeries))).Methods("POST")
+	r.Handle("/api/sonarr/qualityProfiles/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.sonarrProfiles))).Methods("GET")
+	r.Handle("/api/sonarr/languageProfiles/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.sonarrLangProfiles))).Methods("GET")
+	r.Handle("/api/sonarr/rootFolder/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.sonarrRootFolders))).Methods("GET")
+}
+
 func (c *Config) fixSonarrConfig() {
 	for i := range c.Sonarr {
 		if c.Sonarr[i].Timeout.Duration == 0 {

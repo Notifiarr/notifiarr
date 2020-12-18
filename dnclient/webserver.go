@@ -27,47 +27,13 @@ var (
 // RunWebServer starts the web server.
 func (c *Client) RunWebServer() {
 	r := mux.NewRouter()
-	// Generic
+
 	r.PathPrefix("/").Handler(c.responseWrapper(c.notFound))
 	r.Handle("/api/status", c.responseWrapper(c.statusResponse)).Methods("GET", "HEAD")
-
-	// Radarr
-	r.Handle("/api/radarr/add/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.radarrAddMovie))).Methods("POST")
-	r.Handle("/api/radarr/qualityProfiles/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.radarrProfiles))).Methods("GET")
-	r.Handle("/api/radarr/rootFolder/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.radarrRootFolders))).Methods("GET")
-
-	// Readarr
-	r.Handle("/api/readarr/add/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.readarrAddBook))).Methods("POST")
-	r.Handle("/api/readarr/metadataProfiles/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.readarrMetaProfiles))).Methods("GET")
-	r.Handle("/api/readarr/qualityProfiles/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.readarrProfiles))).Methods("GET")
-	r.Handle("/api/readarr/rootFolder/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.readarrRootFolders))).Methods("GET")
-
-	// Sonarr
-	r.Handle("/api/sonarr/add/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.sonarrAddSeries))).Methods("POST")
-	r.Handle("/api/sonarr/qualityProfiles/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.sonarrProfiles))).Methods("GET")
-	r.Handle("/api/sonarr/languageProfiles/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.sonarrLangProfiles))).Methods("GET")
-	r.Handle("/api/sonarr/rootFolder/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.sonarrRootFolders))).Methods("GET")
-
-	// Lidarr
-	r.Handle("/api/lidarr/add/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.lidarrAddAlbum))).Methods("POST")
-	r.Handle("/api/lidarr/qualityProfiles/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.lidarrProfiles))).Methods("GET")
-	r.Handle("/api/lidarr/qualityProfiles/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.lidarrQualityDefs))).Methods("GET")
-	r.Handle("/api/lidarr/rootFolder/{id:[0-9]+}",
-		c.checkAPIKey(c.responseWrapper(c.lidarrRootFolders))).Methods("GET")
+	c.radarrMethods(r)
+	c.readarrMethods(r)
+	c.lidarrMethods(r)
+	c.sonarrMethods(r)
 
 	c.server = &http.Server{
 		Handler:      r,

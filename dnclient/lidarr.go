@@ -16,6 +16,21 @@ import (
 [9:19 PM] nitsua: music brainz i believe is the source for it
 */
 
+func (c *Client) lidarrMethods(r *mux.Router) {
+	for _, l := range c.Config.Lidarr {
+		l.Lidarr = lidarr.New(l.Config)
+	}
+
+	r.Handle("/api/lidarr/add/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.lidarrAddAlbum))).Methods("POST")
+	r.Handle("/api/lidarr/qualityProfiles/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.lidarrProfiles))).Methods("GET")
+	r.Handle("/api/lidarr/qualityProfiles/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.lidarrQualityDefs))).Methods("GET")
+	r.Handle("/api/lidarr/rootFolder/{id:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.lidarrRootFolders))).Methods("GET")
+}
+
 func (c *Config) fixLidarrConfig() {
 	for i := range c.Lidarr {
 		if c.Lidarr[i].Timeout.Duration == 0 {
