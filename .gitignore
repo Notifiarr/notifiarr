@@ -12,7 +12,7 @@
 /*.txz
 /*.*.arm
 /*.*.exe
-/.*.macos
+/*.*.macos
 /*.*.linux
 /*.*.freebsd
 /*.rb
