@@ -71,109 +71,27 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 
 	c.router.Handle(path.Join("/", c.Config.WebRoot, "api", string(app), api),
 		c.checkAPIKey(c.responseWrapper(func(r *http.Request) (int, interface{}) {
-			switch app {
-			case Radarr:
-				return c.setRadarr(r, next)
-			case Lidarr:
-				return c.setLidarr(r, next)
-			case Sonarr:
-				return c.setSonarr(r, next)
-			case Readarr:
-				return c.setReadarr(r, next)
+			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
+			case app == Radarr && (id > len(c.Config.Radarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr)
+			case app == Radarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Radarr, c.Config.Radarr[id-1])))
+			case app == Lidarr && (id > len(c.Config.Lidarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr)
+			case app == Lidarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Lidarr, c.Config.Lidarr[id-1])))
+			case app == Sonarr && (id > len(c.Config.Sonarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr)
+			case app == Sonarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Sonarr, c.Config.Sonarr[id-1])))
+			case app == Readarr && (id > len(c.Config.Readarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr)
+			case app == Readarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Readarr, c.Config.Readarr[id-1])))
 			default: // unknown app, just run the handler.
 				return next(r)
 			}
 		}))).Methods(method...)
-}
-
-/* Every API call runs one of these methods to save the interface into a request context for the respective app. */
-
-// setLidarr saves the lidar config struct in a context so other methods can use it easily.
-func (c *Client) setLidarr(r *http.Request, fn apiHandle) (int, interface{}) {
-	var (
-		id, _ = strconv.Atoi(mux.Vars(r)["id"])
-		app   *LidarrConfig
-	)
-
-	for i, a := range c.Config.Lidarr {
-		if i == id-1 { // discordnotifier wants 1-indexes
-			app = a
-
-			break
-		}
-	}
-
-	if app == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr)
-	}
-
-	return fn(r.WithContext(context.WithValue(r.Context(), Lidarr, app)))
-}
-
-// setRadarr saves the radar config struct in a context so other methods can use it easily.
-func (c *Client) setRadarr(r *http.Request, fn apiHandle) (int, interface{}) {
-	var (
-		id, _ = strconv.Atoi(mux.Vars(r)["id"])
-		app   *RadarrConfig
-	)
-
-	for i, a := range c.Config.Radarr {
-		if i == id-1 { // discordnotifier wants 1-indexes
-			app = a
-
-			break
-		}
-	}
-
-	if app == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr)
-	}
-
-	return fn(r.WithContext(context.WithValue(r.Context(), Radarr, app)))
-}
-
-// setReadarr saves the readar config struct in a context so other methods can use it easily.
-func (c *Client) setReadarr(r *http.Request, next apiHandle) (int, interface{}) {
-	var (
-		id, _ = strconv.Atoi(mux.Vars(r)["id"])
-		app   *ReadarrConfig
-	)
-
-	for i, a := range c.Config.Readarr {
-		if i == id-1 { // discordnotifier wants 1-indexes
-			app = a
-
-			break
-		}
-	}
-
-	if app == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr)
-	}
-
-	return next(r.WithContext(context.WithValue(r.Context(), Readarr, app)))
-}
-
-// setSonarr saves the sonar config struct in a context so other methods can use it easily.
-func (c *Client) setSonarr(r *http.Request, fn apiHandle) (int, interface{}) {
-	var (
-		id, _ = strconv.Atoi(mux.Vars(r)["id"])
-		app   *SonarrConfig
-	)
-
-	for i, a := range c.Config.Sonarr {
-		if i == id-1 { // discordnotifier wants 1-indexes
-			app = a
-
-			break
-		}
-	}
-
-	if app == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr)
-	}
-
-	return fn(r.WithContext(context.WithValue(r.Context(), Sonarr, app)))
 }
 
 /* Every API call runs one of these methods to find the interface for the respective app. */

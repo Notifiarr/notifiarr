@@ -59,7 +59,7 @@ func (c *Client) InitStartup() {
 	}
 }
 
-// Exit stops the web server and logs our exit messages.
+// Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
 	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-c.signal)
@@ -79,11 +79,10 @@ func (c *Client) Exit() error {
 // initLidarr is called on startup to fix the config and print info about each configured server.
 func (c *Client) initLidarr() {
 	for i := range c.Config.Lidarr {
+		c.Config.Lidarr[i].Lidarr = lidarr.New(c.Config.Lidarr[i].Config)
 		if c.Config.Lidarr[i].Timeout.Duration == 0 {
 			c.Config.Lidarr[i].Timeout.Duration = c.Config.Timeout.Duration
 		}
-
-		c.Config.Lidarr[i].Lidarr = lidarr.New(c.Config.Lidarr[i].Config)
 	}
 
 	if count := len(c.Config.Lidarr); count == 1 {
@@ -102,11 +101,10 @@ func (c *Client) initLidarr() {
 // initRadarr is called on startup to fix the config and print info about each configured server.
 func (c *Client) initRadarr() {
 	for i := range c.Config.Radarr {
+		c.Config.Radarr[i].Radarr = radarr.New(c.Config.Radarr[i].Config)
 		if c.Config.Radarr[i].Timeout.Duration == 0 {
 			c.Config.Radarr[i].Timeout.Duration = c.Config.Timeout.Duration
 		}
-
-		c.Config.Radarr[i].Radarr = radarr.New(c.Config.Radarr[i].Config)
 	}
 
 	if count := len(c.Config.Radarr); count == 1 {
@@ -125,11 +123,10 @@ func (c *Client) initRadarr() {
 // initReadarr is called on startup to fix the config and print info about each configured server.
 func (c *Client) initReadarr() {
 	for i := range c.Config.Readarr {
+		c.Config.Readarr[i].Readarr = readarr.New(c.Config.Readarr[i].Config)
 		if c.Config.Readarr[i].Timeout.Duration == 0 {
 			c.Config.Readarr[i].Timeout.Duration = c.Config.Timeout.Duration
 		}
-
-		c.Config.Readarr[i].Readarr = readarr.New(c.Config.Readarr[i].Config)
 	}
 
 	if count := len(c.Config.Readarr); count == 1 {
@@ -148,11 +145,10 @@ func (c *Client) initReadarr() {
 // initSonarr is called on startup to fix the config and print info about each configured server.
 func (c *Client) initSonarr() {
 	for i := range c.Config.Sonarr {
+		c.Config.Sonarr[i].Sonarr = sonarr.New(c.Config.Sonarr[i].Config)
 		if c.Config.Sonarr[i].Timeout.Duration == 0 {
 			c.Config.Sonarr[i].Timeout.Duration = c.Config.Timeout.Duration
 		}
-
-		c.Config.Sonarr[i].Sonarr = sonarr.New(c.Config.Sonarr[i].Config)
 	}
 
 	if count := len(c.Config.Sonarr); count == 1 {
