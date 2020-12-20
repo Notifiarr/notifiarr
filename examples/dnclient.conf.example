@@ -1,0 +1,24 @@
+api_key      = "api-key-from-discordnotifier.com"
+bind_addr    = ":5454"
+debug        = true
+quiet        = false
+#log_file    = "dnclient.log"
+log_files    = 10
+log_files_mb = 100
+timeout      = "15s"
+
+[[radarr]]
+  url                = "http://127.0.0.1:7878/radarr"
+  api_key            = "XXX"
+
+[[readarr]]
+  url                = "http://127.0.0.1:8787/readarr"
+  api_key            = "XXX"
+
+[[sonarr]]
+  url                = "http://127.0.0.1:8989/"
+  api_key            = "XXX"
+
+[[lidarr]]
+  url                = "http://127.0.0.1:8686/"
+  api_key            = "ZZZ"

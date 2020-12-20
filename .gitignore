@@ -1,0 +1,35 @@
+# Change this line.
+/discordnotifier-client
+
+# The rest is probably fine.
+/rsrc.syso
+/*.conf
+/*.gz
+/*.zip
+/unpackerr*.1
+/*.deb
+/*.rpm
+/*.txz
+/*.*.arm
+/*.*.exe
+/*.*.macos
+/*.*.linux
+/*.*.freebsd
+/*.rb
+*.sha256
+/vendor
+.DS_Store
+*~
+/package_build_*
+/release
+MANUAL
+MANUAL.html
+README
+README.html
+/*_manual.html
+/homebrew-mugs
+.secret*files.tar
+github_deploy_key*
+.metadata.make
+/after-install-rendered.sh
+/before-remove-rendered.sh
