@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"path"
 	"strconv"
 	"sync"
 
@@ -13,29 +12,6 @@ import (
 	"golift.io/starr/radarr"
 )
 
-func (c *Client) radarrMethods(r *mux.Router) {
-	for _, r := range c.Config.Radarr {
-		r.Radarr = radarr.New(r.Config)
-	}
-
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/add/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.radarrAddMovie))).Methods("POST")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/check/{id:[0-9]+}/{tmdbid:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.radarrCheckMovie))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/qualityProfiles/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.radarrProfiles))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/rootFolder/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.radarrRootFolders))).Methods("GET")
-}
-
-func (c *Config) fixRadarrConfig() {
-	for i := range c.Radarr {
-		if c.Radarr[i].Timeout.Duration == 0 {
-			c.Radarr[i].Timeout.Duration = c.Timeout.Duration
-		}
-	}
-}
-
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
 	*starr.Config
@@ -43,42 +19,16 @@ type RadarrConfig struct {
 	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
-func (c *Client) logRadarr() {
-	if count := len(c.Radarr); count == 1 {
-		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Radarr[0].URL, c.Radarr[0].APIKey != "", c.Radarr[0].Timeout, c.Radarr[0].ValidSSL)
-	} else {
-		c.Print(" => Radarr Config:", count, "servers")
-
-		for _, f := range c.Radarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-}
-
-// getRadarr finds a radar based on the passed-in ID.
-// Every Radarr handler calls this.
-func (c *Client) getRadarr(id string) *RadarrConfig {
-	j, _ := strconv.Atoi(id)
-
-	for i, radar := range c.Radarr {
-		if i != j-1 { // discordnotifier wants 1-indexes
-			continue
-		}
-
-		return radar
-	}
-
-	return nil
+// radarrHandlers is called once on startup to register the web API paths.
+func (c *Client) radarrHandlers() {
+	c.serveAPIpath(Radarr, "/add/{id:[0-9]+}", "POST", c.radarrAddMovie)
+	c.serveAPIpath(Radarr, "/check/{id:[0-9]+}/{tmdbid:[0-9]+}", "GET", c.radarrCheckMovie)
+	c.serveAPIpath(Radarr, "/qualityProfiles/{id:[0-9]+}", "GET", c.radarrProfiles)
+	c.serveAPIpath(Radarr, "/rootFolder/{id:[0-9]+}", "GET", c.radarrRootFolders)
 }
 
 func (c *Client) radarrRootFolders(r *http.Request) (int, interface{}) {
-	// Make sure the provided radarr id exists.
-	radar := c.getRadarr(mux.Vars(r)["id"])
-	if radar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
-	}
+	radar := getRadarr(r)
 
 	// Get folder list from Radarr.
 	folders, err := radar.GetRootFolders()
@@ -96,11 +46,7 @@ func (c *Client) radarrRootFolders(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
-	// Make sure the provided radarr id exists.
-	radar := c.getRadarr(mux.Vars(r)["id"])
-	if radar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
-	}
+	radar := getRadarr(r)
 
 	// Get the profiles from radarr.
 	profiles, err := radar.GetQualityProfiles()
@@ -118,11 +64,7 @@ func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) radarrCheckMovie(r *http.Request) (int, interface{}) {
-	radar := c.getRadarr(mux.Vars(r)["id"])
-	if radar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
-	}
-
+	radar := getRadarr(r)
 	tmdbID, _ := strconv.Atoi(mux.Vars(r)["tmdbid"])
 
 	// Check for existing movie.
@@ -136,11 +78,7 @@ func (c *Client) radarrCheckMovie(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
-	// Make sure the provided radarr id exists.
-	radar := c.getRadarr(mux.Vars(r)["id"])
-	if radar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
-	}
+	radar := getRadarr(r)
 
 	// Extract payload and check for TMDB ID.
 	payload := &radarr.AddMovieInput{}

@@ -1,10 +1,10 @@
+//nolint:dupl
 package dnclient
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"path"
 	"strconv"
 	"sync"
 
@@ -13,31 +13,6 @@ import (
 	"golift.io/starr/readarr"
 )
 
-func (c *Client) readarrMethods(r *mux.Router) {
-	for _, r := range c.Config.Readarr {
-		r.Readarr = readarr.New(r.Config)
-	}
-
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/add/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.readarrAddBook))).Methods("POST")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/check/{id:[0-9]+}/{grid:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.readarrCheckBook))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/metadataProfiles/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.readarrMetaProfiles))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/qualityProfiles/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.readarrProfiles))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/rootFolder/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.readarrRootFolders))).Methods("GET")
-}
-
-func (c *Config) fixReadarrConfig() {
-	for i := range c.Readarr {
-		if c.Readarr[i].Timeout.Duration == 0 {
-			c.Readarr[i].Timeout.Duration = c.Timeout.Duration
-		}
-	}
-}
-
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
 	*starr.Config
@@ -45,42 +20,17 @@ type ReadarrConfig struct {
 	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
-func (c *Client) logReadarr() {
-	if count := len(c.Readarr); count == 1 {
-		c.Printf(" => Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Readarr[0].URL, c.Readarr[0].APIKey != "", c.Readarr[0].Timeout, c.Readarr[0].ValidSSL)
-	} else {
-		c.Print(" => Readarr Config:", count, "servers")
-
-		for _, f := range c.Readarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-}
-
-// getReadarr finds a Readarr based on the passed-in ID.
-// Every Readarr handler calls this.
-func (c *Client) getReadarr(id string) *ReadarrConfig {
-	j, _ := strconv.Atoi(id)
-
-	for i, app := range c.Readarr {
-		if i != j-1 { // discordnotifier wants 1-indexes
-			continue
-		}
-
-		return app
-	}
-
-	return nil
+// readarrHandlers is called once on startup to register the web API paths.
+func (c *Client) readarrHandlers() {
+	c.serveAPIpath(Readarr, "/add/{id:[0-9]+}", "POST", c.readarrAddBook)
+	c.serveAPIpath(Readarr, "/check/{id:[0-9]+}/{grid:[0-9]+}", "GET", c.readarrCheckBook)
+	c.serveAPIpath(Readarr, "/metadataProfiles/{id:[0-9]+}", "GET", c.readarrMetaProfiles)
+	c.serveAPIpath(Readarr, "/qualityProfiles/{id:[0-9]+}", "GET", c.readarrProfiles)
+	c.serveAPIpath(Readarr, "/rootFolder/{id:[0-9]+}", "GET", c.readarrRootFolders)
 }
 
 func (c *Client) readarrRootFolders(r *http.Request) (int, interface{}) {
-	// Make sure the provided readarr id exists.
-	readar := c.getReadarr(mux.Vars(r)["id"])
-	if readar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoReadarr)
-	}
+	readar := getReadarr(r)
 
 	// Get folder list from Readarr.
 	folders, err := readar.GetRootFolders()
@@ -98,11 +48,7 @@ func (c *Client) readarrRootFolders(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) readarrMetaProfiles(r *http.Request) (int, interface{}) {
-	// Make sure the provided readarr id exists.
-	readar := c.getReadarr(mux.Vars(r)["id"])
-	if readar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoReadarr)
-	}
+	readar := getReadarr(r)
 
 	// Get the metadata profiles from readarr.
 	profiles, err := readar.GetMetadataProfiles()
@@ -120,11 +66,7 @@ func (c *Client) readarrMetaProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) readarrProfiles(r *http.Request) (int, interface{}) {
-	// Make sure the provided readarr id exists.
-	readar := c.getReadarr(mux.Vars(r)["id"])
-	if readar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoReadarr)
-	}
+	readar := getReadarr(r)
 
 	// Get the profiles from readarr.
 	profiles, err := readar.GetQualityProfiles()
@@ -142,12 +84,9 @@ func (c *Client) readarrProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) readarrCheckBook(r *http.Request) (int, interface{}) {
-	readar := c.getReadarr(mux.Vars(r)["id"])
-	if readar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoReadarr)
-	}
-
+	readar := getReadarr(r)
 	grid, _ := strconv.Atoi(mux.Vars(r)["grid"])
+
 	// Check for existing book.
 	if m, err := readar.GetBook(grid); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
@@ -159,11 +98,7 @@ func (c *Client) readarrCheckBook(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) readarrAddBook(r *http.Request) (int, interface{}) {
-	// Make sure the provided readarr id exists.
-	readar := c.getReadarr(mux.Vars(r)["id"])
-	if readar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoReadarr)
-	}
+	readar := getReadarr(r)
 
 	// Extract payload and check for TMDB ID.
 	payload := &readarr.AddBookInput{}

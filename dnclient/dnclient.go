@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
@@ -56,10 +57,12 @@ type Logger struct {
 
 // Client stores all the running data.
 type Client struct {
-	Flags *Flags
-	*Config
 	*Logger
+	Flags  *Flags
+	Config *Config
 	server *http.Server
+	router *mux.Router
+	signal chan os.Signal
 }
 
 // Errors returned by this package.
@@ -70,6 +73,7 @@ var (
 // New returns a new Client pointer with default settings.
 func New() *Client {
 	return &Client{
+		signal: make(chan os.Signal, 1),
 		Logger: &Logger{Logger: log.New(os.Stdout, "", log.LstdFlags)},
 		Config: &Config{
 			WebRoot:   "/",
@@ -105,19 +109,14 @@ func Start() error {
 		return fmt.Errorf("config file: %w", err)
 	} else if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
 		return fmt.Errorf("environment variables: %w", err)
-	} else if c.APIKey == "" {
+	} else if c.Config.APIKey == "" {
 		return ErrNilAPIKey
 	}
 
-	c.setupLogging()
-	c.Printf("%s v%s Starting! (PID: %v) %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
-	c.fixSonarrConfig()
-	c.fixReadarrConfig()
-	c.fixLidarrConfig()
-	c.fixRadarrConfig()
+	c.SetupLogging()
+	c.Printf("%s v%s Starting! [PID: %v] %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
+	c.InitStartup()
+	c.RunWebServer()
 
-	go c.RunWebServer()
-	c.logStartupInfo()
-
-	return c.logExitInfo()
+	return c.Exit()
 }

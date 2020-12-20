@@ -1,10 +1,10 @@
+//nolint:dupl
 package dnclient
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"path"
 	"strconv"
 	"sync"
 
@@ -13,31 +13,6 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-func (c *Client) sonarrMethods(r *mux.Router) {
-	for _, s := range c.Config.Sonarr {
-		s.Sonarr = sonarr.New(s.Config)
-	}
-
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/add/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.sonarrAddSeries))).Methods("POST")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/check/{id:[0-9]+}/{tvdbid:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.sonarrCheckSeries))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/qualityProfiles/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.sonarrProfiles))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/languageProfiles/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.sonarrLangProfiles))).Methods("GET")
-	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/rootFolder/{id:[0-9]+}"),
-		c.checkAPIKey(c.responseWrapper(c.sonarrRootFolders))).Methods("GET")
-}
-
-func (c *Config) fixSonarrConfig() {
-	for i := range c.Sonarr {
-		if c.Sonarr[i].Timeout.Duration == 0 {
-			c.Sonarr[i].Timeout.Duration = c.Timeout.Duration
-		}
-	}
-}
-
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
 	*starr.Config
@@ -45,42 +20,17 @@ type SonarrConfig struct {
 	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
-func (c *Client) logSonarr() {
-	if count := len(c.Sonarr); count == 1 {
-		c.Printf(" => Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Sonarr[0].URL, c.Sonarr[0].APIKey != "", c.Sonarr[0].Timeout, c.Sonarr[0].ValidSSL)
-	} else {
-		c.Print(" => Sonarr Config:", count, "servers")
-
-		for _, f := range c.Sonarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-}
-
-// getSonarr finds a Sonarr based on the passed-in ID.
-// Every Sonarr handler calls this.
-func (c *Client) getSonarr(id string) *SonarrConfig {
-	j, _ := strconv.Atoi(id)
-
-	for i, app := range c.Sonarr {
-		if i != j-1 { // discordnotifier wants 1-indexes
-			continue
-		}
-
-		return app
-	}
-
-	return nil
+// sonarrHandlers is called once on startup to register the web API paths.
+func (c *Client) sonarrHandlers() {
+	c.serveAPIpath(Sonarr, "/add/{id:[0-9]+}", "POST", c.sonarrAddSeries)
+	c.serveAPIpath(Sonarr, "/check/{id:[0-9]+}/{tvdbid:[0-9]+}", "GET", c.sonarrCheckSeries)
+	c.serveAPIpath(Sonarr, "/qualityProfiles/{id:[0-9]+}", "GET", c.sonarrProfiles)
+	c.serveAPIpath(Sonarr, "/languageProfiles/{id:[0-9]+}", "GET", c.sonarrLangProfiles)
+	c.serveAPIpath(Sonarr, "/rootFolder/{id:[0-9]+}", "GET", c.sonarrRootFolders)
 }
 
 func (c *Client) sonarrRootFolders(r *http.Request) (int, interface{}) {
-	// Make sure the provided sonarr id exists.
-	sonar := c.getSonarr(mux.Vars(r)["id"])
-	if sonar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoSonarr)
-	}
+	sonar := getSonarr(r)
 
 	// Get folder list from Sonarr.
 	folders, err := sonar.GetRootFolders()
@@ -98,11 +48,7 @@ func (c *Client) sonarrRootFolders(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrProfiles(r *http.Request) (int, interface{}) {
-	// Make sure the provided sonarr id exists.
-	sonar := c.getSonarr(mux.Vars(r)["id"])
-	if sonar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoSonarr)
-	}
+	sonar := getSonarr(r)
 
 	// Get the profiles from sonarr.
 	profiles, err := sonar.GetQualityProfiles()
@@ -120,11 +66,7 @@ func (c *Client) sonarrProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
-	// Make sure the provided sonarr id exists.
-	sonar := c.getSonarr(mux.Vars(r)["id"])
-	if sonar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoSonarr)
-	}
+	sonar := getSonarr(r)
 
 	// Get the profiles from sonarr.
 	profiles, err := sonar.GetLanguageProfiles()
@@ -142,12 +84,9 @@ func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
-	sonar := c.getSonarr(mux.Vars(r)["id"])
-	if sonar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoSonarr)
-	}
-
+	sonar := getSonarr(r)
 	tvdbid, _ := strconv.Atoi(mux.Vars(r)["tvdbid"])
+
 	// Check for existing series.
 	if m, err := sonar.GetSeries(tvdbid); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
@@ -159,11 +98,7 @@ func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrAddSeries(r *http.Request) (int, interface{}) {
-	// Make sure the provided sonarr id exists.
-	sonar := c.getSonarr(mux.Vars(r)["id"])
-	if sonar == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoSonarr)
-	}
+	sonar := getSonarr(r)
 
 	// Extract payload and check for TMDB ID.
 	payload := &sonarr.AddSeriesInput{}

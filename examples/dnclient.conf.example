@@ -11,7 +11,7 @@ api_key = "api-key-from-discordnotifier.com"
 bind_addr = "0.0.0.0:5454"
 
 # Debug logs a bit more data to the logs and is not very useful right now.
-debug = true
+debug = false
 
 # Quiet makes the app not log anything to output.
 # Recommend setting a log file if you make the app quiet.
