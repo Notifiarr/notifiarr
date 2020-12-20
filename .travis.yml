@@ -75,6 +75,6 @@ deploy:
     on:
       tags: true
   - provider: script
-    script: scripts/formula-deploy.sh
+    script: bash scripts/formula-deploy.sh
     on:
       tags: true
