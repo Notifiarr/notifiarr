@@ -93,7 +93,7 @@ func initWindowsApplicationIco() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "init/windows/application.ico", size: 12206, mode: os.FileMode(420), modTime: time.Unix(1608418956, 0)}
+	info := bindataFileInfo{name: "init/windows/application.ico", size: 12206, mode: os.FileMode(420), modTime: time.Unix(1587356420, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
