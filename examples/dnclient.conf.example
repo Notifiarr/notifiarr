@@ -5,10 +5,9 @@
 # This API key must be copied from your discordnotifier.com account.
 api_key = "api-key-from-discordnotifier.com"
 
-# The bind address must have a colon in it and end with a port number.
-# You can use 127.0.0.1:5454 to only listen on localhost.
-# Using 0.0.0.0 means listen on any IP the computer has.
-bind_addr = "0.0.0.0:5454"
+# The ip:port or port to listen on for incoming web requests.
+# You can use 127.0.0.1:5454 to listen only on localhost.
+bind_addr = "5454"
 
 # Debug logs a bit more data to the logs and is not very useful right now.
 debug = false

@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"path"
 	"strconv"
+	"sync"
 
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
@@ -17,7 +19,6 @@ import (
 
 /* This file contains:
  *** The middleware procedure that stores the app interface in a request context.
- *** Startup logging procedures for each app.
  *** Procedures to save and fetch an app interface into/from a request content.
  */
 
@@ -33,10 +34,42 @@ const (
 	Lidarr  App = "lidarr"
 )
 
-// serveAPIpath makes adding API paths a little cleaner.
+// LidarrConfig represents the input data for a Lidarr server.
+type LidarrConfig struct {
+	*starr.Config
+	*lidarr.Lidarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+// RadarrConfig represents the input data for a Radarr server.
+type RadarrConfig struct {
+	*starr.Config
+	*radarr.Radarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+// ReadarrConfig represents the input data for a Readarr server.
+type ReadarrConfig struct {
+	*starr.Config
+	*readarr.Readarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+// SonarrConfig represents the input data for a Sonarr server.
+type SonarrConfig struct {
+	*starr.Config
+	*sonarr.Sonarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+// handleAPIpath makes adding API paths a little cleaner.
 // This also grabs the app struct and saves it in a context before calling the handler.
-func (c *Client) serveAPIpath(app App, webPath, method string, next apiHandle) {
-	c.router.Handle(path.Join("/", c.Config.WebRoot, "api", string(app), webPath),
+func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...string) {
+	if len(method) == 0 {
+		method = []string{"GET"}
+	}
+
+	c.router.Handle(path.Join("/", c.Config.WebRoot, "api", string(app), api),
 		c.checkAPIKey(c.responseWrapper(func(r *http.Request) (int, interface{}) {
 			switch app {
 			case Radarr:
@@ -50,99 +83,7 @@ func (c *Client) serveAPIpath(app App, webPath, method string, next apiHandle) {
 			default: // unknown app, just run the handler.
 				return next(r)
 			}
-		}))).Methods(method)
-}
-
-// initLidarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initLidarr() {
-	for i := range c.Config.Lidarr {
-		if c.Config.Lidarr[i].Timeout.Duration == 0 {
-			c.Config.Lidarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-
-		c.Config.Lidarr[i].Lidarr = lidarr.New(c.Config.Lidarr[i].Config)
-	}
-
-	if count := len(c.Config.Lidarr); count == 1 {
-		c.Printf(" => Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Lidarr[0].URL, c.Config.Lidarr[0].APIKey != "", c.Config.Lidarr[0].Timeout, c.Config.Lidarr[0].ValidSSL)
-	} else {
-		c.Print(" => Lidarr Config:", count, "servers")
-
-		for _, f := range c.Config.Lidarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-}
-
-// initRadarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initRadarr() {
-	for i := range c.Config.Radarr {
-		if c.Config.Radarr[i].Timeout.Duration == 0 {
-			c.Config.Radarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-
-		c.Config.Radarr[i].Radarr = radarr.New(c.Config.Radarr[i].Config)
-	}
-
-	if count := len(c.Config.Radarr); count == 1 {
-		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Radarr[0].URL, c.Config.Radarr[0].APIKey != "", c.Config.Radarr[0].Timeout, c.Config.Radarr[0].ValidSSL)
-	} else {
-		c.Print(" => Radarr Config:", count, "servers")
-
-		for _, f := range c.Config.Radarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-}
-
-// initReadarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initReadarr() {
-	for i := range c.Config.Readarr {
-		if c.Config.Readarr[i].Timeout.Duration == 0 {
-			c.Config.Readarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-
-		c.Config.Readarr[i].Readarr = readarr.New(c.Config.Readarr[i].Config)
-	}
-
-	if count := len(c.Config.Readarr); count == 1 {
-		c.Printf(" => Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Readarr[0].URL, c.Config.Readarr[0].APIKey != "", c.Config.Readarr[0].Timeout, c.Config.Readarr[0].ValidSSL)
-	} else {
-		c.Print(" => Readarr Config:", count, "servers")
-
-		for _, f := range c.Config.Readarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-}
-
-// initSonarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initSonarr() {
-	for i := range c.Config.Sonarr {
-		if c.Config.Sonarr[i].Timeout.Duration == 0 {
-			c.Config.Sonarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-
-		c.Config.Sonarr[i].Sonarr = sonarr.New(c.Config.Sonarr[i].Config)
-	}
-
-	if count := len(c.Config.Sonarr); count == 1 {
-		c.Printf(" => Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Sonarr[0].URL, c.Config.Sonarr[0].APIKey != "", c.Config.Sonarr[0].Timeout, c.Config.Sonarr[0].ValidSSL)
-	} else {
-		c.Print(" => Sonarr Config:", count, "servers")
-
-		for _, f := range c.Config.Sonarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
+		}))).Methods(method...)
 }
 
 /* Every API call runs one of these methods to save the interface into a request context for the respective app. */

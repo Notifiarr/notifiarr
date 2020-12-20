@@ -14,12 +14,13 @@ import (
 	"golift.io/version"
 )
 
+// Application Defaults.
 const (
-	defaultLogFileMb = 100
-	defaultLogFiles  = 0 // delete none
-	defaultTimeout   = 5 * time.Second
-	defaultBindAddr  = "0.0.0.0:5454"
-	defaultEnvPrefix = "DN"
+	DefaultLogFileMb = 100
+	DefaultLogFiles  = 0 // delete none
+	DefaultTimeout   = 5 * time.Second
+	DefaultBindAddr  = "0.0.0.0:5454"
+	DefaultEnvPrefix = "DN"
 )
 
 // Flags are our CLI input flags.
@@ -67,32 +68,33 @@ type Client struct {
 
 // Errors returned by this package.
 var (
-	ErrNilAPIKey = fmt.Errorf("API key cannot be empty")
+	ErrNilAPIKey = fmt.Errorf("API key may not be empty")
+	ErrNoApps    = fmt.Errorf("0 applications configured")
 )
 
-// New returns a new Client pointer with default settings.
-func New() *Client {
+// NewDefaults returns a new Client pointer with default settings.
+func NewDefaults() *Client {
 	return &Client{
 		signal: make(chan os.Signal, 1),
 		Logger: &Logger{Logger: log.New(os.Stdout, "", log.LstdFlags)},
 		Config: &Config{
 			WebRoot:   "/",
-			LogFiles:  defaultLogFiles,
-			LogFileMb: defaultLogFileMb,
-			BindAddr:  defaultBindAddr,
-			Timeout:   cnfg.Duration{Duration: defaultTimeout},
+			LogFiles:  DefaultLogFiles,
+			LogFileMb: DefaultLogFileMb,
+			BindAddr:  DefaultBindAddr,
+			Timeout:   cnfg.Duration{Duration: DefaultTimeout},
 		}, Flags: &Flags{
 			FlagSet:    flag.NewFlagSet("discordnotifier-client", flag.ExitOnError),
-			ConfigFile: defaultConfFile,
-			EnvPrefix:  defaultEnvPrefix,
+			ConfigFile: DefaultConfFile,
+			EnvPrefix:  DefaultEnvPrefix,
 		},
 	}
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", defaultConfFile, "App Config File (TOML Format)")
-	f.StringVarP(&f.EnvPrefix, "prefix", "p", defaultEnvPrefix, "Environment Variable Prefix")
+	f.StringVarP(&f.ConfigFile, "config", "c", DefaultConfFile, f.Name()+" Config File")
+	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.Parse(args) // nolint: errcheck
 }
@@ -101,16 +103,25 @@ func (f *Flags) ParseArgs(args []string) {
 func Start() error {
 	log.SetFlags(log.LstdFlags) // in case we throw an error for main.go before logging is setup.
 
-	c := New()
-	if c.Flags.ParseArgs(os.Args[1:]); c.Flags.verReq {
+	c := NewDefaults()
+	c.Flags.ParseArgs(os.Args[1:])
+
+	if c.Flags.verReq {
 		fmt.Println(version.Print(c.Flags.Name()))
-		return nil // nolint: nlreturn
-	} else if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
+		return nil // nolint: nlreturn // print version and exit.
+	}
+
+	if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
 		return fmt.Errorf("config file: %w", err)
-	} else if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
+	} else if _, err = cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
 		return fmt.Errorf("environment variables: %w", err)
-	} else if c.Config.APIKey == "" {
+	}
+
+	if c.Config.APIKey == "" {
 		return ErrNilAPIKey
+	} else if len(c.Config.Radarr) < 1 && len(c.Config.Readarr) < 1 &&
+		len(c.Config.Sonarr) < 1 && len(c.Config.Lidarr) < 1 {
+		return fmt.Errorf("at least 1 application must be configured: %w", ErrNoApps)
 	}
 
 	c.SetupLogging()

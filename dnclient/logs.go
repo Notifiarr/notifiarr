@@ -1,17 +1,11 @@
 package dnclient
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/signal"
-	"path"
-	"strings"
-	"syscall"
-	"time"
 
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -77,58 +71,4 @@ func (c *Client) SetupLogging() {
 	default:
 		c.Logger.Logger.SetOutput(rotatorr.NewMust(rotate))
 	}
-}
-
-// InitStartup fixes config problems and prints info about our startup config.
-func (c *Client) InitStartup() {
-	if c.Config.Timeout.Duration == 0 {
-		c.Config.Timeout.Duration = defaultTimeout
-	}
-
-	if c.Config.BindAddr == "" {
-		c.Config.BindAddr = defaultBindAddr
-	} else if !strings.Contains(c.Config.BindAddr, ":") {
-		c.Config.BindAddr = "0.0.0.0:" + c.Config.BindAddr
-	}
-
-	c.Printf("==> %s <==", helpLink)
-	c.Print("==> Startup Settings <==")
-	c.initSonarr()
-	c.initRadarr()
-	c.initLidarr()
-	c.initReadarr()
-	c.Print(" => Debug / Quiet:", c.Config.Debug, "/", c.Config.Quiet)
-
-	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
-		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.WebRoot))
-		c.Print(" => Web Cert & Key Files:", c.Config.SSLCrtFile+", "+c.Config.SSLKeyFile)
-	} else {
-		c.Print(" => Web HTTP Listen:", "http://"+c.Config.BindAddr+path.Join("/", c.Config.WebRoot))
-	}
-
-	if c.Config.LogFile != "" {
-		msg := "no rotation"
-		if c.Config.LogFiles > 0 {
-			msg = fmt.Sprintf("%d @ %dMb", c.Config.LogFiles, c.Config.LogFileMb)
-		}
-
-		c.Printf(" => Log File: %s (%s)", c.Config.LogFile, msg)
-	}
-}
-
-// Exit stops the web server and logs our exit messages.
-func (c *Client) Exit() error {
-	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-c.signal)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	if c.server != nil {
-		defer func() { c.server = nil }()
-
-		return c.server.Shutdown(ctx)
-	}
-
-	return nil
 }

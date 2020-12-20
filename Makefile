@@ -50,11 +50,11 @@ endef
 
 PLUGINS:=$(patsubst plugins/%/main.go,%,$(wildcard plugins/*/main.go))
 
-VERSION_LDFLAGS:= -X $(VERSION_PATH).Branch=$(BRANCH) \
-	-X $(VERSION_PATH).BuildDate=$(DATE) \
-	-X $(VERSION_PATH).BuildUser=$(shell whoami) \
-  -X $(VERSION_PATH).Revision=$(COMMIT) \
-  -X $(VERSION_PATH).Version=$(VERSION)-$(ITERATION)
+VERSION_LDFLAGS:= -X \"$(VERSION_PATH).Branch=$(BRANCH) ($(COMMIT))\" \
+	-X \"$(VERSION_PATH).BuildDate=$(DATE)\" \
+	-X \"$(VERSION_PATH).BuildUser=$(shell whoami)\" \
+  -X \"$(VERSION_PATH).Revision=$(ITERATION)\" \
+  -X \"$(VERSION_PATH).Version=$(VERSION)\"
 
 # Makefile targets follow.
 

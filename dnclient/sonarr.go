@@ -6,34 +6,23 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"sync"
 
 	"github.com/gorilla/mux"
-	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
-// SonarrConfig represents the input data for a Sonarr server.
-type SonarrConfig struct {
-	*starr.Config
-	*sonarr.Sonarr
-	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
-}
-
 // sonarrHandlers is called once on startup to register the web API paths.
 func (c *Client) sonarrHandlers() {
-	c.serveAPIpath(Sonarr, "/add/{id:[0-9]+}", "POST", c.sonarrAddSeries)
-	c.serveAPIpath(Sonarr, "/check/{id:[0-9]+}/{tvdbid:[0-9]+}", "GET", c.sonarrCheckSeries)
-	c.serveAPIpath(Sonarr, "/qualityProfiles/{id:[0-9]+}", "GET", c.sonarrProfiles)
-	c.serveAPIpath(Sonarr, "/languageProfiles/{id:[0-9]+}", "GET", c.sonarrLangProfiles)
-	c.serveAPIpath(Sonarr, "/rootFolder/{id:[0-9]+}", "GET", c.sonarrRootFolders)
+	c.handleAPIpath(Sonarr, "/add/{id:[0-9]+}", c.sonarrAddSeries, "POST")
+	c.handleAPIpath(Sonarr, "/check/{id:[0-9]+}/{tvdbid:[0-9]+}", c.sonarrCheckSeries, "GET")
+	c.handleAPIpath(Sonarr, "/qualityProfiles/{id:[0-9]+}", c.sonarrProfiles, "GET")
+	c.handleAPIpath(Sonarr, "/languageProfiles/{id:[0-9]+}", c.sonarrLangProfiles, "GET")
+	c.handleAPIpath(Sonarr, "/rootFolder/{id:[0-9]+}", c.sonarrRootFolders, "GET")
 }
 
 func (c *Client) sonarrRootFolders(r *http.Request) (int, interface{}) {
-	sonar := getSonarr(r)
-
 	// Get folder list from Sonarr.
-	folders, err := sonar.GetRootFolders()
+	folders, err := getSonarr(r).GetRootFolders()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -48,10 +37,8 @@ func (c *Client) sonarrRootFolders(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrProfiles(r *http.Request) (int, interface{}) {
-	sonar := getSonarr(r)
-
 	// Get the profiles from sonarr.
-	profiles, err := sonar.GetQualityProfiles()
+	profiles, err := getSonarr(r).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -66,10 +53,8 @@ func (c *Client) sonarrProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
-	sonar := getSonarr(r)
-
 	// Get the profiles from sonarr.
-	profiles, err := sonar.GetLanguageProfiles()
+	profiles, err := getSonarr(r).GetLanguageProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting language profiles: %w", err)
 	}
@@ -84,11 +69,9 @@ func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
-	sonar := getSonarr(r)
 	tvdbid, _ := strconv.Atoi(mux.Vars(r)["tvdbid"])
-
 	// Check for existing series.
-	if m, err := sonar.GetSeries(tvdbid); err != nil {
+	if m, err := getSonarr(r).GetSeries(tvdbid); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", tvdbid, ErrExists)
@@ -98,16 +81,15 @@ func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrAddSeries(r *http.Request) (int, interface{}) {
-	sonar := getSonarr(r)
-
-	// Extract payload and check for TMDB ID.
 	payload := &sonarr.AddSeriesInput{}
+	// Extract payload and check for TMDB ID.
 	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	} else if payload.TvdbID == 0 {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
 	}
 
+	sonar := getSonarr(r)
 	// Check for existing series.
 	if m, err := sonar.GetSeries(payload.TvdbID); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)

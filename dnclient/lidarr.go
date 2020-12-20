@@ -3,37 +3,24 @@ package dnclient
 import (
 	"fmt"
 	"net/http"
-	"sync"
-
-	"golift.io/starr"
-	"golift.io/starr/lidarr"
 )
 
 /*
 mbid - music brainz is the source for lidarr (todo)
 */
 
-// LidarrConfig represents the input data for a Lidarr server.
-type LidarrConfig struct {
-	*starr.Config
-	*lidarr.Lidarr
-	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
-}
-
 // lidarrHandlers is called once on startup to register the web API paths.
 func (c *Client) lidarrHandlers() {
-	c.serveAPIpath(Lidarr, "/add/{id:[0-9]+}", "POST", c.lidarrAddAlbum)
-	c.serveAPIpath(Lidarr, "/check/{id:[0-9]+}/{albumid:[0-9]+}", "GET", c.lidarrCheckAlbum)
-	c.serveAPIpath(Lidarr, "/qualityProfiles/{id:[0-9]+}", "GET", c.lidarrProfiles)
-	c.serveAPIpath(Lidarr, "/qualityDefinitions/{id:[0-9]+}", "GET", c.lidarrQualityDefs)
-	c.serveAPIpath(Lidarr, "/rootFolder/{id:[0-9]+}", "GET", c.lidarrRootFolders)
+	c.handleAPIpath(Lidarr, "/add/{id:[0-9]+}", c.lidarrAddAlbum, "POST")
+	c.handleAPIpath(Lidarr, "/check/{id:[0-9]+}/{albumid:[0-9]+}", c.lidarrCheckAlbum, "GET")
+	c.handleAPIpath(Lidarr, "/qualityProfiles/{id:[0-9]+}", c.lidarrProfiles, "GET")
+	c.handleAPIpath(Lidarr, "/qualityDefinitions/{id:[0-9]+}", c.lidarrQualityDefs, "GET")
+	c.handleAPIpath(Lidarr, "/rootFolder/{id:[0-9]+}", c.lidarrRootFolders, "GET")
 }
 
 func (c *Client) lidarrRootFolders(r *http.Request) (int, interface{}) {
-	lidar := getLidarr(r)
-
 	// Get folder list from Lidarr.
-	folders, err := lidar.GetRootFolders()
+	folders, err := getLidarr(r).GetRootFolders()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -48,10 +35,8 @@ func (c *Client) lidarrRootFolders(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) lidarrProfiles(r *http.Request) (int, interface{}) {
-	lidar := getLidarr(r)
-
 	// Get the profiles from lidarr.
-	profiles, err := lidar.GetQualityProfiles()
+	profiles, err := getLidarr(r).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -66,10 +51,8 @@ func (c *Client) lidarrProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) lidarrQualityDefs(r *http.Request) (int, interface{}) {
-	lidar := getLidarr(r)
-
 	// Get the profiles from lidarr.
-	definitions, err := lidar.GetQualityDefinition()
+	definitions, err := getLidarr(r).GetQualityDefinition()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}

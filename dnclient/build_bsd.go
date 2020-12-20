@@ -3,5 +3,6 @@
 package dnclient
 
 const (
-	defaultConfFile = "/usr/local/etc/discordnotifier-client/dnclient.conf"
+	// DefaultConfFile is where the app looks for a config file if one is not provided.
+	DefaultConfFile = "/usr/local/etc/discordnotifier-client/dnclient.conf"
 )
