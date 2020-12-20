@@ -1,0 +1,26 @@
+# Homebrew Formula Template. Built by Makefile: `make fomula`
+# This is part of Application Builder.
+# https://github.com/golift/application-builder
+# This file is used when FORMULA is NOT set to 'service'.
+class {{Class}} < Formula
+  desc "{{Desc}}"
+  homepage "{{URL}}"
+  url "{{SOURCE_PATH}}"
+  sha256 "{{SHA256}}"
+  head "{{URL}}"
+
+  depends_on "go" => :build
+
+  def install
+    bin_path = buildpath/"#{name}"
+    # Copy all files from their current location to buildpath/#{name}
+    bin_path.install Dir["*",".??*"]
+    cd bin_path do
+      system "make", "install", "VERSION=#{version}", "ITERATION={{Iter}}", "PREFIX=#{prefix}", "ETC=#{etc}"
+    end
+  end
+
+  test do
+    assert_match "#{name} v#{version}", shell_output("#{bin}/#{name} -v 2>&1", 2)
+  end
+end

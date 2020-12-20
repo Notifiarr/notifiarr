@@ -70,7 +70,7 @@ func new() *Client {
 			LogFileMb: defaultLogFileMb,
 			BindAddr:  defaultBindAddr,
 			Timeout:   cnfg.Duration{Duration: defaultTimeout},
-		}, Flags: &Flags{FlagSet: flag.NewFlagSet("dnclient", flag.ExitOnError)},
+		}, Flags: &Flags{FlagSet: flag.NewFlagSet("discordnotifier-client", flag.ExitOnError)},
 	}
 }
 

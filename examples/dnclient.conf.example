@@ -14,3 +14,11 @@ timeout      = "15s"
 [[readarr]]
   url                = "http://127.0.0.1:8787/readarr"
   api_key            = "XXX"
+
+[[sonarr]]
+  url                = "http://127.0.0.1:8989/"
+  api_key            = "XXX"
+
+[[lidarr]]
+  url                = "http://127.0.0.1:8686/"
+  api_key            = "ZZZ"

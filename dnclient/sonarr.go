@@ -19,6 +19,8 @@ func (c *Client) sonarrMethods(r *mux.Router) {
 
 	r.Handle("/api/sonarr/add/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.sonarrAddSeries))).Methods("POST")
+	r.Handle("/api/sonarr/check/{id:[0-9]+}/{tvdbid:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.sonarrCheckSeries))).Methods("GET")
 	r.Handle("/api/sonarr/qualityProfiles/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.sonarrProfiles))).Methods("GET")
 	r.Handle("/api/sonarr/languageProfiles/{id:[0-9]+}",
@@ -136,6 +138,23 @@ func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
+	sonar := c.getSonarr(mux.Vars(r)["id"])
+	if sonar == nil {
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoSonarr)
+	}
+
+	tvdbid, _ := strconv.Atoi(mux.Vars(r)["tvdbid"])
+	// Check for existing series.
+	if m, err := sonar.GetSeries(tvdbid); err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%d: %w", tvdbid, ErrExists)
+	}
+
+	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
 func (c *Client) sonarrAddSeries(r *http.Request) (int, interface{}) {

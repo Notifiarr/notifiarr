@@ -23,9 +23,11 @@ func (c *Client) lidarrMethods(r *mux.Router) {
 
 	r.Handle("/api/lidarr/add/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.lidarrAddAlbum))).Methods("POST")
+	r.Handle("/api/lidarr/check/{id:[0-9]+}/{albumid:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.lidarrCheckAlbum))).Methods("GET")
 	r.Handle("/api/lidarr/qualityProfiles/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.lidarrProfiles))).Methods("GET")
-	r.Handle("/api/lidarr/qualityProfiles/{id:[0-9]+}",
+	r.Handle("/api/lidarr/qualityDefinitions/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.lidarrQualityDefs))).Methods("GET")
 	r.Handle("/api/lidarr/rootFolder/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.lidarrRootFolders))).Methods("GET")
@@ -140,6 +142,10 @@ func (c *Client) lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func (c *Client) lidarrCheckAlbum(r *http.Request) (int, interface{}) {
+	return http.StatusLocked, "lidarr does not work yet"
 }
 
 func (c *Client) lidarrAddAlbum(r *http.Request) (int, interface{}) {

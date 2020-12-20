@@ -1,0 +1,80 @@
+# Powered by Application Builder: https://github.com/golift/application-builder
+os: linux
+dist: bionic
+language: go
+git:
+  depth: false
+addons:
+  apt:
+    packages:
+    - ruby-dev
+    - rpm
+    - build-essential
+    - git
+    - libgnome-keyring-dev
+    - fakeroot
+    - zip
+    - debsigs
+#    - gnupg
+    - expect
+    - upx
+go:
+  - 1.15.x
+services:
+  - docker
+install:
+  - mkdir -p $(go env GOPATH)/bin
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
+  - rvm install 2.6.0
+  - rvm 2.6.0 do gem install --no-document fpm
+before_script:
+  # Create your own deploy key, tar it, and encrypt the file to make this work. Optionally add a bitly_token file to the archive.
+  - openssl aes-256-cbc -K $encrypted_43c29b766863_key -iv $encrypted_43c29b766863_iv -in .secret_files.tar.enc -out .secret_files.tar -d
+  - tar -xf .secret_files.tar
+#  - gpg --import gpg.signing.key
+  - rm -f gpg.signing.key .secret_files.tar
+  - source .metadata.sh
+script:
+  # Test Go and Docker.
+  - make test
+  - make docker
+  # Test built docker image.
+  - docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"
+  # Build everything
+  - rvm 2.6.0 do make release
+after_success:
+  # Display Release Folder
+  - ls -l release/
+  # Setup the ssh client so we can clone and push to the homebrew formula repo.
+  # You must put github_deploy_file into .secret_files.tar.enc
+  # This is an ssh key added to your homebrew forumla repo.
+  - |
+    mkdir -p $HOME/.ssh
+    declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
+    echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> $HOME/.ssh/config
+    [ ! -f github_deploy_key ] || (mv github_deploy_key $SSH_FILE \
+      && chmod 600 "$SSH_FILE" \
+      && printf "%s\n" \
+        "Host github.com" \
+        "  IdentityFile $SSH_FILE" \
+        "  StrictHostKeyChecking no" \
+        "  LogLevel ERROR" >> $HOME/.ssh/config)
+deploy:
+  - provider: releases
+    token:
+      # to get a secure api key, run: travis setup releases
+      # make a copy of this file first because that command will change it.
+      # or: make a new key manually at https://github.com/settings/tokens/new
+      # then: echo <NEW_KEY_FROM_GH> | travis encrypt
+      secure: "Qrlk91OPyUVgX2DqBGNlKGg2gaXzbwD9gVL0EfG0PPGa9C4ygNL20SYwoLLT9/LNhNrfT2tTel4zRYMXGw0X0VPytPbmCJltmD4+xoSh2qWRk/9uzEZIZrox77z3w4TlfjGCZSrvlCCAIttzvUv5ecFFgMaZboc6IG1IwJoL5aVf+45TzIMH0Tr2lfNmmX6o4Py/Ox/MvfBZMppYzqRSAS12Rbz60+MEYTIvGU6x9MnPyzq1icyD1RaAPirqUkofj82Y7j9Wzf3TDXNWMc7KL/UpA4ApU1sQL1s1emIZBhbP6xkO8uugptF/8vnHhGrC/qCEqjn53CwyIQO51xtPh+ibL+/C1c41NvnQwcHzJ/LIipHaKHqtOda6DARz1hpAfGGlSmWliTDGdaR34a/rkke+1saH+phI/u16AlgLKw4eCvLByILm/p+sOw4zluFNsJ6chfagBBZ2v7jIjJ4PBhv3koF0qQOeF5ne8JruGwDPYTz5S2w8BaahQi4fEEvjRusUxCWZekJBze4Ze6P5vVfzMMBbMAi8JG0UOu5V1Vf9MY39sofp3smTnmCcajYMPzpdHK7s7nYFF+/8597uJZDW1MVJ0Uge1EVbFebAUkBHLmwL6DUm7Ggo2kk+KPbCfipu18uutRP5aZVqfNSWQESzA9s65Sn07fujXxrQ4os="
+    overwrite: true
+    skip_cleanup: true
+    cleanup: false
+    file_glob: true
+    file: release/*
+    on:
+      tags: true
+  - provider: script
+    script: scripts/formula-deploy.sh
+    on:
+      tags: true

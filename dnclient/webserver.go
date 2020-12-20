@@ -1,6 +1,7 @@
 package dnclient
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -28,14 +29,15 @@ var (
 func (c *Client) RunWebServer() {
 	r := mux.NewRouter()
 
-	r.PathPrefix("/").Handler(c.responseWrapper(c.notFound))
-	r.Handle("/api/status", c.responseWrapper(c.statusResponse)).Methods("GET", "HEAD")
 	c.radarrMethods(r)
 	c.readarrMethods(r)
 	c.lidarrMethods(r)
 	c.sonarrMethods(r)
+	r.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
+	r.Handle("/api/status", c.responseWrapper(c.statusResponse)).Methods("GET", "HEAD")
+	r.PathPrefix("/").Handler(c.responseWrapper(c.notFound))
 
-	c.server = &http.Server{
+	c.server = &http.Server{ // nolint: exhaustivestruct
 		Handler:      r,
 		Addr:         c.Config.BindAddr,
 		IdleTimeout:  time.Second,
@@ -82,6 +84,7 @@ func (c *Client) responseWrapper(next func(r *http.Request) (int, interface{})) 
 			c.Printf("HTTP [%s] %s %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt)
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(stat)
 
 		b, _ := json.Marshal(&Response{Status: statusTxt, Message: msg})
@@ -98,4 +101,16 @@ func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(r *http.Request) (int, interface{}) {
 	return http.StatusNotFound, "The page you requested could not be found. Check your request parameters and try again."
+}
+
+func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
+	if b, err := Asset("init/windows/application.ico"); err != nil {
+		statusTxt := strconv.Itoa(http.StatusInternalServerError) + ": " + http.StatusText(http.StatusInternalServerError)
+		c.Printf("HTTP [%s] %s %s: %s: %v", r.RemoteAddr, r.Method, r.RequestURI, statusTxt, err)
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		statusTxt := strconv.Itoa(http.StatusOK) + ": " + http.StatusText(http.StatusOK)
+		c.Printf("HTTP [%s] %s %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt)
+		http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
+	}
 }

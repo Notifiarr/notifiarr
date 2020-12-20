@@ -19,6 +19,8 @@ func (c *Client) radarrMethods(r *mux.Router) {
 
 	r.Handle("/api/radarr/add/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.radarrAddMovie))).Methods("POST")
+	r.Handle("/api/radarr/check/{id:[0-9]+}/{tmdbid:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.radarrCheckMovie))).Methods("GET")
 	r.Handle("/api/radarr/qualityProfiles/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.radarrProfiles))).Methods("GET")
 	r.Handle("/api/radarr/rootFolder/{id:[0-9]+}",
@@ -112,6 +114,24 @@ func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func (c *Client) radarrCheckMovie(r *http.Request) (int, interface{}) {
+	radar := c.getRadarr(mux.Vars(r)["id"])
+	if radar == nil {
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoRadarr)
+	}
+
+	tmdbID, _ := strconv.Atoi(mux.Vars(r)["tmdbid"])
+
+	// Check for existing movie.
+	if m, err := radar.GetMovie(tmdbID); err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%d: %w", tmdbID, ErrExists)
+	}
+
+	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
 func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {

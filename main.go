@@ -1,5 +1,7 @@
 package main
 
+//go:generate go-bindata -pkg dnclient  -o dnclient/bindata.go init/windows/application.ico
+
 import (
 	"log"
 

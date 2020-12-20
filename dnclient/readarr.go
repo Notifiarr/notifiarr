@@ -19,6 +19,8 @@ func (c *Client) readarrMethods(r *mux.Router) {
 
 	r.Handle("/api/readarr/add/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.readarrAddBook))).Methods("POST")
+	r.Handle("/api/readarr/check/{id:[0-9]+}/{grid:[0-9]+}",
+		c.checkAPIKey(c.responseWrapper(c.readarrCheckBook))).Methods("GET")
 	r.Handle("/api/readarr/metadataProfiles/{id:[0-9]+}",
 		c.checkAPIKey(c.responseWrapper(c.readarrMetaProfiles))).Methods("GET")
 	r.Handle("/api/readarr/qualityProfiles/{id:[0-9]+}",
@@ -136,6 +138,23 @@ func (c *Client) readarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func (c *Client) readarrCheckBook(r *http.Request) (int, interface{}) {
+	readar := c.getReadarr(mux.Vars(r)["id"])
+	if readar == nil {
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", mux.Vars(r)["id"], ErrNoReadarr)
+	}
+
+	grid, _ := strconv.Atoi(mux.Vars(r)["grid"])
+	// Check for existing book.
+	if m, err := readar.GetBook(grid); err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%d: %w", grid, ErrExists)
+	}
+
+	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
 func (c *Client) readarrAddBook(r *http.Request) (int, interface{}) {
