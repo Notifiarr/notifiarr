@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"sync"
 
@@ -17,15 +18,15 @@ func (c *Client) sonarrMethods(r *mux.Router) {
 		s.Sonarr = sonarr.New(s.Config)
 	}
 
-	r.Handle("/api/sonarr/add/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/add/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.sonarrAddSeries))).Methods("POST")
-	r.Handle("/api/sonarr/check/{id:[0-9]+}/{tvdbid:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/check/{id:[0-9]+}/{tvdbid:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.sonarrCheckSeries))).Methods("GET")
-	r.Handle("/api/sonarr/qualityProfiles/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/qualityProfiles/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.sonarrProfiles))).Methods("GET")
-	r.Handle("/api/sonarr/languageProfiles/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/languageProfiles/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.sonarrLangProfiles))).Methods("GET")
-	r.Handle("/api/sonarr/rootFolder/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/sonarr/rootFolder/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.sonarrRootFolders))).Methods("GET")
 }
 

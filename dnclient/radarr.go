@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"sync"
 
@@ -17,13 +18,13 @@ func (c *Client) radarrMethods(r *mux.Router) {
 		r.Radarr = radarr.New(r.Config)
 	}
 
-	r.Handle("/api/radarr/add/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/add/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.radarrAddMovie))).Methods("POST")
-	r.Handle("/api/radarr/check/{id:[0-9]+}/{tmdbid:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/check/{id:[0-9]+}/{tmdbid:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.radarrCheckMovie))).Methods("GET")
-	r.Handle("/api/radarr/qualityProfiles/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/qualityProfiles/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.radarrProfiles))).Methods("GET")
-	r.Handle("/api/radarr/rootFolder/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/radarr/rootFolder/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.radarrRootFolders))).Methods("GET")
 }
 

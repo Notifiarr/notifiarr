@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"time"
 
@@ -34,7 +35,7 @@ func (c *Client) RunWebServer() {
 	c.lidarrMethods(r)
 	c.sonarrMethods(r)
 	r.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
-	r.Handle("/api/status", c.responseWrapper(c.statusResponse)).Methods("GET", "HEAD")
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/status"), c.responseWrapper(c.statusResponse)).Methods("GET", "HEAD")
 	r.PathPrefix("/").Handler(c.responseWrapper(c.notFound))
 
 	c.server = &http.Server{ // nolint: exhaustivestruct
@@ -45,7 +46,13 @@ func (c *Client) RunWebServer() {
 		ReadTimeout:  time.Second,
 		ErrorLog:     c.Logger.Logger,
 	}
-	if err := c.server.ListenAndServe(); err != nil && !errors.Is(http.ErrServerClosed, err) {
+
+	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
+		err := c.server.ListenAndServeTLS(c.Config.SSLCrtFile, c.Config.SSLKeyFile)
+		if err != nil && !errors.Is(http.ErrServerClosed, err) {
+			c.Printf("[ERROR] HTTPS Server: %v", err)
+		}
+	} else if err := c.server.ListenAndServe(); err != nil && !errors.Is(http.ErrServerClosed, err) {
 		c.Printf("[ERROR] HTTP Server: %v", err)
 	}
 }

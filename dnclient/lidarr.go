@@ -3,6 +3,7 @@ package dnclient
 import (
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"sync"
 
@@ -21,15 +22,15 @@ func (c *Client) lidarrMethods(r *mux.Router) {
 		l.Lidarr = lidarr.New(l.Config)
 	}
 
-	r.Handle("/api/lidarr/add/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/lidarr/add/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.lidarrAddAlbum))).Methods("POST")
-	r.Handle("/api/lidarr/check/{id:[0-9]+}/{albumid:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/lidarr/check/{id:[0-9]+}/{albumid:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.lidarrCheckAlbum))).Methods("GET")
-	r.Handle("/api/lidarr/qualityProfiles/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/lidarr/qualityProfiles/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.lidarrProfiles))).Methods("GET")
-	r.Handle("/api/lidarr/qualityDefinitions/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/lidarr/qualityDefinitions/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.lidarrQualityDefs))).Methods("GET")
-	r.Handle("/api/lidarr/rootFolder/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/lidarr/rootFolder/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.lidarrRootFolders))).Methods("GET")
 }
 

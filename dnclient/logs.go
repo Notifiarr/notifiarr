@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path"
 	"syscall"
 	"time"
 
@@ -86,7 +87,13 @@ func (c *Client) logStartupInfo() {
 	c.logLidarr()
 	c.logReadarr()
 	c.Print(" => Debug / Quiet:", c.Config.Debug, "/", c.Config.Quiet)
-	c.Print(" => Web HTTP Listen:", c.Config.BindAddr)
+
+	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
+		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.WebRoot))
+		c.Print(" => Web Cert & Key Files:", c.Config.SSLCrtFile+", "+c.Config.SSLKeyFile)
+	} else {
+		c.Print(" => Web HTTP Listen:", "http://"+c.Config.BindAddr+path.Join("/", c.Config.WebRoot))
+	}
 
 	if c.Config.LogFile != "" {
 		msg := "no rotation"

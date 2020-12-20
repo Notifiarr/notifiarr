@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"sync"
 
@@ -17,15 +18,15 @@ func (c *Client) readarrMethods(r *mux.Router) {
 		r.Readarr = readarr.New(r.Config)
 	}
 
-	r.Handle("/api/readarr/add/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/add/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.readarrAddBook))).Methods("POST")
-	r.Handle("/api/readarr/check/{id:[0-9]+}/{grid:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/check/{id:[0-9]+}/{grid:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.readarrCheckBook))).Methods("GET")
-	r.Handle("/api/readarr/metadataProfiles/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/metadataProfiles/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.readarrMetaProfiles))).Methods("GET")
-	r.Handle("/api/readarr/qualityProfiles/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/qualityProfiles/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.readarrProfiles))).Methods("GET")
-	r.Handle("/api/readarr/rootFolder/{id:[0-9]+}",
+	r.Handle(path.Join("/", c.Config.WebRoot, "/api/readarr/rootFolder/{id:[0-9]+}"),
 		c.checkAPIKey(c.responseWrapper(c.readarrRootFolders))).Methods("GET")
 }
 
