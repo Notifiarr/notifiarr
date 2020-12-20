@@ -107,7 +107,11 @@ $(shell go env GOPATH)/bin/rsrc:
 
 # Binaries
 
-generate:
+bindata: $(shell go env GOPATH)/bin/go-bindata
+$(shell go env GOPATH)/bin/go-bindata:
+	cd /tmp ; go get -u github.com/go-bindata/go-bindata/... ; go install github.com/go-bindata/go-bindata
+
+generate: bindata
 	go generate ./...
 
 build: generate $(BINARY)
