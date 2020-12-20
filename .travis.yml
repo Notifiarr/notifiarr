@@ -29,7 +29,7 @@ install:
   - rvm 2.6.0 do gem install --no-document fpm
 before_script:
   # Create your own deploy key, tar it, and encrypt the file to make this work. Optionally add a bitly_token file to the archive.
-  - openssl aes-256-cbc -K $encrypted_43c29b766863_key -iv $encrypted_43c29b766863_iv -in .secret_files.tar.enc -out .secret_files.tar -d
+  - openssl aes-256-cbc -K $encrypted_772fc4772f04_key -iv $encrypted_772fc4772f04_iv -in .secret_files.tar.enc -out .secret_files.tar -d
   - tar -xf .secret_files.tar
 #  - gpg --import gpg.signing.key
   - rm -f gpg.signing.key .secret_files.tar
@@ -66,7 +66,7 @@ deploy:
       # make a copy of this file first because that command will change it.
       # or: make a new key manually at https://github.com/settings/tokens/new
       # then: echo <NEW_KEY_FROM_GH> | travis encrypt
-      secure: "Qrlk91OPyUVgX2DqBGNlKGg2gaXzbwD9gVL0EfG0PPGa9C4ygNL20SYwoLLT9/LNhNrfT2tTel4zRYMXGw0X0VPytPbmCJltmD4+xoSh2qWRk/9uzEZIZrox77z3w4TlfjGCZSrvlCCAIttzvUv5ecFFgMaZboc6IG1IwJoL5aVf+45TzIMH0Tr2lfNmmX6o4Py/Ox/MvfBZMppYzqRSAS12Rbz60+MEYTIvGU6x9MnPyzq1icyD1RaAPirqUkofj82Y7j9Wzf3TDXNWMc7KL/UpA4ApU1sQL1s1emIZBhbP6xkO8uugptF/8vnHhGrC/qCEqjn53CwyIQO51xtPh+ibL+/C1c41NvnQwcHzJ/LIipHaKHqtOda6DARz1hpAfGGlSmWliTDGdaR34a/rkke+1saH+phI/u16AlgLKw4eCvLByILm/p+sOw4zluFNsJ6chfagBBZ2v7jIjJ4PBhv3koF0qQOeF5ne8JruGwDPYTz5S2w8BaahQi4fEEvjRusUxCWZekJBze4Ze6P5vVfzMMBbMAi8JG0UOu5V1Vf9MY39sofp3smTnmCcajYMPzpdHK7s7nYFF+/8597uJZDW1MVJ0Uge1EVbFebAUkBHLmwL6DUm7Ggo2kk+KPbCfipu18uutRP5aZVqfNSWQESzA9s65Sn07fujXxrQ4os="
+      secure: "CEeczHbmPCs54puNInkE7pCwPrR13Rl054PVtfElsXGD62DoJB6DAW2M9XEEVQPAaCZHj8K1mTRKA6h0W1xSyT0YYZkcVRzrpqkntGo1swfRtPj3nnUCJEqvABrMJWv7c/145LmcoXpalxMCHVOioQJO87hZf+iV+Keb2HwIUTChglVpjcDtTeSrQlKSn58jiYSaVQs4cgdrXhlBFxTwgeyVBTbbg7nU036GgCnQoU9gzWZysa6XGuO4MyoehRfNj5RHIbPITWqmUSbxUHV4G25+SrcP2MBEdZawvWKSrnSvKdYuczhmhv9rVIxNNOM+jRqIpLlaJjY+o1kWL9OBT/e9eqyfpvG7b1sYWyuzQPPNH02hV5NyXLobXtWDpuL8gCbtF/dLTjsom2PGC/g0/aeJ0GvwmSA/c2P8Oc2AajHX9kJ9JSq1R7Kg0JKHFZRwsdUb1sfoc2oyO9sh7YpMDx/6eVnkTekbhpXLdJyJd4pWj6FLllZP6GMVQehyOUANADKZQ1yWH+gPUbgvieEjd54ZqZO5/yPzOI0eIw9j48BCMRgjkY5wZkUJ+lLjN5qMS5Zrc4rSI4kU0UKrvvr9O32EczV6f54lRxp9TK89NuPkkcbCAWa9iVasdONOho5TRKRirp3W3jqWm2rSbKWjPg9axJ2ts53I8w8ybMdyFRE="
     overwrite: true
     skip_cleanup: true
     cleanup: false
