@@ -1,6 +1,7 @@
 <img src="https://raw.githubusercontent.com/wiki/Go-Lift-TV/discordnotifier-client/images/golift-discordnotifier-client.png">
 
-This is the unified client for DiscordNotifier.com. The client enables content requests from Media Bot.
+This is the unified client for [DiscordNotifier.com](https://discordnotifier.com).
+The client enables content requests from Media Bot in your Discord Server.
 
 In the future it will do even more!
 
@@ -126,7 +127,6 @@ brew services start discordnotifier-client
 
 ## Troubleshooting
 
-Make sure your Downloads location matches on all your applications!
 [Find help on Discord](https://discord.gg/tvmpw6mczw).
 
 Log files:
