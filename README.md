@@ -127,7 +127,7 @@ brew services start discordnotifier-client
 
 ## Troubleshooting
 
-[Find help on Discord](https://discord.gg/tvmpw6mczw).
+[Find help on Discord](https://golift.io/discord).
 
 Log files:
 
