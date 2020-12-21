@@ -108,7 +108,7 @@ On FreeBSD the app runs as `nobody`. That's not very good and will probably chan
 ### macOS Install
 
 -   Use homebrew.
--   Edit config file at `/usr/local/etc/discordnotifier-client/dnclioent.conf`
+-   Edit config file at `/usr/local/etc/discordnotifier-client/dnclient.conf`
 -   Start it.
 -   Like this:
 
