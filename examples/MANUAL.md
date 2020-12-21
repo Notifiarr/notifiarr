@@ -18,6 +18,10 @@ OPTIONS
     -c, --config <config file>
         Provide a configuration file (instead of the default).
 
+    -p, --prefix
+        The default environment variable configuration prefix is `DN`.
+        Use this tunable to change it.
+
     -v, --version
         Display version and exit.
 

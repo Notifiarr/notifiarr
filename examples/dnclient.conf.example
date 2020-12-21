@@ -1,24 +1,59 @@
-api_key      = "api-key-from-discordnotifier.com"
-bind_addr    = ":5454"
-debug        = true
-quiet        = false
-#log_file    = "dnclient.log"
-log_files    = 10
+######################################################
+# DiscordNotifier Client Example Configuration File. #
+######################################################
+
+# This API key must be copied from your discordnotifier.com account.
+api_key = "api-key-from-discordnotifier.com"
+
+# The ip:port or port to listen on for incoming web requests.
+# You can use 127.0.0.1:5454 to listen only on localhost.
+bind_addr = "5454"
+
+# Debug logs a bit more data to the logs and is not very useful right now.
+debug = false
+
+# Quiet makes the app not log anything to output.
+# Recommend setting a log file if you make the app quiet.
+quiet = false
+
+# All API paths start with /api.
+# Use this to set it to /somethingelse/api by setting webroot to "/somethingelse"
+webroot = "/"
+
+# If you provide a cert and key file (pem) paths, this app will listen with SSL/TLS.
+# Uncomment both lines and add valid file paths. Make sure this app can read them.
+# ssl_key_file  = "/path/to/cert.key"
+# ssl_cert_file = "/path/to/cert.pem"
+
+# If you set this, logs will be written to this file.
+#log_file = "dnclient.log"
+# Set this to the number of megabytes to rotate files.
 log_files_mb = 100
-timeout      = "15s"
+# How many files to keep? 0 = all.
+log_files = 10
+
+# Default timeout to wait for an application to respond. Can be set per app.
+timeout = "5s"
+
+
+###################################################### ################
+# App settings. Add # to the beginning of app settings you don't use. #
+###################################################### ################
+
+# The API keys are specific to the app. Get it from General Settings.
 
 [[radarr]]
-  url                = "http://127.0.0.1:7878/radarr"
-  api_key            = "XXX"
+  url     = "http://127.0.0.1:7878/radarr"
+  api_key = "ABC"
 
 [[readarr]]
-  url                = "http://127.0.0.1:8787/readarr"
-  api_key            = "XXX"
+  url     = "http://127.0.0.1:8787/readarr"
+  api_key = "XYZ"
 
 [[sonarr]]
-  url                = "http://127.0.0.1:8989/"
-  api_key            = "XXX"
+  url     = "http://127.0.0.1:8989/"
+  api_key = "XXX"
 
 [[lidarr]]
-  url                = "http://127.0.0.1:8686/"
-  api_key            = "ZZZ"
+  url     = "http://127.0.0.1:8686/"
+  api_key = "ZZZ"

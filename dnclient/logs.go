@@ -1,15 +1,11 @@
 package dnclient
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -48,8 +44,8 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 	}
 }
 
-// setupLogging splits log write into a file and/or stdout.
-func (c *Client) setupLogging() {
+// SetupLogging splits log write into a file and/or stdout.
+func (c *Client) SetupLogging() {
 	c.Logger = &Logger{
 		debug:  c.Config.Debug,
 		Logger: log.New(ioutil.Discard, "", log.LstdFlags),
@@ -75,36 +71,4 @@ func (c *Client) setupLogging() {
 	default:
 		c.Logger.Logger.SetOutput(rotatorr.NewMust(rotate))
 	}
-}
-
-// logStartupInfo prints info about our startup config.
-func (c *Client) logStartupInfo() {
-	c.Printf("==> %s <==", helpLink)
-	c.Print("==> Startup Settings <==")
-	c.logSonarr()
-	c.logRadarr()
-	c.logLidarr()
-	c.logReadarr()
-	c.Print(" => Debug / Quiet:", c.Config.Debug, "/", c.Config.Quiet)
-	c.Print(" => Web HTTP Listen:", c.Config.BindAddr)
-
-	if c.Config.LogFile != "" {
-		msg := "no rotation"
-		if c.Config.LogFiles > 0 {
-			msg = fmt.Sprintf("%d @ %dMb", c.Config.LogFiles, c.Config.LogFileMb)
-		}
-
-		c.Printf(" => Log File: %s (%s)", c.Config.LogFile, msg)
-	}
-}
-
-func (c *Client) logExitInfo() error {
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-sig)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	return c.server.Shutdown(ctx)
 }

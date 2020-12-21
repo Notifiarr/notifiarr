@@ -3,5 +3,6 @@
 package dnclient
 
 const (
-	defaultConfFile = `dnclient.conf`
+	// DefaultConfFile is where the app looks for a config file if one is not provided.
+	DefaultConfFile = `dnclient.conf`
 )

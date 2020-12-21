@@ -50,15 +50,19 @@ endef
 
 PLUGINS:=$(patsubst plugins/%/main.go,%,$(wildcard plugins/*/main.go))
 
-VERSION_LDFLAGS:= -X $(VERSION_PATH).Branch=$(BRANCH) \
-	-X $(VERSION_PATH).BuildDate=$(DATE) \
-	-X $(VERSION_PATH).BuildUser=$(shell whoami) \
-  -X $(VERSION_PATH).Revision=$(COMMIT) \
-  -X $(VERSION_PATH).Version=$(VERSION)-$(ITERATION)
+VERSION_LDFLAGS:= -X \"$(VERSION_PATH).Branch=$(BRANCH) ($(COMMIT))\" \
+	-X \"$(VERSION_PATH).BuildDate=$(DATE)\" \
+	-X \"$(VERSION_PATH).BuildUser=$(shell whoami)\" \
+  -X \"$(VERSION_PATH).Revision=$(ITERATION)\" \
+  -X \"$(VERSION_PATH).Version=$(VERSION)\"
 
 # Makefile targets follow.
 
 all: clean build
+
+####################
+##### Releases #####
+####################
 
 # Prepare a release. Called in Travis CI.
 release: clean macos linux_packages freebsd_packages windows
@@ -78,6 +82,10 @@ clean:
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso
 	rm -rf package_build_* release after-install-rendered.sh before-remove-rendered.sh
+
+####################
+##### Sidecars #####
+####################
 
 # Build a man page from a markdown file using md2roff.
 # This also turns the repo readme into an html file.
@@ -105,16 +113,11 @@ rsrc.syso: init/windows/application.ico init/windows/manifest.xml $(shell go env
 $(shell go env GOPATH)/bin/rsrc:
 	cd /tmp ; go get $(RSRC_BIN) ; go install $(RSRC_BIN)
 
-# Binaries
+####################
+##### Binaries #####
+####################
 
-bindata: $(shell go env GOPATH)/bin/go-bindata
-$(shell go env GOPATH)/bin/go-bindata:
-	cd /tmp ; go get -u github.com/go-bindata/go-bindata/... ; go install github.com/go-bindata/go-bindata
-
-generate: bindata
-	go generate ./...
-
-build: generate $(BINARY)
+build: $(BINARY)
 $(BINARY): main.go
 	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS)"
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
@@ -158,7 +161,7 @@ $(BINARY).amd64.freebsd: main.go
 freebsd386: $(BINARY).i386.freebsd
 $(BINARY).i386.freebsd: main.go
 	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
-	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
+	[ "$(COMPRESS)" != "true" ] || upx -q9 $@ || true
 
 freebsdarm: $(BINARY).armhf.freebsd
 $(BINARY).armhf.freebsd: main.go
@@ -171,7 +174,9 @@ $(BINARY).amd64.exe: rsrc.syso main.go
 	GOOS=windows GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
-# Packages
+####################
+##### Packages #####
+####################
 
 linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
@@ -308,6 +313,49 @@ package_build_freebsd_arm: package_build_freebsd freebsdarm
 check_fpm:
 	@fpm --version > /dev/null || (echo "FPM missing. Install FPM: https://fpm.readthedocs.io/en/latest/installing.html" && false)
 
+##################
+##### Extras #####
+##################
+
+plugins: $(patsubst %,%.so,$(PLUGINS))
+$(patsubst %,%.so,$(PLUGINS)):
+	go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.so,%,$@)
+
+linux_plugins: plugins_linux_amd64 plugins_linux_i386 plugins_linux_arm64 plugins_linux_armhf
+plugins_linux_amd64: $(patsubst %,%.linux_amd64.so,$(PLUGINS))
+$(patsubst %,%.linux_amd64.so,$(PLUGINS)):
+	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.linux_amd64.so,%,$@)
+
+plugins_darwin: $(patsubst %,%.darwin.so,$(PLUGINS))
+$(patsubst %,%.darwin.so,$(PLUGINS)):
+	GOOS=darwin go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.darwin.so,%,$@)
+
+# Run code tests and lint.
+test: lint
+	# Testing.
+	go test -race -covermode=atomic ./...
+lint:
+	# Checking lint.
+	$(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
+
+# Mockgen and bindata are examples.
+# Your `go generate` may require other tools; add them!
+
+mockgen: $(shell go env GOPATH)/bin/mockgen
+$(shell go env GOPATH)/bin/mockgen:
+	cd /tmp ; go get github.com/golang/mock/mockgen ; go install github.com/golang/mock/mockgen
+
+bindata: $(shell go env GOPATH)/bin/go-bindata
+$(shell go env GOPATH)/bin/go-bindata:
+	cd /tmp ; go get -u github.com/go-bindata/go-bindata/... ; go install github.com/go-bindata/go-bindata
+
+generate: mockgen bindata
+	go generate ./...
+
+##################
+##### Docker #####
+##################
+
 docker:
 	docker build -f init/docker/Dockerfile \
 		--build-arg "BUILD_DATE=$(DATE)" \
@@ -322,6 +370,10 @@ docker:
 		--build-arg "SOURCE_URL=$(SOURCE_URL)" \
 		--build-arg "CONFIG_FILE=$(CONFIG_FILE)" \
 		--tag $(BINARY) .
+
+####################
+##### Homebrew #####
+####################
 
 # This builds a Homebrew formula file that can be used to install this app from source.
 # The source used comes from the released version on GitHub. This will not work with local source.
@@ -343,31 +395,6 @@ $(BINARY).rb: v$(VERSION).tar.gz.sha256 init/homebrew/$(FORMULA).rb.tmpl
 		-e "s%{{Class}}%$(shell echo $(BINARY) | perl -pe 's/(?:\b|-)(\p{Ll})/\u$$1/g')%g" \
 		init/homebrew/$(FORMULA).rb.tmpl | tee $(BINARY).rb
 		# That perl line turns hello-world into HelloWorld, etc.
-
-plugins: $(patsubst %,%.so,$(PLUGINS))
-$(patsubst %,%.so,$(PLUGINS)):
-	go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.so,%,$@)
-
-linux_plugins: plugins_linux_amd64 plugins_linux_i386 plugins_linux_arm64 plugins_linux_armhf
-plugins_linux_amd64: $(patsubst %,%.linux_amd64.so,$(PLUGINS))
-$(patsubst %,%.linux_amd64.so,$(PLUGINS)):
-	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.linux_amd64.so,%,$@)
-
-plugins_darwin: $(patsubst %,%.darwin.so,$(PLUGINS))
-$(patsubst %,%.darwin.so,$(PLUGINS)):
-	GOOS=darwin go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.darwin.so,%,$@)
-
-# Extras
-
-# Run code tests and lint.
-test: lint
-	# Testing.
-	go test -race -covermode=atomic ./...
-lint:
-	# Checking lint.
-	$(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
-
-# Homebrew stuff. macOS only.
 
 # Used for Homebrew only. Other distros can create packages.
 install: man readme $(BINARY) plugins_darwin
