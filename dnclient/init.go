@@ -3,7 +3,7 @@ package dnclient
 
 /*
   This file contains the procedures that validate config data and initialize each app.
-  All startup logs come from there.
+  All startup logs come from below. Every procedure in this file is run once on startup.
 */
 
 import (
@@ -23,6 +23,7 @@ import (
 )
 
 // InitStartup fixes config problems and prints info about our startup config.
+// This runs once on startup.
 func (c *Client) InitStartup() {
 	if c.Config.Timeout.Duration == 0 {
 		c.Config.Timeout.Duration = DefaultTimeout
