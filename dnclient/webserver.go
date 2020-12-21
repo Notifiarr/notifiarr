@@ -39,9 +39,9 @@ func (c *Client) RunWebServer() {
 	c.server = &http.Server{ // nolint: exhaustivestruct
 		Handler:      c.router,
 		Addr:         c.Config.BindAddr,
-		IdleTimeout:  time.Second,
-		WriteTimeout: time.Second,
-		ReadTimeout:  time.Second,
+		IdleTimeout:  c.Config.Timeout.Duration,
+		WriteTimeout: c.Config.Timeout.Duration,
+		ReadTimeout:  c.Config.Timeout.Duration,
 		ErrorLog:     c.Logger.Logger,
 	}
 

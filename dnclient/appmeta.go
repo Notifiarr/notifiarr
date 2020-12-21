@@ -63,33 +63,34 @@ type SonarrConfig struct {
 }
 
 // handleAPIpath makes adding API paths a little cleaner.
-// This also grabs the app struct and saves it in a context before calling the handler.
+// This grabs the app struct and saves it in a context before calling the handler.
 func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...string) {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
 
+	// disccordnotifier uses 1-indexes.
 	c.router.Handle(path.Join("/", c.Config.WebRoot, "api", string(app), api),
 		c.checkAPIKey(c.responseWrapper(func(r *http.Request) (int, interface{}) {
 			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
-			case app == Radarr && (id > len(c.Config.Radarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr)
-			case app == Radarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Radarr, c.Config.Radarr[id-1])))
-			case app == Lidarr && (id > len(c.Config.Lidarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr)
-			case app == Lidarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Lidarr, c.Config.Lidarr[id-1])))
-			case app == Sonarr && (id > len(c.Config.Sonarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr)
-			case app == Sonarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Sonarr, c.Config.Sonarr[id-1])))
-			case app == Readarr && (id > len(c.Config.Readarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr)
-			case app == Readarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Readarr, c.Config.Readarr[id-1])))
 			default: // unknown app, just run the handler.
 				return next(r)
+			case app == Radarr && (id > len(c.Config.Radarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr)
+			case app == Lidarr && (id > len(c.Config.Lidarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr)
+			case app == Sonarr && (id > len(c.Config.Sonarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr)
+			case app == Readarr && (id > len(c.Config.Readarr) || id < 1):
+				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr)
+			case app == Radarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Radarr, c.Config.Radarr[id-1])))
+			case app == Lidarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Lidarr, c.Config.Lidarr[id-1])))
+			case app == Sonarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Sonarr, c.Config.Sonarr[id-1])))
+			case app == Readarr:
+				return next(r.WithContext(context.WithValue(r.Context(), Readarr, c.Config.Readarr[id-1])))
 			}
 		}))).Methods(method...)
 }
