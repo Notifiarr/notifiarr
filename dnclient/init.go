@@ -44,10 +44,10 @@ func (c *Client) InitStartup() {
 	c.Print(" => Debug / Quiet:", c.Config.Debug, "/", c.Config.Quiet)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
-		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.WebRoot))
+		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
 		c.Print(" => Web Cert & Key Files:", c.Config.SSLCrtFile+", "+c.Config.SSLKeyFile)
 	} else {
-		c.Print(" => Web HTTP Listen:", "http://"+c.Config.BindAddr+path.Join("/", c.Config.WebRoot))
+		c.Print(" => Web HTTP Listen:", "http://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
 	}
 
 	if c.Config.LogFile != "" {

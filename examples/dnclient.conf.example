@@ -17,8 +17,8 @@ debug = false
 quiet = false
 
 # All API paths start with /api.
-# Use this to set it to /somethingelse/api by setting webroot to "/somethingelse"
-webroot = "/"
+# Set it to /somethingelse/api by setting urlbase to "/somethingelse"
+urlbase = "/"
 
 # If you provide a cert and key file (pem) paths, this app will listen with SSL/TLS.
 # Uncomment both lines and add valid file paths. Make sure this app can read them.

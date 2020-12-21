@@ -42,7 +42,7 @@ func (c *Client) lidarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	// Format profile ID=>Name into a nice map.
-	p := make(map[int]string)
+	p := make(map[int64]string)
 	for i := range profiles {
 		p[profiles[i].ID] = profiles[i].Name
 	}
@@ -58,7 +58,7 @@ func (c *Client) lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	}
 
 	// Format definitions ID=>Title into a nice map.
-	p := make(map[int]string)
+	p := make(map[int64]string)
 	for i := range definitions {
 		p[definitions[i].ID] = definitions[i].Title
 	}

@@ -42,7 +42,7 @@ func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	// Format profile ID=>Name into a nice map.
-	p := make(map[int]string)
+	p := make(map[int64]string)
 	for i := range profiles {
 		p[profiles[i].ID] = profiles[i].Name
 	}
@@ -51,7 +51,7 @@ func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) radarrCheckMovie(r *http.Request) (int, interface{}) {
-	tmdbID, _ := strconv.Atoi(mux.Vars(r)["tmdbid"])
+	tmdbID, _ := strconv.ParseInt(mux.Vars(r)["tmdbid"], 10, 64)
 	// Check for existing movie.
 	if m, err := getRadarr(r).GetMovie(tmdbID); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
@@ -81,7 +81,7 @@ func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
 
 	if payload.Title == "" {
 		// Title must exist, even if it's wrong.
-		payload.Title = strconv.Itoa(payload.TmdbID)
+		payload.Title = strconv.FormatInt(payload.TmdbID, 10)
 	}
 
 	if payload.MinimumAvailability == "" {

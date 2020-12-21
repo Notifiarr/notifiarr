@@ -44,7 +44,7 @@ func (c *Client) sonarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	// Format profile ID=>Name into a nice map.
-	p := make(map[int]string)
+	p := make(map[int64]string)
 	for i := range profiles {
 		p[profiles[i].ID] = profiles[i].Name
 	}
@@ -60,7 +60,7 @@ func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	// Format profile ID=>Name into a nice map.
-	p := make(map[int]string)
+	p := make(map[int64]string)
 	for i := range profiles {
 		p[profiles[i].ID] = profiles[i].Name
 	}
@@ -69,7 +69,7 @@ func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
-	tvdbid, _ := strconv.Atoi(mux.Vars(r)["tvdbid"])
+	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], 10, 64)
 	// Check for existing series.
 	if m, err := getSonarr(r).GetSeries(tvdbid); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)

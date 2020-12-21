@@ -16,6 +16,7 @@ import (
 
 // Application Defaults.
 const (
+	DefaultName      = "discordnotifier-client"
 	DefaultLogFileMb = 100
 	DefaultLogFiles  = 0 // delete none
 	DefaultTimeout   = 5 * time.Second
@@ -42,7 +43,7 @@ type Config struct {
 	LogFile    string           `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
 	LogFiles   int              `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
 	LogFileMb  int              `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
-	WebRoot    string           `json:"webroot" toml:"webroot" xml:"webroot" yaml:"webroot"`
+	URLBase    string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
 	Timeout    cnfg.Duration    `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Sonarr     []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
 	Radarr     []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
@@ -78,13 +79,13 @@ func NewDefaults() *Client {
 		signal: make(chan os.Signal, 1),
 		Logger: &Logger{Logger: log.New(os.Stdout, "", log.LstdFlags)},
 		Config: &Config{
-			WebRoot:   "/",
+			URLBase:   "/",
 			LogFiles:  DefaultLogFiles,
 			LogFileMb: DefaultLogFileMb,
 			BindAddr:  DefaultBindAddr,
 			Timeout:   cnfg.Duration{Duration: DefaultTimeout},
 		}, Flags: &Flags{
-			FlagSet:    flag.NewFlagSet("discordnotifier-client", flag.ExitOnError),
+			FlagSet:    flag.NewFlagSet(DefaultName, flag.ExitOnError),
 			ConfigFile: DefaultConfFile,
 			EnvPrefix:  DefaultEnvPrefix,
 		},
