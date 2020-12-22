@@ -52,7 +52,7 @@ func (c *Client) RunWebServer() {
 	c.sonarrHandlers()
 
 	// Initialize "special" internal API paths.
-	c.router.Handle(path.Join("/", c.Config.WebRoot, "api", "status"), // does not return any data
+	c.router.Handle(path.Join("/", c.Config.URLBase, "api", "status"), // does not return any data
 		c.responseWrapper(c.statusResponse)).Methods("GET", "HEAD") // does not require a key
 	c.handleAPIpath("", "version", c.versionResponse, "GET", "HEAD") // requires a key
 

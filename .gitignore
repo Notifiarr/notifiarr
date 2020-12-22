@@ -1,8 +1,8 @@
 # Change this line.
 /discordnotifier-client
-/dnclient.conf
 # The rest is probably fine.
 /rsrc*.syso
+/*.log
 /*.conf
 /*.gz
 /*.zip

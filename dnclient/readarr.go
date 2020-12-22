@@ -44,7 +44,7 @@ func (c *Client) readarrMetaProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	// Format profile ID=>Name into a nice map.
-	p := make(map[int]string)
+	p := make(map[int64]string)
 	for i := range profiles {
 		p[profiles[i].ID] = profiles[i].Name
 	}
@@ -60,7 +60,7 @@ func (c *Client) readarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	// Format profile ID=>Name into a nice map.
-	p := make(map[int]string)
+	p := make(map[int64]string)
 	for i := range profiles {
 		p[profiles[i].ID] = profiles[i].Name
 	}
@@ -69,7 +69,7 @@ func (c *Client) readarrProfiles(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) readarrCheckBook(r *http.Request) (int, interface{}) {
-	grid, _ := strconv.Atoi(mux.Vars(r)["grid"])
+	grid, _ := strconv.ParseInt(mux.Vars(r)["grid"], 10, 64)
 	// Check for existing book.
 	if m, err := getReadarr(r).GetBook(grid); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)

@@ -42,9 +42,9 @@ docker logs <container id from docker run>
 |Config Name|Variable Name|Default / Note|
 |---|---|---|
 debug|`DN_DEBUG`|`false` / Turns on more detailed logs.|
-quiet|`DN_QUIET`|`false` / Turns off output. Recommend setting a log_file when this is true.|
+quiet|`DN_QUIET`|`false` / Turns off output. Set a log_file if this is true.|
 bind_addr|`DN_BIND_ADDR`|`0.0.0.0:5454` / The IP and port to listen on.|
-webroot|`DN_WEBROOT`|`/` / API paths serve on `/api`. Use this to change it.|
+urlbase|`DN_URLBASE`|default: `/` Change the web root with this setting.|
 api_key|`DN_API_KEY`|**Required** / API Key from DiscordNotifier.com.|
 log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to write logs.|
 log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation.|
