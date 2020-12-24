@@ -15,11 +15,11 @@ mbid - music brainz is the source for lidarr (todo)
 
 // lidarrHandlers is called once on startup to register the web API paths.
 func (c *Client) lidarrHandlers() {
-	c.handleAPIpath(Lidarr, "/add/{id:[0-9]+}", c.lidarrAddAlbum, "POST")
-	c.handleAPIpath(Lidarr, "/check/{id:[0-9]+}/{albumid:[-a-z]+}", c.lidarrCheckAlbum, "GET")
-	c.handleAPIpath(Lidarr, "/qualityProfiles/{id:[0-9]+}", c.lidarrProfiles, "GET")
-	c.handleAPIpath(Lidarr, "/qualityDefinitions/{id:[0-9]+}", c.lidarrQualityDefs, "GET")
-	c.handleAPIpath(Lidarr, "/rootFolder/{id:[0-9]+}", c.lidarrRootFolders, "GET")
+	c.handleAPIpath(Lidarr, "/add", c.lidarrAddAlbum, "POST")
+	c.handleAPIpath(Lidarr, "/check/{albumid:[-a-z]+}", c.lidarrCheckAlbum, "GET")
+	c.handleAPIpath(Lidarr, "/qualityProfiles", c.lidarrProfiles, "GET")
+	c.handleAPIpath(Lidarr, "/qualityDefinitions", c.lidarrQualityDefs, "GET")
+	c.handleAPIpath(Lidarr, "/rootFolder", c.lidarrRootFolders, "GET")
 }
 
 func (c *Client) lidarrRootFolders(r *http.Request) (int, interface{}) {

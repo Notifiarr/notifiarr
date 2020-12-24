@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -158,7 +159,7 @@ func (c *Client) notFound(r *http.Request) (int, interface{}) {
 // slash is the handler for /.
 func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
 	msg := "<p>" + c.Flags.Name() + ": <strong>working</strong></p>\n"
-	c.Printf("HTTP [%s] %s %s: OK: %s", r.RemoteAddr, r.Method, r.RequestURI, msg)
+	c.Printf("HTTP [%s] %s %s: OK: %s", r.RemoteAddr, r.Method, r.RequestURI, strings.TrimSpace(msg))
 	_, _ = w.Write([]byte(msg))
 }
 

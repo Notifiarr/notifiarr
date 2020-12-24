@@ -70,7 +70,7 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 	}
 
 	// disccordnotifier uses 1-indexes.
-	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), api),
+	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), "{id:[0-9]+}", api),
 		c.checkAPIKey(c.responseWrapper(func(r *http.Request) (int, interface{}) {
 			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
 			default: // unknown app, just run the handler.

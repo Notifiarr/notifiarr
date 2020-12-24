@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"golift.io/starr/sonarr"
@@ -13,11 +14,12 @@ import (
 
 // sonarrHandlers is called once on startup to register the web API paths.
 func (c *Client) sonarrHandlers() {
-	c.handleAPIpath(Sonarr, "/add/{id:[0-9]+}", c.sonarrAddSeries, "POST")
-	c.handleAPIpath(Sonarr, "/check/{id:[0-9]+}/{tvdbid:[0-9]+}", c.sonarrCheckSeries, "GET")
-	c.handleAPIpath(Sonarr, "/qualityProfiles/{id:[0-9]+}", c.sonarrProfiles, "GET")
-	c.handleAPIpath(Sonarr, "/languageProfiles/{id:[0-9]+}", c.sonarrLangProfiles, "GET")
-	c.handleAPIpath(Sonarr, "/rootFolder/{id:[0-9]+}", c.sonarrRootFolders, "GET")
+	c.handleAPIpath(Sonarr, "/add", c.sonarrAddSeries, "POST")
+	c.handleAPIpath(Sonarr, "/check/{tvdbid:[0-9]+}", c.sonarrCheckSeries, "GET")
+	c.handleAPIpath(Sonarr, "/search/{query}", c.sonarrSearchSeries, "GET")
+	c.handleAPIpath(Sonarr, "/qualityProfiles", c.sonarrProfiles, "GET")
+	c.handleAPIpath(Sonarr, "/languageProfiles", c.sonarrLangProfiles, "GET")
+	c.handleAPIpath(Sonarr, "/rootFolder", c.sonarrRootFolders, "GET")
 }
 
 func (c *Client) sonarrRootFolders(r *http.Request) (int, interface{}) {
@@ -78,6 +80,49 @@ func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
+}
+
+func (c *Client) sonarrSearchSeries(r *http.Request) (int, interface{}) {
+	// Get all movies
+	series, err := getSonarr(r).GetAllSeries()
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting series: %w", err)
+	}
+
+	query := strings.ToLower(mux.Vars(r)["query"])    // in
+	returnSeries := make([]map[string]interface{}, 0) // out
+
+	for _, s := range series {
+		if seriesSearch(query, s.Title, s.AlternateTitles) {
+			returnSeries = append(returnSeries, map[string]interface{}{
+				"id":     s.ID,
+				"title":  s.Title,
+				"first":  s.FirstAired,
+				"next":   s.NextAiring,
+				"prev":   s.PreviousAiring,
+				"added":  s.Added,
+				"status": s.Status,
+				"exists": s.Statistics.SizeOnDisk > 0,
+				"path":   s.Path,
+			})
+		}
+	}
+
+	return http.StatusOK, returnSeries
+}
+
+func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
+	if strings.Contains(strings.ToLower(title), query) {
+		return true
+	}
+
+	for _, t := range alts {
+		if strings.Contains(strings.ToLower(t.Title), query) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (c *Client) sonarrAddSeries(r *http.Request) (int, interface{}) {

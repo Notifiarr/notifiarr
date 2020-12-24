@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"golift.io/starr/radarr"
@@ -12,10 +13,11 @@ import (
 
 // radarrHandlers is called once on startup to register the web API paths.
 func (c *Client) radarrHandlers() {
-	c.handleAPIpath(Radarr, "/add/{id:[0-9]+}", c.radarrAddMovie, "POST")
-	c.handleAPIpath(Radarr, "/check/{id:[0-9]+}/{tmdbid:[0-9]+}", c.radarrCheckMovie, "GET")
-	c.handleAPIpath(Radarr, "/qualityProfiles/{id:[0-9]+}", c.radarrProfiles, "GET")
-	c.handleAPIpath(Radarr, "/rootFolder/{id:[0-9]+}", c.radarrRootFolders, "GET")
+	c.handleAPIpath(Radarr, "/add", c.radarrAddMovie, "POST")
+	c.handleAPIpath(Radarr, "/search/{query}", c.radarrSearchMovie, "GET")
+	c.handleAPIpath(Radarr, "/check/{tmdbid:[0-9]+}", c.radarrCheckMovie, "GET")
+	c.handleAPIpath(Radarr, "/qualityProfiles", c.radarrProfiles, "GET")
+	c.handleAPIpath(Radarr, "/rootFolder", c.radarrRootFolders, "GET")
 }
 
 func (c *Client) radarrRootFolders(r *http.Request) (int, interface{}) {
@@ -60,6 +62,50 @@ func (c *Client) radarrCheckMovie(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
+}
+
+func (c *Client) radarrSearchMovie(r *http.Request) (int, interface{}) {
+	// Get all movies
+	movies, err := getRadarr(r).GetMovie(0)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting movies: %w", err)
+	}
+
+	query := strings.ToLower(mux.Vars(r)["query"])    // in
+	returnMovies := make([]map[string]interface{}, 0) // out
+
+	for _, movie := range movies {
+		if movieSearch(query, []string{movie.Title, movie.OriginalTitle}, movie.AlternateTitles) {
+			returnMovies = append(returnMovies, map[string]interface{}{
+				"id":      movie.ID,
+				"title":   movie.Title,
+				"cinemas": movie.InCinemas,
+				"status":  movie.Status,
+				"exists":  movie.HasFile,
+				"added":   movie.Added,
+				"year":    movie.Year,
+				"path":    movie.Path,
+			})
+		}
+	}
+
+	return http.StatusOK, returnMovies
+}
+
+func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle) bool {
+	for _, t := range titles {
+		if t != "" && strings.Contains(strings.ToLower(t), query) {
+			return true
+		}
+	}
+
+	for _, t := range alts {
+		if strings.Contains(strings.ToLower(t.Title), query) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
