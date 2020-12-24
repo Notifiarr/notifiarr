@@ -134,22 +134,14 @@ func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
 
 // versionResponse returns application run and build time data.
 func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
-	return http.StatusOK, struct {
-		V string  `json:"version"`
-		U string  `json:"uptime"`
-		S float64 `json:"uptime_seconds"`
-		D string  `json:"build_date"`
-		B string  `json:"branch"`
-		G string  `json:"go_version"`
-		R string  `json:"revision"`
-	}{
-		version.Version,
-		time.Since(version.Started).Round(time.Second).String(),
-		time.Since(version.Started).Round(time.Second).Seconds(),
-		version.BuildDate,
-		version.Branch,
-		version.GoVersion,
-		version.Revision,
+	return http.StatusOK, map[string]interface{}{
+		"version":        version.Version,
+		"uptime":         time.Since(version.Started).Round(time.Second).String(),
+		"uptime_seconds": time.Since(version.Started).Round(time.Second).Seconds(),
+		"build_date":     version.BuildDate,
+		"branch":         version.Branch,
+		"go_version":     version.GoVersion,
+		"revision":       version.Revision,
 	}
 }
 
@@ -168,7 +160,7 @@ func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
-	if b, err := bindata.Asset("init/windows/application.ico"); err != nil {
+	if b, err := bindata.Asset("files/favicon.ico"); err != nil {
 		c.Printf("HTTP [%s] %s %s: 500: Internal Server Error: %v",
 			strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, err)
 		w.WriteHeader(http.StatusInternalServerError)

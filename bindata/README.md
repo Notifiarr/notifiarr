@@ -1,2 +1,2 @@
-The files in this folder are auto generated.
-Currently we use bindata to store the favicon.ico file. That is all.
+The files in this folder are auto generated from the files/ folder.
+Currently bindata is used to store the favicon.ico file. That is all.
