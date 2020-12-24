@@ -1,7 +1,5 @@
 package main
 
-//go:generate go-bindata -pkg dnclient -modtime 1587356420 -o dnclient/bindata.go init/windows/application.ico
-
 import (
 	"log"
 	"os"

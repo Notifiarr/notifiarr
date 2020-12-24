@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"golift.io/starr/readarr"
@@ -13,11 +14,12 @@ import (
 
 // readarrHandlers is called once on startup to register the web API paths.
 func (c *Client) readarrHandlers() {
-	c.handleAPIpath(Readarr, "/add/{id:[0-9]+}", c.readarrAddBook, "POST")
-	c.handleAPIpath(Readarr, "/check/{id:[0-9]+}/{grid:[0-9]+}", c.readarrCheckBook, "GET")
-	c.handleAPIpath(Readarr, "/metadataProfiles/{id:[0-9]+}", c.readarrMetaProfiles, "GET")
-	c.handleAPIpath(Readarr, "/qualityProfiles/{id:[0-9]+}", c.readarrProfiles, "GET")
-	c.handleAPIpath(Readarr, "/rootFolder/{id:[0-9]+}", c.readarrRootFolders, "GET")
+	c.handleAPIpath(Readarr, "/add", c.readarrAddBook, "POST")
+	c.handleAPIpath(Readarr, "/search/{query}", c.readarrSearchBook, "GET")
+	c.handleAPIpath(Readarr, "/check/{grid:[0-9]+}", c.readarrCheckBook, "GET")
+	c.handleAPIpath(Readarr, "/metadataProfiles", c.readarrMetaProfiles, "GET")
+	c.handleAPIpath(Readarr, "/qualityProfiles", c.readarrProfiles, "GET")
+	c.handleAPIpath(Readarr, "/rootFolder", c.readarrRootFolders, "GET")
 }
 
 func (c *Client) readarrRootFolders(r *http.Request) (int, interface{}) {
@@ -78,6 +80,56 @@ func (c *Client) readarrCheckBook(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
+}
+
+func (c *Client) readarrSearchBook(r *http.Request) (int, interface{}) {
+	books, err := getReadarr(r).GetBook(0)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
+	}
+
+	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
+	returnBooks := make([]map[string]interface{}, 0)                  // out
+
+	for _, book := range books {
+		if bookSearch(query, book.Title, book.Editions) {
+			b := map[string]interface{}{
+				"id":       book.ID,
+				"title":    book.Title,
+				"release":  book.ReleaseDate,
+				"author":   book.Author.AuthorName,
+				"authorId": book.Author.Ended,
+				"overview": book.Overview,
+				"ratings":  book.Ratings.Value,
+				"pages":    book.PageCount,
+				"exists":   false,
+				"files":    0,
+			}
+
+			if book.Statistics != nil {
+				b["files"] = book.Statistics.BookFileCount
+				b["exists"] = book.Statistics.SizeOnDisk > 0
+			}
+
+			returnBooks = append(returnBooks, b)
+		}
+	}
+
+	return http.StatusOK, returnBooks
+}
+
+func bookSearch(query, title string, editions []*readarr.Edition) bool {
+	if strings.Contains(strings.ToLower(title), query) {
+		return true
+	}
+
+	for _, t := range editions {
+		if strings.Contains(strings.ToLower(t.Title), query) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (c *Client) readarrAddBook(r *http.Request) (int, interface{}) {
