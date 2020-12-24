@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
 	"github.com/gorilla/mux"
 	"golift.io/version"
 )
@@ -86,7 +87,7 @@ func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-Key") != c.Config.APIKey {
 			c.Printf("HTTP [%s] %s %s: %d: Unauthorized: bad API key",
-				r.RemoteAddr, r.Method, r.RequestURI, http.StatusUnauthorized)
+				strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, http.StatusUnauthorized)
 			w.WriteHeader(http.StatusUnauthorized)
 		} else {
 			next.ServeHTTP(w, r)
@@ -111,9 +112,9 @@ func (c *Client) responseWrapper(next apiHandle) http.Handler {
 		}
 
 		if s, ok := msg.(string); ok {
-			c.Printf("HTTP [%s] %s %s: %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt, s)
+			c.Printf("HTTP [%s] %s %s: %s: %s", strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, statusTxt, strings.TrimSpace(s))
 		} else {
-			c.Printf("HTTP [%s] %s %s: %s", r.RemoteAddr, r.Method, r.RequestURI, statusTxt)
+			c.Printf("HTTP [%s] %s %s: %s", strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, statusTxt)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -159,16 +160,16 @@ func (c *Client) notFound(r *http.Request) (int, interface{}) {
 // slash is the handler for /.
 func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
 	msg := "<p>" + c.Flags.Name() + ": <strong>working</strong></p>\n"
-	c.Printf("HTTP [%s] %s %s: OK: %s", r.RemoteAddr, r.Method, r.RequestURI, strings.TrimSpace(msg))
+	c.Printf("HTTP [%s] %s %s: OK: %s", strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, strings.TrimSpace(msg))
 	_, _ = w.Write([]byte(msg))
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
-	if b, err := Asset("init/windows/application.ico"); err != nil {
-		c.Printf("HTTP [%s] %s %s: 500: Internal Server Error: %v", r.RemoteAddr, r.Method, r.RequestURI, err)
+	if b, err := bindata.Asset("init/windows/application.ico"); err != nil {
+		c.Printf("HTTP [%s] %s %s: 500: Internal Server Error: %v", strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, err)
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
-		c.Printf("HTTP [%s] %s %s: 200 OK", r.RemoteAddr, r.Method, r.RequestURI)
+		c.Printf("HTTP [%s] %s %s: 200 OK", strings.Split(r.RemoteAddr, ":")[0], r.Method, strings.TrimSpace(r.RequestURI))
 		http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
 	}
 }

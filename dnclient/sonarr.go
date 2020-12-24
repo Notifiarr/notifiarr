@@ -89,12 +89,12 @@ func (c *Client) sonarrSearchSeries(r *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting series: %w", err)
 	}
 
-	query := strings.ToLower(mux.Vars(r)["query"])    // in
-	returnSeries := make([]map[string]interface{}, 0) // out
+	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
+	returnSeries := make([]map[string]interface{}, 0)                 // out
 
 	for _, s := range series {
 		if seriesSearch(query, s.Title, s.AlternateTitles) {
-			returnSeries = append(returnSeries, map[string]interface{}{
+			b := map[string]interface{}{
 				"id":     s.ID,
 				"title":  s.Title,
 				"first":  s.FirstAired,
@@ -102,9 +102,15 @@ func (c *Client) sonarrSearchSeries(r *http.Request) (int, interface{}) {
 				"prev":   s.PreviousAiring,
 				"added":  s.Added,
 				"status": s.Status,
-				"exists": s.Statistics.SizeOnDisk > 0,
+				"exists": false,
 				"path":   s.Path,
-			})
+			}
+
+			if s.Statistics != nil {
+				b["exists"] = s.Statistics.SizeOnDisk > 0
+			}
+
+			returnSeries = append(returnSeries, b)
 		}
 	}
 

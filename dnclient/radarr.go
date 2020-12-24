@@ -71,8 +71,8 @@ func (c *Client) radarrSearchMovie(r *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting movies: %w", err)
 	}
 
-	query := strings.ToLower(mux.Vars(r)["query"])    // in
-	returnMovies := make([]map[string]interface{}, 0) // out
+	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
+	returnMovies := make([]map[string]interface{}, 0)                 // out
 
 	for _, movie := range movies {
 		if movieSearch(query, []string{movie.Title, movie.OriginalTitle}, movie.AlternateTitles) {

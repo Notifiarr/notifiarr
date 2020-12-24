@@ -88,20 +88,12 @@ func (c *Client) readarrSearchBook(r *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
 	}
 
-	query := strings.ToLower(mux.Vars(r)["query"])   // in
-	returnBooks := make([]map[string]interface{}, 0) // out
+	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
+	returnBooks := make([]map[string]interface{}, 0)                  // out
 
-	/*
-	   $message .= 'ID:         '. $bookResult['id'] ."\n";
-	   $message .= 'Downloaded: '. (($exists) ? 'Yes' : 'No') ."\n";
-	   $message .= 'Rating:     '. $bookResult['average_rating'] ."\n";
-	   $message .= 'Pages:      '. $bookResult['num_pages'] ."\n";
-	   $message .= 'Title:      '. $bookResult['title'] ."\n";
-	   $message .= 'Synopsis:   '. strip_tags(str_replace('<br />', "\n", $bookResult['description'])) ."\n";
-	*/
 	for _, book := range books {
 		if bookSearch(query, book.Title, book.Editions) {
-			returnBooks = append(returnBooks, map[string]interface{}{
+			b := map[string]interface{}{
 				"id":       book.ID,
 				"title":    book.Title,
 				"release":  book.ReleaseDate,
@@ -110,9 +102,16 @@ func (c *Client) readarrSearchBook(r *http.Request) (int, interface{}) {
 				"overview": book.Overview,
 				"ratings":  book.Ratings.Value,
 				"pages":    book.PageCount,
-				"files":    book.Statistics.BookFileCount,
-				"exists":   book.Statistics.SizeOnDisk > 0,
-			})
+				"exists":   false,
+				"files":    0,
+			}
+
+			if book.Statistics != nil {
+				b["files"] = book.Statistics.BookFileCount
+				b["exists"] = book.Statistics.SizeOnDisk > 0
+			}
+
+			returnBooks = append(returnBooks, b)
 		}
 	}
 

@@ -1,4 +1,5 @@
 //nolint:dupl
+
 package dnclient
 
 /*
