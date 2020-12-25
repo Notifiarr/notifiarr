@@ -7,6 +7,7 @@ import (
 	"path"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -70,26 +71,38 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 
 	// disccordnotifier uses 1-indexes.
 	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), "{id:[0-9]+}", api),
-		c.checkAPIKey(c.responseWrapper(func(r *http.Request) (int, interface{}) {
+		c.checkAPIKey(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+
 			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
 			default: // unknown app, just run the handler.
-				return next(r)
+				i, m := next(r)
+				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
+				c.respond(w, i, m)
 			case app == Radarr && (id > len(c.Config.Radarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr)
+				c.respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr))
 			case app == Lidarr && (id > len(c.Config.Lidarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr)
+				c.respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr))
 			case app == Sonarr && (id > len(c.Config.Sonarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr)
+				c.respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr))
 			case app == Readarr && (id > len(c.Config.Readarr) || id < 1):
-				return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr)
+				c.respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr))
 			case app == Radarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Radarr, c.Config.Radarr[id-1])))
+				i, m := next(r.WithContext(context.WithValue(r.Context(), Radarr, c.Config.Radarr[id-1])))
+				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
+				c.respond(w, i, m)
 			case app == Lidarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Lidarr, c.Config.Lidarr[id-1])))
+				i, m := next(r.WithContext(context.WithValue(r.Context(), Lidarr, c.Config.Lidarr[id-1])))
+				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
+				c.respond(w, i, m)
 			case app == Sonarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Sonarr, c.Config.Sonarr[id-1])))
+				i, m := next(r.WithContext(context.WithValue(r.Context(), Sonarr, c.Config.Sonarr[id-1])))
+				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
+				c.respond(w, i, m)
 			case app == Readarr:
-				return next(r.WithContext(context.WithValue(r.Context(), Readarr, c.Config.Readarr[id-1])))
+				i, m := next(r.WithContext(context.WithValue(r.Context(), Readarr, c.Config.Readarr[id-1])))
+				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
+				c.respond(w, i, m)
 			}
 		}))).Methods(method...)
 }

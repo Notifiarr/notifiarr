@@ -10,7 +10,6 @@ import (
 	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
-	"golift.io/cnfg/cnfgfile"
 	"golift.io/version"
 )
 
@@ -19,7 +18,7 @@ const (
 	DefaultName      = "discordnotifier-client"
 	DefaultLogFileMb = 100
 	DefaultLogFiles  = 0 // delete none
-	DefaultTimeout   = 5 * time.Second
+	DefaultTimeout   = time.Minute
 	DefaultBindAddr  = "0.0.0.0:5454"
 	DefaultEnvPrefix = "DN"
 )
@@ -44,6 +43,7 @@ type Config struct {
 	LogFiles   int              `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
 	LogFileMb  int              `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
 	URLBase    string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	Upstreams  []string         `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration    `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Sonarr     []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
 	Radarr     []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
@@ -65,6 +65,7 @@ type Client struct {
 	server *http.Server
 	router *mux.Router
 	signal chan os.Signal
+	allow  allowedIPs
 }
 
 // Errors returned by this package.
@@ -86,7 +87,7 @@ func NewDefaults() *Client {
 			Timeout:   cnfg.Duration{Duration: DefaultTimeout},
 		}, Flags: &Flags{
 			FlagSet:    flag.NewFlagSet(DefaultName, flag.ExitOnError),
-			ConfigFile: DefaultConfFile,
+			ConfigFile: os.Getenv(DefaultEnvPrefix + "_CONFIG_FILE"),
 			EnvPrefix:  DefaultEnvPrefix,
 		},
 	}
@@ -94,7 +95,7 @@ func NewDefaults() *Client {
 
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", DefaultConfFile, f.Name()+" Config File")
+	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.Parse(args) // nolint: errcheck
@@ -112,10 +113,9 @@ func Start() error {
 		return nil // nolint: nlreturn // print version and exit.
 	}
 
-	if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
-		return fmt.Errorf("config file: %w", err)
-	} else if _, err = cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
-		return fmt.Errorf("environment variables: %w", err)
+	msg, err := c.getConfig()
+	if err != nil {
+		return fmt.Errorf("%s: %w", msg, err)
 	}
 
 	if c.Config.APIKey == "" {
@@ -127,6 +127,7 @@ func Start() error {
 
 	c.SetupLogging()
 	c.Printf("%s v%s Starting! [PID: %v] %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
+	c.Printf("==> %s", msg)
 	c.InitStartup()
 	c.RunWebServer()
 

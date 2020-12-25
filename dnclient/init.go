@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/signal"
 	"path"
-	"strings"
 	"syscall"
 	"time"
 
@@ -25,23 +24,14 @@ import (
 // InitStartup fixes config problems and prints info about our startup config.
 // This runs once on startup.
 func (c *Client) InitStartup() {
-	if c.Config.Timeout.Duration == 0 {
-		c.Config.Timeout.Duration = DefaultTimeout
-	}
-
-	if c.Config.BindAddr == "" {
-		c.Config.BindAddr = DefaultBindAddr
-	} else if !strings.Contains(c.Config.BindAddr, ":") {
-		c.Config.BindAddr = "0.0.0.0:" + c.Config.BindAddr
-	}
-
 	c.Printf("==> %s <==", helpLink)
 	c.Print("==> Startup Settings <==")
 	c.initSonarr()
 	c.initRadarr()
 	c.initLidarr()
 	c.initReadarr()
-	c.Print(" => Debug / Quiet:", c.Config.Debug, "/", c.Config.Quiet)
+	c.Printf(" => Timeout: %v, Debug: %v, Quiet: %v", c.Config.Timeout, c.Config.Debug, c.Config.Quiet)
+	c.Print(" => Allows Upstream Networks:", c.allow.combineUpstreams())
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
@@ -58,6 +48,18 @@ func (c *Client) InitStartup() {
 
 		c.Printf(" => Log File: %s (%s)", c.Config.LogFile, msg)
 	}
+}
+
+func (n allowedIPs) combineUpstreams() (s string) {
+	for i := range n {
+		if s != "" {
+			s += ", "
+		}
+
+		s += n[i].String()
+	}
+
+	return s
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.

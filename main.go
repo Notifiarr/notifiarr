@@ -14,7 +14,7 @@ func main() {
 	setTimeZone(os.Getenv("TZ"))
 
 	if err := dnclient.Start(); err != nil {
-		log.Fatal("[ERROR]", err)
+		log.Fatalln("[ERROR]", err)
 	}
 }
 
