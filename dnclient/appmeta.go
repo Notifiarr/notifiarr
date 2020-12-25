@@ -73,11 +73,12 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), "{id:[0-9]+}", api),
 		c.checkAPIKey(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
-
+			defer func() {
+				w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
+			}()
 			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
 			default: // unknown app, just run the handler.
 				i, m := next(r)
-				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
 				c.respond(w, i, m)
 			case app == Radarr && (id > len(c.Config.Radarr) || id < 1):
 				c.respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr))
@@ -89,19 +90,15 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 				c.respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr))
 			case app == Radarr:
 				i, m := next(r.WithContext(context.WithValue(r.Context(), Radarr, c.Config.Radarr[id-1])))
-				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
 				c.respond(w, i, m)
 			case app == Lidarr:
 				i, m := next(r.WithContext(context.WithValue(r.Context(), Lidarr, c.Config.Lidarr[id-1])))
-				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
 				c.respond(w, i, m)
 			case app == Sonarr:
 				i, m := next(r.WithContext(context.WithValue(r.Context(), Sonarr, c.Config.Sonarr[id-1])))
-				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
 				c.respond(w, i, m)
 			case app == Readarr:
 				i, m := next(r.WithContext(context.WithValue(r.Context(), Readarr, c.Config.Readarr[id-1])))
-				w.Header().Set(xRequestTime, time.Since(start).Round(time.Microsecond).String())
 				c.respond(w, i, m)
 			}
 		}))).Methods(method...)

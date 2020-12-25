@@ -41,14 +41,15 @@ docker logs <container id from docker run>
 
 |Config Name|Variable Name|Default / Note|
 |---|---|---|
-debug|`DN_DEBUG`|`false` / Turns on more detailed logs.|
-quiet|`DN_QUIET`|`false` / Turns off output. Set a log_file if this is true.|
-bind_addr|`DN_BIND_ADDR`|`0.0.0.0:5454` / The IP and port to listen on.|
-urlbase|`DN_URLBASE`|default: `/` Change the web root with this setting.|
-api_key|`DN_API_KEY`|**Required** / API Key from DiscordNotifier.com.|
-log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to write logs.|
-log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation.|
-log_file_mb|`DN_LOG_FILE_MB`|`10` / Max size of log files in megabytes.|
+debug|`DN_DEBUG`|`false` / Turns on more detailed logs|
+quiet|`DN_QUIET`|`false` / Turns off output. Set a log_file if this is true|
+bind_addr|`DN_BIND_ADDR`|`0.0.0.0:5454` / The IP and port to listen on|
+urlbase|`DN_URLBASE`|default: `/` Change the web root with this setting|
+upstreams|`DN_UPSTREAMS_0`|List of upstream networks that can set X-Forwarded-For|
+api_key|`DN_API_KEY`|**Required** / API Key from DiscordNotifier.com|
+log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to write logs|
+log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation|
+log_file_mb|`DN_LOG_FILE_MB`|`10` / Max size of log files in megabytes|
 timeout|`DN_TIMEOUT`|`10s` / Global API Timeouts (all apps default)|
 
 ##### Sonarr
@@ -124,6 +125,28 @@ brew services start discordnotifier-client
 -   Edit the example config file from the zip file to suit your system. Rename the example to `dnclient.conf`.
 -   Run the `discordnotifier-client.amd64.exe` binary. This starts the app prints out what it's doing.
 
+## Reverse Proxy
+
+You'll need to expose this application to the Internet, so DiscordNotifier.com
+can make connections to it. While you can certainly poke a hole your firewall
+and send the traffic directly to this app, it is recommended that you put it
+behind a reverse proxy. It's pretty easy.
+
+You'll want to tune the `upstreams` and `urlbase` settings for your environment.
+If your reverse proxy IP is `192.168.3.45` then set `upstreams = ["192.168.3.45/32"]`.
+The `urlbase` can be left at `/`, but change it if you serve this app from a
+subfolder. We'll assume you want to serve the app from `/discordnotifier/` and
+it's running on `192.168.3.33` - here's a sample nginx config to do that:
+
+```
+location /discordnotifier/ {
+  proxy_set_header X-Forwarded-For $remote_addr;
+  proxy_pass http://192.168.3.33:5454$request_uri;
+}
+```
+
+Make sure the `location` path matches the `urlbase` and ends with a `/`.
+That's all there is to it.
 
 ## Troubleshooting
 
@@ -140,7 +163,6 @@ Try the Force Recheck option if you use Deluge.
 
 Still having problems?
 [Let me know!](https://github.com/Go-Lift-TV/discordnotifier-client/issues/new)
-
 
 ## Contributing
 

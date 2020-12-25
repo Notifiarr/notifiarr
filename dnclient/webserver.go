@@ -32,11 +32,6 @@ var (
 	ErrExists    = fmt.Errorf("the requested item already exists")
 )
 
-const (
-	xRequestTime = "X-Request-Time"
-	xAPIKey      = "X-API-Key"
-)
-
 type (
 	// apiHandle is our custom handler function for APIs.
 	apiHandle func(r *http.Request) (int, interface{})
@@ -99,7 +94,7 @@ func (c *Client) runWebServer() {
 // checkAPIKey drops a 403 if the API key doesn't match.
 func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get(xAPIKey) != c.Config.APIKey {
+		if r.Header.Get("X-API-Key") != c.Config.APIKey {
 			w.WriteHeader(http.StatusUnauthorized)
 		} else {
 			next.ServeHTTP(w, r)
@@ -162,8 +157,10 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
 func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := strings.Trim(r.RemoteAddr[:strings.LastIndex(r.RemoteAddr, ":")], "[]")
-		if r.Header.Get("X-Forwarded-For") == "" || !c.allow.contains(ip) {
+		if x := r.Header.Get("X-Forwarded-For"); x == "" || !c.allow.contains(ip) {
 			r.Header.Set("X-Forwarded-For", ip)
+		} else if l := strings.LastIndexAny(x, ", "); l != -1 {
+			r.Header.Set("X-Forwarded-For", strings.Trim(x[l:len(x)-1], ", "))
 		}
 
 		next.ServeHTTP(w, r)

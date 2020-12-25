@@ -17,6 +17,7 @@ OPTIONS
 
     -c, --config <config file>
         Provide a configuration file (instead of the default).
+        Can also be passed as environment variable: DN_CONFIG_FILE
 
     -p, --prefix
         The default environment variable configuration prefix is `DN`.
