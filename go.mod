@@ -3,7 +3,10 @@ module github.com/Go-Lift-TV/discordnotifier-client
 go 1.15
 
 require (
+	fyne.io/fyne v1.4.2
+	github.com/getlantern/systray v1.1.0
 	github.com/gorilla/mux v1.8.0
+	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	golift.io/cnfg v0.0.7
 	golift.io/rotatorr v0.0.0-20201213130124-94efc0b9aff1

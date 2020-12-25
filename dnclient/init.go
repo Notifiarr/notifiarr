@@ -14,7 +14,6 @@ import (
 	"path"
 	"strings"
 	"syscall"
-	"time"
 
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
@@ -62,10 +61,12 @@ func (c *Client) InitStartup() {
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
-	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-c.signal)
+	if c.signal != nil {
+		signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+		c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-c.signal)
+	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 	defer cancel()
 
 	if c.server != nil {
