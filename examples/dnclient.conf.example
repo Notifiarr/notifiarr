@@ -20,6 +20,11 @@ quiet = false
 # Set it to /somethingelse/api by setting urlbase to "/somethingelse"
 urlbase = "/"
 
+# Allowed upstream networks. The networks here are allowed to send x-forwarded-for.
+# Set this to your reverse proxy server's IP or network. If you leave off the mask,
+# then /32 or /128 is assumed depending on IP version. Empty by default. Example:
+#upstreams = [ "127.0.0.1/32", "::1/128" ]
+
 # If you provide a cert and key file (pem) paths, this app will listen with SSL/TLS.
 # Uncomment both lines and add valid file paths. Make sure this app can read them.
 # ssl_key_file  = "/path/to/cert.key"
@@ -32,28 +37,30 @@ log_files_mb = 100
 # How many files to keep? 0 = all.
 log_files = 10
 
-# Default timeout to wait for an application to respond. Can be set per app.
-timeout = "5s"
+# Web server and application timeouts.
+timeout = "1m"
 
 
-###################################################### ################
-# App settings. Add # to the beginning of app settings you don't use. #
-###################################################### ################
+    ##################
+    # Starr Settings #
+    ##################
 
 # The API keys are specific to the app. Get it from General Settings.
+# Configurations for unused apps are harmless. Set URL and API key for
+# apps you have and want to make requests to using Media Bot.
 
 [[radarr]]
   url     = "http://127.0.0.1:7878/radarr"
-  api_key = "ABC"
+  api_key = ""
 
 [[readarr]]
   url     = "http://127.0.0.1:8787/readarr"
-  api_key = "XYZ"
+  api_key = ""
 
 [[sonarr]]
   url     = "http://127.0.0.1:8989/"
-  api_key = "XXX"
+  api_key = ""
 
 [[lidarr]]
   url     = "http://127.0.0.1:8686/"
-  api_key = "ZZZ"
+  api_key = ""

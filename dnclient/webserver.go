@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
 	"github.com/gorilla/mux"
+	apachelog "github.com/lestrrat-go/apache-logformat"
 	"golift.io/version"
 )
 
@@ -30,16 +32,23 @@ var (
 	ErrExists    = fmt.Errorf("the requested item already exists")
 )
 
-// apiHandle is our custom handler function for APIs.
-type apiHandle func(r *http.Request) (int, interface{})
+type (
+	// apiHandle is our custom handler function for APIs.
+	apiHandle func(r *http.Request) (int, interface{})
+	// allowedIPs determines who can set x-forwarded-for.
+	allowedIPs []*net.IPNet
+)
 
 // RunWebServer starts the web server.
 func (c *Client) RunWebServer() {
+	// Create an apache-style logger.
+	l, _ := apachelog.New(`HTTP %{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
+		`"%{User-agent}i" %{X-Request-Time}o %Dμs`)
 	// Create a request router.
 	c.router = mux.NewRouter()
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
-		Handler:      c.router,
+		Handler:      l.Wrap(c.fixForwardedFor(c.router), c.Logger.Logger.Writer()),
 		Addr:         c.Config.BindAddr,
 		IdleTimeout:  c.Config.Timeout.Duration,
 		WriteTimeout: c.Config.Timeout.Duration,
@@ -55,13 +64,13 @@ func (c *Client) RunWebServer() {
 
 	// Initialize "special" internal API paths.
 	c.router.Handle(path.Join("/", c.Config.URLBase, "api", "status"), // does not return any data
-		c.responseWrapper(c.statusResponse)).Methods("GET", "HEAD") // does not require a key
+		http.HandlerFunc(c.statusResponse)).Methods("GET", "HEAD") // does not require a key
 	c.handleAPIpath("", "version", c.versionResponse, "GET", "HEAD") // requires a key
 
 	// Initialize internal-only paths.
-	c.router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))    // built-in icon.
-	c.router.Handle("/", http.HandlerFunc(c.slash))                 // "hi" page on /
-	c.router.PathPrefix("/").Handler(c.responseWrapper(c.notFound)) // 404 everything
+	c.router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
+	c.router.Handle("/", http.HandlerFunc(c.slash))                // "hi" page on /
+	c.router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
 
 	// Run the server.
 	go c.runWebServer()
@@ -86,8 +95,6 @@ func (c *Client) runWebServer() {
 func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-Key") != c.Config.APIKey {
-			c.Printf("HTTP [%s] %s %s: %d: Unauthorized: bad API key",
-				strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, http.StatusUnauthorized)
 			w.WriteHeader(http.StatusUnauthorized)
 		} else {
 			next.ServeHTTP(w, r)
@@ -95,44 +102,21 @@ func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 	})
 }
 
-// Response formats all content-containing replies to client web requests.
-type Response struct {
-	Status  string      `json:"status"`
-	Message interface{} `json:"message"`
+func (c *Client) respond(w http.ResponseWriter, stat int, msg interface{}) {
+	if m, ok := msg.(error); ok {
+		msg = m.Error()
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(stat)
+
+	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+	b, _ := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
+	_, _ = w.Write(b)
+	_, _ = w.Write([]byte("\n")) // curl likes new lines.
 }
 
-// responseWrapper formats all content-containing replies to clients.
-func (c *Client) responseWrapper(next apiHandle) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		stat, msg := next(r)
-		statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
-
-		if m, ok := msg.(error); ok {
-			msg = m.Error()
-		}
-
-		if s, ok := msg.(string); ok {
-			c.Printf("HTTP [%s] %s %s: %s: %s",
-				strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, statusTxt, strings.TrimSpace(s))
-		} else {
-			c.Printf("HTTP [%s] %s %s: %s", strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, statusTxt)
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(stat)
-
-		b, _ := json.Marshal(&Response{Status: statusTxt, Message: msg})
-		_, _ = w.Write(b)
-		_, _ = w.Write([]byte("\n")) // curl likes new lines.
-	})
-}
-
-// notFound is the handler for paths that are not found: 404s.
-func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
-	return http.StatusOK, "I'm alive!"
-}
-
-// versionResponse returns application run and build time data.
+// versionResponse returns application run and build time data: /api/version.
 func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 	return http.StatusOK, map[string]interface{}{
 		"version":        version.Version,
@@ -146,26 +130,49 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 }
 
 // notFound is the handler for paths that are not found: 404s.
-func (c *Client) notFound(r *http.Request) (int, interface{}) {
-	return http.StatusNotFound, "Check your request parameters and try again."
+func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
+	c.respond(w, http.StatusNotFound, "Check your request parameters and try again.")
+}
+
+// statusResponse is the handler for /api/status.
+func (c *Client) statusResponse(w http.ResponseWriter, r *http.Request) {
+	c.respond(w, http.StatusOK, "I'm alive!")
 }
 
 // slash is the handler for /.
 func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
-	msg := "<p>" + c.Flags.Name() + ": <strong>working</strong></p>\n"
-	c.Printf("HTTP [%s] %s %s: OK: %s",
-		strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, strings.TrimSpace(msg))
-
-	_, _ = w.Write([]byte(msg))
+	_, _ = w.Write([]byte("<p>" + c.Flags.Name() + ": <strong>working</strong></p>\n"))
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
 	if b, err := bindata.Asset("files/favicon.ico"); err != nil {
-		c.Printf("HTTP [%s] %s %s: 500: Internal Server Error: %v",
-			strings.Split(r.RemoteAddr, ":")[0], r.Method, r.RequestURI, err)
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
-		c.Printf("HTTP [%s] %s %s: 200 OK", strings.Split(r.RemoteAddr, ":")[0], r.Method, strings.TrimSpace(r.RequestURI))
 		http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
 	}
+}
+
+// fixForwardedFor sets the X-Forwarded-For header to the client IP
+// under specific circumstances.
+func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ip := strings.Trim(r.RemoteAddr[:strings.LastIndex(r.RemoteAddr, ":")], "[]")
+		if x := r.Header.Get("X-Forwarded-For"); x == "" || !c.allow.contains(ip) {
+			r.Header.Set("X-Forwarded-For", ip)
+		} else if l := strings.LastIndexAny(x, ", "); l != -1 {
+			r.Header.Set("X-Forwarded-For", strings.Trim(x[l:len(x)-1], ", "))
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (n allowedIPs) contains(ip string) bool {
+	for i := range n {
+		if n[i].Contains(net.ParseIP(ip)) {
+			return true
+		}
+	}
+
+	return false
 }
