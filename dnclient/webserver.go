@@ -2,6 +2,7 @@ package dnclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -48,12 +49,13 @@ func (c *Client) RunWebServer() {
 	c.router = mux.NewRouter()
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
-		Handler:      l.Wrap(c.fixForwardedFor(c.router), c.Logger.Logger.Writer()),
-		Addr:         c.Config.BindAddr,
-		IdleTimeout:  c.Config.Timeout.Duration,
-		WriteTimeout: c.Config.Timeout.Duration,
-		ReadTimeout:  c.Config.Timeout.Duration,
-		ErrorLog:     c.Logger.Logger,
+		Handler:           l.Wrap(c.fixForwardedFor(c.router), c.Logger.Logger.Writer()),
+		Addr:              c.Config.BindAddr,
+		IdleTimeout:       time.Minute,
+		WriteTimeout:      c.Config.Timeout.Duration,
+		ReadTimeout:       c.Config.Timeout.Duration,
+		ReadHeaderTimeout: c.Config.Timeout.Duration,
+		ErrorLog:          c.Logger.Logger,
 	}
 
 	// Initialize all the application API paths.
@@ -78,17 +80,40 @@ func (c *Client) RunWebServer() {
 
 // runWebServer starts the http or https listener.
 func (c *Client) runWebServer() {
+	var err error
+
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
-		err := c.server.ListenAndServeTLS(c.Config.SSLCrtFile, c.Config.SSLKeyFile)
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
-			c.Printf("[ERROR] HTTPS Server: %v (shutting down)", err)
-		}
-	} else if err := c.server.ListenAndServe(); err != nil && !errors.Is(http.ErrServerClosed, err) {
-		c.Printf("[ERROR] HTTP Server: %v (shutting down)", err)
+		err = c.server.ListenAndServeTLS(c.Config.SSLCrtFile, c.Config.SSLKeyFile)
+	} else {
+		err = c.server.ListenAndServe()
 	}
 
 	c.server = nil
-	c.signal <- os.Kill // stop the app.
+
+	if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.signal <- os.Kill // stop the app.
+	}
+}
+
+// StopWebServer stops the web servers. Panics if that causes an error or timeout.
+func (c *Client) StopWebServer() {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
+	defer cancel()
+
+	if err := c.server.Shutdown(ctx); err != nil {
+		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.signal <- os.Kill
+	}
+}
+
+// RestartWebServer stop and starts the web server.
+// Panics if that causes an error or timeout.
+func (c *Client) RestartWebServer(run func()) {
+	c.StopWebServer()
+	defer c.RunWebServer()
+
+	run()
 }
 
 // checkAPIKey drops a 403 if the API key doesn't match.

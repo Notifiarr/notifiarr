@@ -5,8 +5,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
+	"github.com/gen2brain/dlgs"
+	"github.com/getlantern/systray"
 	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
@@ -15,6 +19,7 @@ import (
 
 // Application Defaults.
 const (
+	Title            = "DiscordNotifier Client"
 	DefaultName      = "discordnotifier-client"
 	DefaultLogFileMb = 100
 	DefaultLogFiles  = 0 // delete none
@@ -66,6 +71,7 @@ type Client struct {
 	router *mux.Router
 	signal chan os.Signal
 	allow  allowedIPs
+	menu   map[string]*systray.MenuItem
 }
 
 // Errors returned by this package.
@@ -78,6 +84,7 @@ var (
 func NewDefaults() *Client {
 	return &Client{
 		signal: make(chan os.Signal, 1),
+		menu:   make(map[string]*systray.MenuItem),
 		Logger: &Logger{Logger: log.New(os.Stdout, "", log.LstdFlags)},
 		Config: &Config{
 			URLBase:   "/",
@@ -103,6 +110,15 @@ func (f *Flags) ParseArgs(args []string) {
 
 // Start runs the app.
 func Start() error {
+	err := start()
+	if err != nil && hasGUI() {
+		_, _ = dlgs.Error(Title, err.Error())
+	}
+
+	return err
+}
+
+func start() error {
 	log.SetFlags(log.LstdFlags) // in case we throw an error for main.go before logging is setup.
 
 	c := NewDefaults()
@@ -130,6 +146,8 @@ func Start() error {
 	c.Printf("==> %s", msg)
 	c.InitStartup()
 	c.RunWebServer()
+	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	c.startTray() // processing stops here on windows and in mac app.
 
 	return c.Exit()
 }

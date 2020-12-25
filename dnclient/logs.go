@@ -6,15 +6,17 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
+	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
 )
 
 // satisfy gomnd.
 const (
-	helpLink  = "GoLift Discord: https://golift.io/discord" // prints on start and on exit.
-	callDepth = 2                                           // log the line that called us.
+	helpLink  = "GoLift Discord: https://golift.io/discord"
+	callDepth = 2 // log the line that called us.
 	megabyte  = 1024 * 1024
 )
 
@@ -46,6 +48,15 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 
 // SetupLogging splits log write into a file and/or stdout.
 func (c *Client) SetupLogging() {
+	if hasGUI() && c.Config.LogFile == "" {
+		f, err := homedir.Expand(filepath.Join("~", ".dnclient", c.Flags.Name()+".log"))
+		if err != nil {
+			c.Config.LogFile = c.Flags.Name() + ".log"
+		} else {
+			c.Config.LogFile = f
+		}
+	}
+
 	c.Logger = &Logger{
 		debug:  c.Config.Debug,
 		Logger: log.New(ioutil.Discard, "", log.LstdFlags),

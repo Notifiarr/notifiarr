@@ -8,10 +8,8 @@ package dnclient
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"os/signal"
 	"path"
+	"path/filepath"
 	"syscall"
 
 	"golift.io/starr/lidarr"
@@ -40,12 +38,16 @@ func (c *Client) InitStartup() {
 	}
 
 	if c.Config.LogFile != "" {
-		msg := "no rotation"
-		if c.Config.LogFiles > 0 {
-			msg = fmt.Sprintf("%d @ %dMb", c.Config.LogFiles, c.Config.LogFileMb)
+		f, err := filepath.Abs(c.Config.LogFile)
+		if err == nil {
+			c.Config.LogFile = f
 		}
 
-		c.Printf(" => Log File: %s (%s)", c.Config.LogFile, msg)
+		if c.Config.LogFiles > 0 {
+			c.Printf(" => Log File: %s (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
+		} else {
+			c.Printf(" => Log File: %s (no rotation)", c.Config.LogFile)
+		}
 	}
 }
 
@@ -64,8 +66,15 @@ func (n allowedIPs) combineUpstreams() (s string) {
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
 	if c.signal != nil {
-		signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-		c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-c.signal)
+		for sigc := range c.signal {
+			if sigc == syscall.SIGHUP {
+				c.reloadConfiguration()
+			} else {
+				c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
+
+				break
+			}
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)

@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 
+	"github.com/gen2brain/dlgs"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
@@ -31,9 +33,10 @@ func (c *Client) getConfig() (string, error) {
 	}
 
 	if f != "" {
-		msg = "Using Config File: " + f
+		c.Flags.ConfigFile, _ = filepath.Abs(f)
+		msg = "Using Config File: " + c.Flags.ConfigFile
 
-		if err := cnfgfile.Unmarshal(c.Config, f); err != nil {
+		if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
 			return msg, fmt.Errorf("config file: %w", err)
 		}
 	} else {
@@ -71,6 +74,37 @@ func (c *Client) fixConfigs() {
 			c.allow = append(c.allow, i)
 		}
 	}
+}
+
+func (c *Client) reloadConfiguration() {
+	//nolint: errcheck,scopelint
+	c.RestartWebServer(func() {
+		var err error
+
+		c.Print("===> Reloading Configuration")
+
+		if err = cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
+			err = fmt.Errorf("config file: %w", err)
+		} else if _, err = cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
+			err = fmt.Errorf("environment variables: %w", err)
+		}
+
+		if err != nil {
+			if hasGUI() {
+				dlgs.Error(Title, err.Error())
+			}
+
+			c.Print("[ERROR]", err)
+			panic(err)
+		}
+
+		if hasGUI() {
+			dlgs.Info(Title, "Configuration Reloaded!")
+		}
+
+		c.Print("===> Configuration Reloaded")
+		c.InitStartup()
+	})
 }
 
 func configFileLocactions() []string {

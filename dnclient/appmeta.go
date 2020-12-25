@@ -69,8 +69,13 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 		method = []string{"GET"}
 	}
 
+	id := ""
+	if app != "" {
+		id = "{id:[0-9]+}"
+	}
+
 	// disccordnotifier uses 1-indexes.
-	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), "{id:[0-9]+}", api),
+	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), id, api),
 		c.checkAPIKey(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 			defer func() {

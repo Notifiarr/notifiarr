@@ -3,11 +3,12 @@ module github.com/Go-Lift-TV/discordnotifier-client
 go 1.15
 
 require (
-	fyne.io/fyne v1.4.2
+	github.com/gen2brain/dlgs v0.0.0-20201118155338-03fe7f81ad25
 	github.com/getlantern/systray v1.1.0
 	github.com/gorilla/mux v1.8.0
 	github.com/lestrrat-go/apache-logformat v2.0.4+incompatible
 	github.com/lestrrat-go/strftime v1.0.3 // indirect
+	github.com/martinlindhe/inputbox v0.0.0-20200313123801-5532e940e508
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23
 	github.com/pkg/errors v0.9.1 // indirect
