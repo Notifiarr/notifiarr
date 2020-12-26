@@ -78,8 +78,7 @@ release: clean linux_packages freebsd_packages windows
 dmg: clean macapp
 	mkdir -p release
 	hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
-	rm -rf $(MACAPP).app
-	openssl dgst -r -sha256 release/* | sed 's#release/##' | grep -v checksums.sha256.txt | tee release/checksums.sha256.txt
+	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/dmg_checksum.sha256.txt
 
 # Delete all build assets.
 clean:
