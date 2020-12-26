@@ -33,12 +33,8 @@ var (
 	ErrExists    = fmt.Errorf("the requested item already exists")
 )
 
-type (
-	// apiHandle is our custom handler function for APIs.
-	apiHandle func(r *http.Request) (int, interface{})
-	// allowedIPs determines who can set x-forwarded-for.
-	allowedIPs []*net.IPNet
-)
+// allowedIPs determines who can set x-forwarded-for.
+type allowedIPs []*net.IPNet
 
 // RunWebServer starts the web server.
 func (c *Client) StartWebServer() {
