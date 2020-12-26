@@ -11,7 +11,6 @@ import (
 	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
 	"github.com/gen2brain/dlgs"
 	"github.com/getlantern/systray"
-	"github.com/pkg/browser"
 	"golift.io/version"
 )
 
@@ -35,7 +34,7 @@ func (c *Client) startTray() {
 
 	os.Stdout.Close()
 
-	quitFn := func() {
+	systray.Run(c.readyTray, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 		defer cancel()
 
@@ -47,11 +46,15 @@ func (c *Client) startTray() {
 		}
 
 		os.Exit(0)
-	}
-	systray.Run(c.readyTray, quitFn)
+	})
 }
 
 func (c *Client) readyTray() {
+	systrayIcon := "files/favicon.ico"
+	if runtime.GOOS == "darwin" {
+		systrayIcon = "files/macos.png"
+	}
+
 	b, err := bindata.Asset(systrayIcon)
 	if err == nil {
 		systray.SetTemplateIcon(b, b)
@@ -93,18 +96,16 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["exit"].ClickedCh:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
 			systray.Quit()
-		case <-c.menu["info"].ClickedCh:
-		case <-c.menu["link"].ClickedCh:
 		case <-c.menu["gh"].ClickedCh:
-			browser.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
+			openURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
 		case <-c.menu["hp"].ClickedCh:
-			browser.OpenURL("https://discordnotifier.com/")
+			openURL("https://discordnotifier.com/")
 		case <-c.menu["logs"].ClickedCh:
-			browser.OpenFile(c.Config.LogFile)
+			openLog(c.Config.LogFile)
 		case <-c.menu["disc1"].ClickedCh:
-			browser.OpenURL("https://discord.gg/AURf8Yz")
+			openURL("https://discord.gg/AURf8Yz")
 		case <-c.menu["disc2"].ClickedCh:
-			browser.OpenURL("https://golift.io/discord")
+			openURL("https://golift.io/discord")
 		case <-c.menu["love"].ClickedCh:
 			dlgs.Warning(Title, "nitusa loves you!\n<3")
 		case <-c.menu["conf"].ClickedCh:
@@ -139,22 +140,49 @@ func (c *Client) displayConfig() (s string) {
 		s += fmt.Sprintf("\nHTTP: http://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))
 	}
 
-	/*
-	   c.initSonarr()
-	   c.initRadarr()
-	   c.initLidarr()
-	   c.initReadarr()
-	*/
-	s += fmt.Sprintf("\nLidarr: %v", len(c.Config.Lidarr))
-	s += fmt.Sprintf("\nSonarr: %v", len(c.Config.Sonarr))
-	s += fmt.Sprintf("\nRadarr: %v", len(c.Config.Radarr))
-	s += fmt.Sprintf("\nReadarr: %v", len(c.Config.Readarr))
+	if c.Config.LogFiles > 0 {
+		s += fmt.Sprintf("\nLog File: %v (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
+	} else {
+		s += fmt.Sprintf("\nLog File: %v (no rotation)", c.Config.LogFile)
+	}
 
-	if c.Config.LogFile != "" {
-		if c.Config.LogFiles > 0 {
-			s += fmt.Sprintf("\nLog File: %v (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
-		} else {
-			s += fmt.Sprintf("\nLog File: %v (no rotation)", c.Config.LogFile)
+	if count := len(c.Config.Lidarr); count == 1 {
+		s += fmt.Sprintf("\n- Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+			c.Config.Lidarr[0].URL, c.Config.Lidarr[0].APIKey != "", c.Config.Lidarr[0].Timeout, c.Config.Lidarr[0].ValidSSL)
+	} else {
+		for _, f := range c.Config.Lidarr {
+			s += fmt.Sprintf("\n- Lidarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
+		}
+	}
+
+	if count := len(c.Config.Radarr); count == 1 {
+		s += fmt.Sprintf("\n- Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+			c.Config.Radarr[0].URL, c.Config.Radarr[0].APIKey != "", c.Config.Radarr[0].Timeout, c.Config.Radarr[0].ValidSSL)
+	} else {
+		for _, f := range c.Config.Radarr {
+			s += fmt.Sprintf("\n- Radarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
+		}
+	}
+
+	if count := len(c.Config.Readarr); count == 1 {
+		s += fmt.Sprintf("\n- Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+			c.Config.Readarr[0].URL, c.Config.Readarr[0].APIKey != "", c.Config.Readarr[0].Timeout, c.Config.Readarr[0].ValidSSL)
+	} else {
+		for _, f := range c.Config.Readarr {
+			s += fmt.Sprintf("\n- Readarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
+		}
+	}
+
+	if count := len(c.Config.Sonarr); count == 1 {
+		s += fmt.Sprintf("\n- Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+			c.Config.Sonarr[0].URL, c.Config.Sonarr[0].APIKey != "", c.Config.Sonarr[0].Timeout, c.Config.Sonarr[0].ValidSSL)
+	} else {
+		for _, f := range c.Config.Sonarr {
+			s += fmt.Sprintf("\n- Sonarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
 		}
 	}
 

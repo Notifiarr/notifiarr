@@ -81,15 +81,9 @@ func (c *Client) reloadConfiguration() {
 	c.RestartWebServer(func() {
 		var err error
 
-		c.Print("===> Reloading Configuration")
+		c.Print("==> Reloading Configuration")
 
-		if err = cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
-			err = fmt.Errorf("config file: %w", err)
-		} else if _, err = cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
-			err = fmt.Errorf("environment variables: %w", err)
-		}
-
-		if err != nil {
+		if _, err = c.getConfig(); err != nil {
 			if hasGUI() {
 				dlgs.Error(Title, err.Error())
 			}
@@ -102,8 +96,8 @@ func (c *Client) reloadConfiguration() {
 			dlgs.Info(Title, "Configuration Reloaded!")
 		}
 
-		c.Print("===> Configuration Reloaded")
 		c.InitStartup()
+		c.Print("==> Configuration Reloaded")
 	})
 }
 

@@ -69,9 +69,9 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 		method = []string{"GET"}
 	}
 
-	id := ""
-	if app != "" {
-		id = "{id:[0-9]+}"
+	id := "{id:[0-9]+}"
+	if app == "" {
+		id = ""
 	}
 
 	// disccordnotifier uses 1-indexes.
@@ -81,6 +81,7 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...st
 			defer func() {
 				w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
 			}()
+
 			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
 			default: // unknown app, just run the handler.
 				i, m := next(r)
