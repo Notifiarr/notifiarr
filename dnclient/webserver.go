@@ -41,7 +41,7 @@ type (
 )
 
 // RunWebServer starts the web server.
-func (c *Client) RunWebServer() {
+func (c *Client) StartWebServer() {
 	// Create an apache-style logger.
 	l, _ := apachelog.New(`HTTP %{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
 		`"%{User-agent}i" %{X-Request-Time}o %Dμs`)
@@ -111,7 +111,7 @@ func (c *Client) StopWebServer() {
 // Panics if that causes an error or timeout.
 func (c *Client) RestartWebServer(run func()) {
 	c.StopWebServer()
-	defer c.RunWebServer()
+	defer c.StartWebServer()
 
 	run()
 }

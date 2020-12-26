@@ -8,10 +8,18 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
 	"github.com/gen2brain/dlgs"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
+)
+
+const (
+	msgNoConfigFile = "Using env variables only. Config file not found."
+	msgConfigFailed = "Using env variables only. Could not create config file: "
+	msgConfigCreate = "Created new config file: "
+	msgConfigFound  = "Using Config File: "
 )
 
 func (c *Client) getConfig() (string, error) {
@@ -19,7 +27,8 @@ func (c *Client) getConfig() (string, error) {
 
 	var f, msg string
 
-	for _, f = range append([]string{c.Flags.ConfigFile}, configFileLocactions()...) {
+	def, cfl := configFileLocactions()
+	for _, f = range append([]string{c.Flags.ConfigFile}, cfl...) {
 		d, err := homedir.Expand(f)
 		if err == nil {
 			f = d
@@ -32,15 +41,20 @@ func (c *Client) getConfig() (string, error) {
 		f = ""
 	}
 
+	msg = msgNoConfigFile
+
 	if f != "" {
 		c.Flags.ConfigFile, _ = filepath.Abs(f)
-		msg = "Using Config File: " + c.Flags.ConfigFile
+		msg = msgConfigFound + c.Flags.ConfigFile
 
 		if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
 			return msg, fmt.Errorf("config file: %w", err)
 		}
-	} else {
-		msg = "No config file found, using env variables only"
+	} else if f, err := c.createConfigFile(def); err != nil {
+		msg = msgConfigFailed + err.Error()
+	} else if f != "" {
+		c.Flags.ConfigFile = f
+		msg = msgConfigCreate + c.Flags.ConfigFile
 	}
 
 	if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
@@ -76,6 +90,44 @@ func (c *Client) fixConfigs() {
 	}
 }
 
+func (c *Client) createConfigFile(file string) (string, error) {
+	if !hasGUI() {
+		return "", nil
+	}
+
+	file, err := homedir.Expand(file)
+	if err != nil {
+		return "", fmt.Errorf("expanding home: %w", err)
+	}
+
+	if file, err = filepath.Abs(file); err != nil {
+		return "", fmt.Errorf("absolute file: %w", err)
+	}
+
+	dir := filepath.Dir(file)
+	if err := os.MkdirAll(dir, 0750); err != nil {
+		return "", fmt.Errorf("making config dir: %w", err)
+	}
+
+	f, err := os.Create(file)
+	if err != nil {
+		return "", fmt.Errorf("creating config file: %w", err)
+	}
+	defer f.Close()
+
+	if a, err := bindata.Asset("../examples/dnclient.conf.example"); err != nil {
+		return "", fmt.Errorf("getting config file: %w", err)
+	} else if _, err = f.Write(a); err != nil {
+		return "", fmt.Errorf("writing config file: %w", err)
+	}
+
+	if err := cnfgfile.Unmarshal(c.Config, file); err != nil {
+		return file, fmt.Errorf("config file: %w", err)
+	}
+
+	return file, nil
+}
+
 func (c *Client) reloadConfiguration() {
 	//nolint: errcheck,scopelint
 	c.RestartWebServer(func() {
@@ -85,7 +137,7 @@ func (c *Client) reloadConfiguration() {
 
 		if _, err = c.getConfig(); err != nil {
 			if hasGUI() {
-				dlgs.Error(Title, err.Error())
+				dlgs.Error(Title, "Reloading Configuration: "+err.Error())
 			}
 
 			c.Print("[ERROR]", err)
@@ -101,16 +153,23 @@ func (c *Client) reloadConfiguration() {
 	})
 }
 
-func configFileLocactions() []string {
+func configFileLocactions() (string, []string) {
 	switch runtime.GOOS {
 	case "windows":
-		return []string{
+		return `C:\ProgramData\discordnotifier-client\dnclient.conf`, []string{
 			`~\.dnclient\dnclient.conf`,
 			`C:\ProgramData\discordnotifier-client\dnclient.conf`,
 			`.\dnclient.conf`,
 		}
-	case "darwin", "freebsd", "netbsd", "openbsd":
-		return []string{
+	case "darwin":
+		return "~/.dnclient/dnclient.conf", []string{
+			"/usr/local/etc/discordnotifier-client/dnclient.conf",
+			"/etc/discordnotifier-client/dnclient.conf",
+			"~/.dnclient/dnclient.conf",
+			"./dnclient.conf",
+		}
+	case "freebsd", "netbsd", "openbsd":
+		return "", []string{
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",
 			"/etc/discordnotifier-client/dnclient.conf",
 			"~/.dnclient/dnclient.conf",
@@ -119,7 +178,7 @@ func configFileLocactions() []string {
 	case "android", "dragonfly", "linux", "nacl", "plan9", "solaris":
 		fallthrough
 	default:
-		return []string{
+		return "", []string{
 			"/etc/discordnotifier-client/dnclient.conf",
 			"/config/dnclient.conf",
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",

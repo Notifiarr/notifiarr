@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"runtime"
 	"syscall"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
@@ -41,11 +40,6 @@ func (c *Client) startTray() {
 }
 
 func (c *Client) readyTray() {
-	systrayIcon := "files/favicon.ico"
-	if runtime.GOOS == "darwin" {
-		systrayIcon = "files/macos.png"
-	}
-
 	b, err := bindata.Asset(systrayIcon)
 	if err == nil {
 		systray.SetTemplateIcon(b, b)
@@ -57,6 +51,8 @@ func (c *Client) readyTray() {
 	systray.SetTooltip(c.Flags.Name())
 
 	menu := make(map[string]*systray.MenuItem)
+	menu["stat"] = systray.AddMenuItem("Running", "web server is running")
+	menu["togg"] = systray.AddMenuItem("Stop", "stop the web server")
 	menu["link"] = systray.AddMenuItem("Links", "external resources")
 	menu["info"] = menu["link"].AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name()))
 	menu["hp"] = menu["link"].AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com")
@@ -65,12 +61,15 @@ func (c *Client) readyTray() {
 	menu["love"] = menu["link"].AddSubMenuItem("<3 ?x?.io", "show some love")
 	menu["gh"] = menu["link"].AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub")
 	menu["conf"] = systray.AddMenuItem("Config", "show configuration")
-	menu["key"] = systray.AddMenuItem("API Key", "set API Key")
+	menu["view"] = menu["conf"].AddSubMenuItem("View", "show configuration")
+	menu["edit"] = menu["conf"].AddSubMenuItem("Edit", "edit configuration")
+	menu["key"] = menu["conf"].AddSubMenuItem("API Key", "set API Key")
+	menu["load"] = menu["conf"].AddSubMenuItem("Reload", "reload configuration")
 	menu["logs"] = systray.AddMenuItem("Logs", "show log file")
-	menu["load"] = systray.AddMenuItem("Reload", "reload configuration")
 	menu["exit"] = systray.AddMenuItem("Quit", "Exit "+c.Flags.Name())
 
 	menu["info"].Disable()
+	menu["stat"].Disable()
 	c.watchGuiChannels(menu)
 }
 
@@ -88,6 +87,20 @@ func (c *Client) watchGuiChannels(menu map[string]*systray.MenuItem) {
 		case <-menu["exit"].ClickedCh:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
 			systray.Quit()
+		case <-menu["togg"].ClickedCh:
+			if c.server == nil {
+				c.Print("Starting Web Server")
+				c.StartWebServer()
+				menu["stat"].SetTitle("Running")
+				menu["togg"].SetTitle("Pause")
+				menu["stat"].SetTooltip("web server is running")
+			} else {
+				c.Print("Pausing Web Server")
+				c.StopWebServer()
+				menu["stat"].SetTitle("Paused")
+				menu["togg"].SetTitle("Start")
+				menu["stat"].SetTooltip("web server is paused")
+			}
 		case <-menu["gh"].ClickedCh:
 			openURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
 		case <-menu["hp"].ClickedCh:
@@ -100,8 +113,10 @@ func (c *Client) watchGuiChannels(menu map[string]*systray.MenuItem) {
 			openURL("https://golift.io/discord")
 		case <-menu["love"].ClickedCh:
 			dlgs.Warning(Title, "nitusa loves you!\n<3")
-		case <-menu["conf"].ClickedCh:
+		case <-menu["view"].ClickedCh:
 			dlgs.Info(Title+": Configuration", c.displayConfig())
+		case <-menu["edit"].ClickedCh:
+			openFile(c.Flags.ConfigFile)
 		case <-menu["load"].ClickedCh:
 			c.reloadConfiguration()
 		case <-menu["key"].ClickedCh:

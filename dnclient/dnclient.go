@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime"
+	"strings"
 	"syscall"
 	"time"
 
@@ -139,24 +139,20 @@ func start() error {
 		return fmt.Errorf("at least 1 application must be configured: %w", ErrNoApps)
 	}
 
+	if strings.HasPrefix(msg, msgConfigCreate) {
+		_ = openFile(c.Flags.ConfigFile)
+		_, _ = dlgs.Warning(Title, "A new configuration file was created @ "+
+			c.Flags.ConfigFile+" - it should open in a text editor. "+
+			"Please edit the file and reload this application using the tray menu.")
+	}
+
 	c.SetupLogging()
 	c.Printf("%s v%s Starting! [PID: %v] %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
 	c.Printf("==> %s", msg)
 	c.InitStartup()
-	c.RunWebServer()
+	c.StartWebServer()
 	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	c.startTray() // processing stops here on windows and in mac app.
 
 	return c.Exit()
-}
-
-func hasGUI() bool {
-	switch runtime.GOOS {
-	case "darwin":
-		return os.Getenv("USEGUI") == "true"
-	case "windows":
-		return true
-	default:
-		return false
-	}
 }
