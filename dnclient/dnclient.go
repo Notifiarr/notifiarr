@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -147,4 +148,15 @@ func start() error {
 	c.startTray() // processing stops here on windows and in mac app.
 
 	return c.Exit()
+}
+
+func hasGUI() bool {
+	switch runtime.GOOS {
+	case "darwin":
+		return os.Getenv("USEGUI") == "true"
+	case "windows":
+		return true
+	default:
+		return false
+	}
 }

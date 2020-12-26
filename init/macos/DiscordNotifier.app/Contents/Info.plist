@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>DiscordNotifier</string>
+	<string>DiscordNotifier Client</string>
 
 	<key>CFBundleIdentifier</key>
 	<string>com.discordnotifier.client</string>
@@ -14,7 +14,7 @@
 	<string>1</string>
 
 	<key>CFBundleExecutable</key>
-	<string>DiscordNotifier</string>
+	<string>DiscordNotifier-Client</string>
 
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -26,7 +26,7 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>CFBundleIconFile</key>
-	<string>DiscordNotifier.icns</string>
+	<string>DiscordNotifier-Client.icns</string>
 
 	<key>CFBundleDisplayName</key>
 	<string>DiscordNotifier Client</string>

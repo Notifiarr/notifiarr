@@ -18,17 +18,6 @@ import (
 
 /* This file handles the OS GUI elements. */
 
-func hasGUI() bool {
-	switch runtime.GOOS {
-	case "darwin":
-		return os.Getenv("USEGUI") == "true"
-	case "windows":
-		return true
-	default:
-		return false
-	}
-}
-
 func (c *Client) startTray() {
 	if !hasGUI() {
 		return

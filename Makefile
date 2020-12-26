@@ -3,7 +3,7 @@
 # See more: https://github.com/golift/application-builder
 
 # Suck in our application information.
-IGNORED:=$(shell bash -c "source .metadata.sh ; env | sed 's/=/:=/;s/^/export /' > .metadata.make")
+IGNORED:=$(shell bash -c "source .metadata.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > .metadata.make")
 
 # md2roff turns markdown into man files and html files.
 MD2ROFF_BIN=github.com/davidnewhall/md2roff
@@ -79,7 +79,7 @@ dmg: clean macapp
 	mkdir -p release
 	mv $(BINARY).*.macos release/
 	gzip -9r release/
-	for i in *.app ; do zip -9qrj release/$$i.zip $$i; rm -rf $$i;done
+	hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov ; rm -rf $(MACAPP).app
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/mac_checksums.sha256.txt
 
 # Delete all build assets.
