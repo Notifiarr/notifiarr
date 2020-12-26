@@ -1,20 +1,17 @@
 # Powered by Application Builder: https://github.com/golift/application-builder
 jobs:
   include:
-    - os: osx
-      language: go
-      env:
-        - MAKERELEASE=macrelease
-        - MY_RUBY_VER=$brew_ruby
-    - os: linux
-      dist: bionic
-      language: go
-      env:
-        - MAKERELEASE=release
-        - MY_RUBY_VER=2.6.0
-os:
-  - linux
-  - osx
+  - os: osx
+    language: go
+    env:
+    - MAKERELEASE=macrelease
+    - MY_RUBY_VER=$brew_ruby
+  - os: linux
+    dist: bionic
+    language: go
+    env:
+    - MAKERELEASE=release
+    - MY_RUBY_VER=2.6.0
 git:
   depth: false
 addons:
@@ -54,9 +51,9 @@ before_script:
 script:
   # Test Go and Docker.
   - make test
-  - [ "$TRAVIS_OS_NAME" == "osx" ] || make docker
+  - '[ "$TRAVIS_OS_NAME" == "osx" ] || make docker'
   # Test built docker image.
-  - [ "$TRAVIS_OS_NAME" == "osx" ] || docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"
+  - '[ "$TRAVIS_OS_NAME" == "osx" ] || docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"'
   # Build everything
   - rvm $MY_RUBY_VER do make $MAKERELEASE
 after_success:
