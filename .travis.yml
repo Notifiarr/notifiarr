@@ -2,13 +2,14 @@
 jobs:
   include:
   - os: osx
+    osx_image: xcode12
     language: go
     go: 1.15.x
     env:
     - MAKERELEASE=dmg
   - os: linux
-    services: docker
     dist: bionic
+    services: docker
     language: go
     go: 1.15.x
     env:
@@ -54,8 +55,8 @@ script:
   # Test built docker image.
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"; fi
   # Build everything
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make $MAKERELEASE; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then rvm $brew_ruby do make $MAKERELEASE; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0      do make $MAKERELEASE; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ];   then rvm $brew_ruby do make $MAKERELEASE; fi
 after_success:
   # Display Release Folder
   - ls -l release/
