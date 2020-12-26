@@ -3,12 +3,14 @@ jobs:
   include:
   - os: osx
     language: go
+    go: 1.15.x
     env:
-    - MAKERELEASE=macrelease
+    - MAKERELEASE=dmg
     - MY_RUBY_VER=$brew_ruby
   - os: linux
     dist: bionic
     language: go
+    go: 1.15.x
     env:
     - MAKERELEASE=release
     - MY_RUBY_VER=2.6.0
