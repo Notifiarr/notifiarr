@@ -2,6 +2,7 @@ package dnclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -32,15 +33,11 @@ var (
 	ErrExists    = fmt.Errorf("the requested item already exists")
 )
 
-type (
-	// apiHandle is our custom handler function for APIs.
-	apiHandle func(r *http.Request) (int, interface{})
-	// allowedIPs determines who can set x-forwarded-for.
-	allowedIPs []*net.IPNet
-)
+// allowedIPs determines who can set x-forwarded-for.
+type allowedIPs []*net.IPNet
 
 // RunWebServer starts the web server.
-func (c *Client) RunWebServer() {
+func (c *Client) StartWebServer() {
 	// Create an apache-style logger.
 	l, _ := apachelog.New(`HTTP %{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
 		`"%{User-agent}i" %{X-Request-Time}o %Dμs`)
@@ -48,12 +45,13 @@ func (c *Client) RunWebServer() {
 	c.router = mux.NewRouter()
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
-		Handler:      l.Wrap(c.fixForwardedFor(c.router), c.Logger.Logger.Writer()),
-		Addr:         c.Config.BindAddr,
-		IdleTimeout:  c.Config.Timeout.Duration,
-		WriteTimeout: c.Config.Timeout.Duration,
-		ReadTimeout:  c.Config.Timeout.Duration,
-		ErrorLog:     c.Logger.Logger,
+		Handler:           l.Wrap(c.fixForwardedFor(c.router), c.Logger.Logger.Writer()),
+		Addr:              c.Config.BindAddr,
+		IdleTimeout:       time.Minute,
+		WriteTimeout:      c.Config.Timeout.Duration,
+		ReadTimeout:       c.Config.Timeout.Duration,
+		ReadHeaderTimeout: c.Config.Timeout.Duration,
+		ErrorLog:          c.Logger.Logger,
 	}
 
 	// Initialize all the application API paths.
@@ -78,17 +76,42 @@ func (c *Client) RunWebServer() {
 
 // runWebServer starts the http or https listener.
 func (c *Client) runWebServer() {
+	var err error
+
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
-		err := c.server.ListenAndServeTLS(c.Config.SSLCrtFile, c.Config.SSLKeyFile)
-		if err != nil && !errors.Is(http.ErrServerClosed, err) {
-			c.Printf("[ERROR] HTTPS Server: %v (shutting down)", err)
-		}
-	} else if err := c.server.ListenAndServe(); err != nil && !errors.Is(http.ErrServerClosed, err) {
-		c.Printf("[ERROR] HTTP Server: %v (shutting down)", err)
+		err = c.server.ListenAndServeTLS(c.Config.SSLCrtFile, c.Config.SSLKeyFile)
+	} else {
+		err = c.server.ListenAndServe()
 	}
 
 	c.server = nil
-	c.signal <- os.Kill // stop the app.
+
+	if err != nil && !errors.Is(http.ErrServerClosed, err) {
+		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.signal <- os.Kill // stop the app.
+	}
+}
+
+// StopWebServer stops the web servers. Panics if that causes an error or timeout.
+func (c *Client) StopWebServer() {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
+	defer cancel()
+
+	if err := c.server.Shutdown(ctx); err != nil {
+		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.signal <- os.Kill
+	}
+}
+
+// RestartWebServer stop and starts the web server.
+// Panics if that causes an error or timeout.
+func (c *Client) RestartWebServer(run func()) {
+	c.StopWebServer()
+	defer c.StartWebServer()
+
+	if run != nil {
+		run()
+	}
 }
 
 // checkAPIKey drops a 403 if the API key doesn't match.
@@ -136,7 +159,7 @@ func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
 
 // statusResponse is the handler for /api/status.
 func (c *Client) statusResponse(w http.ResponseWriter, r *http.Request) {
-	c.respond(w, http.StatusOK, "I'm alive!")
+	c.respond(w, http.StatusOK, c.Flags.Name()+" alive!")
 }
 
 // slash is the handler for /.
@@ -165,6 +188,24 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+var _ = fmt.Stringer(allowedIPs(nil))
+
+func (n allowedIPs) String() (s string) {
+	if len(n) < 1 {
+		return "(none)"
+	}
+
+	for i := range n {
+		if s != "" {
+			s += ", "
+		}
+
+		s += n[i].String()
+	}
+
+	return s
 }
 
 func (n allowedIPs) contains(ip string) bool {

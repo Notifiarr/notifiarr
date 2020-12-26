@@ -108,7 +108,8 @@ On FreeBSD the app runs as `nobody`. That's not very good and will probably chan
 
 ### macOS Install
 
--   Use homebrew.
+#### Homebrew
+
 -   Edit config file at `/usr/local/etc/discordnotifier-client/dnclient.conf`
 -   Start it.
 -   Like this:
@@ -119,11 +120,22 @@ vi /usr/local/etc/discordnotifier-client/dnclient.conf
 brew services start discordnotifier-client
 ```
 
+#### macOS App
+
+-   You can use the unsigned app on the Releases page.
+-   When you open it for the first time it will create a config file and log file:
+    -   `~/.dnclient/dnclient.conf`
+    -   `~/.dnclient/discordnotifier-client.log`
+-   Edit the config file and reload or restart the app.
+
 ### Windows Install
 
 -   Extract a `.exe.zip` file from [the Releases page](https://github.com/Go-Lift-TV/discordnotifier-client/releases).
--   Edit the example config file from the zip file to suit your system. Rename the example to `dnclient.conf`.
--   Run the `discordnotifier-client.amd64.exe` binary. This starts the app prints out what it's doing.
+-   Run the `discordnotifier-client.amd64.exe` binary. This starts the app in the system tray.
+-   When you open it for the first time it will create a config file and log file:
+    -   `C:\ProgramData\discordnotifier-client\dnclient.conf`
+    -   `<your home folder>\.dnclient\discordnotifier-client.log`
+-   Edit the new config file suit your environment then reload or restart the app.
 
 ## Reverse Proxy
 

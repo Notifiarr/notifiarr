@@ -8,12 +8,9 @@ package dnclient
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"os/signal"
 	"path"
+	"path/filepath"
 	"syscall"
-	"time"
 
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
@@ -31,7 +28,7 @@ func (c *Client) InitStartup() {
 	c.initLidarr()
 	c.initReadarr()
 	c.Printf(" => Timeout: %v, Debug: %v, Quiet: %v", c.Config.Timeout, c.Config.Debug, c.Config.Quiet)
-	c.Print(" => Allows Upstream Networks:", c.allow.combineUpstreams())
+	c.Printf(" => Trusted Upstream Networks: %v", c.allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
@@ -41,33 +38,36 @@ func (c *Client) InitStartup() {
 	}
 
 	if c.Config.LogFile != "" {
-		msg := "no rotation"
+		f, err := filepath.Abs(c.Config.LogFile)
+		if err == nil {
+			c.Config.LogFile = f
+		}
+
 		if c.Config.LogFiles > 0 {
-			msg = fmt.Sprintf("%d @ %dMb", c.Config.LogFiles, c.Config.LogFileMb)
+			c.Printf(" => Log File: %s (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
+		} else {
+			c.Printf(" => Log File: %s (no rotation)", c.Config.LogFile)
 		}
-
-		c.Printf(" => Log File: %s (%s)", c.Config.LogFile, msg)
 	}
 }
 
-func (n allowedIPs) combineUpstreams() (s string) {
-	for i := range n {
-		if s != "" {
-			s += ", "
-		}
-
-		s += n[i].String()
-	}
-
-	return s
-}
+// String turns a list of allowedIPs into a printable masterpiece.
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
-	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, <-c.signal)
+	if c.signal != nil {
+		for sigc := range c.signal {
+			if sigc == syscall.SIGHUP {
+				c.reloadConfiguration()
+			} else {
+				c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+				break
+			}
+		}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 	defer cancel()
 
 	if c.server != nil {

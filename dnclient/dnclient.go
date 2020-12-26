@@ -5,8 +5,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 	"time"
 
+	"github.com/gen2brain/dlgs"
 	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
@@ -15,6 +19,7 @@ import (
 
 // Application Defaults.
 const (
+	Title            = "DiscordNotifier Client"
 	DefaultName      = "discordnotifier-client"
 	DefaultLogFileMb = 100
 	DefaultLogFiles  = 0 // delete none
@@ -103,6 +108,15 @@ func (f *Flags) ParseArgs(args []string) {
 
 // Start runs the app.
 func Start() error {
+	err := start()
+	if err != nil && hasGUI() {
+		_, _ = dlgs.Error(Title, err.Error())
+	}
+
+	return err
+}
+
+func start() error {
 	log.SetFlags(log.LstdFlags) // in case we throw an error for main.go before logging is setup.
 
 	c := NewDefaults()
@@ -125,11 +139,20 @@ func Start() error {
 		return fmt.Errorf("at least 1 application must be configured: %w", ErrNoApps)
 	}
 
+	if strings.HasPrefix(msg, msgConfigCreate) && hasGUI() {
+		_ = openFile(c.Flags.ConfigFile)
+		_, _ = dlgs.Warning(Title, "A new configuration file was created @ "+
+			c.Flags.ConfigFile+" - it should open in a text editor. "+
+			"Please edit the file and reload this application using the tray menu.")
+	}
+
 	c.SetupLogging()
 	c.Printf("%s v%s Starting! [PID: %v] %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
 	c.Printf("==> %s", msg)
 	c.InitStartup()
-	c.RunWebServer()
+	c.StartWebServer()
+	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	c.startTray() // processing stops here on windows and in mac app.
 
 	return c.Exit()
 }

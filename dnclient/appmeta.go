@@ -62,20 +62,29 @@ type SonarrConfig struct {
 	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
+// apiHandler is our custom handler function for APIs.
+type apiHandler func(r *http.Request) (int, interface{})
+
 // handleAPIpath makes adding API paths a little cleaner.
 // This grabs the app struct and saves it in a context before calling the handler.
-func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...string) {
+func (c *Client) handleAPIpath(app App, api string, next apiHandler, method ...string) {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
 
+	id := "{id:[0-9]+}"
+	if app == "" {
+		id = ""
+	}
+
 	// disccordnotifier uses 1-indexes.
-	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), "{id:[0-9]+}", api),
+	c.router.Handle(path.Join("/", c.Config.URLBase, "api", string(app), id, api),
 		c.checkAPIKey(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 			defer func() {
 				w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
 			}()
+
 			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
 			default: // unknown app, just run the handler.
 				i, m := next(r)

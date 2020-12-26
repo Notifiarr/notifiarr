@@ -3,7 +3,7 @@
 # See more: https://github.com/golift/application-builder
 
 # Suck in our application information.
-IGNORED:=$(shell bash -c "source .metadata.sh ; env | sed 's/=/:=/;s/^/export /' > .metadata.make")
+IGNORED:=$(shell bash -c "source .metadata.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > .metadata.make")
 
 # md2roff turns markdown into man files and html files.
 MD2ROFF_BIN=github.com/davidnewhall/md2roff
@@ -65,23 +65,27 @@ all: clean build
 ####################
 
 # Prepare a release. Called in Travis CI.
-release: clean macos linux_packages freebsd_packages windows
+release: clean linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
-	mv $(BINARY).*.macos $(BINARY).*.linux $(BINARY).*.freebsd $@/
+	mv $(BINARY).*.linux $(BINARY).*.freebsd $@/
 	gzip -9r $@/
-	for i in $(BINARY)*.exe; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
+	for i in $(BINARY)*.exe ; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
 	mv *.rpm *.deb *.txz $@/
 	# Generating File Hashes
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
+dmg: clean macapp
+	mkdir -p release
+	hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
+	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/dmg_checksum.sha256.txt
+
 # Delete all build assets.
 clean:
-	# Cleaning up.
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make
-	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso
-	rm -rf package_build_* release after-install-rendered.sh before-remove-rendered.sh
+	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
+	rm -rf package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
 
 ####################
 ##### Sidecars #####
@@ -119,19 +123,19 @@ $(shell go env GOPATH)/bin/rsrc:
 
 build: $(BINARY)
 $(BINARY): main.go
-	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS)"
+	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
 linux: $(BINARY).amd64.linux
 $(BINARY).amd64.linux: main.go
 	# Building linux 64-bit x86 binary.
-	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
 linux386: $(BINARY).i386.linux
 $(BINARY).i386.linux: main.go
 	# Building linux 32-bit x86 binary.
-	GOOS=linux GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=linux GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
 arm: arm64 armhf
@@ -139,39 +143,39 @@ arm: arm64 armhf
 arm64: $(BINARY).arm64.linux
 $(BINARY).arm64.linux: main.go
 	# Building linux 64-bit ARM binary.
-	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
 armhf: $(BINARY).armhf.linux
 $(BINARY).armhf.linux: main.go
 	# Building linux 32-bit ARM binary.
-	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
 macos: $(BINARY).amd64.macos
 $(BINARY).amd64.macos: main.go
 	# Building darwin 64-bit x86 binary.
-	GOOS=darwin GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=darwin GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
 freebsd: $(BINARY).amd64.freebsd
 $(BINARY).amd64.freebsd: main.go
-	GOOS=freebsd GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=freebsd GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 freebsd386: $(BINARY).i386.freebsd
 $(BINARY).i386.freebsd: main.go
-	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@ || true
 
 freebsdarm: $(BINARY).armhf.freebsd
 $(BINARY).armhf.freebsd: main.go
-	GOOS=freebsd GOARCH=arm go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=freebsd GOARCH=arm go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 exe: $(BINARY).amd64.exe
 windows: $(BINARY).amd64.exe
 $(BINARY).amd64.exe: rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
-	GOOS=windows GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS)"
+	GOOS=windows GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 	[ "$(COMPRESS)" != "true" ] || upx -q9 $@
 
 ####################
@@ -181,6 +185,12 @@ $(BINARY).amd64.exe: rsrc.syso main.go
 linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
+
+macapp: $(MACAPP).app.zip
+$(MACAPP).app.zip: macos
+	[ "$(MACAPP)" == "" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
+	[ "$(MACAPP)" == "" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
+	[ "$(MACAPP)" == "" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 
 rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux check_fpm
@@ -336,7 +346,9 @@ test: lint
 	go test -race -covermode=atomic ./...
 lint:
 	# Checking lint.
-	$(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
+	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
+	GOOS=freebsd $(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
+	GOOS=windows $(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
 
 # Mockgen and bindata are examples.
 # Your `go generate` may require other tools; add them!
