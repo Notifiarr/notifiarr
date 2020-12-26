@@ -28,7 +28,7 @@ func (c *Client) InitStartup() {
 	c.initLidarr()
 	c.initReadarr()
 	c.Printf(" => Timeout: %v, Debug: %v, Quiet: %v", c.Config.Timeout, c.Config.Debug, c.Config.Quiet)
-	c.Print(" => Allows Upstream Networks:", c.allow.combineUpstreams())
+	c.Printf(" => Trusted Upstream Networks: %v", c.allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
@@ -51,17 +51,7 @@ func (c *Client) InitStartup() {
 	}
 }
 
-func (n allowedIPs) combineUpstreams() (s string) {
-	for i := range n {
-		if s != "" {
-			s += ", "
-		}
-
-		s += n[i].String()
-	}
-
-	return s
-}
+// String turns a list of allowedIPs into a printable masterpiece.
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {

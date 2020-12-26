@@ -113,7 +113,9 @@ func (c *Client) RestartWebServer(run func()) {
 	c.StopWebServer()
 	defer c.StartWebServer()
 
-	run()
+	if run != nil {
+		run()
+	}
 }
 
 // checkAPIKey drops a 403 if the API key doesn't match.
@@ -161,7 +163,7 @@ func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
 
 // statusResponse is the handler for /api/status.
 func (c *Client) statusResponse(w http.ResponseWriter, r *http.Request) {
-	c.respond(w, http.StatusOK, "I'm alive!")
+	c.respond(w, http.StatusOK, c.Flags.Name()+" alive!")
 }
 
 // slash is the handler for /.
@@ -190,6 +192,24 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+var _ = fmt.Stringer(allowedIPs(nil))
+
+func (n allowedIPs) String() (s string) {
+	if len(n) < 1 {
+		return "(none)"
+	}
+
+	for i := range n {
+		if s != "" {
+			s += ", "
+		}
+
+		s += n[i].String()
+	}
+
+	return s
 }
 
 func (n allowedIPs) contains(ip string) bool {

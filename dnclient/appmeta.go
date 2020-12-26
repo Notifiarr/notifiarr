@@ -62,9 +62,12 @@ type SonarrConfig struct {
 	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
+// apiHandler is our custom handler function for APIs.
+type apiHandler func(r *http.Request) (int, interface{})
+
 // handleAPIpath makes adding API paths a little cleaner.
 // This grabs the app struct and saves it in a context before calling the handler.
-func (c *Client) handleAPIpath(app App, api string, next apiHandle, method ...string) {
+func (c *Client) handleAPIpath(app App, api string, next apiHandler, method ...string) {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}

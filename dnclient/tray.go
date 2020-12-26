@@ -51,8 +51,8 @@ func (c *Client) readyTray() {
 	systray.SetTooltip(c.Flags.Name())
 
 	menu := make(map[string]*systray.MenuItem)
-	menu["stat"] = systray.AddMenuItem("Running", "web server is running")
-	menu["togg"] = systray.AddMenuItem("Stop", "stop the web server")
+	menu["stat"] = systray.AddMenuItem("Running", "web server running, uncheck to pause")
+	menu["conf"] = systray.AddMenuItem("Config", "show configuration")
 	menu["link"] = systray.AddMenuItem("Links", "external resources")
 	menu["info"] = menu["link"].AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name()))
 	menu["hp"] = menu["link"].AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com")
@@ -60,7 +60,6 @@ func (c *Client) readyTray() {
 	menu["disc2"] = menu["link"].AddSubMenuItem("Go Lift Discord", "open Go Lift discord server")
 	menu["love"] = menu["link"].AddSubMenuItem("<3 ?x?.io", "show some love")
 	menu["gh"] = menu["link"].AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub")
-	menu["conf"] = systray.AddMenuItem("Config", "show configuration")
 	menu["view"] = menu["conf"].AddSubMenuItem("View", "show configuration")
 	menu["edit"] = menu["conf"].AddSubMenuItem("Edit", "edit configuration")
 	menu["key"] = menu["conf"].AddSubMenuItem("API Key", "set API Key")
@@ -69,7 +68,7 @@ func (c *Client) readyTray() {
 	menu["exit"] = systray.AddMenuItem("Quit", "Exit "+c.Flags.Name())
 
 	menu["info"].Disable()
-	menu["stat"].Disable()
+	menu["stat"].Check()
 	c.watchGuiChannels(menu)
 }
 
@@ -87,19 +86,17 @@ func (c *Client) watchGuiChannels(menu map[string]*systray.MenuItem) {
 		case <-menu["exit"].ClickedCh:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
 			systray.Quit()
-		case <-menu["togg"].ClickedCh:
+		case <-menu["stat"].ClickedCh:
 			if c.server == nil {
 				c.Print("Starting Web Server")
 				c.StartWebServer()
-				menu["stat"].SetTitle("Running")
-				menu["togg"].SetTitle("Pause")
-				menu["stat"].SetTooltip("web server is running")
+				menu["stat"].Check()
+				menu["stat"].SetTooltip("web server running, uncheck to pause")
 			} else {
 				c.Print("Pausing Web Server")
 				c.StopWebServer()
-				menu["stat"].SetTitle("Paused")
-				menu["togg"].SetTitle("Start")
-				menu["stat"].SetTooltip("web server is paused")
+				menu["stat"].Uncheck()
+				menu["stat"].SetTooltip("web server paused, click to start")
 			}
 		case <-menu["gh"].ClickedCh:
 			openURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
@@ -137,7 +134,7 @@ func (c *Client) displayConfig() (s string) {
 	s = "Config File: " + c.Flags.ConfigFile
 	s += fmt.Sprintf("\nDebug: %v", c.Config.Debug)
 	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
-	s += fmt.Sprintf("\nUpstreams: %v", c.allow.combineUpstreams())
+	s += fmt.Sprintf("\nUpstreams: %v", c.allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		s += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))

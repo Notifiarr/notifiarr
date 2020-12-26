@@ -8,10 +8,12 @@ func hasGUI() bool {
 
 func (c *Client) startTray() {}
 
-func openURL(uri string) error {
-	return nil
-}
-
 func openFile(filePath string) error {
 	return nil
 }
+
+/*
+func openURL(uri string) error {
+	return nil
+}
+*/

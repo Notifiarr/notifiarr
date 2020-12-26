@@ -139,7 +139,7 @@ func start() error {
 		return fmt.Errorf("at least 1 application must be configured: %w", ErrNoApps)
 	}
 
-	if strings.HasPrefix(msg, msgConfigCreate) {
+	if strings.HasPrefix(msg, msgConfigCreate) && hasGUI() {
 		_ = openFile(c.Flags.ConfigFile)
 		_, _ = dlgs.Warning(Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
