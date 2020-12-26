@@ -39,7 +39,7 @@ services:
 install:
   - mkdir -p $(go env GOPATH)/bin
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
-  - '[ "$TRAVIS_OS_NAME" == "osx" ] || rvm install $MY_RUBY_VER'
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm install $MY_RUBY_VER; fi
   - rvm $MY_RUBY_VER do gem install --no-document fpm
 before_script:
   # Create your own deploy key, tar it, and encrypt the file to make this work. Optionally add a bitly_token file to the archive.
@@ -51,9 +51,9 @@ before_script:
 script:
   # Test Go and Docker.
   - make test
-  - '[ "$TRAVIS_OS_NAME" == "osx" ] || make docker'
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make docker; fi
   # Test built docker image.
-  - '[ "$TRAVIS_OS_NAME" == "osx" ] || docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"'
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"; fi
   # Build everything
   - rvm $MY_RUBY_VER do make $MAKERELEASE
 after_success:
