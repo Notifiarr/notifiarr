@@ -56,6 +56,7 @@ func (c *Client) readyTray() {
 	menu["link"] = systray.AddMenuItem("Links", "external resources")
 	menu["info"] = menu["link"].AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name()))
 	menu["hp"] = menu["link"].AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com")
+	menu["wiki"] = menu["link"].AddSubMenuItem("DiscordNotifier Wiki", "open DiscordNotifier wiki")
 	menu["disc1"] = menu["link"].AddSubMenuItem("DiscordNotifier Discord", "open DiscordNotifier discord server")
 	menu["disc2"] = menu["link"].AddSubMenuItem("Go Lift Discord", "open Go Lift discord server")
 	menu["love"] = menu["link"].AddSubMenuItem("<3 ?x?.io", "show some love")
@@ -102,6 +103,8 @@ func (c *Client) watchGuiChannels(menu map[string]*systray.MenuItem) {
 			openURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
 		case <-menu["hp"].ClickedCh:
 			openURL("https://discordnotifier.com/")
+		case <-menu["wiki"].ClickedCh:
+			openURL("https://trash-guides.info/Misc/Discord-Notifier-Basic-Setup/")
 		case <-menu["logs"].ClickedCh:
 			openLog(c.Config.LogFile)
 		case <-menu["disc1"].ClickedCh:
