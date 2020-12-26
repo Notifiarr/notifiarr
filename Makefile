@@ -68,7 +68,7 @@ all: clean build
 release: clean linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
-	mv $(BINARY).*.macos $(BINARY).*.linux $(BINARY).*.freebsd $@/
+	mv $(BINARY).*.linux $(BINARY).*.freebsd $@/
 	gzip -9r $@/
 	for i in $(BINARY)*.exe ; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
 	mv *.rpm *.deb *.txz *.app.zip $@/
@@ -84,6 +84,7 @@ dmg: clean macapp
 
 # Delete all build assets.
 clean:
+	cat .metadata.make
 	# Cleaning up.
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make
