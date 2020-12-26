@@ -348,7 +348,9 @@ test: lint
 	go test -race -covermode=atomic ./...
 lint:
 	# Checking lint.
-	$(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
+	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
+	GOOS=freebsd $(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
+	GOOS=windows $(shell go env GOPATH)/bin/golangci-lint run $(GOLANGCI_LINT_ARGS)
 
 # Mockgen and bindata are examples.
 # Your `go generate` may require other tools; add them!
