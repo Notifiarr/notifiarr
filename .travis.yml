@@ -6,14 +6,13 @@ jobs:
     go: 1.15.x
     env:
     - MAKERELEASE=dmg
-    - MY_RUBY_VER=$brew_ruby
   - os: linux
+    services: docker
     dist: bionic
     language: go
     go: 1.15.x
     env:
     - MAKERELEASE=release
-    - MY_RUBY_VER=2.6.0
 git:
   depth: false
 addons:
@@ -34,14 +33,10 @@ addons:
 #    - gnupg
     - expect
     - upx
-go:
-  - 1.15.x
-services:
-  - docker
 install:
   - mkdir -p $(go env GOPATH)/bin
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin latest
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm install $MY_RUBY_VER; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm install 2.6.0; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do gem install --no-document fpm; fi
   # mac
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then rvm $brew_ruby do gem install --no-document fpm; fi
@@ -57,7 +52,7 @@ script:
   - make test
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make docker; fi
   # Test built docker image.
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY, version $VERSION"; fi
   # Build everything
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make $MAKERELEASE; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then rvm $brew_ruby do make $MAKERELEASE; fi
@@ -97,3 +92,4 @@ deploy:
     script: bash scripts/formula-deploy.sh
     on:
       tags: true
+      condition: "$TRAVIS_OS_NAME = osx"
