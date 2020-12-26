@@ -17,6 +17,7 @@ addons:
     packages:
     - rpm
     - gnu-tar
+    - upxs
   apt:
     packages:
     - ruby-dev
