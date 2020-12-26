@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gen2brain/dlgs"
-	"github.com/getlantern/systray"
 	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
@@ -71,7 +70,6 @@ type Client struct {
 	router *mux.Router
 	signal chan os.Signal
 	allow  allowedIPs
-	menu   map[string]*systray.MenuItem
 }
 
 // Errors returned by this package.
@@ -84,7 +82,6 @@ var (
 func NewDefaults() *Client {
 	return &Client{
 		signal: make(chan os.Signal, 1),
-		menu:   make(map[string]*systray.MenuItem),
 		Logger: &Logger{Logger: log.New(os.Stdout, "", log.LstdFlags)},
 		Config: &Config{
 			URLBase:   "/",

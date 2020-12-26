@@ -65,23 +65,31 @@ all: clean build
 ####################
 
 # Prepare a release. Called in Travis CI.
-release: clean macapp linux_packages freebsd_packages windows
+release: clean linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
-	mv $(BINARY).*.macos $(BINARY).*.linux $(BINARY).*.freebsd $@/
+	mv $(BINARY).*.linux $(BINARY).*.freebsd $@/
 	gzip -9r $@/
 	for i in $(BINARY)*.exe ; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
 	mv *.rpm *.deb *.txz *.app.zip $@/
 	# Generating File Hashes
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
+dmg: clean macapp
+	mkdir -p release
+	mv $(BINARY).*.macos release/
+	gzip -9r release/
+	for i in *.app ; do zip -9qrj release/$$i.zip $$i; rm -rf $$i;done
+	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/mac_checksums.sha256.txt
+
 # Delete all build assets.
 clean:
+	cat .metadata.make
 	# Cleaning up.
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
-	rm -rf package_build_* release after-install-rendered.sh before-remove-rendered.sh
+	rm -rf package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
 
 ####################
 ##### Sidecars #####
@@ -186,7 +194,7 @@ macapp: $(MACAPP).app.zip
 $(MACAPP).app.zip: macos
 	[ "$(MACAPP)" == "" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
 	[ "$(MACAPP)" == "" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
-	[ "$(MACAPP)" == "" ] || zip -9qrj $(MACAPP).app.zip init/macos/$(MACAPP).app
+	[ "$(MACAPP)" == "" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 
 rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux check_fpm

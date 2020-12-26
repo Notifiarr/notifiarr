@@ -1,3 +1,5 @@
+// +build darwin windows
+
 package dnclient
 
 import (
@@ -65,24 +67,25 @@ func (c *Client) readyTray() {
 
 	systray.SetTooltip(c.Flags.Name())
 
-	c.menu["link"] = systray.AddMenuItem("Links", "external resources")
-	c.menu["info"] = c.menu["link"].AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name()))
-	c.menu["hp"] = c.menu["link"].AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com")
-	c.menu["disc1"] = c.menu["link"].AddSubMenuItem("DiscordNotifier Discord", "open DiscordNotifier discord server")
-	c.menu["disc2"] = c.menu["link"].AddSubMenuItem("Go Lift Discord", "open Go Lift discord server")
-	c.menu["love"] = c.menu["link"].AddSubMenuItem("<3 ?x?.io", "show some love")
-	c.menu["gh"] = c.menu["link"].AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub")
-	c.menu["conf"] = systray.AddMenuItem("Config", "show configuration")
-	c.menu["key"] = systray.AddMenuItem("API Key", "set API Key")
-	c.menu["logs"] = systray.AddMenuItem("Logs", "show log file")
-	c.menu["load"] = systray.AddMenuItem("Reload", "reload configuration")
-	c.menu["exit"] = systray.AddMenuItem("Quit", "Exit "+c.Flags.Name())
+	menu := make(map[string]*systray.MenuItem)
+	menu["link"] = systray.AddMenuItem("Links", "external resources")
+	menu["info"] = menu["link"].AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name()))
+	menu["hp"] = menu["link"].AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com")
+	menu["disc1"] = menu["link"].AddSubMenuItem("DiscordNotifier Discord", "open DiscordNotifier discord server")
+	menu["disc2"] = menu["link"].AddSubMenuItem("Go Lift Discord", "open Go Lift discord server")
+	menu["love"] = menu["link"].AddSubMenuItem("<3 ?x?.io", "show some love")
+	menu["gh"] = menu["link"].AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub")
+	menu["conf"] = systray.AddMenuItem("Config", "show configuration")
+	menu["key"] = systray.AddMenuItem("API Key", "set API Key")
+	menu["logs"] = systray.AddMenuItem("Logs", "show log file")
+	menu["load"] = systray.AddMenuItem("Reload", "reload configuration")
+	menu["exit"] = systray.AddMenuItem("Quit", "Exit "+c.Flags.Name())
 
-	c.menu["info"].Disable()
-	c.watchGuiChannels()
+	menu["info"].Disable()
+	c.watchGuiChannels(menu)
 }
 
-func (c *Client) watchGuiChannels() {
+func (c *Client) watchGuiChannels(menu map[string]*systray.MenuItem) {
 	// nolint:errcheck
 	for {
 		select {
@@ -93,26 +96,26 @@ func (c *Client) watchGuiChannels() {
 				c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
 				systray.Quit()
 			}
-		case <-c.menu["exit"].ClickedCh:
+		case <-menu["exit"].ClickedCh:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
 			systray.Quit()
-		case <-c.menu["gh"].ClickedCh:
+		case <-menu["gh"].ClickedCh:
 			openURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
-		case <-c.menu["hp"].ClickedCh:
+		case <-menu["hp"].ClickedCh:
 			openURL("https://discordnotifier.com/")
-		case <-c.menu["logs"].ClickedCh:
+		case <-menu["logs"].ClickedCh:
 			openLog(c.Config.LogFile)
-		case <-c.menu["disc1"].ClickedCh:
+		case <-menu["disc1"].ClickedCh:
 			openURL("https://discord.gg/AURf8Yz")
-		case <-c.menu["disc2"].ClickedCh:
+		case <-menu["disc2"].ClickedCh:
 			openURL("https://golift.io/discord")
-		case <-c.menu["love"].ClickedCh:
+		case <-menu["love"].ClickedCh:
 			dlgs.Warning(Title, "nitusa loves you!\n<3")
-		case <-c.menu["conf"].ClickedCh:
+		case <-menu["conf"].ClickedCh:
 			dlgs.Info(Title+": Configuration", c.displayConfig())
-		case <-c.menu["load"].ClickedCh:
+		case <-menu["load"].ClickedCh:
 			c.reloadConfiguration()
-		case <-c.menu["key"].ClickedCh:
+		case <-menu["key"].ClickedCh:
 			key, ok, err := dlgs.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
 			if err != nil {
 				c.Print("[ERROR] Updating API Key:", err)
