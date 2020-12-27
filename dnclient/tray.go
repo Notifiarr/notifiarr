@@ -120,8 +120,7 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["update"].Clicked():
 			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/releases")
 		case <-c.menu["dninfo"].Clicked():
-			ui.Info(Title, c.info)
-			c.info = ""
+			ui.Info(Title, "INFO: "+c.info)
 			c.menu["dninfo"].Hide()
 		case sigc := <-c.signal:
 			if sigc != syscall.SIGHUP {

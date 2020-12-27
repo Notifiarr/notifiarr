@@ -129,17 +129,17 @@ func (c *Client) createConfigFile(file string) (string, error) {
 }
 
 func (c *Client) reloadConfiguration() {
-	//nolint: errcheck,scopelint
+	//nolint: scopelint
 	c.RestartWebServer(func() {
 		c.Print("==> Reloading Configuration")
 
 		if _, err := c.getConfig(); err != nil {
-			ui.Error(Title, "Reloading Configuration: "+err.Error())
-			c.Print("[ERROR]", err)
+			_, _ = ui.Error(Title, "Reloading Configuration: "+err.Error())
+			c.Errorf("reloading config: %v", err)
 			panic(err)
 		}
 
-		ui.Info(Title, "Configuration Reloaded!")
+		_, _ = ui.Info(Title, "Configuration Reloaded!")
 		c.InitStartup()
 		c.Print("==> Configuration Reloaded")
 	})
