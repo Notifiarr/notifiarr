@@ -16,7 +16,7 @@ mbid - music brainz is the source for lidarr (todo)
 // lidarrHandlers is called once on startup to register the web API paths.
 func (c *Client) lidarrHandlers() {
 	c.handleAPIpath(Lidarr, "/add", c.lidarrAddAlbum, "POST")
-	c.handleAPIpath(Lidarr, "/check/{albumid:[-a-z]+}", c.lidarrCheckAlbum, "GET")
+	c.handleAPIpath(Lidarr, "/check/{albumid:[-a-z0-9]+}", c.lidarrCheckAlbum, "GET")
 	c.handleAPIpath(Lidarr, "/qualityProfiles", c.lidarrProfiles, "GET")
 	c.handleAPIpath(Lidarr, "/qualityDefinitions", c.lidarrQualityDefs, "GET")
 	c.handleAPIpath(Lidarr, "/rootFolder", c.lidarrRootFolders, "GET")

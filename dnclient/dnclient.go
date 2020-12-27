@@ -44,7 +44,7 @@ type Config struct {
 	SSLKeyFile string           `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
 	Quiet      bool             `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
 	LogFile    string           `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
-	ErrorLog   string           `json:"error_log" toml:"error_log" xml:"error_log" yaml:"error_log"`
+	HTTPLog    string           `json:"http_log" toml:"http_log" xml:"http_log" yaml:"http_log"`
 	LogFiles   int              `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
 	LogFileMb  int              `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
 	URLBase    string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
@@ -81,8 +81,8 @@ func NewDefaults() *Client {
 		signal: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
 		Logger: &Logger{
-			Logger: log.New(os.Stdout, "[INFO] ", log.LstdFlags),
-			Errors: log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
+			Logger:   log.New(os.Stdout, "", log.LstdFlags),
+			Requests: log.New(os.Stdout, "", log.LstdFlags),
 		},
 		Config: &Config{
 			URLBase:   "/",

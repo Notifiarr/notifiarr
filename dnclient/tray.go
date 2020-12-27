@@ -73,7 +73,7 @@ func (c *Client) readyTray() {
 	logs := systray.AddMenuItem("Logs", "log file info")
 	c.menu["logs"] = ui.WrapMenu(logs)
 	c.menu["logs_view"] = ui.WrapMenu(logs.AddSubMenuItem("View", "view the application log"))
-	c.menu["logs_error"] = ui.WrapMenu(logs.AddSubMenuItem("Errors", "view the error log"))
+	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "there is a newer version available"))
@@ -113,8 +113,8 @@ func (c *Client) watchGuiChannels() {
 			c.changeKey()
 		case <-c.menu["logs_view"].Clicked():
 			ui.OpenLog(c.Config.LogFile)
-		case <-c.menu["logs_error"].Clicked():
-			ui.OpenLog(c.Config.ErrorLog)
+		case <-c.menu["logs_http"].Clicked():
+			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
@@ -165,8 +165,8 @@ func (c *Client) changeKey() {
 func (c *Client) rotateLogs() {
 	c.Print("Rotating Log Files!")
 
-	if _, err := c.Logger.errrotate.Rotate(); err != nil {
-		c.Errorf("Rotating Error Log: %v", err)
+	if _, err := c.Logger.webrotate.Rotate(); err != nil {
+		c.Errorf("Rotating HTTP Log: %v", err)
 	}
 
 	if _, err := c.Logger.logrotate.Rotate(); err != nil {
@@ -189,10 +189,10 @@ func (c *Client) displayConfig() (s string) { //nolint: funlen
 
 	if c.Config.LogFiles > 0 {
 		s += fmt.Sprintf("\nLog File: %v (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
-		s += fmt.Sprintf("\nError Log: %v (%d @ %dMb)", c.Config.ErrorLog, c.Config.LogFiles, c.Config.LogFileMb)
+		s += fmt.Sprintf("\nHTTP Log: %v (%d @ %dMb)", c.Config.HTTPLog, c.Config.LogFiles, c.Config.LogFileMb)
 	} else {
 		s += fmt.Sprintf("\nLog File: %v (no rotation)", c.Config.LogFile)
-		s += fmt.Sprintf("\nError Log: %v (no rotation)", c.Config.ErrorLog)
+		s += fmt.Sprintf("\nHTTP Log: %v (no rotation)", c.Config.HTTPLog)
 	}
 
 	if count := len(c.Config.Lidarr); count == 1 {

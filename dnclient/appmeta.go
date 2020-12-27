@@ -113,6 +113,17 @@ func (c *Client) handleAPIpath(app App, api string, next apiHandler, method ...s
 		}))).Methods(method...)
 }
 
+// checkAPIKey drops a 403 if the API key doesn't match.
+func (c *Client) checkAPIKey(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-API-Key") != c.Config.APIKey {
+			w.WriteHeader(http.StatusUnauthorized)
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+
 /* Every API call runs one of these methods to find the interface for the respective app. */
 
 func getLidarr(r *http.Request) *LidarrConfig {

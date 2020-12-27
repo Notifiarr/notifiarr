@@ -17,8 +17,8 @@ import (
 // Logger provides a struct we can pass into other packages.
 type Logger struct {
 	Logger    *log.Logger
-	Errors    *log.Logger
-	errrotate *rotatorr.Logger
+	Requests  *log.Logger
+	webrotate *rotatorr.Logger
 	logrotate *rotatorr.Logger
 }
 
@@ -47,7 +47,7 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 
 // Errorf writes log lines... to stdout and/or a file.
 func (l *Logger) Errorf(msg string, v ...interface{}) {
-	err := l.Errors.Output(callDepth, fmt.Sprintf(msg, v...))
+	err := l.Logger.Output(callDepth, fmt.Sprintf("[ERROR] "+msg, v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err)
 	}
@@ -64,12 +64,12 @@ func (c *Client) SetupLogging() {
 		}
 	}
 
-	if ui.HasGUI() && c.Config.ErrorLog == "" {
-		f, err := homedir.Expand(filepath.Join("~", ".dnclient", c.Flags.Name()+".error.log"))
+	if ui.HasGUI() && c.Config.HTTPLog == "" {
+		f, err := homedir.Expand(filepath.Join("~", ".dnclient", c.Flags.Name()+".http.log"))
 		if err != nil {
-			c.Config.ErrorLog = c.Flags.Name() + ".error.log"
+			c.Config.HTTPLog = c.Flags.Name() + ".error.log"
 		} else {
-			c.Config.ErrorLog = f
+			c.Config.HTTPLog = f
 		}
 	}
 
@@ -92,22 +92,22 @@ func (c *Client) SetupLogging() {
 		c.Logger.Logger.SetOutput(c.Logger.logrotate)
 	}
 
-	rotateErrors := &rotatorr.Config{
-		Filepath: c.Config.ErrorLog,                                 // log file name.
+	rotateHTTP := &rotatorr.Config{
+		Filepath: c.Config.HTTPLog,                                  // log file name.
 		FileSize: int64(c.Config.LogFileMb) * megabyte,              // megabytes
 		Rotatorr: &timerotator.Layout{FileCount: c.Config.LogFiles}, // number of files to keep.
 	}
 
 	switch { // only use MultiWriter if we have > 1 writer.
-	case !c.Config.Quiet && c.Config.ErrorLog != "":
-		c.Logger.errrotate = rotatorr.NewMust(rotateErrors)
-		c.Logger.Errors.SetOutput(io.MultiWriter(c.Logger.errrotate, os.Stdout))
-	case !c.Config.Quiet && c.Config.ErrorLog == "":
-		c.Logger.Errors.SetOutput(os.Stdout)
-	case c.Config.ErrorLog == "":
-		c.Logger.Errors.SetOutput(ioutil.Discard) // default is "nothing"
+	case !c.Config.Quiet && c.Config.HTTPLog != "":
+		c.Logger.webrotate = rotatorr.NewMust(rotateHTTP)
+		c.Logger.Requests.SetOutput(io.MultiWriter(c.Logger.webrotate, os.Stdout))
+	case !c.Config.Quiet && c.Config.HTTPLog == "":
+		c.Logger.Requests.SetOutput(os.Stdout)
+	case c.Config.HTTPLog == "":
+		c.Logger.Requests.SetOutput(ioutil.Discard) // default is "nothing"
 	default:
-		c.Logger.errrotate = rotatorr.NewMust(rotateErrors)
-		c.Logger.Errors.SetOutput(c.Logger.errrotate)
+		c.Logger.webrotate = rotatorr.NewMust(rotateHTTP)
+		c.Logger.Requests.SetOutput(c.Logger.webrotate)
 	}
 }
