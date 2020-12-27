@@ -118,8 +118,6 @@ func Start() error {
 }
 
 func start() error {
-	log.SetFlags(log.LstdFlags) // in case we throw an error for main.go before logging is setup.
-
 	c := NewDefaults()
 	c.Flags.ParseArgs(os.Args[1:])
 
