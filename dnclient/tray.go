@@ -22,8 +22,6 @@ func (c *Client) startTray() error {
 		return c.Exit()
 	}
 
-	os.Stdout.Close()
-
 	systray.Run(c.readyTray, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 		defer cancel()
@@ -77,10 +75,12 @@ func (c *Client) readyTray() {
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "there is a newer version available"))
-	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info", "info from DiscordNotifier.com"))
+	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from DiscordNotifier.com"))
+	c.menu["alert"] = ui.WrapMenu(systray.AddMenuItem("Alert!", "alert from DiscordNotifier.com"))
 	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
 
 	c.menu["dninfo"].Hide()
+	c.menu["alert"].Hide()
 	c.menu["update"].Hide()
 	c.menu["info"].Disable()
 	c.menu["stat"].Check()

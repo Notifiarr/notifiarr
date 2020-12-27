@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/ui"
 	"golift.io/version"
 )
 
@@ -26,6 +27,8 @@ func (c *Client) internalHandlers() {
 		http.HandlerFunc(c.statusResponse)).Methods("GET", "HEAD")
 	// PUT  /api/info     (w/ key)
 	c.handleAPIpath("", "info", c.updateInfo, "PUT")
+	// PUT  /api/info/alert     (w/ key)
+	c.handleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 	// GET  /api/version  (w/ key)
 	c.handleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 
@@ -51,18 +54,54 @@ func (c *Client) respond(w http.ResponseWriter, stat int, msg interface{}) {
 	_, _ = w.Write([]byte("\n")) // curl likes new lines.
 }
 
-func (c *Client) updateInfo(r *http.Request) (int, interface{}) {
+func (c *Client) updateInfoAny(r *http.Request) (int, string, interface{}) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("reading POST body: %w", err)
-	} else if _, ok := c.menu["dninfo"]; !ok {
-		return http.StatusNotAcceptable, "menu is not active"
+		return http.StatusInternalServerError, "", fmt.Errorf("reading PUT body: %w", err)
+	}
+	c.Print("New Info from DiscordNotifier.com:", string(body))
+
+	if _, ok := c.menu["dninfo"]; !ok {
+		return http.StatusAccepted, "", "menu UI is not active"
 	}
 
-	c.info = string(body)
+	c.info = string(body) // not lockd, prob should be.
 	c.menu["dninfo"].Show()
 
-	return http.StatusOK, "info updated and menu shown"
+	return http.StatusOK, string(body), "info updated and menu shown"
+}
+
+func (c *Client) updateInfo(r *http.Request) (int, interface{}) {
+	code, _, err := c.updateInfoAny(r)
+
+	return code, err
+}
+
+// updateInfoAlert is the same as updateInfo except it adds a popup window.
+func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
+	code, body, err := c.updateInfoAny(r)
+	if body == "" {
+		return code, err
+	}
+
+	c.alertMutex.Lock()
+	defer c.alertMutex.Unlock()
+
+	if c.alert {
+		return http.StatusLocked, "previous alert not acknowledged"
+	}
+
+	c.alert = true
+
+	go func() {
+		_, _ = ui.Warning(Title+" Alert", body)
+		c.alertMutex.Lock()
+		defer c.alertMutex.Unlock()
+
+		c.alert = false
+	}()
+
+	return code, err
 }
 
 // versionResponse returns application run and build time data: /api/version.
