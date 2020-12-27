@@ -27,7 +27,7 @@ func (c *Client) InitStartup() {
 	c.initRadarr()
 	c.initLidarr()
 	c.initReadarr()
-	c.Printf(" => Timeout: %v, Debug: %v, Quiet: %v", c.Config.Timeout, c.Config.Debug, c.Config.Quiet)
+	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {

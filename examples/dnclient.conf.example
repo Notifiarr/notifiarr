@@ -9,11 +9,9 @@ api_key = "api-key-from-discordnotifier.com"
 # You can use 127.0.0.1:5454 to listen only on localhost.
 bind_addr = "5454"
 
-# Debug logs a bit more data to the logs and is not very useful right now.
-debug = false
 
 # Quiet makes the app not log anything to output.
-# Recommend setting a log file if you make the app quiet.
+# Recommend setting log files if you make the app quiet.
 quiet = false
 
 # All API paths start with /api.
@@ -30,8 +28,10 @@ urlbase = "/"
 # ssl_key_file  = "/path/to/cert.key"
 # ssl_cert_file = "/path/to/cert.pem"
 
-# If you set this, logs will be written to this file.
+# If you set these, logs will be written to these files.
+# If blank on windows or macOS, log file paths are chosen for you.
 #log_file = "dnclient.log"
+#error_log = "dnclient.error.log"
 # Set this to the number of megabytes to rotate files.
 log_files_mb = 100
 # How many files to keep? 0 = all.

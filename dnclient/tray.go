@@ -10,16 +10,16 @@ import (
 	"syscall"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
-	"github.com/gen2brain/dlgs"
+	"github.com/Go-Lift-TV/discordnotifier-client/ui"
 	"github.com/getlantern/systray"
 	"golift.io/version"
 )
 
 /* This file handles the OS GUI elements. */
 
-func (c *Client) startTray() {
-	if !hasGUI() {
-		return
+func (c *Client) startTray() error {
+	if !ui.HasGUI() {
+		return c.Exit()
 	}
 
 	os.Stdout.Close()
@@ -30,112 +30,152 @@ func (c *Client) startTray() {
 
 		if c.server != nil {
 			if err := c.server.Shutdown(ctx); err != nil {
-				c.Print("[ERROR]", err)
+				c.Errorf("shutting down web server: %v", err)
 				os.Exit(1) // web server problem
 			}
 		}
 
 		os.Exit(0)
 	})
+
+	// We never get here, but just in case the library changes...
+	return c.Exit()
 }
 
 func (c *Client) readyTray() {
-	b, err := bindata.Asset(systrayIcon)
+	b, err := bindata.Asset(ui.SystrayIcon)
 	if err == nil {
 		systray.SetTemplateIcon(b, b)
 	} else {
-		c.Print("[ERROR] reading icon:", err)
+		c.Errorf("reading icon: %v", err)
 		systray.SetTitle("DNC")
 	}
 
 	systray.SetTooltip(c.Flags.Name())
+	c.menu["stat"] = ui.WrapMenu(systray.AddMenuItem("Running", "web server running, uncheck to pause"))
 
-	menu := make(map[string]*systray.MenuItem)
-	menu["stat"] = systray.AddMenuItem("Running", "web server running, uncheck to pause")
-	menu["conf"] = systray.AddMenuItem("Config", "show configuration")
-	menu["link"] = systray.AddMenuItem("Links", "external resources")
-	menu["info"] = menu["link"].AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name()))
-	menu["hp"] = menu["link"].AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com")
-	menu["wiki"] = menu["link"].AddSubMenuItem("DiscordNotifier Wiki", "open DiscordNotifier wiki")
-	menu["disc1"] = menu["link"].AddSubMenuItem("DiscordNotifier Discord", "open DiscordNotifier discord server")
-	menu["disc2"] = menu["link"].AddSubMenuItem("Go Lift Discord", "open Go Lift discord server")
-	menu["love"] = menu["link"].AddSubMenuItem("<3 ?x?.io", "show some love")
-	menu["gh"] = menu["link"].AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub")
-	menu["view"] = menu["conf"].AddSubMenuItem("View", "show configuration")
-	menu["edit"] = menu["conf"].AddSubMenuItem("Edit", "edit configuration")
-	menu["key"] = menu["conf"].AddSubMenuItem("API Key", "set API Key")
-	menu["load"] = menu["conf"].AddSubMenuItem("Reload", "reload configuration")
-	menu["logs"] = systray.AddMenuItem("Logs", "show log file")
-	menu["exit"] = systray.AddMenuItem("Quit", "Exit "+c.Flags.Name())
+	conf := systray.AddMenuItem("Config", "show configuration")
+	c.menu["conf"] = ui.WrapMenu(conf)
+	c.menu["view"] = ui.WrapMenu(conf.AddSubMenuItem("View", "show configuration"))
+	c.menu["edit"] = ui.WrapMenu(conf.AddSubMenuItem("Edit", "edit configuration"))
+	c.menu["key"] = ui.WrapMenu(conf.AddSubMenuItem("API Key", "set API Key"))
+	c.menu["load"] = ui.WrapMenu(conf.AddSubMenuItem("Reload", "reload configuration"))
 
-	menu["info"].Disable()
-	menu["stat"].Check()
-	c.watchGuiChannels(menu)
+	link := systray.AddMenuItem("Links", "external resources")
+	c.menu["link"] = ui.WrapMenu(link)
+	c.menu["info"] = ui.WrapMenu(link.AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name())))
+	c.menu["hp"] = ui.WrapMenu(link.AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com"))
+	c.menu["wiki"] = ui.WrapMenu(link.AddSubMenuItem("DiscordNotifier Wiki", "open DiscordNotifier wiki"))
+	c.menu["disc1"] = ui.WrapMenu(link.AddSubMenuItem("DiscordNotifier Discord", "open DiscordNotifier discord server"))
+	c.menu["disc2"] = ui.WrapMenu(link.AddSubMenuItem("Go Lift Discord", "open Go Lift discord server"))
+	c.menu["gh"] = ui.WrapMenu(link.AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub"))
+
+	logs := systray.AddMenuItem("Logs", "log file info")
+	c.menu["logs"] = ui.WrapMenu(logs)
+	c.menu["logs_view"] = ui.WrapMenu(logs.AddSubMenuItem("View", "view the application log"))
+	c.menu["logs_error"] = ui.WrapMenu(logs.AddSubMenuItem("Errors", "view the error log"))
+	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
+
+	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "there is a newer version available"))
+	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info", "info from DiscordNotifier.com"))
+	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
+
+	c.menu["dninfo"].Hide()
+	c.menu["update"].Hide()
+	c.menu["info"].Disable()
+	c.menu["stat"].Check()
+	c.watchGuiChannels()
 }
 
-func (c *Client) watchGuiChannels(menu map[string]*systray.MenuItem) {
-	// nolint:errcheck
+// nolint:errcheck
+func (c *Client) watchGuiChannels() {
 	for {
 		select {
-		case sigc := <-c.signal:
-			if sigc == syscall.SIGHUP {
-				c.reloadConfiguration()
-			} else {
-				c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
-				systray.Quit()
-			}
-		case <-menu["exit"].ClickedCh:
-			c.Printf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
-			systray.Quit()
-		case <-menu["stat"].ClickedCh:
-			if c.server == nil {
-				c.Print("Starting Web Server")
-				c.StartWebServer()
-				menu["stat"].Check()
-				menu["stat"].SetTooltip("web server running, uncheck to pause")
-			} else {
-				c.Print("Pausing Web Server")
-				c.StopWebServer()
-				menu["stat"].Uncheck()
-				menu["stat"].SetTooltip("web server paused, click to start")
-			}
-		case <-menu["gh"].ClickedCh:
-			openURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
-		case <-menu["hp"].ClickedCh:
-			openURL("https://discordnotifier.com/")
-		case <-menu["wiki"].ClickedCh:
-			openURL("https://trash-guides.info/Misc/Discord-Notifier-Basic-Setup/")
-		case <-menu["logs"].ClickedCh:
-			openLog(c.Config.LogFile)
-		case <-menu["disc1"].ClickedCh:
-			openURL("https://discord.gg/AURf8Yz")
-		case <-menu["disc2"].ClickedCh:
-			openURL("https://golift.io/discord")
-		case <-menu["love"].ClickedCh:
-			dlgs.Warning(Title, "nitusa loves you!\n<3")
-		case <-menu["view"].ClickedCh:
-			dlgs.Info(Title+": Configuration", c.displayConfig())
-		case <-menu["edit"].ClickedCh:
-			openFile(c.Flags.ConfigFile)
-		case <-menu["load"].ClickedCh:
+		case <-c.menu["stat"].Clicked():
+			c.toggleServer()
+		case <-c.menu["gh"].Clicked():
+			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
+		case <-c.menu["hp"].Clicked():
+			ui.OpenURL("https://discordnotifier.com/")
+		case <-c.menu["wiki"].Clicked():
+			ui.OpenURL("https://trash-guides.info/Misc/Discord-Notifier-Basic-Setup/")
+		case <-c.menu["disc1"].Clicked():
+			ui.OpenURL("https://discord.gg/AURf8Yz")
+		case <-c.menu["disc2"].Clicked():
+			ui.OpenURL("https://golift.io/discord")
+		case <-c.menu["view"].Clicked():
+			ui.Info(Title+": Configuration", c.displayConfig())
+		case <-c.menu["edit"].Clicked():
+			ui.OpenFile(c.Flags.ConfigFile)
+		case <-c.menu["load"].Clicked():
 			c.reloadConfiguration()
-		case <-menu["key"].ClickedCh:
-			key, ok, err := dlgs.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
-			if err != nil {
-				c.Print("[ERROR] Updating API Key:", err)
-			} else if ok && key != c.Config.APIKey {
-				// updateKey shuts down the web server and changes the API key.
-				// The server has to shut down to avoid race conditions.
-				c.Print("Updating API Key!")
-				c.RestartWebServer(func() { c.Config.APIKey = key })
+		case <-c.menu["key"].Clicked():
+			c.changeKey()
+		case <-c.menu["logs_view"].Clicked():
+			ui.OpenLog(c.Config.LogFile)
+		case <-c.menu["logs_error"].Clicked():
+			ui.OpenLog(c.Config.ErrorLog)
+		case <-c.menu["logs_rotate"].Clicked():
+			c.rotateLogs()
+		case <-c.menu["update"].Clicked():
+			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/releases")
+		case <-c.menu["dninfo"].Clicked():
+			ui.Info(Title, "INFO: "+c.info)
+			c.menu["dninfo"].Hide()
+		case sigc := <-c.signal:
+			if sigc != syscall.SIGHUP {
+				c.Errorf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
+				systray.Quit() // this kills the app.
 			}
+
+			c.reloadConfiguration()
+		case <-c.menu["exit"].Clicked():
+			c.Errorf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
+			systray.Quit() // this kills the app.
 		}
 	}
 }
 
-func (c *Client) displayConfig() (s string) {
+func (c *Client) toggleServer() {
+	if c.server == nil {
+		c.Print("Starting Web Server")
+		c.StartWebServer()
+		c.menu["stat"].Check()
+		c.menu["stat"].SetTooltip("web server running, uncheck to pause")
+	} else {
+		c.Print("Pausing Web Server")
+		c.StopWebServer()
+		c.menu["stat"].Uncheck()
+		c.menu["stat"].SetTooltip("web server paused, click to start")
+	}
+}
+
+func (c *Client) changeKey() {
+	key, ok, err := ui.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
+	if err != nil {
+		c.Errorf("Updating API Key: %v", err)
+	} else if ok && key != c.Config.APIKey {
+		// updateKey shuts down the web server and changes the API key.
+		// The server has to shut down to avoid race conditions.
+		c.Print("Updating API Key!")
+		c.RestartWebServer(func() { c.Config.APIKey = key })
+	}
+}
+
+func (c *Client) rotateLogs() {
+	c.Print("Rotating Log Files!")
+
+	if _, err := c.Logger.errrotate.Rotate(); err != nil {
+		c.Errorf("Rotating Error Log: %v", err)
+	}
+
+	if _, err := c.Logger.logrotate.Rotate(); err != nil {
+		c.Errorf("Rotating Log: %v", err)
+	}
+}
+
+func (c *Client) displayConfig() (s string) { //nolint: funlen
 	s = "Config File: " + c.Flags.ConfigFile
-	s += fmt.Sprintf("\nDebug: %v", c.Config.Debug)
 	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
 	s += fmt.Sprintf("\nUpstreams: %v", c.allow)
 
@@ -149,8 +189,10 @@ func (c *Client) displayConfig() (s string) {
 
 	if c.Config.LogFiles > 0 {
 		s += fmt.Sprintf("\nLog File: %v (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
+		s += fmt.Sprintf("\nError Log: %v (%d @ %dMb)", c.Config.ErrorLog, c.Config.LogFiles, c.Config.LogFileMb)
 	} else {
 		s += fmt.Sprintf("\nLog File: %v (no rotation)", c.Config.LogFile)
+		s += fmt.Sprintf("\nError Log: %v (no rotation)", c.Config.ErrorLog)
 	}
 
 	if count := len(c.Config.Lidarr); count == 1 {

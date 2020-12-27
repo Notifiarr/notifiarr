@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -36,10 +37,10 @@ var (
 // allowedIPs determines who can set x-forwarded-for.
 type allowedIPs []*net.IPNet
 
-// RunWebServer starts the web server.
+// StartWebServer starts the web server.
 func (c *Client) StartWebServer() {
 	// Create an apache-style logger.
-	l, _ := apachelog.New(`HTTP %{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
+	l, _ := apachelog.New(`%{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
 		`"%{User-agent}i" %{X-Request-Time}o %Dμs`)
 	// Create a request router.
 	c.router = mux.NewRouter()
@@ -51,7 +52,7 @@ func (c *Client) StartWebServer() {
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,
 		ReadHeaderTimeout: c.Config.Timeout.Duration,
-		ErrorLog:          c.Logger.Logger,
+		ErrorLog:          c.Logger.Errors,
 	}
 
 	// Initialize all the application API paths.
@@ -63,6 +64,7 @@ func (c *Client) StartWebServer() {
 	// Initialize "special" internal API paths.
 	c.router.Handle(path.Join("/", c.Config.URLBase, "api", "status"), // does not return any data
 		http.HandlerFunc(c.statusResponse)).Methods("GET", "HEAD") // does not require a key
+	c.handleAPIpath("", "info", c.updateInfo, "PUT")                 // requires a key
 	c.handleAPIpath("", "version", c.versionResponse, "GET", "HEAD") // requires a key
 
 	// Initialize internal-only paths.
@@ -87,7 +89,7 @@ func (c *Client) runWebServer() {
 	c.server = nil
 
 	if err != nil && !errors.Is(http.ErrServerClosed, err) {
-		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.Errorf("Web Server: %v (shutting down)", err)
 		c.signal <- os.Kill // stop the app.
 	}
 }
@@ -98,7 +100,7 @@ func (c *Client) StopWebServer() {
 	defer cancel()
 
 	if err := c.server.Shutdown(ctx); err != nil {
-		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.Errorf("Web Server: %v (shutting down)", err)
 		c.signal <- os.Kill
 	}
 }
@@ -126,17 +128,33 @@ func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 }
 
 func (c *Client) respond(w http.ResponseWriter, stat int, msg interface{}) {
+	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+
 	if m, ok := msg.(error); ok {
+		c.Errorf("Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
 
-	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 	b, _ := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
 	_, _ = w.Write(b)
 	_, _ = w.Write([]byte("\n")) // curl likes new lines.
+}
+
+func (c *Client) updateInfo(r *http.Request) (int, interface{}) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("reading POST body: %w", err)
+	} else if _, ok := c.menu["dninfo"]; !ok {
+		return http.StatusNotAcceptable, "menu is not active"
+	}
+
+	c.info = string(body)
+	c.menu["dninfo"].Show()
+
+	return http.StatusOK, "info updated and menu shown"
 }
 
 // versionResponse returns application run and build time data: /api/version.

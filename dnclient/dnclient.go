@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gen2brain/dlgs"
+	"github.com/Go-Lift-TV/discordnotifier-client/ui"
 	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
@@ -42,9 +42,9 @@ type Config struct {
 	BindAddr   string           `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
 	SSLCrtFile string           `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
 	SSLKeyFile string           `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
-	Debug      bool             `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
 	Quiet      bool             `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
 	LogFile    string           `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
+	ErrorLog   string           `json:"error_log" toml:"error_log" xml:"error_log" yaml:"error_log"`
 	LogFiles   int              `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
 	LogFileMb  int              `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
 	URLBase    string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
@@ -56,12 +56,6 @@ type Config struct {
 	Readarr    []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
 }
 
-// Logger provides a struct we can pass into other packages.
-type Logger struct {
-	debug  bool
-	Logger *log.Logger
-}
-
 // Client stores all the running data.
 type Client struct {
 	*Logger
@@ -71,6 +65,8 @@ type Client struct {
 	router *mux.Router
 	signal chan os.Signal
 	allow  allowedIPs
+	menu   map[string]ui.MenuItem
+	info   string
 }
 
 // Errors returned by this package.
@@ -83,7 +79,11 @@ var (
 func NewDefaults() *Client {
 	return &Client{
 		signal: make(chan os.Signal, 1),
-		Logger: &Logger{Logger: log.New(os.Stdout, "", log.LstdFlags)},
+		menu:   make(map[string]ui.MenuItem),
+		Logger: &Logger{
+			Logger: log.New(os.Stdout, "[INFO] ", log.LstdFlags),
+			Errors: log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
+		},
 		Config: &Config{
 			URLBase:   "/",
 			LogFiles:  DefaultLogFiles,
@@ -109,8 +109,8 @@ func (f *Flags) ParseArgs(args []string) {
 // Start runs the app.
 func Start() error {
 	err := start()
-	if err != nil && hasGUI() {
-		_, _ = dlgs.Error(Title, err.Error())
+	if err != nil {
+		_, _ = ui.Error(Title, err.Error())
 	}
 
 	return err
@@ -139,9 +139,9 @@ func start() error {
 		return fmt.Errorf("at least 1 application must be configured: %w", ErrNoApps)
 	}
 
-	if strings.HasPrefix(msg, msgConfigCreate) && hasGUI() {
-		_ = openFile(c.Flags.ConfigFile)
-		_, _ = dlgs.Warning(Title, "A new configuration file was created @ "+
+	if strings.HasPrefix(msg, msgConfigCreate) {
+		_ = ui.OpenFile(c.Flags.ConfigFile)
+		_, _ = ui.Warning(Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
 			"Please edit the file and reload this application using the tray menu.")
 	}
@@ -152,7 +152,6 @@ func start() error {
 	c.InitStartup()
 	c.StartWebServer()
 	signal.Notify(c.signal, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
-	c.startTray() // processing stops here on windows and in mac app.
 
-	return c.Exit()
+	return c.startTray()
 }

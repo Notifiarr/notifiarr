@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
-	"github.com/gen2brain/dlgs"
+	"github.com/Go-Lift-TV/discordnotifier-client/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
@@ -91,7 +91,7 @@ func (c *Client) fixConfigs() {
 }
 
 func (c *Client) createConfigFile(file string) (string, error) {
-	if !hasGUI() {
+	if !ui.HasGUI() {
 		return "", nil
 	}
 
@@ -129,25 +129,17 @@ func (c *Client) createConfigFile(file string) (string, error) {
 }
 
 func (c *Client) reloadConfiguration() {
-	//nolint: errcheck,scopelint
+	//nolint: scopelint
 	c.RestartWebServer(func() {
-		var err error
-
 		c.Print("==> Reloading Configuration")
 
-		if _, err = c.getConfig(); err != nil {
-			if hasGUI() {
-				dlgs.Error(Title, "Reloading Configuration: "+err.Error())
-			}
-
-			c.Print("[ERROR]", err)
+		if _, err := c.getConfig(); err != nil {
+			_, _ = ui.Error(Title, "Reloading Configuration: "+err.Error())
+			c.Errorf("reloading config: %v", err)
 			panic(err)
 		}
 
-		if hasGUI() {
-			dlgs.Info(Title, "Configuration Reloaded!")
-		}
-
+		_, _ = ui.Info(Title, "Configuration Reloaded!")
 		c.InitStartup()
 		c.Print("==> Configuration Reloaded")
 	})
