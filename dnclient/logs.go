@@ -83,20 +83,18 @@ func (c *Client) SetupLogging() {
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !c.Config.Quiet && c.Config.LogFile != "":
 		c.Logger.app = rotatorr.NewMust(rotate)
-		writer := io.MultiWriter(c.Logger.app, os.Stdout)
-		c.Logger.Logger.SetOutput(writer)
-		c.Logger.Errors.SetOutput(writer)
+		c.Logger.Logger.SetOutput(io.MultiWriter(c.Logger.app, os.Stdout))
 	case !c.Config.Quiet && c.Config.LogFile == "":
 		c.Logger.Logger.SetOutput(os.Stdout)
-		c.Logger.Errors.SetOutput(os.Stdout)
 	case c.Config.LogFile == "":
 		c.Logger.Logger.SetOutput(ioutil.Discard) // default is "nothing"
-		c.Logger.Errors.SetOutput(ioutil.Discard) // default is "nothing"
 	default:
 		c.Logger.app = rotatorr.NewMust(rotate)
 		c.Logger.Logger.SetOutput(c.Logger.app)
-		c.Logger.Errors.SetOutput(c.Logger.app)
 	}
+
+	c.Logger.Errors.SetOutput(c.Logger.Logger.Writer())
+	log.SetOutput(c.Logger.Errors.Writer())
 
 	rotateHTTP := &rotatorr.Config{
 		Filepath: c.Config.HTTPLog,                                  // log file name.
