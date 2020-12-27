@@ -26,6 +26,7 @@ func StartCmd(c string, v ...string) error {
 	return cmd.Start()
 }
 
+// ErrUnsupported is just an error.
 var ErrUnsupported = fmt.Errorf("unsupported OS")
 
 // OpenCmd opens anything.
