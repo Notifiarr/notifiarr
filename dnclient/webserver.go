@@ -40,7 +40,7 @@ func (c *Client) StartWebServer() {
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,
 		ReadHeaderTimeout: c.Config.Timeout.Duration,
-		ErrorLog:          c.Logger.Logger,
+		ErrorLog:          c.Logger.Errors,
 	}
 
 	// Initialize all the application API paths.

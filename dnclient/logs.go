@@ -16,6 +16,7 @@ import (
 
 // Logger provides a struct we can pass into other packages.
 type Logger struct {
+	Errors    *log.Logger // Shares a Writer with Logger.
 	Logger    *log.Logger
 	Requests  *log.Logger
 	webrotate *rotatorr.Logger
@@ -47,7 +48,7 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 
 // Errorf writes log lines... to stdout and/or a file.
 func (l *Logger) Errorf(msg string, v ...interface{}) {
-	err := l.Logger.Output(callDepth, fmt.Sprintf("[ERROR] "+msg, v...))
+	err := l.Errors.Output(callDepth, fmt.Sprintf(msg, v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err)
 	}
@@ -82,14 +83,19 @@ func (c *Client) SetupLogging() {
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !c.Config.Quiet && c.Config.LogFile != "":
 		c.Logger.logrotate = rotatorr.NewMust(rotate)
-		c.Logger.Logger.SetOutput(io.MultiWriter(c.Logger.logrotate, os.Stdout))
+		writer := io.MultiWriter(c.Logger.logrotate, os.Stdout)
+		c.Logger.Logger.SetOutput(writer)
+		c.Logger.Errors.SetOutput(writer)
 	case !c.Config.Quiet && c.Config.LogFile == "":
 		c.Logger.Logger.SetOutput(os.Stdout)
+		c.Logger.Errors.SetOutput(os.Stdout)
 	case c.Config.LogFile == "":
 		c.Logger.Logger.SetOutput(ioutil.Discard) // default is "nothing"
+		c.Logger.Errors.SetOutput(ioutil.Discard) // default is "nothing"
 	default:
 		c.Logger.logrotate = rotatorr.NewMust(rotate)
 		c.Logger.Logger.SetOutput(c.Logger.logrotate)
+		c.Logger.Errors.SetOutput(c.Logger.logrotate)
 	}
 
 	rotateHTTP := &rotatorr.Config{

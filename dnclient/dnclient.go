@@ -81,7 +81,8 @@ func NewDefaults() *Client {
 		signal: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
 		Logger: &Logger{
-			Logger:   log.New(os.Stdout, "", log.LstdFlags),
+			Logger:   log.New(os.Stdout, "[INFO] ", log.LstdFlags),
+			Errors:   log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
 			Requests: log.New(os.Stdout, "", log.LstdFlags),
 		},
 		Config: &Config{
