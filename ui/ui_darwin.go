@@ -40,5 +40,5 @@ func OpenLog(logFile string) error {
 
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
-	return OpenCmd(filePath)
+	return OpenCmd("-t", filePath)
 }
