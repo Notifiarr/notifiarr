@@ -11,7 +11,7 @@ func (c *Client) startTray() {}
 func openFile(_ string) error { return nil }
 
 /*
-func openURL(uri string) error {
+func openURL(_ string) error {
 	return nil
 }
 */
