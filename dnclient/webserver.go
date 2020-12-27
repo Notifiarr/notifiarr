@@ -39,7 +39,7 @@ type allowedIPs []*net.IPNet
 // RunWebServer starts the web server.
 func (c *Client) StartWebServer() {
 	// Create an apache-style logger.
-	l, _ := apachelog.New(`HTTP %{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
+	l, _ := apachelog.New(`%{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
 		`"%{User-agent}i" %{X-Request-Time}o %Dμs`)
 	// Create a request router.
 	c.router = mux.NewRouter()
@@ -51,7 +51,7 @@ func (c *Client) StartWebServer() {
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,
 		ReadHeaderTimeout: c.Config.Timeout.Duration,
-		ErrorLog:          c.Logger.Logger,
+		ErrorLog:          c.Logger.Errors,
 	}
 
 	// Initialize all the application API paths.
@@ -87,7 +87,7 @@ func (c *Client) runWebServer() {
 	c.server = nil
 
 	if err != nil && !errors.Is(http.ErrServerClosed, err) {
-		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.Errorf("Web Server: %v (shutting down)", err)
 		c.signal <- os.Kill // stop the app.
 	}
 }
@@ -98,7 +98,7 @@ func (c *Client) StopWebServer() {
 	defer cancel()
 
 	if err := c.server.Shutdown(ctx); err != nil {
-		c.Printf("[ERROR] Web Server: %v (shutting down)", err)
+		c.Errorf("Web Server: %v (shutting down)", err)
 		c.signal <- os.Kill
 	}
 }
@@ -126,14 +126,16 @@ func (c *Client) checkAPIKey(next http.Handler) http.Handler {
 }
 
 func (c *Client) respond(w http.ResponseWriter, stat int, msg interface{}) {
+	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+
 	if m, ok := msg.(error); ok {
+		c.Errorf("Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
 
-	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 	b, _ := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
 	_, _ = w.Write(b)
 	_, _ = w.Write([]byte("\n")) // curl likes new lines.
