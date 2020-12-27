@@ -76,9 +76,9 @@ func (c *Client) readyTray() {
 	c.menu["logs_error"] = ui.WrapMenu(logs.AddSubMenuItem("Errors", "view the error log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
+	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "there is a newer version available"))
+	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info", "info from DiscordNotifier.com"))
 	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
-	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update Available", "there is a newer version available"))
-	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("DiscordNotifier Info", "information directly from DiscordNotifier.com"))
 
 	c.menu["dninfo"].Hide()
 	c.menu["update"].Hide()
@@ -87,22 +87,12 @@ func (c *Client) readyTray() {
 	c.watchGuiChannels()
 }
 
-// nolint:errcheck,funlen
+// nolint:errcheck
 func (c *Client) watchGuiChannels() {
 	for {
 		select {
 		case <-c.menu["stat"].Clicked():
-			if c.server == nil {
-				c.Print("Starting Web Server")
-				c.StartWebServer()
-				c.menu["stat"].Check()
-				c.menu["stat"].SetTooltip("web server running, uncheck to pause")
-			} else {
-				c.Print("Pausing Web Server")
-				c.StopWebServer()
-				c.menu["stat"].Uncheck()
-				c.menu["stat"].SetTooltip("web server paused, click to start")
-			}
+			c.toggleServer()
 		case <-c.menu["gh"].Clicked():
 			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
 		case <-c.menu["hp"].Clicked():
@@ -120,29 +110,13 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["load"].Clicked():
 			c.reloadConfiguration()
 		case <-c.menu["key"].Clicked():
-			key, ok, err := ui.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
-			if err != nil {
-				c.Errorf("Updating API Key: %v", err)
-			} else if ok && key != c.Config.APIKey {
-				// updateKey shuts down the web server and changes the API key.
-				// The server has to shut down to avoid race conditions.
-				c.Print("Updating API Key!")
-				c.RestartWebServer(func() { c.Config.APIKey = key })
-			}
+			c.changeKey()
 		case <-c.menu["logs_view"].Clicked():
 			ui.OpenLog(c.Config.LogFile)
 		case <-c.menu["logs_error"].Clicked():
 			ui.OpenLog(c.Config.ErrorLog)
 		case <-c.menu["logs_rotate"].Clicked():
-			c.Print("Rotating Log Files!")
-
-			if _, err := c.Logger.errrotate.Rotate(); err != nil {
-				c.Errorf("Rotating Error Log: %v", err)
-			}
-
-			if _, err := c.Logger.logrotate.Rotate(); err != nil {
-				c.Errorf("Rotating Log: %v", err)
-			}
+			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
 			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/releases")
 		case <-c.menu["dninfo"].Clicked():
@@ -160,6 +134,44 @@ func (c *Client) watchGuiChannels() {
 			c.Errorf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
 			systray.Quit() // this kills the app.
 		}
+	}
+}
+
+func (c *Client) toggleServer() {
+	if c.server == nil {
+		c.Print("Starting Web Server")
+		c.StartWebServer()
+		c.menu["stat"].Check()
+		c.menu["stat"].SetTooltip("web server running, uncheck to pause")
+	} else {
+		c.Print("Pausing Web Server")
+		c.StopWebServer()
+		c.menu["stat"].Uncheck()
+		c.menu["stat"].SetTooltip("web server paused, click to start")
+	}
+}
+
+func (c *Client) changeKey() {
+	key, ok, err := ui.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
+	if err != nil {
+		c.Errorf("Updating API Key: %v", err)
+	} else if ok && key != c.Config.APIKey {
+		// updateKey shuts down the web server and changes the API key.
+		// The server has to shut down to avoid race conditions.
+		c.Print("Updating API Key!")
+		c.RestartWebServer(func() { c.Config.APIKey = key })
+	}
+}
+
+func (c *Client) rotateLogs() {
+	c.Print("Rotating Log Files!")
+
+	if _, err := c.Logger.errrotate.Rotate(); err != nil {
+		c.Errorf("Rotating Error Log: %v", err)
+	}
+
+	if _, err := c.Logger.logrotate.Rotate(); err != nil {
+		c.Errorf("Rotating Log: %v", err)
 	}
 }
 

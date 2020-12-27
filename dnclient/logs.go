@@ -73,11 +73,6 @@ func (c *Client) SetupLogging() {
 		}
 	}
 
-	c.Logger = &Logger{
-		Errors: log.New(ioutil.Discard, "[ERROR] ", log.LstdFlags),
-		Logger: log.New(ioutil.Discard, "[INFO] ", log.LstdFlags),
-	}
-
 	rotate := &rotatorr.Config{
 		Filepath: c.Config.LogFile,                                  // log file name.
 		FileSize: int64(c.Config.LogFileMb) * megabyte,              // megabytes
