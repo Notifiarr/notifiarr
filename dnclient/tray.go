@@ -106,14 +106,17 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["view"].Clicked():
 			ui.Info(Title+": Configuration", c.displayConfig())
 		case <-c.menu["edit"].Clicked():
+			c.Print("User Editing Config File:", c.Flags.ConfigFile)
 			ui.OpenFile(c.Flags.ConfigFile)
 		case <-c.menu["load"].Clicked():
 			c.reloadConfiguration()
 		case <-c.menu["key"].Clicked():
 			c.changeKey()
 		case <-c.menu["logs_view"].Clicked():
+			c.Print("User Viewing Log File:", c.Config.LogFile)
 			ui.OpenLog(c.Config.LogFile)
 		case <-c.menu["logs_http"].Clicked():
+			c.Print("User Viewing Log File:", c.Config.HTTPLog)
 			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
@@ -124,13 +127,13 @@ func (c *Client) watchGuiChannels() {
 			c.menu["dninfo"].Hide()
 		case sigc := <-c.signal:
 			if sigc != syscall.SIGHUP {
-				c.Errorf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
+				c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
 				systray.Quit() // this kills the app.
 			}
 
 			c.reloadConfiguration()
 		case <-c.menu["exit"].Clicked():
-			c.Errorf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
+			c.Errorf("Need help? %s\n=====> Exiting! User Requested", helpLink)
 			systray.Quit() // this kills the app.
 		}
 	}
@@ -142,12 +145,14 @@ func (c *Client) toggleServer() {
 		c.StartWebServer()
 		c.menu["stat"].Check()
 		c.menu["stat"].SetTooltip("web server running, uncheck to pause")
-	} else {
-		c.Print("Pausing Web Server")
-		c.StopWebServer()
-		c.menu["stat"].Uncheck()
-		c.menu["stat"].SetTooltip("web server paused, click to start")
+
+		return
 	}
+
+	c.Print("Pausing Web Server")
+	c.StopWebServer()
+	c.menu["stat"].Uncheck()
+	c.menu["stat"].SetTooltip("web server paused, click to start")
 }
 
 func (c *Client) changeKey() {
@@ -165,11 +170,11 @@ func (c *Client) changeKey() {
 func (c *Client) rotateLogs() {
 	c.Print("Rotating Log Files!")
 
-	if _, err := c.Logger.webrotate.Rotate(); err != nil {
+	if _, err := c.Logger.web.Rotate(); err != nil {
 		c.Errorf("Rotating HTTP Log: %v", err)
 	}
 
-	if _, err := c.Logger.logrotate.Rotate(); err != nil {
+	if _, err := c.Logger.app.Rotate(); err != nil {
 		c.Errorf("Rotating Log: %v", err)
 	}
 }

@@ -16,11 +16,11 @@ import (
 
 // Logger provides a struct we can pass into other packages.
 type Logger struct {
-	Errors    *log.Logger // Shares a Writer with Logger.
-	Logger    *log.Logger
-	Requests  *log.Logger
-	webrotate *rotatorr.Logger
-	logrotate *rotatorr.Logger
+	Errors   *log.Logger // Shares a Writer with Logger.
+	Logger   *log.Logger
+	Requests *log.Logger
+	web      *rotatorr.Logger
+	app      *rotatorr.Logger
 }
 
 // satisfy gomnd.
@@ -82,8 +82,8 @@ func (c *Client) SetupLogging() {
 
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !c.Config.Quiet && c.Config.LogFile != "":
-		c.Logger.logrotate = rotatorr.NewMust(rotate)
-		writer := io.MultiWriter(c.Logger.logrotate, os.Stdout)
+		c.Logger.app = rotatorr.NewMust(rotate)
+		writer := io.MultiWriter(c.Logger.app, os.Stdout)
 		c.Logger.Logger.SetOutput(writer)
 		c.Logger.Errors.SetOutput(writer)
 	case !c.Config.Quiet && c.Config.LogFile == "":
@@ -93,9 +93,9 @@ func (c *Client) SetupLogging() {
 		c.Logger.Logger.SetOutput(ioutil.Discard) // default is "nothing"
 		c.Logger.Errors.SetOutput(ioutil.Discard) // default is "nothing"
 	default:
-		c.Logger.logrotate = rotatorr.NewMust(rotate)
-		c.Logger.Logger.SetOutput(c.Logger.logrotate)
-		c.Logger.Errors.SetOutput(c.Logger.logrotate)
+		c.Logger.app = rotatorr.NewMust(rotate)
+		c.Logger.Logger.SetOutput(c.Logger.app)
+		c.Logger.Errors.SetOutput(c.Logger.app)
 	}
 
 	rotateHTTP := &rotatorr.Config{
@@ -106,14 +106,14 @@ func (c *Client) SetupLogging() {
 
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !c.Config.Quiet && c.Config.HTTPLog != "":
-		c.Logger.webrotate = rotatorr.NewMust(rotateHTTP)
-		c.Logger.Requests.SetOutput(io.MultiWriter(c.Logger.webrotate, os.Stdout))
+		c.Logger.web = rotatorr.NewMust(rotateHTTP)
+		c.Logger.Requests.SetOutput(io.MultiWriter(c.Logger.web, os.Stdout))
 	case !c.Config.Quiet && c.Config.HTTPLog == "":
 		c.Logger.Requests.SetOutput(os.Stdout)
 	case c.Config.HTTPLog == "":
 		c.Logger.Requests.SetOutput(ioutil.Discard) // default is "nothing"
 	default:
-		c.Logger.webrotate = rotatorr.NewMust(rotateHTTP)
-		c.Logger.Requests.SetOutput(c.Logger.webrotate)
+		c.Logger.web = rotatorr.NewMust(rotateHTTP)
+		c.Logger.Requests.SetOutput(c.Logger.web)
 	}
 }
