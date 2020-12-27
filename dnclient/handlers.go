@@ -59,6 +59,7 @@ func (c *Client) updateInfoAny(r *http.Request) (int, string, interface{}) {
 	if err != nil {
 		return http.StatusInternalServerError, "", fmt.Errorf("reading PUT body: %w", err)
 	}
+
 	c.Print("New Info from DiscordNotifier.com:", string(body))
 
 	if _, ok := c.menu["dninfo"]; !ok {
@@ -84,8 +85,8 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 		return code, err
 	}
 
-	c.alertMutex.Lock()
-	defer c.alertMutex.Unlock()
+	c.alerts.Lock()
+	defer c.alerts.Unlock()
 
 	if c.alert {
 		return http.StatusLocked, "previous alert not acknowledged"
@@ -95,8 +96,9 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 
 	go func() {
 		_, _ = ui.Warning(Title+" Alert", body)
-		c.alertMutex.Lock()
-		defer c.alertMutex.Unlock()
+
+		c.alerts.Lock()
+		defer c.alerts.Unlock()
 
 		c.alert = false
 	}()

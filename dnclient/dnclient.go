@@ -60,16 +60,16 @@ type Config struct {
 // Client stores all the running data.
 type Client struct {
 	*Logger
-	Flags      *Flags
-	Config     *Config
-	server     *http.Server
-	router     *mux.Router
-	signal     chan os.Signal
-	allow      allowedIPs
-	menu       map[string]ui.MenuItem
-	info       string
-	alertMutex sync.Mutex
-	alert      bool
+	Flags  *Flags
+	Config *Config
+	server *http.Server
+	router *mux.Router
+	signal chan os.Signal
+	allow  allowedIPs
+	menu   map[string]ui.MenuItem
+	info   string
+	alerts sync.Mutex
+	alert  bool
 }
 
 // Errors returned by this package.
