@@ -11,6 +11,7 @@ require (
 	github.com/lestrrat-go/apache-logformat v2.0.4+incompatible
 	github.com/lestrrat-go/strftime v1.0.3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23 // indirect
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	golang.org/x/sys v0.0.0-20201223074533-0d417f636930 // indirect
 	golift.io/cnfg v0.0.7
