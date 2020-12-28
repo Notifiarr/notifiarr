@@ -34,13 +34,13 @@ func (c *Client) StartWebServer() {
 	c.router = mux.NewRouter()
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
-		Handler:           l.Wrap(c.fixForwardedFor(c.router), c.Logger.Requests.Writer()),
+		Handler:           l.Wrap(c.fixForwardedFor(c.router), c.Logger.HTTPLog.Writer()),
 		Addr:              c.Config.BindAddr,
 		IdleTimeout:       time.Minute,
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,
 		ReadHeaderTimeout: c.Config.Timeout.Duration,
-		ErrorLog:          c.Logger.Errors,
+		ErrorLog:          c.Logger.ErrorLog,
 	}
 
 	// Initialize all the application API paths.
@@ -57,6 +57,11 @@ func (c *Client) StartWebServer() {
 func (c *Client) runWebServer() {
 	var err error
 
+	if c.menu["stat"] != nil {
+		c.menu["stat"].Check()
+		c.menu["stat"].SetTooltip("web server running, uncheck to pause")
+	}
+
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		err = c.server.ListenAndServeTLS(c.Config.SSLCrtFile, c.Config.SSLKeyFile)
 	} else {
@@ -67,28 +72,30 @@ func (c *Client) runWebServer() {
 
 	if err != nil && !errors.Is(http.ErrServerClosed, err) {
 		c.Errorf("Web Server Failed: %v (shutting down)", err)
-		c.signal <- os.Kill // stop the app.
+		c.sigkil <- os.Kill // stop the app.
 	}
 }
 
+// ErrServerNotRunning is an error.
+var ErrServerNotRunning = fmt.Errorf("the web server is not running, cannot stop it")
+
 // StopWebServer stops the web servers. Panics if that causes an error or timeout.
-func (c *Client) StopWebServer() {
+func (c *Client) StopWebServer() error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 	defer cancel()
 
+	if c.server == nil {
+		return ErrServerNotRunning
+	}
+
+	if c.menu["stat"] != nil {
+		c.menu["stat"].Uncheck()
+		c.menu["stat"].SetTooltip("web server paused, click to start")
+	}
+
 	if err := c.server.Shutdown(ctx); err != nil {
-		c.Errorf("Stopping Web Server: %v (shutting down)", err)
-		c.signal <- os.Kill
+		return fmt.Errorf("shutting down web server: %w", err)
 	}
-}
 
-// RestartWebServer stop and starts the web server.
-// Panics if that causes an error or timeout.
-func (c *Client) RestartWebServer(run func()) {
-	c.StopWebServer()
-	defer c.StartWebServer()
-
-	if run != nil {
-		run()
-	}
+	return nil
 }
