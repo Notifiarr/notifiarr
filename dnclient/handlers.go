@@ -85,22 +85,22 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 		return code, err
 	}
 
-	c.alerts.Lock()
-	defer c.alerts.Unlock()
+	c.alert.Lock()
+	defer c.alert.Unlock()
 
-	if c.alert {
+	if c.alert.active {
 		return http.StatusLocked, "previous alert not acknowledged"
 	}
 
-	c.alert = true
+	c.alert.active = true
 
 	go func() {
 		_, _ = ui.Warning(Title+" Alert", body)
 
-		c.alerts.Lock()
-		defer c.alerts.Unlock()
+		c.alert.Lock()
+		defer c.alert.Unlock()
 
-		c.alert = false
+		c.alert.active = false
 	}()
 
 	return code, err

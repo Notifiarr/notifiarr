@@ -68,8 +68,12 @@ type Client struct {
 	allow  allowedIPs
 	menu   map[string]ui.MenuItem
 	info   string
-	alerts sync.Mutex
-	alert  bool
+	alert  alert
+}
+
+type alert struct {
+	sync.Mutex
+	active bool
 }
 
 // Errors returned by this package.
