@@ -78,8 +78,8 @@ type alert struct {
 
 // Errors returned by this package.
 var (
-	ErrNilAPIKey = fmt.Errorf("API key may not be empty")
-	ErrNoApps    = fmt.Errorf("0 applications configured")
+	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file or with environment variable")
+	ErrNoApps    = fmt.Errorf("at least 1 Starr app must be setup in config file or with environment variables")
 )
 
 // NewDefaults returns a new Client pointer with default settings.
@@ -138,11 +138,14 @@ func start() error {
 		return fmt.Errorf("%s: %w", msg, err)
 	}
 
+	c.SetupLogging()
+	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
+
 	if c.Config.APIKey == "" {
-		return ErrNilAPIKey
+		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
 	} else if len(c.Config.Radarr) < 1 && len(c.Config.Readarr) < 1 &&
 		len(c.Config.Sonarr) < 1 && len(c.Config.Lidarr) < 1 {
-		return fmt.Errorf("at least 1 application must be configured: %w", ErrNoApps)
+		return ErrNoApps
 	}
 
 	if strings.HasPrefix(msg, msgConfigCreate) {
@@ -152,8 +155,6 @@ func start() error {
 			"Please edit the file and reload this application using the tray menu.")
 	}
 
-	c.SetupLogging()
-	c.Printf("%s v%s Starting! [PID: %v] %v", c.Flags.Name(), version.Version, os.Getpid(), version.Started)
 	c.Printf("==> %s", msg)
 	c.InitStartup()
 	c.StartWebServer()

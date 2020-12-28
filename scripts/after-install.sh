@@ -5,8 +5,9 @@
 # Edit this file as needed for your application.
 # This file is only installed if FORMULA is set to service.
 
-# Make a user and group for this app.
-useradd --system --user-group --no-create-home --home-dir /tmp --shell /bin/false {{BINARY}}
+# Make a user and group for this app, but only if it does not already exist.
+id {{BINARY}} >/dev/null 2>&1  || \
+  useradd --system --user-group --no-create-home --home-dir /tmp --shell /bin/false {{BINARY}}
 
 if [ -x "/bin/systemctl" ]; then
   # Reload and restart - this starts the application as user nobody.
