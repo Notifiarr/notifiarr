@@ -1,4 +1,3 @@
-//nolint:dupl
 package dnclient
 
 import (
@@ -131,6 +130,7 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 	return false
 }
 
+//nolint:dupl
 func (c *Client) sonarrAddSeries(r *http.Request) (int, interface{}) {
 	payload := &sonarr.AddSeriesInput{}
 	// Extract payload and check for TMDB ID.
