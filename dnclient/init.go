@@ -51,8 +51,6 @@ func (c *Client) InitStartup() {
 	}
 }
 
-// String turns a list of allowedIPs into a printable masterpiece.
-
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
 	if c.signal != nil {
@@ -71,8 +69,6 @@ func (c *Client) Exit() error {
 	defer cancel()
 
 	if c.server != nil {
-		defer func() { c.server = nil }()
-
 		return c.server.Shutdown(ctx)
 	}
 

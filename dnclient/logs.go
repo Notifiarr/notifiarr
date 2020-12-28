@@ -16,10 +16,11 @@ import (
 
 // Logger provides a struct we can pass into other packages.
 type Logger struct {
-	Logger    *log.Logger
-	Errors    *log.Logger
-	errrotate *rotatorr.Logger
-	logrotate *rotatorr.Logger
+	Errors   *log.Logger // Shares a Writer with Logger.
+	Logger   *log.Logger
+	Requests *log.Logger
+	web      *rotatorr.Logger
+	app      *rotatorr.Logger
 }
 
 // satisfy gomnd.
@@ -64,12 +65,12 @@ func (c *Client) SetupLogging() {
 		}
 	}
 
-	if ui.HasGUI() && c.Config.ErrorLog == "" {
-		f, err := homedir.Expand(filepath.Join("~", ".dnclient", c.Flags.Name()+".error.log"))
+	if ui.HasGUI() && c.Config.HTTPLog == "" {
+		f, err := homedir.Expand(filepath.Join("~", ".dnclient", c.Flags.Name()+".http.log"))
 		if err != nil {
-			c.Config.ErrorLog = c.Flags.Name() + ".error.log"
+			c.Config.HTTPLog = c.Flags.Name() + ".error.log"
 		} else {
-			c.Config.ErrorLog = f
+			c.Config.HTTPLog = f
 		}
 	}
 
@@ -81,33 +82,36 @@ func (c *Client) SetupLogging() {
 
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !c.Config.Quiet && c.Config.LogFile != "":
-		c.Logger.logrotate = rotatorr.NewMust(rotate)
-		c.Logger.Logger.SetOutput(io.MultiWriter(c.Logger.logrotate, os.Stdout))
+		c.Logger.app = rotatorr.NewMust(rotate)
+		c.Logger.Logger.SetOutput(io.MultiWriter(c.Logger.app, os.Stdout))
 	case !c.Config.Quiet && c.Config.LogFile == "":
 		c.Logger.Logger.SetOutput(os.Stdout)
 	case c.Config.LogFile == "":
 		c.Logger.Logger.SetOutput(ioutil.Discard) // default is "nothing"
 	default:
-		c.Logger.logrotate = rotatorr.NewMust(rotate)
-		c.Logger.Logger.SetOutput(c.Logger.logrotate)
+		c.Logger.app = rotatorr.NewMust(rotate)
+		c.Logger.Logger.SetOutput(c.Logger.app)
 	}
 
-	rotateErrors := &rotatorr.Config{
-		Filepath: c.Config.ErrorLog,                                 // log file name.
+	c.Logger.Errors.SetOutput(c.Logger.Logger.Writer())
+	log.SetOutput(c.Logger.Errors.Writer())
+
+	rotateHTTP := &rotatorr.Config{
+		Filepath: c.Config.HTTPLog,                                  // log file name.
 		FileSize: int64(c.Config.LogFileMb) * megabyte,              // megabytes
 		Rotatorr: &timerotator.Layout{FileCount: c.Config.LogFiles}, // number of files to keep.
 	}
 
 	switch { // only use MultiWriter if we have > 1 writer.
-	case !c.Config.Quiet && c.Config.ErrorLog != "":
-		c.Logger.errrotate = rotatorr.NewMust(rotateErrors)
-		c.Logger.Errors.SetOutput(io.MultiWriter(c.Logger.errrotate, os.Stdout))
-	case !c.Config.Quiet && c.Config.ErrorLog == "":
-		c.Logger.Errors.SetOutput(os.Stdout)
-	case c.Config.ErrorLog == "":
-		c.Logger.Errors.SetOutput(ioutil.Discard) // default is "nothing"
+	case !c.Config.Quiet && c.Config.HTTPLog != "":
+		c.Logger.web = rotatorr.NewMust(rotateHTTP)
+		c.Logger.Requests.SetOutput(io.MultiWriter(c.Logger.web, os.Stdout))
+	case !c.Config.Quiet && c.Config.HTTPLog == "":
+		c.Logger.Requests.SetOutput(os.Stdout)
+	case c.Config.HTTPLog == "":
+		c.Logger.Requests.SetOutput(ioutil.Discard) // default is "nothing"
 	default:
-		c.Logger.errrotate = rotatorr.NewMust(rotateErrors)
-		c.Logger.Errors.SetOutput(c.Logger.errrotate)
+		c.Logger.web = rotatorr.NewMust(rotateHTTP)
+		c.Logger.Requests.SetOutput(c.Logger.web)
 	}
 }

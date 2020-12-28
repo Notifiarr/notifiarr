@@ -31,7 +31,7 @@ urlbase = "/"
 # If you set these, logs will be written to these files.
 # If blank on windows or macOS, log file paths are chosen for you.
 #log_file = "dnclient.log"
-#error_log = "dnclient.error.log"
+#http_log = "dnclient.http.log"
 # Set this to the number of megabytes to rotate files.
 log_files_mb = 100
 # How many files to keep? 0 = all.

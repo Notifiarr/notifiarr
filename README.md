@@ -41,16 +41,16 @@ docker logs <container id from docker run>
 
 |Config Name|Variable Name|Default / Note|
 |---|---|---|
-debug|`DN_DEBUG`|`false` / Turns on more detailed logs|
+api_key|`DN_API_KEY`|**Required** / API Key from DiscordNotifier.com|
 quiet|`DN_QUIET`|`false` / Turns off output. Set a log_file if this is true|
 bind_addr|`DN_BIND_ADDR`|`0.0.0.0:5454` / The IP and port to listen on|
 urlbase|`DN_URLBASE`|default: `/` Change the web root with this setting|
 upstreams|`DN_UPSTREAMS_0`|List of upstream networks that can set X-Forwarded-For|
-api_key|`DN_API_KEY`|**Required** / API Key from DiscordNotifier.com|
-log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to write logs|
+log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to save app logs|
+http_log|`DN_HTTP_LOG`|None by default. Provide a file path to save HTTP request logs|
 log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation|
 log_file_mb|`DN_LOG_FILE_MB`|`10` / Max size of log files in megabytes|
-timeout|`DN_TIMEOUT`|`10s` / Global API Timeouts (all apps default)|
+timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
 
 ##### Sonarr
 

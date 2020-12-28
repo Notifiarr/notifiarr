@@ -22,8 +22,6 @@ func (c *Client) startTray() error {
 		return c.Exit()
 	}
 
-	os.Stdout.Close()
-
 	systray.Run(c.readyTray, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 		defer cancel()
@@ -73,14 +71,16 @@ func (c *Client) readyTray() {
 	logs := systray.AddMenuItem("Logs", "log file info")
 	c.menu["logs"] = ui.WrapMenu(logs)
 	c.menu["logs_view"] = ui.WrapMenu(logs.AddSubMenuItem("View", "view the application log"))
-	c.menu["logs_error"] = ui.WrapMenu(logs.AddSubMenuItem("Errors", "view the error log"))
+	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "there is a newer version available"))
-	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info", "info from DiscordNotifier.com"))
+	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from DiscordNotifier.com"))
+	c.menu["alert"] = ui.WrapMenu(systray.AddMenuItem("Alert!", "alert from DiscordNotifier.com"))
 	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
 
 	c.menu["dninfo"].Hide()
+	c.menu["alert"].Hide()
 	c.menu["update"].Hide()
 	c.menu["info"].Disable()
 	c.menu["stat"].Check()
@@ -106,15 +106,18 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["view"].Clicked():
 			ui.Info(Title+": Configuration", c.displayConfig())
 		case <-c.menu["edit"].Clicked():
+			c.Print("User Editing Config File:", c.Flags.ConfigFile)
 			ui.OpenFile(c.Flags.ConfigFile)
 		case <-c.menu["load"].Clicked():
 			c.reloadConfiguration()
 		case <-c.menu["key"].Clicked():
 			c.changeKey()
 		case <-c.menu["logs_view"].Clicked():
+			c.Print("User Viewing Log File:", c.Config.LogFile)
 			ui.OpenLog(c.Config.LogFile)
-		case <-c.menu["logs_error"].Clicked():
-			ui.OpenLog(c.Config.ErrorLog)
+		case <-c.menu["logs_http"].Clicked():
+			c.Print("User Viewing Log File:", c.Config.HTTPLog)
+			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
@@ -124,13 +127,13 @@ func (c *Client) watchGuiChannels() {
 			c.menu["dninfo"].Hide()
 		case sigc := <-c.signal:
 			if sigc != syscall.SIGHUP {
-				c.Errorf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
+				c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
 				systray.Quit() // this kills the app.
 			}
 
 			c.reloadConfiguration()
 		case <-c.menu["exit"].Clicked():
-			c.Errorf("[%s] Need help? %s\n=====> Exiting! User Requested", c.Flags.Name(), helpLink)
+			c.Errorf("Need help? %s\n=====> Exiting! User Requested", helpLink)
 			systray.Quit() // this kills the app.
 		}
 	}
@@ -142,12 +145,14 @@ func (c *Client) toggleServer() {
 		c.StartWebServer()
 		c.menu["stat"].Check()
 		c.menu["stat"].SetTooltip("web server running, uncheck to pause")
-	} else {
-		c.Print("Pausing Web Server")
-		c.StopWebServer()
-		c.menu["stat"].Uncheck()
-		c.menu["stat"].SetTooltip("web server paused, click to start")
+
+		return
 	}
+
+	c.Print("Pausing Web Server")
+	c.StopWebServer()
+	c.menu["stat"].Uncheck()
+	c.menu["stat"].SetTooltip("web server paused, click to start")
 }
 
 func (c *Client) changeKey() {
@@ -165,11 +170,11 @@ func (c *Client) changeKey() {
 func (c *Client) rotateLogs() {
 	c.Print("Rotating Log Files!")
 
-	if _, err := c.Logger.errrotate.Rotate(); err != nil {
-		c.Errorf("Rotating Error Log: %v", err)
+	if _, err := c.Logger.web.Rotate(); err != nil {
+		c.Errorf("Rotating HTTP Log: %v", err)
 	}
 
-	if _, err := c.Logger.logrotate.Rotate(); err != nil {
+	if _, err := c.Logger.app.Rotate(); err != nil {
 		c.Errorf("Rotating Log: %v", err)
 	}
 }
@@ -189,10 +194,10 @@ func (c *Client) displayConfig() (s string) { //nolint: funlen
 
 	if c.Config.LogFiles > 0 {
 		s += fmt.Sprintf("\nLog File: %v (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
-		s += fmt.Sprintf("\nError Log: %v (%d @ %dMb)", c.Config.ErrorLog, c.Config.LogFiles, c.Config.LogFileMb)
+		s += fmt.Sprintf("\nHTTP Log: %v (%d @ %dMb)", c.Config.HTTPLog, c.Config.LogFiles, c.Config.LogFileMb)
 	} else {
 		s += fmt.Sprintf("\nLog File: %v (no rotation)", c.Config.LogFile)
-		s += fmt.Sprintf("\nError Log: %v (no rotation)", c.Config.ErrorLog)
+		s += fmt.Sprintf("\nHTTP Log: %v (no rotation)", c.Config.HTTPLog)
 	}
 
 	if count := len(c.Config.Lidarr); count == 1 {
