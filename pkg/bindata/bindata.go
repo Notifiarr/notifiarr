@@ -4,7 +4,7 @@
 // files/favicon.ico
 // files/favicon.png
 // files/macos.png
-// ../examples/dnclient.conf.example
+// ../../examples/dnclient.conf.example
 package bindata
 
 import (
@@ -146,7 +146,7 @@ var _ExamplesDnclientConfExample = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\
 func ExamplesDnclientConfExampleBytes() ([]byte, error) {
 	return bindataRead(
 		_ExamplesDnclientConfExample,
-		"../examples/dnclient.conf.example",
+		"../../examples/dnclient.conf.example",
 	)
 }
 
@@ -156,7 +156,7 @@ func ExamplesDnclientConfExample() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "../examples/dnclient.conf.example", size: 2204, mode: os.FileMode(420), modTime: time.Unix(1587356420, 0)}
+	info := bindataFileInfo{name: "../../examples/dnclient.conf.example", size: 2204, mode: os.FileMode(420), modTime: time.Unix(1587356420, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -213,10 +213,10 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"files/favicon.ico":                 filesFaviconIco,
-	"files/favicon.png":                 filesFaviconPng,
-	"files/macos.png":                   filesMacosPng,
-	"../examples/dnclient.conf.example": ExamplesDnclientConfExample,
+	"files/favicon.ico":                    filesFaviconIco,
+	"files/favicon.png":                    filesFaviconPng,
+	"files/macos.png":                      filesMacosPng,
+	"../../examples/dnclient.conf.example": ExamplesDnclientConfExample,
 }
 
 // AssetDir returns the file names below a certain
@@ -261,8 +261,10 @@ type bintree struct {
 
 var _bintree = &bintree{nil, map[string]*bintree{
 	"..": &bintree{nil, map[string]*bintree{
-		"examples": &bintree{nil, map[string]*bintree{
-			"dnclient.conf.example": &bintree{ExamplesDnclientConfExample, map[string]*bintree{}},
+		"..": &bintree{nil, map[string]*bintree{
+			"examples": &bintree{nil, map[string]*bintree{
+				"dnclient.conf.example": &bintree{ExamplesDnclientConfExample, map[string]*bintree{}},
+			}},
 		}},
 	}},
 	"files": &bintree{nil, map[string]*bintree{
