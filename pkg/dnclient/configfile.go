@@ -9,8 +9,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/ui"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
@@ -116,7 +116,7 @@ func (c *Client) createConfigFile(file string) (string, error) {
 	}
 	defer f.Close()
 
-	if a, err := bindata.Asset("../examples/dnclient.conf.example"); err != nil {
+	if a, err := bindata.Asset("../../examples/dnclient.conf.example"); err != nil {
 		return "", fmt.Errorf("getting config file: %w", err)
 	} else if _, err = f.Write(a); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)

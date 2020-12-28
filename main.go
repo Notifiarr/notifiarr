@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/dnclient"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/dnclient"
 )
 
 func main() {

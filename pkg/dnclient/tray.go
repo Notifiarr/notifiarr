@@ -8,8 +8,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/ui"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"github.com/getlantern/systray"
 	"golift.io/version"
 )

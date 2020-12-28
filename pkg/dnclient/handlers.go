@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/ui"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"golift.io/version"
 )
 

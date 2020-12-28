@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/logs"
-	"github.com/Go-Lift-TV/discordnotifier-client/ui"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
@@ -146,17 +146,17 @@ func start() error {
 		return ErrNoApps
 	}
 
+	c.Printf("==> %s", msg)
+	c.InitStartup()
+	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	signal.Notify(c.sighup, syscall.SIGHUP)
+
 	if strings.HasPrefix(msg, msgConfigCreate) {
 		_ = ui.OpenFile(c.Flags.ConfigFile)
 		_, _ = ui.Warning(Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
 			"Please edit the file and reload this application using the tray menu.")
 	}
-
-	c.Printf("==> %s", msg)
-	c.InitStartup()
-	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
-	signal.Notify(c.sighup, syscall.SIGHUP)
 
 	return c.Run()
 }
