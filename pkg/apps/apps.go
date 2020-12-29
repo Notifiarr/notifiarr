@@ -2,7 +2,9 @@ package apps
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"path"
 	"strconv"
@@ -22,18 +24,17 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey  string           `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
-	URLBase string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	Sonarr  []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr  []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr  []*LidarrConfig  `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Router  *mux.Router      `json:"-" toml:"-" xml:"-" yaml:"-"`
-	Respond Responder        `json:"-" toml:"-" xml:"-" yaml:"-"`
+	APIKey   string           `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
+	URLBase  string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	Sonarr   []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
+	Radarr   []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
+	Lidarr   []*LidarrConfig  `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
+	Readarr  []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Router   *mux.Router      `json:"-" toml:"-" xml:"-" yaml:"-"`
+	ErrorLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
 // Responder converts all our data to a JSON response.
-type Responder func(http.ResponseWriter, int, interface{}, time.Time)
 
 // App allows safely storing context values.
 type App string
@@ -60,12 +61,12 @@ var (
 	ErrExists    = fmt.Errorf("the requested item already exists")
 )
 
-// apiHandler is our custom handler function for APIs.
-type apiHandler func(r *http.Request) (int, interface{})
+// APIHandler is our custom handler function for APIs.
+type APIHandler func(r *http.Request) (int, interface{})
 
 // HandleAPIpath makes adding API paths a little cleaner.
 // This grabs the app struct and saves it in a context before calling the handler.
-func (a *Apps) HandleAPIpath(app App, api string, next apiHandler, method ...string) {
+func (a *Apps) HandleAPIpath(app App, api string, next APIHandler, method ...string) {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
@@ -146,6 +147,23 @@ func (a *Apps) Setup(timeout time.Duration) {
 	for i := range a.Lidarr {
 		a.Lidarr[i].fix(timeout)
 	}
+}
+
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {
+	w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(stat)
+
+	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+
+	if m, ok := msg.(error); ok {
+		a.ErrorLog.Printf("Status: %s, Message: %v", statusTxt, m)
+		msg = m.Error()
+	}
+
+	b, _ := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
+	_, _ = w.Write(b)
+	_, _ = w.Write([]byte("\n")) // curl likes new lines.
 }
 
 /* Every API call runs one of these methods to find the interface for the respective app. */

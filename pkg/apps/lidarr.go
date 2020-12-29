@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -28,8 +27,7 @@ func (a *Apps) lidarrHandlers() {
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
 	*starr.Config
-	lidarr       *lidarr.Lidarr
-	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+	lidarr *lidarr.Lidarr
 }
 
 func (r *LidarrConfig) fix(timeout time.Duration) {

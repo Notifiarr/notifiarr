@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -27,8 +26,7 @@ func (a *Apps) readarrHandlers() {
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
 	*starr.Config
-	readarr      *readarr.Readarr
-	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+	readarr *readarr.Readarr
 }
 
 func (r *ReadarrConfig) fix(timeout time.Duration) {

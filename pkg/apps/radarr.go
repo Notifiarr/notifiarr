@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -26,8 +25,7 @@ func (a *Apps) radarrHandlers() {
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
 	*starr.Config
-	radarr       *radarr.Radarr `json:"-" toml:"-" xml:"-" yaml:"-"`
-	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+	radarr *radarr.Radarr `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
 func (r *RadarrConfig) fix(timeout time.Duration) {

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -27,8 +26,7 @@ func (a *Apps) sonarrHandlers() {
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
 	*starr.Config
-	sonarr       *sonarr.Sonarr
-	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+	sonarr *sonarr.Sonarr
 }
 
 func (r *SonarrConfig) fix(timeout time.Duration) {
