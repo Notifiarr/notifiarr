@@ -29,7 +29,7 @@ type SonarrConfig struct {
 	sonarr *sonarr.Sonarr
 }
 
-func (r *SonarrConfig) fix(timeout time.Duration) {
+func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.sonarr = sonarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout

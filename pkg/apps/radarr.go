@@ -28,7 +28,7 @@ type RadarrConfig struct {
 	radarr *radarr.Radarr `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
-func (r *RadarrConfig) fix(timeout time.Duration) {
+func (r *RadarrConfig) setup(timeout time.Duration) {
 	r.radarr = radarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout

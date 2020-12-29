@@ -30,7 +30,7 @@ type LidarrConfig struct {
 	lidarr *lidarr.Lidarr
 }
 
-func (r *LidarrConfig) fix(timeout time.Duration) {
+func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.lidarr = lidarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout

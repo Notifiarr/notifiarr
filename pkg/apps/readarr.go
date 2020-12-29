@@ -29,7 +29,7 @@ type ReadarrConfig struct {
 	readarr *readarr.Readarr
 }
 
-func (r *ReadarrConfig) fix(timeout time.Duration) {
+func (r *ReadarrConfig) setup(timeout time.Duration) {
 	r.readarr = readarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
