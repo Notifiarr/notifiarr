@@ -154,15 +154,15 @@ func sonarrAddSeries(r *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
 	}
 
-	sonar := getSonarr(r)
+	app := getSonarr(r)
 	// Check for existing series.
-	if m, err := sonar.GetSeries(payload.TvdbID); err != nil {
+	if m, err := app.GetSeries(payload.TvdbID); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TvdbID, ErrExists)
 	}
 
-	series, err := sonar.AddSeries(payload)
+	series, err := app.AddSeries(payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
 	}

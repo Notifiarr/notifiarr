@@ -105,7 +105,7 @@ func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
 	}
 
-	lidar := getLidarr(r)
+	app := getLidarr(r)
 	// Check for existing album.
 	/* broken:
 	if m, err := lidar.GetAlbum(payload.AlbumID); err != nil {
@@ -116,7 +116,7 @@ func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	*/
 
 	// Add book using payload.
-	book, err := lidar.AddAlbum(&payload)
+	book, err := app.AddAlbum(&payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding album: %w", err)
 	}

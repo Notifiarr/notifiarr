@@ -132,9 +132,9 @@ func radarrAddMovie(r *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
 	}
 
-	radar := getRadarr(r)
+	app := getRadarr(r)
 	// Check for existing movie.
-	if m, err := radar.GetMovie(payload.TmdbID); err != nil {
+	if m, err := app.GetMovie(payload.TmdbID); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TmdbID, ErrExists)
@@ -150,7 +150,7 @@ func radarrAddMovie(r *http.Request) (int, interface{}) {
 	}
 
 	// Add movie using fixed payload.
-	movie, err := radar.AddMovie(payload)
+	movie, err := app.AddMovie(payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
 	}

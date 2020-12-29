@@ -155,16 +155,16 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
 	}
 
-	readar := getReadarr(r)
+	app := getReadarr(r)
 	// Check for existing book.
-	if m, err := readar.GetBook(payload.ForeignBookID); err != nil {
+	if m, err := app.GetBook(payload.ForeignBookID); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.ForeignBookID, ErrExists)
 	}
 
 	// Add book using payload.
-	book, err := readar.AddBook(payload)
+	book, err := app.AddBook(payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding book: %w", err)
 	}

@@ -149,6 +149,7 @@ func (a *Apps) Setup(timeout time.Duration) {
 	}
 }
 
+// Respond sends a standard response to our caller. JSON encoded blobs.
 func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {
 	w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
 	w.Header().Set("Content-Type", "application/json")

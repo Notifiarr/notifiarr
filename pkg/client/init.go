@@ -12,7 +12,8 @@ import (
 
 const helpLink = "GoLift Discord: https://golift.io/discord"
 
-// InitStartup prints info about our startup config. This runs once on startup.
+// PrintStartupInfo prints info about our startup config.
+// This runs once on startup, and again during reloads.
 func (c *Client) PrintStartupInfo() {
 	c.Printf("==> %s <==", helpLink)
 	c.Print("==> Startup Settings <==")
