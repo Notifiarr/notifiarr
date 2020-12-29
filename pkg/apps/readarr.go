@@ -1,4 +1,4 @@
-package dnclient
+package apps
 
 import (
 	"encoding/json"
@@ -6,22 +6,39 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 	"golift.io/starr/readarr"
 )
 
 // readarrHandlers is called once on startup to register the web API paths.
-func (c *Client) readarrHandlers() {
-	c.handleAPIpath(Readarr, "/add", c.readarrAddBook, "POST")
-	c.handleAPIpath(Readarr, "/search/{query}", c.readarrSearchBook, "GET")
-	c.handleAPIpath(Readarr, "/check/{grid:[0-9]+}", c.readarrCheckBook, "GET")
-	c.handleAPIpath(Readarr, "/metadataProfiles", c.readarrMetaProfiles, "GET")
-	c.handleAPIpath(Readarr, "/qualityProfiles", c.readarrProfiles, "GET")
-	c.handleAPIpath(Readarr, "/rootFolder", c.readarrRootFolders, "GET")
+func (a *Apps) readarrHandlers() {
+	a.HandleAPIpath(Readarr, "/add", readarrAddBook, "POST")
+	a.HandleAPIpath(Readarr, "/search/{query}", readarrSearchBook, "GET")
+	a.HandleAPIpath(Readarr, "/check/{grid:[0-9]+}", readarrCheckBook, "GET")
+	a.HandleAPIpath(Readarr, "/metadataProfiles", readarrMetaProfiles, "GET")
+	a.HandleAPIpath(Readarr, "/qualityProfiles", readarrProfiles, "GET")
+	a.HandleAPIpath(Readarr, "/rootFolder", readarrRootFolders, "GET")
 }
 
-func (c *Client) readarrRootFolders(r *http.Request) (int, interface{}) {
+// ReadarrConfig represents the input data for a Readarr server.
+type ReadarrConfig struct {
+	*starr.Config
+	readarr      *readarr.Readarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+func (r *ReadarrConfig) fix(timeout time.Duration) {
+	r.readarr = readarr.New(r.Config)
+	if r.Timeout.Duration == 0 {
+		r.Timeout.Duration = timeout
+	}
+}
+
+func readarrRootFolders(r *http.Request) (int, interface{}) {
 	// Get folder list from Readarr.
 	folders, err := getReadarr(r).GetRootFolders()
 	if err != nil {
@@ -37,7 +54,7 @@ func (c *Client) readarrRootFolders(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) readarrMetaProfiles(r *http.Request) (int, interface{}) {
+func readarrMetaProfiles(r *http.Request) (int, interface{}) {
 	// Get the metadata profiles from readarr.
 	profiles, err := getReadarr(r).GetMetadataProfiles()
 	if err != nil {
@@ -53,7 +70,7 @@ func (c *Client) readarrMetaProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) readarrProfiles(r *http.Request) (int, interface{}) {
+func readarrProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from readarr.
 	profiles, err := getReadarr(r).GetQualityProfiles()
 	if err != nil {
@@ -69,7 +86,7 @@ func (c *Client) readarrProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) readarrCheckBook(r *http.Request) (int, interface{}) {
+func readarrCheckBook(r *http.Request) (int, interface{}) {
 	grid, _ := strconv.ParseInt(mux.Vars(r)["grid"], 10, 64)
 	// Check for existing book.
 	if m, err := getReadarr(r).GetBook(grid); err != nil {
@@ -81,7 +98,7 @@ func (c *Client) readarrCheckBook(r *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
-func (c *Client) readarrSearchBook(r *http.Request) (int, interface{}) {
+func readarrSearchBook(r *http.Request) (int, interface{}) {
 	books, err := getReadarr(r).GetBook(0)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
@@ -131,8 +148,7 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 	return false
 }
 
-//nolint:dupl
-func (c *Client) readarrAddBook(r *http.Request) (int, interface{}) {
+func readarrAddBook(r *http.Request) (int, interface{}) {
 	payload := &readarr.AddBookInput{}
 	// Extract payload and check for TMDB ID.
 	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {

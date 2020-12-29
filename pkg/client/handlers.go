@@ -1,4 +1,4 @@
-package dnclient
+package client
 
 import (
 	"bytes"
@@ -23,19 +23,19 @@ type allowedIPs []*net.IPNet
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
 	// GET  /api/status   (w/o key)
-	c.router.Handle(path.Join("/", c.Config.URLBase, "api", "status"),
+	c.Config.Router.Handle(path.Join("/", c.Config.URLBase, "api", "status"),
 		http.HandlerFunc(c.statusResponse)).Methods("GET", "HEAD")
 	// PUT  /api/info     (w/ key)
-	c.handleAPIpath("", "info", c.updateInfo, "PUT")
+	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	// PUT  /api/info/alert     (w/ key)
-	c.handleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
+	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 	// GET  /api/version  (w/ key)
-	c.handleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 
 	// Initialize internal-only paths.
-	c.router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
-	c.router.Handle("/", http.HandlerFunc(c.slash))                // "hi" page on /
-	c.router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
+	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
+	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))                // "hi" page on /
+	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
 }
 
 func (c *Client) respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {

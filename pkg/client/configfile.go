@@ -1,4 +1,4 @@
-package dnclient
+package client
 
 import (
 	"errors"
@@ -66,6 +66,8 @@ func (c *Client) getConfig() (string, error) {
 }
 
 func (c *Client) fixConfigs() {
+	c.Config.Respond = c.respond
+
 	if c.Config.Timeout.Duration == 0 {
 		c.Config.Timeout.Duration = DefaultTimeout
 	}

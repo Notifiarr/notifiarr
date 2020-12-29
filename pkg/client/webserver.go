@@ -1,4 +1,4 @@
-package dnclient
+package client
 
 import (
 	"context"
@@ -32,10 +32,10 @@ func (c *Client) StartWebServer() {
 	l, _ := apachelog.New(`%{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
 		`"%{User-agent}i" %{X-Request-Time}o %Dμs`)
 	// Create a request router.
-	c.router = mux.NewRouter()
+	c.Config.Router = mux.NewRouter()
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
-		Handler:           l.Wrap(c.fixForwardedFor(c.router), c.Logger.HTTPLog.Writer()),
+		Handler:           l.Wrap(c.fixForwardedFor(c.Config.Router), c.Logger.HTTPLog.Writer()),
 		Addr:              c.Config.BindAddr,
 		IdleTimeout:       time.Minute,
 		WriteTimeout:      c.Config.Timeout.Duration,
@@ -45,10 +45,7 @@ func (c *Client) StartWebServer() {
 	}
 
 	// Initialize all the application API paths.
-	c.radarrHandlers()
-	c.readarrHandlers()
-	c.lidarrHandlers()
-	c.sonarrHandlers()
+	c.Config.InitHandlers()
 	c.internalHandlers()
 	// Run the server.
 	go c.runWebServer()

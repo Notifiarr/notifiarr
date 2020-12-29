@@ -1,6 +1,6 @@
 // +build darwin windows
 
-package dnclient
+package client
 
 import (
 	"errors"

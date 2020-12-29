@@ -1,4 +1,4 @@
-package dnclient
+package apps
 
 import (
 	"encoding/json"
@@ -6,22 +6,39 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
 // sonarrHandlers is called once on startup to register the web API paths.
-func (c *Client) sonarrHandlers() {
-	c.handleAPIpath(Sonarr, "/add", c.sonarrAddSeries, "POST")
-	c.handleAPIpath(Sonarr, "/check/{tvdbid:[0-9]+}", c.sonarrCheckSeries, "GET")
-	c.handleAPIpath(Sonarr, "/search/{query}", c.sonarrSearchSeries, "GET")
-	c.handleAPIpath(Sonarr, "/qualityProfiles", c.sonarrProfiles, "GET")
-	c.handleAPIpath(Sonarr, "/languageProfiles", c.sonarrLangProfiles, "GET")
-	c.handleAPIpath(Sonarr, "/rootFolder", c.sonarrRootFolders, "GET")
+func (a *Apps) sonarrHandlers() {
+	a.HandleAPIpath(Sonarr, "/add", sonarrAddSeries, "POST")
+	a.HandleAPIpath(Sonarr, "/check/{tvdbid:[0-9]+}", sonarrCheckSeries, "GET")
+	a.HandleAPIpath(Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
+	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrProfiles, "GET")
+	a.HandleAPIpath(Sonarr, "/languageProfiles", sonarrLangProfiles, "GET")
+	a.HandleAPIpath(Sonarr, "/rootFolder", sonarrRootFolders, "GET")
 }
 
-func (c *Client) sonarrRootFolders(r *http.Request) (int, interface{}) {
+// SonarrConfig represents the input data for a Sonarr server.
+type SonarrConfig struct {
+	*starr.Config
+	sonarr       *sonarr.Sonarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+func (r *SonarrConfig) fix(timeout time.Duration) {
+	r.sonarr = sonarr.New(r.Config)
+	if r.Timeout.Duration == 0 {
+		r.Timeout.Duration = timeout
+	}
+}
+
+func sonarrRootFolders(r *http.Request) (int, interface{}) {
 	// Get folder list from Sonarr.
 	folders, err := getSonarr(r).GetRootFolders()
 	if err != nil {
@@ -37,7 +54,7 @@ func (c *Client) sonarrRootFolders(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) sonarrProfiles(r *http.Request) (int, interface{}) {
+func sonarrProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(r).GetQualityProfiles()
 	if err != nil {
@@ -53,7 +70,7 @@ func (c *Client) sonarrProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
+func sonarrLangProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(r).GetLanguageProfiles()
 	if err != nil {
@@ -69,7 +86,7 @@ func (c *Client) sonarrLangProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
+func sonarrCheckSeries(r *http.Request) (int, interface{}) {
 	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], 10, 64)
 	// Check for existing series.
 	if m, err := getSonarr(r).GetSeries(tvdbid); err != nil {
@@ -81,7 +98,7 @@ func (c *Client) sonarrCheckSeries(r *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
-func (c *Client) sonarrSearchSeries(r *http.Request) (int, interface{}) {
+func sonarrSearchSeries(r *http.Request) (int, interface{}) {
 	// Get all movies
 	series, err := getSonarr(r).GetAllSeries()
 	if err != nil {
@@ -130,8 +147,7 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 	return false
 }
 
-//nolint:dupl
-func (c *Client) sonarrAddSeries(r *http.Request) (int, interface{}) {
+func sonarrAddSeries(r *http.Request) (int, interface{}) {
 	payload := &sonarr.AddSeriesInput{}
 	// Extract payload and check for TMDB ID.
 	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {

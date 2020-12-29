@@ -1,11 +1,14 @@
-package dnclient
+package apps
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
+	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 	"golift.io/starr/lidarr"
 )
 
@@ -14,15 +17,29 @@ mbid - music brainz is the source for lidarr (todo)
 */
 
 // lidarrHandlers is called once on startup to register the web API paths.
-func (c *Client) lidarrHandlers() {
-	c.handleAPIpath(Lidarr, "/add", c.lidarrAddAlbum, "POST")
-	c.handleAPIpath(Lidarr, "/check/{albumid:[-a-z0-9]+}", c.lidarrCheckAlbum, "GET")
-	c.handleAPIpath(Lidarr, "/qualityProfiles", c.lidarrProfiles, "GET")
-	c.handleAPIpath(Lidarr, "/qualityDefinitions", c.lidarrQualityDefs, "GET")
-	c.handleAPIpath(Lidarr, "/rootFolder", c.lidarrRootFolders, "GET")
+func (a *Apps) lidarrHandlers() {
+	a.HandleAPIpath(Lidarr, "/add", lidarrAddAlbum, "POST")
+	a.HandleAPIpath(Lidarr, "/check/{albumid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrProfiles, "GET")
+	a.HandleAPIpath(Lidarr, "/qualityDefinitions", lidarrQualityDefs, "GET")
+	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
 }
 
-func (c *Client) lidarrRootFolders(r *http.Request) (int, interface{}) {
+// LidarrConfig represents the input data for a Lidarr server.
+type LidarrConfig struct {
+	*starr.Config
+	lidarr       *lidarr.Lidarr
+	sync.RWMutex `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+func (r *LidarrConfig) fix(timeout time.Duration) {
+	r.lidarr = lidarr.New(r.Config)
+	if r.Timeout.Duration == 0 {
+		r.Timeout.Duration = timeout
+	}
+}
+
+func lidarrRootFolders(r *http.Request) (int, interface{}) {
 	// Get folder list from Lidarr.
 	folders, err := getLidarr(r).GetRootFolders()
 	if err != nil {
@@ -38,7 +55,7 @@ func (c *Client) lidarrRootFolders(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) lidarrProfiles(r *http.Request) (int, interface{}) {
+func lidarrProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
 	profiles, err := getLidarr(r).GetQualityProfiles()
 	if err != nil {
@@ -54,7 +71,7 @@ func (c *Client) lidarrProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) lidarrQualityDefs(r *http.Request) (int, interface{}) {
+func lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
 	definitions, err := getLidarr(r).GetQualityDefinition()
 	if err != nil {
@@ -70,7 +87,7 @@ func (c *Client) lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) lidarrCheckAlbum(r *http.Request) (int, interface{}) {
+func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
 	// Check for existing movie.
 	if m, err := getLidarr(r).GetAlbum(mux.Vars(r)["albumid"]); err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
@@ -81,7 +98,7 @@ func (c *Client) lidarrCheckAlbum(r *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
-func (c *Client) lidarrAddAlbum(r *http.Request) (int, interface{}) {
+func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	var payload lidarr.AddAlbumInput
 	// Extract payload and check for TMDB ID.
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {

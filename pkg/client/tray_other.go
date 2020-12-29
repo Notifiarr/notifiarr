@@ -1,5 +1,5 @@
 // +build !windows,!darwin
 
-package dnclient
+package client
 
 func (c *Client) startTray() {}
