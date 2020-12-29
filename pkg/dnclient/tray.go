@@ -17,28 +17,19 @@ import (
 /* This file handles the OS GUI elements. */
 
 // Run starts the web server and the system tray/menu bar app.
-func (c *Client) Run() error {
-	if !ui.HasGUI() {
-		c.StartWebServer()
+func (c *Client) startTray() {
+	systray.Run(c.readyTray, c.exitTray)
+}
 
-		return c.Exit()
+func (c *Client) exitTray() {
+	c.sigkil = nil
+
+	if err := c.Exit(); err != nil {
+		c.Errorf("Shutting down web server: %v", err)
+		os.Exit(1) // web server problem
 	}
-
-	exit := func() {
-		c.sigkil = nil
-
-		if err := c.Exit(); err != nil {
-			c.Errorf("Shutting down web server: %v", err)
-			os.Exit(1) // web server problem
-		}
-
-		os.Exit(0) // because systray wants to control the exit code? no..
-	}
-
-	systray.Run(c.readyTray, exit)
-
-	// We never get here, but just in case the library changes...
-	return c.Exit()
+	// because systray wants to control the exit code? no..
+	os.Exit(0)
 }
 
 func (c *Client) readyTray() {

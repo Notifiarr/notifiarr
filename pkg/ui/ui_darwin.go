@@ -9,9 +9,11 @@ import (
 // SystrayIcon is the icon in the menu bar.
 const SystrayIcon = "files/macos.png"
 
+var hasGUI = os.Getenv("USEGUI") == "true"
+
 // HasGUI returns false on Linux, true on Windows and optional on macOS.
 func HasGUI() bool {
-	return os.Getenv("USEGUI") == "true"
+	return hasGUI
 }
 
 // StartCmd starts a command.

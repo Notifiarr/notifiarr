@@ -90,8 +90,6 @@ func NewDefaults() *Client {
 			URLBase:  "/",
 			BindAddr: DefaultBindAddr,
 			Logs: &logs.Logs{
-				AppName:   DefaultName,
-				Defaults:  ui.HasGUI(),
 				LogFiles:  DefaultLogFiles,
 				LogFileMb: DefaultLogFileMb,
 			},
@@ -136,9 +134,20 @@ func start() error {
 		return fmt.Errorf("%s: %w", msg, err)
 	}
 
+	if ui.HasGUI() {
+		// Setting AppName forces log files (even if not configured).
+		// Used for GUI apps that have no console output.
+		c.Config.Logs.AppName = c.Flags.Name()
+	}
+
 	c.Logger.SetupLogging(c.Config.Logs)
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
+	c.Printf("==> %s", msg)
 
+	return c.run(strings.HasPrefix(msg, msgConfigCreate))
+}
+
+func (c *Client) run(newConfig bool) error {
 	if c.Config.APIKey == "" {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
 	} else if len(c.Config.Radarr) < 1 && len(c.Config.Readarr) < 1 &&
@@ -146,17 +155,23 @@ func start() error {
 		return ErrNoApps
 	}
 
-	c.Printf("==> %s", msg)
 	c.InitStartup()
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 
-	if strings.HasPrefix(msg, msgConfigCreate) {
+	if newConfig {
 		_ = ui.OpenFile(c.Flags.ConfigFile)
 		_, _ = ui.Warning(Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
 			"Please edit the file and reload this application using the tray menu.")
 	}
 
-	return c.Run()
+	switch ui.HasGUI() {
+	case true:
+		c.startTray() // This starts the web server.
+		return nil    // startTray() calls os.Exit()
+	default:
+		c.StartWebServer()
+		return c.Exit()
+	}
 }

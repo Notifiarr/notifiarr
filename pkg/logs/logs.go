@@ -28,9 +28,12 @@ type Logger struct {
 const (
 	callDepth = 2 // log the line that called us.
 	megabyte  = 1024 * 1024
+	defExt    = ".log"
+	httpExt   = ".http.log"
 )
 
 // Logs allows sending logs to rotating files.
+// Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
 type Logs struct {
 	AppName   string `json:"-"`
 	LogFile   string `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
@@ -39,7 +42,6 @@ type Logs struct {
 	LogFileMb int    `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
 	Debug     bool   `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
 	Quiet     bool   `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
-	Defaults  bool   `json:"-"`
 }
 
 // New returns a new Logger with debug off and sends everything to stdout.
@@ -127,31 +129,38 @@ func (l *Logger) SetupLogging(config *Logs) {
 }
 
 func (l *Logger) setLogPaths() {
-	if l.logs.Defaults && l.logs.LogFile == "" {
-		f, err := homedir.Expand(filepath.Join("~", ".dnclient", l.logs.AppName+".log"))
-		if err != nil {
-			l.logs.LogFile = l.logs.AppName + ".log"
-		} else {
-			l.logs.LogFile = f
+	// Make sure log file paths exist if AppName is provided.
+	if l.logs.AppName != "" {
+		if l.logs.LogFile == "" {
+			l.logs.LogFile = filepath.Join("~", ".dnclient", l.logs.AppName+defExt)
+		}
+
+		if l.logs.HTTPLog == "" {
+			l.logs.HTTPLog = filepath.Join("~", ".dnclient", l.logs.AppName+httpExt)
 		}
 	}
 
-	if l.logs.Defaults && l.logs.HTTPLog == "" {
-		f, err := homedir.Expand(filepath.Join("~", ".dnclient", l.logs.AppName+".http.log"))
-		if err != nil {
-			l.logs.HTTPLog = l.logs.AppName + ".http.log"
-		} else {
-			l.logs.HTTPLog = f
-		}
-	}
-
+	// Regular log file.
 	if l.logs.LogFile != "" {
+		if f, err := homedir.Expand(l.logs.LogFile); err == nil {
+			l.logs.LogFile = f
+		} else if l.logs.AppName != "" {
+			l.logs.LogFile = l.logs.AppName + defExt
+		}
+
 		if f, err := filepath.Abs(l.logs.LogFile); err == nil {
 			l.logs.LogFile = f
 		}
 	}
 
+	// HTTP log file.
 	if l.logs.HTTPLog != "" {
+		if f, err := homedir.Expand(l.logs.HTTPLog); err == nil {
+			l.logs.HTTPLog = f
+		} else if l.logs.AppName != "" {
+			l.logs.HTTPLog = l.logs.AppName + httpExt
+		}
+
 		if f, err := filepath.Abs(l.logs.HTTPLog); err == nil {
 			l.logs.HTTPLog = f
 		}
