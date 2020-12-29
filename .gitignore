@@ -7,6 +7,7 @@
 /*.conf
 /*.gz
 /*.zip
+/*.upx
 /unpackerr*.1
 /*.deb
 /*.rpm
