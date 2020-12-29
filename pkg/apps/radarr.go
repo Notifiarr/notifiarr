@@ -1,4 +1,4 @@
-package dnclient
+package apps
 
 import (
 	"encoding/json"
@@ -6,21 +6,36 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 	"golift.io/starr/radarr"
 )
 
 // radarrHandlers is called once on startup to register the web API paths.
-func (c *Client) radarrHandlers() {
-	c.handleAPIpath(Radarr, "/add", c.radarrAddMovie, "POST")
-	c.handleAPIpath(Radarr, "/search/{query}", c.radarrSearchMovie, "GET")
-	c.handleAPIpath(Radarr, "/check/{tmdbid:[0-9]+}", c.radarrCheckMovie, "GET")
-	c.handleAPIpath(Radarr, "/qualityProfiles", c.radarrProfiles, "GET")
-	c.handleAPIpath(Radarr, "/rootFolder", c.radarrRootFolders, "GET")
+func (a *Apps) radarrHandlers() {
+	a.HandleAPIpath(Radarr, "/add", radarrAddMovie, "POST")
+	a.HandleAPIpath(Radarr, "/search/{query}", radarrSearchMovie, "GET")
+	a.HandleAPIpath(Radarr, "/check/{tmdbid:[0-9]+}", radarrCheckMovie, "GET")
+	a.HandleAPIpath(Radarr, "/qualityProfiles", radarrProfiles, "GET")
+	a.HandleAPIpath(Radarr, "/rootFolder", radarrRootFolders, "GET")
 }
 
-func (c *Client) radarrRootFolders(r *http.Request) (int, interface{}) {
+// RadarrConfig represents the input data for a Radarr server.
+type RadarrConfig struct {
+	*starr.Config
+	radarr *radarr.Radarr `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+func (r *RadarrConfig) fix(timeout time.Duration) {
+	r.radarr = radarr.New(r.Config)
+	if r.Timeout.Duration == 0 {
+		r.Timeout.Duration = timeout
+	}
+}
+
+func radarrRootFolders(r *http.Request) (int, interface{}) {
 	// Get folder list from Radarr.
 	folders, err := getRadarr(r).GetRootFolders()
 	if err != nil {
@@ -36,7 +51,7 @@ func (c *Client) radarrRootFolders(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
+func radarrProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from radarr.
 	profiles, err := getRadarr(r).GetQualityProfiles()
 	if err != nil {
@@ -52,7 +67,7 @@ func (c *Client) radarrProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func (c *Client) radarrCheckMovie(r *http.Request) (int, interface{}) {
+func radarrCheckMovie(r *http.Request) (int, interface{}) {
 	tmdbID, _ := strconv.ParseInt(mux.Vars(r)["tmdbid"], 10, 64)
 	// Check for existing movie.
 	if m, err := getRadarr(r).GetMovie(tmdbID); err != nil {
@@ -64,7 +79,7 @@ func (c *Client) radarrCheckMovie(r *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
-func (c *Client) radarrSearchMovie(r *http.Request) (int, interface{}) {
+func radarrSearchMovie(r *http.Request) (int, interface{}) {
 	// Get all movies
 	movies, err := getRadarr(r).GetMovie(0)
 	if err != nil {
@@ -108,7 +123,7 @@ func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle)
 	return false
 }
 
-func (c *Client) radarrAddMovie(r *http.Request) (int, interface{}) {
+func radarrAddMovie(r *http.Request) (int, interface{}) {
 	payload := &radarr.AddMovieInput{}
 	// Extract payload and check for TMDB ID.
 	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {

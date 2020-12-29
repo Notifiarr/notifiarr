@@ -1,4 +1,4 @@
-package dnclient
+package client
 
 /*
   This file contains the procedures that validate config data and initialize each app.
@@ -8,24 +8,18 @@ package dnclient
 import (
 	"context"
 	"path"
-
-	"golift.io/starr/lidarr"
-	"golift.io/starr/radarr"
-	"golift.io/starr/readarr"
-	"golift.io/starr/sonarr"
 )
 
 const helpLink = "GoLift Discord: https://golift.io/discord"
 
-// InitStartup fixes config problems and prints info about our startup config.
-// This runs once on startup.
-func (c *Client) InitStartup() {
+// InitStartup prints info about our startup config. This runs once on startup.
+func (c *Client) PrintStartupInfo() {
 	c.Printf("==> %s <==", helpLink)
 	c.Print("==> Startup Settings <==")
-	c.initSonarr()
-	c.initRadarr()
-	c.initLidarr()
-	c.initReadarr()
+	c.printSonarr()
+	c.printRadarr()
+	c.printLidarr()
+	c.printReadarr()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.allow)
 
@@ -79,15 +73,8 @@ func (c *Client) Exit() (err error) {
 	}
 }
 
-// initLidarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initLidarr() { //nolint:dupl
-	for i := range c.Config.Lidarr {
-		c.Config.Lidarr[i].Lidarr = lidarr.New(c.Config.Lidarr[i].Config)
-		if c.Config.Lidarr[i].Timeout.Duration == 0 {
-			c.Config.Lidarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-	}
-
+// printLidarr is called on startup to print info about each configured server.
+func (c *Client) printLidarr() {
 	if count := len(c.Config.Lidarr); count == 1 {
 		c.Printf(" => Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
 			c.Config.Lidarr[0].URL, c.Config.Lidarr[0].APIKey != "", c.Config.Lidarr[0].Timeout, c.Config.Lidarr[0].ValidSSL)
@@ -101,15 +88,8 @@ func (c *Client) initLidarr() { //nolint:dupl
 	}
 }
 
-// initRadarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initRadarr() { //nolint:dupl
-	for i := range c.Config.Radarr {
-		c.Config.Radarr[i].Radarr = radarr.New(c.Config.Radarr[i].Config)
-		if c.Config.Radarr[i].Timeout.Duration == 0 {
-			c.Config.Radarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-	}
-
+// printRadarr is called on startup to print info about each configured server.
+func (c *Client) printRadarr() {
 	if count := len(c.Config.Radarr); count == 1 {
 		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
 			c.Config.Radarr[0].URL, c.Config.Radarr[0].APIKey != "", c.Config.Radarr[0].Timeout, c.Config.Radarr[0].ValidSSL)
@@ -123,15 +103,8 @@ func (c *Client) initRadarr() { //nolint:dupl
 	}
 }
 
-// initReadarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initReadarr() { //nolint:dupl
-	for i := range c.Config.Readarr {
-		c.Config.Readarr[i].Readarr = readarr.New(c.Config.Readarr[i].Config)
-		if c.Config.Readarr[i].Timeout.Duration == 0 {
-			c.Config.Readarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-	}
-
+// printReadarr is called on startup to print info about each configured server.
+func (c *Client) printReadarr() {
 	if count := len(c.Config.Readarr); count == 1 {
 		c.Printf(" => Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
 			c.Config.Readarr[0].URL, c.Config.Readarr[0].APIKey != "", c.Config.Readarr[0].Timeout, c.Config.Readarr[0].ValidSSL)
@@ -145,15 +118,8 @@ func (c *Client) initReadarr() { //nolint:dupl
 	}
 }
 
-// initSonarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initSonarr() { //nolint:dupl
-	for i := range c.Config.Sonarr {
-		c.Config.Sonarr[i].Sonarr = sonarr.New(c.Config.Sonarr[i].Config)
-		if c.Config.Sonarr[i].Timeout.Duration == 0 {
-			c.Config.Sonarr[i].Timeout.Duration = c.Config.Timeout.Duration
-		}
-	}
-
+// printSonarr is called on startup to print info about each configured server.
+func (c *Client) printSonarr() {
 	if count := len(c.Config.Sonarr); count == 1 {
 		c.Printf(" => Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
 			c.Config.Sonarr[0].URL, c.Config.Sonarr[0].APIKey != "", c.Config.Sonarr[0].Timeout, c.Config.Sonarr[0].ValidSSL)

@@ -1,4 +1,4 @@
-package dnclient
+package client
 
 import (
 	"context"
@@ -12,18 +12,8 @@ import (
 	apachelog "github.com/lestrrat-go/apache-logformat"
 )
 
-// Errors sent to client web requests.
-var (
-	ErrNoTMDB    = fmt.Errorf("TMDB ID must not be empty")
-	ErrNoGRID    = fmt.Errorf("GRID ID must not be empty")
-	ErrNoTVDB    = fmt.Errorf("TVDB ID must not be empty")
-	ErrNoMBID    = fmt.Errorf("MBID ID must not be empty")
-	ErrNoRadarr  = fmt.Errorf("configured radarr ID not found")
-	ErrNoSonarr  = fmt.Errorf("configured sonarr ID not found")
-	ErrNoLidarr  = fmt.Errorf("configured lidarr ID not found")
-	ErrNoReadarr = fmt.Errorf("configured readarr ID not found")
-	ErrExists    = fmt.Errorf("the requested item already exists")
-)
+// ErrNoServer returns when the server is already stopped and a stop req occurs.
+var ErrNoServer = fmt.Errorf("the web server is not running, cannot stop it")
 
 // StartWebServer starts the web server.
 func (c *Client) StartWebServer() {
@@ -31,10 +21,11 @@ func (c *Client) StartWebServer() {
 	l, _ := apachelog.New(`%{X-Forwarded-For}i %l %u %t "%r" %>s %b "%{Referer}i" ` +
 		`"%{User-agent}i" %{X-Request-Time}o %Dμs`)
 	// Create a request router.
-	c.router = mux.NewRouter()
+	c.Config.Apps.Router = mux.NewRouter()
+	c.Config.Apps.ErrorLog = c.Logger.ErrorLog
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
-		Handler:           l.Wrap(c.fixForwardedFor(c.router), c.Logger.HTTPLog.Writer()),
+		Handler:           l.Wrap(c.fixForwardedFor(c.Config.Apps.Router), c.Logger.HTTPLog.Writer()),
 		Addr:              c.Config.BindAddr,
 		IdleTimeout:       time.Minute,
 		WriteTimeout:      c.Config.Timeout.Duration,
@@ -44,10 +35,7 @@ func (c *Client) StartWebServer() {
 	}
 
 	// Initialize all the application API paths.
-	c.radarrHandlers()
-	c.readarrHandlers()
-	c.lidarrHandlers()
-	c.sonarrHandlers()
+	c.Config.Apps.InitHandlers()
 	c.internalHandlers()
 	// Run the server.
 	go c.runWebServer()
@@ -76,16 +64,13 @@ func (c *Client) runWebServer() {
 	}
 }
 
-// ErrServerNotRunning is an error.
-var ErrServerNotRunning = fmt.Errorf("the web server is not running, cannot stop it")
-
 // StopWebServer stops the web servers. Panics if that causes an error or timeout.
 func (c *Client) StopWebServer() error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 	defer cancel()
 
 	if c.server == nil {
-		return ErrServerNotRunning
+		return ErrNoServer
 	}
 
 	if c.menu["stat"] != nil {

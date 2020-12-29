@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/dnclient"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/client"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func run() error {
 		log.Print(err)
 	}
 
-	return dnclient.Start()
+	return client.Start()
 }
 
 func setTimeZone(tz string) (err error) {

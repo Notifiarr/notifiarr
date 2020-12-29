@@ -1,14 +1,12 @@
-package dnclient
+package client
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -23,36 +21,19 @@ type allowedIPs []*net.IPNet
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
 	// GET  /api/status   (w/o key)
-	c.router.Handle(path.Join("/", c.Config.URLBase, "api", "status"),
+	c.Config.Router.Handle(path.Join("/", c.Config.URLBase, "api", "status"),
 		http.HandlerFunc(c.statusResponse)).Methods("GET", "HEAD")
 	// PUT  /api/info     (w/ key)
-	c.handleAPIpath("", "info", c.updateInfo, "PUT")
+	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	// PUT  /api/info/alert     (w/ key)
-	c.handleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
+	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 	// GET  /api/version  (w/ key)
-	c.handleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 
 	// Initialize internal-only paths.
-	c.router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
-	c.router.Handle("/", http.HandlerFunc(c.slash))                // "hi" page on /
-	c.router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
-}
-
-func (c *Client) respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {
-	w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(stat)
-
-	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
-
-	if m, ok := msg.(error); ok {
-		c.Errorf("Status: %s, Message: %v", statusTxt, m)
-		msg = m.Error()
-	}
-
-	b, _ := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
-	_, _ = w.Write(b)
-	_, _ = w.Write([]byte("\n")) // curl likes new lines.
+	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
+	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))                // "hi" page on /
+	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
 }
 
 func (c *Client) updateInfoAny(r *http.Request) (int, string, interface{}) {
@@ -122,12 +103,12 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
-	c.respond(w, http.StatusNotFound, "Check your request parameters and try again.", time.Now())
+	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.", time.Now())
 }
 
 // statusResponse is the handler for /api/status.
 func (c *Client) statusResponse(w http.ResponseWriter, r *http.Request) {
-	c.respond(w, http.StatusOK, c.Flags.Name()+" alive!", time.Now())
+	c.Config.Respond(w, http.StatusOK, c.Flags.Name()+" alive!", time.Now())
 }
 
 // slash is the handler for /.

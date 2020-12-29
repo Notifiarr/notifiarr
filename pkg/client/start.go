@@ -1,4 +1,4 @@
-package dnclient
+package client
 
 import (
 	"fmt"
@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/apps"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
-	"github.com/gorilla/mux"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
 	"golift.io/version"
@@ -39,18 +39,13 @@ type Flags struct {
 
 // Config represents the data in our config file.
 type Config struct {
-	APIKey     string           `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
-	BindAddr   string           `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
-	SSLCrtFile string           `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
-	SSLKeyFile string           `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
-	URLBase    string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	Upstreams  []string         `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
-	Timeout    cnfg.Duration    `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Sonarr     []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr     []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr     []*LidarrConfig  `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr    []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	BindAddr   string        `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
+	SSLCrtFile string        `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
+	SSLKeyFile string        `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
+	Upstreams  []string      `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
+	Timeout    cnfg.Duration `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	*logs.Logs
+	*apps.Apps
 }
 
 // Client stores all the running data.
@@ -59,7 +54,6 @@ type Client struct {
 	Flags  *Flags
 	Config *Config
 	server *http.Server
-	router *mux.Router
 	sigkil chan os.Signal
 	sighup chan os.Signal
 	allow  allowedIPs
@@ -87,7 +81,9 @@ func NewDefaults() *Client {
 		menu:   make(map[string]ui.MenuItem),
 		Logger: logs.New(),
 		Config: &Config{
-			URLBase:  "/",
+			Apps: &apps.Apps{
+				URLBase: "/",
+			},
 			BindAddr: DefaultBindAddr,
 			Logs: &logs.Logs{
 				LogFiles:  DefaultLogFiles,
@@ -155,7 +151,8 @@ func (c *Client) run(newConfig bool) error {
 		return ErrNoApps
 	}
 
-	c.InitStartup()
+	c.Config.Apps.Setup(c.Config.Timeout.Duration)
+	c.PrintStartupInfo()
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 
