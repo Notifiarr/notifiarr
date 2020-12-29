@@ -144,7 +144,7 @@ func (c *Client) reloadConfiguration() {
 		panic(err)
 	}
 
-	c.InitStartup()
+	c.PrintStartupInfo()
 	c.Print("==> Configuration Reloaded")
 
 	_, _ = ui.Info(Title, "Configuration Reloaded!")

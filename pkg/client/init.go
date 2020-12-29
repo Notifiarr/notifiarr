@@ -12,12 +12,10 @@ import (
 
 const helpLink = "GoLift Discord: https://golift.io/discord"
 
-// InitStartup fixes config problems and prints info about our startup config.
-// This runs once on startup.
-func (c *Client) InitStartup() {
+// InitStartup prints info about our startup config. This runs once on startup.
+func (c *Client) PrintStartupInfo() {
 	c.Printf("==> %s <==", helpLink)
 	c.Print("==> Startup Settings <==")
-	c.Config.Apps.Setup(c.Config.Timeout.Duration)
 	c.printSonarr()
 	c.printRadarr()
 	c.printLidarr()
