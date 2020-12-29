@@ -23,6 +23,7 @@ var (
 	ErrNoLidarr  = fmt.Errorf("configured lidarr ID not found")
 	ErrNoReadarr = fmt.Errorf("configured readarr ID not found")
 	ErrExists    = fmt.Errorf("the requested item already exists")
+	ErrNoServer  = fmt.Errorf("the web server is not running, cannot stop it")
 )
 
 // StartWebServer starts the web server.
@@ -76,16 +77,13 @@ func (c *Client) runWebServer() {
 	}
 }
 
-// ErrServerNotRunning is an error.
-var ErrServerNotRunning = fmt.Errorf("the web server is not running, cannot stop it")
-
 // StopWebServer stops the web servers. Panics if that causes an error or timeout.
 func (c *Client) StopWebServer() error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 	defer cancel()
 
 	if c.server == nil {
-		return ErrServerNotRunning
+		return ErrNoServer
 	}
 
 	if c.menu["stat"] != nil {

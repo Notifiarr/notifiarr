@@ -132,10 +132,10 @@ func (c *Client) createConfigFile(file string) (string, error) {
 func (c *Client) reloadConfiguration() {
 	c.Print("==> Reloading Configuration")
 
-	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrServerNotRunning) {
+	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
 		c.Errorf("Unable to reload configuration: %v", err)
 		return
-	} else if !errors.Is(err, ErrServerNotRunning) {
+	} else if !errors.Is(err, ErrNoServer) {
 		defer c.StartWebServer()
 	}
 

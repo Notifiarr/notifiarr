@@ -176,10 +176,10 @@ func (c *Client) changeKey() {
 
 	c.Print("Updating API Key!")
 
-	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrServerNotRunning) {
+	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
 		c.Errorf("Unable to update API Key: %v", err)
 		return
-	} else if !errors.Is(err, ErrServerNotRunning) {
+	} else if !errors.Is(err, ErrNoServer) {
 		defer c.StartWebServer()
 	}
 
