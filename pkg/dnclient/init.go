@@ -1,4 +1,3 @@
-//nolint:dupl,golint
 package dnclient
 
 /*
@@ -9,14 +8,14 @@ package dnclient
 import (
 	"context"
 	"path"
-	"path/filepath"
-	"syscall"
 
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
 	"golift.io/starr/sonarr"
 )
+
+const helpLink = "GoLift Discord: https://golift.io/discord"
 
 // InitStartup fixes config problems and prints info about our startup config.
 // This runs once on startup.
@@ -38,45 +37,50 @@ func (c *Client) InitStartup() {
 	}
 
 	if c.Config.LogFile != "" {
-		f, err := filepath.Abs(c.Config.LogFile)
-		if err == nil {
-			c.Config.LogFile = f
-		}
-
 		if c.Config.LogFiles > 0 {
 			c.Printf(" => Log File: %s (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
 		} else {
 			c.Printf(" => Log File: %s (no rotation)", c.Config.LogFile)
 		}
 	}
+
+	if c.Config.HTTPLog != "" {
+		if c.Config.LogFiles > 0 {
+			c.Printf(" => HTTP Log: %s (%d @ %dMb)", c.Config.HTTPLog, c.Config.LogFiles, c.Config.LogFileMb)
+		} else {
+			c.Printf(" => HTTP Log: %s (no rotation)", c.Config.HTTPLog)
+		}
+	}
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
-func (c *Client) Exit() error {
-	if c.signal != nil {
-		for sigc := range c.signal {
-			if sigc == syscall.SIGHUP {
-				c.reloadConfiguration()
-			} else {
-				c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
+func (c *Client) Exit() (err error) {
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
+		defer cancel()
 
-				break
-			}
+		if c.server != nil {
+			err = c.server.Shutdown(ctx)
+		}
+	}()
+
+	if c.sigkil == nil || c.sighup == nil {
+		return
+	}
+
+	for {
+		select {
+		case sigc := <-c.sigkil:
+			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
+			return
+		case <-c.sighup:
+			c.reloadConfiguration()
 		}
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
-	defer cancel()
-
-	if c.server != nil {
-		return c.server.Shutdown(ctx)
-	}
-
-	return nil
 }
 
 // initLidarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initLidarr() {
+func (c *Client) initLidarr() { //nolint:dupl
 	for i := range c.Config.Lidarr {
 		c.Config.Lidarr[i].Lidarr = lidarr.New(c.Config.Lidarr[i].Config)
 		if c.Config.Lidarr[i].Timeout.Duration == 0 {
@@ -98,7 +102,7 @@ func (c *Client) initLidarr() {
 }
 
 // initRadarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initRadarr() {
+func (c *Client) initRadarr() { //nolint:dupl
 	for i := range c.Config.Radarr {
 		c.Config.Radarr[i].Radarr = radarr.New(c.Config.Radarr[i].Config)
 		if c.Config.Radarr[i].Timeout.Duration == 0 {
@@ -120,7 +124,7 @@ func (c *Client) initRadarr() {
 }
 
 // initReadarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initReadarr() {
+func (c *Client) initReadarr() { //nolint:dupl
 	for i := range c.Config.Readarr {
 		c.Config.Readarr[i].Readarr = readarr.New(c.Config.Readarr[i].Config)
 		if c.Config.Readarr[i].Timeout.Duration == 0 {
@@ -142,7 +146,7 @@ func (c *Client) initReadarr() {
 }
 
 // initSonarr is called on startup to fix the config and print info about each configured server.
-func (c *Client) initSonarr() {
+func (c *Client) initSonarr() { //nolint:dupl
 	for i := range c.Config.Sonarr {
 		c.Config.Sonarr[i].Sonarr = sonarr.New(c.Config.Sonarr[i].Config)
 		if c.Config.Sonarr[i].Timeout.Duration == 0 {

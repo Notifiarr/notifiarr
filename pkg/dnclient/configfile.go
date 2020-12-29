@@ -1,6 +1,7 @@
 package dnclient
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -8,8 +9,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/ui"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
@@ -115,7 +116,7 @@ func (c *Client) createConfigFile(file string) (string, error) {
 	}
 	defer f.Close()
 
-	if a, err := bindata.Asset("../examples/dnclient.conf.example"); err != nil {
+	if a, err := bindata.Asset("../../examples/dnclient.conf.example"); err != nil {
 		return "", fmt.Errorf("getting config file: %w", err)
 	} else if _, err = f.Write(a); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)
@@ -129,20 +130,24 @@ func (c *Client) createConfigFile(file string) (string, error) {
 }
 
 func (c *Client) reloadConfiguration() {
-	//nolint: scopelint
-	c.RestartWebServer(func() {
-		c.Print("==> Reloading Configuration")
+	c.Print("==> Reloading Configuration")
 
-		if _, err := c.getConfig(); err != nil {
-			_, _ = ui.Error(Title, "Reloading Configuration: "+err.Error())
-			c.Errorf("reloading config: %v", err)
-			panic(err)
-		}
+	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrServerNotRunning) {
+		c.Errorf("Unable to reload configuration: %v", err)
+		return
+	} else if !errors.Is(err, ErrServerNotRunning) {
+		defer c.StartWebServer()
+	}
 
-		_, _ = ui.Info(Title, "Configuration Reloaded!")
-		c.InitStartup()
-		c.Print("==> Configuration Reloaded")
-	})
+	if _, err := c.getConfig(); err != nil {
+		c.Errorf("Reloading Config: %v", err)
+		panic(err)
+	}
+
+	c.InitStartup()
+	c.Print("==> Configuration Reloaded")
+
+	_, _ = ui.Info(Title, "Configuration Reloaded!")
 }
 
 func configFileLocactions() (string, []string) {

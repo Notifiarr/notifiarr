@@ -1,4 +1,3 @@
-//nolint:dupl
 package dnclient
 
 import (
@@ -132,6 +131,7 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 	return false
 }
 
+//nolint:dupl
 func (c *Client) readarrAddBook(r *http.Request) (int, interface{}) {
 	payload := &readarr.AddBookInput{}
 	// Extract payload and check for TMDB ID.

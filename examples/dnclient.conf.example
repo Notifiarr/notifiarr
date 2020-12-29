@@ -9,9 +9,10 @@ api_key = "api-key-from-discordnotifier.com"
 # You can use 127.0.0.1:5454 to listen only on localhost.
 bind_addr = "5454"
 
-
 # Quiet makes the app not log anything to output.
 # Recommend setting log files if you make the app quiet.
+# This is default on Windows and macOS app. Log files will
+# automatically be written on those platforms.
 quiet = false
 
 # All API paths start with /api.
@@ -30,10 +31,10 @@ urlbase = "/"
 
 # If you set these, logs will be written to these files.
 # If blank on windows or macOS, log file paths are chosen for you.
-#log_file = "dnclient.log"
-#http_log = "dnclient.http.log"
+#log_file = "~/.dnclient/dnclient.log"
+#http_log = "~/.dnclient/dnclient.http.log"
 # Set this to the number of megabytes to rotate files.
-log_files_mb = 100
+log_file_mb = 100
 # How many files to keep? 0 = all.
 log_files = 10
 
@@ -41,26 +42,24 @@ log_files = 10
 timeout = "1m"
 
 
-    ##################
-    # Starr Settings #
-    ##################
+##################
+# Starr Settings #
+##################
 
 # The API keys are specific to the app. Get it from General Settings.
 # Configurations for unused apps are harmless. Set URL and API key for
 # apps you have and want to make requests to using Media Bot.
 
+# Examples follow. The first one is uncommented.
+
 [[radarr]]
-  url     = "http://127.0.0.1:7878/radarr"
-  api_key = ""
+url     = "http://127.0.0.1:7878/radarr"
+api_key = ""
 
-[[readarr]]
-  url     = "http://127.0.0.1:8787/readarr"
-  api_key = ""
+#[[readarr]]
+#url     = "http://127.0.0.1:8787/readarr"
+#api_key = ""
 
-[[sonarr]]
-  url     = "http://127.0.0.1:8989/"
-  api_key = ""
-
-[[lidarr]]
-  url     = "http://127.0.0.1:8686/"
-  api_key = ""
+#[[sonarr]]
+#url     = "http://127.0.0.1:8989/"
+#api_key = ""

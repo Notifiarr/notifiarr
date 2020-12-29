@@ -3,41 +3,33 @@
 package dnclient
 
 import (
-	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
-	"syscall"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/ui"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"github.com/getlantern/systray"
 	"golift.io/version"
 )
 
 /* This file handles the OS GUI elements. */
 
-func (c *Client) startTray() error {
-	if !ui.HasGUI() {
-		return c.Exit()
+// Run starts the web server and the system tray/menu bar app.
+func (c *Client) startTray() {
+	systray.Run(c.readyTray, c.exitTray)
+}
+
+func (c *Client) exitTray() {
+	c.sigkil = nil
+
+	if err := c.Exit(); err != nil {
+		c.Errorf("Shutting down web server: %v", err)
+		os.Exit(1) // web server problem
 	}
-
-	systray.Run(c.readyTray, func() {
-		ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
-		defer cancel()
-
-		if c.server != nil {
-			if err := c.server.Shutdown(ctx); err != nil {
-				c.Errorf("shutting down web server: %v", err)
-				os.Exit(1) // web server problem
-			}
-		}
-
-		os.Exit(0)
-	})
-
-	// We never get here, but just in case the library changes...
-	return c.Exit()
+	// because systray wants to control the exit code? no..
+	os.Exit(0)
 }
 
 func (c *Client) readyTray() {
@@ -45,12 +37,24 @@ func (c *Client) readyTray() {
 	if err == nil {
 		systray.SetTemplateIcon(b, b)
 	} else {
-		c.Errorf("reading icon: %v", err)
+		c.Errorf("Reading Icon: %v", err)
 		systray.SetTitle("DNC")
 	}
 
-	systray.SetTooltip(c.Flags.Name())
-	c.menu["stat"] = ui.WrapMenu(systray.AddMenuItem("Running", "web server running, uncheck to pause"))
+	systray.SetTooltip(c.Flags.Name() + " v" + version.Version)
+
+	c.makeChannels() // make these before starting the web server.
+	c.menu["info"].Disable()
+	c.menu["dninfo"].Hide()
+	c.menu["alert"].Hide() // currently unused.
+	c.menu["update"].Hide()
+
+	c.StartWebServer()
+	c.watchGuiChannels()
+}
+
+func (c *Client) makeChannels() {
+	c.menu["stat"] = ui.WrapMenu(systray.AddMenuItem("Running", "web server state unknown"))
 
 	conf := systray.AddMenuItem("Config", "show configuration")
 	c.menu["conf"] = ui.WrapMenu(conf)
@@ -74,22 +78,19 @@ func (c *Client) readyTray() {
 	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
+	// These start hidden.
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "there is a newer version available"))
 	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from DiscordNotifier.com"))
 	c.menu["alert"] = ui.WrapMenu(systray.AddMenuItem("Alert!", "alert from DiscordNotifier.com"))
-	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
 
-	c.menu["dninfo"].Hide()
-	c.menu["alert"].Hide()
-	c.menu["update"].Hide()
-	c.menu["info"].Disable()
-	c.menu["stat"].Check()
-	c.watchGuiChannels()
+	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
 }
 
-// nolint:errcheck
 func (c *Client) watchGuiChannels() {
+	defer systray.Quit() // this kills the app.
+
 	for {
+		// nolint:errcheck
 		select {
 		case <-c.menu["stat"].Clicked():
 			c.toggleServer()
@@ -125,16 +126,15 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["dninfo"].Clicked():
 			ui.Info(Title, "INFO: "+c.info)
 			c.menu["dninfo"].Hide()
-		case sigc := <-c.signal:
-			if sigc != syscall.SIGHUP {
-				c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
-				systray.Quit() // this kills the app.
-			}
-
+		case sigc := <-c.sighup:
+			c.Printf("Caught Signal: %v (reloading configuration)", sigc)
 			c.reloadConfiguration()
+		case sigc := <-c.sigkil:
+			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
+			return
 		case <-c.menu["exit"].Clicked():
 			c.Errorf("Need help? %s\n=====> Exiting! User Requested", helpLink)
-			systray.Quit() // this kills the app.
+			return
 		}
 	}
 }
@@ -143,40 +143,47 @@ func (c *Client) toggleServer() {
 	if c.server == nil {
 		c.Print("Starting Web Server")
 		c.StartWebServer()
-		c.menu["stat"].Check()
-		c.menu["stat"].SetTooltip("web server running, uncheck to pause")
 
 		return
 	}
 
 	c.Print("Pausing Web Server")
-	c.StopWebServer()
-	c.menu["stat"].Uncheck()
-	c.menu["stat"].SetTooltip("web server paused, click to start")
-}
 
-func (c *Client) changeKey() {
-	key, ok, err := ui.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
-	if err != nil {
-		c.Errorf("Updating API Key: %v", err)
-	} else if ok && key != c.Config.APIKey {
-		// updateKey shuts down the web server and changes the API key.
-		// The server has to shut down to avoid race conditions.
-		c.Print("Updating API Key!")
-		c.RestartWebServer(func() { c.Config.APIKey = key })
+	if err := c.StopWebServer(); err != nil {
+		c.Errorf("Unable to Pause Server: %v", err)
 	}
 }
 
 func (c *Client) rotateLogs() {
 	c.Print("Rotating Log Files!")
 
-	if _, err := c.Logger.web.Rotate(); err != nil {
-		c.Errorf("Rotating HTTP Log: %v", err)
+	for _, err := range c.Logger.Rotate() {
+		if err != nil {
+			c.Errorf("Rotating Log Files: %v", err)
+		}
+	}
+}
+
+// changeKey shuts down the web server and changes the API key.
+// The server has to shut down to avoid race conditions.
+func (c *Client) changeKey() {
+	key, ok, err := ui.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
+	if err != nil {
+		c.Errorf("Updating API Key: %v", err)
+	} else if !ok || key == c.Config.APIKey {
+		return
 	}
 
-	if _, err := c.Logger.app.Rotate(); err != nil {
-		c.Errorf("Rotating Log: %v", err)
+	c.Print("Updating API Key!")
+
+	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrServerNotRunning) {
+		c.Errorf("Unable to update API Key: %v", err)
+		return
+	} else if !errors.Is(err, ErrServerNotRunning) {
+		defer c.StartWebServer()
 	}
+
+	c.Config.APIKey = key
 }
 
 func (c *Client) displayConfig() (s string) { //nolint: funlen

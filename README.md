@@ -33,8 +33,8 @@ docker logs <container id from docker run>
     container with environment variables.
 -   Any variable not provided takes the default.
 -   Must provide an API key from discordnotifier.com.
--   Must provide URL and API key for Sonarr or Radarr or Lidarr or any combination.
--   You may provide multiple sonarr, radarr or lidarr instances using
+-   Must provide URL and API key for Sonarr or Radarr or Readarr or any combination.
+-   You may provide multiple sonarr, radarr or readarr instances using
     `DN_SONARR_1_URL`, `DN_SONARR_2_URL`, etc.
 -   DiscordNotifier.com may or may not support multiple instances.
 
