@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -18,7 +19,9 @@ mbid - music brainz is the source for lidarr (todo)
 // lidarrHandlers is called once on startup to register the web API paths.
 func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(Lidarr, "/add", lidarrAddAlbum, "POST")
-	a.HandleAPIpath(Lidarr, "/check/{albumid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/check/{mbid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/get/{albumid:[0-9]+}", lidarrGetAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/update", lidarrUpdateAlbum, "PUT")
 	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrProfiles, "GET")
 	a.HandleAPIpath(Lidarr, "/qualityDefinitions", lidarrQualityDefs, "GET")
 	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
@@ -86,20 +89,50 @@ func lidarrQualityDefs(r *http.Request) (int, interface{}) {
 }
 
 func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
-	// Check for existing movie.
-	if m, err := getLidarr(r).GetAlbum(mux.Vars(r)["albumid"]); err != nil {
+	id := mux.Vars(r)["mbid"]
+
+	m, err := getLidarr(r).GetAlbum(id)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", mux.Vars(r)["albumid"], ErrExists)
+		return http.StatusConflict, fmt.Errorf("%s: %w", id, ErrExists)
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
+func lidarrGetAlbum(r *http.Request) (int, interface{}) {
+	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], 10, 64)
+
+	album, err := getLidarr(r).GetAlbumByID(albumID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
+	}
+
+	return http.StatusOK, album
+}
+
+func lidarrUpdateAlbum(r *http.Request) (int, interface{}) {
+	var album lidarr.Album
+
+	err := json.NewDecoder(r.Body).Decode(&album)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	err = getLidarr(r).UpdateAlbum(album.ID, &album)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating album: %w", err)
+	}
+
+	return http.StatusOK, "lidarr seems to have worked"
+}
+
 func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	var payload lidarr.AddAlbumInput
-	// Extract payload and check for TMDB ID.
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	} else if payload == nil {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
@@ -108,18 +141,18 @@ func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	app := getLidarr(r)
 	// Check for existing album.
 	/* broken:
-	if m, err := lidar.GetAlbum(payload.AlbumID); err != nil {
+	m, err := lidar.GetAlbum(payload.AlbumID)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.AlbumID, ErrExists)
 	}
 	*/
 
-	// Add book using payload.
-	book, err := app.AddAlbum(&payload)
+	album, err := app.AddAlbum(&payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding album: %w", err)
 	}
 
-	return http.StatusCreated, book
+	return http.StatusCreated, album
 }

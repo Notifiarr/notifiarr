@@ -18,6 +18,8 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/add", sonarrAddSeries, "POST")
 	a.HandleAPIpath(Sonarr, "/check/{tvdbid:[0-9]+}", sonarrCheckSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
+	a.HandleAPIpath(Sonarr, "/get/{seriesid:[0-9]+}", sonarrGetSeries, "GET")
+	a.HandleAPIpath(Sonarr, "/update", sonarrUpdateSeries, "PUT")
 	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/languageProfiles", sonarrLangProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/rootFolder", sonarrRootFolders, "GET")
@@ -87,7 +89,8 @@ func sonarrLangProfiles(r *http.Request) (int, interface{}) {
 func sonarrCheckSeries(r *http.Request) (int, interface{}) {
 	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], 10, 64)
 	// Check for existing series.
-	if m, err := getSonarr(r).GetSeries(tvdbid); err != nil {
+	m, err := getSonarr(r).GetSeries(tvdbid)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", tvdbid, ErrExists)
@@ -145,10 +148,38 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 	return false
 }
 
+func sonarrGetSeries(r *http.Request) (int, interface{}) {
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
+
+	series, err := getSonarr(r).GetSeriesByID(seriesID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+	}
+
+	return http.StatusOK, series
+}
+
+func sonarrUpdateSeries(r *http.Request) (int, interface{}) {
+	var series sonarr.Series
+
+	err := json.NewDecoder(r.Body).Decode(&series)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	err = getSonarr(r).UpdateSeries(series.ID, &series)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating series: %w", err)
+	}
+
+	return http.StatusOK, "sonarr seems to have worked"
+}
+
 func sonarrAddSeries(r *http.Request) (int, interface{}) {
-	payload := &sonarr.AddSeriesInput{}
-	// Extract payload and check for TMDB ID.
-	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
+	var payload sonarr.AddSeriesInput
+	// Extract payload and check for TVDB ID.
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	} else if payload.TvdbID == 0 {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
@@ -156,13 +187,14 @@ func sonarrAddSeries(r *http.Request) (int, interface{}) {
 
 	app := getSonarr(r)
 	// Check for existing series.
-	if m, err := app.GetSeries(payload.TvdbID); err != nil {
+	m, err := app.GetSeries(payload.TvdbID)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TvdbID, ErrExists)
 	}
 
-	series, err := app.AddSeries(payload)
+	series, err := app.AddSeries(&payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
 	}

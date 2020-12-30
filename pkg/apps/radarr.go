@@ -18,6 +18,8 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/add", radarrAddMovie, "POST")
 	a.HandleAPIpath(Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(Radarr, "/check/{tmdbid:[0-9]+}", radarrCheckMovie, "GET")
+	a.HandleAPIpath(Radarr, "/get/{movieid:[0-9]+}", radarrGetMovie, "GET")
+	a.HandleAPIpath(Radarr, "/update", radarrUpdateMovie, "PUT")
 	a.HandleAPIpath(Radarr, "/qualityProfiles", radarrProfiles, "GET")
 	a.HandleAPIpath(Radarr, "/rootFolder", radarrRootFolders, "GET")
 }
@@ -70,13 +72,25 @@ func radarrProfiles(r *http.Request) (int, interface{}) {
 func radarrCheckMovie(r *http.Request) (int, interface{}) {
 	tmdbID, _ := strconv.ParseInt(mux.Vars(r)["tmdbid"], 10, 64)
 	// Check for existing movie.
-	if m, err := getRadarr(r).GetMovie(tmdbID); err != nil {
+	m, err := getRadarr(r).GetMovie(tmdbID)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", tmdbID, ErrExists)
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
+}
+
+func radarrGetMovie(r *http.Request) (int, interface{}) {
+	movieID, _ := strconv.ParseInt(mux.Vars(r)["movieid"], 10, 64)
+
+	movie, err := getRadarr(r).GetMovieByID(movieID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
+	}
+
+	return http.StatusOK, movie
 }
 
 func radarrSearchMovie(r *http.Request) (int, interface{}) {
@@ -123,10 +137,28 @@ func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle)
 	return false
 }
 
-func radarrAddMovie(r *http.Request) (int, interface{}) {
-	payload := &radarr.AddMovieInput{}
+func radarrUpdateMovie(r *http.Request) (int, interface{}) {
+	var movie radarr.Movie
 	// Extract payload and check for TMDB ID.
-	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
+	err := json.NewDecoder(r.Body).Decode(&movie)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	// Check for existing movie.
+	err = getRadarr(r).UpdateMovie(movie.ID, &movie)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating movie: %w", err)
+	}
+
+	return http.StatusOK, "radarr seems to have worked"
+}
+
+func radarrAddMovie(r *http.Request) (int, interface{}) {
+	var payload radarr.AddMovieInput
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	} else if payload.TmdbID == 0 {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
@@ -134,7 +166,8 @@ func radarrAddMovie(r *http.Request) (int, interface{}) {
 
 	app := getRadarr(r)
 	// Check for existing movie.
-	if m, err := app.GetMovie(payload.TmdbID); err != nil {
+	m, err := app.GetMovie(payload.TmdbID)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TmdbID, ErrExists)
@@ -150,7 +183,7 @@ func radarrAddMovie(r *http.Request) (int, interface{}) {
 	}
 
 	// Add movie using fixed payload.
-	movie, err := app.AddMovie(payload)
+	movie, err := app.AddMovie(&payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
 	}

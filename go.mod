@@ -2,6 +2,7 @@ module github.com/Go-Lift-TV/discordnotifier-client
 
 go 1.15
 
+replace golift.io/starr => ../../../golift.io/starr
 require (
 	github.com/gen2brain/dlgs v0.0.0-20201118155338-03fe7f81ad25
 	github.com/getlantern/golog v0.0.0-20201105130739-9586b8bde3a9 // indirect

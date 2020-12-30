@@ -18,6 +18,10 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(Readarr, "/add", readarrAddBook, "POST")
 	a.HandleAPIpath(Readarr, "/search/{query}", readarrSearchBook, "GET")
 	a.HandleAPIpath(Readarr, "/check/{grid:[0-9]+}", readarrCheckBook, "GET")
+	a.HandleAPIpath(Readarr, "/get/{bookid:[0-9]+}", readarrGetBook, "GET")
+	a.HandleAPIpath(Readarr, "/update", readarrUpdateBook, "PUT")
+	a.HandleAPIpath(Readarr, "/author/{authorid:[0-9]+}", readarrGetAuthor, "GET")
+	a.HandleAPIpath(Readarr, "/updateauthor", readarrUpdateAuthor, "PUT")
 	a.HandleAPIpath(Readarr, "/metadataProfiles", readarrMetaProfiles, "GET")
 	a.HandleAPIpath(Readarr, "/qualityProfiles", readarrProfiles, "GET")
 	a.HandleAPIpath(Readarr, "/rootFolder", readarrRootFolders, "GET")
@@ -87,7 +91,8 @@ func readarrProfiles(r *http.Request) (int, interface{}) {
 func readarrCheckBook(r *http.Request) (int, interface{}) {
 	grid, _ := strconv.ParseInt(mux.Vars(r)["grid"], 10, 64)
 	// Check for existing book.
-	if m, err := getReadarr(r).GetBook(grid); err != nil {
+	m, err := getReadarr(r).GetBook(grid)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", grid, ErrExists)
@@ -112,7 +117,7 @@ func readarrSearchBook(r *http.Request) (int, interface{}) {
 				"title":    book.Title,
 				"release":  book.ReleaseDate,
 				"author":   book.Author.AuthorName,
-				"authorId": book.Author.Ended,
+				"authorId": book.Author.ID,
 				"overview": book.Overview,
 				"ratings":  book.Ratings.Value,
 				"pages":    book.PageCount,
@@ -146,10 +151,65 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 	return false
 }
 
+func readarrGetAuthor(r *http.Request) (int, interface{}) {
+	authorID, _ := strconv.ParseInt(mux.Vars(r)["authorid"], 10, 64)
+
+	author, err := getReadarr(r).GetAuthorByID(authorID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting author: %w", err)
+	}
+
+	return http.StatusOK, author
+}
+
+func readarrUpdateAuthor(r *http.Request) (int, interface{}) {
+	var author readarr.Author
+
+	err := json.NewDecoder(r.Body).Decode(&author)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	err = getReadarr(r).UpdateAuthor(author.ID, &author)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating author: %w", err)
+	}
+
+	return http.StatusOK, "readarr seems to have worked"
+}
+
+func readarrGetBook(r *http.Request) (int, interface{}) {
+	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], 10, 64)
+
+	book, err := getReadarr(r).GetBookByID(bookID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
+	}
+
+	return http.StatusOK, book
+}
+
+func readarrUpdateBook(r *http.Request) (int, interface{}) {
+	var book readarr.Book
+
+	err := json.NewDecoder(r.Body).Decode(&book)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	err = getReadarr(r).UpdateBook(book.ID, &book)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating book: %w", err)
+	}
+
+	return http.StatusOK, "readarr seems to have worked"
+}
+
 func readarrAddBook(r *http.Request) (int, interface{}) {
 	payload := &readarr.AddBookInput{}
-	// Extract payload and check for TMDB ID.
-	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
+	// Extract payload and check for GRID ID.
+	err := json.NewDecoder(r.Body).Decode(payload)
+	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	} else if payload.ForeignBookID == 0 {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
@@ -157,7 +217,8 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 
 	app := getReadarr(r)
 	// Check for existing book.
-	if m, err := app.GetBook(payload.ForeignBookID); err != nil {
+	m, err := app.GetBook(payload.ForeignBookID)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, fmt.Errorf("%d: %w", payload.ForeignBookID, ErrExists)
