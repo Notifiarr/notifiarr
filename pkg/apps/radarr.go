@@ -27,7 +27,7 @@ func (a *Apps) radarrHandlers() {
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
 	*starr.Config
-	radarr *radarr.Radarr `json:"-" toml:"-" xml:"-" yaml:"-"`
+	radarr *radarr.Radarr
 }
 
 func (r *RadarrConfig) setup(timeout time.Duration) {
@@ -106,14 +106,18 @@ func radarrSearchMovie(r *http.Request) (int, interface{}) {
 	for _, movie := range movies {
 		if movieSearch(query, []string{movie.Title, movie.OriginalTitle}, movie.AlternateTitles) {
 			returnMovies = append(returnMovies, map[string]interface{}{
-				"id":      movie.ID,
-				"title":   movie.Title,
-				"cinemas": movie.InCinemas,
-				"status":  movie.Status,
-				"exists":  movie.HasFile,
-				"added":   movie.Added,
-				"year":    movie.Year,
-				"path":    movie.Path,
+				"id":                  movie.ID,
+				"title":               movie.Title,
+				"cinemas":             movie.InCinemas,
+				"status":              movie.Status,
+				"exists":              movie.HasFile,
+				"added":               movie.Added,
+				"year":                movie.Year,
+				"path":                movie.Path,
+				"tmdbId":              movie.TmdbID,
+				"qualityProfileId":    movie.QualityProfileID,
+				"monitored":           movie.Monitored,
+				"minimumAvailability": movie.MinimumAvailability,
 			})
 		}
 	}

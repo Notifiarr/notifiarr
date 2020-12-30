@@ -20,11 +20,12 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(Readarr, "/check/{grid:[0-9]+}", readarrCheckBook, "GET")
 	a.HandleAPIpath(Readarr, "/get/{bookid:[0-9]+}", readarrGetBook, "GET")
 	a.HandleAPIpath(Readarr, "/update", readarrUpdateBook, "PUT")
-	a.HandleAPIpath(Readarr, "/author/{authorid:[0-9]+}", readarrGetAuthor, "GET")
-	a.HandleAPIpath(Readarr, "/updateauthor", readarrUpdateAuthor, "PUT")
 	a.HandleAPIpath(Readarr, "/metadataProfiles", readarrMetaProfiles, "GET")
 	a.HandleAPIpath(Readarr, "/qualityProfiles", readarrProfiles, "GET")
 	a.HandleAPIpath(Readarr, "/rootFolder", readarrRootFolders, "GET")
+
+	a.HandleAPIpath(Readarr, "/author/{authorid:[0-9]+}", readarrGetAuthor, "GET")
+	a.HandleAPIpath(Readarr, "/updateauthor", readarrUpdateAuthor, "PUT")
 }
 
 // ReadarrConfig represents the input data for a Readarr server.
@@ -151,33 +152,6 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 	return false
 }
 
-func readarrGetAuthor(r *http.Request) (int, interface{}) {
-	authorID, _ := strconv.ParseInt(mux.Vars(r)["authorid"], 10, 64)
-
-	author, err := getReadarr(r).GetAuthorByID(authorID)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting author: %w", err)
-	}
-
-	return http.StatusOK, author
-}
-
-func readarrUpdateAuthor(r *http.Request) (int, interface{}) {
-	var author readarr.Author
-
-	err := json.NewDecoder(r.Body).Decode(&author)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	}
-
-	err = getReadarr(r).UpdateAuthor(author.ID, &author)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating author: %w", err)
-	}
-
-	return http.StatusOK, "readarr seems to have worked"
-}
-
 func readarrGetBook(r *http.Request) (int, interface{}) {
 	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], 10, 64)
 
@@ -231,4 +205,31 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusCreated, book
+}
+
+func readarrGetAuthor(r *http.Request) (int, interface{}) {
+	authorID, _ := strconv.ParseInt(mux.Vars(r)["authorid"], 10, 64)
+
+	author, err := getReadarr(r).GetAuthorByID(authorID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting author: %w", err)
+	}
+
+	return http.StatusOK, author
+}
+
+func readarrUpdateAuthor(r *http.Request) (int, interface{}) {
+	var author readarr.Author
+
+	err := json.NewDecoder(r.Body).Decode(&author)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	err = getReadarr(r).UpdateAuthor(author.ID, &author)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating author: %w", err)
+	}
+
+	return http.StatusOK, "readarr seems to have worked"
 }

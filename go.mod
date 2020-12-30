@@ -3,6 +3,7 @@ module github.com/Go-Lift-TV/discordnotifier-client
 go 1.15
 
 replace golift.io/starr => ../../../golift.io/starr
+
 require (
 	github.com/gen2brain/dlgs v0.0.0-20201118155338-03fe7f81ad25
 	github.com/getlantern/golog v0.0.0-20201105130739-9586b8bde3a9 // indirect
@@ -16,6 +17,6 @@ require (
 	golang.org/x/sys v0.0.0-20201223074533-0d417f636930 // indirect
 	golift.io/cnfg v0.0.7
 	golift.io/rotatorr v0.0.0-20201213130124-94efc0b9aff1
-	golift.io/starr v0.9.5-0.20201225031430-d96b4216b1b8
+	golift.io/starr v0.9.5-0.20201230203645-502d24215ae9
 	golift.io/version v0.0.2
 )

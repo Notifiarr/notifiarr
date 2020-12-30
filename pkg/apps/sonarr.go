@@ -112,15 +112,22 @@ func sonarrSearchSeries(r *http.Request) (int, interface{}) {
 	for _, s := range series {
 		if seriesSearch(query, s.Title, s.AlternateTitles) {
 			b := map[string]interface{}{
-				"id":     s.ID,
-				"title":  s.Title,
-				"first":  s.FirstAired,
-				"next":   s.NextAiring,
-				"prev":   s.PreviousAiring,
-				"added":  s.Added,
-				"status": s.Status,
-				"exists": false,
-				"path":   s.Path,
+				"id":                s.ID,
+				"title":             s.Title,
+				"first":             s.FirstAired,
+				"next":              s.NextAiring,
+				"prev":              s.PreviousAiring,
+				"added":             s.Added,
+				"status":            s.Status,
+				"exists":            false,
+				"path":              s.Path,
+				"tvdbId":            s.TvdbID,
+				"monitored":         s.Monitored,
+				"qualityProfileId":  s.QualityProfileID,
+				"seasonFolder":      s.SeasonFolder,
+				"seriesType":        s.SeriesType,
+				"languageProfileId": s.LanguageProfileID,
+				"seasons":           s.Seasons,
 			}
 
 			if s.Statistics != nil {
