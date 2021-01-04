@@ -49,6 +49,7 @@ func (c *Client) readyTray() {
 	c.menu["alert"].Hide() // currently unused.
 	c.menu["update"].Hide()
 
+	go c.watchKillerChannels()
 	c.StartWebServer()
 	c.watchGuiChannels()
 }
@@ -86,9 +87,25 @@ func (c *Client) makeChannels() {
 	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
 }
 
-func (c *Client) watchGuiChannels() {
-	defer systray.Quit() // this kills the app.
+func (c *Client) watchKillerChannels() {
+	defer systray.Quit() // this kills the app
 
+	for {
+		select {
+		case sigc := <-c.sighup:
+			c.Printf("Caught Signal: %v (reloading configuration)", sigc)
+			c.reloadConfiguration()
+		case sigc := <-c.sigkil:
+			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
+			return
+		case <-c.menu["exit"].Clicked():
+			c.Errorf("Need help? %s\n=====> Exiting! User Requested", helpLink)
+			return
+		}
+	}
+}
+
+func (c *Client) watchGuiChannels() {
 	for {
 		// nolint:errcheck
 		select {
@@ -124,17 +141,8 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["update"].Clicked():
 			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/releases")
 		case <-c.menu["dninfo"].Clicked():
-			ui.Info(Title, "INFO: "+c.info)
 			c.menu["dninfo"].Hide()
-		case sigc := <-c.sighup:
-			c.Printf("Caught Signal: %v (reloading configuration)", sigc)
-			c.reloadConfiguration()
-		case sigc := <-c.sigkil:
-			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
-			return
-		case <-c.menu["exit"].Clicked():
-			c.Errorf("Need help? %s\n=====> Exiting! User Requested", helpLink)
-			return
+			ui.Info(Title, "INFO: "+c.info)
 		}
 	}
 }

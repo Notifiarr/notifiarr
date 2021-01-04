@@ -59,6 +59,7 @@ var (
 	ErrNoLidarr  = fmt.Errorf("configured lidarr ID not found")
 	ErrNoReadarr = fmt.Errorf("configured readarr ID not found")
 	ErrExists    = fmt.Errorf("the requested item already exists")
+	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
 )
 
 // APIHandler is our custom handler function for APIs.
@@ -94,7 +95,7 @@ func (a *Apps) HandleAPIpath(app App, api string, next APIHandler, method ...str
 				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr), start)
 
 			// These store the application configuration (starr) in a context then pass that into the next method.
-			// They retrieve the return code and output, then send a response (a.respond).
+			// They retrieve the return code and output, then send a response (a.Respond).
 			case app == Radarr:
 				i, m := next(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
 				a.Respond(w, i, m, start)
@@ -116,9 +117,10 @@ func (a *Apps) checkAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-Key") != a.APIKey {
 			w.WriteHeader(http.StatusUnauthorized)
-		} else {
-			next.ServeHTTP(w, r)
+			return
 		}
+
+		next.ServeHTTP(w, r)
 	})
 }
 
@@ -133,22 +135,23 @@ func (a *Apps) InitHandlers() {
 // Setup creates request interfaces and sets the timeout for each server.
 func (a *Apps) Setup(timeout time.Duration) {
 	for i := range a.Radarr {
-		a.Radarr[i].fix(timeout)
+		a.Radarr[i].setup(timeout)
 	}
 
 	for i := range a.Readarr {
-		a.Readarr[i].fix(timeout)
+		a.Readarr[i].setup(timeout)
 	}
 
 	for i := range a.Sonarr {
-		a.Sonarr[i].fix(timeout)
+		a.Sonarr[i].setup(timeout)
 	}
 
 	for i := range a.Lidarr {
-		a.Lidarr[i].fix(timeout)
+		a.Lidarr[i].setup(timeout)
 	}
 }
 
+// Respond sends a standard response to our caller. JSON encoded blobs.
 func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {
 	w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
 	w.Header().Set("Content-Type", "application/json")
@@ -157,13 +160,19 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start t
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
 	if m, ok := msg.(error); ok {
-		a.ErrorLog.Printf("Status: %s, Message: %v", statusTxt, m)
+		a.ErrorLog.Printf("Request failed. Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
-	b, _ := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
-	_, _ = w.Write(b)
-	_, _ = w.Write([]byte("\n")) // curl likes new lines.
+	b, err := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
+	if err != nil {
+		a.ErrorLog.Printf("JSON marshal failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
+	}
+
+	size, err := w.Write(append(b, '\n')) // curl likes new lines.
+	if err != nil {
+		a.ErrorLog.Printf("Response failed. Written: %d/%d, Status: %s, Error: %v", size, len(b)+1, statusTxt, err)
+	}
 }
 
 /* Every API call runs one of these methods to find the interface for the respective app. */

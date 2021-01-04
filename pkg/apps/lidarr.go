@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -18,10 +20,16 @@ mbid - music brainz is the source for lidarr (todo)
 // lidarrHandlers is called once on startup to register the web API paths.
 func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(Lidarr, "/add", lidarrAddAlbum, "POST")
-	a.HandleAPIpath(Lidarr, "/check/{albumid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/check/{mbid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/search/{query}", lidarrSearchAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/get/{albumid:[0-9]+}", lidarrGetAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/update", lidarrUpdateAlbum, "PUT")
 	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrProfiles, "GET")
 	a.HandleAPIpath(Lidarr, "/qualityDefinitions", lidarrQualityDefs, "GET")
+	a.HandleAPIpath(Lidarr, "/metadataProfiles", lidarrMetadata, "GET")
 	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
+	a.HandleAPIpath(Lidarr, "/artist/{artistid:[0-9]+}", lidarrGetArtist, "GET")
+	a.HandleAPIpath(Lidarr, "/updateartist", lidarrUpdateArtist, "PUT")
 }
 
 // LidarrConfig represents the input data for a Lidarr server.
@@ -30,7 +38,7 @@ type LidarrConfig struct {
 	lidarr *lidarr.Lidarr
 }
 
-func (r *LidarrConfig) fix(timeout time.Duration) {
+func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.lidarr = lidarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
@@ -69,6 +77,21 @@ func lidarrProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+func lidarrMetadata(r *http.Request) (int, interface{}) {
+	profiles, err := getLidarr(r).GetMetadataProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	// Format profile ID=>Name into a nice map.
+	p := make(map[int64]string)
+	for i := range profiles {
+		p[profiles[i].ID] = profiles[i].Name
+	}
+
+	return http.StatusOK, p
+}
+
 func lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
 	definitions, err := getLidarr(r).GetQualityDefinition()
@@ -86,40 +109,148 @@ func lidarrQualityDefs(r *http.Request) (int, interface{}) {
 }
 
 func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
-	// Check for existing movie.
-	if m, err := getLidarr(r).GetAlbum(mux.Vars(r)["albumid"]); err != nil {
+	id := mux.Vars(r)["mbid"]
+
+	m, err := getLidarr(r).GetAlbum(id)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", mux.Vars(r)["albumid"], ErrExists)
+		return http.StatusConflict, fmt.Errorf("%s: %w", id, ErrExists)
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
+func lidarrGetAlbum(r *http.Request) (int, interface{}) {
+	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], 10, 64)
+
+	album, err := getLidarr(r).GetAlbumByID(albumID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
+	}
+
+	return http.StatusOK, album
+}
+
+func lidarrGetArtist(r *http.Request) (int, interface{}) {
+	artistID, _ := strconv.ParseInt(mux.Vars(r)["artistid"], 10, 64)
+
+	artist, err := getLidarr(r).GetArtistByID(artistID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking artist: %w", err)
+	}
+
+	return http.StatusOK, artist
+}
+
+func lidarrUpdateAlbum(r *http.Request) (int, interface{}) {
+	var album lidarr.Album
+
+	err := json.NewDecoder(r.Body).Decode(&album)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getLidarr(r).UpdateAlbum(album.ID, &album)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating album: %w", err)
+	}
+
+	return http.StatusOK, "success"
+}
+
+func lidarrUpdateArtist(r *http.Request) (int, interface{}) {
+	var artist lidarr.Artist
+
+	err := json.NewDecoder(r.Body).Decode(&artist)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getLidarr(r).UpdateArtist(&artist)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating artist: %w", err)
+	}
+
+	return http.StatusOK, "success"
+}
+
 func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	var payload lidarr.AddAlbumInput
-	// Extract payload and check for TMDB ID.
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	} else if payload == nil {
-		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
+	} else if payload.ForeignAlbumID == "" {
+		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoMBID)
 	}
 
-	lidar := getLidarr(r)
+	app := getLidarr(r)
 	// Check for existing album.
-	/* broken:
-	if m, err := lidar.GetAlbum(payload.AlbumID); err != nil {
+	m, err := app.GetAlbum(payload.ForeignAlbumID)
+	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", payload.AlbumID, ErrExists)
+		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignAlbumID, ErrExists)
 	}
-	*/
 
-	// Add book using payload.
-	book, err := lidar.AddAlbum(&payload)
+	album, err := app.AddAlbum(&payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding album: %w", err)
 	}
 
-	return http.StatusCreated, book
+	return http.StatusCreated, album
+}
+
+func lidarrSearchAlbum(r *http.Request) (int, interface{}) {
+	albums, err := getLidarr(r).GetAlbum("")
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting albums: %w", err)
+	}
+
+	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
+	output := make([]map[string]interface{}, 0)                       // out
+
+	for _, album := range albums {
+		if albumSearch(query, album.Title, album.Releases) {
+			a := map[string]interface{}{
+				"id":         album.ID,
+				"mbid":       album.ForeignAlbumID,
+				"metadataId": album.Artist.MetadataProfileID,
+				"qualityId":  album.Artist.QualityProfileID,
+				"title":      album.Title,
+				"release":    album.ReleaseDate,
+				"artistId":   album.ArtistID,
+				"artistName": album.Artist.ArtistName,
+				"profileId":  album.ProfileID,
+				"overview":   album.Overview,
+				"ratings":    album.Ratings.Value,
+				"type":       album.AlbumType,
+				"exists":     false,
+				"files":      0,
+			}
+
+			if album.Statistics != nil {
+				a["exists"] = album.Statistics.SizeOnDisk > 0
+			}
+
+			output = append(output, a)
+		}
+	}
+
+	return http.StatusOK, output
+}
+
+func albumSearch(query, title string, releases []*lidarr.Release) bool {
+	if strings.Contains(strings.ToLower(title), query) {
+		return true
+	}
+
+	for _, t := range releases {
+		if strings.Contains(strings.ToLower(t.Title), query) {
+			return true
+		}
+	}
+
+	return false
 }
