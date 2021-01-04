@@ -297,7 +297,7 @@ package_build_linux_armhf: package_build_linux armhf
 	cp $(BINARY).armhf.linux $@/usr/bin/$(BINARY)
 
 # Build an environment that can be packaged for freebsd.
-package_build_freebsd: readme man freebsd
+package_build_freebsd: readme man after-install-rendered.sh before-remove-rendered.sh freebsd
 	mkdir -p $@/usr/local/bin $@/usr/local/etc/$(BINARY) $@/usr/local/share/man/man1 $@/usr/local/share/doc/$(BINARY)
 	cp $(BINARY).amd64.freebsd $@/usr/local/bin/$(BINARY)
 	cp *.1.gz $@/usr/local/share/man/man1
