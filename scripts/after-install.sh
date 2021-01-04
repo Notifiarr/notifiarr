@@ -5,9 +5,23 @@
 # Edit this file as needed for your application.
 # This file is only installed if FORMULA is set to service.
 
-# Make a user and group for this app, but only if it does not already exist.
-id {{BINARY}} >/dev/null 2>&1  || \
-  useradd --system --user-group --no-create-home --home-dir /tmp --shell /bin/false {{BINARY}}
+OS=$(uname -s)
+
+if [ "$OS" == "Linux" ]; then
+  # Make a user and group for this app, but only if it does not already exist.
+  id {{BINARY}} >/dev/null 2>&1  || \
+    useradd --system --user-group --no-create-home --home-dir /tmp --shell /bin/false {{BINARY}}
+fi
+
+if [ "$OS" == "OpenBSD" ]; then
+  id {{BINARY}} >/dev/null 2>&1  || \
+    useradd  -g =uid -d /tmp -s /bin/false {{BINARY}}
+fi
+
+if [ "$OS" == "FreeBSD" ]; then
+  id {{BINARY}} >/dev/null 2>&1  || \
+    pw useradd {{BINARY}} -g "" -d /tmp -w no -s /bin/false
+fi
 
 if [ -x "/bin/systemctl" ]; then
   # Reload and restart - this starts the application as user nobody.
