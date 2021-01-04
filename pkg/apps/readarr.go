@@ -41,8 +41,8 @@ func (r *ReadarrConfig) setup(timeout time.Duration) {
 	}
 }
 
+// Get folder list from Readarr.
 func readarrRootFolders(r *http.Request) (int, interface{}) {
-	// Get folder list from Readarr.
 	folders, err := getReadarr(r).GetRootFolders()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
@@ -57,8 +57,8 @@ func readarrRootFolders(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// Get the metadata profiles from readarr.
 func readarrMetaProfiles(r *http.Request) (int, interface{}) {
-	// Get the metadata profiles from readarr.
 	profiles, err := getReadarr(r).GetMetadataProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
@@ -73,8 +73,8 @@ func readarrMetaProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// Get the profiles from readarr.
 func readarrProfiles(r *http.Request) (int, interface{}) {
-	// Get the profiles from readarr.
 	profiles, err := getReadarr(r).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
@@ -89,9 +89,9 @@ func readarrProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// Check for existing book.
 func readarrCheckBook(r *http.Request) (int, interface{}) {
 	grid, _ := strconv.ParseInt(mux.Vars(r)["grid"], 10, 64)
-	// Check for existing book.
 	m, err := getReadarr(r).GetBook(grid)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
