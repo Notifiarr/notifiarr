@@ -174,6 +174,7 @@ func lidarrUpdateArtist(r *http.Request) (int, interface{}) {
 
 	return http.StatusOK, "success"
 }
+
 func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	var payload lidarr.AddAlbumInput
 

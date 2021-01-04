@@ -92,6 +92,7 @@ func readarrProfiles(r *http.Request) (int, interface{}) {
 // Check for existing book.
 func readarrCheckBook(r *http.Request) (int, interface{}) {
 	grid, _ := strconv.ParseInt(mux.Vars(r)["grid"], 10, 64)
+
 	m, err := getReadarr(r).GetBook(grid)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
