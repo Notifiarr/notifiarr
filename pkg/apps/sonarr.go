@@ -119,7 +119,6 @@ func sonarrSearchSeries(r *http.Request) (int, interface{}) {
 				"prev":              s.PreviousAiring,
 				"added":             s.Added,
 				"status":            s.Status,
-				"exists":            false,
 				"path":              s.Path,
 				"tvdbId":            s.TvdbID,
 				"monitored":         s.Monitored,
@@ -128,6 +127,7 @@ func sonarrSearchSeries(r *http.Request) (int, interface{}) {
 				"seriesType":        s.SeriesType,
 				"languageProfileId": s.LanguageProfileID,
 				"seasons":           s.Seasons,
+				"exists":            false,
 			}
 
 			if s.Statistics != nil {
