@@ -16,12 +16,12 @@ import (
 // radarrHandlers is called once on startup to register the web API paths.
 func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/add", radarrAddMovie, "POST")
-	a.HandleAPIpath(Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(Radarr, "/check/{tmdbid:[0-9]+}", radarrCheckMovie, "GET")
 	a.HandleAPIpath(Radarr, "/get/{movieid:[0-9]+}", radarrGetMovie, "GET")
-	a.HandleAPIpath(Radarr, "/update", radarrUpdateMovie, "PUT")
 	a.HandleAPIpath(Radarr, "/qualityProfiles", radarrProfiles, "GET")
 	a.HandleAPIpath(Radarr, "/rootFolder", radarrRootFolders, "GET")
+	a.HandleAPIpath(Radarr, "/search/{query}", radarrSearchMovie, "GET")
+	a.HandleAPIpath(Radarr, "/update", radarrUpdateMovie, "PUT")
 }
 
 // RadarrConfig represents the input data for a Radarr server.
@@ -37,36 +37,41 @@ func (r *RadarrConfig) setup(timeout time.Duration) {
 	}
 }
 
-func radarrRootFolders(r *http.Request) (int, interface{}) {
-	// Get folder list from Radarr.
-	folders, err := getRadarr(r).GetRootFolders()
+func radarrAddMovie(r *http.Request) (int, interface{}) {
+	var payload radarr.AddMovieInput
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	} else if payload.TmdbID == 0 {
+		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
 	}
 
-	// Format folder list into a nice path=>freesSpace map.
-	p := make(map[string]int64)
-	for i := range folders {
-		p[folders[i].Path] = folders[i].FreeSpace
-	}
-
-	return http.StatusOK, p
-}
-
-func radarrProfiles(r *http.Request) (int, interface{}) {
-	// Get the profiles from radarr.
-	profiles, err := getRadarr(r).GetQualityProfiles()
+	app := getRadarr(r)
+	// Check for existing movie.
+	m, err := app.GetMovie(payload.TmdbID)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TmdbID, ErrExists)
 	}
 
-	// Format profile ID=>Name into a nice map.
-	p := make(map[int64]string)
-	for i := range profiles {
-		p[profiles[i].ID] = profiles[i].Name
+	if payload.Title == "" {
+		// Title must exist, even if it's wrong.
+		payload.Title = strconv.FormatInt(payload.TmdbID, 10)
 	}
 
-	return http.StatusOK, p
+	if payload.MinimumAvailability == "" {
+		payload.MinimumAvailability = "released"
+	}
+
+	// Add movie using fixed payload.
+	movie, err := app.AddMovie(&payload)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
+	}
+
+	return http.StatusCreated, movie
 }
 
 func radarrCheckMovie(r *http.Request) (int, interface{}) {
@@ -91,6 +96,38 @@ func radarrGetMovie(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, movie
+}
+
+func radarrProfiles(r *http.Request) (int, interface{}) {
+	// Get the profiles from radarr.
+	profiles, err := getRadarr(r).GetQualityProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	// Format profile ID=>Name into a nice map.
+	p := make(map[int64]string)
+	for i := range profiles {
+		p[profiles[i].ID] = profiles[i].Name
+	}
+
+	return http.StatusOK, p
+}
+
+func radarrRootFolders(r *http.Request) (int, interface{}) {
+	// Get folder list from Radarr.
+	folders, err := getRadarr(r).GetRootFolders()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
+	}
+
+	// Format folder list into a nice path=>freesSpace map.
+	p := make(map[string]int64)
+	for i := range folders {
+		p[folders[i].Path] = folders[i].FreeSpace
+	}
+
+	return http.StatusOK, p
 }
 
 func radarrSearchMovie(r *http.Request) (int, interface{}) {
@@ -156,41 +193,4 @@ func radarrUpdateMovie(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "radarr seems to have worked"
-}
-
-func radarrAddMovie(r *http.Request) (int, interface{}) {
-	var payload radarr.AddMovieInput
-	// Extract payload and check for TMDB ID.
-	err := json.NewDecoder(r.Body).Decode(&payload)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	} else if payload.TmdbID == 0 {
-		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
-	}
-
-	app := getRadarr(r)
-	// Check for existing movie.
-	m, err := app.GetMovie(payload.TmdbID)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
-	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TmdbID, ErrExists)
-	}
-
-	if payload.Title == "" {
-		// Title must exist, even if it's wrong.
-		payload.Title = strconv.FormatInt(payload.TmdbID, 10)
-	}
-
-	if payload.MinimumAvailability == "" {
-		payload.MinimumAvailability = "released"
-	}
-
-	// Add movie using fixed payload.
-	movie, err := app.AddMovie(&payload)
-	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
-	}
-
-	return http.StatusCreated, movie
 }

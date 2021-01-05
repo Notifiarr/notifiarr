@@ -54,10 +54,10 @@ var (
 	ErrNoGRID    = fmt.Errorf("GRID ID must not be empty")
 	ErrNoTVDB    = fmt.Errorf("TVDB ID must not be empty")
 	ErrNoMBID    = fmt.Errorf("MBID ID must not be empty")
-	ErrNoRadarr  = fmt.Errorf("configured radarr ID not found")
-	ErrNoSonarr  = fmt.Errorf("configured sonarr ID not found")
-	ErrNoLidarr  = fmt.Errorf("configured lidarr ID not found")
-	ErrNoReadarr = fmt.Errorf("configured readarr ID not found")
+	ErrNoRadarr  = fmt.Errorf("configured %s ID not found", Radarr)
+	ErrNoSonarr  = fmt.Errorf("configured %s ID not found", Sonarr)
+	ErrNoLidarr  = fmt.Errorf("configured %s ID not found", Lidarr)
+	ErrNoReadarr = fmt.Errorf("configured %s ID not found", Readarr)
 	ErrExists    = fmt.Errorf("the requested item already exists")
 	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
 )
@@ -66,7 +66,6 @@ var (
 type APIHandler func(r *http.Request) (int, interface{})
 
 // HandleAPIpath makes adding API paths a little cleaner.
-// This grabs the app struct and saves it in a context before calling the handler.
 func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) {
 	if len(method) == 0 {
 		method = []string{"GET"}
@@ -78,10 +77,11 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 	}
 
 	uri = path.Join("/", a.URLBase, "api", string(app), id, uri)
-	a.Router.Handle(uri, a.checkAPIKey(a.handleAPIpath(app, api))).Methods(method...)
+	a.Router.Handle(uri, a.checkAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
 
-func (a *Apps) handleAPIpath(app App, api APIHandler) http.HandlerFunc {
+// This grabs the app struct and saves it in a context before calling the handler.
+func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(mux.Vars(r)["id"])
 
@@ -94,7 +94,7 @@ func (a *Apps) handleAPIpath(app App, api APIHandler) http.HandlerFunc {
 			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr), time.Since(start))
 		case app == Readarr && (id > len(a.Readarr) || id < 1):
 			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr), time.Since(start))
-		// These store the application configuration (starr) in a context then pass that into the next method.
+		// These store the application configuration (starr) in a context then pass that into the api() method.
 		// They retrieve the return code and output, then send a response (a.Respond).
 		// disccordnotifier.com uses 1-indexes, so we subtract 1 from the ID (turn 1 into 0).
 		case app == Radarr:
