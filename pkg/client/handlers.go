@@ -111,7 +111,7 @@ func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
 }
 
 func (c *Client) slowResponse(r *http.Request) (int, interface{}) {
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond) //nolint:gomnd
 	return http.StatusOK, ""
 }
 
