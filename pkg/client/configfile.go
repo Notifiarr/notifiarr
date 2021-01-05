@@ -24,7 +24,7 @@ const (
 )
 
 func (c *Client) getConfig() (string, error) {
-	defer c.fixConfigs()
+	defer c.setupConfig()
 
 	var f, msg string
 
@@ -65,10 +65,13 @@ func (c *Client) getConfig() (string, error) {
 	return msg, nil
 }
 
-func (c *Client) fixConfigs() {
+func (c *Client) setupConfig() {
 	if c.Config.Timeout.Duration == 0 {
 		c.Config.Timeout.Duration = DefaultTimeout
 	}
+
+	// Make sure each app has a sane timeout.
+	c.Config.Apps.Setup(c.Config.Timeout.Duration)
 
 	if c.Config.BindAddr == "" {
 		c.Config.BindAddr = DefaultBindAddr

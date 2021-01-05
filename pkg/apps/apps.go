@@ -54,10 +54,10 @@ var (
 	ErrNoGRID    = fmt.Errorf("GRID ID must not be empty")
 	ErrNoTVDB    = fmt.Errorf("TVDB ID must not be empty")
 	ErrNoMBID    = fmt.Errorf("MBID ID must not be empty")
-	ErrNoRadarr  = fmt.Errorf("configured radarr ID not found")
-	ErrNoSonarr  = fmt.Errorf("configured sonarr ID not found")
-	ErrNoLidarr  = fmt.Errorf("configured lidarr ID not found")
-	ErrNoReadarr = fmt.Errorf("configured readarr ID not found")
+	ErrNoRadarr  = fmt.Errorf("configured %s ID not found", Radarr)
+	ErrNoSonarr  = fmt.Errorf("configured %s ID not found", Sonarr)
+	ErrNoLidarr  = fmt.Errorf("configured %s ID not found", Lidarr)
+	ErrNoReadarr = fmt.Errorf("configured %s ID not found", Readarr)
 	ErrExists    = fmt.Errorf("the requested item already exists")
 	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
 )
@@ -66,8 +66,7 @@ var (
 type APIHandler func(r *http.Request) (int, interface{})
 
 // HandleAPIpath makes adding API paths a little cleaner.
-// This grabs the app struct and saves it in a context before calling the handler.
-func (a *Apps) HandleAPIpath(app App, api string, next APIHandler, method ...string) {
+func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
@@ -77,43 +76,50 @@ func (a *Apps) HandleAPIpath(app App, api string, next APIHandler, method ...str
 		id = ""
 	}
 
-	// disccordnotifier uses 1-indexes.
-	a.Router.Handle(path.Join("/", a.URLBase, "api", string(app), id, api),
-		a.checkAPIKey(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now() // Capture the starr app request time in a response header.
-			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
-			default: // unknown app, just run the handler.
-				i, m := next(r)
-				a.Respond(w, i, m, start)
-			case app == Radarr && (id > len(a.Radarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr), start)
-			case app == Lidarr && (id > len(a.Lidarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr), start)
-			case app == Sonarr && (id > len(a.Sonarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr), start)
-			case app == Readarr && (id > len(a.Readarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr), start)
-
-			// These store the application configuration (starr) in a context then pass that into the next method.
-			// They retrieve the return code and output, then send a response (a.Respond).
-			case app == Radarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
-				a.Respond(w, i, m, start)
-			case app == Lidarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Lidarr, a.Lidarr[id-1])))
-				a.Respond(w, i, m, start)
-			case app == Sonarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Sonarr, a.Sonarr[id-1])))
-				a.Respond(w, i, m, start)
-			case app == Readarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Readarr, a.Readarr[id-1])))
-				a.Respond(w, i, m, start)
-			}
-		}))).Methods(method...)
+	uri = path.Join("/", a.URLBase, "api", string(app), id, uri)
+	a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
 
-// checkAPIKey drops a 403 if the API key doesn't match.
-func (a *Apps) checkAPIKey(next http.Handler) http.Handler {
+// This grabs the app struct and saves it in a context before calling the handler.
+// The purpose of this complicated monster is to keep API handler methods simple.
+func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+		switch start := time.Now(); {
+		case app == Radarr && (id > len(a.Radarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr), time.Since(start))
+		case app == Lidarr && (id > len(a.Lidarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr), time.Since(start))
+		case app == Sonarr && (id > len(a.Sonarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr), time.Since(start))
+		case app == Readarr && (id > len(a.Readarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr), time.Since(start))
+		// These store the application configuration (starr) in a context then pass that into the api() method.
+		// They retrieve the return code and output, then send a response (a.Respond).
+		// disccordnotifier.com uses 1-indexes, so we subtract 1 from the ID (turn 1 into 0).
+		case app == Radarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		case app == Lidarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Lidarr, a.Lidarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		case app == Sonarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Sonarr, a.Sonarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		case app == Readarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Readarr, a.Readarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		default:
+			// unknown app, just run the handler.
+			code, msg := api(r)
+			a.Respond(w, code, msg, time.Since(start))
+		}
+	}
+}
+
+// CheckAPIKey drops a 403 if the API key doesn't match, otherwise run next handler.
+func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-Key") != a.APIKey {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -124,7 +130,7 @@ func (a *Apps) checkAPIKey(next http.Handler) http.Handler {
 	})
 }
 
-// InitHandlers activates all our handlers.
+// InitHandlers activates all our handlers. This is part of the web server init.
 func (a *Apps) InitHandlers() {
 	a.radarrHandlers()
 	a.readarrHandlers()
@@ -133,6 +139,7 @@ func (a *Apps) InitHandlers() {
 }
 
 // Setup creates request interfaces and sets the timeout for each server.
+// This is part of the config/startup init.
 func (a *Apps) Setup(timeout time.Duration) {
 	for i := range a.Radarr {
 		a.Radarr[i].setup(timeout)
@@ -152,10 +159,16 @@ func (a *Apps) Setup(timeout time.Duration) {
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {
-	w.Header().Set("X-Request-Time", time.Since(start).Round(time.Microsecond).String())
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(stat)
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime time.Duration) {
+	w.Header().Set("X-Request-Time", fmt.Sprintf("%dms", reqTime.Milliseconds()))
+
+	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
+		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
+		w.Header().Set("Location", msg.(string))
+		w.WriteHeader(stat)
+
+		return
+	}
 
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
@@ -164,14 +177,14 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start t
 		msg = m.Error()
 	}
 
-	b, err := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
-	if err != nil {
-		a.ErrorLog.Printf("JSON marshal failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
-	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(stat)
+	json := json.NewEncoder(w)
+	json.SetEscapeHTML(false)
 
-	size, err := w.Write(append(b, '\n')) // curl likes new lines.
+	err := json.Encode(map[string]interface{}{"status": statusTxt, "message": msg})
 	if err != nil {
-		a.ErrorLog.Printf("Response failed. Written: %d/%d, Status: %s, Error: %v", size, len(b)+1, statusTxt, err)
+		a.ErrorLog.Printf("JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
 }
 

@@ -17,12 +17,12 @@ import (
 func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/add", sonarrAddSeries, "POST")
 	a.HandleAPIpath(Sonarr, "/check/{tvdbid:[0-9]+}", sonarrCheckSeries, "GET")
-	a.HandleAPIpath(Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/get/{seriesid:[0-9]+}", sonarrGetSeries, "GET")
-	a.HandleAPIpath(Sonarr, "/update", sonarrUpdateSeries, "PUT")
-	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/languageProfiles", sonarrLangProfiles, "GET")
+	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/rootFolder", sonarrRootFolders, "GET")
+	a.HandleAPIpath(Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
+	a.HandleAPIpath(Sonarr, "/update", sonarrUpdateSeries, "PUT")
 }
 
 // SonarrConfig represents the input data for a Sonarr server.
@@ -38,17 +38,68 @@ func (r *SonarrConfig) setup(timeout time.Duration) {
 	}
 }
 
-func sonarrRootFolders(r *http.Request) (int, interface{}) {
-	// Get folder list from Sonarr.
-	folders, err := getSonarr(r).GetRootFolders()
+func sonarrAddSeries(r *http.Request) (int, interface{}) {
+	var payload sonarr.AddSeriesInput
+	// Extract payload and check for TVDB ID.
+	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	} else if payload.TvdbID == 0 {
+		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
 	}
 
-	// Format folder list into a nice path=>freesSpace map.
-	p := make(map[string]int64)
-	for i := range folders {
-		p[folders[i].Path] = folders[i].FreeSpace
+	app := getSonarr(r)
+	// Check for existing series.
+	m, err := app.GetSeries(payload.TvdbID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TvdbID, ErrExists)
+	}
+
+	series, err := app.AddSeries(&payload)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
+	}
+
+	return http.StatusCreated, series
+}
+
+func sonarrCheckSeries(r *http.Request) (int, interface{}) {
+	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], 10, 64)
+	// Check for existing series.
+	m, err := getSonarr(r).GetSeries(tvdbid)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%d: %w", tvdbid, ErrExists)
+	}
+
+	return http.StatusOK, http.StatusText(http.StatusNotFound)
+}
+
+func sonarrGetSeries(r *http.Request) (int, interface{}) {
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
+
+	series, err := getSonarr(r).GetSeriesByID(seriesID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+	}
+
+	return http.StatusOK, series
+}
+
+func sonarrLangProfiles(r *http.Request) (int, interface{}) {
+	// Get the profiles from sonarr.
+	profiles, err := getSonarr(r).GetLanguageProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting language profiles: %w", err)
+	}
+
+	// Format profile ID=>Name into a nice map.
+	p := make(map[int64]string)
+	for i := range profiles {
+		p[profiles[i].ID] = profiles[i].Name
 	}
 
 	return http.StatusOK, p
@@ -70,33 +121,20 @@ func sonarrProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func sonarrLangProfiles(r *http.Request) (int, interface{}) {
-	// Get the profiles from sonarr.
-	profiles, err := getSonarr(r).GetLanguageProfiles()
+func sonarrRootFolders(r *http.Request) (int, interface{}) {
+	// Get folder list from Sonarr.
+	folders, err := getSonarr(r).GetRootFolders()
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting language profiles: %w", err)
+		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
 
-	// Format profile ID=>Name into a nice map.
-	p := make(map[int64]string)
-	for i := range profiles {
-		p[profiles[i].ID] = profiles[i].Name
+	// Format folder list into a nice path=>freesSpace map.
+	p := make(map[string]int64)
+	for i := range folders {
+		p[folders[i].Path] = folders[i].FreeSpace
 	}
 
 	return http.StatusOK, p
-}
-
-func sonarrCheckSeries(r *http.Request) (int, interface{}) {
-	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], 10, 64)
-	// Check for existing series.
-	m, err := getSonarr(r).GetSeries(tvdbid)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
-	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", tvdbid, ErrExists)
-	}
-
-	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
 func sonarrSearchSeries(r *http.Request) (int, interface{}) {
@@ -155,17 +193,6 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 	return false
 }
 
-func sonarrGetSeries(r *http.Request) (int, interface{}) {
-	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
-
-	series, err := getSonarr(r).GetSeriesByID(seriesID)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
-	}
-
-	return http.StatusOK, series
-}
-
 func sonarrUpdateSeries(r *http.Request) (int, interface{}) {
 	var series sonarr.Series
 
@@ -180,31 +207,4 @@ func sonarrUpdateSeries(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "sonarr seems to have worked"
-}
-
-func sonarrAddSeries(r *http.Request) (int, interface{}) {
-	var payload sonarr.AddSeriesInput
-	// Extract payload and check for TVDB ID.
-	err := json.NewDecoder(r.Body).Decode(&payload)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	} else if payload.TvdbID == 0 {
-		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
-	}
-
-	app := getSonarr(r)
-	// Check for existing series.
-	m, err := app.GetSeries(payload.TvdbID)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
-	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TvdbID, ErrExists)
-	}
-
-	series, err := app.AddSeries(&payload)
-	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
-	}
-
-	return http.StatusCreated, series
 }

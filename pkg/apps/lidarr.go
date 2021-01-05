@@ -20,15 +20,15 @@ mbid - music brainz is the source for lidarr (todo)
 // lidarrHandlers is called once on startup to register the web API paths.
 func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(Lidarr, "/add", lidarrAddAlbum, "POST")
-	a.HandleAPIpath(Lidarr, "/check/{mbid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
-	a.HandleAPIpath(Lidarr, "/search/{query}", lidarrSearchAlbum, "GET")
-	a.HandleAPIpath(Lidarr, "/get/{albumid:[0-9]+}", lidarrGetAlbum, "GET")
-	a.HandleAPIpath(Lidarr, "/update", lidarrUpdateAlbum, "PUT")
-	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrProfiles, "GET")
-	a.HandleAPIpath(Lidarr, "/qualityDefinitions", lidarrQualityDefs, "GET")
-	a.HandleAPIpath(Lidarr, "/metadataProfiles", lidarrMetadata, "GET")
-	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
 	a.HandleAPIpath(Lidarr, "/artist/{artistid:[0-9]+}", lidarrGetArtist, "GET")
+	a.HandleAPIpath(Lidarr, "/check/{mbid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/get/{albumid:[0-9]+}", lidarrGetAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/metadataProfiles", lidarrMetadata, "GET")
+	a.HandleAPIpath(Lidarr, "/qualityDefinitions", lidarrQualityDefs, "GET")
+	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrProfiles, "GET")
+	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
+	a.HandleAPIpath(Lidarr, "/search/{query}", lidarrSearchAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/update", lidarrUpdateAlbum, "PUT")
 	a.HandleAPIpath(Lidarr, "/updateartist", lidarrUpdateArtist, "PUT")
 }
 
@@ -45,36 +45,66 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	}
 }
 
-func lidarrRootFolders(r *http.Request) (int, interface{}) {
-	// Get folder list from Lidarr.
-	folders, err := getLidarr(r).GetRootFolders()
+func lidarrAddAlbum(r *http.Request) (int, interface{}) {
+	var payload lidarr.AddAlbumInput
+
+	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	} else if payload.ForeignAlbumID == "" {
+		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoMBID)
 	}
 
-	// Format folder list into a nice path=>freesSpace map.
-	p := make(map[string]int64)
-	for i := range folders {
-		p[folders[i].Path] = folders[i].FreeSpace
+	app := getLidarr(r)
+	// Check for existing album.
+	m, err := app.GetAlbum(payload.ForeignAlbumID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignAlbumID, ErrExists)
 	}
 
-	return http.StatusOK, p
+	album, err := app.AddAlbum(&payload)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding album: %w", err)
+	}
+
+	return http.StatusCreated, album
 }
 
-func lidarrProfiles(r *http.Request) (int, interface{}) {
-	// Get the profiles from lidarr.
-	profiles, err := getLidarr(r).GetQualityProfiles()
+func lidarrGetArtist(r *http.Request) (int, interface{}) {
+	artistID, _ := strconv.ParseInt(mux.Vars(r)["artistid"], 10, 64)
+
+	artist, err := getLidarr(r).GetArtistByID(artistID)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return http.StatusServiceUnavailable, fmt.Errorf("checking artist: %w", err)
 	}
 
-	// Format profile ID=>Name into a nice map.
-	p := make(map[int64]string)
-	for i := range profiles {
-		p[profiles[i].ID] = profiles[i].Name
+	return http.StatusOK, artist
+}
+
+func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
+	id := mux.Vars(r)["mbid"]
+
+	m, err := getLidarr(r).GetAlbum(id)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
+	} else if len(m) > 0 {
+		return http.StatusConflict, fmt.Errorf("%s: %w", id, ErrExists)
 	}
 
-	return http.StatusOK, p
+	return http.StatusOK, http.StatusText(http.StatusNotFound)
+}
+
+func lidarrGetAlbum(r *http.Request) (int, interface{}) {
+	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], 10, 64)
+
+	album, err := getLidarr(r).GetAlbumByID(albumID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
+	}
+
+	return http.StatusOK, album
 }
 
 func lidarrMetadata(r *http.Request) (int, interface{}) {
@@ -108,98 +138,36 @@ func lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
-	id := mux.Vars(r)["mbid"]
-
-	m, err := getLidarr(r).GetAlbum(id)
+func lidarrProfiles(r *http.Request) (int, interface{}) {
+	// Get the profiles from lidarr.
+	profiles, err := getLidarr(r).GetQualityProfiles()
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
-	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", id, ErrExists)
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
 
-	return http.StatusOK, http.StatusText(http.StatusNotFound)
+	// Format profile ID=>Name into a nice map.
+	p := make(map[int64]string)
+	for i := range profiles {
+		p[profiles[i].ID] = profiles[i].Name
+	}
+
+	return http.StatusOK, p
 }
 
-func lidarrGetAlbum(r *http.Request) (int, interface{}) {
-	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], 10, 64)
-
-	album, err := getLidarr(r).GetAlbumByID(albumID)
+func lidarrRootFolders(r *http.Request) (int, interface{}) {
+	// Get folder list from Lidarr.
+	folders, err := getLidarr(r).GetRootFolders()
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
+		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
 
-	return http.StatusOK, album
-}
-
-func lidarrGetArtist(r *http.Request) (int, interface{}) {
-	artistID, _ := strconv.ParseInt(mux.Vars(r)["artistid"], 10, 64)
-
-	artist, err := getLidarr(r).GetArtistByID(artistID)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking artist: %w", err)
+	// Format folder list into a nice path=>freesSpace map.
+	p := make(map[string]int64)
+	for i := range folders {
+		p[folders[i].Path] = folders[i].FreeSpace
 	}
 
-	return http.StatusOK, artist
-}
-
-func lidarrUpdateAlbum(r *http.Request) (int, interface{}) {
-	var album lidarr.Album
-
-	err := json.NewDecoder(r.Body).Decode(&album)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	}
-
-	_, err = getLidarr(r).UpdateAlbum(album.ID, &album)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating album: %w", err)
-	}
-
-	return http.StatusOK, "success"
-}
-
-func lidarrUpdateArtist(r *http.Request) (int, interface{}) {
-	var artist lidarr.Artist
-
-	err := json.NewDecoder(r.Body).Decode(&artist)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	}
-
-	_, err = getLidarr(r).UpdateArtist(&artist)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating artist: %w", err)
-	}
-
-	return http.StatusOK, "success"
-}
-
-func lidarrAddAlbum(r *http.Request) (int, interface{}) {
-	var payload lidarr.AddAlbumInput
-
-	err := json.NewDecoder(r.Body).Decode(&payload)
-	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	} else if payload.ForeignAlbumID == "" {
-		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoMBID)
-	}
-
-	app := getLidarr(r)
-	// Check for existing album.
-	m, err := app.GetAlbum(payload.ForeignAlbumID)
-	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
-	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignAlbumID, ErrExists)
-	}
-
-	album, err := app.AddAlbum(&payload)
-	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding album: %w", err)
-	}
-
-	return http.StatusCreated, album
+	return http.StatusOK, p
 }
 
 func lidarrSearchAlbum(r *http.Request) (int, interface{}) {
@@ -253,4 +221,36 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 	}
 
 	return false
+}
+
+func lidarrUpdateAlbum(r *http.Request) (int, interface{}) {
+	var album lidarr.Album
+
+	err := json.NewDecoder(r.Body).Decode(&album)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getLidarr(r).UpdateAlbum(album.ID, &album)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating album: %w", err)
+	}
+
+	return http.StatusOK, "success"
+}
+
+func lidarrUpdateArtist(r *http.Request) (int, interface{}) {
+	var artist lidarr.Artist
+
+	err := json.NewDecoder(r.Body).Decode(&artist)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getLidarr(r).UpdateArtist(&artist)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating artist: %w", err)
+	}
+
+	return http.StatusOK, "success"
 }

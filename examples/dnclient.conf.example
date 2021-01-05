@@ -61,5 +61,9 @@ api_key = ""
 #api_key = ""
 
 #[[sonarr]]
-#url     = "http://127.0.0.1:8989/"
+#url     = "http://sonarr:8989/"
+#api_key = ""
+
+#[[lidarr]]
+#url     = "http://lidarr:8989/"
 #api_key = ""

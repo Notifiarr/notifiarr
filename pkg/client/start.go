@@ -151,7 +151,6 @@ func (c *Client) run(newConfig bool) error {
 		return ErrNoApps
 	}
 
-	c.Config.Apps.Setup(c.Config.Timeout.Duration)
 	c.PrintStartupInfo()
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)

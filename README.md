@@ -54,24 +54,32 @@ timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
 
 ##### Sonarr
 
-|Config Name|Variable Name|Default / Note|
+|Config Name|Variable Name|Note|
 |---|---|---|
 sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
 sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
 
 ##### Radarr
 
-|Config Name|Variable Name|Default / Note|
+|Config Name|Variable Name|Note|
 |---|---|---|
 radarr.url|`DN_RADARR_0_URL`|No Default. Something like: `http://localhost:7878`|
 radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you use Radarr|
 
 ##### Readarr
 
-|Config Name|Variable Name|Default / Note|
+|Config Name|Variable Name|Note|
 |---|---|---|
 readarr.url|`DN_READARR_0_URL`|No Default. Something like: `http://localhost:8787`|
 readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
+
+##### Lidarr
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+lidarr.url|`DN_LIDARR_0_URL`|No Default. Something like: `http://lidarr:8686`|
+lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
+
 
 ##### Example Usage
 
