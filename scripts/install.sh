@@ -111,7 +111,7 @@ INSTALLER="rpm -Uvh"
 if [ "$FILE" = "deb" ]; then
   INSTALLER="dpkg --force-confdef --force-confold --install"
 elif [ "$FILE" = "txz" ]; then
-  INSTALLER="pkg install"
+  INSTALLER="pkg install --yes"
 fi
 
 FILE=$(basename ${URL})
