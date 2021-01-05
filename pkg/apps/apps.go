@@ -154,8 +154,6 @@ func (a *Apps) Setup(timeout time.Duration) {
 // Respond sends a standard response to our caller. JSON encoded blobs.
 func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {
 	w.Header().Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(stat)
 
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
@@ -164,10 +162,21 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start t
 		msg = m.Error()
 	}
 
+	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
+		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
+		w.Header().Set("Location", msg.(string))
+		w.WriteHeader(stat)
+
+		return
+	}
+
 	b, err := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
 	if err != nil {
 		a.ErrorLog.Printf("JSON marshal failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(stat)
 
 	size, err := w.Write(append(b, '\n')) // curl likes new lines.
 	if err != nil {
