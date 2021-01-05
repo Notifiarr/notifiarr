@@ -104,6 +104,7 @@ func sonarrLangProfiles(r *http.Request) (int, interface{}) {
 
 	return http.StatusOK, p
 }
+
 func sonarrProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(r).GetQualityProfiles()

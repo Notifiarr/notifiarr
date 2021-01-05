@@ -77,10 +77,11 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 	}
 
 	uri = path.Join("/", a.URLBase, "api", string(app), id, uri)
-	a.Router.Handle(uri, a.checkAPIKey(a.handleAPI(app, api))).Methods(method...)
+	a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
+// The purpose of this complicated monster is to keep API handler methods simple.
 func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, _ := strconv.Atoi(mux.Vars(r)["id"])
@@ -117,8 +118,8 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 	}
 }
 
-// checkAPIKey drops a 403 if the API key doesn't match.
-func (a *Apps) checkAPIKey(next http.Handler) http.Handler {
+// CheckAPIKey drops a 403 if the API key doesn't match, otherwise run next handler.
+func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-API-Key") != a.APIKey {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -129,7 +130,7 @@ func (a *Apps) checkAPIKey(next http.Handler) http.Handler {
 	})
 }
 
-// InitHandlers activates all our handlers.
+// InitHandlers activates all our handlers. This is part of the web server init.
 func (a *Apps) InitHandlers() {
 	a.radarrHandlers()
 	a.readarrHandlers()
@@ -138,6 +139,7 @@ func (a *Apps) InitHandlers() {
 }
 
 // Setup creates request interfaces and sets the timeout for each server.
+// This is part of the config/startup init.
 func (a *Apps) Setup(timeout time.Duration) {
 	for i := range a.Radarr {
 		a.Radarr[i].setup(timeout)
@@ -160,13 +162,6 @@ func (a *Apps) Setup(timeout time.Duration) {
 func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime time.Duration) {
 	w.Header().Set("X-Request-Time", fmt.Sprintf("%dms", reqTime.Milliseconds()))
 
-	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
-
-	if m, ok := msg.(error); ok {
-		a.ErrorLog.Printf("Request failed. Status: %s, Message: %v", statusTxt, m)
-		msg = m.Error()
-	}
-
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
 		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
 		w.Header().Set("Location", msg.(string))
@@ -175,17 +170,21 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime
 		return
 	}
 
-	b, err := json.Marshal(map[string]interface{}{"status": statusTxt, "message": msg})
-	if err != nil {
-		a.ErrorLog.Printf("JSON marshal failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
+	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+
+	if m, ok := msg.(error); ok {
+		a.ErrorLog.Printf("Request failed. Status: %s, Message: %v", statusTxt, m)
+		msg = m.Error()
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
+	json := json.NewEncoder(w)
+	json.SetEscapeHTML(false)
 
-	size, err := w.Write(append(b, '\n')) // curl likes new lines.
+	err := json.Encode(map[string]interface{}{"status": statusTxt, "message": msg})
 	if err != nil {
-		a.ErrorLog.Printf("Response failed. Written: %d/%d, Status: %s, Error: %v", size, len(b)+1, statusTxt, err)
+		a.ErrorLog.Printf("JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
 }
 
