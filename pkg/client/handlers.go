@@ -103,7 +103,7 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
-	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.", "0ms")
+	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.", 0)
 }
 
 func (c *Client) statusResponse(r *http.Request) (int, interface{}) {

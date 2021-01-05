@@ -67,7 +67,7 @@ type APIHandler func(r *http.Request) (int, interface{})
 
 // HandleAPIpath makes adding API paths a little cleaner.
 // This grabs the app struct and saves it in a context before calling the handler.
-func (a *Apps) HandleAPIpath(app App, api string, next APIHandler, method ...string) {
+func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
@@ -77,44 +77,43 @@ func (a *Apps) HandleAPIpath(app App, api string, next APIHandler, method ...str
 		id = ""
 	}
 
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-		var (
-			id, _     = strconv.Atoi(mux.Vars(r)["id"])
-			start     = time.Now() // Capture the starr app request time in a response header.
-			code, msg = a.handleAPIpath(r, next, app, id)
-		)
-
-		a.Respond(w, code, msg, fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
-	}
-
-	a.Router.Handle(path.Join("/", a.URLBase, "api", string(app), id, api),
-		a.checkAPIKey(http.HandlerFunc(handlerFunc))).Methods(method...)
+	uri = path.Join("/", a.URLBase, "api", string(app), id, uri)
+	a.Router.Handle(uri, a.checkAPIKey(a.handleAPIpath(app, api))).Methods(method...)
 }
 
-func (a *Apps) handleAPIpath(r *http.Request, next APIHandler, app App, id int) (code int, msg interface{}) {
-	switch {
-	case app == Radarr && (id > len(a.Radarr) || id < 1):
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr)
-	case app == Lidarr && (id > len(a.Lidarr) || id < 1):
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr)
-	case app == Sonarr && (id > len(a.Sonarr) || id < 1):
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr)
-	case app == Readarr && (id > len(a.Readarr) || id < 1):
-		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr)
-	// These store the application configuration (starr) in a context then pass that into the next method.
-	// They retrieve the return code and output, then send a response (a.Respond).
-	// disccordnotifier.com uses 1-indexes, so we subtract 1 from the ID (turn 1 into 0).
-	case app == Radarr:
-		return next(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
-	case app == Lidarr:
-		return next(r.WithContext(context.WithValue(r.Context(), Lidarr, a.Lidarr[id-1])))
-	case app == Sonarr:
-		return next(r.WithContext(context.WithValue(r.Context(), Sonarr, a.Sonarr[id-1])))
-	case app == Readarr:
-		return next(r.WithContext(context.WithValue(r.Context(), Readarr, a.Readarr[id-1])))
-	default:
-		// unknown app, just run the handler.
-		return next(r)
+func (a *Apps) handleAPIpath(app App, api APIHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+		switch start := time.Now(); {
+		case app == Radarr && (id > len(a.Radarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr), time.Since(start))
+		case app == Lidarr && (id > len(a.Lidarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr), time.Since(start))
+		case app == Sonarr && (id > len(a.Sonarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr), time.Since(start))
+		case app == Readarr && (id > len(a.Readarr) || id < 1):
+			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr), time.Since(start))
+		// These store the application configuration (starr) in a context then pass that into the next method.
+		// They retrieve the return code and output, then send a response (a.Respond).
+		// disccordnotifier.com uses 1-indexes, so we subtract 1 from the ID (turn 1 into 0).
+		case app == Radarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		case app == Lidarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Lidarr, a.Lidarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		case app == Sonarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Sonarr, a.Sonarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		case app == Readarr:
+			code, msg := api(r.WithContext(context.WithValue(r.Context(), Readarr, a.Readarr[id-1])))
+			a.Respond(w, code, msg, time.Since(start))
+		default:
+			// unknown app, just run the handler.
+			code, msg := api(r)
+			a.Respond(w, code, msg, time.Since(start))
+		}
 	}
 }
 
@@ -158,8 +157,8 @@ func (a *Apps) Setup(timeout time.Duration) {
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime string) {
-	w.Header().Set("X-Request-Time", reqTime)
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime time.Duration) {
+	w.Header().Set("X-Request-Time", fmt.Sprintf("%dms", reqTime.Milliseconds()))
 
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
