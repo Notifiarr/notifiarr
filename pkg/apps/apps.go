@@ -77,39 +77,45 @@ func (a *Apps) HandleAPIpath(app App, api string, next APIHandler, method ...str
 		id = ""
 	}
 
-	// disccordnotifier uses 1-indexes.
-	a.Router.Handle(path.Join("/", a.URLBase, "api", string(app), id, api),
-		a.checkAPIKey(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now() // Capture the starr app request time in a response header.
-			switch id, _ := strconv.Atoi(mux.Vars(r)["id"]); {
-			default: // unknown app, just run the handler.
-				i, m := next(r)
-				a.Respond(w, i, m, start)
-			case app == Radarr && (id > len(a.Radarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr), start)
-			case app == Lidarr && (id > len(a.Lidarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr), start)
-			case app == Sonarr && (id > len(a.Sonarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr), start)
-			case app == Readarr && (id > len(a.Readarr) || id < 1):
-				a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr), start)
+	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
+		var (
+			id, _     = strconv.Atoi(mux.Vars(r)["id"])
+			start     = time.Now() // Capture the starr app request time in a response header.
+			code, msg = a.handleAPIpath(r, next, app, id)
+		)
 
-			// These store the application configuration (starr) in a context then pass that into the next method.
-			// They retrieve the return code and output, then send a response (a.Respond).
-			case app == Radarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
-				a.Respond(w, i, m, start)
-			case app == Lidarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Lidarr, a.Lidarr[id-1])))
-				a.Respond(w, i, m, start)
-			case app == Sonarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Sonarr, a.Sonarr[id-1])))
-				a.Respond(w, i, m, start)
-			case app == Readarr:
-				i, m := next(r.WithContext(context.WithValue(r.Context(), Readarr, a.Readarr[id-1])))
-				a.Respond(w, i, m, start)
-			}
-		}))).Methods(method...)
+		a.Respond(w, code, msg, fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
+	}
+
+	a.Router.Handle(path.Join("/", a.URLBase, "api", string(app), id, api),
+		a.checkAPIKey(http.HandlerFunc(handlerFunc))).Methods(method...)
+}
+
+func (a *Apps) handleAPIpath(r *http.Request, next APIHandler, app App, id int) (code int, msg interface{}) {
+	switch {
+	case app == Radarr && (id > len(a.Radarr) || id < 1):
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr)
+	case app == Lidarr && (id > len(a.Lidarr) || id < 1):
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr)
+	case app == Sonarr && (id > len(a.Sonarr) || id < 1):
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr)
+	case app == Readarr && (id > len(a.Readarr) || id < 1):
+		return http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr)
+	// These store the application configuration (starr) in a context then pass that into the next method.
+	// They retrieve the return code and output, then send a response (a.Respond).
+	// disccordnotifier.com uses 1-indexes, so we subtract 1 from the ID (turn 1 into 0).
+	case app == Radarr:
+		return next(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
+	case app == Lidarr:
+		return next(r.WithContext(context.WithValue(r.Context(), Lidarr, a.Lidarr[id-1])))
+	case app == Sonarr:
+		return next(r.WithContext(context.WithValue(r.Context(), Sonarr, a.Sonarr[id-1])))
+	case app == Readarr:
+		return next(r.WithContext(context.WithValue(r.Context(), Readarr, a.Readarr[id-1])))
+	default:
+		// unknown app, just run the handler.
+		return next(r)
+	}
 }
 
 // checkAPIKey drops a 403 if the API key doesn't match.
@@ -152,8 +158,8 @@ func (a *Apps) Setup(timeout time.Duration) {
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, start time.Time) {
-	w.Header().Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime string) {
+	w.Header().Set("X-Request-Time", reqTime)
 
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
