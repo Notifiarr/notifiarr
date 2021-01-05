@@ -19,6 +19,7 @@ type allowedIPs []*net.IPNet
 
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
+	c.Config.HandleAPIpath("", "slow", c.slowResponse, "HEAD") // log testing
 	c.Config.HandleAPIpath("", "status", c.statusResponse, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
@@ -107,6 +108,11 @@ func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
 
 func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
 	return http.StatusOK, c.Flags.Name() + " alive!"
+}
+
+func (c *Client) slowResponse(r *http.Request) (int, interface{}) {
+	time.Sleep(100 * time.Millisecond)
+	return http.StatusOK, ""
 }
 
 // slash is the handler for /.
