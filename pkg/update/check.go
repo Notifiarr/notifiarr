@@ -14,6 +14,14 @@ import (
 	"golang.org/x/mod/semver"
 )
 
+// OSsuffixMap is the OS to file suffix map for downloads.
+var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
+	"darwin":  ".dmg",
+	"windows": ".exe.zip",
+	"freebsd": ".txz",
+	"linux":   "", // too many variants right now.
+}
+
 // Latest is where we find the latest release.
 const Latest = "https://api.github.com/repos/%s/releases/latest"
 
@@ -29,10 +37,24 @@ type Update struct {
 
 // Check checks if the app this library lives in has an updated version on GitHub.
 func Check(userRepo string, version string) (*Update, error) {
+	resp, err := getResp(fmt.Sprintf(Latest, userRepo))
+	if err != nil {
+		return nil, err
+	}
+
+	release, err := decodeBody(resp)
+	if err != nil {
+		return nil, fmt.Errorf("decoding github response: %w", err)
+	}
+
+	return fillUpdate(release, version), nil
+}
+
+func getResp(uri string) (*http.Response, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5) // nolint:gomnd
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(Latest, userRepo), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
 		return nil, fmt.Errorf("requesting github: %w", err)
 	}
@@ -42,12 +64,7 @@ func Check(userRepo string, version string) (*Update, error) {
 		return nil, fmt.Errorf("querying github: %w", err)
 	}
 
-	release, err := decodeBody(resp)
-	if err != nil {
-		return nil, fmt.Errorf("decoding github response: %w", err)
-	}
-
-	return fillUpdate(release, version), nil
+	return resp, nil
 }
 
 func decodeBody(resp *http.Response) (*gitHubReleasesLatest, error) {
@@ -60,12 +77,12 @@ func decodeBody(resp *http.Response) (*gitHubReleasesLatest, error) {
 
 func fillUpdate(release *gitHubReleasesLatest, version string) *Update {
 	u := &Update{
+		Date:    release.PublishedAt,
+		URL:     release.HTMLURL,
 		Current: release.TagName,
-		Version: "v" + version,
+		Version: "v" + strings.TrimPrefix(version, "v"),
 		Outdate: semver.Compare("v"+strings.TrimPrefix(release.TagName, "v"),
 			"v"+strings.TrimPrefix(version, "v")) > 0,
-		URL:  release.HTMLURL,
-		Date: release.PublishedAt,
 	}
 
 	arch := runtime.GOARCH
@@ -75,22 +92,12 @@ func fillUpdate(release *gitHubReleasesLatest, version string) *Update {
 		arch = "i386"
 	}
 
-	switch runtime.GOOS {
-	case "darwin":
-		return u.getFile(release.Assets, ".exe.zip")
-	case "windows":
-		return u.getFile(release.Assets, ".dmg")
-	case "freebsd":
-		return u.getFile(release.Assets, arch+".txz")
-	case "linux":
-		fallthrough // :( too many variants
-	default:
-		return u
+	suffix := OSsuffixMap[runtime.GOOS]
+	if runtime.GOOS == "freebsd" || runtime.GOOS == "linux" {
+		suffix = arch + suffix
 	}
-}
 
-func (u *Update) getFile(assets []*asset, suffix string) *Update {
-	for _, file := range assets {
+	for _, file := range release.Assets {
 		if strings.HasSuffix(file.BrowserDownloadURL, suffix) {
 			u.URL = file.BrowserDownloadURL
 			u.Date = file.UpdatedAt
@@ -106,7 +113,7 @@ type gitHubReleasesLatest struct {
 	UploadURL       string    `json:"upload_url"`
 	HTMLURL         string    `json:"html_url"`
 	ID              int64     `json:"id"`
-	Author          *user     `json:"author"`
+	Author          ghUser    `json:"author"`
 	NodeID          string    `json:"node_id"`
 	TagName         string    `json:"tag_name"`
 	TargetCommitish string    `json:"target_commitish"`
@@ -115,19 +122,19 @@ type gitHubReleasesLatest struct {
 	Prerelease      bool      `json:"prerelease"`
 	CreatedAt       time.Time `json:"created_at"`
 	PublishedAt     time.Time `json:"published_at"`
-	Assets          []*asset  `json:"assets"`
+	Assets          []ghAsset `json:"assets"`
 	TarballURL      string    `json:"tarball_url"`
 	ZipballURL      string    `json:"zipball_url"`
 	Body            string    `json:"body"`
 }
 
-type asset struct {
+type ghAsset struct {
 	URL                string    `json:"url"`
 	ID                 int64     `json:"id"`
 	NodeID             string    `json:"node_id"`
 	Name               string    `json:"name"`
 	Label              string    `json:"label"`
-	Uploader           *user     `json:"uploader"`
+	Uploader           ghUser    `json:"uploader"`
 	ContentType        string    `json:"content_type"`
 	State              string    `json:"state"`
 	Size               int       `json:"size"`
@@ -137,7 +144,7 @@ type asset struct {
 	BrowserDownloadURL string    `json:"browser_download_url"`
 }
 
-type user struct {
+type ghUser struct {
 	Login             string `json:"login"`
 	ID                int64  `json:"id"`
 	NodeID            string `json:"node_id"`
