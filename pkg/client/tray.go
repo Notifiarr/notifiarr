@@ -7,16 +7,19 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/update"
 	"github.com/getlantern/systray"
+	"github.com/hako/durafmt"
 	"golift.io/version"
 )
 
 /* This file handles the OS GUI elements. */
 
-// Run starts the web server and the system tray/menu bar app.
+// startTray Run()s readyTray to bring up the web server and the GUI app.
 func (c *Client) startTray() {
 	systray.Run(c.readyTray, c.exitTray)
 }
@@ -32,6 +35,7 @@ func (c *Client) exitTray() {
 	os.Exit(0)
 }
 
+// readyTray creates the system tray/menu bar app items, and starts the web server.
 func (c *Client) readyTray() {
 	b, err := bindata.Asset(ui.SystrayIcon)
 	if err == nil {
@@ -47,7 +51,6 @@ func (c *Client) readyTray() {
 	c.menu["info"].Disable()
 	c.menu["dninfo"].Hide()
 	c.menu["alert"].Hide() // currently unused.
-	c.menu["update"].Hide()
 
 	go c.watchKillerChannels()
 	c.StartWebServer()
@@ -80,7 +83,7 @@ func (c *Client) makeChannels() {
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
 	// These start hidden.
-	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "there is a newer version available"))
+	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
 	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from DiscordNotifier.com"))
 	c.menu["alert"] = ui.WrapMenu(systray.AddMenuItem("Alert!", "alert from DiscordNotifier.com"))
 
@@ -139,7 +142,7 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
-			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/releases")
+			c.checkForUpdate()
 		case <-c.menu["dninfo"].Clicked():
 			c.menu["dninfo"].Hide()
 			ui.Info(Title, "INFO: "+c.info)
@@ -192,6 +195,28 @@ func (c *Client) changeKey() {
 	}
 
 	c.Config.APIKey = key
+}
+
+func (c *Client) checkForUpdate() {
+	c.Print("User Requested Update Check")
+
+	switch update, err := update.Check("Go-Lift-TV/discordnotifier-client", version.Version); {
+	case err != nil:
+		_, _ = ui.Error(Title, "Failure checking version on GitHub: "+err.Error())
+	case update.Outdate:
+		yes, _ := ui.Question(Title, "An Update is available! Download?\n\n"+
+			"Your Version: "+update.Version+"\n"+
+			"New Version: "+update.Current+"\n"+
+			"Date: "+update.Date.Format("Jan 2, 2006")+" ("+
+			durafmt.Parse(time.Since(update.Date).Round(time.Hour)).String()+" ago)", false)
+		if yes {
+			_ = ui.OpenURL(update.URL)
+		}
+	default:
+		_, _ = ui.Info(Title, "You're up to date! Version: "+update.Version+"\n"+
+			"Updated: "+update.Date.Format("Jan 2, 2006")+" ("+
+			durafmt.Parse(time.Since(update.Date).Round(time.Hour)).String()+" ago)")
+	}
 }
 
 func (c *Client) displayConfig() (s string) { //nolint: funlen

@@ -237,6 +237,7 @@ func lidarrGetTags(r *http.Request) (int, interface{}) {
 
 func lidarrUpdateTag(r *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
 	tagID, err := getLidarr(r).UpdateTag(id, mux.Vars(r)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
