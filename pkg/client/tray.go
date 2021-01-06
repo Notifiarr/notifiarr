@@ -202,20 +202,21 @@ func (c *Client) checkForUpdate() {
 
 	switch update, err := update.Check("Go-Lift-TV/discordnotifier-client", version.Version); {
 	case err != nil:
+		c.Errorf("Update Check: %v", err)
 		_, _ = ui.Error(Title, "Failure checking version on GitHub: "+err.Error())
 	case update.Outdate:
 		yes, _ := ui.Question(Title, "An Update is available! Download?\n\n"+
 			"Your Version: "+update.Version+"\n"+
 			"New Version: "+update.Current+"\n"+
-			"Date: "+update.Date.Format("Jan 2, 2006")+" ("+
-			durafmt.Parse(time.Since(update.Date).Round(time.Hour)).String()+" ago)", false)
+			"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
+			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
 		if yes {
-			_ = ui.OpenURL(update.URL)
+			_ = ui.OpenURL(update.CurrURL)
 		}
 	default:
 		_, _ = ui.Info(Title, "You're up to date! Version: "+update.Version+"\n"+
-			"Updated: "+update.Date.Format("Jan 2, 2006")+" ("+
-			durafmt.Parse(time.Since(update.Date).Round(time.Hour)).String()+" ago)")
+			"Updated: "+update.RelDate.Format("Jan 2, 2006")+" ("+
+			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)")
 	}
 }
 
