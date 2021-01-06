@@ -190,11 +190,12 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
-macapp: $(MACAPP).app.zip
-$(MACAPP).app.zip: macos
-	[ "$(MACAPP)" == "" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
-	[ "$(MACAPP)" == "" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
-	[ "$(MACAPP)" == "" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
+macapp: $(MACAPP).app
+$(MACAPP).app: macos
+	@[ "$(MACAPP)" != "" ] || (echo "Must set 'MACAPP' in settings.sh!" && exit 1)
+	mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
+	cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
+	cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 
 rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux check_fpm

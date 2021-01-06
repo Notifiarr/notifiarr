@@ -13,7 +13,6 @@ REPO="Go-Lift-TV/discordnotifier-client"
 # Github repo containing homebrew formula repo.
 HBREPO="golift/homebrew-mugs"
 MAINT="David Newhall II <david at sleepers dot pro>"
-VENDOR="Go Lift <code@golift.io>"
 DESC="Unified Client for DiscordNotifier.com"
 GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo"
 # Example must exist at examples/$CONFIG_FILE.example
@@ -35,7 +34,7 @@ VERSION_PATH="golift.io/version"
 SOURCE_PATH=https://codeload.github.com/${REPO}/tar.gz/v${VERSION}
 
 export BINARY HBREPO MAINT VENDOR DESC GOLANGCI_LINT_ARGS CONFIG_FILE
-export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH COMPRESS
+export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH
 
 # Optional
 export WINDOWS_LDFLAGS="-H windowsgui"

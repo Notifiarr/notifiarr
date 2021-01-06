@@ -22,6 +22,9 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/rootFolder", sonarrRootFolders, "GET")
 	a.HandleAPIpath(Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
+	a.HandleAPIpath(Sonarr, "/tag", sonarrGetTags, "GET")
+	a.HandleAPIpath(Sonarr, "/tag/{id:[0-9]+}/{label}", sonarrUpdateTag, "PUT")
+	a.HandleAPIpath(Sonarr, "/tag/{label}", sonarrSetTag, "PUT")
 	a.HandleAPIpath(Sonarr, "/update", sonarrUpdateSeries, "PUT")
 }
 
@@ -191,6 +194,35 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 	}
 
 	return false
+}
+
+func sonarrGetTags(r *http.Request) (int, interface{}) {
+	tags, err := getSonarr(r).GetTags()
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
+	}
+
+	return http.StatusOK, tags
+}
+
+func sonarrUpdateTag(r *http.Request) (int, interface{}) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	tagID, err := getSonarr(r).UpdateTag(id, mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
+}
+
+func sonarrSetTag(r *http.Request) (int, interface{}) {
+	tagID, err := getSonarr(r).AddTag(mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
 }
 
 func sonarrUpdateSeries(r *http.Request) (int, interface{}) {

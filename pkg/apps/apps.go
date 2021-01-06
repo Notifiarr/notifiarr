@@ -84,37 +84,40 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 // The purpose of this complicated monster is to keep API handler methods simple.
 func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		var (
+			msg   interface{}
+			ctx   = r.Context()
+			code  = http.StatusUnprocessableEntity
+			id, _ = strconv.Atoi(mux.Vars(r)["id"])
+			start = time.Now()
+		)
 
-		switch start := time.Now(); {
-		case app == Radarr && (id > len(a.Radarr) || id < 1):
-			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoRadarr), time.Since(start))
-		case app == Lidarr && (id > len(a.Lidarr) || id < 1):
-			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoLidarr), time.Since(start))
-		case app == Sonarr && (id > len(a.Sonarr) || id < 1):
-			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoSonarr), time.Since(start))
-		case app == Readarr && (id > len(a.Readarr) || id < 1):
-			a.Respond(w, http.StatusUnprocessableEntity, fmt.Errorf("%v: %w", id, ErrNoReadarr), time.Since(start))
-		// These store the application configuration (starr) in a context then pass that into the api() method.
-		// They retrieve the return code and output, then send a response (a.Respond).
-		// disccordnotifier.com uses 1-indexes, so we subtract 1 from the ID (turn 1 into 0).
+		// disccordnotifier.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
+		switch id--; {
+		// Make sure the id is within range of the available service.
+		case app == Radarr && (id >= len(a.Radarr) || id < 0):
+			msg = fmt.Errorf("%v: %w", id, ErrNoRadarr)
+		case app == Lidarr && (id >= len(a.Lidarr) || id < 0):
+			msg = fmt.Errorf("%v: %w", id, ErrNoLidarr)
+		case app == Sonarr && (id >= len(a.Sonarr) || id < 0):
+			msg = fmt.Errorf("%v: %w", id, ErrNoSonarr)
+		case app == Readarr && (id >= len(a.Readarr) || id < 0):
+			msg = fmt.Errorf("%v: %w", id, ErrNoReadarr)
+		// Store the application configuration (starr) in a context then pass that into the api() method.
+		// Retrieve the return code and output, and send a response via a.Respond().
 		case app == Radarr:
-			code, msg := api(r.WithContext(context.WithValue(r.Context(), Radarr, a.Radarr[id-1])))
-			a.Respond(w, code, msg, time.Since(start))
+			code, msg = api(r.WithContext(context.WithValue(ctx, Radarr, a.Radarr[id])))
 		case app == Lidarr:
-			code, msg := api(r.WithContext(context.WithValue(r.Context(), Lidarr, a.Lidarr[id-1])))
-			a.Respond(w, code, msg, time.Since(start))
+			code, msg = api(r.WithContext(context.WithValue(ctx, Lidarr, a.Lidarr[id])))
 		case app == Sonarr:
-			code, msg := api(r.WithContext(context.WithValue(r.Context(), Sonarr, a.Sonarr[id-1])))
-			a.Respond(w, code, msg, time.Since(start))
+			code, msg = api(r.WithContext(context.WithValue(ctx, Sonarr, a.Sonarr[id])))
 		case app == Readarr:
-			code, msg := api(r.WithContext(context.WithValue(r.Context(), Readarr, a.Readarr[id-1])))
-			a.Respond(w, code, msg, time.Since(start))
+			code, msg = api(r.WithContext(context.WithValue(ctx, Readarr, a.Readarr[id])))
 		default:
-			// unknown app, just run the handler.
-			code, msg := api(r)
-			a.Respond(w, code, msg, time.Since(start))
+			code, msg = api(r) // unknown app, just run the handler.
 		}
+
+		a.Respond(w, code, msg, time.Since(start))
 	}
 }
 
