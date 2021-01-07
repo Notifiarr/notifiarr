@@ -24,6 +24,9 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(Readarr, "/rootFolder", readarrRootFolders, "GET")
 	a.HandleAPIpath(Readarr, "/search/{query}", readarrSearchBook, "GET")
 	a.HandleAPIpath(Readarr, "/update", readarrUpdateBook, "PUT")
+	a.HandleAPIpath(Readarr, "/tag", readarrGetTags, "GET")
+	a.HandleAPIpath(Readarr, "/tag/{id:[0-9]+}/{label}", readarrUpdateTag, "PUT")
+	a.HandleAPIpath(Readarr, "/tag/{label}", readarrSetTag, "PUT")
 	a.HandleAPIpath(Readarr, "/updateauthor", readarrUpdateAuthor, "PUT")
 }
 
@@ -200,6 +203,35 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 	}
 
 	return false
+}
+
+func readarrGetTags(r *http.Request) (int, interface{}) {
+	tags, err := getReadarr(r).GetTags()
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
+	}
+
+	return http.StatusOK, tags
+}
+
+func readarrUpdateTag(r *http.Request) (int, interface{}) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	tagID, err := getReadarr(r).UpdateTag(id, mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
+}
+
+func readarrSetTag(r *http.Request) (int, interface{}) {
+	tagID, err := getReadarr(r).AddTag(mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
 }
 
 func readarrUpdateBook(r *http.Request) (int, interface{}) {

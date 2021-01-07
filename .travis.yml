@@ -42,7 +42,7 @@ before_script:
   - tar -xf .secret_files.tar
 #  - gpg --import gpg.signing.key
   - rm -f gpg.signing.key .secret_files.tar
-  - source .metadata.sh
+  - source settings.sh
 script:
   # Test Go and Docker.
   - make test

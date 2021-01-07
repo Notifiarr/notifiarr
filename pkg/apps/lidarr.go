@@ -28,6 +28,9 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrProfiles, "GET")
 	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
 	a.HandleAPIpath(Lidarr, "/search/{query}", lidarrSearchAlbum, "GET")
+	a.HandleAPIpath(Lidarr, "/tag", lidarrGetTags, "GET")
+	a.HandleAPIpath(Lidarr, "/tag/{id:[0-9]+}/{label}", lidarrUpdateTag, "PUT")
+	a.HandleAPIpath(Lidarr, "/tag/{label}", lidarrSetTag, "PUT")
 	a.HandleAPIpath(Lidarr, "/update", lidarrUpdateAlbum, "PUT")
 	a.HandleAPIpath(Lidarr, "/updateartist", lidarrUpdateArtist, "PUT")
 }
@@ -221,6 +224,35 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 	}
 
 	return false
+}
+
+func lidarrGetTags(r *http.Request) (int, interface{}) {
+	tags, err := getLidarr(r).GetTags()
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
+	}
+
+	return http.StatusOK, tags
+}
+
+func lidarrUpdateTag(r *http.Request) (int, interface{}) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	tagID, err := getLidarr(r).UpdateTag(id, mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
+}
+
+func lidarrSetTag(r *http.Request) (int, interface{}) {
+	tagID, err := getLidarr(r).AddTag(mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
 }
 
 func lidarrUpdateAlbum(r *http.Request) (int, interface{}) {

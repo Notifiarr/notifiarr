@@ -8,13 +8,11 @@ source $(dirname "${BASH_SOURCE[0]}")/init/buildinfo.sh
 
 # Must match the repo name to make things easy. Otherwise, fix some other paths.
 BINARY="discordnotifier-client"
-REPO="discordnotifier-client"
-# github username
-GHUSER="Go-Lift-TV"
+# github username / repo name
+REPO="Go-Lift-TV/discordnotifier-client"
 # Github repo containing homebrew formula repo.
 HBREPO="golift/homebrew-mugs"
 MAINT="David Newhall II <david at sleepers dot pro>"
-VENDOR="Go Lift"
 DESC="Unified Client for DiscordNotifier.com"
 GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo"
 # Example must exist at examples/$CONFIG_FILE.example
@@ -24,10 +22,8 @@ LICENSE="MIT"
 # This affects the homebrew formula (launchd) and linux packages (systemd).
 FORMULA="service"
 
-# Used for source links and wiki links.
-SOURCE_URL="https://github.com/${GHUSER}/${REPO}"
-# Used for documentation links.
-URL="${SOURCE_URL}"
+# Used for source links in package metadata and docker labels.
+SOURCE_URL="https://github.com/${REPO}"
 
 # This parameter is passed in as -X to go build. Used to override the Version variable in a package.
 # This makes a path like golift.io/version.Version=1.3.3
@@ -35,13 +31,11 @@ URL="${SOURCE_URL}"
 VERSION_PATH="golift.io/version"
 
 # Used by homebrew downloads.
-SOURCE_PATH=https://codeload.github.com/${GHUSER}/${REPO}/tar.gz/v${VERSION}
+SOURCE_PATH=https://codeload.github.com/${REPO}/tar.gz/v${VERSION}
 
-# Use upx to compress binaries. Must install upx. apt/yum/brew install upx
-COMPRESS=true
+export BINARY HBREPO MAINT VENDOR DESC GOLANGCI_LINT_ARGS CONFIG_FILE
+export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH
 
-export BINARY GHUSER HBREPO MAINT VENDOR DESC GOLANGCI_LINT_ARGS CONFIG_FILE
-export LICENSE FORMULA SOURCE_URL URL VERSION_PATH SOURCE_PATH COMPRESS
-
+# Optional
 export WINDOWS_LDFLAGS="-H windowsgui"
 export MACAPP="DiscordNotifier-Client"

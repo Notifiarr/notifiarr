@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"runtime"
 	"strings"
 	"time"
 
@@ -87,6 +88,7 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 	return http.StatusOK, map[string]interface{}{
 		"version":        version.Version,
+		"os_arch":        runtime.GOOS + "." + runtime.GOARCH,
 		"uptime":         time.Since(version.Started).Round(time.Second).String(),
 		"uptime_seconds": time.Since(version.Started).Round(time.Second).Seconds(),
 		"build_date":     version.BuildDate,

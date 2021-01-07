@@ -21,6 +21,9 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/qualityProfiles", radarrProfiles, "GET")
 	a.HandleAPIpath(Radarr, "/rootFolder", radarrRootFolders, "GET")
 	a.HandleAPIpath(Radarr, "/search/{query}", radarrSearchMovie, "GET")
+	a.HandleAPIpath(Radarr, "/tag", radarrGetTags, "GET")
+	a.HandleAPIpath(Radarr, "/tag/{id:[0-9]+}/{label}", radarrUpdateTag, "PUT")
+	a.HandleAPIpath(Radarr, "/tag/{label}", radarrSetTag, "PUT")
 	a.HandleAPIpath(Radarr, "/update", radarrUpdateMovie, "PUT")
 }
 
@@ -176,6 +179,35 @@ func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle)
 	}
 
 	return false
+}
+
+func radarrGetTags(r *http.Request) (int, interface{}) {
+	tags, err := getRadarr(r).GetTags()
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
+	}
+
+	return http.StatusOK, tags
+}
+
+func radarrUpdateTag(r *http.Request) (int, interface{}) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	tagID, err := getRadarr(r).UpdateTag(id, mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
+}
+
+func radarrSetTag(r *http.Request) (int, interface{}) {
+	tagID, err := getRadarr(r).AddTag(mux.Vars(r)["label"])
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
+	}
+
+	return http.StatusOK, tagID
 }
 
 func radarrUpdateMovie(r *http.Request) (int, interface{}) {

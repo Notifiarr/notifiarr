@@ -21,3 +21,8 @@ func Info(title, msg string) (bool, error) {
 func Entry(title, msg, val string) (string, bool, error) {
 	return val, false, nil
 }
+
+// Question wraps dlgs.Question.
+func Question(title, text string, defaultCancel bool) (bool, error) {
+	return true, nil
+}

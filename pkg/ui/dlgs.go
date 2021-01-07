@@ -39,3 +39,12 @@ func Entry(title, msg, val string) (string, bool, error) {
 
 	return dlgs.Entry(title, msg, val)
 }
+
+// Question wraps dlgs.Question.
+func Question(title, text string, defaultCancel bool) (bool, error) {
+	if !HasGUI() {
+		return true, nil
+	}
+
+	return dlgs.Question(title, text, defaultCancel)
+}
