@@ -18,6 +18,6 @@ require (
 	golang.org/x/sys v0.0.0-20201223074533-0d417f636930 // indirect
 	golift.io/cnfg v0.0.7
 	golift.io/rotatorr v0.0.0-20201213130124-94efc0b9aff1
-	golift.io/starr v0.9.5-0.20210106213634-edf8887280d5
+	golift.io/starr v0.9.5-0.20210207012347-fb29f869af9f
 	golift.io/version v0.0.2
 )
