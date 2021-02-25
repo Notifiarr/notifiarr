@@ -14,7 +14,7 @@ REPO="Go-Lift-TV/discordnotifier-client"
 HBREPO="golift/homebrew-mugs"
 MAINT="David Newhall II <david at sleepers dot pro>"
 DESC="Unified Client for DiscordNotifier.com"
-GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo"
+GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo,cyclop"
 # Example must exist at examples/$CONFIG_FILE.example
 CONFIG_FILE="dnclient.conf"
 LICENSE="MIT"
