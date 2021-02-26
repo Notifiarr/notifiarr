@@ -112,6 +112,10 @@ golift.io/starr v0.9.5-0.20210106213634-edf8887280d5 h1:0fViTc9QBhSZsopWPmynIm+a
 golift.io/starr v0.9.5-0.20210106213634-edf8887280d5/go.mod h1:EE8B7OlqZlE/EGmBP1bLsK1OHEgWwbNpyjDXX0B2f0Y=
 golift.io/starr v0.9.9 h1:5TIjrtwISD04NdtAbd0tIlDtoeVSI6tuO4wHW43ie5E=
 golift.io/starr v0.9.9/go.mod h1:EE8B7OlqZlE/EGmBP1bLsK1OHEgWwbNpyjDXX0B2f0Y=
+golift.io/starr v0.9.10-0.20210225213428-069a16634325 h1:szVQbyOLKZY94ZgeSxoaz+IemR9q3V2uYZ8GK7vC6RU=
+golift.io/starr v0.9.10-0.20210225213428-069a16634325/go.mod h1:EE8B7OlqZlE/EGmBP1bLsK1OHEgWwbNpyjDXX0B2f0Y=
+golift.io/starr v0.9.10-0.20210226013220-95f7b61c3bb1 h1:LFbGwVPfFRNFE3Zi+ou2h0kjm9Us3KHbDJdEpBsQwfU=
+golift.io/starr v0.9.10-0.20210226013220-95f7b61c3bb1/go.mod h1:EE8B7OlqZlE/EGmBP1bLsK1OHEgWwbNpyjDXX0B2f0Y=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
