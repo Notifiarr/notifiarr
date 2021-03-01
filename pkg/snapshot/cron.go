@@ -17,6 +17,8 @@ func (c *Config) Start(apikey string) {
 
 	if c.Interval.Duration == 0 || c.stopChan != nil {
 		return
+	} else if c.Interval.Duration < minimumInterval {
+		c.Interval.Duration = minimumInterval
 	}
 
 	t := time.NewTicker(c.Interval.Duration)
