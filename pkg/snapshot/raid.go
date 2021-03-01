@@ -27,6 +27,7 @@ md1 : active raid1 sdd2[3] sdb2[1] sdc2[2] sda2[0]
       bitmap: 3/4 pages [12KB], 65536KB chunk
 unused devices: <none>
 */
+
 func (s *Snapshot) getRaidMDstat() {
 	b, _ := ioutil.ReadFile("/proc/mdstat")
 	// Remove the first line "Personalities" and replace the rest of the newlines with spaces.
@@ -59,6 +60,7 @@ Disk Cache Policy   : Enabled
 Encryption Type     : None
 Is VD Cached: No
 */
+
 func (s *Snapshot) getRaidMegaCLI(ctx context.Context) error {
 	// The megacli code is barely tested.
 	megacli, err := exec.LookPath("MegaCli")

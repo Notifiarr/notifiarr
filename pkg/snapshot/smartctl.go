@@ -27,6 +27,7 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 
 	for _, partition := range partitions {
 		log.Printf("[TEMPORARY] partition %s =-> %s", partition.Mountpoint, partition.Device)
+
 		if _, ok := devices[partition.Device]; ok {
 			continue
 		}

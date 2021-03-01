@@ -24,7 +24,7 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
 
 	for scanner.Scan() {
 		switch fields := strings.Fields(scanner.Text()); {
-		case len(fields) < 3:
+		case len(fields) < 3: //nolint:gomnd
 			continue
 		case strings.EqualFold(fields[0], "MemTotal:"):
 			s.System.MemTotal, _ = strconv.ParseUint(fields[1], 10, 64)

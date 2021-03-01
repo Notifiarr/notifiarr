@@ -34,9 +34,9 @@ const (
 // Flags are our CLI input flags.
 type Flags struct {
 	*flag.FlagSet
-	verReq     bool
 	ConfigFile string
 	EnvPrefix  string
+	verReq     bool
 	TestSnaps  bool
 }
 
