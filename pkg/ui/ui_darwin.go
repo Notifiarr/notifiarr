@@ -16,6 +16,8 @@ func HasGUI() bool {
 	return hasGUI
 }
 
+func HideConsoleWindow() {}
+
 // StartCmd starts a command.
 func StartCmd(c string, v ...string) error {
 	cmd := exec.Command(c, v...)

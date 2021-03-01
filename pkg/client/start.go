@@ -1,17 +1,19 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/apps"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/plex"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/snapshot"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
@@ -35,15 +37,18 @@ type Flags struct {
 	verReq     bool
 	ConfigFile string
 	EnvPrefix  string
+	TestSnaps  bool
 }
 
 // Config represents the data in our config file.
 type Config struct {
-	BindAddr   string        `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
-	SSLCrtFile string        `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
-	SSLKeyFile string        `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
-	Upstreams  []string      `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
-	Timeout    cnfg.Duration `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	BindAddr   string           `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
+	SSLCrtFile string           `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
+	SSLKeyFile string           `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
+	Upstreams  []string         `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
+	Timeout    cnfg.Duration    `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	Plex       *plex.Server     `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
+	Snapshot   *snapshot.Config `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
 	*logs.Logs
 	*apps.Apps
 }
@@ -59,12 +64,8 @@ type Client struct {
 	allow  allowedIPs
 	menu   map[string]ui.MenuItem
 	info   string
-	alert  alert
-}
-
-type alert struct {
-	sync.Mutex
-	active bool
+	alert  *logs.Cooler
+	plex   *logs.Cooler
 }
 
 // Errors returned by this package.
@@ -79,6 +80,8 @@ func NewDefaults() *Client {
 		sigkil: make(chan os.Signal, 1),
 		sighup: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
+		plex:   &logs.Cooler{},
+		alert:  &logs.Cooler{},
 		Logger: logs.New(),
 		Config: &Config{
 			Apps: &apps.Apps{
@@ -89,7 +92,8 @@ func NewDefaults() *Client {
 				LogFiles:  DefaultLogFiles,
 				LogFileMb: DefaultLogFileMb,
 			},
-			Timeout: cnfg.Duration{Duration: DefaultTimeout},
+			Timeout:  cnfg.Duration{Duration: DefaultTimeout},
+			Snapshot: &snapshot.Config{},
 		}, Flags: &Flags{
 			FlagSet:    flag.NewFlagSet(DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(DefaultEnvPrefix + "_CONFIG_FILE"),
@@ -101,6 +105,7 @@ func NewDefaults() *Client {
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
+	f.BoolVar(&f.TestSnaps, "snaps", false, f.Name()+"Test Snapshots")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.Parse(args) // nolint: errcheck
@@ -139,8 +144,39 @@ func start() error {
 	c.Logger.SetupLogging(c.Config.Logs)
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
 	c.Printf("==> %s", msg)
+	c.startPlex()
+	c.startSnaps()
+
+	if c.Flags.TestSnaps {
+		c.testSnaps(snapshot.NotifiarrTestURL)
+		return nil
+	}
 
 	return c.run(strings.HasPrefix(msg, msgConfigCreate))
+}
+
+// starts plex if it's configured. logs any error.
+func (c *Client) startPlex() bool {
+	var err error
+
+	if c.Config.Plex != nil {
+		c.Config.Plex.Logger = c.Logger
+
+		if err = c.Config.Plex.Start(); err != nil {
+			c.Errorf("plex config: %v (plex DISABLED)", err)
+			c.Config.Plex = nil
+		}
+	}
+
+	return err != nil
+}
+
+// starts snapshots if it's configured. logs any error.
+func (c *Client) startSnaps() {
+	if c.Config.Snapshot != nil {
+		c.Config.Snapshot.Logger = c.Logger
+		c.Config.Snapshot.Start()
+	}
 }
 
 func (c *Client) run(newConfig bool) error {
@@ -169,5 +205,39 @@ func (c *Client) run(newConfig bool) error {
 	default:
 		c.StartWebServer()
 		return c.Exit()
+	}
+}
+
+// Temporary code?
+func (c *Client) testSnaps(send string) {
+	snaps, errs := c.Config.Snapshot.GetSnapshot()
+	if len(errs) > 0 {
+		for _, err := range errs {
+			if err != nil {
+				c.Errorf("%v", err)
+			}
+		}
+	}
+
+	p, err := c.Config.Plex.GetSessions()
+	if err != nil {
+		c.Errorf("%v", err)
+	}
+
+	b, _ := json.Marshal(&struct {
+		*snapshot.Snapshot
+		Plex *plex.Sessions `json:"plex"`
+	}{Snapshot: snaps, Plex: p})
+
+	c.Printf("Snapshot Data:\n%s", string(b))
+
+	if send == "" {
+		return
+	}
+
+	if body, err := snapshot.SendJSON(send, b); err != nil {
+		c.Errorf("POSTING: %v: %s", err, string(body))
+	} else {
+		c.Printf("Sent Test Snapshot to %s", send)
 	}
 }

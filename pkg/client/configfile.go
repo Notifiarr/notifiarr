@@ -132,8 +132,10 @@ func (c *Client) createConfigFile(file string) (string, error) {
 	return file, nil
 }
 
-func (c *Client) reloadConfiguration() {
-	c.Print("==> Reloading Configuration")
+func (c *Client) reloadConfiguration(msg string) {
+	c.Print("==> Reloading Configuration: " + msg)
+	c.Config.Plex.Stop()
+	c.Config.Snapshot.Stop()
 
 	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
 		c.Errorf("Unable to reload configuration: %v", err)
@@ -148,9 +150,14 @@ func (c *Client) reloadConfiguration() {
 	}
 
 	c.PrintStartupInfo()
-	c.Print("==> Configuration Reloaded")
+	c.startSnaps()
 
-	_, _ = ui.Info(Title, "Configuration Reloaded!")
+	if err := c.startPlex(); err {
+		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROOR: Plex DISABLED due to bad config.")
+	} else {
+		c.Print("==> Configuration Reloaded!")
+		_, _ = ui.Info(Title, "Configuration Reloaded!")
+	}
 }
 
 func configFileLocactions() (string, []string) {

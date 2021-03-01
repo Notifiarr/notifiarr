@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/snapshot"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/update"
 	"github.com/getlantern/systray"
@@ -82,6 +83,11 @@ func (c *Client) makeChannels() {
 	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
+	data := systray.AddMenuItem("Data", "Data Collection and Snapshots")
+	c.menu["data"] = ui.WrapMenu(data)
+	c.menu["snap_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Snapshot", "write snapshot data to log file"))
+	c.menu["snap_send"] = ui.WrapMenu(data.AddSubMenuItem("Test Snapshot", "send snapshot to notifiarr test endpoint"))
+
 	// These start hidden.
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
 	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from DiscordNotifier.com"))
@@ -97,7 +103,7 @@ func (c *Client) watchKillerChannels() {
 		select {
 		case sigc := <-c.sighup:
 			c.Printf("Caught Signal: %v (reloading configuration)", sigc)
-			c.reloadConfiguration()
+			c.reloadConfiguration("caught signal " + sigc.String())
 		case sigc := <-c.sigkil:
 			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
 			return
@@ -130,7 +136,7 @@ func (c *Client) watchGuiChannels() {
 			c.Print("User Editing Config File:", c.Flags.ConfigFile)
 			ui.OpenFile(c.Flags.ConfigFile)
 		case <-c.menu["load"].Clicked():
-			c.reloadConfiguration()
+			c.reloadConfiguration("UI requested")
 		case <-c.menu["key"].Clicked():
 			c.changeKey()
 		case <-c.menu["logs_view"].Clicked():
@@ -141,6 +147,10 @@ func (c *Client) watchGuiChannels() {
 			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
+		case <-c.menu["snap_log"].Clicked():
+			c.testSnaps("")
+		case <-c.menu["snap_send"].Clicked():
+			c.testSnaps(snapshot.NotifiarrTestURL)
 		case <-c.menu["update"].Clicked():
 			c.checkForUpdate()
 		case <-c.menu["dninfo"].Clicked():
@@ -220,7 +230,7 @@ func (c *Client) checkForUpdate() {
 	}
 }
 
-func (c *Client) displayConfig() (s string) { //nolint: funlen
+func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 	s = "Config File: " + c.Flags.ConfigFile
 	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
 	s += fmt.Sprintf("\nUpstreams: %v", c.allow)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/client"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 )
 
 func main() {
@@ -16,6 +17,7 @@ func main() {
 }
 
 func run() error {
+	ui.HideConsoleWindow()
 	// setup log package in case we throw an error for main.go before logging is setup.
 	log.SetFlags(log.LstdFlags)
 	log.SetPrefix("[ERROR] ")

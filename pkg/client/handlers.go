@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/plex"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"golift.io/version"
 )
@@ -25,6 +27,11 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
+
+	if c.Config.Plex != nil && c.Config.Plex.Token != "" {
+		c.Config.Router.Handle("/plex",
+			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", c.Config.Plex.Token)
+	}
 
 	// Initialize internal-only paths.
 	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
@@ -63,22 +70,13 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 		return code, err
 	}
 
-	c.alert.Lock()
-	defer c.alert.Unlock()
-
-	if c.alert.active {
+	if c.alert.Active() {
 		return http.StatusLocked, "previous alert not acknowledged"
 	}
 
-	c.alert.active = true
-
 	go func() {
 		_, _ = ui.Warning(Title+" Alert", body)
-
-		c.alert.Lock()
-		defer c.alert.Unlock()
-
-		c.alert.active = false
+		c.alert.Done() //nolint:wsl
 	}()
 
 	return code, err
@@ -128,6 +126,44 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
 	}
+}
+
+func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseMultipartForm(1000 * 100); err != nil { // nolint:gomnd // 100kbyte memory usage
+		c.Errorf("Parsing Multipart Form (plex): %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	var v plex.Webhook
+	if err := json.Unmarshal([]byte(r.Form.Get("payload")), &v); err != nil {
+		c.Errorf("Unmarshalling Plex payload: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
+
+	if c.plex.Active() {
+		c.Printf("Plex Webhook IGNORED (cooldown): %s, %s '%s' => %s",
+			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ignored\n"))
+
+		return
+	}
+
+	go func() {
+		defer c.plex.Done()
+		c.Printf("Plex Webhook: %s, %s '%s' => %s", v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+
+		if body, err := c.Config.Plex.SendMeta(&v); err != nil {
+			c.Errorf("Sending Plex Session to Notifiarr: %v: %v", err, string(body))
+			return
+		}
+
+		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
+	}()
 }
 
 // fixForwardedFor sets the X-Forwarded-For header to the client IP

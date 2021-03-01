@@ -67,3 +67,43 @@ api_key = ""
 #[[lidarr]]
 #url     = "http://lidarr:8989/"
 #api_key = ""
+
+#################
+# Plex Settings #
+#################
+[plex]
+## Plex URL and Token where requests are sent. Secret is used for incoming webhooks.
+## Interval is how often to send session data (cron).
+url = "http://localhost:32400"
+token = ""
+interval = "30m"
+## For shared plex servers, you can map an email to a name.. someemail,Name|someotheremail|name
+account_map = ""
+## Name of the server the notifications are coming from (optional).
+# server = "plex"
+
+#####################
+# Snapshot Settings #
+#####################
+[snapshot]
+interval          = "30m"
+timeout           = "30s"
+use_sudo          = false
+monitor_raid      = true
+monitor_drives    = true
+monitor_space     = true
+monitor_uptime    = true
+monitor_cpuMemory = true
+monitor_cpuTemp   = true
+zfs_pools         = []
+
+####################
+# Network Settings #
+####################
+[network]
+## Ex: plex, this is the name you want to see in the notification
+# name = ""
+## Add things to monitor by name = ip. Examples:
+# plex   = "10.1.0.1"
+# radarr = "10.1.0.2"
+# sonarr = "10.1.0.3"
