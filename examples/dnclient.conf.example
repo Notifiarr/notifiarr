@@ -15,7 +15,7 @@ bind_addr = "5454"
 # automatically be written on those platforms.
 quiet = false
 
-# All API paths start with /api.
+# All API paths start with /api. This does not affect incoming /plex webhooks.
 # Set it to /somethingelse/api by setting urlbase to "/somethingelse"
 urlbase = "/"
 
@@ -72,38 +72,26 @@ api_key = ""
 # Plex Settings #
 #################
 [plex]
-## Plex URL and Token where requests are sent. Secret is used for incoming webhooks.
-## Interval is how often to send session data (cron).
-url = "http://localhost:32400"
-token = ""
-interval = "30m"
-## For shared plex servers, you can map an email to a name.. someemail,Name|someotheremail|name
-account_map = ""
-## Name of the server the notifications are coming from (optional).
-# server = "plex"
+url         = "http://localhost:32400" # Your plex URL
+token       = ""     # your plex token; et this from a web inspector
+interval    = "30m"  # how often to send session data, 0 = off
+cooldown    = "15s"  # how often plex webhooks may trigger session hooks
+account_map = ""     # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
+server      = "plex" # optional name of the server the notifications are from
 
 #####################
 # Snapshot Settings #
 #####################
 [snapshot]
-interval          = "30m"
-timeout           = "30s"
-use_sudo          = false
-monitor_raid      = true
-monitor_drives    = true
-monitor_space     = true
-monitor_uptime    = true
-monitor_cpuMemory = true
-monitor_cpuTemp   = true
-zfs_pools         = []
-
-####################
-# Network Settings #
-####################
-[network]
-## Ex: plex, this is the name you want to see in the notification
-# name = ""
-## Add things to monitor by name = ip. Examples:
-# plex   = "10.1.0.1"
-# radarr = "10.1.0.2"
-# sonarr = "10.1.0.3"
+interval          = "30m" # how often to send a snapshot, 0 = off
+timeout           = "30s" # how long a snapshot may take
+monitor_raid      = true  # mdadm / megacli
+monitor_drives    = true  # smartctl: age, temp, health
+monitor_space     = true  # disk usage for all partitions
+monitor_uptime    = true  # system data, hostname, uptime, os, build
+monitor_cpuMemory = true  # literally cpu usage and memory
+monitor_cpuTemp   = true  # cpu temperatures, not available on all platforms
+zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
+use_sudo          = false # sudo is needed on unix when monitor_drives=true
+# An example sudoers entry follows. Fix the path to smartctl.
+# discordnotifier-client ALL=(root) NOPASSWD:/usr/sbin/smartctl *

@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-func (c *Config) Start() {
-	if c.Timeout.Duration < minimumInterval {
+func (c *Config) Start(apikey string) {
+	if c.Timeout.Duration < minimumTimeout {
 		c.Timeout.Duration = minimumTimeout
 	}
 
@@ -23,31 +23,58 @@ func (c *Config) Start() {
 	c.stopChan = make(chan struct{})
 
 	go func() {
+		defer func() {
+			t.Stop()
+			close(c.stopChan)
+			c.stopChan = nil
+		}()
+
 		for {
 			select {
 			case <-t.C:
-				c.sendSnapshot()
+				c.sendSnapshot(apikey)
 			case <-c.stopChan:
-				t.Stop()
 				return
 			}
 		}
 	}()
+	c.logStart()
+}
 
-	c.Printf("==> System Snapshot Collection Started, interval: %v", c.Interval)
+func (c *Config) logStart() {
+	var ex string
+
+	for k, v := range map[string]bool{
+		"raid":    c.Raid,
+		"disks":   c.DiskUsage,
+		"drives":  c.DriveData,
+		"uptime":  c.Uptime,
+		"cpumem":  c.CPUMem,
+		"cputemp": c.CPUTemp,
+		"zfs":     c.ZFSPools != nil,
+		"sudo":    c.UseSudo && c.DriveData,
+	} {
+		if !v {
+			continue
+		}
+
+		if ex != "" {
+			ex += ", "
+		}
+
+		ex += k
+	}
+
+	c.Printf("==> System Snapshot Collection Started, interval: %v, timeout: %v, enabled: %s", c.Interval, c.Timeout, ex)
 }
 
 func (c *Config) Stop() {
-	if c == nil || c.stopChan == nil {
-		return
+	if c != nil && c.stopChan != nil {
+		c.stopChan <- struct{}{}
 	}
-
-	c.stopChan <- struct{}{}
-	close(c.stopChan)
-	c.stopChan = nil
 }
 
-func (c *Config) sendSnapshot() {
+func (c *Config) sendSnapshot(apikey string) {
 	snapshot, errs := c.GetSnapshot()
 	if len(errs) > 0 {
 		for _, err := range errs {
@@ -60,7 +87,7 @@ func (c *Config) sendSnapshot() {
 	b, _ := json.Marshal(&snapshot)
 	// log.Println(string(b))
 
-	body, err := SendJSON(NotifiarrTestURL, b)
+	body, err := SendJSON(NotifiarrTestURL, apikey, b)
 	if err != nil {
 		c.Errorf("Sending snapshot to Notifiarr: %v: %v", err, string(body))
 	} else {
@@ -68,7 +95,9 @@ func (c *Config) sendSnapshot() {
 	}
 }
 
-func SendJSON(url string, data []byte) ([]byte, error) {
+// SendJSON posts a JSON payload to a URL. Returns the response body or an error.
+// The response status code is lost.
+func SendJSON(url, apikey string, data []byte) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -79,6 +108,10 @@ func SendJSON(url string, data []byte) ([]byte, error) {
 
 	req.Header.Set("Content-Type", "application/json")
 
+	if apikey != "" {
+		req.Header.Set("X-API-Key", apikey)
+	}
+
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("making http request: %w", err)
@@ -87,7 +120,7 @@ func SendJSON(url string, data []byte) ([]byte, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("reading http response: %w", err)
+		return body, fmt.Errorf("reading http response: %w", err)
 	}
 
 	return body, nil

@@ -137,33 +137,35 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var v plex.Webhook
-	if err := json.Unmarshal([]byte(r.Form.Get("payload")), &v); err != nil {
+
+	switch err := json.Unmarshal([]byte(r.Form.Get("payload")), &v); {
+	case err != nil:
 		c.Errorf("Unmarshalling Plex payload: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
-
-		return
-	}
-
-	if c.plex.Active() {
-		c.Printf("Plex Webhook IGNORED (cooldown): %s, %s '%s' => %s",
+	case !strings.HasPrefix(v.Event, "media"):
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ignored, non-media\n"))
+	case c.plex.Active():
+		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("ignored\n"))
+		_, _ = w.Write([]byte("ignored, cooldown\n"))
+	default:
+		go c.collectSessions(&v)
+	}
+}
 
+func (c *Client) collectSessions(v *plex.Webhook) {
+	defer c.plex.Done()
+	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
+		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+
+	if body, err := c.Config.Plex.SendMeta(v, c.Config.APIKey); err != nil {
+		c.Errorf("Sending Plex Session to Notifiarr: %v: %v", err, string(body))
 		return
 	}
 
-	go func() {
-		defer c.plex.Done()
-		c.Printf("Plex Webhook: %s, %s '%s' => %s", v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-
-		if body, err := c.Config.Plex.SendMeta(&v); err != nil {
-			c.Errorf("Sending Plex Session to Notifiarr: %v: %v", err, string(body))
-			return
-		}
-
-		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
-	}()
+	c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
 }
 
 // fixForwardedFor sets the X-Forwarded-For header to the client IP

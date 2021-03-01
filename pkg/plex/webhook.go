@@ -20,7 +20,7 @@ type hookMeta struct {
 // after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr.
-func (s *Server) SendMeta(hook *Webhook) (b []byte, err error) {
+func (s *Server) SendMeta(hook *Webhook, apikey string) (b []byte, err error) {
 	wg, hm := (&hookMeta{nil, &snapshot.Snapshot{}, hook}).get()
 
 	// Wait 10 seconds for the server to get the session ready
@@ -35,7 +35,7 @@ func (s *Server) SendMeta(hook *Webhook) (b []byte, err error) {
 	b, _ = json.Marshal(&hm)
 	// log.Println(string(data))
 
-	return snapshot.SendJSON(snapshot.NotifiarrTestURL, b)
+	return snapshot.SendJSON(snapshot.NotifiarrTestURL, apikey, b)
 }
 
 func (hm *hookMeta) get() (*sync.WaitGroup, *hookMeta) {

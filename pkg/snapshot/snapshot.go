@@ -20,6 +20,12 @@ const (
 	NotifiarrTestURL = "https://discordnotifier.com/notifierTest.php"
 )
 
+const (
+	defaultTimeout  = 10 * time.Second
+	minimumTimeout  = 5 * time.Second
+	minimumInterval = 10 * time.Minute
+)
+
 // Config determines which checks to run, etc.
 type Config struct {
 	Timeout      cnfg.Duration `toml:"timeout"`           // total run time allowed.
@@ -74,12 +80,6 @@ type Partition struct {
 	Total  uint64 `json:"total"`
 	Free   uint64 `json:"free"`
 }
-
-const (
-	defaultTimeout  = 10 * time.Second
-	minimumTimeout  = 2 * time.Second
-	minimumInterval = 10 * time.Minute
-)
 
 // GetSnapshot returns a system snapshot based on requested data in the config.
 func (c *Config) GetSnapshot() (*Snapshot, []error) {

@@ -11,10 +11,9 @@ import (
 
 type Server struct {
 	Timeout      cnfg.Duration `toml:"timeout"`
-	Interval     cnfg.Duration `toml:"timeout"`
+	Interval     cnfg.Duration `toml:"interval"`
 	URL          string        `toml:"url"`
 	Token        string        `toml:"token"`
-	Secret       string        `toml:"secret"`
 	AccountMap   string        `toml:"account_map"`
 	Name         string        `toml:"server"`
 	ReturnJSON   bool          `toml:"return_json"`
@@ -36,12 +35,12 @@ const (
 var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
 
 // Start checks input values and starts the cron interval if it's configured.
-func (s *Server) Start() error {
+func (s *Server) Start(apikey string) error {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return ErrNoURLToken
 	}
 
-	if s.Interval.Duration < minimumInterval {
+	if s.Interval.Duration < minimumInterval && s.Interval.Duration != 0 {
 		s.Interval.Duration = minimumInterval
 	}
 
@@ -61,42 +60,46 @@ func (s *Server) Start() error {
 		s.Cooldown.Duration = s.Timeout.Duration
 	}
 
-	go s.startCron()
+	go s.startCron(apikey)
 
 	return nil
 }
 
-func (s *Server) startCron() {
+func (s *Server) startCron(apikey string) {
 	if s.Interval.Duration == 0 {
 		return
 	}
 
+	time.Sleep(time.Second)
 	t := time.NewTicker(s.Interval.Duration)
 	s.stopChan = make(chan struct{})
-	s.Printf("==> Plex Sessions Collection Started, interval: %v", s.Interval)
+
+	defer func() {
+		t.Stop()
+		close(s.stopChan)
+		s.stopChan = nil
+	}()
+
+	s.Printf("==> Plex Sessions Collection Started, URL: %s, interval: %v, timeout: %v, cooldown: %v",
+		s.URL, s.Interval, s.Timeout, s.Cooldown)
 
 	for {
 		select {
 		case <-t.C:
-			if body, err := s.SendMeta(nil); err != nil {
+			if body, err := s.SendMeta(nil, apikey); err != nil {
 				s.Errorf("Sending Plex Session to Notifiarr: %v: %v", err, string(body))
 				continue
 			}
 
 			s.Printf("Plex Sessions sent to Notifiarr, sending again in %s", s.Interval)
 		case <-s.stopChan:
-			t.Stop()
 			return
 		}
 	}
 }
 
 func (s *Server) Stop() {
-	if s == nil || s.stopChan == nil {
-		return
+	if s != nil || s.stopChan != nil {
+		s.stopChan <- struct{}{}
 	}
-
-	s.stopChan <- struct{}{}
-	close(s.stopChan)
-	s.stopChan = nil
 }

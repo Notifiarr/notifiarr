@@ -71,7 +71,6 @@ type Client struct {
 // Errors returned by this package.
 var (
 	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file or with environment variable")
-	ErrNoApps    = fmt.Errorf("at least 1 Starr app must be setup in config file or with environment variables")
 )
 
 // NewDefaults returns a new Client pointer with default settings.
@@ -144,50 +143,23 @@ func start() error {
 	c.Logger.SetupLogging(c.Config.Logs)
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
 	c.Printf("==> %s", msg)
-	c.startPlex()
-	c.startSnaps()
 
+	return c.run(strings.HasPrefix(msg, msgConfigCreate))
+}
+
+func (c *Client) run(newConfig bool) error {
 	if c.Flags.TestSnaps {
 		c.testSnaps(snapshot.NotifiarrTestURL)
 		return nil
 	}
 
-	return c.run(strings.HasPrefix(msg, msgConfigCreate))
-}
-
-// starts plex if it's configured. logs any error.
-func (c *Client) startPlex() bool {
-	var err error
-
-	if c.Config.Plex != nil {
-		c.Config.Plex.Logger = c.Logger
-
-		if err = c.Config.Plex.Start(); err != nil {
-			c.Errorf("plex config: %v (plex DISABLED)", err)
-			c.Config.Plex = nil
-		}
-	}
-
-	return err != nil
-}
-
-// starts snapshots if it's configured. logs any error.
-func (c *Client) startSnaps() {
-	if c.Config.Snapshot != nil {
-		c.Config.Snapshot.Logger = c.Logger
-		c.Config.Snapshot.Start()
-	}
-}
-
-func (c *Client) run(newConfig bool) error {
 	if c.Config.APIKey == "" {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
-	} else if len(c.Config.Radarr) < 1 && len(c.Config.Readarr) < 1 &&
-		len(c.Config.Sonarr) < 1 && len(c.Config.Lidarr) < 1 {
-		return ErrNoApps
 	}
 
 	c.PrintStartupInfo()
+	c.startPlex()
+	c.startSnaps()
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 
@@ -208,8 +180,32 @@ func (c *Client) run(newConfig bool) error {
 	}
 }
 
+// starts plex if it's configured. logs any error.
+func (c *Client) startPlex() bool {
+	var err error
+
+	if c.Config.Plex != nil {
+		c.Config.Plex.Logger = c.Logger
+
+		if err = c.Config.Plex.Start(c.Config.APIKey); err != nil {
+			c.Errorf("plex config: %v (plex DISABLED)", err)
+			c.Config.Plex = nil
+		}
+	}
+
+	return err != nil
+}
+
+// starts snapshots if it's configured. logs any error.
+func (c *Client) startSnaps() {
+	if c.Config.Snapshot != nil {
+		c.Config.Snapshot.Logger = c.Logger
+		c.Config.Snapshot.Start(c.Config.APIKey)
+	}
+}
+
 // Temporary code?
-func (c *Client) testSnaps(send string) {
+func (c *Client) testSnaps(url string) {
 	snaps, errs := c.Config.Snapshot.GetSnapshot()
 	if len(errs) > 0 {
 		for _, err := range errs {
@@ -231,13 +227,13 @@ func (c *Client) testSnaps(send string) {
 
 	c.Printf("Snapshot Data:\n%s", string(b))
 
-	if send == "" {
+	if url == "" {
 		return
 	}
 
-	if body, err := snapshot.SendJSON(send, b); err != nil {
+	if body, err := snapshot.SendJSON(url, c.Config.APIKey, b); err != nil {
 		c.Errorf("POSTING: %v: %s", err, string(body))
 	} else {
-		c.Printf("Sent Test Snapshot to %s", send)
+		c.Printf("Sent Test Snapshot to %s", url)
 	}
 }
