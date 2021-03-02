@@ -56,17 +56,17 @@ type Config struct {
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	Flags     *Flags
-	Config    *Config
-	server    *http.Server
-	sigkil    chan os.Signal
-	sighup    chan os.Signal
-	allow     allowedIPs
-	menu      map[string]ui.MenuItem
-	info      string
-	notifiarr *notifiarr.Config
-	alert     *logs.Cooler
-	plex      *logs.Cooler
+	Flags  *Flags
+	Config *Config
+	server *http.Server
+	sigkil chan os.Signal
+	sighup chan os.Signal
+	allow  allowedIPs
+	menu   map[string]ui.MenuItem
+	info   string
+	notify *notifiarr.Config
+	alert  *logs.Cooler
+	plex   *logs.Cooler
 }
 
 // Errors returned by this package.
@@ -163,7 +163,7 @@ func (c *Client) run(newConfig bool) error {
 	c.PrintStartupInfo()
 	c.checkPlex()
 	c.Config.Snapshot.Validate()
-	c.notifiarr.Start()
+	c.notify.Start()
 
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)

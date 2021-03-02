@@ -41,7 +41,7 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 
-	body, err := c.notifiarr.SendMeta(v, plex.WaitTime)
+	body, err := c.notify.SendMeta(v, plex.WaitTime)
 	if err != nil {
 		c.Errorf("Sending Plex Session to Notifiarr: %v", err)
 		return
@@ -54,7 +54,7 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	}
 }
 
-// Temporary code? sure is ugly and should probably go in notifiarr.
+// Temporary code? sure is ugly and should probably go in notify.
 func (c *Client) testSnaps(url string) {
 	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
 	for _, err := range errs {
@@ -91,7 +91,7 @@ func (c *Client) testSnaps(url string) {
 		return
 	}
 
-	if body, err := c.notifiarr.SendJSON(url, b); err != nil {
+	if body, err := c.notify.SendJSON(url, b); err != nil {
 		c.Errorf("POSTING: %v: %s", err, string(body))
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("Sent Test Snapshot to %s, reply: %s", url, fields[3])

@@ -73,7 +73,7 @@ func (c *Client) setupConfig() {
 
 	// Make sure each app has a sane timeout.
 	c.Config.Apps.Setup(c.Config.Timeout.Duration)
-	c.notifiarr = &notifiarr.Config{
+	c.notify = &notifiarr.Config{
 		Apps:   c.Config.Apps,
 		Plex:   c.Config.Plex,
 		Snap:   c.Config.Snapshot,
@@ -141,7 +141,7 @@ func (c *Client) createConfigFile(file string) (string, error) {
 
 func (c *Client) reloadConfiguration(msg string) {
 	c.Print("==> Reloading Configuration: " + msg)
-	c.notifiarr.Stop()
+	c.notify.Stop()
 
 	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
 		c.Errorf("Unable to reload configuration: %v", err)
@@ -156,7 +156,7 @@ func (c *Client) reloadConfiguration(msg string) {
 	}
 
 	c.PrintStartupInfo()
-	c.notifiarr.Start()
+	c.notify.Start()
 	c.Print("==> Configuration Reloaded!")
 
 	if failed := c.checkPlex(); failed {
