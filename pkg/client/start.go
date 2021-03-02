@@ -35,10 +35,10 @@ const (
 // Flags are our CLI input flags.
 type Flags struct {
 	*flag.FlagSet
+	verReq     bool
+	testSnaps  bool
 	ConfigFile string
 	EnvPrefix  string
-	verReq     bool
-	TestSnaps  bool
 }
 
 // Config represents the data in our config file.
@@ -57,7 +57,6 @@ type Config struct {
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	notifiarr *notifiarr.Config
 	Flags     *Flags
 	Config    *Config
 	server    *http.Server
@@ -66,6 +65,7 @@ type Client struct {
 	allow     allowedIPs
 	menu      map[string]ui.MenuItem
 	info      string
+	notifiarr *notifiarr.Config
 	alert     *logs.Cooler
 	plex      *logs.Cooler
 }
@@ -89,12 +89,12 @@ func NewDefaults() *Client {
 				URLBase: "/",
 			},
 			BindAddr: DefaultBindAddr,
+			Snapshot: &snapshot.Config{},
 			Logs: &logs.Logs{
 				LogFiles:  DefaultLogFiles,
 				LogFileMb: DefaultLogFileMb,
 			},
-			Timeout:  cnfg.Duration{Duration: DefaultTimeout},
-			Snapshot: &snapshot.Config{},
+			Timeout: cnfg.Duration{Duration: DefaultTimeout},
 		}, Flags: &Flags{
 			FlagSet:    flag.NewFlagSet(DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(DefaultEnvPrefix + "_CONFIG_FILE"),
@@ -106,7 +106,7 @@ func NewDefaults() *Client {
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
-	f.BoolVar(&f.TestSnaps, "snaps", false, f.Name()+"Test Snapshots")
+	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.Parse(args) // nolint: errcheck
@@ -150,7 +150,7 @@ func start() error {
 }
 
 func (c *Client) run(newConfig bool) error {
-	if c.Flags.TestSnaps {
+	if c.Flags.testSnaps {
 		c.checkPlex()
 		c.testSnaps(notifiarr.TestURL)
 

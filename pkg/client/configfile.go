@@ -157,11 +157,11 @@ func (c *Client) reloadConfiguration(msg string) {
 
 	c.PrintStartupInfo()
 	c.notifiarr.Start()
+	c.Print("==> Configuration Reloaded!")
 
 	if failed := c.checkPlex(); failed {
 		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROOR: Plex DISABLED due to bad config.")
 	} else {
-		c.Print("==> Configuration Reloaded!")
 		_, _ = ui.Info(Title, "Configuration Reloaded!")
 	}
 }
