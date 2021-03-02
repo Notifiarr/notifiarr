@@ -12,6 +12,7 @@ import (
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/apps"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/plex"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/snapshot"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
@@ -56,16 +57,17 @@ type Config struct {
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	Flags  *Flags
-	Config *Config
-	server *http.Server
-	sigkil chan os.Signal
-	sighup chan os.Signal
-	allow  allowedIPs
-	menu   map[string]ui.MenuItem
-	info   string
-	alert  *logs.Cooler
-	plex   *logs.Cooler
+	notifiarr *notifiarr.Config
+	Flags     *Flags
+	Config    *Config
+	server    *http.Server
+	sigkil    chan os.Signal
+	sighup    chan os.Signal
+	allow     allowedIPs
+	menu      map[string]ui.MenuItem
+	info      string
+	alert     *logs.Cooler
+	plex      *logs.Cooler
 }
 
 // Errors returned by this package.
@@ -149,7 +151,9 @@ func start() error {
 
 func (c *Client) run(newConfig bool) error {
 	if c.Flags.TestSnaps {
-		c.testSnaps(snapshot.NotifiarrTestURL)
+		c.checkPlex()
+		c.testSnaps(notifiarr.TestURL)
+
 		return nil
 	}
 
@@ -158,8 +162,10 @@ func (c *Client) run(newConfig bool) error {
 	}
 
 	c.PrintStartupInfo()
-	c.startPlex()
-	c.startSnaps()
+	c.checkPlex()
+	c.Config.Snapshot.Validate()
+	c.notifiarr.Start()
+
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 
@@ -181,13 +187,11 @@ func (c *Client) run(newConfig bool) error {
 }
 
 // starts plex if it's configured. logs any error.
-func (c *Client) startPlex() bool {
+func (c *Client) checkPlex() bool {
 	var err error
 
 	if c.Config.Plex != nil {
-		c.Config.Plex.Logger = c.Logger
-
-		if err = c.Config.Plex.Start(c.Config.APIKey); err != nil {
+		if err = c.Config.Plex.Validate(); err != nil {
 			c.Errorf("plex config: %v (plex DISABLED)", err)
 			c.Config.Plex = nil
 		}
@@ -196,34 +200,36 @@ func (c *Client) startPlex() bool {
 	return err != nil
 }
 
-// starts snapshots if it's configured. logs any error.
-func (c *Client) startSnaps() {
-	if c.Config.Snapshot != nil {
-		c.Config.Snapshot.Logger = c.Logger
-		c.Config.Snapshot.Start(c.Config.APIKey)
-	}
-}
-
-// Temporary code?
+// Temporary code? sure is ugly and should probably go in notifiarr.
 func (c *Client) testSnaps(url string) {
-	snaps, errs := c.Config.Snapshot.GetSnapshot()
-	if len(errs) > 0 {
-		for _, err := range errs {
-			if err != nil {
-				c.Errorf("%v", err)
-			}
+	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
+	for _, err := range errs {
+		if err != nil {
+			c.Errorf("%v", err)
 		}
 	}
 
-	p, err := c.Config.Plex.GetSessions()
-	if err != nil {
-		c.Errorf("%v", err)
+	for _, err := range debug {
+		if err != nil {
+			c.Errorf("%v", err)
+		}
 	}
 
-	b, _ := json.Marshal(&struct {
-		*snapshot.Snapshot
-		Plex *plex.Sessions `json:"plex"`
-	}{Snapshot: snaps, Plex: p})
+	var (
+		plex *plex.Sessions
+		err  error
+	)
+
+	if c.Config.Plex != nil {
+		if plex, err = c.Config.Plex.GetSessions(); err != nil {
+			c.Errorf("%v", err)
+		}
+	}
+
+	b, _ := json.Marshal(&notifiarr.Payload{
+		Snap: snaps,
+		Plex: plex,
+	})
 
 	c.Printf("Snapshot Data:\n%s", string(b))
 
@@ -231,9 +237,11 @@ func (c *Client) testSnaps(url string) {
 		return
 	}
 
-	if body, err := snapshot.SendJSON(url, c.Config.APIKey, b); err != nil {
+	if body, err := c.notifiarr.SendJSON(url, b); err != nil {
 		c.Errorf("POSTING: %v: %s", err, string(body))
+	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
+		c.Printf("Sent Test Snapshot to %s, reply: %s", url, fields[3])
 	} else {
-		c.Printf("Sent Test Snapshot to %s", url)
+		c.Printf("Sent Test Snapshot to %s, reply: %s", url, string(body))
 	}
 }

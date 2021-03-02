@@ -19,6 +19,8 @@ type Sessions struct {
 
 type Session interface{}
 
+var ErrBadStatus = fmt.Errorf("status code not 200")
+
 func (s *Server) GetSessions() (*Sessions, error) {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return nil, ErrNoURLToken
@@ -80,6 +82,10 @@ func (s *Server) getPlexSessions(ctx context.Context, headers map[string]string)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("reading http response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return body, ErrBadStatus
 	}
 
 	return body, nil

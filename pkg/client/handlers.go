@@ -160,12 +160,17 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 
-	if body, err := c.Config.Plex.SendMeta(v, c.Config.APIKey); err != nil {
-		c.Errorf("Sending Plex Session to Notifiarr: %v: %v", err, string(body))
+	body, err := c.notifiarr.SendMeta(v, plex.WaitTime)
+	if err != nil {
+		c.Errorf("Sending Plex Session to Notifiarr: %v", err)
 		return
 	}
 
-	c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
+	if fields := strings.Split(string(body), `"`); len(fields) > 3 { // nolint:gomnd
+		c.Printf("Plex => Notifiarr: %s '%s' => %s (%s)", v.Account.Title, v.Event, v.Metadata.Title, fields[3])
+	} else {
+		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
+	}
 }
 
 // fixForwardedFor sets the X-Forwarded-For header to the client IP

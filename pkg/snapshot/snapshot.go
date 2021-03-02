@@ -9,15 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
 	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/cnfg"
-)
-
-// Notifiarr URLs.
-const (
-	NotifiarrURL     = "https://discordnotifier.com/notifier.php"
-	NotifiarrTestURL = "https://discordnotifier.com/notifierTest.php"
 )
 
 const (
@@ -28,18 +21,16 @@ const (
 
 // Config determines which checks to run, etc.
 type Config struct {
-	Timeout      cnfg.Duration `toml:"timeout"`           // total run time allowed.
-	Interval     cnfg.Duration `toml:"interval"`          // how often to send snaps (cron).
-	UseSudo      bool          `toml:"use_sudo"`          // use sudo for smartctl commands.
-	Raid         bool          `toml:"monitor_raid"`      // include mdstat and/or megaraid.
-	DriveData    bool          `toml:"monitor_drives"`    // smartctl commands.
-	DiskUsage    bool          `toml:"monitor_space"`     // get disk usage.
-	Uptime       bool          `toml:"monitor_uptime"`    // all system stats.
-	CPUMem       bool          `toml:"monitor_cpuMemory"` // cpu perct and memory used/free.
-	CPUTemp      bool          `toml:"monitor_cpuTemp"`   // not everything supports temps.
-	ZFSPools     []string      `toml:"zfs_pools"`         // zfs pools to monitor.
-	*logs.Logger `toml:"-"`
-	stopChan     chan struct{}
+	Timeout   cnfg.Duration `toml:"timeout"`           // total run time allowed.
+	Interval  cnfg.Duration `toml:"interval"`          // how often to send snaps (cron).
+	UseSudo   bool          `toml:"use_sudo"`          // use sudo for smartctl commands.
+	Raid      bool          `toml:"monitor_raid"`      // include mdstat and/or megaraid.
+	DriveData bool          `toml:"monitor_drives"`    // smartctl commands.
+	DiskUsage bool          `toml:"monitor_space"`     // get disk usage.
+	Uptime    bool          `toml:"monitor_uptime"`    // all system stats.
+	CPUMem    bool          `toml:"monitor_cpuMemory"` // cpu perct and memory used/free.
+	CPUTemp   bool          `toml:"monitor_cpuTemp"`   // not everything supports temps.
+	ZFSPools  []string      `toml:"zfs_pools"`         // zfs pools to monitor.
 }
 
 // Errors this package generates.
@@ -81,8 +72,20 @@ type Partition struct {
 	Free   uint64 `json:"free"`
 }
 
+func (c *Config) Validate() {
+	if c.Timeout.Duration < minimumTimeout {
+		c.Timeout.Duration = minimumTimeout
+	}
+
+	if c.Interval.Duration == 0 {
+		return
+	} else if c.Interval.Duration < minimumInterval {
+		c.Interval.Duration = minimumInterval
+	}
+}
+
 // GetSnapshot returns a system snapshot based on requested data in the config.
-func (c *Config) GetSnapshot() (*Snapshot, []error) {
+func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = defaultTimeout
 	} else if c.Timeout.Duration < minimumTimeout {
@@ -93,12 +96,13 @@ func (c *Config) GetSnapshot() (*Snapshot, []error) {
 	defer cancel()
 
 	s := &Snapshot{}
+	errs, debug := c.getSnapshot(ctx, s)
 
-	return s, c.getSnapshot(ctx, s)
+	return s, errs, debug
 }
 
-func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) []error {
-	var errs []error
+func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error) {
+	var errs, debug []error
 
 	if err := s.GetLocalData(ctx, c.Uptime); len(err) != 0 {
 		errs = append(errs, err...)
@@ -108,11 +112,9 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) []error {
 		errs = append(errs, err...)
 	}
 
-	// ignore these errors.
-	// _ = s.getDriveData(ctx, c.DriveData, c.UseSudo) /*
 	if err := s.getDriveData(ctx, c.DriveData, c.UseSudo); len(err) != 0 {
-		errs = append(errs, err...)
-	} /**/
+		debug = append(debug, err...) // these can be noisy, so debug/hide them.
+	}
 
 	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
 	errs = append(errs, s.GetMemoryUsage(ctx, c.CPUMem))
@@ -120,7 +122,7 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) []error {
 	errs = append(errs, s.getRaidData(ctx, c.Raid))
 	errs = append(errs, s.getSystemTemps(ctx, c.CPUTemp))
 
-	return errs
+	return errs, debug
 }
 
 /*******************************************************/
@@ -140,7 +142,7 @@ func readyCommand(ctx context.Context, useSudo bool, run string, args ...string)
 	}
 
 	if useSudo {
-		args = append([]string{cmdPath, "-n"}, args...)
+		args = append([]string{"-n", cmdPath}, args...)
 
 		if cmdPath, err = exec.LookPath("sudo"); err != nil {
 			return nil, nil, nil, fmt.Errorf("sudo missing! %w", err)

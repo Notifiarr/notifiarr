@@ -3,21 +3,35 @@ package snapshot
 import (
 	"context"
 	"fmt"
-	"log"
+	"path"
+	"runtime"
 	"strconv"
 	"strings"
 
+	"github.com/jaypipes/ghw"
 	"github.com/shirou/gopsutil/v3/disk"
 )
+
+var ErrNoDisks = fmt.Errorf("no disks found")
 
 func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (errs []error) {
 	if !run {
 		return nil
 	}
 
-	partitions, err := disk.PartitionsWithContext(ctx, true)
+	finder := getParts
+
+	if runtime.GOOS == "darwin" || runtime.GOOS == "windows" || runtime.GOOS == "linux" {
+		finder = getBlocks
+	}
+
+	disks, err := finder(ctx)
 	if err != nil {
-		return []error{fmt.Errorf("unable to get partitions: %w", err)}
+		return []error{err}
+	}
+
+	if len(disks) == 0 {
+		return []error{ErrNoDisks}
 	}
 
 	devices := make(map[string]struct{})
@@ -25,19 +39,53 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	s.DriveTemps = make(map[string]int)
 	s.DiskHealth = make(map[string]string)
 
-	for _, partition := range partitions {
-		log.Printf("[TEMPORARY] partition %s =-> %s", partition.Mountpoint, partition.Device)
-
-		if _, ok := devices[partition.Device]; ok {
+	for _, disk := range disks {
+		if _, ok := devices[disk]; ok {
 			continue
 		}
 
-		errs = append(errs, s.getDiskData(ctx, partition.Device, useSudo))
-		errs = append(errs, s.getDiskHealth(ctx, partition.Device, useSudo))
-		devices[partition.Device] = struct{}{}
+		errs = append(errs, s.getDiskData(ctx, disk, useSudo))
+		errs = append(errs, s.getDiskHealth(ctx, disk, useSudo))
+		devices[disk] = struct{}{}
 	}
 
 	return errs
+}
+
+// works well on mac and linux, probably windows too.
+func getBlocks(ctx context.Context) ([]string, error) {
+	block, err := ghw.Block()
+	if err != nil {
+		return nil, fmt.Errorf("unable to get block devices: %w", err)
+	}
+
+	list := []string{}
+
+	for _, dev := range block.Disks {
+		if runtime.GOOS != "windows" {
+			list = append(list, path.Join("/dev", dev.Name))
+		} else {
+			list = append(list, dev.Name)
+		}
+	}
+
+	return list, nil
+}
+
+// use this for everything else....
+func getParts(ctx context.Context) ([]string, error) {
+	partitions, err := disk.PartitionsWithContext(ctx, false)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get partitions: %w", err)
+	}
+
+	list := []string{}
+
+	for _, part := range partitions {
+		list = append(list, part.Device)
+	}
+
+	return list, nil
 }
 
 func (s *Snapshot) getDiskData(ctx context.Context, disk string, useSudo bool) error { //nolint: cyclop

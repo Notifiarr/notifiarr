@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/snapshot"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/update"
 	"github.com/getlantern/systray"
@@ -114,9 +114,9 @@ func (c *Client) watchKillerChannels() {
 	}
 }
 
+// nolint:errcheck,cyclop
 func (c *Client) watchGuiChannels() {
 	for {
-		// nolint:errcheck
 		select {
 		case <-c.menu["stat"].Clicked():
 			c.toggleServer()
@@ -150,7 +150,7 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["snap_log"].Clicked():
 			c.testSnaps("")
 		case <-c.menu["snap_send"].Clicked():
-			c.testSnaps(snapshot.NotifiarrTestURL)
+			c.testSnaps(notifiarr.TestURL)
 		case <-c.menu["update"].Clicked():
 			c.checkForUpdate()
 		case <-c.menu["dninfo"].Clicked():
