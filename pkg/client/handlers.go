@@ -2,7 +2,6 @@ package client
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -12,7 +11,6 @@ import (
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/plex"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	"golift.io/version"
 )
@@ -28,7 +26,7 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 
-	if c.Config.Plex != nil && c.Config.Plex.Token != "" {
+	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
 		c.Config.Router.Handle("/plex",
 			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", c.Config.Plex.Token)
 	}
@@ -125,51 +123,6 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
-	}
-}
-
-func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(1000 * 100); err != nil { // nolint:gomnd // 100kbyte memory usage
-		c.Errorf("Parsing Multipart Form (plex): %v", err)
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
-	var v plex.Webhook
-
-	switch err := json.Unmarshal([]byte(r.Form.Get("payload")), &v); {
-	case err != nil:
-		c.Errorf("Unmarshalling Plex payload: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-	case !strings.HasPrefix(v.Event, "media"):
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("ignored, non-media\n"))
-	case c.plex.Active():
-		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
-			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("ignored, cooldown\n"))
-	default:
-		go c.collectSessions(&v)
-	}
-}
-
-func (c *Client) collectSessions(v *plex.Webhook) {
-	defer c.plex.Done()
-	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
-		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-
-	body, err := c.notifiarr.SendMeta(v, plex.WaitTime)
-	if err != nil {
-		c.Errorf("Sending Plex Session to Notifiarr: %v", err)
-		return
-	}
-
-	if fields := strings.Split(string(body), `"`); len(fields) > 3 { // nolint:gomnd
-		c.Printf("Plex => Notifiarr: %s '%s' => %s (%s)", v.Account.Title, v.Event, v.Metadata.Title, fields[3])
-	} else {
-		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
 	}
 }
 
