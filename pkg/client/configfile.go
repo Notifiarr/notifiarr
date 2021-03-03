@@ -156,7 +156,7 @@ func (c *Client) reloadConfiguration(msg string) {
 	}
 
 	c.PrintStartupInfo()
-	c.notify.Start()
+	c.notify.Start(c.Flags.Mode)
 	c.Print("==> Configuration Reloaded!")
 
 	if failed := c.checkPlex(); failed {

@@ -58,6 +58,7 @@ func (c *Client) readyTray() {
 	c.watchGuiChannels()
 }
 
+//nolint:lll
 func (c *Client) makeChannels() {
 	c.menu["stat"] = ui.WrapMenu(systray.AddMenuItem("Running", "web server state unknown"))
 
@@ -83,10 +84,21 @@ func (c *Client) makeChannels() {
 	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
-	data := systray.AddMenuItem("Data", "Data Collection and Snapshots")
+	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, network monitors")
 	c.menu["data"] = ui.WrapMenu(data)
-	c.menu["snap_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Snapshot", "write snapshot data to log file"))
-	c.menu["snap_send"] = ui.WrapMenu(data.AddSubMenuItem("Test Snapshot", "send snapshot to notifiarr test endpoint"))
+	c.menu["snap_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Full Snapshot", "write snapshot data to log file"))
+	c.menu["plex_test"] = ui.WrapMenu(data.AddSubMenuItem("Test Plex Sessions", "send plex sessions to notifiarr test endpoint"))
+	c.menu["snap_test"] = ui.WrapMenu(data.AddSubMenuItem("Test System Snapshot", "send system snapshot to notifiarr test endpoint"))
+	c.menu["netw_test"] = ui.WrapMenu(data.AddSubMenuItem("Test Network Snapshot", "send network snapshot to notifiarr test endpoint"))
+	c.menu["plex_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Plex Sessions", "send plex sessions to notifiarr dev endpoint"))
+	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
+	c.menu["netw_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Network Snapshot", "send network snapshot to notifiarr dev endpoint"))
+	c.menu["plex_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod Plex Sessions", "send plex sessions to notifiarr"))
+	c.menu["snap_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod System Snapshot", "send system snapshot to notifiarr"))
+	c.menu["netw_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod Network Snapshot", "send network snapshot to notifiarr"))
+	c.menu["netw_dev"].Disable()  // these are not ready yet.
+	c.menu["netw_test"].Disable() // these are not ready yet.
+	c.menu["netw_prod"].Disable() // these are not ready yet.
 
 	// These start hidden.
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
@@ -148,9 +160,19 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
 		case <-c.menu["snap_log"].Clicked():
-			c.testSnaps("")
-		case <-c.menu["snap_send"].Clicked():
-			c.testSnaps(notifiarr.TestURL)
+			c.logSnaps()
+		case <-c.menu["plex_test"].Clicked():
+			c.sendPlexSessions(notifiarr.TestURL)
+		case <-c.menu["snap_test"].Clicked():
+			c.sendSystemSnapshot(notifiarr.TestURL)
+		case <-c.menu["plex_dev"].Clicked():
+			c.sendPlexSessions(notifiarr.DevURL)
+		case <-c.menu["snap_dev"].Clicked():
+			c.sendSystemSnapshot(notifiarr.DevURL)
+		case <-c.menu["plex_prod"].Clicked():
+			c.sendPlexSessions(notifiarr.ProdURL)
+		case <-c.menu["snap_prod"].Clicked():
+			c.sendSystemSnapshot(notifiarr.ProdURL)
 		case <-c.menu["update"].Clicked():
 			c.checkForUpdate()
 		case <-c.menu["dninfo"].Clicked():

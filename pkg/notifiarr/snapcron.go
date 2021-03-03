@@ -72,11 +72,11 @@ func (c *Config) sendSnapshot() {
 		}
 	}
 
-	if body, err := c.SendData(TestURL, &Payload{Snap: snapshot}); err != nil {
-		c.Errorf("Sending snapshot to Notifiarr: %v: %v", err, string(body))
+	if body, err := c.SendData(c.URL, &Payload{Snap: snapshot}); err != nil {
+		c.Errorf("Sending snapshot to %s: %v: %v", c.URL, err, string(body))
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("Systems Snapshot sent to Notifiarr, sending again in %s, reply: %s", c.Snap.Interval, fields[3])
+		c.Printf("Systems Snapshot sent to %s, sending again in %s, reply: %s", c.URL, c.Snap.Interval, fields[3])
 	} else {
-		c.Printf("Systems Snapshot sent to Notifiarr, sending again in %s, reply: %s", c.Snap.Interval, string(body))
+		c.Printf("Systems Snapshot sent to %s, sending again in %s, reply: %s", c.URL, c.Snap.Interval, string(body))
 	}
 }

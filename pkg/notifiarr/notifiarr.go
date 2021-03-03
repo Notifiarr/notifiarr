@@ -20,8 +20,9 @@ import (
 
 // Notifiarr URLs.
 const (
-	URL     = "https://discordnotifier.com/notifier.php"
+	ProdURL = "https://discordnotifier.com/notifier.php"
 	TestURL = "https://discordnotifier.com/notifierTest.php"
+	DevURL  = "http://dev.discordnotifier.com/notifier.php"
 )
 
 // Payload is the outbound payload structure that is sent to Notifiarr.
@@ -34,17 +35,29 @@ type Payload struct {
 
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
-	Apps         *apps.Apps       `json:"-"` // has API key
-	Plex         *plex.Server     `json:"-"` // plex sessions
-	Snap         *snapshot.Config `json:"-"` // system snapshot data
-	*logs.Logger `json:"-"`       // log file writer
+	Apps         *apps.Apps       // has API key
+	Plex         *plex.Server     // plex sessions
+	Snap         *snapshot.Config // system snapshot data
+	URL          string
+	*logs.Logger // log file writer
 	stopPlex     chan struct{}
 	stopSnap     chan struct{}
 	client       *http.Client
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
-func (c *Config) Start() {
+func (c *Config) Start(mode string) {
+	switch mode {
+	default:
+		fallthrough
+	case "test", "testing":
+		c.URL = TestURL
+	case "prod", "production":
+		c.URL = ProdURL
+	case "dev", "development":
+		c.URL = DevURL
+	}
+
 	go c.startSnapCron()
 	go c.startPlexCron()
 }
@@ -65,7 +78,7 @@ func (c *Config) Stop() {
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) SendMeta(hook *plex.Webhook, wait time.Duration) (b []byte, err error) {
+func (c *Config) SendMeta(hook *plex.Webhook, url string, wait time.Duration) (b []byte, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
 
@@ -97,7 +110,7 @@ func (c *Config) SendMeta(hook *plex.Webhook, wait time.Duration) (b []byte, err
 
 	wg.Wait()
 
-	return c.SendData(TestURL, payload)
+	return c.SendData(url, payload)
 }
 
 // SendJSON posts a JSON payload to a URL. Returns the response body or an error.

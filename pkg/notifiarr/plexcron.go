@@ -26,12 +26,12 @@ func (c *Config) startPlexCron() {
 	for {
 		select {
 		case <-t.C:
-			if body, err := c.SendMeta(nil, 0); err != nil {
-				c.Errorf("Sending Plex Session to Notifiarr: %v: %v", err, string(body))
+			if body, err := c.SendMeta(nil, c.URL, 0); err != nil {
+				c.Errorf("Sending Plex Session to %s: %v: %v", c.URL, err, string(body))
 			} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-				c.Printf("Plex Sessions sent to Notifiarr, sending again in %s, reply: %s", c.Plex.Interval, fields[3])
+				c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, fields[3])
 			} else {
-				c.Printf("Plex Sessions sent to Notifiarr, sending again in %s, reply: %s", c.Plex.Interval, string(body))
+				c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, string(body))
 			}
 		case <-c.stopPlex:
 			return

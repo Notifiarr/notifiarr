@@ -41,7 +41,7 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 
-	body, err := c.notify.SendMeta(v, plex.WaitTime)
+	body, err := c.notify.SendMeta(v, c.notify.URL, plex.WaitTime)
 	if err != nil {
 		c.Errorf("Sending Plex Session to Notifiarr: %v", err)
 		return
@@ -54,18 +54,60 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	}
 }
 
-// Temporary code? sure is ugly and should probably go in notify.
-func (c *Client) testSnaps(url string) {
+// sendPlexSessions is triggered from a menu-bar item.
+func (c *Client) sendPlexSessions(url string) {
+	c.Printf("[user requested] Sending Plex Sessions to %s", url)
+
+	if body, err := c.notify.SendMeta(nil, url, 0); err != nil {
+		c.Errorf("[user requested] Sending Plex Sessions to %s: %v: %v", url, err, string(body))
+	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
+		c.Printf("[user requested] Sent Plex Sessions to %s, reply: %s", url, fields[3])
+	} else {
+		c.Printf("[user requested] Sent Plex Sessions to %s, reply: %s", url, string(body))
+	}
+}
+
+// sendSystemSnapshot is triggered from a menu-bar item.
+func (c *Client) sendSystemSnapshot(url string) {
+	c.Printf("[user requested] Sending System Snapshot to %s", url)
+
 	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
 	for _, err := range errs {
 		if err != nil {
-			c.Errorf("%v", err)
+			c.Errorf("[user requested] %v", err)
 		}
 	}
 
 	for _, err := range debug {
 		if err != nil {
-			c.Errorf("%v", err)
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	b, _ := json.Marshal(&notifiarr.Payload{Snap: snaps})
+	if body, err := c.notify.SendJSON(url, b); err != nil {
+		c.Errorf("[user requested] Sending System Snapshot to %s: %v: %s", url, err, string(body))
+	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
+		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, fields[3])
+	} else {
+		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, string(body))
+	}
+}
+
+// logSnaps writes a full snapshot payload to the log file.
+func (c *Client) logSnaps() {
+	c.Printf("[user requested] Collecting Snapshot from Plex and the System (for log file).")
+
+	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
+	for _, err := range errs {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	for _, err := range debug {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
 		}
 	}
 
@@ -76,26 +118,10 @@ func (c *Client) testSnaps(url string) {
 
 	if c.Config.Plex != nil {
 		if plex, err = c.Config.Plex.GetSessions(); err != nil {
-			c.Errorf("%v", err)
+			c.Errorf("[user requested] %v", err)
 		}
 	}
 
-	b, _ := json.Marshal(&notifiarr.Payload{
-		Snap: snaps,
-		Plex: plex,
-	})
-
-	c.Printf("Snapshot Data:\n%s", string(b))
-
-	if url == "" {
-		return
-	}
-
-	if body, err := c.notify.SendJSON(url, b); err != nil {
-		c.Errorf("POSTING: %v: %s", err, string(body))
-	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("Sent Test Snapshot to %s, reply: %s", url, fields[3])
-	} else {
-		c.Printf("Sent Test Snapshot to %s, reply: %s", url, string(body))
-	}
+	b, _ := json.Marshal(&notifiarr.Payload{Snap: snaps, Plex: plex})
+	c.Printf("[user requested] Snapshot Data:\n%s", string(b))
 }
