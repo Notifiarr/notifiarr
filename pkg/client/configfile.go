@@ -78,6 +78,7 @@ func (c *Client) setupConfig() {
 		Plex:   c.Config.Plex,
 		Snap:   c.Config.Snapshot,
 		Logger: c.Logger,
+		URL:    notifiarr.TestURL,
 	}
 
 	if c.Config.BindAddr == "" {
