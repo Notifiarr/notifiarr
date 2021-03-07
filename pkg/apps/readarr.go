@@ -25,7 +25,7 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(Readarr, "/search/{query}", readarrSearchBook, "GET")
 	a.HandleAPIpath(Readarr, "/update", readarrUpdateBook, "PUT")
 	a.HandleAPIpath(Readarr, "/tag", readarrGetTags, "GET")
-	a.HandleAPIpath(Readarr, "/tag/{id:[0-9]+}/{label}", readarrUpdateTag, "PUT")
+	a.HandleAPIpath(Readarr, "/tag/{tid:[0-9]+}/{label}", readarrUpdateTag, "PUT")
 	a.HandleAPIpath(Readarr, "/tag/{label}", readarrSetTag, "PUT")
 	a.HandleAPIpath(Readarr, "/updateauthor", readarrUpdateAuthor, "PUT")
 }
@@ -215,7 +215,7 @@ func readarrGetTags(r *http.Request) (int, interface{}) {
 }
 
 func readarrUpdateTag(r *http.Request) (int, interface{}) {
-	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	id, _ := strconv.Atoi(mux.Vars(r)["tid"])
 
 	tagID, err := getReadarr(r).UpdateTag(id, mux.Vars(r)["label"])
 	if err != nil {

@@ -23,7 +23,7 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/rootFolder", sonarrRootFolders, "GET")
 	a.HandleAPIpath(Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/tag", sonarrGetTags, "GET")
-	a.HandleAPIpath(Sonarr, "/tag/{id:[0-9]+}/{label}", sonarrUpdateTag, "PUT")
+	a.HandleAPIpath(Sonarr, "/tag/{tid:[0-9]+}/{label}", sonarrUpdateTag, "PUT")
 	a.HandleAPIpath(Sonarr, "/tag/{label}", sonarrSetTag, "PUT")
 	a.HandleAPIpath(Sonarr, "/update", sonarrUpdateSeries, "PUT")
 }
@@ -206,7 +206,7 @@ func sonarrGetTags(r *http.Request) (int, interface{}) {
 }
 
 func sonarrUpdateTag(r *http.Request) (int, interface{}) {
-	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	id, _ := strconv.Atoi(mux.Vars(r)["tid"])
 
 	tagID, err := getSonarr(r).UpdateTag(id, mux.Vars(r)["label"])
 	if err != nil {
