@@ -21,7 +21,7 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 
 	finder := getParts
 
-	if runtime.GOOS == "darwin" || runtime.GOOS == "windows" || runtime.GOOS == "linux" {
+	if runtime.GOOS == "darwin" || runtime.GOOS == "linux" {
 		finder = getBlocks
 	}
 

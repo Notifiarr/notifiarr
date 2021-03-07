@@ -82,6 +82,6 @@ func (c *Client) logSnaps() {
 		}
 	}
 
-	b, _ := json.Marshal(&notifiarr.Payload{Snap: snaps, Plex: plex})
+	b, _ := json.MarshalIndent(&notifiarr.Payload{Snap: snaps, Plex: plex}, "", "  ")
 	c.Printf("[user requested] Snapshot Data:\n%s", string(b))
 }
