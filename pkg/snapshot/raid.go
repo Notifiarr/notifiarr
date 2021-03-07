@@ -73,7 +73,8 @@ func (s *Snapshot) getRaidMegaCLI(ctx context.Context) error {
 	}
 
 	if err != nil {
-		return nil
+		// we dont return an error if megacli does not exist.
+		return nil //nolint:nilerr
 	}
 
 	stderr := &bytes.Buffer{}
