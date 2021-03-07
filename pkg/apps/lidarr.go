@@ -29,7 +29,7 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
 	a.HandleAPIpath(Lidarr, "/search/{query}", lidarrSearchAlbum, "GET")
 	a.HandleAPIpath(Lidarr, "/tag", lidarrGetTags, "GET")
-	a.HandleAPIpath(Lidarr, "/tag/{id:[0-9]+}/{label}", lidarrUpdateTag, "PUT")
+	a.HandleAPIpath(Lidarr, "/tag/{tid:[0-9]+}/{label}", lidarrUpdateTag, "PUT")
 	a.HandleAPIpath(Lidarr, "/tag/{label}", lidarrSetTag, "PUT")
 	a.HandleAPIpath(Lidarr, "/update", lidarrUpdateAlbum, "PUT")
 	a.HandleAPIpath(Lidarr, "/updateartist", lidarrUpdateArtist, "PUT")
@@ -236,7 +236,7 @@ func lidarrGetTags(r *http.Request) (int, interface{}) {
 }
 
 func lidarrUpdateTag(r *http.Request) (int, interface{}) {
-	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	id, _ := strconv.Atoi(mux.Vars(r)["tid"])
 
 	tagID, err := getLidarr(r).UpdateTag(id, mux.Vars(r)["label"])
 	if err != nil {
