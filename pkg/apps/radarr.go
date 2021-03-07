@@ -23,9 +23,12 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/rootFolder", radarrRootFolders, "GET")
 	a.HandleAPIpath(Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(Radarr, "/tag", radarrGetTags, "GET")
-	a.HandleAPIpath(Radarr, "/tag/{id:[0-9]+}/{label}", radarrUpdateTag, "PUT")
+	a.HandleAPIpath(Radarr, "/tag/{tid:[0-9]+}/{label}", radarrUpdateTag, "PUT")
 	a.HandleAPIpath(Radarr, "/tag/{label}", radarrSetTag, "PUT")
 	a.HandleAPIpath(Radarr, "/update", radarrUpdateMovie, "PUT")
+	a.HandleAPIpath(Radarr, "/exclusions", radarrGetExclusions, "GET")
+	a.HandleAPIpath(Radarr, "/exclusions", radarrAddExclusions, "POST")
+	a.HandleAPIpath(Radarr, "/exclusions/{eid:(?:[0-9],?)+}", radarrDelExclusions, "DELETE")
 }
 
 // RadarrConfig represents the input data for a Radarr server.
@@ -201,7 +204,7 @@ func radarrGetTags(r *http.Request) (int, interface{}) {
 }
 
 func radarrUpdateTag(r *http.Request) (int, interface{}) {
-	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	id, _ := strconv.Atoi(mux.Vars(r)["tid"])
 
 	tagID, err := getRadarr(r).UpdateTag(id, mux.Vars(r)["label"])
 	if err != nil {
@@ -235,4 +238,49 @@ func radarrUpdateMovie(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "radarr seems to have worked"
+}
+
+func radarrAddExclusions(r *http.Request) (int, interface{}) {
+	var exclusions []*radarr.Exclusion
+
+	err := json.NewDecoder(r.Body).Decode(&exclusions)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	// Get the profiles from radarr.
+	err = getRadarr(r).AddExclusions(exclusions)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding exclusions: %w", err)
+	}
+
+	return http.StatusOK, "added " + strconv.Itoa(len(exclusions)) + " exclusions"
+}
+
+func radarrGetExclusions(r *http.Request) (int, interface{}) {
+	exclusions, err := getRadarr(r).GetExclusions()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting exclusions: %w", err)
+	}
+
+	return http.StatusOK, exclusions
+}
+
+func radarrDelExclusions(r *http.Request) (int, interface{}) {
+	ids := mux.Vars(r)["eid"]
+	exclusions := []int64{}
+
+	for _, s := range strings.Split(ids, ",") {
+		if i, err := strconv.ParseInt(s, 10, 64); err == nil {
+			exclusions = append(exclusions, i)
+		}
+	}
+
+	// Get the profiles from radarr.
+	err := getRadarr(r).DeleteExclusions(exclusions)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting exclusions: %w", err)
+	}
+
+	return http.StatusOK, "deleted: " + strings.Join(strings.Split(ids, ","), ", ")
 }
