@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"strings"
 	"syscall"
+
+	"github.com/gonutz/w32"
 )
 
 // SystrayIcon is the icon in the system tray or task bar.
@@ -12,6 +14,15 @@ const SystrayIcon = "files/favicon.ico"
 
 func HasGUI() bool {
 	return true
+}
+
+func HideConsoleWindow() {
+	if console := w32.GetConsoleWindow(); console != 0 {
+		_, consoleProcID := w32.GetWindowThreadProcessId(console)
+		if w32.GetCurrentProcessId() == consoleProcID {
+			w32.ShowWindowAsync(console, w32.SW_HIDE)
+		}
+	}
 }
 
 // StartCmd starts a command.

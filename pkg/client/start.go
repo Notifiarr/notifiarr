@@ -6,12 +6,14 @@ import (
 	"os"
 	"os/signal"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/apps"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/plex"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/snapshot"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
@@ -33,17 +35,21 @@ const (
 type Flags struct {
 	*flag.FlagSet
 	verReq     bool
+	testSnaps  bool
 	ConfigFile string
 	EnvPrefix  string
+	Mode       string
 }
 
 // Config represents the data in our config file.
 type Config struct {
-	BindAddr   string        `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
-	SSLCrtFile string        `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
-	SSLKeyFile string        `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
-	Upstreams  []string      `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
-	Timeout    cnfg.Duration `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	BindAddr   string           `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
+	SSLCrtFile string           `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
+	SSLKeyFile string           `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
+	Upstreams  []string         `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
+	Timeout    cnfg.Duration    `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	Plex       *plex.Server     `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
+	Snapshot   *snapshot.Config `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
 	*logs.Logs
 	*apps.Apps
 }
@@ -59,18 +65,14 @@ type Client struct {
 	allow  allowedIPs
 	menu   map[string]ui.MenuItem
 	info   string
-	alert  alert
-}
-
-type alert struct {
-	sync.Mutex
-	active bool
+	notify *notifiarr.Config
+	alert  *logs.Cooler
+	plex   *logs.Cooler
 }
 
 // Errors returned by this package.
 var (
 	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file or with environment variable")
-	ErrNoApps    = fmt.Errorf("at least 1 Starr app must be setup in config file or with environment variables")
 )
 
 // NewDefaults returns a new Client pointer with default settings.
@@ -79,12 +81,15 @@ func NewDefaults() *Client {
 		sigkil: make(chan os.Signal, 1),
 		sighup: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
+		plex:   &logs.Cooler{},
+		alert:  &logs.Cooler{},
 		Logger: logs.New(),
 		Config: &Config{
 			Apps: &apps.Apps{
 				URLBase: "/",
 			},
 			BindAddr: DefaultBindAddr,
+			Snapshot: &snapshot.Config{},
 			Logs: &logs.Logs{
 				LogFiles:  DefaultLogFiles,
 				LogFileMb: DefaultLogFileMb,
@@ -101,6 +106,8 @@ func NewDefaults() *Client {
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
+	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots")
+	f.StringVarP(&f.Mode, "mode", "m", "testing", "Selects Notifiarr URL: test, dev, prod")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.Parse(args) // nolint: errcheck
@@ -144,14 +151,22 @@ func start() error {
 }
 
 func (c *Client) run(newConfig bool) error {
+	if c.Flags.testSnaps {
+		c.checkPlex()
+		c.logSnaps()
+
+		return nil
+	}
+
 	if c.Config.APIKey == "" {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
-	} else if len(c.Config.Radarr) < 1 && len(c.Config.Readarr) < 1 &&
-		len(c.Config.Sonarr) < 1 && len(c.Config.Lidarr) < 1 {
-		return ErrNoApps
 	}
 
 	c.PrintStartupInfo()
+	c.checkPlex()
+	c.Config.Snapshot.Validate()
+	c.notify.Start(c.Flags.Mode)
+
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 
@@ -170,4 +185,18 @@ func (c *Client) run(newConfig bool) error {
 		c.StartWebServer()
 		return c.Exit()
 	}
+}
+
+// starts plex if it's configured. logs any error.
+func (c *Client) checkPlex() bool {
+	var err error
+
+	if c.Config.Plex != nil {
+		if err = c.Config.Plex.Validate(); err != nil {
+			c.Errorf("plex config: %v (plex DISABLED)", err)
+			c.Config.Plex = nil
+		}
+	}
+
+	return err != nil
 }

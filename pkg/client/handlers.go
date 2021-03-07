@@ -26,6 +26,11 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 
+	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
+		c.Config.Router.Handle("/plex",
+			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", c.Config.Plex.Token)
+	}
+
 	// Initialize internal-only paths.
 	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
 	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))                // "hi" page on /
@@ -63,22 +68,13 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 		return code, err
 	}
 
-	c.alert.Lock()
-	defer c.alert.Unlock()
-
-	if c.alert.active {
+	if c.alert.Active() {
 		return http.StatusLocked, "previous alert not acknowledged"
 	}
 
-	c.alert.active = true
-
 	go func() {
 		_, _ = ui.Warning(Title+" Alert", body)
-
-		c.alert.Lock()
-		defer c.alert.Unlock()
-
-		c.alert.active = false
+		c.alert.Done() //nolint:wsl
 	}()
 
 	return code, err

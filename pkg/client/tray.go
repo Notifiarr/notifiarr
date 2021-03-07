@@ -3,17 +3,12 @@
 package client
 
 import (
-	"errors"
-	"fmt"
 	"os"
-	"path"
-	"time"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/update"
 	"github.com/getlantern/systray"
-	"github.com/hako/durafmt"
 	"golift.io/version"
 )
 
@@ -57,6 +52,7 @@ func (c *Client) readyTray() {
 	c.watchGuiChannels()
 }
 
+//nolint:lll
 func (c *Client) makeChannels() {
 	c.menu["stat"] = ui.WrapMenu(systray.AddMenuItem("Running", "web server state unknown"))
 
@@ -82,6 +78,22 @@ func (c *Client) makeChannels() {
 	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
+	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, network monitors")
+	c.menu["data"] = ui.WrapMenu(data)
+	c.menu["snap_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Full Snapshot", "write snapshot data to log file"))
+	c.menu["plex_test"] = ui.WrapMenu(data.AddSubMenuItem("Test Plex Sessions", "send plex sessions to notifiarr test endpoint"))
+	c.menu["snap_test"] = ui.WrapMenu(data.AddSubMenuItem("Test System Snapshot", "send system snapshot to notifiarr test endpoint"))
+	c.menu["netw_test"] = ui.WrapMenu(data.AddSubMenuItem("Test Network Snapshot", "send network snapshot to notifiarr test endpoint"))
+	c.menu["plex_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Plex Sessions", "send plex sessions to notifiarr dev endpoint"))
+	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
+	c.menu["netw_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Network Snapshot", "send network snapshot to notifiarr dev endpoint"))
+	c.menu["plex_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod Plex Sessions", "send plex sessions to notifiarr"))
+	c.menu["snap_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod System Snapshot", "send system snapshot to notifiarr"))
+	c.menu["netw_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod Network Snapshot", "send network snapshot to notifiarr"))
+	c.menu["netw_dev"].Disable()  // these are not ready yet.
+	c.menu["netw_test"].Disable() // these are not ready yet.
+	c.menu["netw_prod"].Disable() // these are not ready yet.
+
 	// These start hidden.
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
 	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from DiscordNotifier.com"))
@@ -97,7 +109,7 @@ func (c *Client) watchKillerChannels() {
 		select {
 		case sigc := <-c.sighup:
 			c.Printf("Caught Signal: %v (reloading configuration)", sigc)
-			c.reloadConfiguration()
+			c.reloadConfiguration("caught signal " + sigc.String())
 		case sigc := <-c.sigkil:
 			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
 			return
@@ -108,9 +120,9 @@ func (c *Client) watchKillerChannels() {
 	}
 }
 
+// nolint:errcheck,cyclop
 func (c *Client) watchGuiChannels() {
 	for {
-		// nolint:errcheck
 		select {
 		case <-c.menu["stat"].Clicked():
 			c.toggleServer()
@@ -130,7 +142,7 @@ func (c *Client) watchGuiChannels() {
 			c.Print("User Editing Config File:", c.Flags.ConfigFile)
 			ui.OpenFile(c.Flags.ConfigFile)
 		case <-c.menu["load"].Clicked():
-			c.reloadConfiguration()
+			c.reloadConfiguration("UI requested")
 		case <-c.menu["key"].Clicked():
 			c.changeKey()
 		case <-c.menu["logs_view"].Clicked():
@@ -141,6 +153,20 @@ func (c *Client) watchGuiChannels() {
 			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
+		case <-c.menu["snap_log"].Clicked():
+			c.logSnaps()
+		case <-c.menu["plex_test"].Clicked():
+			c.sendPlexSessions(notifiarr.TestURL)
+		case <-c.menu["snap_test"].Clicked():
+			c.sendSystemSnapshot(notifiarr.TestURL)
+		case <-c.menu["plex_dev"].Clicked():
+			c.sendPlexSessions(notifiarr.DevURL)
+		case <-c.menu["snap_dev"].Clicked():
+			c.sendSystemSnapshot(notifiarr.DevURL)
+		case <-c.menu["plex_prod"].Clicked():
+			c.sendPlexSessions(notifiarr.ProdURL)
+		case <-c.menu["snap_prod"].Clicked():
+			c.sendSystemSnapshot(notifiarr.ProdURL)
 		case <-c.menu["update"].Clicked():
 			c.checkForUpdate()
 		case <-c.menu["dninfo"].Clicked():
@@ -148,138 +174,4 @@ func (c *Client) watchGuiChannels() {
 			ui.Info(Title, "INFO: "+c.info)
 		}
 	}
-}
-
-func (c *Client) toggleServer() {
-	if c.server == nil {
-		c.Print("Starting Web Server")
-		c.StartWebServer()
-
-		return
-	}
-
-	c.Print("Pausing Web Server")
-
-	if err := c.StopWebServer(); err != nil {
-		c.Errorf("Unable to Pause Server: %v", err)
-	}
-}
-
-func (c *Client) rotateLogs() {
-	c.Print("Rotating Log Files!")
-
-	for _, err := range c.Logger.Rotate() {
-		if err != nil {
-			c.Errorf("Rotating Log Files: %v", err)
-		}
-	}
-}
-
-// changeKey shuts down the web server and changes the API key.
-// The server has to shut down to avoid race conditions.
-func (c *Client) changeKey() {
-	key, ok, err := ui.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
-	if err != nil {
-		c.Errorf("Updating API Key: %v", err)
-	} else if !ok || key == c.Config.APIKey {
-		return
-	}
-
-	c.Print("Updating API Key!")
-
-	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
-		c.Errorf("Unable to update API Key: %v", err)
-		return
-	} else if !errors.Is(err, ErrNoServer) {
-		defer c.StartWebServer()
-	}
-
-	c.Config.APIKey = key
-}
-
-func (c *Client) checkForUpdate() {
-	c.Print("User Requested Update Check")
-
-	switch update, err := update.Check("Go-Lift-TV/discordnotifier-client", version.Version); {
-	case err != nil:
-		c.Errorf("Update Check: %v", err)
-		_, _ = ui.Error(Title, "Failure checking version on GitHub: "+err.Error())
-	case update.Outdate:
-		yes, _ := ui.Question(Title, "An Update is available! Download?\n\n"+
-			"Your Version: "+update.Version+"\n"+
-			"New Version: "+update.Current+"\n"+
-			"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
-			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
-		if yes {
-			_ = ui.OpenURL(update.CurrURL)
-		}
-	default:
-		_, _ = ui.Info(Title, "You're up to date! Version: "+update.Version+"\n"+
-			"Updated: "+update.RelDate.Format("Jan 2, 2006")+" ("+
-			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)")
-	}
-}
-
-func (c *Client) displayConfig() (s string) { //nolint: funlen
-	s = "Config File: " + c.Flags.ConfigFile
-	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
-	s += fmt.Sprintf("\nUpstreams: %v", c.allow)
-
-	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
-		s += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))
-		s += fmt.Sprintf("\nCert File: %v", c.Config.SSLCrtFile)
-		s += fmt.Sprintf("\nCert Key: %v", c.Config.SSLKeyFile)
-	} else {
-		s += fmt.Sprintf("\nHTTP: http://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))
-	}
-
-	if c.Config.LogFiles > 0 {
-		s += fmt.Sprintf("\nLog File: %v (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
-		s += fmt.Sprintf("\nHTTP Log: %v (%d @ %dMb)", c.Config.HTTPLog, c.Config.LogFiles, c.Config.LogFileMb)
-	} else {
-		s += fmt.Sprintf("\nLog File: %v (no rotation)", c.Config.LogFile)
-		s += fmt.Sprintf("\nHTTP Log: %v (no rotation)", c.Config.HTTPLog)
-	}
-
-	if count := len(c.Config.Lidarr); count == 1 {
-		s += fmt.Sprintf("\n- Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Lidarr[0].URL, c.Config.Lidarr[0].APIKey != "", c.Config.Lidarr[0].Timeout, c.Config.Lidarr[0].ValidSSL)
-	} else {
-		for _, f := range c.Config.Lidarr {
-			s += fmt.Sprintf("\n- Lidarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-
-	if count := len(c.Config.Radarr); count == 1 {
-		s += fmt.Sprintf("\n- Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Radarr[0].URL, c.Config.Radarr[0].APIKey != "", c.Config.Radarr[0].Timeout, c.Config.Radarr[0].ValidSSL)
-	} else {
-		for _, f := range c.Config.Radarr {
-			s += fmt.Sprintf("\n- Radarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-
-	if count := len(c.Config.Readarr); count == 1 {
-		s += fmt.Sprintf("\n- Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Readarr[0].URL, c.Config.Readarr[0].APIKey != "", c.Config.Readarr[0].Timeout, c.Config.Readarr[0].ValidSSL)
-	} else {
-		for _, f := range c.Config.Readarr {
-			s += fmt.Sprintf("\n- Readarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-
-	if count := len(c.Config.Sonarr); count == 1 {
-		s += fmt.Sprintf("\n- Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Sonarr[0].URL, c.Config.Sonarr[0].APIKey != "", c.Config.Sonarr[0].Timeout, c.Config.Sonarr[0].ValidSSL)
-	} else {
-		for _, f := range c.Config.Sonarr {
-			s += fmt.Sprintf("\n- Sonarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
-		}
-	}
-
-	return s + "\n"
 }

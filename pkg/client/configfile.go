@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
+	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
 	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
@@ -72,6 +73,13 @@ func (c *Client) setupConfig() {
 
 	// Make sure each app has a sane timeout.
 	c.Config.Apps.Setup(c.Config.Timeout.Duration)
+	c.notify = &notifiarr.Config{
+		Apps:   c.Config.Apps,
+		Plex:   c.Config.Plex,
+		Snap:   c.Config.Snapshot,
+		Logger: c.Logger,
+		URL:    notifiarr.TestURL,
+	}
 
 	if c.Config.BindAddr == "" {
 		c.Config.BindAddr = DefaultBindAddr
@@ -132,8 +140,9 @@ func (c *Client) createConfigFile(file string) (string, error) {
 	return file, nil
 }
 
-func (c *Client) reloadConfiguration() {
-	c.Print("==> Reloading Configuration")
+func (c *Client) reloadConfiguration(msg string) {
+	c.Print("==> Reloading Configuration: " + msg)
+	c.notify.Stop()
 
 	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
 		c.Errorf("Unable to reload configuration: %v", err)
@@ -148,9 +157,14 @@ func (c *Client) reloadConfiguration() {
 	}
 
 	c.PrintStartupInfo()
-	c.Print("==> Configuration Reloaded")
+	c.notify.Start(c.Flags.Mode)
+	c.Print("==> Configuration Reloaded!")
 
-	_, _ = ui.Info(Title, "Configuration Reloaded!")
+	if failed := c.checkPlex(); failed {
+		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROOR: Plex DISABLED due to bad config.")
+	} else {
+		_, _ = ui.Info(Title, "Configuration Reloaded!")
+	}
 }
 
 func configFileLocactions() (string, []string) {

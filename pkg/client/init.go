@@ -69,7 +69,7 @@ func (c *Client) Exit() (err error) {
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
 			return
 		case <-c.sighup:
-			c.reloadConfiguration()
+			c.reloadConfiguration("caught signal: sighup")
 		}
 	}
 }
