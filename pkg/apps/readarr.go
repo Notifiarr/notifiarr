@@ -49,7 +49,7 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 	err := json.NewDecoder(r.Body).Decode(payload)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	} else if payload.ForeignBookID == 0 {
+	} else if payload.ForeignBookID == "" {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
 	}
 
@@ -59,7 +59,7 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", payload.ForeignBookID, ErrExists)
+		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignBookID, ErrExists)
 	}
 
 	// Add book using payload.
@@ -84,13 +84,13 @@ func readarrGetAuthor(r *http.Request) (int, interface{}) {
 
 // Check for existing book.
 func readarrCheckBook(r *http.Request) (int, interface{}) {
-	grid, _ := strconv.ParseInt(mux.Vars(r)["grid"], 10, 64)
+	grid := mux.Vars(r)["grid"]
 
 	m, err := getReadarr(r).GetBook(grid)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", grid, ErrExists)
+		return http.StatusConflict, fmt.Errorf("%s: %w", grid, ErrExists)
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
@@ -156,7 +156,7 @@ func readarrRootFolders(r *http.Request) (int, interface{}) {
 }
 
 func readarrSearchBook(r *http.Request) (int, interface{}) {
-	books, err := getReadarr(r).GetBook(0)
+	books, err := getReadarr(r).GetBook("")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
 	}
