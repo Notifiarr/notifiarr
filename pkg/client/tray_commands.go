@@ -155,7 +155,7 @@ func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 func (c *Client) sendPlexSessions(url string) {
 	c.Printf("[user requested] Sending Plex Sessions to %s", url)
 
-	if body, err := c.notify.SendMeta(nil, url, 0); err != nil {
+	if body, err := c.notify.SendMeta(notifiarr.PlexCron, url, nil, 0); err != nil {
 		c.Errorf("[user requested] Sending Plex Sessions to %s: %v: %v", url, err, string(body))
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("[user requested] Sent Plex Sessions to %s, reply: %s", url, fields[3])
@@ -181,7 +181,7 @@ func (c *Client) sendSystemSnapshot(url string) {
 		}
 	}
 
-	b, _ := json.Marshal(&notifiarr.Payload{Snap: snaps})
+	b, _ := json.Marshal(&notifiarr.Payload{Type: notifiarr.SnapCron, Snap: snaps})
 	if body, err := c.notify.SendJSON(url, b); err != nil {
 		c.Errorf("[user requested] Sending System Snapshot to %s: %v: %s", url, err, string(body))
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd

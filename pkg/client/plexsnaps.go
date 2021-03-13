@@ -41,7 +41,7 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 
-	body, err := c.notify.SendMeta(v, c.notify.URL, plex.WaitTime)
+	body, err := c.notify.SendMeta(notifiarr.PlexHook, c.notify.URL, v, plex.WaitTime)
 	if err != nil {
 		c.Errorf("Sending Plex Session to Notifiarr: %v", err)
 		return
@@ -82,6 +82,10 @@ func (c *Client) logSnaps() {
 		}
 	}
 
-	b, _ := json.MarshalIndent(&notifiarr.Payload{Snap: snaps, Plex: plex}, "", "  ")
+	b, _ := json.MarshalIndent(&notifiarr.Payload{
+		Type: notifiarr.LogLocal,
+		Snap: snaps,
+		Plex: plex,
+	}, "", "  ")
 	c.Printf("[user requested] Snapshot Data:\n%s", string(b))
 }

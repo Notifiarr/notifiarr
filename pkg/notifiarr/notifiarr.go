@@ -25,9 +25,17 @@ const (
 	DevURL  = "http://dev.discordnotifier.com/notifier.php"
 )
 
+const (
+	PlexCron = "plexcron"
+	SnapCron = "snapcron"
+	PlexHook = "plexhook"
+	LogLocal = "loglocal"
+)
+
 // Payload is the outbound payload structure that is sent to Notifiarr.
 // No other payload formats are used for data sent to notifiarr.com.
 type Payload struct {
+	Type string             `json:"eventType"`
 	Plex *plex.Sessions     `json:"plex,omitempty"`
 	Snap *snapshot.Snapshot `json:"snapshot,omitempty"`
 	Load *plex.Webhook      `json:"payload,omitempty"`
@@ -78,7 +86,7 @@ func (c *Config) Stop() {
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) SendMeta(hook *plex.Webhook, url string, wait time.Duration) (b []byte, err error) {
+func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.Duration) (b []byte, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
 
