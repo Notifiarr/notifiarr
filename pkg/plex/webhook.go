@@ -27,6 +27,9 @@ type Webhook struct {
 		GUID                  string  `json:"guid"`
 		Studio                string  `json:"studio"`
 		Type                  string  `json:"type"`
+		GrandParentTitle      string  `json:"grandparentTitle"`
+		ParentIndex           int64   `json:"parentIndex"`
+		Index                 int64   `json:"index"`
 		Title                 string  `json:"title"`
 		TitleSort             string  `json:"titleSort"`
 		LibrarySectionTitle   string  `json:"librarySectionTitle"`

@@ -19,7 +19,10 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 
 	var v plex.Webhook
 
-	switch err := json.Unmarshal([]byte(r.Form.Get("payload")), &v); {
+	payload := r.Form.Get("payload")
+	c.Debugf("Plex Webhook Payload: %s", payload)
+
+	switch err := json.Unmarshal([]byte(payload), &v); {
 	case err != nil:
 		c.Errorf("Unmarshalling Plex payload: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
