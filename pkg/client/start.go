@@ -107,7 +107,7 @@ func NewDefaults() *Client {
 func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
 	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots")
-	f.StringVarP(&f.Mode, "mode", "m", "testing", "Selects Notifiarr URL: test, dev, prod")
+	f.StringVarP(&f.Mode, "mode", "m", "prod", "Selects Notifiarr URL: test, dev, prod")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.Parse(args) // nolint: errcheck

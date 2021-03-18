@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/load"
 	"golift.io/cnfg"
 )
 
@@ -50,6 +51,8 @@ type Snapshot struct {
 		MemUsed  uint64             `json:"memUsed"`
 		MemTotal uint64             `json:"memTotal"`
 		Temps    map[string]float64 `json:"temperatures,omitempty"`
+		Users    int                `json:"users"`
+		*load.AvgStat
 	} `json:"system"`
 	Raid       *RaidData             `json:"raid,omitempty"`
 	DriveAges  map[string]int        `json:"driveAges,omitempty"`

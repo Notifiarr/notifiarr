@@ -86,34 +86,47 @@ func (c *Config) Stop() {
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.Duration) (b []byte, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), wait)
+func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.Duration) ([]byte, []byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), wait+time.Second*2)
 	defer cancel()
 
 	var (
-		snap    = &snapshot.Snapshot{}
-		payload = &Payload{Snap: snap, Load: hook}
+		payload = &Payload{Type: eventType, Snap: &snapshot.Snapshot{}, Load: hook}
 		wg      sync.WaitGroup
 	)
 
+	rep := make(chan error)
+	defer close(rep)
+
+	go func() {
+		for err := range rep {
+			if err != nil { // maybe move this out of this method?
+				c.Errorf("metadata: %v", err)
+			}
+		}
+	}()
+
 	wg.Add(3) //nolint: gomnd,wsl
 	go func() {
-		_ = snap.GetCPUSample(ctx, true)
+		rep <- payload.Snap.GetCPUSample(ctx, true)
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
-		_ = snap.GetMemoryUsage(ctx, true)
+		rep <- payload.Snap.GetMemoryUsage(ctx, true)
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
-		_ = snap.GetLocalData(ctx, false)
+		for _, err := range payload.Snap.GetLocalData(ctx, false) {
+			rep <- err
+		}
 		wg.Done() //nolint:wsl
 	}()
 
 	time.Sleep(wait)
 
+	var err error
 	if payload.Plex, err = c.Plex.GetSessions(); err != nil {
-		return nil, fmt.Errorf("getting sessions: %w", err)
+		return nil, nil, fmt.Errorf("getting sessions: %w", err)
 	}
 
 	wg.Wait()
@@ -149,13 +162,15 @@ func (c *Config) SendJSON(url string, data []byte) ([]byte, error) {
 	return body, nil
 }
 
-func (c *Config) SendData(url string, payload *Payload) ([]byte, error) {
-	b, err := json.Marshal(payload)
+func (c *Config) SendData(url string, payload *Payload) ([]byte, []byte, error) {
+	post, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("encoding data: %w", err)
+		return nil, nil, fmt.Errorf("encoding data: %w", err)
 	}
 
-	return c.SendJSON(url, b)
+	reply, err := c.SendJSON(url, post)
+
+	return post, reply, err
 }
 
 func (c *Config) getClient() *http.Client {
