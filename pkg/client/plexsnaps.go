@@ -24,15 +24,16 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 		c.Errorf("Unmarshalling Plex payload: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	case !strings.HasPrefix(v.Event, "media"):
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNoContent)
 		_, _ = w.Write([]byte("ignored, non-media\n"))
 	case c.plex.Active():
 		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNoContent)
 		_, _ = w.Write([]byte("ignored, cooldown\n"))
 	default:
 		go c.collectSessions(&v)
+		w.WriteHeader(http.StatusAccepted)
 	}
 }
 
@@ -41,17 +42,19 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 
-	body, err := c.notify.SendMeta(v, c.notify.URL, plex.WaitTime)
+	posted, reply, err := c.notify.SendMeta(notifiarr.PlexHook, c.notify.URL, v, plex.WaitTime)
 	if err != nil {
 		c.Errorf("Sending Plex Session to Notifiarr: %v", err)
 		return
 	}
 
-	if fields := strings.Split(string(body), `"`); len(fields) > 3 { // nolint:gomnd
+	if fields := strings.Split(string(reply), `"`); len(fields) > 3 { // nolint:gomnd
 		c.Printf("Plex => Notifiarr: %s '%s' => %s (%s)", v.Account.Title, v.Event, v.Metadata.Title, fields[3])
 	} else {
 		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
 	}
+
+	c.Debugf("Payload Sent: %s", strings.ReplaceAll(string(posted), "\n", " "))
 }
 
 // logSnaps writes a full snapshot payload to the log file.
@@ -82,6 +85,10 @@ func (c *Client) logSnaps() {
 		}
 	}
 
-	b, _ := json.MarshalIndent(&notifiarr.Payload{Snap: snaps, Plex: plex}, "", "  ")
+	b, _ := json.MarshalIndent(&notifiarr.Payload{
+		Type: notifiarr.LogLocal,
+		Snap: snaps,
+		Plex: plex,
+	}, "", "  ")
 	c.Printf("[user requested] Snapshot Data:\n%s", string(b))
 }

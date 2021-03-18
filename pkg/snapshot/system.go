@@ -8,6 +8,7 @@ import (
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/load"
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
@@ -22,6 +23,11 @@ func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
 	}
 
 	s.System.CPU = cpus[0]
+
+	s.System.AvgStat, err = load.AvgWithContext(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to get load avg: %w", err)
+	}
 
 	return nil
 }
@@ -53,6 +59,10 @@ func (s *Snapshot) GetLocalData(ctx context.Context, run bool) (errs []error) {
 
 	if !run {
 		return errs
+	}
+
+	if err := s.GetUsers(ctx); err != nil {
+		errs = append(errs, err)
 	}
 
 	if s.System.InfoStat, err = host.InfoWithContext(ctx); err != nil {

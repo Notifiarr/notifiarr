@@ -26,7 +26,7 @@ func (c *Config) startPlexCron() {
 	for {
 		select {
 		case <-t.C:
-			if body, err := c.SendMeta(nil, c.URL, 0); err != nil {
+			if _, body, err := c.SendMeta(PlexCron, c.URL, nil, 0); err != nil {
 				c.Errorf("Sending Plex Session to %s: %v: %v", c.URL, err, string(body))
 			} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 				c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, fields[3])
