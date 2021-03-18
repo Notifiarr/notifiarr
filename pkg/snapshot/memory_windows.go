@@ -19,6 +19,7 @@ type memoryStatusEx struct {
 	ullAvailExtendedVirtual uint64
 }
 
+//nolint:gochecknoglobals
 var kernel = syscall.NewLazyDLL("Kernel32.dll")
 
 func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
