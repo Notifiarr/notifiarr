@@ -21,12 +21,30 @@ type Webhook struct {
 		UUID          string `json:"uuid"`
 	} `json:"Player"`
 	Metadata struct {
-		LibrarySectionType    string  `json:"librarySectionType"`
-		RatingKey             string  `json:"ratingKey"`
-		Key                   string  `json:"key"`
-		GUID                  string  `json:"guid"`
+		LibrarySectionType   string `json:"librarySectionType"`
+		RatingKey            string `json:"ratingKey"`
+		ParentRatingKey      string `json:"parentRatingKey"`
+		GrandparentRatingKey string `json:"grandparentRatingKey"`
+		Key                  string `json:"key"`
+		GUID                 string `json:"guid"`
+		ParentGUID           string `json:"parentGuid"`
+		GrandparentGUID      string `json:"grandparentGuid"`
+		GuID                 []struct {
+			ID string `json:"id"`
+		} `json:"Guid"`
 		Studio                string  `json:"studio"`
 		Type                  string  `json:"type"`
+		GrandParentTitle      string  `json:"grandparentTitle"`
+		GrandparentKey        string  `json:"grandparentKey"`
+		ParentKey             string  `json:"parentKey"`
+		ParentTitle           string  `json:"parentTitle"`
+		ParentYear            int     `json:"parentYear"`
+		ParentThumb           string  `json:"parentThumb"`
+		GrandparentThumb      string  `json:"grandparentThumb"`
+		GrandparentArt        string  `json:"grandparentArt"`
+		GrandparentTheme      string  `json:"grandparentTheme"`
+		ParentIndex           int64   `json:"parentIndex"`
+		Index                 int64   `json:"index"`
 		Title                 string  `json:"title"`
 		TitleSort             string  `json:"titleSort"`
 		LibrarySectionTitle   string  `json:"librarySectionTitle"`
