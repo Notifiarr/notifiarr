@@ -25,6 +25,7 @@ const (
 type Config struct {
 	Timeout   cnfg.Duration `toml:"timeout"`           // total run time allowed.
 	Interval  cnfg.Duration `toml:"interval"`          // how often to send snaps (cron).
+	ZFSPools  []string      `toml:"zfs_pools"`         // zfs pools to monitor.
 	UseSudo   bool          `toml:"use_sudo"`          // use sudo for smartctl commands.
 	Raid      bool          `toml:"monitor_raid"`      // include mdstat and/or megaraid.
 	DriveData bool          `toml:"monitor_drives"`    // smartctl commands.
@@ -32,7 +33,6 @@ type Config struct {
 	Uptime    bool          `toml:"monitor_uptime"`    // all system stats.
 	CPUMem    bool          `toml:"monitor_cpuMemory"` // cpu perct and memory used/free.
 	CPUTemp   bool          `toml:"monitor_cpuTemp"`   // not everything supports temps.
-	ZFSPools  []string      `toml:"zfs_pools"`         // zfs pools to monitor.
 	synology  bool
 }
 
@@ -180,7 +180,7 @@ func runCommand(cmd *exec.Cmd, wg *sync.WaitGroup) error {
 
 	stderr := &bytes.Buffer{}
 	cmd.Stderr = stderr
-	err := cmd.Run()
+	err := cmd.Run() //nolint:ifshort
 
 	wg.Wait()
 
