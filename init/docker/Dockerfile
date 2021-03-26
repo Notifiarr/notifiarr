@@ -20,7 +20,10 @@ COPY . /${BINARY}
 WORKDIR /${BINARY}
 
 RUN apt update && \
-    apt install -y upx && \
+    apt install -y upx smartmontools util-linux mdadm && \
+    upx -9 /usr/sbin/smartctl && \
+    upx -9 /sbin/blkid && \
+    upx -9 /sbin/mdadm && \
     CGO_ENABLED=0 make ${BINARY}.${ARCH}.${OS}
 
 FROM scratch
@@ -54,10 +57,19 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
 COPY --from=builder /${BINARY}/${BINARY}.${ARCH}.${OS} /image
 # COPY --from=builder /${BINARY}/examples/${CONFIG_FILE}.example /etc/${BINARY}/${CONFIG_FILE}
 
+
 # Make sure we have an ssl cert chain and timezone data.
 COPY --from=builder /etc/ssl /etc/ssl
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
 ENV TZ=UTC
+
+# Notifiarr specific.
+ENV PATH=/bin:/usr/bin:/
+ENV USER=root
+EXPOSE 5454
+COPY --from=builder /usr/sbin/smartctl /smartctl
+COPY --from=builder /sbin/blkid /blkid
+COPY --from=builder /sbin/mdadm /mdadm
 
 ENTRYPOINT [ "/image" ]

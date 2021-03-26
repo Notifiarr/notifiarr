@@ -154,7 +154,7 @@ func (c *Config) CheckAPIKey() error {
 	}
 	defer resp.Body.Close()
 
-	_, _ = io.Copy(io.Discard, resp.Body)
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return ErrNon200

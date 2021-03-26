@@ -90,7 +90,8 @@ func getParts(ctx context.Context) ([]string, error) {
 
 func (s *Snapshot) getDiskData(ctx context.Context, disk string, useSudo bool) error { //nolint: cyclop
 	if strings.HasPrefix(disk, "/dev/md") || strings.HasPrefix(disk, "/dev/ram") ||
-		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") {
+		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") ||
+		strings.HasPrefix(disk, "/dev/nbd") || strings.HasPrefix(disk, "/dev/vda") {
 		return nil
 	}
 
@@ -128,7 +129,8 @@ func (s *Snapshot) getDiskData(ctx context.Context, disk string, useSudo bool) e
 
 func (s *Snapshot) getDiskHealth(ctx context.Context, disk string, useSudo bool) error {
 	if strings.HasPrefix(disk, "/dev/md") || strings.HasPrefix(disk, "/dev/ram") ||
-		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") {
+		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") ||
+		strings.HasPrefix(disk, "/dev/nbd") || strings.HasPrefix(disk, "/dev/vda") {
 		return nil
 	}
 

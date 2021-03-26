@@ -23,16 +23,16 @@ const (
 
 // Config determines which checks to run, etc.
 type Config struct {
-	Timeout   cnfg.Duration `toml:"timeout"`           // total run time allowed.
-	Interval  cnfg.Duration `toml:"interval"`          // how often to send snaps (cron).
-	ZFSPools  []string      `toml:"zfs_pools"`         // zfs pools to monitor.
-	UseSudo   bool          `toml:"use_sudo"`          // use sudo for smartctl commands.
-	Raid      bool          `toml:"monitor_raid"`      // include mdstat and/or megaraid.
-	DriveData bool          `toml:"monitor_drives"`    // smartctl commands.
-	DiskUsage bool          `toml:"monitor_space"`     // get disk usage.
-	Uptime    bool          `toml:"monitor_uptime"`    // all system stats.
-	CPUMem    bool          `toml:"monitor_cpuMemory"` // cpu perct and memory used/free.
-	CPUTemp   bool          `toml:"monitor_cpuTemp"`   // not everything supports temps.
+	Timeout   cnfg.Duration `toml:"timeout"`                  // total run time allowed.
+	Interval  cnfg.Duration `toml:"interval"`                 // how often to send snaps (cron).
+	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool"` // zfs pools to monitor.
+	UseSudo   bool          `toml:"use_sudo"`                 // use sudo for smartctl commands.
+	Raid      bool          `toml:"monitor_raid"`             // include mdstat and/or megaraid.
+	DriveData bool          `toml:"monitor_drives"`           // smartctl commands.
+	DiskUsage bool          `toml:"monitor_space"`            // get disk usage.
+	Uptime    bool          `toml:"monitor_uptime"`           // all system stats.
+	CPUMem    bool          `toml:"monitor_cpuMemory"`        // cpu perct and memory used/free.
+	CPUTemp   bool          `toml:"monitor_cpuTemp"`          // not everything supports temps.
 	synology  bool
 }
 
