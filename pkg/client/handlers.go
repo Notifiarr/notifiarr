@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
+	"github.com/Go-Lift-TV/notifiarr/pkg/bindata"
+	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
 	"golift.io/version"
 )
 
@@ -43,7 +43,7 @@ func (c *Client) updateInfoAny(r *http.Request) (int, string, interface{}) {
 		return http.StatusInternalServerError, "", fmt.Errorf("reading PUT body: %w", err)
 	}
 
-	c.Print("New Info from DiscordNotifier.com:", string(body))
+	c.Print("New Info from Notifiarr.com:", string(body))
 
 	if _, ok := c.menu["dninfo"]; !ok {
 		return http.StatusAccepted, "", "menu UI is not active"

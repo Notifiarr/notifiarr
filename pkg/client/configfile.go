@@ -9,9 +9,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
+	"github.com/Go-Lift-TV/notifiarr/pkg/bindata"
+	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
+	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
@@ -78,7 +78,7 @@ func (c *Client) setupConfig() {
 		Plex:   c.Config.Plex,
 		Snap:   c.Config.Snapshot,
 		Logger: c.Logger,
-		URL:    notifiarr.TestURL,
+		URL:    notifiarr.ProdURL,
 	}
 
 	if c.Config.BindAddr == "" {
@@ -127,7 +127,7 @@ func (c *Client) createConfigFile(file string) (string, error) {
 	}
 	defer f.Close()
 
-	if a, err := bindata.Asset("../../examples/dnclient.conf.example"); err != nil {
+	if a, err := bindata.Asset("../../examples/notifiarr.conf.example"); err != nil {
 		return "", fmt.Errorf("getting config file: %w", err)
 	} else if _, err = f.Write(a); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)
@@ -170,34 +170,46 @@ func (c *Client) reloadConfiguration(msg string) {
 func configFileLocactions() (string, []string) {
 	switch runtime.GOOS {
 	case "windows":
-		return `C:\ProgramData\discordnotifier-client\dnclient.conf`, []string{
+		return `C:\ProgramData\notifiarr\notifiarr.conf`, []string{
 			`~\.dnclient\dnclient.conf`,
+			`~\.notifiarr\notifiarr.conf`,
+			`C:\ProgramData\notifiarr\notifiarr.conf`,
 			`C:\ProgramData\discordnotifier-client\dnclient.conf`,
-			`.\dnclient.conf`,
+			`.\notifiarr.conf`,
 		}
 	case "darwin":
-		return "~/.dnclient/dnclient.conf", []string{
+		return "~/.notifiarr/notifiarr.conf", []string{
+			"/usr/local/etc/notifiarr/notifiarr.conf",
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",
+			"/etc/notifiarr/notifiarr.conf",
 			"/etc/discordnotifier-client/dnclient.conf",
+			"~/.notifiarr/notifiarr.conf",
 			"~/.dnclient/dnclient.conf",
-			"./dnclient.conf",
+			"./notifiarr.conf",
 		}
 	case "freebsd", "netbsd", "openbsd":
 		return "", []string{
+			"/usr/local/etc/notifiarr/notifiarr.conf",
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",
+			"/etc/notifiarr/notifiarr.conf",
 			"/etc/discordnotifier-client/dnclient.conf",
+			"~/.dnotifiarr/notifiarr.conf",
 			"~/.dnclient/dnclient.conf",
-			"./dnclient.conf",
+			"./notifiarr.conf",
 		}
 	case "android", "dragonfly", "linux", "nacl", "plan9", "solaris":
 		fallthrough
 	default:
 		return "", []string{
+			"/etc/notifiarr/notifiarr.conf",
 			"/etc/discordnotifier-client/dnclient.conf",
+			"/config/notifiarr.conf",
 			"/config/dnclient.conf",
+			"/usr/local/etc/notifiarr/notifiarr.conf",
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",
+			"~/.notifiarr/notifiarr.conf",
 			"~/.dnclient/dnclient.conf",
-			"./dnclient.conf",
+			"./notifiarr.conf",
 		}
 	}
 }

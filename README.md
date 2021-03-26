@@ -1,6 +1,6 @@
-<img src="https://raw.githubusercontent.com/wiki/Go-Lift-TV/discordnotifier-client/images/golift-discordnotifier-client.png">
+<img src="https://raw.githubusercontent.com/wiki/Go-Lift-TV/notifiarr/images/golift-discordnotifier-client.png">
 
-This is the unified client for [DiscordNotifier.com](https://discordnotifier.com).
+This is the unified client for [Notifiarr.com](https://notifiarr.com).
 The client enables content requests from Media Bot in your Discord Server.
 
 In the future it will do even more!
@@ -9,21 +9,19 @@ In the future it will do even more!
 
 ### Docker
 
-This project builds automatically in [Docker Cloud](https://hub.docker.com/r/golift/discordnotifier-client)
-and creates [ready-to-use multi-architecture images](https://hub.docker.com/r/golift/discordnotifier-client/tags).
+This project builds automatically in [Docker Cloud](https://hub.docker.com/r/golift/notifiarr)
+and creates [ready-to-use multi-architecture images](https://hub.docker.com/r/golift/notifiarr/tags).
 The `latest` tag is always a tagged release in GitHub. The `main` tag corresponds
 to the `main` branch in GitHub and may be broken.
 
 #### Docker Config File
 
--   Copy the [example config file](https://github.com/Go-Lift-TV/discordnotifier-client/blob/main/examples/dnclient.conf.example) from this repo.
+-   Copy the [example config file](https://github.com/Go-Lift-TV/notifiarr/blob/main/examples/dnclient.conf.example) from this repo.
 -   Then grab the image from docker hub and run it using an overlay for the config file.
 
 ```shell
-docker pull golift/discordnotifier-client
-docker run -d \
-  -v /your/config/dnclient.conf:/etc/discordnotifier-client/dnclient.conf \
-  golift/discordnotifier-client
+docker pull golift/notifiarr
+docker run -d -v /your/config/dnclient.conf:/etc/notifiarr/notifiarr.conf golift/notifiarr
 docker logs <container id from docker run>
 ```
 
@@ -32,16 +30,16 @@ docker logs <container id from docker run>
 -   Instead of, or in addition to a config file, you may configure the docker
     container with environment variables.
 -   Any variable not provided takes the default.
--   Must provide an API key from discordnotifier.com.
+-   Must provide an API key from notifiarr.com.
 -   Must provide URL and API key for Sonarr or Radarr or Readarr or any combination.
 -   You may provide multiple sonarr, radarr or readarr instances using
     `DN_SONARR_1_URL`, `DN_SONARR_2_URL`, etc.
--   DiscordNotifier.com may or may not support multiple instances.
+-   Notifiarr.com may or may not support multiple instances.
 
 
 |Config Name|Variable Name|Default / Note|
 |---|---|---|
-api_key|`DN_API_KEY`|**Required** / API Key from DiscordNotifier.com|
+api_key|`DN_API_KEY`|**Required** / API Key from Notifiarr.com|
 quiet|`DN_QUIET`|`false` / Turns off output. Set a log_file if this is true|
 bind_addr|`DN_BIND_ADDR`|`0.0.0.0:5454` / The IP and port to listen on|
 urlbase|`DN_URLBASE`|default: `/` Change the web root with this setting|
@@ -84,70 +82,68 @@ lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you 
 ##### Example Usage
 
 ```shell
-docker pull golift/discordnotifier-client
+docker pull golift/notifiarr
 docker run -d \
   -e "DN_API_KEY=abcdef-12345-bcfead-43312-bbbaaa-123" \
   -e "DN_SONARR_0_URL=http://localhost:8989" \
   -e "DN_SONARR_0_API_KEY=kjsdkasjdaksdj" \
-  golift/discordnotifier-client
+  golift/notifiarr
 docker logs <container id from docker run>
 ```
 
 ### Linux and FreeBSD Install
 
--   Download a package from the [Releases](https://github.com/Go-Lift-TV/discordnotifier-client/releases) page.
+-   Download a package from the [Releases](https://github.com/Go-Lift-TV/notifiarr/releases) page.
 -   Install it, edit config, start it.
 
 Example of the above in shell form:
 
 ```shell
-wget -qO- https://raw.githubusercontent.com/Go-Lift-TV/discordnotifier-client/main/scripts/install.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/Go-Lift-TV/notifiarr/main/scripts/install.sh | sudo bash
 
-nano /etc/discordnotifier-client/dnclient.conf         # linux
-vi /usr/local/etc/discordnotifier-client/dnclient.conf # freebsd
+nano /etc/notifiarr/notifiarr.conf         # linux
+vi /usr/local/etc/notifiarr/notifiarr.conf # freebsd
 
-sudo systemctl restart discordnotifier-client    # linux
-service discordnotifier-client start             # freebsd
+sudo systemctl restart notifiarr   # linux
+service notifiarr start            # freebsd
 ```
 
-On Linux, discordnotifier-client runs as `user:group` `discordnotifier-client:discordnotifier-client`.
-
-On FreeBSD the app runs as `nobody`. That's not very good and will probably change in the future.
+On Linux and FreeBSD, Notifiarr runs as `user:group` `notifiarr:notifiarr`.
 
 ### macOS Install
 
 #### Homebrew
 
--   Edit config file at `/usr/local/etc/discordnotifier-client/dnclient.conf`
+-   Edit config file at `/usr/local/etc/notifiarr/notifiarr.conf`
 -   Start it.
 -   Like this:
 
 ```shell
-brew install golift/mugs/discordnotifier-client
-vi /usr/local/etc/discordnotifier-client/dnclient.conf
-brew services start discordnotifier-client
+brew install golift/mugs/notifiarr
+vi /usr/local/etc/notifiarr/notifiarr.conf
+brew services start notifiarr
 ```
 
 #### macOS App
 
 -   You can use the unsigned app on the Releases page.
 -   When you open it for the first time it will create a config file and log file:
-    -   `~/.dnclient/dnclient.conf`
-    -   `~/.dnclient/discordnotifier-client.log`
+    -   `~/.notifiarr/notifiarr.conf`
+    -   `~/.notifiarr/notifiarr.log`
 -   Edit the config file and reload or restart the app.
 
 ### Windows Install
 
--   Extract a `.exe.zip` file from [the Releases page](https://github.com/Go-Lift-TV/discordnotifier-client/releases).
--   Run the `discordnotifier-client.amd64.exe` binary. This starts the app in the system tray.
+-   Extract a `.exe.zip` file from [the Releases page](https://github.com/Go-Lift-TV/notifiarr/releases).
+-   Run the `notifiarr.amd64.exe` binary. This starts the app in the system tray.
 -   When you open it for the first time it will create a config file and log file:
-    -   `C:\ProgramData\discordnotifier-client\dnclient.conf`
-    -   `<your home folder>\.dnclient\discordnotifier-client.log`
+    -   `C:\ProgramData\notifiarr\notifiarr.conf`
+    -   `<your home folder>\.notifiarr\notifiarr.log`
 -   Edit the new config file suit your environment then reload or restart the app.
 
 ## Reverse Proxy
 
-You'll need to expose this application to the Internet, so DiscordNotifier.com
+You'll need to expose this application to the Internet, so Notifiarr.com
 can make connections to it. While you can certainly poke a hole your firewall
 and send the traffic directly to this app, it is recommended that you put it
 behind a reverse proxy. It's pretty easy.
@@ -155,11 +151,11 @@ behind a reverse proxy. It's pretty easy.
 You'll want to tune the `upstreams` and `urlbase` settings for your environment.
 If your reverse proxy IP is `192.168.3.45` then set `upstreams = ["192.168.3.45/32"]`.
 The `urlbase` can be left at `/`, but change it if you serve this app from a
-subfolder. We'll assume you want to serve the app from `/discordnotifier/` and
+subfolder. We'll assume you want to serve the app from `/notifiarr/` and
 it's running on `192.168.3.33` - here's a sample nginx config to do that:
 
 ```
-location /discordnotifier/ {
+location /notifiarr/ {
   proxy_set_header X-Forwarded-For $remote_addr;
   proxy_pass http://192.168.3.33:5454$request_uri;
 }
@@ -176,13 +172,13 @@ Log files:
 
 -   Linux: `/var/log/messages` or `/var/log/syslog` (w/ default syslog)
 -   FreeBSD: `/var/log/syslog` (w/ default syslog)
--   macOS: `/usr/local/var/log/discordnotifier-client.log`
+-   macOS: `/usr/local/var/log/notifiarr.log`
 
 If transfers are in a Warning or Error state they will not be extracted.
 Try the Force Recheck option if you use Deluge.
 
 Still having problems?
-[Let me know!](https://github.com/Go-Lift-TV/discordnotifier-client/issues/new)
+[Let me know!](https://github.com/Go-Lift-TV/notifiarr/issues/new)
 
 ## Contributing
 
@@ -190,4 +186,4 @@ Yes, please.
 
 ## License
 
-[MIT](https://github.com/Go-Lift-TV/discordnotifier-client/blob/main/LICENSE) - Copyright (c) 2020-2021 Go Lift
+[MIT](https://github.com/Go-Lift-TV/notifiarr/blob/main/LICENSE) - Copyright (c) 2020-2021 Go Lift
