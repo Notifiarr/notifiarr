@@ -10,7 +10,7 @@ func Warning(title, msg string) (bool, error) {
 		return true, nil
 	}
 
-	return dlgs.Warning(title, msg)
+	return dlgs.Warning(title, msg) //nolint:nolint,wrapcheck
 }
 
 // Error wraps dlgs.Error.
@@ -19,7 +19,7 @@ func Error(title, msg string) (bool, error) {
 		return true, nil
 	}
 
-	return dlgs.Error(title, msg)
+	return dlgs.Error(title, msg) //nolint:nolint,wrapcheck
 }
 
 // Info wraps dlgs.Info.
@@ -28,7 +28,7 @@ func Info(title, msg string) (bool, error) {
 		return true, nil
 	}
 
-	return dlgs.Info(title, msg)
+	return dlgs.Info(title, msg) //nolint:nolint,wrapcheck
 }
 
 // Entry wraps dlgs.Entry.
@@ -37,7 +37,7 @@ func Entry(title, msg, val string) (string, bool, error) {
 		return val, true, nil
 	}
 
-	return dlgs.Entry(title, msg, val)
+	return dlgs.Entry(title, msg, val) //nolint:nolint,wrapcheck
 }
 
 // Question wraps dlgs.Question.
@@ -46,5 +46,5 @@ func Question(title, text string, defaultCancel bool) (bool, error) {
 		return true, nil
 	}
 
-	return dlgs.Question(title, text, defaultCancel)
+	return dlgs.Question(title, text, defaultCancel) //nolint:nolint,wrapcheck
 }
