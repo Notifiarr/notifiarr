@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"sync"
 	"time"
@@ -24,6 +25,7 @@ const (
 type Config struct {
 	Timeout   cnfg.Duration `toml:"timeout"`           // total run time allowed.
 	Interval  cnfg.Duration `toml:"interval"`          // how often to send snaps (cron).
+	ZFSPools  []string      `toml:"zfs_pools"`         // zfs pools to monitor.
 	UseSudo   bool          `toml:"use_sudo"`          // use sudo for smartctl commands.
 	Raid      bool          `toml:"monitor_raid"`      // include mdstat and/or megaraid.
 	DriveData bool          `toml:"monitor_drives"`    // smartctl commands.
@@ -31,7 +33,7 @@ type Config struct {
 	Uptime    bool          `toml:"monitor_uptime"`    // all system stats.
 	CPUMem    bool          `toml:"monitor_cpuMemory"` // cpu perct and memory used/free.
 	CPUTemp   bool          `toml:"monitor_cpuTemp"`   // not everything supports temps.
-	ZFSPools  []string      `toml:"zfs_pools"`         // zfs pools to monitor.
+	synology  bool
 }
 
 // Errors this package generates.
@@ -60,6 +62,7 @@ type Snapshot struct {
 	DiskUsage  map[string]*Partition `json:"diskUsage,omitempty"`
 	DiskHealth map[string]string     `json:"driveHealth,omitempty"`
 	ZFSPool    map[string]*Partition `json:"zfsPools,omitempty"`
+	synology   bool
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -85,6 +88,10 @@ func (c *Config) Validate() {
 	} else if c.Interval.Duration < minimumInterval {
 		c.Interval.Duration = minimumInterval
 	}
+
+	if _, err := os.Stat(synologyConf); err == nil {
+		c.synology = true
+	}
 }
 
 // GetSnapshot returns a system snapshot based on requested data in the config.
@@ -98,7 +105,7 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
-	s := &Snapshot{}
+	s := &Snapshot{synology: c.synology}
 	errs, debug := c.getSnapshot(ctx, s)
 
 	return s, errs, debug
@@ -109,6 +116,10 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 
 	if err := s.GetLocalData(ctx, c.Uptime); len(err) != 0 {
 		errs = append(errs, err...)
+	}
+
+	if err := s.GetSynology(c.Uptime); err != nil {
+		errs = append(errs, err)
 	}
 
 	if err := s.getDisksUsage(ctx, c.DiskUsage); len(err) != 0 {

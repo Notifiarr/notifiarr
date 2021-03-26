@@ -11,12 +11,14 @@ import (
 )
 
 func main() {
-	if err := run(); err != nil {
+	setup()
+
+	if err := client.Start(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run() error {
+func setup() {
 	ui.HideConsoleWindow()
 	// setup log package in case we throw an error for main.go before logging is setup.
 	log.SetFlags(log.LstdFlags)
@@ -26,8 +28,6 @@ func run() error {
 	if err := setTimeZone(os.Getenv("TZ")); err != nil {
 		log.Print(err)
 	}
-
-	return client.Start()
 }
 
 func setTimeZone(tz string) (err error) {

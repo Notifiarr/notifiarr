@@ -1,44 +1,56 @@
-######################################################
-# DiscordNotifier Client Example Configuration File. #
-######################################################
+#########################################
+# Notifiarr Client Sample Configuration #
+#########################################
 
-# This API key must be copied from your discordnotifier.com account.
+## This API key must be copied from your notifiarr account
+## Click Profile on the site and the API Key is listed
+#
 api_key = "api-key-from-discordnotifier.com"
 
-# The ip:port or port to listen on for incoming web requests.
-# You can use 127.0.0.1:5454 to listen only on localhost.
-bind_addr = "5454"
+## The ip:port or port to listen on for incoming web requests.
+## You can use 127.0.0.1:5454 to listen only on localhost.
+## This will be used in Plex for example to send webhooks, Example: http://localhost:5454
+## This will be used in Media Requests for example to send payloads, Example: http://your-domain.com:5454
+#
+bind_addr = "0.0.0.0:5454"
 
-# Quiet makes the app not log anything to output.
-# Recommend setting log files if you make the app quiet.
-# This is default on Windows and macOS app. Log files will
-# automatically be written on those platforms.
+## Quiet makes the app not log anything to output.
+## Recommend setting log files if you make the app quiet.
+## This is default on Windows and macOS app. Log files will be
+## automatically written on those platforms.
+#
 quiet = false
 
-# All API paths start with /api. This does not affect incoming /plex webhooks.
-# Set it to /somethingelse/api by setting urlbase to "/somethingelse"
+## All API paths start with /api. This does not affect incoming /plex webhooks.
+## Set it to /somethingelse/api by setting urlbase to "/somethingelse"
+#
 urlbase = "/"
 
-# Allowed upstream networks. The networks here are allowed to send x-forwarded-for.
-# Set this to your reverse proxy server's IP or network. If you leave off the mask,
-# then /32 or /128 is assumed depending on IP version. Empty by default. Example:
+## Allowed upstream networks. The networks here are allowed to send x-forwarded-for.
+## Set this to your reverse proxy server's IP or network. If you leave off the mask,
+## then /32 or /128 is assumed depending on IP version. Empty by default. Example:
+#
 #upstreams = [ "127.0.0.1/32", "::1/128" ]
 
-# If you provide a cert and key file (pem) paths, this app will listen with SSL/TLS.
-# Uncomment both lines and add valid file paths. Make sure this app can read them.
-# ssl_key_file  = "/path/to/cert.key"
-# ssl_cert_file = "/path/to/cert.pem"
+## If you provide a cert and key file (pem) paths, this app will listen with SSL/TLS.
+## Uncomment both lines and add valid file paths. Make sure this app can read them.
+#
+#ssl_key_file  = "/path/to/cert.key"
+#ssl_cert_file = "/path/to/cert.pem"
 
-# If you set these, logs will be written to these files.
-# If blank on windows or macOS, log file paths are chosen for you.
+## If you set these, logs will be written to these files.
+## If blank on windows or macOS, log file paths are chosen for you.
 #log_file = "~/.dnclient/dnclient.log"
 #http_log = "~/.dnclient/dnclient.http.log"
-# Set this to the number of megabytes to rotate files.
+#
+## Set this to the number of megabytes to rotate files.
 log_file_mb = 100
-# How many files to keep? 0 = all.
+#
+## How many files to keep? 0 = all.
 log_files = 10
 
-# Web server and application timeouts.
+## Web server and application timeouts.
+#
 timeout = "1m"
 
 
@@ -46,11 +58,11 @@ timeout = "1m"
 # Starr Settings #
 ##################
 
-# The API keys are specific to the app. Get it from General Settings.
-# Configurations for unused apps are harmless. Set URL and API key for
-# apps you have and want to make requests to using Media Bot.
+## The API keys are specific to the app. Get it from Settings -> General.
+## Configurations for unused apps are harmless. Set URL and API key for
+## apps you have and want to make requests to using Media Bot.
 
-# Examples follow. The first one is uncommented.
+## Examples follow. The first one is uncommented.
 
 [[radarr]]
 url     = "http://127.0.0.1:7878/radarr"
@@ -73,7 +85,7 @@ api_key = ""
 #################
 
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
-
+#
 [plex]
 url         = "http://localhost:32400" # Your plex URL
 token       = ""     # your plex token; get this from a web inspector
@@ -86,16 +98,23 @@ server      = "plex" # optional name of the server the notifications are from
 # Snapshot Settings #
 #####################
 
+## Install package(s)
+##	- Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
+##	- Linux:    apt install smartmontools || yum install smartmontools
+##	- Synology: opkg install smartmontools
+##	- Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
+##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
+#
 [snapshot]
 interval          = "30m" # how often to send a snapshot, 0 = off
 timeout           = "30s" # how long a snapshot may take
 monitor_raid      = true  # mdadm / megacli
 monitor_drives    = true  # smartctl: age, temp, health
 monitor_space     = true  # disk usage for all partitions
-monitor_uptime    = true  # system data, hostname, uptime, os, build
-monitor_cpuMemory = true  # literally cpu usage and memory
+monitor_uptime    = true  # system data, users, hostname, uptime, os, build
+monitor_cpuMemory = true  # literally cpu usage, load averages, and memory
 monitor_cpuTemp   = true  # cpu temperatures, not available on all platforms
 zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
 use_sudo          = false # sudo is needed on unix when monitor_drives=true
-# An example sudoers entry follows. Fix the path to smartctl.
-# discordnotifier-client ALL=(root) NOPASSWD:/usr/sbin/smartctl *
+## An example sudoers entry follows. Fix the path to smartctl.
+## discordnotifier-client ALL=(root) NOPASSWD:/usr/sbin/smartctl *
