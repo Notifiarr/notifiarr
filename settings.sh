@@ -39,3 +39,4 @@ export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH
 # Optional
 export WINDOWS_LDFLAGS=""
 export MACAPP="Notifiarr"
+export EXTRA_FPM_FLAGS="--conflicts=discordnotifier-client>0.0.1 --provides=notifiarr --provides=discordnotifier-client"
