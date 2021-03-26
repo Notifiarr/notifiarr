@@ -16,7 +16,7 @@ MAINT="David Newhall II <david at sleepers dot pro>"
 DESC="Unified Client for Notifiarr.com"
 GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo,cyclop"
 # Example must exist at examples/$CONFIG_FILE.example
-CONFIG_FILE="dnclient.conf"
+CONFIG_FILE="notifiarr.conf"
 LICENSE="MIT"
 # FORMULA is either 'service' or 'tool'. Services run as a daemon, tools do not.
 # This affects the homebrew formula (launchd) and linux packages (systemd).
