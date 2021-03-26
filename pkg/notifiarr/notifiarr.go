@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"sync"
@@ -18,11 +19,14 @@ import (
 	"github.com/Go-Lift-TV/notifiarr/pkg/snapshot"
 )
 
+var ErrNon200 = fmt.Errorf("return code was not 200")
+
 // Notifiarr URLs.
 const (
-	ProdURL = "https://notifiarr/notifier.php"
-	TestURL = "https://notifiarr/notifierTest.php"
-	DevURL  = "http://dev.notifiarr/notifier.php"
+	BaseURL = "https://notifiarr.com"
+	ProdURL = BaseURL + "/notifier.php"
+	TestURL = BaseURL + "/notifierTest.php"
+	DevURL  = "http://dev.notifiarr.com/notifier.php"
 )
 
 const (
@@ -132,6 +136,31 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 	wg.Wait()
 
 	return c.SendData(url, payload)
+}
+
+// CheckURLResponse returns nil if the request returns a 200.
+func (c *Config) CheckAPIKey() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, BaseURL+"/api/user/0/apikey/"+c.Apps.APIKey, nil)
+	if err != nil {
+		return fmt.Errorf("creating http request: %w", err)
+	}
+
+	resp, err := c.getClient().Do(req)
+	if err != nil {
+		return fmt.Errorf("making http request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	_, _ = io.Copy(io.Discard, resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return ErrNon200
+	}
+
+	return nil
 }
 
 // SendJSON posts a JSON payload to a URL. Returns the response body or an error.

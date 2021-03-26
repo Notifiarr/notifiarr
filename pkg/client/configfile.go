@@ -78,7 +78,7 @@ func (c *Client) setupConfig() {
 		Plex:   c.Config.Plex,
 		Snap:   c.Config.Snapshot,
 		Logger: c.Logger,
-		URL:    notifiarr.TestURL,
+		URL:    notifiarr.ProdURL,
 	}
 
 	if c.Config.BindAddr == "" {
@@ -127,7 +127,7 @@ func (c *Client) createConfigFile(file string) (string, error) {
 	}
 	defer f.Close()
 
-	if a, err := bindata.Asset("../../examples/dnclient.conf.example"); err != nil {
+	if a, err := bindata.Asset("../../examples/notifiarr.conf.example"); err != nil {
 		return "", fmt.Errorf("getting config file: %w", err)
 	} else if _, err = f.Write(a); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)

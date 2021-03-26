@@ -161,6 +161,8 @@ func (c *Client) run(newConfig bool) error {
 
 	if c.Config.APIKey == "" {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
+	} else if err := c.notify.CheckAPIKey(); err != nil {
+		c.Print("[WARNING] API Key may be invalid:", err)
 	}
 
 	c.PrintStartupInfo()
