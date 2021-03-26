@@ -153,6 +153,7 @@ func start() error {
 func (c *Client) run(newConfig bool) error {
 	if c.Flags.testSnaps {
 		c.checkPlex()
+		c.Config.Snapshot.Validate()
 		c.logSnaps()
 
 		return nil
