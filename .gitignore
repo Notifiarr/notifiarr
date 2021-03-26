@@ -1,5 +1,5 @@
 # Change this line.
-/discordnotifier-client
+/notifiarr
 /init/macos/*.app/Contents/MacOS/*
 # The rest is probably fine.
 /rsrc*.syso
