@@ -3,9 +3,8 @@ module github.com/Go-Lift-TV/notifiarr
 go 1.16
 
 require (
-	github.com/BurntSushi/toml v0.3.1
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
-	github.com/gen2brain/dlgs v0.0.0-20210222160047-2f436553172f
+	github.com/gen2brain/dlgs v0.0.0-20210324163825-f2c7498414a6
 	github.com/getlantern/golog v0.0.0-20201105130739-9586b8bde3a9 // indirect
 	github.com/getlantern/hidden v0.0.0-20201229170000-e66e7f878730 // indirect
 	github.com/getlantern/ops v0.0.0-20200403153110-8476b16edcd6 // indirect
@@ -21,12 +20,11 @@ require (
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/shirou/gopsutil v3.21.1+incompatible
 	github.com/shirou/gopsutil/v3 v3.21.2
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	golang.org/x/mod v0.4.2
-	golang.org/x/sys v0.0.0-20210316164454-77fc1eacc6aa
+	golang.org/x/sys v0.0.0-20210324051608-47abb6519492
 	golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
 	golift.io/starr v0.9.10-0.20210310051019-8d3335849120
