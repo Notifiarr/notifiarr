@@ -180,7 +180,7 @@ func runCommand(cmd *exec.Cmd, wg *sync.WaitGroup) error {
 
 	stderr := &bytes.Buffer{}
 	cmd.Stderr = stderr
-	err := cmd.Run()
+	err := cmd.Run() //nolint:nolint,ifshort
 
 	wg.Wait()
 
