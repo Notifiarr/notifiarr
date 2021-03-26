@@ -5,9 +5,9 @@ package client
 import (
 	"os"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/bindata"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
+	"github.com/Go-Lift-TV/notifiarr/pkg/bindata"
+	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
+	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
 	"github.com/getlantern/systray"
 	"golift.io/version"
 )
@@ -66,9 +66,9 @@ func (c *Client) makeChannels() {
 	link := systray.AddMenuItem("Links", "external resources")
 	c.menu["link"] = ui.WrapMenu(link)
 	c.menu["info"] = ui.WrapMenu(link.AddSubMenuItem(c.Flags.Name(), version.Print(c.Flags.Name())))
-	c.menu["hp"] = ui.WrapMenu(link.AddSubMenuItem("DiscordNotifier.com", "open DiscordNotifier.com"))
-	c.menu["wiki"] = ui.WrapMenu(link.AddSubMenuItem("DiscordNotifier Wiki", "open DiscordNotifier wiki"))
-	c.menu["disc1"] = ui.WrapMenu(link.AddSubMenuItem("DiscordNotifier Discord", "open DiscordNotifier discord server"))
+	c.menu["hp"] = ui.WrapMenu(link.AddSubMenuItem("Notifiarr.com", "open Notifiarr.com"))
+	c.menu["wiki"] = ui.WrapMenu(link.AddSubMenuItem("Notifiarr Wiki", "open Notifiarr wiki"))
+	c.menu["disc1"] = ui.WrapMenu(link.AddSubMenuItem("Notifiarr Discord", "open Notifiarr discord server"))
 	c.menu["disc2"] = ui.WrapMenu(link.AddSubMenuItem("Go Lift Discord", "open Go Lift discord server"))
 	c.menu["gh"] = ui.WrapMenu(link.AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub"))
 
@@ -96,8 +96,8 @@ func (c *Client) makeChannels() {
 
 	// These start hidden.
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
-	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from DiscordNotifier.com"))
-	c.menu["alert"] = ui.WrapMenu(systray.AddMenuItem("Alert!", "alert from DiscordNotifier.com"))
+	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from Notifiarr.com"))
+	c.menu["alert"] = ui.WrapMenu(systray.AddMenuItem("Alert!", "alert from Notifiarr.com"))
 
 	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
 }
@@ -127,9 +127,9 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["stat"].Clicked():
 			c.toggleServer()
 		case <-c.menu["gh"].Clicked():
-			ui.OpenURL("https://github.com/Go-Lift-TV/discordnotifier-client/")
+			ui.OpenURL("https://github.com/Go-Lift-TV/notifiarr/")
 		case <-c.menu["hp"].Clicked():
-			ui.OpenURL("https://discordnotifier.com/")
+			ui.OpenURL("https://notifiarr.com/")
 		case <-c.menu["wiki"].Clicked():
 			ui.OpenURL("https://trash-guides.info/Misc/Discord-Notifier-Basic-Setup/")
 		case <-c.menu["disc1"].Clicked():

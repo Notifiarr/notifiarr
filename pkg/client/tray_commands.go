@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/update"
+	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
+	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
+	"github.com/Go-Lift-TV/notifiarr/pkg/update"
 	"github.com/hako/durafmt"
 	"golift.io/version"
 )
@@ -67,7 +67,7 @@ func (c *Client) changeKey() {
 func (c *Client) checkForUpdate() {
 	c.Print("User Requested Update Check")
 
-	switch update, err := update.Check("Go-Lift-TV/discordnotifier-client", version.Version); {
+	switch update, err := update.Check("Go-Lift-TV/notifiarr", version.Version); {
 	case err != nil:
 		c.Errorf("Update Check: %v", err)
 		_, _ = ui.Error(Title, "Failure checking version on GitHub: "+err.Error())

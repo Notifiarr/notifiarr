@@ -1,4 +1,4 @@
-module github.com/Go-Lift-TV/discordnotifier-client
+module github.com/Go-Lift-TV/notifiarr
 
 go 1.16
 

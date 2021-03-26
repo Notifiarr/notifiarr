@@ -1,9 +1,9 @@
-######################################################
-# DiscordNotifier Client Example Configuration File. #
-######################################################
+################################################
+# Notifiarr Client Example Configuration File. #
+################################################
 
-# This API key must be copied from your discordnotifier.com account.
-api_key = "api-key-from-discordnotifier.com"
+# This API key must be copied from your notifiarr.com account.
+api_key = "api-key-from-notifiarr.com"
 
 # The ip:port or port to listen on for incoming web requests.
 # You can use 127.0.0.1:5454 to listen only on localhost.
@@ -98,4 +98,4 @@ monitor_cpuTemp   = true  # cpu temperatures, not available on all platforms
 zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
 use_sudo          = false # sudo is needed on unix when monitor_drives=true
 # An example sudoers entry follows. Fix the path to smartctl.
-# discordnotifier-client ALL=(root) NOPASSWD:/usr/sbin/smartctl *
+# notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *

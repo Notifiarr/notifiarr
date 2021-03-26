@@ -7,13 +7,13 @@
 source $(dirname "${BASH_SOURCE[0]}")/init/buildinfo.sh
 
 # Must match the repo name to make things easy. Otherwise, fix some other paths.
-BINARY="discordnotifier-client"
+BINARY="notifiarr"
 # github username / repo name
-REPO="Go-Lift-TV/discordnotifier-client"
+REPO="Go-Lift-TV/notifiarr"
 # Github repo containing homebrew formula repo.
 HBREPO="golift/homebrew-mugs"
 MAINT="David Newhall II <david at sleepers dot pro>"
-DESC="Unified Client for DiscordNotifier.com"
+DESC="Unified Client for Notifiarr.com"
 GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo,cyclop"
 # Example must exist at examples/$CONFIG_FILE.example
 CONFIG_FILE="dnclient.conf"
@@ -38,4 +38,4 @@ export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH
 
 # Optional
 export WINDOWS_LDFLAGS=""
-export MACAPP="DiscordNotifier-Client"
+export MACAPP="Notifiarr"

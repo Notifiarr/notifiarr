@@ -1,19 +1,20 @@
-discordnotifier-client(1) -- Unified Client for DiscordNotifier.com
+notifiarr(1) -- Unified Client for Notifiarr.com
 ===
 
 SYNOPSIS
 ---
 
-`discordnotifier-client -c /etc/discordnotifier-client/dnconfig.conf`
+`notifiarr -c /etc/notifiarr/notifiarr.conf`
 
-This service runs a web server that allows discordnotifier.com's Media Bot to
+This service runs a web server that allows notifiarr.com's Media Bot to
 communicate with Radarr, Lidarr, Readarr and Sonarr. This provides the ability
-to add new content to your libraries from within Discord.
+to add new content to your libraries from within Discord. This client also sends
+system snapshot and Plex session data to Notifiarr for Discord notifictaions.
 
 OPTIONS
 ---
 
-`discordnotifier-client [-c <config file>] [-h] [-v]`
+`notifiarr [-c <config file>] [-h] [-v]`
 
     -c, --config <config file>
         Provide a configuration file (instead of the default).
@@ -41,4 +42,4 @@ AUTHOR
 
 LOCATION
 ---
-*   DiscordNotifier Client: [https://github.com/Go-Lift-TV/discordnotifier-client](https://github.com/Go-Lift-TV/discordnotifier-client)
+* Notifiarr: [https://github.com/Go-Lift-TV/notifiarr](https://github.com/Go-Lift-TV/notifiarr)

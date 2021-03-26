@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>DiscordNotifier Client</string>
+	<string>Notifiarr</string>
 
 	<key>CFBundleIdentifier</key>
-	<string>com.discordnotifier.client</string>
+	<string>com.notifiarr.client</string>
 
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
@@ -14,7 +14,7 @@
 	<string>1</string>
 
 	<key>CFBundleExecutable</key>
-	<string>DiscordNotifier-Client</string>
+	<string>Notifiarr</string>
 
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -26,10 +26,10 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>CFBundleIconFile</key>
-	<string>DiscordNotifier-Client.icns</string>
+	<string>Notifiarr.icns</string>
 
 	<key>CFBundleDisplayName</key>
-	<string>DiscordNotifier Client</string>
+	<string>Notifiarr</string>
 
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2020-2021 Go Lift, MIT License</string>

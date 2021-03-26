@@ -12,17 +12,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/apps"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/plex"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/snapshot"
+	"github.com/Go-Lift-TV/notifiarr/pkg/apps"
+	"github.com/Go-Lift-TV/notifiarr/pkg/logs"
+	"github.com/Go-Lift-TV/notifiarr/pkg/plex"
+	"github.com/Go-Lift-TV/notifiarr/pkg/snapshot"
 )
 
 // Notifiarr URLs.
 const (
-	ProdURL = "https://discordnotifier.com/notifier.php"
-	TestURL = "https://discordnotifier.com/notifierTest.php"
-	DevURL  = "http://dev.discordnotifier.com/notifier.php"
+	ProdURL = "https://notifiarr/notifier.php"
+	TestURL = "https://notifiarr/notifierTest.php"
+	DevURL  = "http://dev.notifiarr/notifier.php"
 )
 
 const (

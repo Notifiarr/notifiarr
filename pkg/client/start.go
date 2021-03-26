@@ -9,12 +9,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/apps"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/logs"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/notifiarr"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/plex"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/snapshot"
-	"github.com/Go-Lift-TV/discordnotifier-client/pkg/ui"
+	"github.com/Go-Lift-TV/notifiarr/pkg/apps"
+	"github.com/Go-Lift-TV/notifiarr/pkg/logs"
+	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
+	"github.com/Go-Lift-TV/notifiarr/pkg/plex"
+	"github.com/Go-Lift-TV/notifiarr/pkg/snapshot"
+	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
 	"golift.io/version"
@@ -22,8 +22,8 @@ import (
 
 // Application Defaults.
 const (
-	Title            = "DiscordNotifier Client"
-	DefaultName      = "discordnotifier-client"
+	Title            = "Notifiarr"
+	DefaultName      = "notifiarr"
 	DefaultLogFileMb = 100
 	DefaultLogFiles  = 0 // delete none
 	DefaultTimeout   = time.Minute
