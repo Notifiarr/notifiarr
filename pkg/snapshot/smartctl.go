@@ -89,7 +89,17 @@ func getParts(ctx context.Context) ([]string, error) {
 }
 
 func (s *Snapshot) getDiskData(ctx context.Context, disk string, useSudo bool) error { //nolint: cyclop
-	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", "-A", disk)
+	if strings.HasPrefix(disk, "/dev/md") || strings.HasPrefix(disk, "/dev/ram") ||
+		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") {
+		return nil
+	}
+
+	args := []string{"-A", disk}
+	if s.synology {
+		args = []string{"-d", "sat", "-a", disk}
+	}
+
+	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", args...)
 	if err != nil {
 		return err
 	}
@@ -117,6 +127,11 @@ func (s *Snapshot) getDiskData(ctx context.Context, disk string, useSudo bool) e
 }
 
 func (s *Snapshot) getDiskHealth(ctx context.Context, disk string, useSudo bool) error {
+	if strings.HasPrefix(disk, "/dev/md") || strings.HasPrefix(disk, "/dev/ram") ||
+		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") {
+		return nil
+	}
+
 	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", "-H", disk)
 	if err != nil {
 		return err
@@ -124,7 +139,8 @@ func (s *Snapshot) getDiskHealth(ctx context.Context, disk string, useSudo bool)
 
 	go func() {
 		for stdout.Scan() {
-			if text := stdout.Text(); strings.Contains(text, "self-assessment ") {
+			if text := stdout.Text(); strings.Contains(text, "self-assessment ") ||
+				strings.Contains(text, "SMART Health Status:") {
 				s.DiskHealth[disk] = text[strings.LastIndex(text, " ")+1:]
 			}
 		}
