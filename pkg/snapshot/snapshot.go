@@ -67,8 +67,8 @@ type Snapshot struct {
 
 // RaidData contains raid information from mdstat and/or megacli.
 type RaidData struct {
-	MDstat  string `json:"mdstat,omitempty"`
-	MegaCLI string `json:"megacli,omitempty"`
+	MDstat  string            `json:"mdstat,omitempty"`
+	MegaCLI map[string]string `json:"megacli,omitempty"`
 }
 
 // Partition is used for ZFS pools as well as normal Disk arrays.
@@ -87,6 +87,10 @@ func (c *Config) Validate() {
 		return
 	} else if c.Interval.Duration < minimumInterval {
 		c.Interval.Duration = minimumInterval
+	}
+
+	if os.Getenv("NOTIFIARR_IN_DOCKER") == "true" {
+		c.UseSudo = false
 	}
 
 	if _, err := os.Stat(synologyConf); err == nil {
@@ -133,7 +137,7 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
 	errs = append(errs, s.GetMemoryUsage(ctx, c.CPUMem))
 	errs = append(errs, s.getZFSPoolData(ctx, c.ZFSPools))
-	errs = append(errs, s.getRaidData(ctx, c.Raid))
+	errs = append(errs, s.getRaidData(ctx, c.UseSudo, c.Raid))
 	errs = append(errs, s.getSystemTemps(ctx, c.CPUTemp))
 
 	return errs, debug

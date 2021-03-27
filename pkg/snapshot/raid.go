@@ -3,12 +3,12 @@ package snapshot
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io/ioutil"
 	"os/exec"
+	"strings"
 )
 
-func (s *Snapshot) getRaidData(ctx context.Context, run bool) error {
+func (s *Snapshot) getRaidData(ctx context.Context, useSudo, run bool) error {
 	if !run {
 		return nil
 	}
@@ -16,7 +16,7 @@ func (s *Snapshot) getRaidData(ctx context.Context, run bool) error {
 	s.Raid = &RaidData{}
 	s.getRaidMDstat()
 
-	return s.getRaidMegaCLI(ctx)
+	return s.getRaidMegaCLI(ctx, useSudo)
 }
 
 /* four drive raid1:
@@ -61,11 +61,11 @@ Encryption Type     : None
 Is VD Cached: No
 */
 
-func (s *Snapshot) getRaidMegaCLI(ctx context.Context) error {
+func (s *Snapshot) getRaidMegaCLI(ctx context.Context, useSudo bool) error {
 	// The megacli code is barely tested.
 	megacli, err := exec.LookPath("MegaCli")
 	for _, s := range []string{"MegaCli64", "megacli", "megacli64"} {
-		if err != nil {
+		if err == nil {
 			break
 		}
 
@@ -77,23 +77,21 @@ func (s *Snapshot) getRaidMegaCLI(ctx context.Context) error {
 		return nil //nolint:nilerr
 	}
 
-	stderr := &bytes.Buffer{}
-	stdout := &bytes.Buffer{}
-	cmd := exec.CommandContext(ctx, megacli, "-LDInfo", "-Lall", "-aALL")
-	cmd.Stderr = stderr
-	cmd.Stdout = stdout
-
-	sysCallSettings(cmd)
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("megacli error: %w", err)
+	cmd, stdout, wg, err := readyCommand(ctx, useSudo, megacli, "-LDInfo", "-Lall", "-aALL")
+	if err != nil {
+		return err
 	}
 
-	if exitCode := cmd.ProcessState.ExitCode(); exitCode != 0 {
-		return fmt.Errorf("%w (%d): megacli error: %s", ErrNonZeroExit, exitCode, stderr)
-	}
+	s.Raid.MegaCLI = make(map[string]string)
 
-	s.Raid.MegaCLI = stdout.String()
+	go func() {
+		for stdout.Scan() {
+			if split := strings.Split(strings.TrimSpace(stdout.Text()), ":"); len(split) == 2 {
+				s.Raid.MegaCLI[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
+			}
+		}
+		wg.Done()
+	}()
 
-	return nil
+	return runCommand(cmd, wg)
 }

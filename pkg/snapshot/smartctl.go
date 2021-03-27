@@ -1,12 +1,14 @@
 package snapshot
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"path"
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/jaypipes/ghw"
 	"github.com/shirou/gopsutil/v3/disk"
@@ -27,45 +29,67 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 
 	disks, err := finder(ctx)
 	if err != nil {
-		return []error{err}
+		errs = append(errs, err)
+	}
+
+	if err = getSmartDisks(ctx, useSudo, disks); err != nil {
+		errs = append(errs, err)
 	}
 
 	if len(disks) == 0 {
-		return []error{ErrNoDisks}
+		return append(errs, ErrNoDisks)
 	}
 
-	devices := make(map[string]struct{})
 	s.DriveAges = make(map[string]int)
 	s.DriveTemps = make(map[string]int)
 	s.DiskHealth = make(map[string]string)
 
-	for _, disk := range disks {
-		if _, ok := devices[disk]; ok {
-			continue
-		}
-
-		errs = append(errs, s.getDiskData(ctx, disk, useSudo))
-		errs = append(errs, s.getDiskHealth(ctx, disk, useSudo))
-		devices[disk] = struct{}{}
+	for name, dev := range disks {
+		errs = append(errs, s.getDiskData(ctx, name, dev, useSudo))
 	}
 
 	return errs
 }
 
+func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) error {
+	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", "--scan-open")
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		for stdout.Scan() {
+			fields := strings.Fields(stdout.Text())
+			if len(fields) < 3 || fields[0] == "#" {
+				continue
+			}
+
+			if strings.Contains(fields[2], ",") {
+				disks[fields[2]] = fields[0]
+			} else {
+				disks[fields[0]] = fields[2]
+			}
+		}
+		wg.Done()
+	}()
+
+	return runCommand(cmd, wg)
+}
+
 // works well on mac and linux, probably windows too.
-func getBlocks(ctx context.Context) ([]string, error) {
+func getBlocks(ctx context.Context) (map[string]string, error) {
 	block, err := ghw.Block()
 	if err != nil {
 		return nil, fmt.Errorf("unable to get block devices: %w", err)
 	}
 
-	list := []string{}
+	list := make(map[string]string)
 
 	for _, dev := range block.Disks {
 		if runtime.GOOS != "windows" {
-			list = append(list, path.Join("/dev", dev.Name))
+			list[path.Join("/dev", dev.Name)] = ""
 		} else {
-			list = append(list, dev.Name)
+			list[dev.Name] = ""
 		}
 	}
 
@@ -73,31 +97,37 @@ func getBlocks(ctx context.Context) ([]string, error) {
 }
 
 // use this for everything else....
-func getParts(ctx context.Context) ([]string, error) {
+func getParts(ctx context.Context) (map[string]string, error) {
 	partitions, err := disk.PartitionsWithContext(ctx, false)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get partitions: %w", err)
 	}
 
-	list := []string{}
+	list := make(map[string]string)
 
 	for _, part := range partitions {
-		list = append(list, part.Device)
+		list[part.Device] = ""
 	}
 
 	return list, nil
 }
 
-func (s *Snapshot) getDiskData(ctx context.Context, disk string, useSudo bool) error { //nolint: cyclop
-	if strings.HasPrefix(disk, "/dev/md") || strings.HasPrefix(disk, "/dev/ram") ||
-		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") ||
-		strings.HasPrefix(disk, "/dev/nbd") || strings.HasPrefix(disk, "/dev/vda") {
+func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bool) error {
+	if strings.HasPrefix(name, "/dev/md") || strings.HasPrefix(name, "/dev/ram") ||
+		strings.HasPrefix(name, "/dev/zram") || strings.HasPrefix(name, "/dev/synoboot") ||
+		strings.HasPrefix(name, "/dev/nbd") || strings.HasPrefix(name, "/dev/vda") {
 		return nil
 	}
 
-	args := []string{"-A", disk}
-	if s.synology {
-		args = []string{"-d", "sat", "-a", disk}
+	args := []string{"-AH", name}
+
+	switch {
+	case s.synology:
+		args = []string{"-d", "sat", "-AH", name}
+	case dev != "" && strings.Contains(name, ","):
+		args = []string{"-d", name, "-AH", dev}
+	case dev != "":
+		args = []string{"-d", dev, "-AH", name}
 	}
 
 	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", args...)
@@ -105,49 +135,32 @@ func (s *Snapshot) getDiskData(ctx context.Context, disk string, useSudo bool) e
 		return err
 	}
 
-	go func() {
-		for stdout.Scan() {
-			switch fields := strings.Fields(stdout.Text()); {
-			case len(fields) > 1 && fields[0] == "Temperature:":
-				s.DriveTemps[disk], _ = strconv.Atoi(fields[1])
-			case len(fields) > 3 && fields[0]+fields[1]+fields[2] == "PowerOnHours:":
-				s.DriveAges[disk], _ = strconv.Atoi(strings.ReplaceAll(fields[3], ",", ""))
-			case len(fields) < 10: // nolint: gomnd
-				continue
-			case strings.HasPrefix(fields[1], "Airflow_Temp") ||
-				strings.HasPrefix(fields[1], "Temperature_Cel"):
-				s.DriveTemps[disk], _ = strconv.Atoi(fields[9])
-			case strings.HasPrefix(fields[1], "Power_On_Hour"):
-				s.DriveAges[disk], _ = strconv.Atoi(fields[9])
-			}
-		}
-		wg.Done()
-	}()
+	go s.scanSmartctl(stdout, name, wg)
 
 	return runCommand(cmd, wg)
 }
 
-func (s *Snapshot) getDiskHealth(ctx context.Context, disk string, useSudo bool) error {
-	if strings.HasPrefix(disk, "/dev/md") || strings.HasPrefix(disk, "/dev/ram") ||
-		strings.HasPrefix(disk, "/dev/zram") || strings.HasPrefix(disk, "/dev/synoboot") ||
-		strings.HasPrefix(disk, "/dev/nbd") || strings.HasPrefix(disk, "/dev/vda") {
-		return nil
-	}
+//nolint: cyclop
+func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, wg *sync.WaitGroup) {
+	for stdout.Scan() {
+		text := stdout.Text()
 
-	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", "-H", disk)
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		for stdout.Scan() {
-			if text := stdout.Text(); strings.Contains(text, "self-assessment ") ||
-				strings.Contains(text, "SMART Health Status:") {
-				s.DiskHealth[disk] = text[strings.LastIndex(text, " ")+1:]
-			}
+		switch fields := strings.Fields(text); {
+		case len(fields) > 1 && fields[0] == "Temperature:":
+			s.DriveTemps[name], _ = strconv.Atoi(fields[1])
+		case len(fields) > 3 && fields[0]+fields[1]+fields[2] == "PowerOnHours:":
+			s.DriveAges[name], _ = strconv.Atoi(strings.ReplaceAll(fields[3], ",", ""))
+		case strings.Contains(text, "self-assessment ") ||
+			strings.Contains(text, "SMART Health Status:"):
+			s.DiskHealth[name] = fields[len(fields)-1]
+		case len(fields) < 10: // nolint: gomnd
+			continue
+		case strings.HasPrefix(fields[1], "Airflow_Temp") ||
+			strings.HasPrefix(fields[1], "Temperature_Cel"):
+			s.DriveTemps[name], _ = strconv.Atoi(fields[9])
+		case strings.HasPrefix(fields[1], "Power_On_Hour"):
+			s.DriveAges[name], _ = strconv.Atoi(fields[9])
 		}
-		wg.Done()
-	}()
-
-	return runCommand(cmd, wg)
+	}
+	wg.Done()
 }
