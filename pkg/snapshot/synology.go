@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const synologyConf = "/etc/synoinfo.conf"
+const SynologyConf = "/etc/synoinfo.conf"
 
 type Synology struct {
 	Build   string `json:"last_admin_login_build"` // 254263
@@ -30,7 +30,7 @@ func (s *Snapshot) GetSynology(run bool) error { //nolint:cyclop
 		return nil
 	}
 
-	file, err := os.Open(synologyConf)
+	file, err := os.Open(SynologyConf)
 	if err != nil {
 		return fmt.Errorf("opening synology conf: %w", err)
 	}

@@ -93,7 +93,7 @@ func (c *Config) Validate() {
 		c.UseSudo = false
 	}
 
-	if _, err := os.Stat(synologyConf); err == nil {
+	if _, err := os.Stat(SynologyConf); err == nil {
 		c.synology = true
 	}
 }
@@ -184,16 +184,12 @@ func runCommand(cmd *exec.Cmd, wg *sync.WaitGroup) error {
 
 	stderr := &bytes.Buffer{}
 	cmd.Stderr = stderr
-	err := cmd.Run() //nolint:nolint,ifshort
+	err := cmd.Run() //nolint:ifshort
 
 	wg.Wait()
 
 	if err != nil {
 		return fmt.Errorf("%v %w: %s", cmd.Args, err, stderr)
-	}
-
-	if exitCode := cmd.ProcessState.ExitCode(); exitCode != 0 {
-		return fmt.Errorf("%v %w (%d): %s", cmd.Args, ErrNonZeroExit, exitCode, stderr)
 	}
 
 	return nil
