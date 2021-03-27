@@ -13,6 +13,7 @@ import (
 	"github.com/Go-Lift-TV/notifiarr/pkg/logs"
 	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
 	"github.com/Go-Lift-TV/notifiarr/pkg/plex"
+	"github.com/Go-Lift-TV/notifiarr/pkg/services"
 	"github.com/Go-Lift-TV/notifiarr/pkg/snapshot"
 	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
 	flag "github.com/spf13/pflag"
@@ -43,13 +44,15 @@ type Flags struct {
 
 // Config represents the data in our config file.
 type Config struct {
-	BindAddr   string           `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
-	SSLCrtFile string           `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
-	SSLKeyFile string           `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
-	Upstreams  []string         `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
-	Timeout    cnfg.Duration    `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Plex       *plex.Server     `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
-	Snapshot   *snapshot.Config `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
+	BindAddr   string              `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
+	SSLCrtFile string              `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
+	SSLKeyFile string              `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
+	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
+	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	Plex       *plex.Server        `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
+	Snapshot   *snapshot.Config    `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
+	Services   *services.Config    `json:"services" toml:"services" xml:"services" yaml:"services"`
+	Service    []*services.Service `json:"service" toml:"service" xml:"service" yaml:"service"`
 	*logs.Logs
 	*apps.Apps
 }
@@ -88,6 +91,7 @@ func NewDefaults() *Client {
 			Apps: &apps.Apps{
 				URLBase: "/",
 			},
+			Services: &services.Config{Disabled: true},
 			BindAddr: DefaultBindAddr,
 			Snapshot: &snapshot.Config{},
 			Logs: &logs.Logs{
@@ -147,10 +151,6 @@ func start() error {
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
 	c.Printf("==> %s", msg)
 
-	return c.run(strings.HasPrefix(msg, msgConfigCreate))
-}
-
-func (c *Client) run(newConfig bool) error {
 	if c.Flags.testSnaps {
 		c.checkPlex()
 		c.Config.Snapshot.Validate()
@@ -165,10 +165,22 @@ func (c *Client) run(newConfig bool) error {
 		c.Print("[WARNING] API Key may be invalid:", err)
 	}
 
+	return c.run(strings.HasPrefix(msg, msgConfigCreate))
+}
+
+func (c *Client) run(newConfig bool) error {
 	c.PrintStartupInfo()
 	c.checkPlex()
 	c.Config.Snapshot.Validate()
 	c.notify.Start(c.Flags.Mode)
+
+	c.Config.Services.Logger = c.Logger
+	c.Config.Services.Apps = c.Config.Apps
+	c.Config.Services.Notify = c.notify
+
+	if err := c.Config.Services.Start(c.Config.Service); err != nil {
+		return fmt.Errorf("service checks: %w", err)
+	}
 
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)

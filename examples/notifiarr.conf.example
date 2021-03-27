@@ -63,18 +63,22 @@ timeout = "1m"
 ## Examples follow. The first one is uncommented.
 
 [[radarr]]
+name = "" # set a name to enable checks of your service.
 url     = "http://127.0.0.1:7878/radarr"
 api_key = ""
 
 #[[readarr]]
+#name = "" # set a name to enable checks of your service.
 #url     = "http://127.0.0.1:8787/readarr"
 #api_key = ""
 
 #[[sonarr]]
+#name = "" # set a name to enable checks of your service.
 #url     = "http://sonarr:8989/"
 #api_key = ""
 
 #[[lidarr]]
+#name = "" # set a name to enable checks of your service.
 #url     = "http://lidarr:8989/"
 #api_key = ""
 
@@ -116,3 +120,19 @@ zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
 use_sudo          = false # sudo is needed on unix when monitor_drives=true
 # An example sudoers entry follows. Fix the path to smartctl.
 # notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
+
+
+##################
+# Service Checks #
+##################
+
+[services]
+interval = "10m"
+parallel = 1
+
+[[service]]
+name    = "MyServer"            # name must be unique
+type    = "http"                # type can be "http", "tcp", or "ping"
+check   = "http://192.168.3.2"  # url for 'http', host/IP for 'ping', host/IP:port for 'tcp'
+expect  = "200"                 # return code to expect (for http only)
+timeout = "10s"                 # how long to wait for tcp or http checks.
