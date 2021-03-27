@@ -120,9 +120,10 @@ monitor_uptime    = true  # system data, users, hostname, uptime, os, build
 monitor_cpuMemory = true  # literally cpu usage, load averages, and memory
 monitor_cpuTemp   = true  # cpu temperatures, not available on all platforms
 zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
-use_sudo          = false # sudo is needed on unix when monitor_drives=true
-# An example sudoers entry follows. Fix the path to smartctl.
+use_sudo          = false # sudo is needed on unix when monitor_drives=true or for megacli.
+# Example sudoers entries follow. Fix the paths to smartctl and MegaCli.
 # notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
+# notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 
 
 ##################

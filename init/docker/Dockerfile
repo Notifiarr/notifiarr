@@ -24,13 +24,10 @@ RUN apt update && \
     CGO_ENABLED=0 make ${BINARY}.${ARCH}.${OS} && \
     curl -sSLo /smartmontools.tar.gz \
     https://1276-105252244-gh.circle-artifacts.com/0/builds/smartmontools-linux-x86_64-static-7.3-r5214.tar.gz && \
-    curl -sSLo /utillinux.tgz https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.34/util-linux-2.34.tar.gz && \
     curl -skSLo /megacli.rpm https://srkdev.com/megacli/MegaCli-8.07.14-1.noarch.rpm && \
-    tar -zxf /utillinux.tgz -C / && \
     tar -zxf /smartmontools.tar.gz -C / && \
     rpm2cpio /megacli.rpm | cpio -idmvD / && \
-    cd /util-linux-2.34 && ./configure --enable-static-programs=blkid && make blkid && \
-    upx -9 /usr/local/sbin/smartctl /util-linux-2.34/blkid /opt/MegaRAID/MegaCli/MegaCli64 && \
+    upx -9 /usr/local/sbin/smartctl /opt/MegaRAID/MegaCli/MegaCli64 && \
     ln -sf /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.5
 
 FROM scratch
@@ -62,7 +59,6 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.version="${VERSION}"
 
 COPY --from=builder /${BINARY}/${BINARY}.${ARCH}.${OS} /image
-# COPY --from=builder /${BINARY}/examples/${CONFIG_FILE}.example /etc/${BINARY}/${CONFIG_FILE}
 
 # Make sure we have an ssl cert chain and timezone data.
 COPY --from=builder /etc/ssl /etc/ssl
@@ -75,14 +71,11 @@ ENV PATH=/
 ENV USER=root
 ENV NOTIFIARR_IN_DOCKER=true
 EXPOSE 5454
-COPY --from=builder /usr/local/sbin/smartctl /smartctl
-COPY --from=builder /util-linux-2.34/blkid /blkid
+COPY --from=builder /opt/MegaRAID/MegaCli/MegaCli64 /opt/MegaRAID/MegaCli/libstorelibir-2.so.14.07-0 /usr/local/sbin/smartctl /
 # All of this is for megacli.
-COPY --from=builder /opt/MegaRAID/MegaCli/MegaCli64 /opt/MegaRAID/MegaCli/libstorelibir-2.so.14.07-0 /
-COPY --from=builder /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=builder /etc/ld.so.cache /etc/ld.so.cache
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25 /usr/lib/x86_64-linux-gnu/
-COPY --from=builder /lib/x86_64-linux-gnu/ld-2.28.so /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread-2.28.so \
+COPY --from=builder /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 /lib64/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25 \
+  /lib/x86_64-linux-gnu/ld-2.28.so /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread-2.28.so \
   /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm-2.28.so /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libdl.so.2 \
   /lib/x86_64-linux-gnu/libdl-2.28.so /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc-2.28.so /lib/x86_64-linux-gnu/libncurses.so.5 \
   /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.6.1 /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/

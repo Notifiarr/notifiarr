@@ -21,18 +21,21 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 		return nil
 	}
 
-	finder := getParts
+	var (
+		disks = make(map[string]string)
+		err   error
+	)
 
-	if runtime.GOOS == "darwin" || runtime.GOOS == "linux" {
-		finder = getBlocks
+	switch runtime.GOOS {
+	case "linux":
+		err = getSmartDisks(ctx, useSudo, disks)
+	case "darwin":
+		err = getBlocks(disks)
+	default:
+		err = getParts(ctx, disks)
 	}
 
-	disks, err := finder(ctx)
 	if err != nil {
-		errs = append(errs, err)
-	}
-
-	if err = getSmartDisks(ctx, useSudo, disks); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -77,51 +80,45 @@ func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) e
 }
 
 // works well on mac and linux, probably windows too.
-func getBlocks(ctx context.Context) (map[string]string, error) {
+func getBlocks(disks map[string]string) error {
 	block, err := ghw.Block()
 	if err != nil {
-		return nil, fmt.Errorf("unable to get block devices: %w", err)
+		return fmt.Errorf("unable to get block devices: %w", err)
 	}
-
-	list := make(map[string]string)
 
 	for _, dev := range block.Disks {
 		if runtime.GOOS != "windows" {
-			list[path.Join("/dev", dev.Name)] = ""
+			disks[path.Join("/dev", dev.Name)] = ""
 		} else {
-			list[dev.Name] = ""
+			disks[dev.Name] = ""
 		}
 	}
 
-	return list, nil
+	return nil
 }
 
 // use this for everything else....
-func getParts(ctx context.Context) (map[string]string, error) {
+func getParts(ctx context.Context, disks map[string]string) error {
 	partitions, err := disk.PartitionsWithContext(ctx, false)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get partitions: %w", err)
+		return fmt.Errorf("unable to get partitions: %w", err)
 	}
-
-	list := make(map[string]string)
 
 	for _, part := range partitions {
-		list[part.Device] = ""
+		disks[part.Device] = ""
 	}
 
-	return list, nil
+	return nil
 }
 
 func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bool) error {
-	if strings.HasPrefix(name, "/dev/md") || strings.HasPrefix(name, "/dev/ram") ||
-		strings.HasPrefix(name, "/dev/zram") || strings.HasPrefix(name, "/dev/synoboot") ||
-		strings.HasPrefix(name, "/dev/nbd") || strings.HasPrefix(name, "/dev/vda") {
-		return nil
-	}
-
 	args := []string{"-AH", name}
 
 	switch {
+	case strings.HasPrefix(name, "/dev/md") || strings.HasPrefix(name, "/dev/ram") ||
+		strings.HasPrefix(name, "/dev/zram") || strings.HasPrefix(name, "/dev/synoboot") ||
+		strings.HasPrefix(name, "/dev/nbd") || strings.HasPrefix(name, "/dev/vda"):
+		return nil
 	case s.synology:
 		args = []string{"-d", "sat", "-AH", name}
 	case dev != "" && strings.Contains(name, ","):
