@@ -86,7 +86,7 @@ func (s *Snapshot) getRaidMegaCLI(ctx context.Context, useSudo bool) error {
 
 	go func() {
 		for stdout.Scan() {
-			if split := strings.Split(strings.TrimSpace(stdout.Text()), ":"); len(split) == 2 {
+			if split := strings.Split(strings.TrimSpace(stdout.Text()), ":"); len(split) == 2 { // nolint:gomnd
 				s.Raid.MegaCLI[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
 			}
 		}
