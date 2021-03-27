@@ -32,6 +32,7 @@ func (a *Apps) readarrHandlers() {
 
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
+	Name string
 	*starr.Config
 	readarr *readarr.Readarr
 }
