@@ -42,6 +42,7 @@ brew services start notifiarr
 #### macOS App
 
 -   You can use the unsigned app on the Releases page.
+-   You must right click the app and select `Open` so macOS allows it.
 -   When you open it for the first time it will create a config file and log file:
     -   `~/.notifiarr/notifiarr.conf`
     -   `~/.notifiarr/notifiarr.log`
@@ -67,12 +68,13 @@ to the `main` branch in GitHub and may be broken.
 
 -   Copy the [example config file](https://github.com/Go-Lift-TV/notifiarr/blob/main/examples/notifiarr.conf.example) from this repo.
 -   Then grab the image from docker hub and run it using an overlay for the config file.
--   You may not need `privileged` in your system, try without first.
+-   You must set `privileged` to use `smartctl` (`monitor_drives`) and/or `MegaCli` (`monitor_raid`).
 -   Map the `/var/run/utmp` volume if you want to count users.
+-   Mount any volumes you want to report storage space for. Where does not matter, "where" is the "name".
 
 ```shell
 docker pull golift/notifiarr
-docker run -d --privileged \
+docker run -d \
 -v /your/config/notifiarr.conf:/config/notifiarr.conf \
 -v /var/run/utmp:/var/run/utmp \
 golift/notifiarr
@@ -82,6 +84,7 @@ docker logs <container id from docker run>
 #### Docker Environment Variables
 
 See below for more information about which environment variables are available.
+You must set `--privileged` when `monitor_drives=true`.
 
 ```shell
 docker pull golift/notifiarr
@@ -90,6 +93,7 @@ docker run -d --privileged \
   -e "DN_API_KEY=abcdef-12345-bcfead-43312-bbbaaa-123" \
   -e "DN_SONARR_0_URL=http://localhost:8989" \
   -e "DN_SONARR_0_API_KEY=kjsdkasjdaksdj" \
+  -e "DN_SNAPSHOT_MONITOR_DRIVES=true" \
   golift/notifiarr
 docker logs <container id from docker run>
 ```
@@ -181,10 +185,12 @@ you a notification. Snapshot means system health like cpu, memory, disk, raid, u
 
 If you monitor drive health you must have smartmontools (`smartctl`) installed.
 If you use smartctl on Linux, you must enable sudo. Add this sudoers entry to
-`/etc/sudoers` and fix thepath to `smartctl` if yours differs:
+`/etc/sudoers` and fix the path to `smartctl` if yours differs. If you monitor
+raid and use MegaCli (LSI card), add the appropriate sudoers entry for that too.
 
 ```
 notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
+notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 ```
 
 ###### Snapshot Packages
@@ -208,11 +214,9 @@ snapshot.monitor_uptime|`DN_SNAPSHOT_MONITOR_UPTIME`|Set `true` to report Local 
 snapshot.monitor_cpuMemory|`DN_SNAPSHOT_MONITOR_CPUMEMORY`|Set `true` to report CPU and Memory usage|
 snapshot.monitor_cpuTemp|`DN_SNAPSHOT_MONITOR_CPUTEMP`|Set `true` to report CPU temperatures|
 snapshot.zfs_pools|`DN_SNAPSHOT_ZFS_POOL_0`|Provide a list of zfs pools to monitor, ie. `data`|
-snapshot.use_sudo|`DN_SNAPSHOT_USE_SUDO`|Set `true` if `monitor_drives=true` on Linux|
+snapshot.use_sudo|`DN_SNAPSHOT_USE_SUDO`|Set `true` if `monitor_drives=true` or you use `megacli` on Linux|
 
-- _Notes: `megacli` is not well tested, please provide feedback, it may require sudo.
-  Not all systems can report CPU temperatures. If you have ideas on how to make
-  smartctl work in Docker, please contact us!_
+- _Notes: Not all systems can report CPU temperatures._
 
 #### Service Checks
 
