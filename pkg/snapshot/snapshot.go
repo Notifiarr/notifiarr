@@ -13,6 +13,7 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"golift.io/cnfg"
+	"golift.io/version"
 )
 
 const (
@@ -45,7 +46,9 @@ var (
 
 // Snapshot is the output data sent to Notifiarr.
 type Snapshot struct {
-	System struct {
+	Version string
+	Uptime  time.Duration
+	System  struct {
 		*host.InfoStat
 		Username string             `json:"username"`
 		CPU      float64            `json:"cpuPerc"`
@@ -109,7 +112,11 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
-	s := &Snapshot{synology: c.synology}
+	s := &Snapshot{
+		Version:  version.Version + "-" + version.Revision,
+		Uptime:   time.Since(version.Started),
+		synology: c.synology,
+	}
 	errs, debug := c.getSnapshot(ctx, s)
 
 	return s, errs, debug
