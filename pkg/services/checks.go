@@ -65,6 +65,8 @@ func (s *Service) check() {
 	case CheckPING:
 		s.checkPING()
 	}
+
+	s.lastCheck = time.Now()
 }
 
 const maxBody = 150
@@ -99,6 +101,7 @@ func (s *Service) checkHTTP() {
 	if strconv.Itoa(resp.StatusCode) == s.Expect {
 		s.state = StateOK
 		s.output = resp.Status
+
 		return
 	}
 
@@ -111,7 +114,6 @@ func (s *Service) checkHTTP() {
 }
 
 func (s *Service) checkTCP() {
-	s.lastCheck = time.Now()
 
 	switch conn, err := net.DialTimeout("tcp", s.Value, s.Timeout.Duration); {
 	case err != nil:
@@ -121,7 +123,8 @@ func (s *Service) checkTCP() {
 		s.state = StateUnknown
 		s.output = "connection failed, no specific error"
 	default:
-		defer conn.Close()
+		conn.Close()
+
 		s.state = StateOK
 		s.output = "connected to port " + strings.Split(s.Value, ":")[1] + " OK"
 	}

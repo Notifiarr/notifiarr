@@ -94,9 +94,10 @@ func (c *Config) Start(services []*Service) error {
 	}
 
 	c.startCheckers()
-	go c.run()
 
+	go c.run()
 	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
+
 	return nil
 }
 
@@ -215,6 +216,8 @@ func (c *Config) reportChecks() {
 	svcs := []*CheckResult{}
 
 	for _, s := range c.services {
+		c.Printf("Service Checked: %s, state: %s, output: %s", s.Name, s.state, s.output)
+
 		svcs = append(svcs, &CheckResult{
 			Name:   s.Name,
 			State:  s.state,
@@ -222,7 +225,6 @@ func (c *Config) reportChecks() {
 			Type:   s.Type,
 			Time:   s.lastCheck,
 		})
-		c.Printf("Service Checked: %s, state: %s, output: %s", s.Name, s.state, s.output)
 	}
 
 	data, _ := json.MarshalIndent(&struct {
@@ -259,13 +261,15 @@ func (c *Config) Stop() {
 
 func (c CheckState) String() string {
 	switch c {
-	case StateOK:
-		return "OK"
-	case StateWarning:
-		return "Warning"
+	default:
+		fallthrough
+	case StateUnknown:
+		return "Unknown"
 	case StateCritical:
 		return "Critical"
-	default:
-		return "Unknown"
+	case StateWarning:
+		return "Warning"
+	case StateOK:
+		return "OK"
 	}
 }
