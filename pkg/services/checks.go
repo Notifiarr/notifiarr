@@ -41,20 +41,6 @@ func (s *Service) validate() error {
 	return nil
 }
 
-// startCheckers runs Parallel checkers.
-func (c *Config) startCheckers() {
-	for i := uint(0); i < c.Parallel; i++ {
-		go func() {
-			for check := range c.checks {
-				check.check()
-				c.done <- struct{}{}
-			}
-
-			c.done <- struct{}{}
-		}()
-	}
-}
-
 func (s *Service) check() {
 	// check this service.
 	switch s.Type {

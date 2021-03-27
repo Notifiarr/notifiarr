@@ -93,12 +93,44 @@ func (c *Config) Start(services []*Service) error {
 		return err
 	}
 
-	c.startCheckers()
-
-	go c.run()
-	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
+	c.start()
 
 	return nil
+}
+
+// start runs Parallel checkers and the check reporter.
+func (c *Config) start() {
+	for i := uint(0); i < c.Parallel; i++ {
+		go func() {
+			for check := range c.checks {
+				check.check()
+				c.done <- struct{}{}
+			}
+
+			c.done <- struct{}{}
+		}()
+	}
+
+	go c.runServiceChecker()
+}
+
+func (c *Config) runServiceChecker() {
+	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
+
+	ticker := time.NewTicker(c.Interval.Duration)
+	defer func() {
+		ticker.Stop()
+		c.done <- struct{}{}
+	}()
+
+	for {
+		select {
+		case <-ticker.C:
+			c.reportChecks()
+		case <-c.stopChan:
+			return
+		}
+	}
 }
 
 func (c *Config) setup(services []*Service) error {
@@ -185,23 +217,6 @@ func (c *Config) collectApps() []*Service {
 	}
 
 	return svcs
-}
-
-func (c *Config) run() {
-	ticker := time.NewTicker(c.Interval.Duration)
-	defer func() {
-		ticker.Stop()
-		c.done <- struct{}{}
-	}()
-
-	for {
-		select {
-		case <-ticker.C:
-			c.reportChecks()
-		case <-c.stopChan:
-			return
-		}
-	}
 }
 
 func (c *Config) reportChecks() {
