@@ -124,6 +124,7 @@ timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
 
 |Config Name|Variable Name|Note|
 |---|---|---|
+sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enabled service checks.|
 sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
 sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
 
@@ -131,6 +132,7 @@ sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you 
 
 |Config Name|Variable Name|Note|
 |---|---|---|
+radarr.name|`DN_RADARR_0_NAME`|No Default. Setting a name enabled service checks.|
 radarr.url|`DN_RADARR_0_URL`|No Default. Something like: `http://localhost:7878`|
 radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you use Radarr|
 
@@ -138,6 +140,7 @@ radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you 
 
 |Config Name|Variable Name|Note|
 |---|---|---|
+readarr.name|`DN_READARR_0_NAME`|No Default. Setting a name enabled service checks.|
 readarr.url|`DN_READARR_0_URL`|No Default. Something like: `http://localhost:8787`|
 readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
@@ -145,6 +148,7 @@ readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if yo
 
 |Config Name|Variable Name|Note|
 |---|---|---|
+lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enabled service checks.|
 lidarr.url|`DN_LIDARR_0_URL`|No Default. Something like: `http://lidarr:8686`|
 lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
@@ -207,7 +211,28 @@ snapshot.zfs_pools|`DN_SNAPSHOT_ZFS_POOL_0`|Provide a list of zfs pools to monit
 snapshot.use_sudo|`DN_SNAPSHOT_USE_SUDO`|Set `true` if `monitor_drives=true` on Linux|
 
 - _Notes: `megacli` is not well tested, please provide feedback, it may require sudo.
-  Not all systems can report CPU temperatures._
+  Not all systems can report CPU temperatures. If you have ideas on how to make
+  smartctl work in Docker, please contact us!_
+
+#### Service Checks
+
+The Notifiarr client can also check URLs for health. If you set names on your
+Starr apps they will be automatically checked and reports sent to Notifiarr.
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+services.interval|`DN_SERVICES_INTERVAL`|`10m`, How often to check service health; minimum: `5m`|
+services.parallel|`DN_SERVICES_PARALLE`|`1`, How many services can be checked at once; 1 is plenty|
+
+You can also create ad-hoc service checks for things like Bazarr.
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+service.name|`DN_SERVICE_0_NAME`|Services must have a unique name|
+service.type|`DN_SERVICE_0_TYPE`|Type must be one of `http`, `tcp`|
+service.check|`DN_SERVICE_0_CHECK`|The `URL`, or `host/ip:port` to check|
+service.expect|`DN_SERVICE_0_EXPECT`|`200`, For HTTP, the return code to expect|
+service.timeout|`DN_SERVICE_0_TIMEOUT`|`15s`, How long to wait for service response|
 
 ## Reverse Proxy
 

@@ -14,7 +14,7 @@ import (
 // Defaults.
 const (
 	DefaultInterval = 10 * time.Minute
-	MinimumInterval = 1 * time.Minute
+	MinimumInterval = DefaultInterval / 2
 	MinimumTimeout  = time.Second
 	DefaultTimeout  = 10 * MinimumTimeout
 	MaximumParallel = 10
@@ -24,16 +24,17 @@ const (
 var (
 	ErrNoName      = fmt.Errorf("service check is missing a unique name")
 	ErrNoCheck     = fmt.Errorf("service check is missing a check value")
-	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s, %s", CheckTCP, CheckHTTP, CheckPING)
+	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s", CheckTCP, CheckHTTP)
+	ErrBadTCP      = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
 )
 
 // Config for this plugin.
 type Config struct {
-	Interval     cnfg.Duration     `json:"interval"`
-	Parallel     uint              `json:"parallel"`
-	Disabled     bool              `json:"disabled"`
-	Apps         *apps.Apps        `json:"-"`
-	Notify       *notifiarr.Config `json:"-"`
+	Interval     cnfg.Duration     `toml:"interval"`
+	Parallel     uint              `toml:"parallel"`
+	Disabled     bool              `toml:"disabled"`
+	Apps         *apps.Apps        `toml:"-"`
+	Notify       *notifiarr.Config `toml:"-"`
 	*logs.Logger `json:"-"`        // log file writer
 	services     map[string]*Service
 	checks       chan *Service
@@ -73,11 +74,11 @@ type CheckResult struct {
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name      string        `json:"name"`    // Radarr
-	Type      CheckType     `json:"type"`    // http
-	Value     string        `json:"check"`   // http://some.url
-	Expect    string        `json:"expect"`  // 200
-	Timeout   cnfg.Duration `json:"timeout"` // 10s
+	Name      string        `toml:"name"`    // Radarr
+	Type      CheckType     `toml:"type"`    // http
+	Value     string        `toml:"check"`   // http://some.url
+	Expect    string        `toml:"expect"`  // 200
+	Timeout   cnfg.Duration `toml:"timeout"` // 10s
 	output    string
 	state     CheckState
 	lastCheck time.Time
@@ -224,10 +225,10 @@ func (c *Config) reportChecks() {
 		c.Printf("Service Checked: %s, state: %s, output: %s", s.Name, s.state, s.output)
 	}
 
-	data, _ := json.Marshal(&struct {
+	data, _ := json.MarshalIndent(&struct {
 		Type string         `json:"eventType"`
 		Svcs []*CheckResult `json:"services"`
-	}{Type: "service_checks", Svcs: svcs})
+	}{Type: "service_checks", Svcs: svcs}, "", " ")
 
 	c.Debug("Sending Payload:", string(data))
 

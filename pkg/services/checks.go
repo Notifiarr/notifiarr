@@ -2,17 +2,20 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
 func (s *Service) validate() error {
 	if s.Name == "" {
-		return ErrNoName
+		return fmt.Errorf("%s: %w", s.Value, ErrNoName)
 	} else if s.Value == "" {
-		return ErrNoCheck
+		return fmt.Errorf("%s: %w", s.Name, ErrNoCheck)
 	}
 
 	switch s.Type {
@@ -21,6 +24,9 @@ func (s *Service) validate() error {
 			s.Expect = "200"
 		}
 	case CheckTCP:
+		if !strings.Contains(s.Value, ":") {
+			return ErrBadTCP
+		}
 	case CheckPING:
 	default:
 		return ErrInvalidType
@@ -101,17 +107,28 @@ func (s *Service) checkHTTP() {
 	}
 
 	s.state = StateCritical
-	s.output = resp.Status + ": " + string(body)
+	s.output = resp.Status + ": " + strings.TrimSpace(string(body))
 }
 
 func (s *Service) checkTCP() {
-	s.state = StateUnknown
-	s.output = "not working yet"
 	s.lastCheck = time.Now()
+
+	switch conn, err := net.DialTimeout("tcp", s.Value, s.Timeout.Duration); {
+	case err != nil:
+		s.state = StateCritical
+		s.output = "connection error: " + err.Error()
+	case conn == nil:
+		s.state = StateUnknown
+		s.output = "connection failed, no specific error"
+	default:
+		defer conn.Close()
+		s.state = StateOK
+		s.output = "connected to port " + strings.Split(s.Value, ":")[1] + " OK"
+	}
 }
 
 func (s *Service) checkPING() {
 	s.state = StateUnknown
-	s.output = "not working yet"
+	s.output = "ping does not work yet"
 	s.lastCheck = time.Now()
 }
