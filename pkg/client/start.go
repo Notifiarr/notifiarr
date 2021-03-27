@@ -91,7 +91,7 @@ func NewDefaults() *Client {
 			Apps: &apps.Apps{
 				URLBase: "/",
 			},
-			Services: &services.Config{Disabled: true},
+			Services: &services.Config{},
 			BindAddr: DefaultBindAddr,
 			Snapshot: &snapshot.Config{},
 			Logs: &logs.Logs{

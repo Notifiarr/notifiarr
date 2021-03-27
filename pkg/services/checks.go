@@ -73,8 +73,7 @@ const maxBody = 150
 
 func (s *Service) checkHTTP() {
 	s.state = StateUnknown
-	s.output = "not working yet"
-	s.lastCheck = time.Now()
+	s.output = "unknown"
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
@@ -114,7 +113,6 @@ func (s *Service) checkHTTP() {
 }
 
 func (s *Service) checkTCP() {
-
 	switch conn, err := net.DialTimeout("tcp", s.Value, s.Timeout.Duration); {
 	case err != nil:
 		s.state = StateCritical

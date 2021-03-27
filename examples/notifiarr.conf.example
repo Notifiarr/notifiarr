@@ -14,13 +14,13 @@ bind_addr = "0.0.0.0:5454"
 
 ## Quiet makes the app not log anything to output.
 ## Recommend setting log files if you make the app quiet.
-## This is default on Windows and macOS app. Log files will be
-## automatically written on those platforms.
+## This is always true on Windows and macOS app.
+## Log files are automatically written on those platforms.
 #
 quiet = false
 
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
-## Set it to /somethingelse/api by setting urlbase to "/somethingelse"
+## Change it to /somethingelse/api by setting urlbase to "/somethingelse"
 #
 urlbase = "/"
 
@@ -59,8 +59,9 @@ timeout = "1m"
 ## The API keys are specific to the app. Get it from Settings -> General.
 ## Configurations for unused apps are harmless. Set URL and API key for
 ## apps you have and want to make requests to using Media Bot.
-
-## Examples follow. The first one is uncommented.
+## See the Service Checks section below for information about setting the names.
+##
+## Examples follow. The first one is uncommented, fix the URL.
 
 [[radarr]]
 name = "" # set a name to enable checks of your service.
@@ -82,6 +83,7 @@ api_key = ""
 #url     = "http://lidarr:8989/"
 #api_key = ""
 
+
 #################
 # Plex Settings #
 #################
@@ -95,6 +97,7 @@ interval    = "30m"  # how often to send session data, 0 = off
 cooldown    = "15s"  # how often plex webhooks may trigger session hooks
 account_map = ""     # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
 server      = "plex" # optional name of the server the notifications are from
+
 
 #####################
 # Snapshot Settings #
@@ -132,17 +135,26 @@ use_sudo          = false # sudo is needed on unix when monitor_drives=true
 ## Use the [[service]] directive to add more service checks. Example below.
 
 [services]
-  disabled = false # Settig this to true turns off service check notifications.
+  disabled = false # Setting this to true disables all service checking routines.
   interval = "10m" # How often to check services and send a report. Minimum = 5m.
-  parallel = 1     # How many services to check in parallel. 1 is probably enough.
+  parallel = 1     # How many services to check concurrently. 1 should be enough.
 
-## Uncomment the following section to enable an ad-hoc service check on a URL or endpoint.
-## You can add as many [[service]] sections as you have services to check.
-## Do not add Radarr, Sonarr, Readarr or Lidarr here! Set a name to enable their checks.
+## Uncomment the following section to create a service check on a URL or IP:port.
+## You may include as many [[service]] sections as you have services to check.
+## Do not add Radarr, Sonarr, Readarr or Lidarr here! Add a name to enable their checks.
 #
 #[[service]]
 #  name    = "MyServer"          # name must be unique
-#  type    = "http"              # type can be "http", "tcp", or "ping"
-#  check   = "http://127.0.0.1"  # url for 'http', host/IP for 'ping', host/IP:port for 'tcp'
+#  type    = "http"              # type can be "http" or "tcp"
+#  check   = "http://127.0.0.1"  # url for 'http', host/IP:port for 'tcp'
 #  expect  = "200"               # return code to expect (for http only)
 #  timeout = "10s"               # how long to wait for tcp or http checks.
+
+## Another example. Remember to uncomment [[service]] if you use this!
+#
+#[[service]]
+#  name    = "Bazarr"
+#  type    = "http"
+#  check   = "http://10.1.1.2:6767/series/"
+#  expect  = "200"
+#  timeout = "10s"
