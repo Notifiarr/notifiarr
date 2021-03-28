@@ -25,38 +25,38 @@ const (
 	msgConfigFound  = "Using Config File: "
 )
 
+// getConfig attempts to find or create a config file.
+// Sometimes the app runs without a config entirely.
 func (c *Client) getConfig() (string, error) {
 	defer c.setupConfig()
 
-	var f, msg string
+	confFile := ""
+	msg := msgNoConfigFile
 
-	def, cfl := configFileLocactions()
-	for _, f = range append([]string{c.Flags.ConfigFile}, cfl...) {
+	defaultConfigFile, configFileList := configFileLocactions()
+	for _, f := range append([]string{c.Flags.ConfigFile}, configFileList...) {
 		d, err := homedir.Expand(f)
 		if err == nil {
 			f = d
 		}
 
 		if _, err := os.Stat(f); err == nil {
+			confFile = f
 			break
 		} // else { c.Print("rip:", err) }
-
-		f = ""
 	}
 
-	msg = msgNoConfigFile
-
-	if f != "" {
-		c.Flags.ConfigFile, _ = filepath.Abs(f)
+	if confFile != "" {
+		c.Flags.ConfigFile, _ = filepath.Abs(confFile)
 		msg = msgConfigFound + c.Flags.ConfigFile
 
 		if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
 			return msg, fmt.Errorf("config file: %w", err)
 		}
-	} else if f, err := c.createConfigFile(def); err != nil {
+	} else if findFile, err := c.createConfigFile(defaultConfigFile); err != nil {
 		msg = msgConfigFailed + err.Error()
-	} else if f != "" {
-		c.Flags.ConfigFile = f
+	} else if findFile != "" {
+		c.Flags.ConfigFile = findFile
 		msg = msgConfigCreate + c.Flags.ConfigFile
 	}
 
@@ -104,7 +104,7 @@ func (c *Client) setupConfig() {
 }
 
 func (c *Client) createConfigFile(file string) (string, error) {
-	if !ui.HasGUI() {
+	if file == "" {
 		return "", nil
 	}
 
@@ -141,9 +141,12 @@ func (c *Client) createConfigFile(file string) (string, error) {
 	return file, nil
 }
 
+// reloadConfiguration is called from a menu tray item or when a HUP signal is received.
+// Re-reads the configuration file and stops/starts all the internal routines.
 func (c *Client) reloadConfiguration(msg string) {
 	c.Print("==> Reloading Configuration: " + msg)
 	c.notify.Stop()
+	c.Config.Services.Stop()
 
 	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
 		c.Errorf("Unable to reload configuration: %v", err)
@@ -159,6 +162,12 @@ func (c *Client) reloadConfiguration(msg string) {
 
 	c.PrintStartupInfo()
 	c.notify.Start(c.Flags.Mode)
+
+	if err := c.Config.Services.Start(c.Config.Service); err != nil {
+		c.Errorf("Reloading Config: %v", err)
+		panic(err)
+	}
+
 	c.Print("==> Configuration Reloaded!")
 
 	if failed := c.checkPlex(); failed {
@@ -168,7 +177,8 @@ func (c *Client) reloadConfiguration(msg string) {
 	}
 }
 
-// First strng is default conf. It will be created if no config files are found.
+// First string is default config file.
+// It is created (later) if no config files are found.
 func configFileLocactions() (string, []string) {
 	defaultConf := ""
 
