@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/Go-Lift-TV/notifiarr/pkg/apps"
@@ -40,6 +41,7 @@ type Config struct {
 	checks       chan *Service
 	done         chan struct{}
 	stopChan     chan struct{}
+	mu           sync.Mutex
 }
 
 // CheckType locks us into a few specific types of checks.
@@ -63,7 +65,13 @@ const (
 	StateUnknown
 )
 
-// CheckResult is sent to Notifiarr.
+// Results is sent to Notifiarr.
+type Results struct {
+	Type string         `json:"eventType"`
+	Svcs []*CheckResult `json:"services"`
+}
+
+// CheckResult represents the status of a service.
 type CheckResult struct {
 	Name   string     `json:"name"`   // "Radarr"
 	State  CheckState `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
@@ -126,7 +134,7 @@ func (c *Config) runServiceChecker() {
 	for {
 		select {
 		case <-ticker.C:
-			c.reportChecks()
+			c.SendResults(c.RunChecks(), notifiarr.ProdURL)
 		case <-c.stopChan:
 			return
 		}
@@ -219,7 +227,11 @@ func (c *Config) collectApps() []*Service {
 	return svcs
 }
 
-func (c *Config) reportChecks() {
+// RunChecks forces all checks to run right now.
+func (c *Config) RunChecks() *Results {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	for s := range c.services {
 		c.checks <- c.services[s]
 	}
@@ -242,14 +254,15 @@ func (c *Config) reportChecks() {
 		})
 	}
 
-	data, _ := json.MarshalIndent(&struct {
-		Type string         `json:"eventType"`
-		Svcs []*CheckResult `json:"services"`
-	}{Type: "service_checks", Svcs: svcs}, "", " ")
+	return &Results{Type: "service_checks", Svcs: svcs}
+}
 
+// SendResults sends a set of Results to Notifiarr.
+func (c *Config) SendResults(results *Results, url string) {
+	data, _ := json.MarshalIndent(results, "", " ")
 	c.Debug("Sending Payload:", string(data))
 
-	if _, err := c.Notify.SendJSON(notifiarr.BaseURL, data); err != nil {
+	if _, err := c.Notify.SendJSON(url, data); err != nil {
 		c.Error("Sending service check update to Notifiarr:", err)
 	}
 }

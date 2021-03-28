@@ -3,6 +3,7 @@
 package client
 
 import (
+	"encoding/json"
 	"os"
 
 	"github.com/Go-Lift-TV/notifiarr/pkg/bindata"
@@ -48,6 +49,7 @@ func (c *Client) readyTray() {
 	c.menu["alert"].Hide() // currently unused.
 
 	go c.watchKillerChannels()
+	go c.watchNotifiarrMenu()
 	c.StartWebServer()
 	c.watchGuiChannels()
 }
@@ -78,21 +80,18 @@ func (c *Client) makeChannels() {
 	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
 
-	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, network monitors")
+	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, service checks")
 	c.menu["data"] = ui.WrapMenu(data)
 	c.menu["snap_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Full Snapshot", "write snapshot data to log file"))
+	c.menu["svcs_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Service Checks", "check all services and log results"))
+	c.menu["svcs_prod"] = ui.WrapMenu(data.AddSubMenuItem("Check Services", "check all services and send results to notifiarr"))
+	c.menu["plex_prod"] = ui.WrapMenu(data.AddSubMenuItem("Plex Sessions", "send plex sessions to notifiarr"))
+	c.menu["snap_prod"] = ui.WrapMenu(data.AddSubMenuItem("System Snapshot", "send system snapshot to notifiarr"))
+	c.menu["svcs_test"] = ui.WrapMenu(data.AddSubMenuItem("Test Service Checks", "send all service check results to test endpoint"))
 	c.menu["plex_test"] = ui.WrapMenu(data.AddSubMenuItem("Test Plex Sessions", "send plex sessions to notifiarr test endpoint"))
 	c.menu["snap_test"] = ui.WrapMenu(data.AddSubMenuItem("Test System Snapshot", "send system snapshot to notifiarr test endpoint"))
-	c.menu["netw_test"] = ui.WrapMenu(data.AddSubMenuItem("Test Network Snapshot", "send network snapshot to notifiarr test endpoint"))
 	c.menu["plex_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Plex Sessions", "send plex sessions to notifiarr dev endpoint"))
 	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
-	c.menu["netw_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Network Snapshot", "send network snapshot to notifiarr dev endpoint"))
-	c.menu["plex_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod Plex Sessions", "send plex sessions to notifiarr"))
-	c.menu["snap_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod System Snapshot", "send system snapshot to notifiarr"))
-	c.menu["netw_prod"] = ui.WrapMenu(data.AddSubMenuItem("Prod Network Snapshot", "send network snapshot to notifiarr"))
-	c.menu["netw_dev"].Disable()  // these are not ready yet.
-	c.menu["netw_test"].Disable() // these are not ready yet.
-	c.menu["netw_prod"].Disable() // these are not ready yet.
 
 	// These start hidden.
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
@@ -153,8 +152,30 @@ func (c *Client) watchGuiChannels() {
 			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
+		case <-c.menu["update"].Clicked():
+			c.checkForUpdate()
+		case <-c.menu["dninfo"].Clicked():
+			c.menu["dninfo"].Hide()
+			ui.Info(Title, "INFO: "+c.info)
+		}
+	}
+}
+
+func (c *Client) watchNotifiarrMenu() {
+	for {
+		select {
 		case <-c.menu["snap_log"].Clicked():
 			c.logSnaps()
+		case <-c.menu["svcs_log"].Clicked():
+			c.Printf("[user requested] Checking services and logging results.")
+			data, _ := json.MarshalIndent(c.Config.Services.RunChecks(), "", " ")
+			c.Print("Payload (log only):", string(data))
+		case <-c.menu["svcs_prod"].Clicked():
+			c.Printf("[user requested] Checking services and sending results to Notifiarr.")
+			c.Config.Services.SendResults(c.Config.Services.RunChecks(), notifiarr.ProdURL)
+		case <-c.menu["svcs_test"].Clicked():
+			c.Printf("[user requested] Checking services and sending results to Notifiarr Test.")
+			c.Config.Services.SendResults(c.Config.Services.RunChecks(), notifiarr.TestURL)
 		case <-c.menu["plex_test"].Clicked():
 			c.sendPlexSessions(notifiarr.TestURL)
 		case <-c.menu["snap_test"].Clicked():
@@ -167,11 +188,6 @@ func (c *Client) watchGuiChannels() {
 			c.sendPlexSessions(notifiarr.ProdURL)
 		case <-c.menu["snap_prod"].Clicked():
 			c.sendSystemSnapshot(notifiarr.ProdURL)
-		case <-c.menu["update"].Clicked():
-			c.checkForUpdate()
-		case <-c.menu["dninfo"].Clicked():
-			c.menu["dninfo"].Hide()
-			ui.Info(Title, "INFO: "+c.info)
 		}
 	}
 }
