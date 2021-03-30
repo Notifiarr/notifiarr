@@ -161,21 +161,21 @@ func (c *Client) watchGuiChannels() {
 	}
 }
 
-func (c *Client) watchNotifiarrMenu() {
+func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 	for {
 		select {
 		case <-c.menu["snap_log"].Clicked():
 			c.logSnaps()
 		case <-c.menu["svcs_log"].Clicked():
 			c.Printf("[user requested] Checking services and logging results.")
-			data, _ := json.MarshalIndent(c.Config.Services.RunChecks(), "", " ")
+			data, _ := json.MarshalIndent(c.Config.Services.RunChecks("user"), "", " ")
 			c.Print("Payload (log only):", string(data))
 		case <-c.menu["svcs_prod"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr.")
-			c.Config.Services.SendResults(c.Config.Services.RunChecks(), notifiarr.ProdURL)
+			c.Config.Services.SendResults(c.Config.Services.RunChecks("user"), notifiarr.ProdURL)
 		case <-c.menu["svcs_test"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr Test.")
-			c.Config.Services.SendResults(c.Config.Services.RunChecks(), notifiarr.TestURL)
+			c.Config.Services.SendResults(c.Config.Services.RunChecks("user"), notifiarr.TestURL)
 		case <-c.menu["plex_test"].Clicked():
 			c.sendPlexSessions(notifiarr.TestURL)
 		case <-c.menu["snap_test"].Clicked():
