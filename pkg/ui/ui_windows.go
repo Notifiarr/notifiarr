@@ -32,7 +32,7 @@ func StartCmd(c string, v ...string) error {
 	cmd.Stderr = ioutil.Discard
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 
-	return cmd.Start() //nolint:nolint,wrapcheck
+	return cmd.Start() //nolint:wrapcheck
 }
 
 // OpenCmd opens anything.
