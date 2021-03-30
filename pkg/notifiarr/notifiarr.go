@@ -105,7 +105,7 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 	go func() {
 		for err := range rep {
 			if err != nil { // maybe move this out of this method?
-				c.Errorf("metadata: %v", err)
+				c.Errorf("Building Metadata: %v", err)
 			}
 		}
 	}()
@@ -130,7 +130,7 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 
 	var err error
 	if payload.Plex, err = c.Plex.GetSessions(); err != nil {
-		return nil, nil, fmt.Errorf("getting sessions: %w", err)
+		rep <- fmt.Errorf("getting sessions: %w", err)
 	}
 
 	wg.Wait()

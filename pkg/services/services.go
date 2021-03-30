@@ -67,8 +67,10 @@ const (
 
 // Results is sent to Notifiarr.
 type Results struct {
-	Type string         `json:"eventType"`
-	Svcs []*CheckResult `json:"services"`
+	Type     string         `json:"eventType"`
+	What     string         `json:"what"`
+	Interval float64        `json:"interval"`
+	Svcs     []*CheckResult `json:"services"`
 }
 
 // CheckResult represents the status of a service.
@@ -134,7 +136,7 @@ func (c *Config) runServiceChecker() {
 	for {
 		select {
 		case <-ticker.C:
-			c.SendResults(c.RunChecks(), notifiarr.ProdURL)
+			c.SendResults(c.RunChecks("timer"), notifiarr.ProdURL)
 		case <-c.stopChan:
 			return
 		}
@@ -228,7 +230,7 @@ func (c *Config) collectApps() []*Service {
 }
 
 // RunChecks forces all checks to run right now.
-func (c *Config) RunChecks() *Results {
+func (c *Config) RunChecks(what string) *Results {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -254,7 +256,7 @@ func (c *Config) RunChecks() *Results {
 		})
 	}
 
-	return &Results{Type: "service_checks", Svcs: svcs}
+	return &Results{Type: "service_checks", Svcs: svcs, What: what, Interval: c.Interval.Seconds()}
 }
 
 // SendResults sends a set of Results to Notifiarr.

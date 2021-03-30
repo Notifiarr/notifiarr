@@ -206,7 +206,7 @@ func (c *Client) run(newConfig bool) error {
 func (c *Client) checkPlex() bool {
 	var err error
 
-	if c.Config.Plex != nil {
+	if c.Config.Plex != nil && c.Config.Plex.URL != "" && c.Config.Plex.Token != "" {
 		if err = c.Config.Plex.Validate(); err != nil {
 			c.Errorf("plex config: %v (plex DISABLED)", err)
 			c.Config.Plex = nil

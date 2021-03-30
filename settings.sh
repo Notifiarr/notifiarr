@@ -14,7 +14,7 @@ REPO="Go-Lift-TV/notifiarr"
 HBREPO="golift/homebrew-mugs"
 MAINT="David Newhall II <david at sleepers dot pro>"
 DESC="Unified Client for Notifiarr.com"
-GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo,cyclop"
+GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo,cyclop,godot"
 # Example must exist at examples/$CONFIG_FILE.example
 CONFIG_FILE="notifiarr.conf"
 LICENSE="MIT"
