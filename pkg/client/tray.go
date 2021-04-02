@@ -8,6 +8,7 @@ import (
 
 	"github.com/Go-Lift-TV/notifiarr/pkg/bindata"
 	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
+	"github.com/Go-Lift-TV/notifiarr/pkg/services"
 	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
 	"github.com/getlantern/systray"
 	"golift.io/version"
@@ -168,14 +169,17 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 			c.logSnaps()
 		case <-c.menu["svcs_log"].Clicked():
 			c.Printf("[user requested] Checking services and logging results.")
-			data, _ := json.MarshalIndent(c.Config.Services.RunChecks("user"), "", " ")
+			r := c.Config.Services.RunChecks(true)
+			data, _ := json.MarshalIndent(&services.Results{What: "user", Svcs: r}, "", " ")
 			c.Print("Payload (log only):", string(data))
 		case <-c.menu["svcs_prod"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr.")
-			c.Config.Services.SendResults(c.Config.Services.RunChecks("user"), notifiarr.ProdURL)
+			r := c.Config.Services.RunChecks(true)
+			c.Config.Services.SendResults(notifiarr.ProdURL, &services.Results{What: "user", Svcs: r})
 		case <-c.menu["svcs_test"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr Test.")
-			c.Config.Services.SendResults(c.Config.Services.RunChecks("user"), notifiarr.TestURL)
+			r := c.Config.Services.RunChecks(true)
+			c.Config.Services.SendResults(notifiarr.TestURL, &services.Results{What: "user", Svcs: r})
 		case <-c.menu["plex_test"].Clicked():
 			c.sendPlexSessions(notifiarr.TestURL)
 		case <-c.menu["snap_test"].Clicked():

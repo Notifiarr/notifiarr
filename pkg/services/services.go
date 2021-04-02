@@ -67,28 +67,30 @@ const (
 
 // Results is sent to Notifiarr.
 type Results struct {
-	Type     string         `json:"eventType"`
-	What     string         `json:"what"`
-	Interval float64        `json:"interval"`
-	Svcs     []*CheckResult `json:"services"`
+	Type string         `json:"eventType"`
+	What string         `json:"what"`
+	Svcs []*CheckResult `json:"services"`
 }
 
 // CheckResult represents the status of a service.
 type CheckResult struct {
-	Name   string     `json:"name"`   // "Radarr"
-	State  CheckState `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
-	Output string     `json:"output"` // metadata message
-	Type   CheckType  `json:"type"`   // http, tcp, ping
-	Time   time.Time  `json:"time"`   // when it was checked
+	Name     string     `json:"name"`   // "Radarr"
+	State    CheckState `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
+	Output   string     `json:"output"` // metadata message
+	Type     CheckType  `json:"type"`   // http, tcp, ping
+	Time     time.Time  `json:"time"`   // when it was checked, rounded to Microseconds
+	Since    time.Time  `json:"since"`  // how long it has been in this state, rounded to Microseconds
+	Interval float64    `json:"interval"`
 }
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name      string        `toml:"name"`    // Radarr
-	Type      CheckType     `toml:"type"`    // http
-	Value     string        `toml:"check"`   // http://some.url
-	Expect    string        `toml:"expect"`  // 200
-	Timeout   cnfg.Duration `toml:"timeout"` // 10s
+	Name      string        `toml:"name"`     // Radarr
+	Type      CheckType     `toml:"type"`     // http
+	Value     string        `toml:"check"`    // http://some.url
+	Expect    string        `toml:"expect"`   // 200
+	Timeout   cnfg.Duration `toml:"timeout"`  // 10s
+	Interval  cnfg.Duration `toml:"interval"` // 1m
 	output    string
 	state     CheckState
 	lastCheck time.Time
@@ -127,20 +129,59 @@ func (c *Config) start() {
 func (c *Config) runServiceChecker() {
 	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
 
+	results := c.RunChecks(true)
 	ticker := time.NewTicker(c.Interval.Duration)
+	second := time.NewTicker(time.Second)
+
 	defer func() {
+		second.Stop()
 		ticker.Stop()
 		c.done <- struct{}{}
 	}()
 
 	for {
 		select {
+		case <-second.C:
+			results = c.combineResults(results, c.RunChecks(false))
 		case <-ticker.C:
-			c.SendResults(c.RunChecks("timer"), notifiarr.ProdURL)
+			c.SendResults(notifiarr.ProdURL, &Results{
+				What: "timer",
+				Svcs: results,
+			})
 		case <-c.stopChan:
 			return
 		}
 	}
+}
+
+// combineResults updates a running result tally with updates.
+// updates may be 1 or more new check results.
+func (c *Config) combineResults(existing, updates []*CheckResult) []*CheckResult {
+UPDATES:
+	for _, s := range updates {
+		for i := range existing {
+			if existing[i].Name == s.Name {
+				existing[i].merge(s)
+				continue UPDATES // avoid append(), below.
+			}
+		}
+
+		s.Since = s.Time // new service
+		existing = append(existing, s)
+	}
+
+	return existing
+}
+
+// merge updates an existing check result with a fresh result.
+func (e *CheckResult) merge(n *CheckResult) {
+	if e.State != n.State {
+		e.Since = n.Time
+		e.State = n.State
+	}
+
+	e.Time = n.Time
+	e.Output = n.Output
 }
 
 func (c *Config) setup(services []*Service) error {
@@ -230,37 +271,48 @@ func (c *Config) collectApps() []*Service {
 }
 
 // RunChecks forces all checks to run right now.
-func (c *Config) RunChecks(what string) *Results {
+func (c *Config) RunChecks(forceAll bool) []*CheckResult {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	count := 0
+	svcs := []*CheckResult{}
+
 	for s := range c.services {
-		c.checks <- c.services[s]
+		if c.services[s].lastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
+			count++
+			c.checks <- c.services[s]
+		}
 	}
 
-	for range c.services {
+	if count == 0 {
+		return nil
+	}
+
+	for ; count > 0; count-- {
 		<-c.done
 	}
-
-	svcs := []*CheckResult{}
 
 	for _, s := range c.services {
 		c.Printf("Service Checked: %s, state: %s, output: %s", s.Name, s.state, s.output)
 
 		svcs = append(svcs, &CheckResult{
-			Name:   s.Name,
-			State:  s.state,
-			Output: s.output,
-			Type:   s.Type,
-			Time:   s.lastCheck,
+			Interval: s.Interval.Duration.Seconds(),
+			Name:     s.Name,
+			State:    s.state,
+			Output:   s.output,
+			Type:     s.Type,
+			Time:     s.lastCheck.Round(time.Microsecond),
 		})
 	}
 
-	return &Results{Type: "service_checks", Svcs: svcs, What: what, Interval: c.Interval.Seconds()}
+	return svcs
 }
 
 // SendResults sends a set of Results to Notifiarr.
-func (c *Config) SendResults(results *Results, url string) {
+func (c *Config) SendResults(url string, results *Results) {
+	results.Type = "service_checks"
+
 	data, _ := json.MarshalIndent(results, "", " ")
 	c.Debug("Sending Payload:", string(data))
 

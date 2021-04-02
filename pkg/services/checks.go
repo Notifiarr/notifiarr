@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (s *Service) validate() error {
+func (s *Service) validate() error { //nolint:cyclop
 	if s.Name == "" {
 		return fmt.Errorf("%s: %w", s.Value, ErrNoName)
 	} else if s.Value == "" {
@@ -38,6 +38,12 @@ func (s *Service) validate() error {
 		s.Timeout.Duration = MinimumTimeout
 	}
 
+	if s.Interval.Duration == 0 {
+		s.Interval.Duration = DefaultInterval
+	} else if s.Interval.Duration < MinimumInterval {
+		s.Interval.Duration = MinimumInterval
+	}
+
 	return nil
 }
 
@@ -52,7 +58,7 @@ func (s *Service) check() {
 		s.checkPING()
 	}
 
-	s.lastCheck = time.Now()
+	s.lastCheck = time.Now().Round(time.Microsecond)
 }
 
 const maxBody = 150
@@ -117,5 +123,4 @@ func (s *Service) checkTCP() {
 func (s *Service) checkPING() {
 	s.state = StateUnknown
 	s.output = "ping does not work yet"
-	s.lastCheck = time.Now()
 }
