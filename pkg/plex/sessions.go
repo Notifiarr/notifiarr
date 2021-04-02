@@ -17,8 +17,6 @@ type Sessions struct {
 	XML        string    `json:"sessions_xml"`
 }
 
-type Session interface{}
-
 var ErrBadStatus = fmt.Errorf("status code not 200")
 
 func (s *Server) GetSessions() (*Sessions, error) {
