@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
 )
@@ -38,7 +39,7 @@ func (a *Apps) lidarrHandlers() {
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
 	Name     string
-	Interval time.Duration
+	Interval cnfg.Duration
 	*starr.Config
 	lidarr *lidarr.Lidarr
 }

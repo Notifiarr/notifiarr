@@ -208,7 +208,7 @@ func (c *Config) collectApps() []*Service {
 				Value:    a.URL,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: cnfg.Duration{Duration: a.Interval},
+				Interval: a.Interval,
 			})
 		}
 	}
@@ -221,7 +221,7 @@ func (c *Config) collectApps() []*Service {
 				Value:    a.URL,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: cnfg.Duration{Duration: a.Interval},
+				Interval: a.Interval,
 			})
 		}
 	}
@@ -234,7 +234,7 @@ func (c *Config) collectApps() []*Service {
 				Value:    a.URL,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: cnfg.Duration{Duration: a.Interval},
+				Interval: a.Interval,
 			})
 		}
 	}
@@ -247,7 +247,7 @@ func (c *Config) collectApps() []*Service {
 				Value:    a.URL,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: cnfg.Duration{Duration: a.Interval},
+				Interval: a.Interval,
 			})
 		}
 	}
