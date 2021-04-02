@@ -107,13 +107,21 @@ setuid notifiarr
 exec /usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf
 EOT
 
-id notifiarr >/dev/null 2>&1
+ID=$(id notifiarr 2>&1)
 if [ "$?" = "0" ]; then
-  echo "${P} Starting service: start notifiarr"
-  start notifiarr
+  echo "${P} Adding notifiarr user: synouser --add notifiarr Notifiarr 0 support@notifiarr.com 0"
+  pass="${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
+  synouser --add notifiarr "${pass}" Notifiarr 0 support@notifiarr.com 0
+  #        --add username  pwd       full-name expired{0|1} mail privilege(0=none)
 else
-  echo "${P} IMPORTANT: Add user 'notifiarr' in the GUI!"
+  echo "${P} User notifiarr already exists: ${ID}"
 fi
+
+echo "${P} Restarting service: status notifiarr ; stop notifiarr ; start notifiarr"
+status notifiarr
+["$?" != "0"] || stop notifiarr
+start notifiarr
+
 
 echo "${P} Installed. Edit your config file: /etc/notifiarr/notifiarr.conf"
 echo "${P} The config may be symlinked at:   /volume1/data/notifiarr.conf"
