@@ -252,7 +252,7 @@ func (c *Config) RunChecks(what string) *Results {
 			State:  s.state,
 			Output: s.output,
 			Type:   s.Type,
-			Time:   s.lastCheck,
+			Time:   s.lastCheck.Round(time.Microsecond),
 		})
 	}
 
