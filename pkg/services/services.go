@@ -140,7 +140,7 @@ func (c *Config) runServiceChecker() {
 	})
 
 	ticker := time.NewTicker(c.Interval.Duration)
-	second := time.NewTicker(time.Millisecond * 4159)
+	second := time.NewTicker(time.Millisecond * 4159) //nolint:gomnd
 
 	defer func() {
 		second.Stop()

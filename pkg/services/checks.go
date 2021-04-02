@@ -130,6 +130,7 @@ func (s *Service) checkHTTP() *result {
 
 	r.state = StateCritical
 	r.output = resp.Status + ": " + strings.TrimSpace(string(body))
+
 	return r
 }
 

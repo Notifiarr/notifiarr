@@ -170,6 +170,7 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 		case <-c.menu["svcs_log"].Clicked():
 			c.Printf("[user requested] Checking services and logging results.")
 			c.Config.Services.RunChecks(true)
+
 			data, _ := json.MarshalIndent(&services.Results{
 				What:     "user",
 				Svcs:     c.Config.Services.GetResults(),
