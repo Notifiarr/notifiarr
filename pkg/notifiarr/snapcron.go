@@ -66,6 +66,7 @@ func (c *Config) sendSnapshot() {
 		}
 	}
 
+	// These debug messages are mostly just errors that we we expect to have.
 	for _, err := range debug {
 		if err != nil {
 			c.Debugf("Snapshot: %v", err)

@@ -45,7 +45,7 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 		v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 
-	posted, reply, err := c.notify.SendMeta(notifiarr.PlexHook, c.notify.URL, v, plex.WaitTime)
+	reply, err := c.notify.SendMeta(notifiarr.PlexHook, c.notify.URL, v, plex.WaitTime)
 	if err != nil {
 		c.Errorf("Sending Plex Session to Notifiarr: %v", err)
 		return
@@ -56,8 +56,6 @@ func (c *Client) collectSessions(v *plex.Webhook) {
 	} else {
 		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
 	}
-
-	c.Debugf("Payload Sent: %s", strings.ReplaceAll(string(posted), "\n", " "))
 }
 
 // logSnaps writes a full snapshot payload to the log file.
@@ -83,7 +81,7 @@ func (c *Client) logSnaps() {
 	)
 
 	if c.Config.Plex != nil {
-		if plex, err = c.Config.Plex.GetSessions(); err != nil {
+		if plex, err = c.Config.Plex.GetXMLSessions(); err != nil {
 			c.Errorf("[user requested] %v", err)
 		}
 	}
