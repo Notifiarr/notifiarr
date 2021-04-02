@@ -30,7 +30,8 @@ func (a *Apps) sonarrHandlers() {
 
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
-	Name string
+	Name     string
+	Interval time.Duration
 	*starr.Config
 	sonarr *sonarr.Sonarr
 }

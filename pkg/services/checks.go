@@ -11,6 +11,11 @@ import (
 	"time"
 )
 
+type result struct {
+	output string
+	state  CheckState
+}
+
 func (s *Service) validate() error { //nolint:cyclop
 	if s.Name == "" {
 		return fmt.Errorf("%s: %w", s.Value, ErrNoName)
@@ -39,88 +44,121 @@ func (s *Service) validate() error { //nolint:cyclop
 	}
 
 	if s.Interval.Duration == 0 {
-		s.Interval.Duration = DefaultInterval
-	} else if s.Interval.Duration < MinimumInterval {
-		s.Interval.Duration = MinimumInterval
+		s.Interval.Duration = DefaultCheckInterval
+	} else if s.Interval.Duration < MinimumCheckInterval {
+		s.Interval.Duration = MinimumCheckInterval
 	}
 
 	return nil
 }
 
-func (s *Service) check() {
+func (s *Service) check() bool {
 	// check this service.
 	switch s.Type {
 	case CheckHTTP:
-		s.checkHTTP()
+		return s.update(s.checkHTTP())
 	case CheckTCP:
-		s.checkTCP()
+		return s.update(s.checkTCP())
 	case CheckPING:
-		s.checkPING()
+		return s.update(s.checkPING())
+	default:
+		return false
+	}
+}
+
+// Return true if the service state changed.
+func (s *Service) update(r *result) bool {
+	if s.lastCheck = time.Now().Round(time.Microsecond); s.since.IsZero() {
+		s.since = s.lastCheck
 	}
 
-	s.lastCheck = time.Now().Round(time.Microsecond)
+	s.output = r.output
+
+	if s.state == r.state {
+		s.log.Printf("Service Checked: %s, state: %s for %v, output: %s",
+			s.Name, s.state, time.Since(s.since).Round(time.Second), s.output)
+		return false
+	}
+
+	s.log.Printf("Service Checked: %s, state: %s => %s, output: %s", s.Name, s.state, r.state, s.output)
+	s.since = s.lastCheck
+	s.state = r.state
+
+	return true
 }
 
 const maxBody = 150
 
-func (s *Service) checkHTTP() {
-	s.state = StateUnknown
-	s.output = "unknown"
+func (s *Service) checkHTTP() *result {
+	r := &result{
+		state:  StateUnknown,
+		output: "unknown",
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.Value, nil)
 	if err != nil {
-		s.output = "creating request: " + err.Error()
-		return
+		r.output = "creating request: " + err.Error()
+		return r
 	}
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		s.output = "making request: " + err.Error()
-		return
+		r.output = "making request: " + err.Error()
+		return r
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		s.output = "reading body: " + err.Error()
-		return
+		r.output = "reading body: " + err.Error()
+		return r
 	}
 
 	if strconv.Itoa(resp.StatusCode) == s.Expect {
-		s.state = StateOK
-		s.output = resp.Status
+		r.state = StateOK
+		r.output = resp.Status
 
-		return
+		return r
 	}
 
 	if len(body) > maxBody {
 		body = body[:maxBody]
 	}
 
-	s.state = StateCritical
-	s.output = resp.Status + ": " + strings.TrimSpace(string(body))
+	r.state = StateCritical
+	r.output = resp.Status + ": " + strings.TrimSpace(string(body))
+	return r
 }
 
-func (s *Service) checkTCP() {
+func (s *Service) checkTCP() *result {
+	r := &result{
+		state:  StateUnknown,
+		output: "unknown",
+	}
+
 	switch conn, err := net.DialTimeout("tcp", s.Value, s.Timeout.Duration); {
 	case err != nil:
-		s.state = StateCritical
-		s.output = "connection error: " + err.Error()
+		r.state = StateCritical
+		r.output = "connection error: " + err.Error()
 	case conn == nil:
-		s.state = StateUnknown
-		s.output = "connection failed, no specific error"
+		r.state = StateUnknown
+		r.output = "connection failed, no specific error"
 	default:
 		conn.Close()
 
-		s.state = StateOK
-		s.output = "connected to port " + strings.Split(s.Value, ":")[1] + " OK"
+		r.state = StateOK
+		r.output = "connected to port " + strings.Split(s.Value, ":")[1] + " OK"
 	}
+
+	return r
 }
 
-func (s *Service) checkPING() {
-	s.state = StateUnknown
-	s.output = "ping does not work yet"
+func (s *Service) checkPING() *result {
+	return &result{
+		state:  StateUnknown,
+		output: "ping does not work yet",
+	}
 }

@@ -37,7 +37,8 @@ func (a *Apps) lidarrHandlers() {
 
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
-	Name string
+	Name     string
+	Interval time.Duration
 	*starr.Config
 	lidarr *lidarr.Lidarr
 }

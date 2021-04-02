@@ -33,7 +33,8 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	Name string
+	Name     string
+	Interval time.Duration
 	*starr.Config
 	radarr *radarr.Radarr
 }
