@@ -93,7 +93,7 @@ type sessionDonePayload struct {
 // nolint:cyclop
 func (c *Config) checkSessionDone(sent map[string]struct{}, s *plex.Session) (float64, string) {
 	var (
-		msg   = "sending"
+		msg   = "ignoring"
 		pct   = s.ViewOffset / s.Duration * 100
 		_, ok = sent[s.Session.ID+s.SessionKey]
 	)
@@ -105,6 +105,7 @@ func (c *Config) checkSessionDone(sent map[string]struct{}, s *plex.Session) (fl
 		fallthrough
 	case c.Plex.SeriesPC > 0 && s.Type == "episode" && pct > float64(c.Plex.SeriesPC):
 		sent[s.Session.ID+s.SessionKey] = struct{}{}
+		msg = "sending"
 
 		_, _, err := c.SendData(c.URL, &sessionDonePayload{T: "session_complete_" + s.Type, S: s})
 		if err != nil {
@@ -114,8 +115,6 @@ func (c *Config) checkSessionDone(sent map[string]struct{}, s *plex.Session) (fl
 		fallthrough
 	case c.Plex.MoviesPC > 0 && s.Type == "movie":
 		msg = "watching"
-	default:
-		msg = "ignoring"
 	}
 
 	return pct, msg
