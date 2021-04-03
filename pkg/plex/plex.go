@@ -28,6 +28,8 @@ const (
 	defaultCooldown = 15 * time.Second
 	minimumCooldown = 10 * time.Second
 	minimumInterval = 5 * time.Minute
+	minimumComplete = 70
+	maximumComplete = 99
 )
 
 // WaitTime is the recommended wait time to pull plex sessions after a webhook.
@@ -43,6 +45,18 @@ func (s *Server) Validate() error {
 
 	if s.Interval.Duration < minimumInterval && s.Interval.Duration != 0 {
 		s.Interval.Duration = minimumInterval
+	}
+
+	if s.SeriesPC > maximumComplete {
+		s.SeriesPC = maximumComplete
+	} else if s.SeriesPC != 0 && s.SeriesPC < minimumComplete {
+		s.SeriesPC = minimumComplete
+	}
+
+	if s.MoviesPC > maximumComplete {
+		s.MoviesPC = maximumComplete
+	} else if s.MoviesPC != 0 && s.MoviesPC < minimumComplete {
+		s.MoviesPC = minimumComplete
 	}
 
 	if s.Timeout.Duration == 0 {

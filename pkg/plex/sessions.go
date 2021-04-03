@@ -12,7 +12,6 @@ import (
 type Sessions struct {
 	Name       string    `json:"server"`
 	AccountMap []string  `json:"account_map"`
-	Size       int       `json:"size"`
 	Sessions   []Session `json:"sessions"`
 	XML        string    `json:"sessions_xml"`
 }
@@ -34,7 +33,6 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 
 	var v struct {
 		MediaContainer struct {
-			Size     int       `json:"size"`
 			Sessions []Session `json:"Metadata"`
 		} `json:"MediaContainer"`
 	}
@@ -52,7 +50,6 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 
 	return &Sessions{
 		Name:       s.Name,
-		Size:       v.MediaContainer.Size,
 		AccountMap: strings.Split(s.AccountMap, "|"),
 		XML:        string(xml),
 		Sessions:   v.MediaContainer.Sessions,
@@ -66,7 +63,6 @@ func (s *Server) GetSessions() ([]*Session, error) {
 
 	var v struct {
 		MediaContainer struct {
-			Size     int        `json:"size"`
 			Sessions []*Session `json:"Metadata"`
 		} `json:"MediaContainer"`
 	}

@@ -85,11 +85,6 @@ func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 	}
 }
 
-type sessionDonePayload struct {
-	T string        `json:"eventType"`
-	S *plex.Session `json:"session"`
-}
-
 // nolint:cyclop
 func (c *Config) checkSessionDone(sent map[string]struct{}, s *plex.Session) (float64, string) {
 	var (
@@ -107,7 +102,14 @@ func (c *Config) checkSessionDone(sent map[string]struct{}, s *plex.Session) (fl
 		sent[s.Session.ID+s.SessionKey] = struct{}{}
 		msg = "sending"
 
-		_, _, err := c.SendData(c.URL, &sessionDonePayload{T: "session_complete_" + s.Type, S: s})
+		_, _, err := c.SendData(c.URL, &Payload{
+			Type: "plex_session_complete_" + s.Type,
+			Plex: &plex.Sessions{
+				Name:       c.Plex.Name,
+				Sessions:   []plex.Session{*s},
+				AccountMap: strings.Split(c.Plex.AccountMap, "|"),
+			},
+		})
 		if err != nil {
 			c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
 		}

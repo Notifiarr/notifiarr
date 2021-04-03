@@ -97,6 +97,8 @@ interval    = "30m"  # how often to send session data, 0 = off
 cooldown    = "15s"  # how often plex webhooks may trigger session hooks
 account_map = ""     # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
 server      = "plex" # optional name of the server the notifications are from
+movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
+series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 
 
 #####################
