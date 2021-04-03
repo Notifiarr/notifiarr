@@ -74,33 +74,47 @@ func (c *Config) checkForFinishedItems(ignored map[string]struct{}) { //nolint:c
 		return
 	}
 
+	for _, s := range sessions {
+		msg := "sending"
+
+		switch _, ok := ignored[s.Session.ID+s.SessionKey]; {
+		case ok:
+			msg = "sent"
+		case c.Plex.MoviesPC > 0 && s.Type == "movie" && s.ViewOffset/s.Duration*100 > float64(c.Plex.MoviesPC):
+			fallthrough
+		case c.Plex.SeriesPC > 0 && s.Type == "episode" && s.ViewOffset/s.Duration*100 > float64(c.Plex.SeriesPC):
+			c.checkAndSendSessionCompleted(ignored, s)
+		case c.Plex.SeriesPC > 0 && s.Type == "episode":
+			fallthrough
+		case c.Plex.MoviesPC > 0 && s.Type == "movie":
+			msg = "watching"
+		default:
+			msg = "ignoring"
+		}
+
+		// nolint:lll
+		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
+		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
+		c.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
+			c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
+			s.Type, s.Title, s.Player.State, s.ViewOffset/s.Duration*100, msg) //nolint:gomnd
+	}
+}
+
+func (c *Config) checkAndSendSessionCompleted(ignored map[string]struct{}, s *plex.Session) {
 	type payload struct {
 		T string        `json:"eventType"`
 		S *plex.Session `json:"session"`
 	}
 
-	//nolint:lll
-	for _, s := range sessions {
-		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
-		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
-		c.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%%",
-			c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
-			s.Type, s.Title, s.Player.State, s.ViewOffset/s.Duration*100) //nolint:gomnd
+	if _, ok := ignored[s.Session.ID+s.SessionKey]; ok {
+		return // already sent, and now ignored.
+	}
 
-		switch {
-		case c.Plex.MoviesPC > 0 && s.Type == "movie" && s.ViewOffset/s.Duration*100 > float64(c.Plex.MoviesPC):
-			fallthrough
-		case c.Plex.SeriesPC > 0 && s.Type == "episode" && s.ViewOffset/s.Duration*100 > float64(c.Plex.SeriesPC):
-			if _, ok := ignored[s.Session.ID+s.SessionKey]; ok {
-				continue // already sent, and now ignored.
-			}
+	ignored[s.Session.ID+s.SessionKey] = struct{}{}
 
-			ignored[s.Session.ID+s.SessionKey] = struct{}{}
-
-			_, _, err := c.SendData(c.URL, &payload{T: "session_complete_" + s.Type, S: s})
-			if err != nil {
-				c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
-			}
-		}
+	_, _, err := c.SendData(c.URL, &payload{T: "session_complete_" + s.Type, S: s})
+	if err != nil {
+		c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
 	}
 }
