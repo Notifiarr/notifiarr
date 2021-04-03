@@ -194,7 +194,7 @@ func (c *Config) SendJSON(url string, data []byte) ([]byte, error) {
 	return body, nil
 }
 
-func (c *Config) SendData(url string, payload *Payload) ([]byte, []byte, error) {
+func (c *Config) SendData(url string, payload interface{}) ([]byte, []byte, error) {
 	post, err := json.MarshalIndent(payload, "", " ")
 	if err != nil {
 		return nil, nil, fmt.Errorf("encoding data: %w", err)
