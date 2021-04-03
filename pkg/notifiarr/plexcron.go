@@ -40,7 +40,7 @@ func (c *Config) startPlexCron() {
 
 // Do not call this directly. Called from above, only.
 func (c *Config) plexCron(timer1, timer2 *time.Ticker) {
-	ignored := make(map[string]struct{})
+	sent := make(map[string]struct{})
 
 	for {
 		select {
@@ -53,7 +53,7 @@ func (c *Config) plexCron(timer1, timer2 *time.Ticker) {
 				c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, string(body))
 			}
 		case <-timer2.C:
-			c.checkForFinishedItems(ignored)
+			c.checkForFinishedItems(sent)
 		case <-c.stopPlex:
 			return
 		}
@@ -64,7 +64,7 @@ func (c *Config) plexCron(timer1, timer2 *time.Ticker) {
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
-func (c *Config) checkForFinishedItems(ignored map[string]struct{}) { //nolint:cyclop
+func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 	sessions, err := c.Plex.GetSessions()
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
@@ -75,46 +75,48 @@ func (c *Config) checkForFinishedItems(ignored map[string]struct{}) { //nolint:c
 	}
 
 	for _, s := range sessions {
-		msg := "sending"
-
-		switch _, ok := ignored[s.Session.ID+s.SessionKey]; {
-		case ok:
-			msg = "sent"
-		case c.Plex.MoviesPC > 0 && s.Type == "movie" && s.ViewOffset/s.Duration*100 > float64(c.Plex.MoviesPC):
-			fallthrough
-		case c.Plex.SeriesPC > 0 && s.Type == "episode" && s.ViewOffset/s.Duration*100 > float64(c.Plex.SeriesPC):
-			c.checkAndSendSessionCompleted(ignored, s)
-		case c.Plex.SeriesPC > 0 && s.Type == "episode":
-			fallthrough
-		case c.Plex.MoviesPC > 0 && s.Type == "movie":
-			msg = "watching"
-		default:
-			msg = "ignoring"
-		}
-
+		pct, msg := c.checkSessionDone(sent, s)
 		// nolint:lll
 		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
 		c.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
 			c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
-			s.Type, s.Title, s.Player.State, s.ViewOffset/s.Duration*100, msg) //nolint:gomnd
+			s.Type, s.Title, s.Player.State, pct, msg)
 	}
 }
 
-func (c *Config) checkAndSendSessionCompleted(ignored map[string]struct{}, s *plex.Session) {
-	type payload struct {
-		T string        `json:"eventType"`
-		S *plex.Session `json:"session"`
+type sessionDonePayload struct {
+	T string        `json:"eventType"`
+	S *plex.Session `json:"session"`
+}
+
+// nolint:cyclop
+func (c *Config) checkSessionDone(sent map[string]struct{}, s *plex.Session) (float64, string) {
+	var (
+		msg   = "sending"
+		pct   = s.ViewOffset / s.Duration * 100
+		_, ok = sent[s.Session.ID+s.SessionKey]
+	)
+
+	switch {
+	case ok:
+		msg = "sent"
+	case c.Plex.MoviesPC > 0 && s.Type == "movie" && pct > float64(c.Plex.MoviesPC):
+		fallthrough
+	case c.Plex.SeriesPC > 0 && s.Type == "episode" && pct > float64(c.Plex.SeriesPC):
+		sent[s.Session.ID+s.SessionKey] = struct{}{}
+
+		_, _, err := c.SendData(c.URL, &sessionDonePayload{T: "session_complete_" + s.Type, S: s})
+		if err != nil {
+			c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
+		}
+	case c.Plex.SeriesPC > 0 && s.Type == "episode":
+		fallthrough
+	case c.Plex.MoviesPC > 0 && s.Type == "movie":
+		msg = "watching"
+	default:
+		msg = "ignoring"
 	}
 
-	if _, ok := ignored[s.Session.ID+s.SessionKey]; ok {
-		return // already sent, and now ignored.
-	}
-
-	ignored[s.Session.ID+s.SessionKey] = struct{}{}
-
-	_, _, err := c.SendData(c.URL, &payload{T: "session_complete_" + s.Type, S: s})
-	if err != nil {
-		c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
-	}
+	return pct, msg
 }
