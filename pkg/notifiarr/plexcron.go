@@ -63,17 +63,17 @@ func (c *Config) plexCron(timer1, timer2 *time.Ticker) {
 func (c *Config) checkForFinishedItems() {
 	sessions, err := c.Plex.GetSessions()
 	if err != nil {
-		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.URL, err)
+		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
 		return
 	}
 
 	switch l := len(sessions); l {
 	case 0:
-		c.Debugf("[PLEX] No Sessions Collected from %s", c.URL)
+		c.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.URL)
 	case 1:
-		c.Debugf("[PLEX] Collected 1 session from %s:", c.URL)
+		c.Debugf("[PLEX] Collected 1 session from %s:", c.Plex.URL)
 	default:
-		c.Debugf("[PLEX] Collected %d sessions from %s:", l, c.URL)
+		c.Debugf("[PLEX] Collected %d sessions from %s:", l, c.Plex.URL)
 	}
 
 	for _, s := range sessions {
