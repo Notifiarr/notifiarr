@@ -17,6 +17,8 @@ type Server struct {
 	Name       string        `toml:"server"`
 	ReturnJSON bool          `toml:"return_json"`
 	Cooldown   cnfg.Duration `toml:"cooldown"`
+	SeriesPC   float64       `toml:"series_percent_complete"`
+	MoviesPC   float64       `toml:"movies_percent_complete"`
 	client     *http.Client
 }
 

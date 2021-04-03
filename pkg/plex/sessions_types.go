@@ -10,10 +10,11 @@ type Session struct {
 	Art                 string    `json:"art"`
 	AudienceRating      string    `json:"audienceRating"`
 	AudienceRatingImg   string    `json:"audienceRatingImage"`
-	Duration            string    `json:"duration"`
+	Duration            float64   `json:"duration,string"`
+	ViewOffset          float64   `json:"viewOffset,string"`
 	GUID                string    `json:"guid"`
 	Key                 string    `json:"key"`
-	LastViewed          string    `json:"lastViewedAt"`
+	LastViewed          int64     `json:"lastViewedAt,string"`
 	LibrarySectionID    string    `json:"librarySectionID"`
 	LibrarySectionKey   string    `json:"librarySectionKey"`
 	LibrarySectionTitle string    `json:"librarySectionTitle"`
@@ -29,8 +30,7 @@ type Session struct {
 	Title               string    `json:"title"`
 	TitleSort           string    `json:"titleSort"`
 	Type                string    `json:"type"`
-	Updated             string    `json:"updatedAt"`
-	ViewOffset          string    `json:"viewOffset"`
+	Updated             int64     `json:"updatedAt,string"`
 	Year                string    `json:"year"`
 	Session             struct {
 		Bandwidth int64  `json:"bandwidth"`
@@ -94,51 +94,51 @@ type Genre struct {
 }
 
 type MediaStream struct {
-	Bitrate         string `json:"bitrate"`
-	Codec           string `json:"codec"`
-	ColorPrimaries  string `json:"colorPrimaries,omitempty"`
-	ColorTrc        string `json:"colorTrc,omitempty"`
-	Decision        string `json:"decision"`
-	Default         string `json:"default,omitempty"`
-	DisplayTitle    string `json:"displayTitle"`
-	ExtDisplayTitle string `json:"extendedDisplayTitle"`
-	FrameRate       string `json:"frameRate,omitempty"`
-	Height          string `json:"height,omitempty"`
-	ID              string `json:"id"`
-	Location        string `json:"location"`
-	StreamType      string `json:"streamType"`
-	Width           string `json:"width,omitempty"`
-	BitrateMode     string `json:"bitrateMode,omitempty"`
-	Channels        string `json:"channels,omitempty"`
-	Language        string `json:"language,omitempty"`
-	LanguageCode    string `json:"languageCode,omitempty"`
-	Selected        string `json:"selected,omitempty"`
+	Bitrate         float64 `json:"bitrate,string"`
+	Codec           string  `json:"codec"`
+	ColorPrimaries  string  `json:"colorPrimaries,omitempty"`
+	ColorTrc        string  `json:"colorTrc,omitempty"`
+	Decision        string  `json:"decision"`
+	Default         string  `json:"default,omitempty"`
+	DisplayTitle    string  `json:"displayTitle"`
+	ExtDisplayTitle string  `json:"extendedDisplayTitle"`
+	FrameRate       float64 `json:"frameRate,omitempty,string"`
+	Height          int64   `json:"height,omitempty,string"`
+	ID              string  `json:"id"`
+	Location        string  `json:"location"`
+	StreamType      string  `json:"streamType"`
+	Width           int64   `json:"width,omitempty,string"`
+	BitrateMode     string  `json:"bitrateMode,omitempty"`
+	Channels        string  `json:"channels,omitempty"`
+	Language        string  `json:"language,omitempty"`
+	LanguageCode    string  `json:"languageCode,omitempty"`
+	Selected        string  `json:"selected,omitempty"`
 }
 
 type MediaPart struct {
 	Stream          []*MediaStream `json:"Stream"`
-	Bitrate         string         `json:"bitrate"`
+	Bitrate         int64          `json:"bitrate,string"`
 	Container       string         `json:"container"`
 	Decision        string         `json:"decision"`
-	Duration        string         `json:"duration"`
-	Height          string         `json:"height"`
+	Duration        float64        `json:"duration,string"`
+	Height          int64          `json:"height,string"`
 	ID              string         `json:"id"`
 	Indexes         string         `json:"indexes"`
 	StreamingOptmzd string         `json:"optimizedForStreaming"`
 	Protocol        string         `json:"protocol"`
 	VideoProfile    string         `json:"videoProfile"`
-	Width           string         `json:"width"`
+	Width           int64          `json:"width,string"`
 	Selected        bool           `json:"selected"`
 }
 
 type Media struct {
 	Part            []*MediaPart `json:"Part"`
-	AudioChannels   string       `json:"audioChannels"`
+	AudioChannels   int          `json:"audioChannels,string"`
 	AudioCodec      string       `json:"audioCodec"`
-	Bitrate         string       `json:"bitrate"`
+	Bitrate         int64        `json:"bitrate,string"`
 	Container       string       `json:"container"`
-	Duration        string       `json:"duration"`
-	Height          string       `json:"height"`
+	Duration        float64      `json:"duration,string"`
+	Height          int64        `json:"height,string"`
 	ID              string       `json:"id"`
 	StreamingOptmzd string       `json:"optimizedForStreaming"`
 	Protocol        string       `json:"protocol"`
@@ -146,7 +146,7 @@ type Media struct {
 	VideoFrameRate  string       `json:"videoFrameRate"`
 	VideoProfile    string       `json:"videoProfile"`
 	VideoResolution string       `json:"videoResolution"`
-	Width           string       `json:"width"`
+	Width           int64        `json:"width,string"`
 	Selected        bool         `json:"selected"`
 }
 
