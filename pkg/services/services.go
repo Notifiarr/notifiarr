@@ -262,8 +262,6 @@ func (c *Config) RunChecks(what string) *Results {
 // SendResults sends a set of Results to Notifiarr.
 func (c *Config) SendResults(results *Results, url string) {
 	data, _ := json.MarshalIndent(results, "", " ")
-	c.Debug("Sending Payload:", string(data))
-
 	if _, err := c.Notify.SendJSON(url, data); err != nil {
 		c.Error("Sending service check update to Notifiarr:", err)
 	}
