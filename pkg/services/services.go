@@ -103,7 +103,8 @@ type Service struct {
 }
 
 func (c *Config) Start(services []*Service) error {
-	if c.Disabled {
+	services = append(services, c.collectApps()...)
+	if c.Disabled || len(services) == 0 {
 		return nil
 	}
 
@@ -168,8 +169,6 @@ func (c *Config) setup(services []*Service) error {
 	c.checks = make(chan *Service, DefaultBuffer)
 	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
-
-	services = append(services, c.collectApps()...)
 
 	for i := range services {
 		services[i].log = c.Logger
