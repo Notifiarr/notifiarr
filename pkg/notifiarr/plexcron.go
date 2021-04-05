@@ -1,6 +1,7 @@
 package notifiarr
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -29,8 +30,8 @@ func (c *Config) startPlexCron() {
 
 	if c.Plex.MoviesPC != 0 || c.Plex.SeriesPC != 0 {
 		defer timer2.Stop()
-		c.Printf("==> Plex Completed Items Started, URL: %s, interval: 1m, timeout: %v",
-			c.Plex.URL, c.Plex.Timeout)
+		c.Printf("==> Plex Completed Items Started, URL: %s, interval: 1m, timeout: %v movies: %d%%, series: %d%%",
+			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
 	} else {
 		timer2.Stop() // nothing to check, so turn off this timer.
 	}
@@ -117,11 +118,16 @@ func (c *Config) checkSessionDone(s *plex.Session, pct float64) string {
 }
 
 func (c *Config) sendSessionDone(s *plex.Session) string {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Snap.Timeout.Duration)
+	snap := c.GetMetaSnap(ctx)
+	cancel() //nolint:wsl
+
 	_, _, err := c.SendData(c.URL, &Payload{
 		Type: "plex_session_complete_" + s.Type,
+		Snap: snap,
 		Plex: &plex.Sessions{
 			Name:       c.Plex.Name,
-			Sessions:   []plex.Session{*s},
+			Sessions:   []*plex.Session{s},
 			AccountMap: strings.Split(c.Plex.AccountMap, "|"),
 		},
 	})

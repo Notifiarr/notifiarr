@@ -51,6 +51,7 @@ type Config struct {
 	Plex         *plex.Server     // plex sessions
 	Snap         *snapshot.Config // system snapshot data
 	URL          string
+	Timeout      time.Duration
 	*logs.Logger // log file writer
 	stopPlex     chan struct{}
 	stopSnap     chan struct{}
@@ -91,39 +92,22 @@ func (c *Config) Stop() {
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
 func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.Duration) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), wait+time.Second*2)
+	ctx, cancel := context.WithTimeout(context.Background(), wait+c.Snap.Timeout.Duration)
 	defer cancel()
 
 	var (
-		payload = &Payload{Type: eventType, Snap: &snapshot.Snapshot{}, Load: hook}
+		payload = &Payload{Type: eventType, Load: hook}
 		wg      sync.WaitGroup
 	)
 
 	rep := make(chan error)
 	defer close(rep)
 
-	go func() {
-		for err := range rep {
-			if err != nil { // maybe move this out of this method?
-				c.Errorf("Building Metadata: %v", err)
-			}
-		}
-	}()
+	wg.Add(1)
 
-	wg.Add(3) //nolint: gomnd,wsl
 	go func() {
-		rep <- payload.Snap.GetCPUSample(ctx, true)
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		rep <- payload.Snap.GetMemoryUsage(ctx, true)
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		for _, err := range payload.Snap.GetLocalData(ctx, false) {
-			rep <- err
-		}
-		wg.Done() //nolint:wsl
+		payload.Snap = c.GetMetaSnap(ctx)
+		wg.Done() // nolint:wsl
 	}()
 
 	time.Sleep(wait)
@@ -140,9 +124,48 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 	return e, err
 }
 
-// CheckURLResponse returns nil if the request returns a 200.
+// GetMetaSnap grabs some basic system info: cpu, memory, username.
+func (c *Config) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
+	var (
+		snap = &snapshot.Snapshot{}
+		wg   sync.WaitGroup
+	)
+
+	rep := make(chan error)
+	defer close(rep)
+
+	go func() {
+		for err := range rep {
+			if err != nil { // maybe move this out of this method?
+				c.Errorf("Building Metadata: %v", err)
+			}
+		}
+	}()
+
+	wg.Add(3) //nolint: gomnd,wsl
+	go func() {
+		rep <- snap.GetCPUSample(ctx, true)
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		rep <- snap.GetMemoryUsage(ctx, true)
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		for _, err := range snap.GetLocalData(ctx, false) {
+			rep <- err
+		}
+		wg.Done() //nolint:wsl
+	}()
+
+	wg.Wait()
+
+	return snap
+}
+
+// CheckAPIKey returns an error if the API key is wrong.
 func (c *Config) CheckAPIKey() error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, BaseURL+"/api/user/0/apikey/"+c.Apps.APIKey, nil)
@@ -168,7 +191,7 @@ func (c *Config) CheckAPIKey() error {
 // SendJSON posts a JSON payload to a URL. Returns the response body or an error.
 // The response status code is lost.
 func (c *Config) SendJSON(url string, data []byte) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
@@ -207,7 +230,7 @@ func (c *Config) SendData(url string, payload interface{}) ([]byte, []byte, erro
 
 func (c *Config) getClient() *http.Client {
 	if c.client == nil {
-		c.client = &http.Client{Timeout: time.Minute}
+		c.client = &http.Client{Timeout: c.Timeout}
 	}
 
 	return c.client

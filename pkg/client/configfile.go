@@ -75,11 +75,12 @@ func (c *Client) setupConfig() {
 	// Make sure each app has a sane timeout.
 	c.Config.Apps.Setup(c.Config.Timeout.Duration)
 	c.notify = &notifiarr.Config{
-		Apps:   c.Config.Apps,
-		Plex:   c.Config.Plex,
-		Snap:   c.Config.Snapshot,
-		Logger: c.Logger,
-		URL:    notifiarr.ProdURL,
+		Apps:    c.Config.Apps,
+		Plex:    c.Config.Plex,
+		Snap:    c.Config.Snapshot,
+		Logger:  c.Logger,
+		URL:     notifiarr.ProdURL,
+		Timeout: c.Config.Timeout.Duration,
 	}
 
 	if c.Config.BindAddr == "" {

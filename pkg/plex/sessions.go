@@ -10,10 +10,10 @@ import (
 )
 
 type Sessions struct {
-	Name       string    `json:"server"`
-	AccountMap []string  `json:"account_map"`
-	Sessions   []Session `json:"sessions"`
-	XML        string    `json:"sessions_xml"`
+	Name       string     `json:"server"`
+	AccountMap []string   `json:"account_map"`
+	Sessions   []*Session `json:"sessions"`
+	XML        string     `json:"sessions_xml"`
 }
 
 var ErrBadStatus = fmt.Errorf("status code not 200")
@@ -33,7 +33,7 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 
 	var v struct {
 		MediaContainer struct {
-			Sessions []Session `json:"Metadata"`
+			Sessions []*Session `json:"Metadata"`
 		} `json:"MediaContainer"`
 	}
 
