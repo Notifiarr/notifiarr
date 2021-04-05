@@ -152,8 +152,8 @@ vercomp () {
 
 vercomp "$INSTALLED" "$TAG"
 case $? in
-  0) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is current: ${CURRENT}" ; exit 0 ;;
-  1) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is newer than the current release (${CURRENT})" ; exit 0 ;;
+  0) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is current: ${TAG}" ; exit 0 ;;
+  1) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is newer than the current release (${TAG})" ; exit 0 ;;
   2) echo "${P} Upgrading ${PACKAGE} to ${TAG} from ${INSTALLED}." ;;
   3) echo "${P} Installing ${PACKAGE} version ${TAG}." ;;
 esac
