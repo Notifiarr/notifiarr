@@ -75,7 +75,19 @@ func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 	}
 
 	for _, s := range sessions {
-		pct, msg := c.checkSessionDone(sent, s)
+		var (
+			_, ok = sent[s.Session.ID+s.SessionKey]
+			pct   = s.ViewOffset / s.Duration * 100
+			msg   = "sent"
+		)
+
+		if !ok {
+			msg = c.checkSessionDone(s, pct)
+			if msg == "sending" {
+				sent[s.Session.ID+s.SessionKey] = struct{}{}
+			}
+		}
+
 		// nolint:lll
 		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
@@ -85,39 +97,37 @@ func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 	}
 }
 
-// nolint:cyclop
-func (c *Config) checkSessionDone(sent map[string]struct{}, s *plex.Session) (float64, string) {
-	var (
-		msg   = "ignoring"
-		pct   = s.ViewOffset / s.Duration * 100
-		_, ok = sent[s.Session.ID+s.SessionKey]
-	)
-
+func (c *Config) checkSessionDone(s *plex.Session, pct float64) string {
 	switch {
-	case ok:
-		msg = "sent"
-	case c.Plex.MoviesPC > 0 && s.Type == "movie" && pct > float64(c.Plex.MoviesPC):
-		fallthrough
-	case c.Plex.SeriesPC > 0 && s.Type == "episode" && pct > float64(c.Plex.SeriesPC):
-		sent[s.Session.ID+s.SessionKey] = struct{}{}
-		msg = "sending"
-
-		_, _, err := c.SendData(c.URL, &Payload{
-			Type: "plex_session_complete_" + s.Type,
-			Plex: &plex.Sessions{
-				Name:       c.Plex.Name,
-				Sessions:   []plex.Session{*s},
-				AccountMap: strings.Split(c.Plex.AccountMap, "|"),
-			},
-		})
-		if err != nil {
-			c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
-		}
-	case c.Plex.SeriesPC > 0 && s.Type == "episode":
-		fallthrough
 	case c.Plex.MoviesPC > 0 && s.Type == "movie":
-		msg = "watching"
+		if pct < float64(c.Plex.MoviesPC) {
+			return "watching"
+		}
+
+		return c.sendSessionDone(s)
+	case c.Plex.SeriesPC > 0 && s.Type == "episode":
+		if pct < float64(c.Plex.SeriesPC) {
+			return "watching"
+		}
+
+		return c.sendSessionDone(s)
+	default:
+		return "ignoring"
+	}
+}
+
+func (c *Config) sendSessionDone(s *plex.Session) string {
+	_, _, err := c.SendData(c.URL, &Payload{
+		Type: "plex_session_complete_" + s.Type,
+		Plex: &plex.Sessions{
+			Name:       c.Plex.Name,
+			Sessions:   []plex.Session{*s},
+			AccountMap: strings.Split(c.Plex.AccountMap, "|"),
+		},
+	})
+	if err != nil {
+		c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
 	}
 
-	return pct, msg
+	return "sending"
 }
