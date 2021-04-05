@@ -3,57 +3,57 @@ package plex
 /* This file contains all the types for Plex Sessions API response. */
 
 type Session struct {
-	User                 User                   `json:"User"`
-	Player               Player                 `json:"Player"`
-	TranscodeSession     Transcode              `json:"TranscodeSession"`
-	Added                string                 `json:"addedAt"`
-	Art                  string                 `json:"art"`
-	AudienceRating       string                 `json:"audienceRating"`
-	AudienceRatingImg    string                 `json:"audienceRatingImage"`
-	ContentRating        string                 `json:"contentRating"`
-	Duration             float64                `json:"duration,string"`
-	GUID                 string                 `json:"guid"`
-	GuID                 map[string]interface{} `json:"Guid"` // this is wrong
-	GrandparentArt       string                 `json:"grandparentArt"`
-	GrandparentGUID      string                 `json:"grandparentGuid"`
-	GrandparentKey       string                 `json:"grandparentKey"`
-	GrandparentRatingKey string                 `json:"grandparentRatingKey"`
-	GrandparentTheme     string                 `json:"grandparentTheme"`
-	GrandparentThumb     string                 `json:"grandparentThumb"`
-	GrandparentTitle     string                 `json:"grandparentTitle"`
-	Index                string                 `json:"index"`
-	Key                  string                 `json:"key"`
-	LastViewed           int64                  `json:"lastViewedAt,string"`
-	LibrarySectionID     string                 `json:"librarySectionID"`
-	LibrarySectionKey    string                 `json:"librarySectionKey"`
-	LibrarySectionTitle  string                 `json:"librarySectionTitle"`
-	OriginallyAvailable  string                 `json:"originallyAvailableAt"`
-	ParentGUID           string                 `json:"parentGuid"`
-	ParentIndex          string                 `json:"parentIndex"`
-	ParentKey            string                 `json:"parentKey"`
-	ParentRatingKey      string                 `json:"parentRatingKey"`
-	ParentThumb          string                 `json:"parentThumb"`
-	ParentTitle          string                 `json:"parentTitle"`
-	PrimaryExtraKey      string                 `json:"primaryExtraKey"`
-	Rating               string                 `json:"rating"`
-	RatingImage          string                 `json:"ratingImage"`
-	RatingKey            string                 `json:"ratingKey"`
-	SessionKey           string                 `json:"sessionKey"`
-	Studio               string                 `json:"studio"`
-	Summary              string                 `json:"summary"`
-	Thumb                string                 `json:"thumb"`
-	Title                string                 `json:"title"`
-	TitleSort            string                 `json:"titleSort"`
-	Type                 string                 `json:"type"`
-	Updated              int64                  `json:"updatedAt,string"`
-	ViewCount            string                 `json:"viewCount"`
-	ViewOffset           float64                `json:"viewOffset,string"`
-	Year                 string                 `json:"year"`
+	User                 User      `json:"User"`
+	Player               Player    `json:"Player"`
+	TranscodeSession     Transcode `json:"TranscodeSession"`
+	Added                string    `json:"addedAt"`
+	Art                  string    `json:"art"`
+	AudienceRating       string    `json:"audienceRating"`
+	AudienceRatingImg    string    `json:"audienceRatingImage"`
+	ContentRating        string    `json:"contentRating"`
+	Duration             float64   `json:"duration,string"`
+	GUID                 string    `json:"guid"`
+	GrandparentArt       string    `json:"grandparentArt"`
+	GrandparentGUID      string    `json:"grandparentGuid"`
+	GrandparentKey       string    `json:"grandparentKey"`
+	GrandparentRatingKey string    `json:"grandparentRatingKey"`
+	GrandparentTheme     string    `json:"grandparentTheme"`
+	GrandparentThumb     string    `json:"grandparentThumb"`
+	GrandparentTitle     string    `json:"grandparentTitle"`
+	Index                string    `json:"index"`
+	Key                  string    `json:"key"`
+	LastViewed           int64     `json:"lastViewedAt,string"`
+	LibrarySectionID     string    `json:"librarySectionID"`
+	LibrarySectionKey    string    `json:"librarySectionKey"`
+	LibrarySectionTitle  string    `json:"librarySectionTitle"`
+	OriginallyAvailable  string    `json:"originallyAvailableAt"`
+	ParentGUID           string    `json:"parentGuid"`
+	ParentIndex          string    `json:"parentIndex"`
+	ParentKey            string    `json:"parentKey"`
+	ParentRatingKey      string    `json:"parentRatingKey"`
+	ParentThumb          string    `json:"parentThumb"`
+	ParentTitle          string    `json:"parentTitle"`
+	PrimaryExtraKey      string    `json:"primaryExtraKey"`
+	Rating               string    `json:"rating"`
+	RatingImage          string    `json:"ratingImage"`
+	RatingKey            string    `json:"ratingKey"`
+	SessionKey           string    `json:"sessionKey"`
+	Studio               string    `json:"studio"`
+	Summary              string    `json:"summary"`
+	Thumb                string    `json:"thumb"`
+	Title                string    `json:"title"`
+	TitleSort            string    `json:"titleSort"`
+	Type                 string    `json:"type"`
+	Updated              int64     `json:"updatedAt,string"`
+	ViewCount            string    `json:"viewCount"`
+	ViewOffset           float64   `json:"viewOffset,string"`
+	Year                 string    `json:"year"`
 	Session              struct {
 		Bandwidth int64  `json:"bandwidth"`
 		ID        string `json:"id"`
 		Location  string `json:"location"`
 	} `json:"Session"`
+	GuID     []*GUID     `json:"Guid,omitempty"`
 	Country  []*Country  `json:"Country"`
 	Director []*Director `json:"Director"`
 	Genre    []*Genre    `json:"Genre"`

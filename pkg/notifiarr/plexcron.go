@@ -2,6 +2,7 @@ package notifiarr
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -61,6 +62,20 @@ func (c *Config) plexCron(timer1, timer2 *time.Ticker) {
 	}
 }
 
+// Statuses for an item being played on Plex.
+const (
+	statusIgnoring = "ignoring"
+	statusWatching = "watching"
+	statusSending  = "sending"
+	statusError    = "error"
+	statusSent     = "sent"
+)
+
+const (
+	movie   = "movie"
+	episode = "episode"
+)
+
 // This cron tab runs every minute to send a report when a user gets to the end of a movie or tv show.
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
@@ -71,7 +86,7 @@ func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
 		return
 	} else if len(sessions) == 0 {
-		c.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.URL)
+		// c.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.URL)
 		return
 	}
 
@@ -79,12 +94,12 @@ func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 		var (
 			_, ok = sent[s.Session.ID+s.SessionKey]
 			pct   = s.ViewOffset / s.Duration * 100
-			msg   = "sent"
+			msg   = statusSent
 		)
 
-		if !ok {
+		if !ok { // ok means we already sent a message for this session.
 			msg = c.checkSessionDone(s, pct)
-			if msg == "sending" {
+			if strings.HasPrefix(msg, statusSending) {
 				sent[s.Session.ID+s.SessionKey] = struct{}{}
 			}
 		}
@@ -92,32 +107,42 @@ func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 		// nolint:lll
 		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
-		c.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
-			c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
-			s.Type, s.Title, s.Player.State, pct, msg)
+		if strings.HasPrefix(msg, statusSending) || strings.HasPrefix(msg, statusError) {
+			c.Printf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
+				c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
+				s.Type, s.Title, s.Player.State, pct, msg)
+		} else {
+			c.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
+				c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
+				s.Type, s.Title, s.Player.State, pct, msg)
+		}
 	}
 }
 
 func (c *Config) checkSessionDone(s *plex.Session, pct float64) string {
 	switch {
-	case c.Plex.MoviesPC > 0 && s.Type == "movie":
+	case c.Plex.MoviesPC > 0 && strings.EqualFold(s.Type, movie):
 		if pct < float64(c.Plex.MoviesPC) {
-			return "watching"
+			return statusWatching
 		}
 
 		return c.sendSessionDone(s)
-	case c.Plex.SeriesPC > 0 && s.Type == "episode":
+	case c.Plex.SeriesPC > 0 && strings.EqualFold(s.Type, episode):
 		if pct < float64(c.Plex.SeriesPC) {
-			return "watching"
+			return statusWatching
 		}
 
 		return c.sendSessionDone(s)
 	default:
-		return "ignoring"
+		return statusIgnoring
 	}
 }
 
 func (c *Config) sendSessionDone(s *plex.Session) string {
+	if err := c.checkPlexAgent(s); err != nil {
+		return statusError + ": " + err.Error()
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), c.Snap.Timeout.Duration)
 	snap := c.GetMetaSnap(ctx)
 	cancel() //nolint:wsl
@@ -132,8 +157,28 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 		},
 	})
 	if err != nil {
-		c.Errorf("[PLEX] Sending Completed Session to %s: %v", c.URL, err)
+		return statusError + ": sending to " + c.URL + ": " + err.Error()
 	}
 
-	return "sending"
+	return statusSending + " to " + c.URL
+}
+
+func (c *Config) checkPlexAgent(s *plex.Session) error {
+	if !strings.Contains(s.GUID, "plex://") || s.Key == "" {
+		return nil
+	}
+
+	sections, err := c.Plex.GetPlexSectionKey(s.Key)
+	if err != nil {
+		return fmt.Errorf("getting plex key %s: %w", s.Key, err)
+	}
+
+	for _, section := range sections.Metadata {
+		if section.RatingKey == s.RatingKey {
+			s.GuID = section.GuID
+			return nil
+		}
+	}
+
+	return nil
 }
