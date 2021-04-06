@@ -29,6 +29,9 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/exclusions", radarrGetExclusions, "GET")
 	a.HandleAPIpath(Radarr, "/exclusions", radarrAddExclusions, "POST")
 	a.HandleAPIpath(Radarr, "/exclusions/{eid:(?:[0-9],?)+}", radarrDelExclusions, "DELETE")
+	a.HandleAPIpath(Radarr, "/customformats", radarrGetCustomFormats, "GET")
+	a.HandleAPIpath(Radarr, "/customformats", radarrAddCustomFormat, "POST")
+	a.HandleAPIpath(Radarr, "/customformats/{cfid:[0-9]+}", radarrUpdateCustomFormat, "PUT")
 }
 
 // RadarrConfig represents the input data for a Radarr server.
@@ -277,11 +280,51 @@ func radarrDelExclusions(r *http.Request) (int, interface{}) {
 		}
 	}
 
-	// Get the profiles from radarr.
 	err := getRadarr(r).DeleteExclusions(exclusions)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("deleting exclusions: %w", err)
 	}
 
 	return http.StatusOK, "deleted: " + strings.Join(strings.Split(ids, ","), ", ")
+}
+
+func radarrAddCustomFormat(r *http.Request) (int, interface{}) {
+	var cf radarr.CustomFormat
+
+	err := json.NewDecoder(r.Body).Decode(&cf)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	resp, err := getRadarr(r).AddCustomFormat(&cf)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding custom format: %w", err)
+	}
+
+	return http.StatusOK, resp
+}
+
+func radarrGetCustomFormats(r *http.Request) (int, interface{}) {
+	cf, err := getRadarr(r).GetCustomFormats()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
+	}
+
+	return http.StatusOK, cf
+}
+
+func radarrUpdateCustomFormat(r *http.Request) (int, interface{}) {
+	var cf radarr.CustomFormat
+	if err := json.NewDecoder(r.Body).Decode(&cf); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	cfID, _ := strconv.Atoi(mux.Vars(r)["cfid"])
+
+	output, err := getRadarr(r).UpdateCustomFormat(&cf, cfID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
+	}
+
+	return http.StatusOK, output
 }
