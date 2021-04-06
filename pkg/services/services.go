@@ -14,12 +14,15 @@ import (
 
 // Defaults.
 const (
-	DefaultInterval = 10 * time.Minute
-	MinimumInterval = DefaultInterval / 2
-	MinimumTimeout  = time.Second
-	DefaultTimeout  = 10 * MinimumTimeout
-	MaximumParallel = 10
-	DefaultBuffer   = 1000
+	DefaultSendInterval  = 10 * time.Minute
+	MinimumSendInterval  = DefaultSendInterval / 2
+	DefaultCheckInterval = MinimumSendInterval
+	MinimumCheckInterval = 10 * time.Second
+	MinimumTimeout       = time.Second
+	DefaultTimeout       = 10 * MinimumTimeout
+	MaximumParallel      = 10
+	DefaultBuffer        = 1000
+	NotifiarrEventType   = "service_checks"
 )
 
 var (
@@ -39,7 +42,7 @@ type Config struct {
 	*logs.Logger `json:"-"`        // log file writer
 	services     map[string]*Service
 	checks       chan *Service
-	done         chan struct{}
+	done         chan bool
 	stopChan     chan struct{}
 	mu           sync.Mutex
 }
@@ -75,27 +78,33 @@ type Results struct {
 
 // CheckResult represents the status of a service.
 type CheckResult struct {
-	Name   string     `json:"name"`   // "Radarr"
-	State  CheckState `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
-	Output string     `json:"output"` // metadata message
-	Type   CheckType  `json:"type"`   // http, tcp, ping
-	Time   time.Time  `json:"time"`   // when it was checked
+	Name     string     `json:"name"`   // "Radarr"
+	State    CheckState `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
+	Output   string     `json:"output"` // metadata message
+	Type     CheckType  `json:"type"`   // http, tcp, ping
+	Time     time.Time  `json:"time"`   // when it was checked, rounded to Microseconds
+	Since    time.Time  `json:"since"`  // how long it has been in this state, rounded to Microseconds
+	Interval float64    `json:"interval"`
 }
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name      string        `toml:"name"`    // Radarr
-	Type      CheckType     `toml:"type"`    // http
-	Value     string        `toml:"check"`   // http://some.url
-	Expect    string        `toml:"expect"`  // 200
-	Timeout   cnfg.Duration `toml:"timeout"` // 10s
+	Name      string        `toml:"name"`     // Radarr
+	Type      CheckType     `toml:"type"`     // http
+	Value     string        `toml:"check"`    // http://some.url
+	Expect    string        `toml:"expect"`   // 200
+	Timeout   cnfg.Duration `toml:"timeout"`  // 10s
+	Interval  cnfg.Duration `toml:"interval"` // 1m
+	log       *logs.Logger
 	output    string
 	state     CheckState
+	since     time.Time
 	lastCheck time.Time
 }
 
 func (c *Config) Start(services []*Service) error {
-	if c.Disabled {
+	services = append(services, c.collectApps()...)
+	if c.Disabled || len(services) == 0 {
 		return nil
 	}
 
@@ -113,11 +122,10 @@ func (c *Config) start() {
 	for i := uint(0); i < c.Parallel; i++ {
 		go func() {
 			for check := range c.checks {
-				check.check()
-				c.done <- struct{}{}
+				c.done <- check.check()
 			}
 
-			c.done <- struct{}{}
+			c.done <- false
 		}()
 	}
 
@@ -126,17 +134,30 @@ func (c *Config) start() {
 
 func (c *Config) runServiceChecker() {
 	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
+	c.RunChecks(true)
+	c.SendResults(notifiarr.ProdURL, &Results{
+		What: "start",
+		Svcs: c.GetResults(),
+	})
 
 	ticker := time.NewTicker(c.Interval.Duration)
+	second := time.NewTicker(time.Millisecond * 4159) //nolint:gomnd
+
 	defer func() {
+		second.Stop()
 		ticker.Stop()
-		c.done <- struct{}{}
+		c.done <- false
 	}()
 
 	for {
 		select {
+		case <-second.C:
+			c.RunChecks(false)
 		case <-ticker.C:
-			c.SendResults(c.RunChecks("timer"), notifiarr.ProdURL)
+			c.SendResults(notifiarr.ProdURL, &Results{
+				What: "timer",
+				Svcs: c.GetResults(),
+			})
 		case <-c.stopChan:
 			return
 		}
@@ -146,12 +167,11 @@ func (c *Config) runServiceChecker() {
 func (c *Config) setup(services []*Service) error {
 	c.services = make(map[string]*Service)
 	c.checks = make(chan *Service, DefaultBuffer)
-	c.done = make(chan struct{})
+	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
 
-	services = append(services, c.collectApps()...)
-
 	for i := range services {
+		services[i].log = c.Logger
 		if err := services[i].validate(); err != nil {
 			return err
 		}
@@ -167,25 +187,27 @@ func (c *Config) setup(services []*Service) error {
 	}
 
 	if c.Interval.Duration == 0 {
-		c.Interval.Duration = DefaultInterval
-	} else if c.Interval.Duration < MinimumInterval {
-		c.Interval.Duration = MinimumInterval
+		c.Interval.Duration = DefaultSendInterval
+	} else if c.Interval.Duration < MinimumSendInterval {
+		c.Interval.Duration = MinimumSendInterval
 	}
 
 	return nil
 }
 
+// collectApps turns app configs into service checks if they have a name.
 func (c *Config) collectApps() []*Service {
 	svcs := []*Service{}
 
 	for _, a := range c.Apps.Lidarr {
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:    a.Name,
-				Type:    CheckHTTP,
-				Value:   a.URL,
-				Expect:  "200",
-				Timeout: cnfg.Duration{Duration: a.Timeout.Duration},
+				Name:     a.Name,
+				Type:     CheckHTTP,
+				Value:    a.URL,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
+				Interval: a.Interval,
 			})
 		}
 	}
@@ -193,11 +215,12 @@ func (c *Config) collectApps() []*Service {
 	for _, a := range c.Apps.Radarr {
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:    a.Name,
-				Type:    CheckHTTP,
-				Value:   a.URL,
-				Expect:  "200",
-				Timeout: cnfg.Duration{Duration: a.Timeout.Duration},
+				Name:     a.Name,
+				Type:     CheckHTTP,
+				Value:    a.URL,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
+				Interval: a.Interval,
 			})
 		}
 	}
@@ -205,11 +228,12 @@ func (c *Config) collectApps() []*Service {
 	for _, a := range c.Apps.Readarr {
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:    a.Name,
-				Type:    CheckHTTP,
-				Value:   a.URL,
-				Expect:  "200",
-				Timeout: cnfg.Duration{Duration: a.Timeout.Duration},
+				Name:     a.Name,
+				Type:     CheckHTTP,
+				Value:    a.URL,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
+				Interval: a.Interval,
 			})
 		}
 	}
@@ -217,11 +241,12 @@ func (c *Config) collectApps() []*Service {
 	for _, a := range c.Apps.Sonarr {
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:    a.Name,
-				Type:    CheckHTTP,
-				Value:   a.URL,
-				Expect:  "200",
-				Timeout: cnfg.Duration{Duration: a.Timeout.Duration},
+				Name:     a.Name,
+				Type:     CheckHTTP,
+				Value:    a.URL,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
+				Interval: a.Interval,
 			})
 		}
 	}
@@ -229,41 +254,64 @@ func (c *Config) collectApps() []*Service {
 	return svcs
 }
 
-// RunChecks forces all checks to run right now.
-func (c *Config) RunChecks(what string) *Results {
+// RunChecks runs checks that are due. Passing true, runs them even if they're not due.
+// Returns true if a service state changed.
+func (c *Config) RunChecks(forceAll bool) bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	count := 0
+	stateChange := false
+
 	for s := range c.services {
-		c.checks <- c.services[s]
+		if forceAll || c.services[s].lastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
+			count++
+			c.checks <- c.services[s]
+		}
 	}
 
-	for range c.services {
-		<-c.done
+	for ; count > 0; count-- {
+		if sc := <-c.done; sc {
+			stateChange = true
+		}
 	}
 
-	svcs := []*CheckResult{}
+	return stateChange
+}
+
+func (c *Config) GetResults() []*CheckResult {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	svcs := make([]*CheckResult, len(c.services))
+	count := 0
 
 	for _, s := range c.services {
-		c.Printf("Service Checked: %s, state: %s, output: %s", s.Name, s.state, s.output)
-
-		svcs = append(svcs, &CheckResult{
-			Name:   s.Name,
-			State:  s.state,
-			Output: s.output,
-			Type:   s.Type,
-			Time:   s.lastCheck.Round(time.Microsecond),
-		})
+		svcs[count] = &CheckResult{
+			Interval: s.Interval.Duration.Seconds(),
+			Name:     s.Name,
+			State:    s.state,
+			Output:   s.output,
+			Type:     s.Type,
+			Time:     s.lastCheck,
+			Since:    s.since,
+		}
+		count++
 	}
 
-	return &Results{Type: "service_checks", Svcs: svcs, What: what, Interval: c.Interval.Seconds()}
+	return svcs
 }
 
 // SendResults sends a set of Results to Notifiarr.
-func (c *Config) SendResults(results *Results, url string) {
+func (c *Config) SendResults(url string, results *Results) {
+	results.Type = NotifiarrEventType
+	results.Interval = c.Interval.Seconds()
+
 	data, _ := json.MarshalIndent(results, "", " ")
 	if _, err := c.Notify.SendJSON(url, data); err != nil {
-		c.Error("Sending service check update to Notifiarr:", err)
+		c.Errorf("Sending service check update to %s: %v", url, err)
+	} else {
+		c.Printf("Sent %d service check states to %s", len(results.Svcs), url)
 	}
 }
 

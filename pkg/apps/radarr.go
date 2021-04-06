@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/radarr"
 )
@@ -36,7 +37,8 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	Name string
+	Name     string
+	Interval cnfg.Duration
 	*starr.Config
 	radarr *radarr.Radarr
 }

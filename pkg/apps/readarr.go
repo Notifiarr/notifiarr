@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/readarr"
 )
@@ -32,7 +33,8 @@ func (a *Apps) readarrHandlers() {
 
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
-	Name string
+	Name     string
+	Interval cnfg.Duration
 	*starr.Config
 	readarr *readarr.Readarr
 }
