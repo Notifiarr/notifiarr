@@ -90,7 +90,7 @@ func (c *Config) Stop() {
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.Duration) ([]byte, []byte, error) {
+func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.Duration) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), wait+time.Second*2)
 	defer cancel()
 
@@ -129,13 +129,15 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 	time.Sleep(wait)
 
 	var err error
-	if payload.Plex, err = c.Plex.GetSessions(); err != nil {
+	if payload.Plex, err = c.Plex.GetXMLSessions(); err != nil {
 		rep <- fmt.Errorf("getting sessions: %w", err)
 	}
 
 	wg.Wait()
 
-	return c.SendData(url, payload)
+	_, e, err := c.SendData(url, payload)
+
+	return e, err
 }
 
 // CheckURLResponse returns nil if the request returns a 200.
@@ -176,6 +178,7 @@ func (c *Config) SendJSON(url string, data []byte) ([]byte, error) {
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-API-Key", c.Apps.APIKey)
+	c.Debugf("Sending JSON Payload to %s:\n%s", url, string(data))
 
 	resp, err := c.getClient().Do(req)
 	if err != nil {
@@ -192,7 +195,7 @@ func (c *Config) SendJSON(url string, data []byte) ([]byte, error) {
 }
 
 func (c *Config) SendData(url string, payload *Payload) ([]byte, []byte, error) {
-	post, err := json.Marshal(payload)
+	post, err := json.MarshalIndent(payload, "", " ")
 	if err != nil {
 		return nil, nil, fmt.Errorf("encoding data: %w", err)
 	}

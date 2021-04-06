@@ -17,11 +17,9 @@ type Sessions struct {
 	XML        string    `json:"sessions_xml"`
 }
 
-type Session interface{}
-
 var ErrBadStatus = fmt.Errorf("status code not 200")
 
-func (s *Server) GetSessions() (*Sessions, error) {
+func (s *Server) GetXMLSessions() (*Sessions, error) {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return nil, ErrNoURLToken
 	}
@@ -59,6 +57,30 @@ func (s *Server) GetSessions() (*Sessions, error) {
 		XML:        string(xml),
 		Sessions:   v.MediaContainer.Sessions,
 	}, nil
+}
+
+func (s *Server) GetSessions() ([]*Session, error) {
+	if s == nil || s.URL == "" || s.Token == "" {
+		return nil, ErrNoURLToken
+	}
+
+	var v struct {
+		MediaContainer struct {
+			Size     int        `json:"size"`
+			Sessions []*Session `json:"Metadata"`
+		} `json:"MediaContainer"`
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
+	defer cancel()
+
+	if data, err := s.getPlexSessions(ctx, map[string]string{"Accept": "application/json"}); err != nil {
+		return nil, err
+	} else if err = json.Unmarshal(data, &v); err != nil {
+		return nil, fmt.Errorf("parsing plex sessions: %w", err)
+	}
+
+	return v.MediaContainer.Sessions, nil
 }
 
 func (s *Server) getPlexSessions(ctx context.Context, headers map[string]string) ([]byte, error) {

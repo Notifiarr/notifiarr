@@ -308,8 +308,6 @@ func (c *Config) SendResults(url string, results *Results) {
 	results.Interval = c.Interval.Seconds()
 
 	data, _ := json.MarshalIndent(results, "", " ")
-	c.Debug("Sending Payload:", string(data))
-
 	if _, err := c.Notify.SendJSON(url, data); err != nil {
 		c.Errorf("Sending service check update to %s: %v", url, err)
 	} else {
