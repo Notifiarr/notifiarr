@@ -139,7 +139,7 @@ use_sudo          = false # sudo is needed on unix when monitor_drives=true or f
 
 [services]
   disabled = false # Setting this to true disables all service checking routines.
-  interval = "10m" # How often to check services and send a report. Minimum = 5m.
+  interval = "10m" # How often to service states to Notifiarr.com. Minimum = 5m.
   parallel = 1     # How many services to check concurrently. 1 should be enough.
 
 ## Uncomment the following section to create a service check on a URL or IP:port.
@@ -147,11 +147,12 @@ use_sudo          = false # sudo is needed on unix when monitor_drives=true or f
 ## Do not add Radarr, Sonarr, Readarr or Lidarr here! Add a name to enable their checks.
 #
 #[[service]]
-#  name    = "MyServer"          # name must be unique
-#  type    = "http"              # type can be "http" or "tcp"
-#  check   = "http://127.0.0.1"  # url for 'http', host/IP:port for 'tcp'
-#  expect  = "200"               # return code to expect (for http only)
-#  timeout = "10s"               # how long to wait for tcp or http checks.
+#  name     = "MyServer"          # name must be unique
+#  type     = "http"              # type can be "http" or "tcp"
+#  check    = "http://127.0.0.1"  # url for 'http', host/IP:port for 'tcp'
+#  expect   = "200"               # return code to expect (for http only)
+#  timeout  = "10s"               # how long to wait for tcp or http checks.
+#  interval = "5m"                # how often to check this service.
 
 ## Another example. Remember to uncomment [[service]] if you use this!
 #
