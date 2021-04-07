@@ -108,7 +108,7 @@ exec /usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf
 EOT
 
 ID=$(id notifiarr 2>&1)
-if [ "$?" = "0" ]; then
+if [ "$?" != "0" ]; then
   echo "${P} Adding notifiarr user: synouser --add notifiarr Notifiarr 0 support@notifiarr.com 0"
   pass="${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
   synouser --add notifiarr "${pass}" Notifiarr 0 support@notifiarr.com 0
@@ -119,7 +119,7 @@ fi
 
 echo "${P} Restarting service: status notifiarr ; stop notifiarr ; start notifiarr"
 status notifiarr
-["$?" != "0"] || stop notifiarr
+[ "$?" != "0" ] || stop notifiarr
 start notifiarr
 
 

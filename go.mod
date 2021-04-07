@@ -2,6 +2,7 @@ module github.com/Go-Lift-TV/notifiarr
 
 go 1.16
 
+replace golift.io/starr => ../../../golift.io/starr
 require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/gen2brain/dlgs v0.0.0-20210324163825-f2c7498414a6
