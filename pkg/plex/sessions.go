@@ -10,11 +10,10 @@ import (
 )
 
 type Sessions struct {
-	Name       string    `json:"server"`
-	AccountMap []string  `json:"account_map"`
-	Size       int       `json:"size"`
-	Sessions   []Session `json:"sessions"`
-	XML        string    `json:"sessions_xml"`
+	Name       string     `json:"server"`
+	AccountMap []string   `json:"account_map"`
+	Sessions   []*Session `json:"sessions"`
+	XML        string     `json:"sessions_xml"`
 }
 
 var ErrBadStatus = fmt.Errorf("status code not 200")
@@ -34,8 +33,7 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 
 	var v struct {
 		MediaContainer struct {
-			Size     int       `json:"size"`
-			Sessions []Session `json:"Metadata"`
+			Sessions []*Session `json:"Metadata"`
 		} `json:"MediaContainer"`
 	}
 
@@ -45,6 +43,7 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 			return nil, err
 		}
 
+		// log.Print("DEBUG PLEX PAYLOAD:\n", string(data))
 		if err = json.Unmarshal(data, &v); err != nil {
 			return nil, fmt.Errorf("parsing plex sessions: %w", err)
 		}
@@ -52,7 +51,6 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 
 	return &Sessions{
 		Name:       s.Name,
-		Size:       v.MediaContainer.Size,
 		AccountMap: strings.Split(s.AccountMap, "|"),
 		XML:        string(xml),
 		Sessions:   v.MediaContainer.Sessions,
@@ -66,7 +64,6 @@ func (s *Server) GetSessions() ([]*Session, error) {
 
 	var v struct {
 		MediaContainer struct {
-			Size     int        `json:"size"`
 			Sessions []*Session `json:"Metadata"`
 		} `json:"MediaContainer"`
 	}
@@ -74,9 +71,13 @@ func (s *Server) GetSessions() ([]*Session, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
 
-	if data, err := s.getPlexSessions(ctx, map[string]string{"Accept": "application/json"}); err != nil {
+	data, err := s.getPlexSessions(ctx, map[string]string{"Accept": "application/json"})
+	if err != nil {
 		return nil, err
-	} else if err = json.Unmarshal(data, &v); err != nil {
+	}
+
+	// log.Print("DEBUG PLEX PAYLOAD:\n", string(data))
+	if err = json.Unmarshal(data, &v); err != nil {
 		return nil, fmt.Errorf("parsing plex sessions: %w", err)
 	}
 

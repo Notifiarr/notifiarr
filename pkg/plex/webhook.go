@@ -21,17 +21,15 @@ type Webhook struct {
 		UUID          string `json:"uuid"`
 	} `json:"Player"`
 	Metadata struct {
-		LibrarySectionType   string `json:"librarySectionType"`
-		RatingKey            string `json:"ratingKey"`
-		ParentRatingKey      string `json:"parentRatingKey"`
-		GrandparentRatingKey string `json:"grandparentRatingKey"`
-		Key                  string `json:"key"`
-		GUID                 string `json:"guid"`
-		ParentGUID           string `json:"parentGuid"`
-		GrandparentGUID      string `json:"grandparentGuid"`
-		GuID                 []struct {
-			ID string `json:"id"`
-		} `json:"Guid"`
+		LibrarySectionType    string  `json:"librarySectionType"`
+		RatingKey             string  `json:"ratingKey"`
+		ParentRatingKey       string  `json:"parentRatingKey"`
+		GrandparentRatingKey  string  `json:"grandparentRatingKey"`
+		Key                   string  `json:"key"`
+		GUID                  string  `json:"guid"`
+		ParentGUID            string  `json:"parentGuid"`
+		GrandparentGUID       string  `json:"grandparentGuid"`
+		GuID                  []*GUID `json:"Guid"`
 		Studio                string  `json:"studio"`
 		Type                  string  `json:"type"`
 		GrandParentTitle      string  `json:"grandparentTitle"`
@@ -67,48 +65,5 @@ type Webhook struct {
 		AudienceRatingImage   string  `json:"audienceRatingImage"`
 		PrimaryExtraKey       string  `json:"primaryExtraKey"`
 		RatingImage           string  `json:"ratingImage"`
-		Genre                 []struct {
-			ID     int    `json:"id"`
-			Filter string `json:"filter"`
-			Tag    string `json:"tag"`
-			Count  int    `json:"count"`
-		} `json:"Genre"`
-		Director []struct {
-			ID     int    `json:"id"`
-			Filter string `json:"filter"`
-			Tag    string `json:"tag"`
-		} `json:"Director"`
-		Writer []struct {
-			ID     int    `json:"id"`
-			Filter string `json:"filter"`
-			Tag    string `json:"tag"`
-			Count  int    `json:"count"`
-		} `json:"Writer"`
-		Producer []struct {
-			ID     int    `json:"id"`
-			Filter string `json:"filter"`
-			Tag    string `json:"tag"`
-			Count  int    `json:"count,omitempty"`
-		} `json:"Producer"`
-		Country []struct {
-			ID     int    `json:"id"`
-			Filter string `json:"filter"`
-			Tag    string `json:"tag"`
-			Count  int    `json:"count"`
-		} `json:"Country"`
-		Role []struct {
-			ID     int    `json:"id"`
-			Filter string `json:"filter"`
-			Tag    string `json:"tag"`
-			Count  int    `json:"count,omitempty"`
-			Role   string `json:"role"`
-			Thumb  string `json:"thumb,omitempty"`
-		} `json:"Role"`
-		Similar []struct {
-			ID     int    `json:"id"`
-			Filter string `json:"filter"`
-			Tag    string `json:"tag"`
-			Count  int    `json:"count"`
-		} `json:"Similar"`
 	} `json:"Metadata"`
 }

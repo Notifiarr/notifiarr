@@ -159,9 +159,16 @@ lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you 
 #### Plex
 
 This application can also send Plex sessions to Notfiarr so you can receive Discord
-notifications when users interact with your server.
+notifications when users interact with your server. This has three different features:
+
+- Notify all sessions on a longer interval (30+ minutes).
+- Notify on session nearing completion (percent complete).
+- Notify on session change (Plex Webhook) ie. pause/resume.
+
 You [must provide Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
-for this to work. Since it's two-way, you also need to add a webhook to Plex so it send a notice to this application.
+for this to work. Setting `movies_percent_complete` or `series_percent_complete` to a number above 0 will cause this
+application to poll Plex once per minute looking for sessions nearing completion. If Plex goes down
+this will cause a lot of log spam. You may also need to add a webhook to Plex so it sends notices to this application.
 
 - In Plex Media Server, add this URL to webhooks:
   - `http://localhost:5454/plex?token=plex-token-here`
@@ -173,10 +180,12 @@ for this to work. Since it's two-way, you also need to add a webhook to Plex so 
 |---|---|---|
 plex.url|`DN_PLEX_URL`|`http://localhost:32400` / local URL to your plex server|
 plex.token|`DN_PLEX_TOKEN`|Required. [Must provide Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) for this to work.|
-plex.interval|`DN_PLEX_INTERVAL`|`30m`, How often to notify on session data (cron)|
+plex.interval|`DN_PLEX_INTERVAL`|`30m`, How often to notify on all session data (cron)|
 plex.cooldown|`DN_PLEX_COOLDOWN`|`10s`, Maximum rate of notifications is 1 every cooldown interval|
 plex.account_map|`DN_PLEX_ACCOUNT_MAP`|map an email to a name, ex: `"som@ema.il,Name|some@ther.mail,name"`|
 plex.server|`DN_PLEX_SERVER`|Optional name of this server; discovered automatically otherwise|
+plex.movies_percent_complete|`DN_PLEX_MOVIES_PERCENT_COMPLETE`|Send complete notice when a movie reaches this percent.|
+plex.series_percent_complete|`DN_PLEX_SERIES_PERCENT_COMPLETE`|Send complete notice when a show reaches this percent.|
 
 #### System Snapshot
 
