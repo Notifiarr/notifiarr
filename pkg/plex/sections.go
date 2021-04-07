@@ -75,14 +75,13 @@ type LibrarySection struct {
 				Size                  int    `json:"size"`
 				AudioProfile          string `json:"audioProfile"`
 				Container             string `json:"container"`
-				Has64BitOffsets       bool   `json:"has64bitOffsets"`
 				Indexes               string `json:"indexes"`
-				OptimizedForStreaming bool   `json:"optimizedForStreaming"`
 				VideoProfile          string `json:"videoProfile"`
+				OptimizedForStreaming bool   `json:"optimizedForStreaming"`
+				Has64BitOffsets       bool   `json:"has64bitOffsets"`
 				Stream                []struct {
 					ID                   int     `json:"id"`
 					StreamType           int     `json:"streamType"`
-					Default              bool    `json:"default"`
 					Codec                string  `json:"codec"`
 					Index                int     `json:"index"`
 					Bitrate              int     `json:"bitrate"`
@@ -94,7 +93,6 @@ type LibrarySection struct {
 					ColorRange           string  `json:"colorRange,omitempty"`
 					ColorSpace           string  `json:"colorSpace,omitempty"`
 					FrameRate            float64 `json:"frameRate,omitempty"`
-					HasScalingMatrix     bool    `json:"hasScalingMatrix,omitempty"`
 					Height               int     `json:"height,omitempty"`
 					Level                int     `json:"level,omitempty"`
 					Profile              string  `json:"profile"`
@@ -103,28 +101,31 @@ type LibrarySection struct {
 					Width                int     `json:"width,omitempty"`
 					DisplayTitle         string  `json:"displayTitle"`
 					ExtendedDisplayTitle string  `json:"extendedDisplayTitle"`
-					Selected             bool    `json:"selected,omitempty"`
 					Channels             int     `json:"channels,omitempty"`
 					Language             string  `json:"language,omitempty"`
 					LanguageCode         string  `json:"languageCode,omitempty"`
 					AudioChannelLayout   string  `json:"audioChannelLayout,omitempty"`
 					SamplingRate         int     `json:"samplingRate,omitempty"`
+					Selected             bool    `json:"selected,omitempty"`
+					HasScalingMatrix     bool    `json:"hasScalingMatrix,omitempty"`
+					Default              bool    `json:"default"`
 				} `json:"Stream"`
 			} `json:"Part"`
 		} `json:"Media"`
-		TitleSort           string      `json:"titleSort,omitempty"`
-		ViewOffset          int         `json:"viewOffset,omitempty"`
-		LastViewedAt        int         `json:"lastViewedAt,omitempty"`
-		ParentYear          int         `json:"parentYear,omitempty"`
-		Studio              string      `json:"studio,omitempty"`
-		AudienceRating      float64     `json:"audienceRating,omitempty"`
-		ViewCount           int         `json:"viewCount,omitempty"`
-		Tagline             string      `json:"tagline,omitempty"`
-		AudienceRatingImage string      `json:"audienceRatingImage,omitempty"`
-		ChapterSource       string      `json:"chapterSource,omitempty"`
-		PrimaryExtraKey     string      `json:"primaryExtraKey,omitempty"`
-		RatingImage         string      `json:"ratingImage,omitempty"`
-		GuID                []*GUID     `json:"Guid,omitempty"`
+		TitleSort           string  `json:"titleSort,omitempty"`
+		ViewOffset          int     `json:"viewOffset,omitempty"`
+		LastViewedAt        int     `json:"lastViewedAt,omitempty"`
+		ParentYear          int     `json:"parentYear,omitempty"`
+		Studio              string  `json:"studio,omitempty"`
+		AudienceRating      float64 `json:"audienceRating,omitempty"`
+		ViewCount           int     `json:"viewCount,omitempty"`
+		Tagline             string  `json:"tagline,omitempty"`
+		AudienceRatingImage string  `json:"audienceRatingImage,omitempty"`
+		ChapterSource       string  `json:"chapterSource,omitempty"`
+		PrimaryExtraKey     string  `json:"primaryExtraKey,omitempty"`
+		RatingImage         string  `json:"ratingImage,omitempty"`
+		GuID                []*GUID `json:"Guid,omitempty"`
+		/* These do not work as-is.
 		Country             []*Country  `json:"Country"`
 		Director            []*Director `json:"Director"`
 		Genre               []*Genre    `json:"Genre"`
@@ -132,6 +133,7 @@ type LibrarySection struct {
 		Role                []*Role     `json:"Role"`
 		Similar             []*Similar  `json:"Similar"`
 		Writer              []*Writer   `json:"Writer"`
+		*/
 	} `json:"Metadata"`
 }
 
@@ -143,31 +145,30 @@ func (s *Server) GetPlexSectionKey(keyPath string) (*LibrarySection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
 
-	data, err := s.getPlexSectionKey(ctx, keyPath)
+	data, err := s.getPlexSectionKey(ctx, s.URL+keyPath)
 	if err != nil {
 		return nil, err
 	}
 
 	var v struct {
-		MediaContainer struct {
-			Section *LibrarySection `json:"Metadata"`
-		} `json:"MediaContainer"`
+		MediaContainer *LibrarySection `json:"MediaContainer"`
 	}
 
 	if err := json.Unmarshal(data, &v); err != nil {
-		return nil, fmt.Errorf("unmarshaling library section: %w", err)
+		return nil, fmt.Errorf("unmarshaling library section from %s: %w", s.URL+keyPath, err)
 	}
 
-	return v.MediaContainer.Section, nil
+	return v.MediaContainer, nil
 }
 
-func (s *Server) getPlexSectionKey(ctx context.Context, keyPath string) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+keyPath, nil)
+func (s *Server) getPlexSectionKey(ctx context.Context, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("creating http request: %w", err)
 	}
 
 	req.Header.Set("X-Plex-Token", s.Token)
+	req.Header.Set("Accept", "application/json")
 
 	resp, err := s.getClient().Do(req)
 	if err != nil {

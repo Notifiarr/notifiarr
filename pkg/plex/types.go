@@ -53,7 +53,8 @@ type Session struct {
 		ID        string `json:"id"`
 		Location  string `json:"location"`
 	} `json:"Session"`
-	GuID     []*GUID     `json:"Guid,omitempty"`
+	GuID []*GUID `json:"Guid,omitempty"`
+	/* Notifiarr does not need these. :shrug:
 	Country  []*Country  `json:"Country"`
 	Director []*Director `json:"Director"`
 	Genre    []*Genre    `json:"Genre"`
@@ -62,6 +63,7 @@ type Session struct {
 	Role     []*Role     `json:"Role"`
 	Similar  []*Similar  `json:"Similar"`
 	Writer   []*Writer   `json:"Writer"`
+	*/
 }
 
 type User struct {
@@ -91,10 +93,10 @@ type Player struct {
 }
 
 type Country struct {
-	Count  string `json:"count"`
-	Filter string `json:"filter"`
-	ID     string `json:"id"`
-	Tag    string `json:"tag"`
+	Count  string      `json:"count"`
+	Filter string      `json:"filter"`
+	ID     interface{} `json:"id"`
+	Tag    string      `json:"tag"`
 }
 
 type Director struct {
