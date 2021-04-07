@@ -84,10 +84,10 @@ gunzip -c /tmp/${FILE} > /usr/bin/notifiarr
 rm /tmp/${FILE}
 chmod 0755 /usr/bin/notifiarr
 
-echo "${P} Ensuring config file: /etc/notifiarr/notifiarr.conf"
+echo "${P} Ensuring config file: /etc/notifiarr/notifiarr.conf (File exists error after this is OK!)"
 mkdir /etc/notifiarr 2>/dev/null || \
   $CMD https://notifiarr.com/scripts/notifiarr-client.conf > /etc/notifiarr/notifiarr.conf
-[ ! -d /volume1/data ] || ln -s /etc/notifiarr/notifiarr.conf /volume1/data/notifiarr.conf
+[ ! -d /volume1/data ] || cp -n /etc/notifiarr/notifiarr.conf /volume1/data/notifiarr.conf
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
@@ -104,11 +104,11 @@ respawn
 respawn limit 5 10
 
 setuid notifiarr
-exec /usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf
+exec /usr/bin/notifiarr -c /volume1/data/notifiarr.conf
 EOT
 
 ID=$(id notifiarr 2>&1)
-if [ "$?" = "0" ]; then
+if [ "$?" != "0" ]; then
   echo "${P} Adding notifiarr user: synouser --add notifiarr Notifiarr 0 support@notifiarr.com 0"
   pass="${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
   synouser --add notifiarr "${pass}" Notifiarr 0 support@notifiarr.com 0
@@ -117,11 +117,12 @@ else
   echo "${P} User notifiarr already exists: ${ID}"
 fi
 
-echo "${P} Restarting service: status notifiarr ; stop notifiarr ; start notifiarr"
+echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
 status notifiarr
-["$?" != "0"] || stop notifiarr
-start notifiarr
-
+if [ "$?" = "0" ]; then
+  stop notifiarr
+  start notifiarr
+fi
 
 echo "${P} Installed. Edit your config file: /etc/notifiarr/notifiarr.conf"
 echo "${P} The config may be symlinked at:   /volume1/data/notifiarr.conf"

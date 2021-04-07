@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/wiki/Go-Lift-TV/notifiarr/images/golift-discordnotifier-client.png">
+<img src="https://docs.notifiarr.com/img/repo-logo.png">
 
 This is the unified client for [Notifiarr.com](https://notifiarr.com).
 The client enables content requests from Media Bot in your Discord Server.
@@ -158,7 +158,7 @@ lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you 
 
 #### Plex
 
-This application can also send Plex sessions to Notfiarr so you can receive Discord
+This application can also send Plex sessions to Notfiarr so you can receive
 notifications when users interact with your server. This has three different features:
 
 - Notify all sessions on a longer interval (30+ minutes).
@@ -272,7 +272,8 @@ That's all there is to it.
 
 ## Troubleshooting
 
-[Find help on Discord](https://golift.io/discord).
+- Find help on [GoLift Discord](https://golift.io/discord).
+- And/or on [Notifiarr Discord](https://discord.gg/AURf8Yz).
 
 Log files:
 
