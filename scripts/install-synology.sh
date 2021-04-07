@@ -119,7 +119,7 @@ fi
 
 echo "${P} Restarting service: status notifiarr ; stop notifiarr ; start notifiarr"
 status notifiarr
-[ "$?" != "0" ] || stop notifiarr
+[ "$?" = "0" ] || stop notifiarr
 start notifiarr
 
 
