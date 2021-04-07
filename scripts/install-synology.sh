@@ -117,11 +117,12 @@ else
   echo "${P} User notifiarr already exists: ${ID}"
 fi
 
-echo "${P} Restarting service: status notifiarr ; stop notifiarr ; start notifiarr"
+echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
 status notifiarr
-[ "$?" = "0" ] || stop notifiarr
-start notifiarr
-
+if [ "$?" = "0" ]; then
+  stop notifiarr
+  start notifiarr
+fi
 
 echo "${P} Installed. Edit your config file: /etc/notifiarr/notifiarr.conf"
 echo "${P} The config may be symlinked at:   /volume1/data/notifiarr.conf"
