@@ -8,13 +8,13 @@ It also provides reports for Plex usage and system health.
 
 ### Linux and FreeBSD
 
--   Download a package from the [Releases](https://github.com/Go-Lift-TV/notifiarr/releases) page.
+-   Download a package from the [Releases](https://github.com/Notifiarr/notifiarr/releases) page.
 -   Install it, edit config, start it.
 
 Example of the above in shell form:
 
 ```shell
-wget -qO- https://raw.githubusercontent.com/Go-Lift-TV/notifiarr/main/scripts/install.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install.sh | sudo bash
 
 nano /etc/notifiarr/notifiarr.conf         # linux
 vi /usr/local/etc/notifiarr/notifiarr.conf # freebsd
@@ -50,7 +50,7 @@ brew services start notifiarr
 
 ### Windows
 
--   Extract a `.exe.zip` file from [the Releases page](https://github.com/Go-Lift-TV/notifiarr/releases).
+-   Extract a `.exe.zip` file from [the Releases page](https://github.com/Notifiarr/notifiarr/releases).
 -   Run the `notifiarr.amd64.exe` binary. This starts the app in the system tray.
 -   When you open it for the first time it will create a config file and log file:
     -   `C:\ProgramData\notifiarr\notifiarr.conf`
@@ -66,7 +66,7 @@ to the `main` branch in GitHub and may be broken.
 
 #### Docker Config File
 
--   Copy the [example config file](https://github.com/Go-Lift-TV/notifiarr/blob/main/examples/notifiarr.conf.example) from this repo.
+-   Copy the [example config file](https://github.com/Notifiarr/notifiarr/blob/main/examples/notifiarr.conf.example) from this repo.
 -   Then grab the image from docker hub and run it using an overlay for the config file.
 -   You must set `privileged` to use `smartctl` (`monitor_drives`) and/or `MegaCli` (`monitor_raid`).
 -   Map the `/var/run/utmp` volume if you want to count users.
@@ -288,7 +288,7 @@ You can set a log file in the config. You should do that. Otherwise, find your l
 If transfers are in a Warning or Error state they will not be extracted.
 
 Still having problems?
-[Let us know!](https://github.com/Go-Lift-TV/notifiarr/issues/new)
+[Let us know!](https://github.com/Notifiarr/notifiarr/issues/new)
 
 ## Contributing
 
@@ -296,4 +296,4 @@ Yes, please.
 
 ## License
 
-[MIT](https://github.com/Go-Lift-TV/notifiarr/blob/main/LICENSE) - Copyright (c) 2020-2021 Go Lift
+[MIT](https://github.com/Notifiarr/notifiarr/blob/main/LICENSE) - Copyright (c) 2020-2021 Go Lift

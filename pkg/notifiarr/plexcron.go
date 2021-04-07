@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Go-Lift-TV/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
 
 // This cron tab runs every 10-60 minutes to send a report of who's currently watching.

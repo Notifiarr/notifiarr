@@ -4,8 +4,8 @@
 #
 # Use it like this, pick curl or wget:  (sudo is optional)
 # ----
-#   curl -sL https://raw.githubusercontent.com/Go-Lift-TV/notifiarr/main/scripts/install.sh | sudo bash
-#   wget -qO- https://raw.githubusercontent.com/Go-Lift-TV/notifiarr/main/scripts/install.sh | sudo bash
+#   curl -sL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install.sh | sudo bash
+#   wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install.sh | sudo bash
 # ----
 #
 # - If you're on RedHat/CentOS/Fedora, installs the latest rpm package.
@@ -16,7 +16,7 @@
 # https://github.com/golift/application-builder
 
 # Set the repo name correctly.
-REPO=Go-Lift-TV/notifiarr
+REPO=Notifiarr/notifiarr
 BREW=golift/mugs/notifiarr
 PACKAGE=$(echo "$REPO" | cut -d/ -f 2)
 

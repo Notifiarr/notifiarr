@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Go-Lift-TV/notifiarr/pkg/apps"
-	"github.com/Go-Lift-TV/notifiarr/pkg/logs"
-	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"golift.io/cnfg"
 )
 

@@ -4,12 +4,12 @@
 #
 # Use it like this, pick curl or wget:  (sudo is optional)
 # ----
-#   curl -sL https://raw.githubusercontent.com/Go-Lift-TV/notifiarr/main/scripts/install-synology.sh | sudo bash
-#   wget -qO- https://raw.githubusercontent.com/Go-Lift-TV/notifiarr/main/scripts/install-synology.sh | sudo bash
+#   curl -sL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh | sudo bash
+#   wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh | sudo bash
 # ----
 
 # Set the repo name correctly.
-REPO=Go-Lift-TV/notifiarr
+REPO=Notifiarr/notifiarr
 
 # Nothing else needs to be changed. Unless you're fixing things!
 

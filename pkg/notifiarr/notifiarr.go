@@ -13,10 +13,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Go-Lift-TV/notifiarr/pkg/apps"
-	"github.com/Go-Lift-TV/notifiarr/pkg/logs"
-	"github.com/Go-Lift-TV/notifiarr/pkg/plex"
-	"github.com/Go-Lift-TV/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
 
 var ErrNon200 = fmt.Errorf("return code was not 200")

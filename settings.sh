@@ -9,7 +9,7 @@ source $(dirname "${BASH_SOURCE[0]}")/init/buildinfo.sh
 # Must match the repo name to make things easy. Otherwise, fix some other paths.
 BINARY="notifiarr"
 # github username / repo name
-REPO="Go-Lift-TV/notifiarr"
+REPO="Notifiarr/notifiarr"
 # Github repo containing homebrew formula repo.
 HBREPO="golift/homebrew-mugs"
 MAINT="David Newhall II <david at sleepers dot pro>"
