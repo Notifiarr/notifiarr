@@ -42,4 +42,4 @@ AUTHOR
 
 LOCATION
 ---
-* Notifiarr: [https://github.com/Go-Lift-TV/notifiarr](https://github.com/Go-Lift-TV/notifiarr)
+* Notifiarr: [https://github.com/Notifiarr/notifiarr](https://github.com/Notifiarr/notifiarr)

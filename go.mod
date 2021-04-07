@@ -1,4 +1,4 @@
-module github.com/Go-Lift-TV/notifiarr
+module github.com/Notifiarr/notifiarr
 
 go 1.16
 

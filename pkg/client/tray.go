@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/Go-Lift-TV/notifiarr/pkg/bindata"
-	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
-	"github.com/Go-Lift-TV/notifiarr/pkg/services"
-	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/services"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/getlantern/systray"
 	"golift.io/version"
 )
@@ -127,7 +127,7 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["stat"].Clicked():
 			c.toggleServer()
 		case <-c.menu["gh"].Clicked():
-			ui.OpenURL("https://github.com/Go-Lift-TV/notifiarr/")
+			ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
 		case <-c.menu["hp"].Clicked():
 			ui.OpenURL("https://notifiarr.com/")
 		case <-c.menu["wiki"].Clicked():

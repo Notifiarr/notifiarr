@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/Go-Lift-TV/notifiarr/pkg/client"
-	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/client"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
 func main() {

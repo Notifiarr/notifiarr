@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Go-Lift-TV/notifiarr/pkg/notifiarr"
-	"github.com/Go-Lift-TV/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
 
 func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {

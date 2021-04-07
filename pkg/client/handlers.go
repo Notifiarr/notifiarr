@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Go-Lift-TV/notifiarr/pkg/bindata"
-	"github.com/Go-Lift-TV/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"golift.io/version"
 )
 
