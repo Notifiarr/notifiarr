@@ -2,8 +2,10 @@ package client
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
@@ -12,31 +14,31 @@ import (
 func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(1000 * 100); err != nil { // nolint:gomnd // 100kbyte memory usage
 		c.Errorf("Parsing Multipart Form (plex): %v", err)
-		w.WriteHeader(http.StatusBadRequest)
+		c.Config.Respond(w, http.StatusBadRequest, "form parse error")
 
 		return
 	}
 
 	var v plex.Webhook
 
+	start := time.Now()
 	payload := r.Form.Get("payload")
 	c.Debugf("Plex Webhook Payload: %s", payload)
+	r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 
 	switch err := json.Unmarshal([]byte(payload), &v); {
 	case err != nil:
+		c.Config.Respond(w, http.StatusInternalServerError, "payload error")
 		c.Errorf("Unmarshalling Plex payload: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
 	case !strings.HasPrefix(v.Event, "media"):
-		w.WriteHeader(http.StatusNoContent)
-		_, _ = w.Write([]byte("ignored, non-media\n"))
+		c.Config.Respond(w, http.StatusNoContent, "ignored, non-media")
 	case (v.Event == "media.resume" || v.Event == "media.pause") && c.plex.Active():
 		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		w.WriteHeader(http.StatusNoContent)
-		_, _ = w.Write([]byte("ignored, cooldown\n"))
+		c.Config.Respond(w, http.StatusNoContent, "ignored, cooldown")
 	default:
 		go c.collectSessions(&v)
-		w.WriteHeader(http.StatusAccepted)
+		c.Config.Respond(w, http.StatusAccepted, "processing")
 	}
 }
 

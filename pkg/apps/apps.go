@@ -117,7 +117,8 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 			code, msg = api(r) // unknown app, just run the handler.
 		}
 
-		a.Respond(w, code, msg, time.Since(start))
+		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
+		a.Respond(w, code, msg)
 	}
 }
 
@@ -162,9 +163,7 @@ func (a *Apps) Setup(timeout time.Duration) {
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime time.Duration) {
-	w.Header().Set("X-Request-Time", fmt.Sprintf("%dms", reqTime.Milliseconds()))
-
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) {
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
 		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
 		w.Header().Set("Location", msg.(string))

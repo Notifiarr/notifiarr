@@ -19,7 +19,7 @@ var ErrNoServer = fmt.Errorf("the web server is not running, cannot stop it")
 func (c *Client) StartWebServer() {
 	// Create an apache-style logger.
 	l, _ := apachelog.New(`%{X-Forwarded-For}i %l %u %t "%{X-Redacted-URI}i" %>s %b "%{Referer}i" ` +
-		`"%{User-agent}i" %{X-Request-Time}o %{ms}Tms`)
+		`"%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	// Create a request router.
 	c.Config.Apps.Router = mux.NewRouter()
 	c.Config.Apps.ErrorLog = c.Logger.ErrorLog

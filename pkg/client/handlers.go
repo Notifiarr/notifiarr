@@ -102,7 +102,7 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
-	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.", 0)
+	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.")
 }
 
 func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
@@ -127,16 +127,16 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// stripSecrets runs after all http handlers and before the logger.
-// This allows us to remove api tokens and keys from log messages.
+// stripSecrets runs first to save a redacted URI in a special request header.
+// The logger uses this special value to save a redacted URI in the log file.
 func (c *Client) stripSecrets(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// gather configured/known secrets.
-		s := []string{c.Config.Apps.APIKey}
-		if c.Config.Plex != nil {
-			s = append(s, c.Config.Plex.Token)
-		}
+	s := []string{c.Config.Apps.APIKey}
+	// gather configured/known secrets.
+	if c.Config.Plex != nil {
+		s = append(s, c.Config.Plex.Token)
+	}
 
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uri := r.RequestURI
 		// then redact secrets from request.
 		for _, s := range s {
