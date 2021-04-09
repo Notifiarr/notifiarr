@@ -36,10 +36,10 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 	case (v.Event == "media.resume" || v.Event == "media.pause") && c.plex.Active(c.Config.Plex.Cooldown.Duration):
 		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		c.Config.Respond(w, http.StatusNoContent, "ignored, cooldown")
+		c.Config.Respond(w, http.StatusAlreadyReported, "ignored, cooldown")
 	default:
 		go c.collectSessions(&v)
-		c.Config.Respond(w, http.StatusAccepted, "processing")
+		c.Config.Respond(w, http.StatusAlreadyReported, "processing")
 	}
 }
 
