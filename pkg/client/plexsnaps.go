@@ -21,11 +21,11 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var v plex.Webhook
-
 	payload := r.Form.Get("payload")
 	c.Debugf("Plex Webhook Payload: %s", payload)
 	r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
+
+	var v plex.Webhook
 
 	switch err := json.Unmarshal([]byte(payload), &v); {
 	case err != nil:
@@ -33,7 +33,7 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 		c.Errorf("Unmarshalling Plex payload: %v", err)
 	case v.Event == "media.play":
 		go c.collectSessions(&v, plex.WaitTime)
-		c.Config.Respond(w, http.StatusAlreadyReported, "processing")
+		c.Config.Respond(w, http.StatusAccepted, "processing")
 	case (v.Event == "media.resume" || v.Event == "media.pause") && c.plex.Active(c.Config.Plex.Cooldown.Duration):
 		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
@@ -41,9 +41,9 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(v.Event, "media"):
 		c.collectSessions(&v, 0)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
-		c.Config.Respond(w, http.StatusAlreadyReported, "processed")
+		c.Config.Respond(w, http.StatusAccepted, "processed")
 	default:
-		c.Config.Respond(w, http.StatusNoContent, "ignored, non-media")
+		c.Config.Respond(w, http.StatusAlreadyReported, "ignored, non-media")
 		c.Printf("Plex Incoming Webhook IGNORED (non-media): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 	}
