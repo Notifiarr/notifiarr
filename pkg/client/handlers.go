@@ -127,6 +127,30 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// stripSecrets runs after all http handlers and before the logger.
+// This allows us to remove api tokens and keys from log messages.
+func (c *Client) stripSecrets(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// gather configured/known secrets.
+		s := []string{c.Config.Apps.APIKey}
+		if c.Config.Plex != nil {
+			s = append(s, c.Config.Plex.Token)
+		}
+
+		uri := r.RequestURI
+		// then redact secrets from request.
+		for _, s := range s {
+			if s != "" {
+				uri = strings.ReplaceAll(uri, s, "<redacted>")
+			}
+		}
+
+		// save into a request header for the logger.
+		r.Header.Set("X-Redacted-URI", uri)
+		next.ServeHTTP(w, r)
+	})
+}
+
 // fixForwardedFor sets the X-Forwarded-For header to the client IP
 // under specific circumstances.
 func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
