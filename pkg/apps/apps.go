@@ -58,7 +58,6 @@ var (
 	ErrNoSonarr  = fmt.Errorf("configured %s ID not found", Sonarr)
 	ErrNoLidarr  = fmt.Errorf("configured %s ID not found", Lidarr)
 	ErrNoReadarr = fmt.Errorf("configured %s ID not found", Readarr)
-	ErrExists    = fmt.Errorf("the requested item already exists")
 	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
 )
 

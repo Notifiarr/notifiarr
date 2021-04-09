@@ -62,7 +62,7 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignBookID, ErrExists)
+		return http.StatusConflict, m[0].ID
 	}
 
 	// Add book using payload.
@@ -93,7 +93,7 @@ func readarrCheckBook(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", m[0].ID, ErrExists)
+		return http.StatusConflict, m[0].ID
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)

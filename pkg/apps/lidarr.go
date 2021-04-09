@@ -67,7 +67,7 @@ func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignAlbumID, ErrExists)
+		return http.StatusConflict, m[0].ID
 	}
 
 	album, err := app.AddAlbum(&payload)
@@ -96,7 +96,7 @@ func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", m[0].ID, ErrExists)
+		return http.StatusConflict, m[0].ID
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
