@@ -78,7 +78,7 @@ func sonarrCheckSeries(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", m[0].ID, ErrExists)
+		return http.StatusConflict, fmt.Errorf("%d: %w", m[0].ID, ErrExists)
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
