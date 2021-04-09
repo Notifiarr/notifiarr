@@ -93,7 +93,7 @@ func readarrCheckBook(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", grid, ErrExists)
+		return http.StatusConflict, fmt.Errorf("%d: %w", m[0].ID, ErrExists)
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
