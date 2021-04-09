@@ -26,7 +26,7 @@ func (c *Config) startPlexCron() {
 		c.stopPlex = nil
 	}()
 
-	c.Printf("==> Plex Sessions Collection Started, URL: %s, interval: %v, timeout: %v, cooldown: %v",
+	c.Printf("==> Plex Sessions Collection Started, URL: %s, interval: %v, timeout: %v, webhook cooldown: %v",
 		c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown)
 
 	if c.Plex.MoviesPC != 0 || c.Plex.SeriesPC != 0 {
