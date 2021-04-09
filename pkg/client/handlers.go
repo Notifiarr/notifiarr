@@ -27,8 +27,9 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 
 	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
+		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.Handle("/plex",
-			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", c.Config.Plex.Token)
+			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", tokens)
 	}
 
 	// Initialize internal-only paths.

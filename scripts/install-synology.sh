@@ -87,7 +87,12 @@ chmod 0755 /usr/bin/notifiarr
 echo "${P} Ensuring config file: /etc/notifiarr/notifiarr.conf (File exists error after this is OK!)"
 mkdir /etc/notifiarr 2>/dev/null || \
   $CMD https://notifiarr.com/scripts/notifiarr-client.conf > /etc/notifiarr/notifiarr.conf
-[ ! -d /volume1/data ] || cp -n /etc/notifiarr/notifiarr.conf /volume1/data/notifiarr.conf
+
+CONFIGFILE=/etc/notifiarr/notifiarr.conf
+if [ -d /volume1/data ]; then
+  CONFIGFILE=/volume1/data/notifiarr.conf
+  [ -f /volume1/data/otifiarr.conf ] || cp /etc/notifiarr/notifiarr.conf ${CONFIGFILE}
+fi
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
@@ -112,7 +117,10 @@ if [ "$?" != "0" ]; then
   echo "${P} Adding notifiarr user: synouser --add notifiarr Notifiarr 0 support@notifiarr.com 0"
   pass="${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
   synouser --add notifiarr "${pass}" Notifiarr 0 support@notifiarr.com 0
-  #        --add username  pwd       full-name expired{0|1} mail privilege(0=none)
+  if [ "${CONFIGFILE}" != "/etc/notifiarr/notifiarr.conf" ] then
+    echo "${P} Authorizing notifiarr user: synoacltool -add /volume1/data user:notifiarr:allow:r--------------:fd--"
+    synoacltool -add /volume1/data user:notifiarr:allow:r--------------:fd--
+  fi
 else
   echo "${P} User notifiarr already exists: ${ID}"
 fi
@@ -124,8 +132,7 @@ if [ "$?" = "0" ]; then
   start notifiarr
 fi
 
-echo "${P} Installed. Edit your config file: /etc/notifiarr/notifiarr.conf"
-echo "${P} The config may be symlinked at:   /volume1/data/notifiarr.conf"
+echo "${P} Installed. Edit your config file: ${CONFIGFILE}"
 echo "${P} start the service with:  start notifiarr"
 echo "${P} stop the service with:   stop notifiarr"
 echo "${P} to check service status: status notifiarr"

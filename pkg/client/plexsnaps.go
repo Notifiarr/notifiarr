@@ -29,7 +29,7 @@ func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 	case !strings.HasPrefix(v.Event, "media"):
 		w.WriteHeader(http.StatusNoContent)
 		_, _ = w.Write([]byte("ignored, non-media\n"))
-	case c.plex.Active():
+	case (v.Event == "media.resume" || v.Event == "media.pause") && c.plex.Active():
 		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		w.WriteHeader(http.StatusNoContent)
