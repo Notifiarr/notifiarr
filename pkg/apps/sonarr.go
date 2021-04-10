@@ -27,6 +27,7 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/tag/{tid:[0-9]+}/{label}", sonarrUpdateTag, "PUT")
 	a.HandleAPIpath(Sonarr, "/tag/{label}", sonarrSetTag, "PUT")
 	a.HandleAPIpath(Sonarr, "/update", sonarrUpdateSeries, "PUT")
+	a.HandleAPIpath(Sonarr, "/command/search/{seriesid:[0-9]+}", sonarrTriggerSearchSeries, "GET")
 }
 
 // SonarrConfig represents the input data for a Sonarr server.
@@ -60,7 +61,7 @@ func sonarrAddSeries(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", payload.TvdbID, ErrExists)
+		return http.StatusConflict, sonarrData(m[0])
 	}
 
 	series, err := app.AddSeries(&payload)
@@ -71,6 +72,19 @@ func sonarrAddSeries(r *http.Request) (int, interface{}) {
 	return http.StatusCreated, series
 }
 
+func sonarrData(series *sonarr.Series) map[string]interface{} {
+	hasFile := false
+	if series.Statistics != nil {
+		hasFile = series.Statistics.SizeOnDisk > 0
+	}
+
+	return map[string]interface{}{
+		"id":        series.ID,
+		"hasFile":   hasFile,
+		"monitored": series.Monitored,
+	}
+}
+
 func sonarrCheckSeries(r *http.Request) (int, interface{}) {
 	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], 10, 64)
 	// Check for existing series.
@@ -78,7 +92,7 @@ func sonarrCheckSeries(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%d: %w", tvdbid, ErrExists)
+		return http.StatusConflict, sonarrData(m[0])
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
@@ -93,6 +107,20 @@ func sonarrGetSeries(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, series
+}
+
+func sonarrTriggerSearchSeries(r *http.Request) (int, interface{}) {
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
+
+	output, err := getSonarr(r).SendCommand(&sonarr.CommandRequest{
+		Name:     "SeriesSearch",
+		SeriesID: seriesID,
+	})
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("triggering series search: %w", err)
+	}
+
+	return http.StatusOK, output.Status
 }
 
 func sonarrLangProfiles(r *http.Request) (int, interface{}) {

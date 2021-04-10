@@ -29,6 +29,7 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(Readarr, "/tag/{tid:[0-9]+}/{label}", readarrUpdateTag, "PUT")
 	a.HandleAPIpath(Readarr, "/tag/{label}", readarrSetTag, "PUT")
 	a.HandleAPIpath(Readarr, "/updateauthor", readarrUpdateAuthor, "PUT")
+	a.HandleAPIpath(Readarr, "/command/search/{bookid:[0-9]+}", readarrTriggerSearchBook, "GET")
 }
 
 // ReadarrConfig represents the input data for a Readarr server.
@@ -62,7 +63,7 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignBookID, ErrExists)
+		return http.StatusConflict, readarrData(m[0])
 	}
 
 	// Add book using payload.
@@ -85,6 +86,19 @@ func readarrGetAuthor(r *http.Request) (int, interface{}) {
 	return http.StatusOK, author
 }
 
+func readarrData(book *readarr.Book) map[string]interface{} {
+	hasFile := false
+	if book.Statistics != nil {
+		hasFile = book.Statistics.SizeOnDisk > 0
+	}
+
+	return map[string]interface{}{
+		"id":        book.ID,
+		"hasFile":   hasFile,
+		"monitored": book.Monitored,
+	}
+}
+
 // Check for existing book.
 func readarrCheckBook(r *http.Request) (int, interface{}) {
 	grid := mux.Vars(r)["grid"]
@@ -93,7 +107,7 @@ func readarrCheckBook(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", grid, ErrExists)
+		return http.StatusConflict, readarrData(m[0])
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
@@ -108,6 +122,20 @@ func readarrGetBook(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, book
+}
+
+func readarrTriggerSearchBook(r *http.Request) (int, interface{}) {
+	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], 10, 64)
+
+	output, err := getReadarr(r).SendCommand(&readarr.CommandRequest{
+		Name:    "BookSearch",
+		BookIDs: []int64{bookID},
+	})
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
+	}
+
+	return http.StatusOK, output.Status
 }
 
 // Get the metadata profiles from readarr.

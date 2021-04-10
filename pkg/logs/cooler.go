@@ -1,6 +1,9 @@
 package logs
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 /* This is a helper method used in a couple spots. Doesn't have anything to do with logs. */
 
@@ -30,4 +33,22 @@ func (c *Cooler) Done() {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.active = false
+}
+
+type Timer struct {
+	lock  sync.Mutex
+	start time.Time
+}
+
+func (t *Timer) Active(d time.Duration) bool {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	if time.Since(t.start) < d {
+		return true
+	}
+
+	t.start = time.Now()
+
+	return false
 }

@@ -58,7 +58,6 @@ var (
 	ErrNoSonarr  = fmt.Errorf("configured %s ID not found", Sonarr)
 	ErrNoLidarr  = fmt.Errorf("configured %s ID not found", Lidarr)
 	ErrNoReadarr = fmt.Errorf("configured %s ID not found", Readarr)
-	ErrExists    = fmt.Errorf("the requested item already exists")
 	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
 )
 
@@ -92,7 +91,7 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 			start = time.Now()
 		)
 
-		// disccordnotifier.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
+		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
 		// Make sure the id is within range of the available service.
 		case app == Radarr && (id >= len(a.Radarr) || id < 0):
@@ -117,7 +116,8 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 			code, msg = api(r) // unknown app, just run the handler.
 		}
 
-		a.Respond(w, code, msg, time.Since(start))
+		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
+		a.Respond(w, code, msg)
 	}
 }
 
@@ -162,9 +162,7 @@ func (a *Apps) Setup(timeout time.Duration) {
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}, reqTime time.Duration) {
-	w.Header().Set("X-Request-Time", fmt.Sprintf("%dms", reqTime.Milliseconds()))
-
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) {
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
 		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
 		w.Header().Set("Location", msg.(string))

@@ -70,7 +70,7 @@ type Client struct {
 	info   string
 	notify *notifiarr.Config
 	alert  *logs.Cooler
-	plex   *logs.Cooler
+	plex   *logs.Timer
 }
 
 // Errors returned by this package.
@@ -84,7 +84,7 @@ func NewDefaults() *Client {
 		sigkil: make(chan os.Signal, 1),
 		sighup: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
-		plex:   &logs.Cooler{},
+		plex:   &logs.Timer{},
 		alert:  &logs.Cooler{},
 		Logger: logs.New(),
 		Config: &Config{

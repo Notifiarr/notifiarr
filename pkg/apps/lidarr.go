@@ -34,6 +34,7 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(Lidarr, "/tag/{label}", lidarrSetTag, "PUT")
 	a.HandleAPIpath(Lidarr, "/update", lidarrUpdateAlbum, "PUT")
 	a.HandleAPIpath(Lidarr, "/updateartist", lidarrUpdateArtist, "PUT")
+	a.HandleAPIpath(Lidarr, "/command/search/{albumid:[0-9]+}", lidarrTriggerSearchAlbum, "GET")
 }
 
 // LidarrConfig represents the input data for a Lidarr server.
@@ -67,7 +68,7 @@ func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", payload.ForeignAlbumID, ErrExists)
+		return http.StatusConflict, lidarrData(m[0])
 	}
 
 	album, err := app.AddAlbum(&payload)
@@ -89,6 +90,19 @@ func lidarrGetArtist(r *http.Request) (int, interface{}) {
 	return http.StatusOK, artist
 }
 
+func lidarrData(album *lidarr.Album) map[string]interface{} {
+	hasFile := false
+	if album.Statistics != nil {
+		hasFile = album.Statistics.SizeOnDisk > 0
+	}
+
+	return map[string]interface{}{
+		"id":        album.ID,
+		"hasFile":   hasFile,
+		"monitored": album.Monitored,
+	}
+}
+
 func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
 	id := mux.Vars(r)["mbid"]
 
@@ -96,7 +110,7 @@ func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, fmt.Errorf("%s: %w", id, ErrExists)
+		return http.StatusConflict, lidarrData(m[0])
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
@@ -111,6 +125,20 @@ func lidarrGetAlbum(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, album
+}
+
+func lidarrTriggerSearchAlbum(r *http.Request) (int, interface{}) {
+	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], 10, 64)
+
+	output, err := getLidarr(r).SendCommand(&lidarr.CommandRequest{
+		Name:     "AlbumSearch",
+		AlbumIDs: []int64{albumID},
+	})
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("triggering album search: %w", err)
+	}
+
+	return http.StatusOK, output.Status
 }
 
 func lidarrMetadata(r *http.Request) (int, interface{}) {

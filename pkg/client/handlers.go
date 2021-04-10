@@ -27,8 +27,9 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 
 	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
+		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.Handle("/plex",
-			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", c.Config.Plex.Token)
+			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", tokens)
 	}
 
 	// Initialize internal-only paths.
@@ -101,7 +102,7 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
-	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.", 0)
+	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.")
 }
 
 func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
@@ -124,6 +125,30 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
 	}
+}
+
+// stripSecrets runs first to save a redacted URI in a special request header.
+// The logger uses this special value to save a redacted URI in the log file.
+func (c *Client) stripSecrets(next http.Handler) http.Handler {
+	s := []string{c.Config.Apps.APIKey}
+	// gather configured/known secrets.
+	if c.Config.Plex != nil {
+		s = append(s, c.Config.Plex.Token)
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		uri := r.RequestURI
+		// then redact secrets from request.
+		for _, s := range s {
+			if s != "" {
+				uri = strings.ReplaceAll(uri, s, "<redacted>")
+			}
+		}
+
+		// save into a request header for the logger.
+		r.Header.Set("X-Redacted-URI", uri)
+		next.ServeHTTP(w, r)
+	})
 }
 
 // fixForwardedFor sets the X-Forwarded-For header to the client IP
