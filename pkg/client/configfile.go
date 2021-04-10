@@ -204,7 +204,7 @@ func configFileLocactions() (string, []string) {
 	}
 
 	switch runtime.GOOS {
-	case "windows":
+	case windows:
 		return `C:\ProgramData\notifiarr\notifiarr.conf`, []string{
 			`~\.dnclient\dnclient.conf`,
 			`~\.notifiarr\notifiarr.conf`,

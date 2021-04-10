@@ -72,7 +72,7 @@ func (c *Client) checkForUpdate() {
 	case err != nil:
 		c.Errorf("Update Check: %v", err)
 		_, _ = ui.Error(Title+" ERROR", "Checking version on GitHub: "+err.Error())
-	case update.Outdate && runtime.GOOS == "windows":
+	case update.Outdate && runtime.GOOS == windows:
 		c.upgradeWindows(update)
 	case update.Outdate:
 		c.downloadOther(update)

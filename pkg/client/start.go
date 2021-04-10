@@ -34,6 +34,10 @@ const (
 	DefaultEnvPrefix = "DN"
 )
 
+const (
+	windows = "windows"
+)
+
 // Flags are our CLI input flags.
 type Flags struct {
 	*flag.FlagSet
@@ -119,7 +123,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == windows {
 		f.BoolVarP(&f.restart, "restart", "r", false, "This is used by auto-update, do not call it")
 	}
 
@@ -209,7 +213,7 @@ func (c *Client) run(newConfig bool) error {
 			"Please edit the file and reload this application using the tray menu.")
 	}
 
-	if c.Config.AutoUpdate != "" && runtime.GOOS == "windows" {
+	if c.Config.AutoUpdate != "" && runtime.GOOS == windows {
 		go c.AutoWatchUpdate()
 	}
 
