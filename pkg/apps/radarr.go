@@ -33,6 +33,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/customformats", radarrGetCustomFormats, "GET")
 	a.HandleAPIpath(Radarr, "/customformats", radarrAddCustomFormat, "POST")
 	a.HandleAPIpath(Radarr, "/customformats/{cfid:[0-9]+}", radarrUpdateCustomFormat, "PUT")
+	a.HandleAPIpath(Radarr, "/command/search/{movieid:[0-9]+}", radarrTriggerSearchMovie, "GET")
 }
 
 // RadarrConfig represents the input data for a Radarr server.
@@ -66,7 +67,7 @@ func radarrAddMovie(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, m[0].ID
+		return http.StatusConflict, radarrData(m[0])
 	}
 
 	if payload.Title == "" {
@@ -87,6 +88,14 @@ func radarrAddMovie(r *http.Request) (int, interface{}) {
 	return http.StatusCreated, movie
 }
 
+func radarrData(movie *radarr.Movie) map[string]interface{} {
+	return map[string]interface{}{
+		"id":        movie.ID,
+		"hasFile":   movie.HasFile,
+		"monitored": movie.Monitored,
+	}
+}
+
 func radarrCheckMovie(r *http.Request) (int, interface{}) {
 	tmdbID, _ := strconv.ParseInt(mux.Vars(r)["tmdbid"], 10, 64)
 	// Check for existing movie.
@@ -94,7 +103,7 @@ func radarrCheckMovie(r *http.Request) (int, interface{}) {
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
-		return http.StatusConflict, m[0].ID
+		return http.StatusConflict, radarrData(m[0])
 	}
 
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
@@ -109,6 +118,20 @@ func radarrGetMovie(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, movie
+}
+
+func radarrTriggerSearchMovie(r *http.Request) (int, interface{}) {
+	movieID, _ := strconv.ParseInt(mux.Vars(r)["movieid"], 10, 64)
+
+	output, err := getRadarr(r).SendCommand(&radarr.CommandRequest{
+		Name:     "MoviesSearch",
+		MovieIDs: []int64{movieID},
+	})
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("triggering movie search: %w", err)
+	}
+
+	return http.StatusOK, output.Status
 }
 
 func radarrGetAllMovies(r *http.Request) (int, interface{}) {

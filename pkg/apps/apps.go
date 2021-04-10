@@ -91,7 +91,7 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 			start = time.Now()
 		)
 
-		// disccordnotifier.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
+		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
 		// Make sure the id is within range of the available service.
 		case app == Radarr && (id >= len(a.Radarr) || id < 0):
