@@ -26,11 +26,10 @@ const (
 
 // Command is the input data to perform an in-place update.
 type Command struct {
-	URL         string    // file to download.
-	Path        string    // file to be updated.
-	Args        []string  // optional, but non-nil will crash.
-	Signal      os.Signal // unused in this library
-	*log.Logger           // debug logs.
+	URL         string   // file to download.
+	Path        string   // file to be updated.
+	Args        []string // optional, but non-nil will crash.
+	*log.Logger          // debug logs.
 }
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.

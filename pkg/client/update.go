@@ -65,7 +65,6 @@ func (c *Client) updateNow(u *update.Update, msg string) error {
 		Logger: c.Logger.DebugLog,
 		Args:   []string{"-rc", c.Flags.ConfigFile},
 		Path:   os.Args[0],
-		Signal: &update.Signal{Text: "upgrade request"},
 	}
 
 	if path, err := osext.Executable(); err == nil {
@@ -83,7 +82,7 @@ func (c *Client) updateNow(u *update.Update, msg string) error {
 
 	c.Printf("Update installed to %s restarting! Backup: %s", uc.Path, backupFile)
 	// And exit, so we can restart.
-	c.sigkil <- uc.Signal
+	c.sigkil <- &update.Signal{Text: "upgrade request"}
 
 	return nil
 }
