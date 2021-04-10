@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/update"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
 	"golift.io/version"
@@ -37,6 +39,7 @@ type Flags struct {
 	*flag.FlagSet
 	verReq     bool
 	testSnaps  bool
+	restart    bool
 	ConfigFile string
 	EnvPrefix  string
 	Mode       string
@@ -53,6 +56,7 @@ type Config struct {
 	Snapshot   *snapshot.Config    `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
 	Services   *services.Config    `json:"services" toml:"services" xml:"services" yaml:"services"`
 	Service    []*services.Service `json:"service" toml:"service" xml:"service" yaml:"service"`
+	AutoUpdate string              `json:"auto_update" toml:"auto_update" xml:"auto_update" yaml:"auto_update"`
 	*logs.Logs
 	*apps.Apps
 }
@@ -114,6 +118,11 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.Mode, "mode", "m", "prod", "Selects Notifiarr URL: test, dev, prod")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
+
+	if runtime.GOOS == "windows" {
+		f.BoolVarP(&f.restart, "restart", "r", false, "This is used by auto-update, do not call it")
+	}
+
 	f.Parse(args) // nolint: errcheck
 }
 
@@ -136,8 +145,16 @@ func start() error {
 		return nil // print version and exit.
 	}
 
-	msg, err := c.getConfig()
-	if err != nil {
+	msg := c.findAndSetConfigFile()
+
+	if c.Flags.restart {
+		return update.Restart(&update.Command{ //nolint:wrapcheck
+			Path: os.Args[0],
+			Args: []string{"-c", c.Flags.ConfigFile},
+		})
+	}
+
+	if err := c.getConfig(); err != nil {
 		return fmt.Errorf("%s: %w", msg, err)
 	}
 
@@ -190,6 +207,10 @@ func (c *Client) run(newConfig bool) error {
 		_, _ = ui.Warning(Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
 			"Please edit the file and reload this application using the tray menu.")
+	}
+
+	if c.Config.AutoUpdate != "" && runtime.GOOS == "windows" {
+		go c.AutoWatchUpdate()
 	}
 
 	switch ui.HasGUI() {

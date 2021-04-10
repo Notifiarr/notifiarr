@@ -16,6 +16,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
 	github.com/iamacarpet/go-win64api v0.0.0-20210311141720-fe38760bed28
 	github.com/jaypipes/ghw v0.7.0
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/lestrrat-go/apache-logformat v0.0.0-20200929122403-cd9b7dc018c7
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/mitchellh/go-homedir v1.1.0

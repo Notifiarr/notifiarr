@@ -27,16 +27,28 @@ const (
 
 // getConfig attempts to find or create a config file.
 // Sometimes the app runs without a config entirely.
-func (c *Client) getConfig() (string, error) {
+func (c *Client) getConfig() error {
 	defer c.setupConfig()
 
-	confFile := ""
-	msg := msgNoConfigFile
+	if c.Flags.ConfigFile != "" {
+		if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
+			return fmt.Errorf("config file: %w", err)
+		}
+	}
+
+	if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
+		return fmt.Errorf("environment variables: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) findAndSetConfigFile() string {
+	var confFile string
 
 	defaultConfigFile, configFileList := configFileLocactions()
 	for _, f := range append([]string{c.Flags.ConfigFile}, configFileList...) {
-		d, err := homedir.Expand(f)
-		if err == nil {
+		if d, err := homedir.Expand(f); err == nil {
 			f = d
 		}
 
@@ -46,25 +58,23 @@ func (c *Client) getConfig() (string, error) {
 		} // else { c.Print("rip:", err) }
 	}
 
-	if confFile != "" {
+	if c.Flags.ConfigFile = ""; confFile != "" {
 		c.Flags.ConfigFile, _ = filepath.Abs(confFile)
-		msg = msgConfigFound + c.Flags.ConfigFile
+		return msgConfigFound + c.Flags.ConfigFile
+	}
 
-		if err := cnfgfile.Unmarshal(c.Config, c.Flags.ConfigFile); err != nil {
-			return msg, fmt.Errorf("config file: %w", err)
-		}
-	} else if findFile, err := c.createConfigFile(defaultConfigFile); err != nil {
-		msg = msgConfigFailed + err.Error()
+	if c.Flags.restart {
+		return msgNoConfigFile
+	}
+
+	if findFile, err := c.createConfigFile(defaultConfigFile); err != nil {
+		return msgConfigFailed + err.Error()
 	} else if findFile != "" {
 		c.Flags.ConfigFile = findFile
-		msg = msgConfigCreate + c.Flags.ConfigFile
+		return msgConfigCreate + c.Flags.ConfigFile
 	}
 
-	if _, err := cnfg.UnmarshalENV(c.Config, c.Flags.EnvPrefix); err != nil {
-		return msg, fmt.Errorf("environment variables: %w", err)
-	}
-
-	return msg, nil
+	return msgNoConfigFile
 }
 
 func (c *Client) setupConfig() {
@@ -156,7 +166,7 @@ func (c *Client) reloadConfiguration(msg string) {
 		defer c.StartWebServer()
 	}
 
-	if _, err := c.getConfig(); err != nil {
+	if err := c.getConfig(); err != nil {
 		c.Errorf("Reloading Config: %v", err)
 		panic(err)
 	}
