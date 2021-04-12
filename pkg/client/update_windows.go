@@ -95,8 +95,8 @@ func (c *Client) AutoWatchUpdate() {
 			break
 		}
 
-		if dur < time.Minute {
-			dur = time.Minute
+		if dur < time.Hour {
+			dur = time.Hour
 		}
 	}
 
