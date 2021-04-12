@@ -22,6 +22,7 @@ import (
 const (
 	downloadTimeout = 5 * time.Minute
 	sleepTime       = 5 * time.Second
+	windows         = "windows"
 )
 
 // Command is the input data to perform an in-place update.
@@ -40,6 +41,8 @@ func Restart(u *Command) error {
 	if err := exec.Command(u.Path, u.Args...).Start(); err != nil { //nolint:gosec
 		return fmt.Errorf("executing command %w", err)
 	}
+
+	time.Sleep(time.Second)
 
 	return nil
 }
@@ -101,23 +104,29 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	if runtime.GOOS != "windows" {
+	if runtime.GOOS != windows {
 		_ = os.Chmod(tempFile, 0755)
 	}
 
-	backupFile := u.Path + ".backup." + time.Now().Format("06-01-02T15:04:05")
+	backupFile := u.Path + ".backup." + time.Now().Format("060102T150405")
 	u.Printf("[Update] Renaming %s => %s", u.Path, backupFile)
 
 	if err := os.Rename(u.Path, backupFile); err != nil {
-		return backupFile, fmt.Errorf("renaming original file %w", err)
+		return backupFile, fmt.Errorf("renaming original file: %w", err)
 	}
 
 	u.Printf("[Update] Renaming %s => %s", tempFile, u.Path)
 
 	if err := os.Rename(tempFile, u.Path); err != nil {
+		return backupFile, fmt.Errorf("renaming downloaded file: %w", err)
+	}
+	/* // Hack used for testing.
+	u.Printf("[Update] Renaming [HACK] %s => %s", backupFile, u.Path)
+
+	if err := os.Rename(backupFile, u.Path); err != nil {
 		return backupFile, fmt.Errorf("renaming downloaded file %w", err)
 	}
-
+	/**/
 	return backupFile, nil
 }
 
@@ -191,15 +200,15 @@ func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error
 	// Open a zip archive for reading.
 	zipReader, err := zip.NewReader(bytes.NewReader(body), size)
 	if err != nil {
-		return fmt.Errorf("unzipping zipped download: %w", err)
+		return fmt.Errorf("unzipping downloaded file: %w", err)
 	}
 
 	// Find the exe file and write that.
 	for _, zipFile := range zipReader.File {
-		if strings.HasSuffix(zipFile.Name, ".exe") {
+		if runtime.GOOS == windows && strings.HasSuffix(zipFile.Name, ".exe") {
 			f, err := zipFile.Open()
 			if err != nil {
-				return fmt.Errorf("reading zipped file: %w", err)
+				return fmt.Errorf("reading zipped exe file: %w", err)
 			}
 			defer f.Close()
 

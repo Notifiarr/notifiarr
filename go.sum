@@ -70,6 +70,8 @@ github.com/lestrrat-go/strftime v1.0.4/go.mod h1:E1nN3pCbtMSu1yjSVeyuRFVm/U0xoR7
 github.com/mitchellh/go-homedir v1.0.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
+github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d h1:VhgPp6v9qf9Agr/56bj7Y/xa04UccTW04VP0Qed4vnQ=
+github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d/go.mod h1:YUTz3bUH2ZwIWBy3CJBeOBEugqcmXREj14T+iG/4k4U=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
@@ -122,8 +124,6 @@ golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93 h1:6zgmt5vpnqltfJ7Wfj16NT+rg
 golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93/go.mod h1:AsB0DJe7nv0bizKaoy3e3MjjOF7upTpMOMvsfv4CNNk=
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9 h1:j/WeLF6Ew1lc/m8/bh5qleZ66aSeJ72B1fUWigF69OE=
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9/go.mod h1:EZevRvIGRh8jDMwuYL0/tlPns0KynquPZzb0SerIC1s=
-golift.io/starr v0.9.10-0.20210410042602-a2a6bc274f63 h1:E2CmEtDeNVVFrMRvmEV55SPXf/cZEbBC+yZKiO4Ffyg=
-golift.io/starr v0.9.10-0.20210410042602-a2a6bc274f63/go.mod h1:oaAjRa9vIpsj0lTR79vDDRVqXuq6ID6RXbQIoFljhbM=
 golift.io/starr v0.9.10 h1:1XJRImHcIrr8iTzoH0e439XTwnlhnYt5J/LwyAAH92U=
 golift.io/starr v0.9.10/go.mod h1:oaAjRa9vIpsj0lTR79vDDRVqXuq6ID6RXbQIoFljhbM=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
@@ -131,6 +131,8 @@ golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33q108Sa+fhmuc+sWQYwY=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2 h1:MZF6J7CV6s/h0HBkfqebrYfKCVEo5iN+wzE4QhV3Evo=
+gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2/go.mod h1:s1Sn2yZos05Qfs7NKt867Xe18emOmtsO3eAKbDaon0o=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=

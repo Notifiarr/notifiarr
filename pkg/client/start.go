@@ -44,6 +44,7 @@ type Flags struct {
 	verReq     bool
 	testSnaps  bool
 	restart    bool
+	updated    bool
 	ConfigFile string
 	EnvPrefix  string
 	Mode       string
@@ -124,7 +125,8 @@ func (f *Flags) ParseArgs(args []string) {
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 
 	if runtime.GOOS == windows {
-		f.BoolVarP(&f.restart, "restart", "r", false, "This is used by auto-update, do not call it")
+		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it")
+		f.BoolVar(&f.updated, "updated", false, "This flags causes the app to print an updated message")
 	}
 
 	f.Parse(args) // nolint: errcheck
@@ -154,7 +156,7 @@ func start() error {
 	if c.Flags.restart {
 		return update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
-			Args: []string{"-c", c.Flags.ConfigFile},
+			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
 		})
 	}
 
@@ -171,6 +173,10 @@ func start() error {
 	c.Logger.SetupLogging(c.Config.Logs)
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
 	c.Printf("==> %s", msg)
+
+	if c.Flags.updated {
+		c.printUpdateMessage()
+	}
 
 	if c.Flags.testSnaps {
 		c.checkPlex()

@@ -18,6 +18,8 @@ import (
 	"golift.io/version"
 )
 
+const userRepo = "Notifiarr/notifiarr"
+
 func (c *Client) toggleServer() {
 	if c.server == nil {
 		c.Print("[user requested] Starting Web Server")
@@ -80,20 +82,6 @@ func (c *Client) checkForUpdate() {
 		_, _ = ui.Info(Title, "You're up to date! Version: "+update.Version+"\n"+
 			"Updated: "+update.RelDate.Format("Jan 2, 2006")+" ("+
 			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)")
-	}
-}
-
-func (c *Client) upgradeWindows(update *update.Update) {
-	yes, _ := ui.Question(Title, "An Update is available! Upgrade Now?\n\n"+
-		"Your Version: "+update.Version+"\n"+
-		"New Version: "+update.Current+"\n"+
-		"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
-		durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
-	if yes {
-		if err := c.updateNow(update, "user requested"); err != nil {
-			c.Errorf("Update Failed: %v", err)
-			_, _ = ui.Error(Title+" ERROR", "Updating Notifiarr:\n"+err.Error()+"\n")
-		}
 	}
 }
 

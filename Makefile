@@ -26,7 +26,6 @@ else
 	ITERATION:=$(_ITERATION)
 endif
 
-
 # rpm is wierd and changes - to _ in versions.
 RPMVERSION:=$(shell echo $(VERSION) | tr -- - _)
 # used for freebsd packages.
