@@ -16,9 +16,11 @@ require (
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
 	github.com/iamacarpet/go-win64api v0.0.0-20210311141720-fe38760bed28
 	github.com/jaypipes/ghw v0.7.0
+	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/lestrrat-go/apache-logformat v0.0.0-20200929122403-cd9b7dc018c7
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.3
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
@@ -29,6 +31,7 @@ require (
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
 	golift.io/starr v0.9.10
 	golift.io/version v0.0.2
+	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	howett.net/plist v0.0.0-20201203080718-1454fab16a06 // indirect

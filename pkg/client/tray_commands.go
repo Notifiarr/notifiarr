@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"runtime"
 	"strings"
 	"time"
 
@@ -17,15 +18,17 @@ import (
 	"golift.io/version"
 )
 
+const userRepo = "Notifiarr/notifiarr"
+
 func (c *Client) toggleServer() {
 	if c.server == nil {
-		c.Print("Starting Web Server")
+		c.Print("[user requested] Starting Web Server")
 		c.StartWebServer()
 
 		return
 	}
 
-	c.Print("Pausing Web Server")
+	c.Print("[user requested] Pausing Web Server")
 
 	if err := c.StopWebServer(); err != nil {
 		c.Errorf("Unable to Pause Server: %v", err)
@@ -33,7 +36,7 @@ func (c *Client) toggleServer() {
 }
 
 func (c *Client) rotateLogs() {
-	c.Print("Rotating Log Files!")
+	c.Print("[user requested] Rotating Log Files!")
 
 	for _, err := range c.Logger.Rotate() {
 		if err != nil {
@@ -52,7 +55,7 @@ func (c *Client) changeKey() {
 		return
 	}
 
-	c.Print("Updating API Key!")
+	c.Print("[user requested] Updating API Key!")
 
 	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
 		c.Errorf("Unable to update API Key: %v", err)
@@ -65,25 +68,31 @@ func (c *Client) changeKey() {
 }
 
 func (c *Client) checkForUpdate() {
-	c.Print("User Requested Update Check")
+	c.Print("[user requested] GitHub Update Check")
 
-	switch update, err := update.Check("Notifiarr/notifiarr", version.Version); {
+	switch update, err := update.Check(userRepo, version.Version); {
 	case err != nil:
 		c.Errorf("Update Check: %v", err)
-		_, _ = ui.Error(Title, "Failure checking version on GitHub: "+err.Error())
+		_, _ = ui.Error(Title+" ERROR", "Checking version on GitHub: "+err.Error())
+	case update.Outdate && runtime.GOOS == windows:
+		c.upgradeWindows(update)
 	case update.Outdate:
-		yes, _ := ui.Question(Title, "An Update is available! Download?\n\n"+
-			"Your Version: "+update.Version+"\n"+
-			"New Version: "+update.Current+"\n"+
-			"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
-			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
-		if yes {
-			_ = ui.OpenURL(update.CurrURL)
-		}
+		c.downloadOther(update)
 	default:
 		_, _ = ui.Info(Title, "You're up to date! Version: "+update.Version+"\n"+
 			"Updated: "+update.RelDate.Format("Jan 2, 2006")+" ("+
 			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)")
+	}
+}
+
+func (c *Client) downloadOther(update *update.Update) {
+	yes, _ := ui.Question(Title, "An Update is available! Download?\n\n"+
+		"Your Version: "+update.Version+"\n"+
+		"New Version: "+update.Current+"\n"+
+		"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
+		durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
+	if yes {
+		_ = ui.OpenURL(update.CurrURL)
 	}
 }
 
