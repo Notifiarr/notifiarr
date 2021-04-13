@@ -8,9 +8,8 @@ It also provides reports for Plex usage and system health.
 
 ### Linux
 
-[![packagecloud](https://docs.golift.io/integrations/packagecloud.png "PackageCloud.io")](http://packagecloud.io)
-
-Linux repository hosting provided by [Packagecloud.io](https://packagecloud.io)!
+Linux repository hosting provided by
+[![packagecloud](https://docs.golift.io/integrations/packagecloud-full.png "PackageCloud.io")](http://packagecloud.io)
 
 After install, edit the config and start the service:
 
