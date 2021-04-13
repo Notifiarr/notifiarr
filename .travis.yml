@@ -81,7 +81,8 @@ deploy:
     skip_cleanup: true
     cleanup: false
     on:
-     tags: true
+      tags: true
+      condition: "$TRAVIS_OS_NAME = linux"
   - provider: packagecloud
     repository: "pkgs"
     username: "golift"
@@ -93,7 +94,8 @@ deploy:
     skip_cleanup: true
     cleanup: false
     on:
-     tags: true
+      tags: true
+      condition: "$TRAVIS_OS_NAME = linux"
   - provider: releases
     token:
       # to get a secure api key, run: travis setup releases
