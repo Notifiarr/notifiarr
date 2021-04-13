@@ -39,7 +39,7 @@ sudo apt install notifiarr
 Install the repo like this. All variants use the same `el/6` repo. The app works on all Linuxes.
 
 ```shell
-sudo tee golift.repo <<-EOF
+sudo tee /etc/yum.repos.d/golift.repo <<-EOF
 [golift]
 name=golift
 baseurl=https://packagecloud.io/golift/pkgs/el/6/\$basearch
