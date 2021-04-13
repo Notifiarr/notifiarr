@@ -4,7 +4,7 @@
 # Optionally triggers a package install if $1 is non-empty.
 #
 ### Install Notifiarr:
-# curl -sL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install.sh | sudo bash notifiarr
+# curl -sL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-repo.sh | sudo bash -s - notifiarr
 #
 
 APT=$(which apt)
@@ -12,7 +12,7 @@ YUM=$(which yum)
 PKG=$1
 
 if [ -d /etc/apt/sources.list.d ] && [ "$APT" != "" ]; then
-  curl -L https://packagecloud.io/golift/pkgs/gpgkey | apt-key add -
+  curl -sL https://packagecloud.io/golift/pkgs/gpgkey | apt-key add -
   echo "deb https://packagecloud.io/golift/pkgs/ubuntu focal main" > /etc/apt/sources.list.d/golift.list
   apt update
   [ "$PKG" = "" ] || apt install $PKG
