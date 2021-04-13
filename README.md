@@ -23,7 +23,7 @@ sudo service systemctl restart notifiarr
 
 - Ubuntu, etc.
 
-Install the repo like this. All variants use the same `debian/focal` repo. The app works on all Linuxes.
+Install the repo like this. All variants use the same `ubuntu/focal` repo. The app works on all Linuxes.
 
 ```shell
 curl -L https://packagecloud.io/golift/pkgs/gpgkey | sudo apt-key add -
