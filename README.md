@@ -26,7 +26,7 @@ Install the repo like this. All variants use the same `ubuntu/focal` repo. The a
 
 ```shell
 curl -L https://packagecloud.io/golift/pkgs/gpgkey | sudo apt-key add -
-echo "deb https://packagecloud.io/golift/pkgs/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/golift.conf
+echo "deb https://packagecloud.io/golift/pkgs/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/golift.list
 sudo apt update
 sudo apt install notifiarr
 ```
