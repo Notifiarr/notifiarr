@@ -36,7 +36,12 @@ SOURCE_PATH=https://codeload.github.com/${REPO}/tar.gz/v${VERSION}
 export BINARY HBREPO MAINT VENDOR DESC GOLANGCI_LINT_ARGS CONFIG_FILE
 export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH
 
-# Optional
+### Optional ###
+
+# Import this signing key only if it's in the keyring.
+gpg --list-keys 2>/dev/null | grep -q B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
+[ "$?" != "0" ] || export SIGNING_KEY=B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
+
 export WINDOWS_LDFLAGS=""
 export MACAPP="Notifiarr"
 export EXTRA_FPM_FLAGS="--conflicts=discordnotifier-client>0.0.1 --provides=notifiarr --provides=discordnotifier-client"
