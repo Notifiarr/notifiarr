@@ -73,36 +73,36 @@ after_success:
 deploy:
   # Unstable (master pushes).
   - provider: packagecloud
-    repository: "unstable"
-    username: "golift"
+    repository: unstable
+    username: golift
     token:
       secure: "KlMzZdcu46vS5emuS+uAYjwCstbE7rgXbfOyQDw70Qp2MuXDI4aPqt//TcIwcJZN0rjaqLX6hf5P7L0qV+ro676Br5gNm0YZWNN3W165QGTH5LwBEt6cFxOD/hKVKSE7wx7XXd++/Di2Gy1f7Gi0EIpit0rBpDy9u9GHwIkgU57k/ET5kcIAfsc4EHnF2oQEPjk0qunrdmkM29unbKExOa7M5vcJK1hUggLPRszJR6bIaPsT1wJfaw/+oS59y4D8f/LvPjDD6oirEdwEGLqC6slZ2GIWLAGB747UIeXcRTUym4xpUtcr4M/kQ9ZWR98MifBCkcnUgRnXiwPxhWw5QKUEAc41fQY/HIyZyqokdY7z3mALcPdfGn9KoBZw1JOgxKMPCO9jU+sf3ZyC0G0Ue6oS3BPNN0FKAMAF7aWzpFl01ou8a+q7vJq/OBrTOLYrcWW+yWGHtiS95dTJLMFaqZ1jaHrwk6jz5bRvcSHuCXhoXQZsMoOLF3gZWt6Mv6GGqSxPShDVWXZ0n8OSZOtp2W1e1QPG7hRnat+Ga5aDZrWtqvcf3LmN0hMijXk2EStSShBNjpcCezMfn9i4m83B82aD6ZB/0J+rBLs8qVqtEc2LGavPPKu5AlsxD3ffvzQ3342RBrFEZDuVV+GMSGt51v02KcT3UMU70sgT+VP1BTw="
-    dist: "ubuntu/focal"
+    dist: ubuntu/focal
     local-dir: release
     package_glob: "*.deb"
     cleanup: false
     on:
-      branch: master
+      branch: unstable
       condition: "$TRAVIS_OS_NAME = linux"
   - provider: packagecloud
-    repository: "unstable"
-    username: "golift"
+    repository: unstable
+    username: golift
     token:
       secure: "KlMzZdcu46vS5emuS+uAYjwCstbE7rgXbfOyQDw70Qp2MuXDI4aPqt//TcIwcJZN0rjaqLX6hf5P7L0qV+ro676Br5gNm0YZWNN3W165QGTH5LwBEt6cFxOD/hKVKSE7wx7XXd++/Di2Gy1f7Gi0EIpit0rBpDy9u9GHwIkgU57k/ET5kcIAfsc4EHnF2oQEPjk0qunrdmkM29unbKExOa7M5vcJK1hUggLPRszJR6bIaPsT1wJfaw/+oS59y4D8f/LvPjDD6oirEdwEGLqC6slZ2GIWLAGB747UIeXcRTUym4xpUtcr4M/kQ9ZWR98MifBCkcnUgRnXiwPxhWw5QKUEAc41fQY/HIyZyqokdY7z3mALcPdfGn9KoBZw1JOgxKMPCO9jU+sf3ZyC0G0Ue6oS3BPNN0FKAMAF7aWzpFl01ou8a+q7vJq/OBrTOLYrcWW+yWGHtiS95dTJLMFaqZ1jaHrwk6jz5bRvcSHuCXhoXQZsMoOLF3gZWt6Mv6GGqSxPShDVWXZ0n8OSZOtp2W1e1QPG7hRnat+Ga5aDZrWtqvcf3LmN0hMijXk2EStSShBNjpcCezMfn9i4m83B82aD6ZB/0J+rBLs8qVqtEc2LGavPPKu5AlsxD3ffvzQ3342RBrFEZDuVV+GMSGt51v02KcT3UMU70sgT+VP1BTw="
-    dist: "el/6"
+    dist: el/6
     local-dir: release
     package_glob: "*.rpm"
     cleanup: false
     on:
-      branch: master
+      branch: unstable
       condition: "$TRAVIS_OS_NAME = linux"
   # Stable packages (releases).
   - provider: packagecloud
-    repository: "pkgs"
-    username: "golift"
+    repository: pkgs
+    username: golift
     token:
       secure: "KlMzZdcu46vS5emuS+uAYjwCstbE7rgXbfOyQDw70Qp2MuXDI4aPqt//TcIwcJZN0rjaqLX6hf5P7L0qV+ro676Br5gNm0YZWNN3W165QGTH5LwBEt6cFxOD/hKVKSE7wx7XXd++/Di2Gy1f7Gi0EIpit0rBpDy9u9GHwIkgU57k/ET5kcIAfsc4EHnF2oQEPjk0qunrdmkM29unbKExOa7M5vcJK1hUggLPRszJR6bIaPsT1wJfaw/+oS59y4D8f/LvPjDD6oirEdwEGLqC6slZ2GIWLAGB747UIeXcRTUym4xpUtcr4M/kQ9ZWR98MifBCkcnUgRnXiwPxhWw5QKUEAc41fQY/HIyZyqokdY7z3mALcPdfGn9KoBZw1JOgxKMPCO9jU+sf3ZyC0G0Ue6oS3BPNN0FKAMAF7aWzpFl01ou8a+q7vJq/OBrTOLYrcWW+yWGHtiS95dTJLMFaqZ1jaHrwk6jz5bRvcSHuCXhoXQZsMoOLF3gZWt6Mv6GGqSxPShDVWXZ0n8OSZOtp2W1e1QPG7hRnat+Ga5aDZrWtqvcf3LmN0hMijXk2EStSShBNjpcCezMfn9i4m83B82aD6ZB/0J+rBLs8qVqtEc2LGavPPKu5AlsxD3ffvzQ3342RBrFEZDuVV+GMSGt51v02KcT3UMU70sgT+VP1BTw="
-    dist: "ubuntu/focal"
+    dist: ubuntu/focal
     local-dir: release
     package_glob: "*.deb"
     skip_cleanup: true
@@ -111,11 +111,11 @@ deploy:
       tags: true
       condition: "$TRAVIS_OS_NAME = linux"
   - provider: packagecloud
-    repository: "pkgs"
-    username: "golift"
+    repository: pkgs
+    username: golift
     token:
       secure: "KlMzZdcu46vS5emuS+uAYjwCstbE7rgXbfOyQDw70Qp2MuXDI4aPqt//TcIwcJZN0rjaqLX6hf5P7L0qV+ro676Br5gNm0YZWNN3W165QGTH5LwBEt6cFxOD/hKVKSE7wx7XXd++/Di2Gy1f7Gi0EIpit0rBpDy9u9GHwIkgU57k/ET5kcIAfsc4EHnF2oQEPjk0qunrdmkM29unbKExOa7M5vcJK1hUggLPRszJR6bIaPsT1wJfaw/+oS59y4D8f/LvPjDD6oirEdwEGLqC6slZ2GIWLAGB747UIeXcRTUym4xpUtcr4M/kQ9ZWR98MifBCkcnUgRnXiwPxhWw5QKUEAc41fQY/HIyZyqokdY7z3mALcPdfGn9KoBZw1JOgxKMPCO9jU+sf3ZyC0G0Ue6oS3BPNN0FKAMAF7aWzpFl01ou8a+q7vJq/OBrTOLYrcWW+yWGHtiS95dTJLMFaqZ1jaHrwk6jz5bRvcSHuCXhoXQZsMoOLF3gZWt6Mv6GGqSxPShDVWXZ0n8OSZOtp2W1e1QPG7hRnat+Ga5aDZrWtqvcf3LmN0hMijXk2EStSShBNjpcCezMfn9i4m83B82aD6ZB/0J+rBLs8qVqtEc2LGavPPKu5AlsxD3ffvzQ3342RBrFEZDuVV+GMSGt51v02KcT3UMU70sgT+VP1BTw="
-    dist: "el/6"
+    dist: el/6
     local-dir: release
     package_glob: "*.rpm"
     skip_cleanup: true
