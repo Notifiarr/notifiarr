@@ -305,7 +305,7 @@ If transfers are in a Warning or Error state they will not be extracted.
 Still having problems?
 [Let us know!](https://github.com/Notifiarr/notifiarr/issues/new)
 
-## Intergrations
+## Integrations
 
 The following fine folks are providing their services, completely free! These service
 integrations are used for things like storage, building, compiling, distribution and
