@@ -20,14 +20,10 @@ COPY . /${BINARY}
 WORKDIR /${BINARY}
 
 RUN apt update && \
-    apt install -y upx cpio rpm2cpio && \
+    apt install -y upx && \
     CGO_ENABLED=0 make ${BINARY}.${ARCH}.${OS} && \
-    curl -sSLo /smartmontools.tar.gz \
-    https://1276-105252244-gh.circle-artifacts.com/0/builds/smartmontools-linux-x86_64-static-7.3-r5214.tar.gz && \
-    curl -skSLo /megacli.rpm https://srkdev.com/megacli/MegaCli-8.07.14-1.noarch.rpm && \
-    tar -zxf /smartmontools.tar.gz -C / && \
-    rpm2cpio /megacli.rpm | cpio -idmvD / && \
-    upx -9 /usr/local/sbin/smartctl /opt/MegaRAID/MegaCli/MegaCli64 && \
+    curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-amd64.tgz \
+    tar -zxf /notifiarr.tgz -C / && \
     ln -sf /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.5
 
 FROM scratch
@@ -71,7 +67,7 @@ ENV PATH=/
 ENV USER=root
 ENV NOTIFIARR_IN_DOCKER=true
 EXPOSE 5454
-COPY --from=builder /opt/MegaRAID/MegaCli/MegaCli64 /opt/MegaRAID/MegaCli/libstorelibir-2.so.14.07-0 /usr/local/sbin/smartctl /
+COPY --from=builder /MegaCli64 /libstorelibir-2.so.14.07-0 /smartctl /
 # All of this is for megacli.
 COPY --from=builder /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 /lib64/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25 \
