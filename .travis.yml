@@ -52,7 +52,7 @@ script:
   # Build mac binary or image.
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make dmg; fi
   # Test homebrew (with make install).
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; make install VERSION=$VERSION ITERATION=$ITERATION PREFIX=/tmp/ab-$VERSION ETC=/tmp/ab-$VERSION/etc; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install VERSION=$VERSION ITERATION=$ITERATION PREFIX=/tmp/ab-$VERSION ETC=/tmp/ab-$VERSION/etc; fi
 after_success:
   # Display Release Folder
   - ls -l release/
