@@ -19,6 +19,7 @@
 /*.*.freebsd
 /*.rb
 /*.upx
+/*.app
 *.sha256
 /vendor
 .DS_Store
