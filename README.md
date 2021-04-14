@@ -11,49 +11,17 @@ It also provides reports for Plex usage and system health.
 Linux repository hosting provided by
 [![packagecloud](https://docs.golift.io/integrations/packagecloud-full.png "PackageCloud.io")](http://packagecloud.io)
 
+This works on any system with apt or yum. If your system does not use APT or YUM, then download a package from the [Releases](https://github.com/Notifiarr/notifiarr/releases) page.
+Install the Go Lift package repo and Notifiarr with this command:
+```
+curl -s https://golift.io/repo.sh | sudo bash -s - notifiarr
+```
+
 After install, edit the config and start the service:
 
 ```
 sudo nano /etc/notifiarr/notifiarr.conf
 sudo service systemctl restart notifiarr
-```
-
-#### Debian Variants
-
-- Ubuntu, etc.
-
-Install the repo like this. All variants use the same `ubuntu/focal` repo. The app works on all Linuxes.
-
-```shell
-curl -L https://packagecloud.io/golift/pkgs/gpgkey | sudo apt-key add -
-echo "deb https://packagecloud.io/golift/pkgs/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/golift.list
-sudo apt update
-sudo apt install notifiarr
-```
-
-#### RedHat Variants
-
-- CentOS, Fedora, SUSE, etc.
-
-Install the repo like this. All variants use the same `el/6` repo. The app works on all Linuxes.
-
-```shell
-sudo tee /etc/yum.repos.d/golift.repo <<-EOF
-[golift]
-name=golift
-baseurl=https://packagecloud.io/golift/pkgs/el/6/\$basearch
-repo_gpgcheck=1
-gpgcheck=1
-enabled=1
-gpgkey=https://packagecloud.io/golift/pkgs/gpgkey
-       https://packagecloud.io/golift/pkgs/gpgkey/golift-pkgs-7F7791485BF8996D.pub.gpg
-sslverify=1
-sslcacert=/etc/pki/tls/certs/ca-bundle.crt
-metadata_expire=300
-EOF
-
-sudo yum -q makecache -y --disablerepo='*' --enablerepo='golift'
-sudo yum install notifiarr
 ```
 
 ### FreeBSD
