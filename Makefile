@@ -78,15 +78,18 @@ release: clean linux_packages freebsd_packages windows
 	# Generating File Hashes
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
+# DMG only makes a DMG file is MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
 dmg: clean macapp
 	mkdir -p release
-	hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
-	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/dmg_checksum.sha256.txt
+	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
+	[ "$(MACAPP)" != "" ] || mv $(BINARY).*.macos release/
+	[ "$(MACAPP)" != "" ] || gzip -9r release/
+	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
 # Delete all build assets.
 clean:
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
-	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make
+	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
 	rm -rf package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
 
@@ -191,10 +194,9 @@ freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
 macapp: $(MACAPP).app
 $(MACAPP).app: macos
-	@[ "$(MACAPP)" != "" ] || (echo "Must set 'MACAPP' in settings.sh!" && exit 1)
-	mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
-	cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
-	cp -rp init/macos/$(MACAPP).app $(MACAPP).app
+	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
+	[ -z "$(MACAPP)" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
+	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 
 rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux check_fpm
