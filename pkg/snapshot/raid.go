@@ -26,7 +26,7 @@ Personalities : [raid1] [linear] [multipath] [raid0] [raid6] [raid5] [raid4] [ra
 md1 : active raid1 sdd2[3] sdb2[1] sdc2[2] sda2[0]
       536738816 blocks super 1.2 [4/4] [UUUU]
       bitmap: 3/4 pages [12KB], 65536KB chunk
-unused devices: <none>
+unused devices: <none>.
 */
 func (s *Snapshot) getRaidMDstat() {
 	b, _ := ioutil.ReadFile("/proc/mdstat")
