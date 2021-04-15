@@ -9,16 +9,16 @@ import (
 )
 
 type Server struct {
-	Timeout    cnfg.Duration `toml:"timeout"`
-	Interval   cnfg.Duration `toml:"interval"`
-	URL        string        `toml:"url"`
-	Token      string        `toml:"token"`
-	AccountMap string        `toml:"account_map"`
-	Name       string        `toml:"server"`
-	ReturnJSON bool          `toml:"return_json"`
-	Cooldown   cnfg.Duration `toml:"cooldown"`
-	SeriesPC   uint          `toml:"series_percent_complete"`
-	MoviesPC   uint          `toml:"movies_percent_complete"`
+	Timeout    cnfg.Duration `toml:"timeout" xml:"timeout"`
+	Interval   cnfg.Duration `toml:"interval" xml:"interval"`
+	URL        string        `toml:"url" xml:"url"`
+	Token      string        `toml:"token" xml:"token"`
+	AccountMap string        `toml:"account_map" xml:"account_map"`
+	Name       string        `toml:"server" xml:"server"`
+	ReturnJSON bool          `toml:"return_json" xml:"return_json"`
+	Cooldown   cnfg.Duration `toml:"cooldown" xml:"cooldown"`
+	SeriesPC   uint          `toml:"series_percent_complete" xml:"series_percent_complete"`
+	MoviesPC   uint          `toml:"movies_percent_complete" xml:"movies_percent_complete"`
 	client     *http.Client
 }
 
