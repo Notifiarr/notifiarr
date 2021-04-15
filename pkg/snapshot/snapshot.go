@@ -24,7 +24,7 @@ const (
 
 // Config determines which checks to run, etc.
 type Config struct {
-	Timeout   cnfg.Duration `toml:"timeout" xml:"interval"`                    // total run time allowed.
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout"`                     // total run time allowed.
 	Interval  cnfg.Duration `toml:"interval" xml:"interval"`                   // how often to send snaps (cron).
 	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool"`                  // zfs pools to monitor.
 	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo"`                   // use sudo for smartctl commands.
