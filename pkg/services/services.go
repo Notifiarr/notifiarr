@@ -34,9 +34,9 @@ var (
 
 // Config for this plugin.
 type Config struct {
-	Interval     cnfg.Duration     `toml:"interval "toml:"interval"`
-	Parallel     uint              `toml:"parallel" toml:"parallel"`
-	Disabled     bool              `toml:"disabled" toml:"disabled"`
+	Interval     cnfg.Duration     `toml:"interval" xml:"interval"`
+	Parallel     uint              `toml:"parallel" xml:"parallel"`
+	Disabled     bool              `toml:"disabled" xml:"disabled"`
 	Apps         *apps.Apps        `toml:"-"`
 	Notify       *notifiarr.Config `toml:"-"`
 	*logs.Logger `json:"-"`        // log file writer
