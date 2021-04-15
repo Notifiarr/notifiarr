@@ -22,7 +22,7 @@ WORKDIR /${BINARY}
 RUN apt update && \
     apt install -y upx && \
     CGO_ENABLED=0 make ${BINARY}.${ARCH}.${OS} && \
-    curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-amd64.tgz && \
+    curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$ARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
     ln -sf /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.5
 
@@ -67,8 +67,8 @@ ENV PATH=/
 ENV USER=root
 ENV NOTIFIARR_IN_DOCKER=true
 EXPOSE 5454
-COPY --from=builder /MegaCli64 /libstorelibir-2.so.14.07-0 /smartctl /
-# All of this is for megacli.
+COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
+# All of this is for megacli, and probably doesn't work on i386.
 COPY --from=builder /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 /lib64/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25 \
   /lib/x86_64-linux-gnu/ld-2.28.so /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread-2.28.so \
