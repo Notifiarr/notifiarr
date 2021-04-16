@@ -99,7 +99,7 @@ func (c *Client) downloadOther(update *update.Update) {
 func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 	s = "Config File: " + c.Flags.ConfigFile
 	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
-	s += fmt.Sprintf("\nUpstreams: %v", c.allow)
+	s += fmt.Sprintf("\nUpstreams: %v", c.Config.Allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		s += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))

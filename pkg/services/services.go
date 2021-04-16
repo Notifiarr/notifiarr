@@ -89,12 +89,12 @@ type CheckResult struct {
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name      string        `toml:"name"`     // Radarr
-	Type      CheckType     `toml:"type"`     // http
-	Value     string        `toml:"check"`    // http://some.url
-	Expect    string        `toml:"expect"`   // 200
-	Timeout   cnfg.Duration `toml:"timeout"`  // 10s
-	Interval  cnfg.Duration `toml:"interval"` // 1m
+	Name      string        `toml:"name" xml:"name"`         // Radarr
+	Type      CheckType     `toml:"type" xml:"type"`         // http
+	Value     string        `toml:"check" xml:"check"`       // http://some.url
+	Expect    string        `toml:"expect" xml:"expect"`     // 200
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout"`   // 10s
+	Interval  cnfg.Duration `toml:"interval" xml:"interval"` // 1m
 	log       *logs.Logger
 	output    string
 	state     CheckState
@@ -105,10 +105,11 @@ type Service struct {
 func (c *Config) Start(services []*Service) error {
 	services = append(services, c.collectApps()...)
 	if c.Disabled || len(services) == 0 {
+		_ = c.setup(services, false)
 		return nil
 	}
 
-	if err := c.setup(services); err != nil {
+	if err := c.setup(services, true); err != nil {
 		return err
 	}
 
@@ -164,11 +165,14 @@ func (c *Config) runServiceChecker() {
 	}
 }
 
-func (c *Config) setup(services []*Service) error {
+func (c *Config) setup(services []*Service, run bool) error {
 	c.services = make(map[string]*Service)
-	c.checks = make(chan *Service, DefaultBuffer)
-	c.done = make(chan bool)
-	c.stopChan = make(chan struct{})
+
+	if run {
+		c.checks = make(chan *Service, DefaultBuffer)
+		c.done = make(chan bool)
+		c.stopChan = make(chan struct{})
+	}
 
 	for i := range services {
 		services[i].log = c.Logger

@@ -6,15 +6,12 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"strings"
 	"syscall"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -30,8 +27,6 @@ const (
 	DefaultName      = "notifiarr"
 	DefaultLogFileMb = 100
 	DefaultLogFiles  = 0 // delete none
-	DefaultTimeout   = time.Minute
-	DefaultBindAddr  = "0.0.0.0:5454"
 	DefaultEnvPrefix = "DN"
 )
 
@@ -51,36 +46,20 @@ type Flags struct {
 	Mode       string
 }
 
-// Config represents the data in our config file.
-type Config struct {
-	BindAddr   string              `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
-	SSLCrtFile string              `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
-	SSLKeyFile string              `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
-	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
-	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Plex       *plex.Server        `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
-	Snapshot   *snapshot.Config    `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
-	Services   *services.Config    `json:"services" toml:"services" xml:"services" yaml:"services"`
-	Service    []*services.Service `json:"service" toml:"service" xml:"service" yaml:"service"`
-	AutoUpdate string              `json:"auto_update" toml:"auto_update" xml:"auto_update" yaml:"auto_update"`
-	*logs.Logs
-	*apps.Apps
-}
-
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
 	Flags  *Flags
-	Config *Config
+	Config *configfile.Config
 	server *http.Server
 	sigkil chan os.Signal
 	sighup chan os.Signal
-	allow  allowedIPs
 	menu   map[string]ui.MenuItem
 	info   string
 	notify *notifiarr.Config
 	alert  *logs.Cooler
 	plex   *logs.Timer
+	newCon bool
 }
 
 // Errors returned by this package.
@@ -97,18 +76,23 @@ func NewDefaults() *Client {
 		plex:   &logs.Timer{},
 		alert:  &logs.Cooler{},
 		Logger: logs.New(),
-		Config: &Config{
+		Config: &configfile.Config{
 			Apps: &apps.Apps{
 				URLBase: "/",
 			},
-			Services: &services.Config{},
-			BindAddr: DefaultBindAddr,
-			Snapshot: &snapshot.Config{},
+			Services: &services.Config{
+				Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
+				Parallel: 1,
+			},
+			BindAddr: configfile.DefaultBindAddr,
+			Snapshot: &snapshot.Config{
+				Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
+			},
 			Logs: &logs.Logs{
 				LogFiles:  DefaultLogFiles,
 				LogFileMb: DefaultLogFileMb,
 			},
-			Timeout: cnfg.Duration{Duration: DefaultTimeout},
+			Timeout: cnfg.Duration{Duration: configfile.DefaultTimeout},
 		}, Flags: &Flags{
 			FlagSet:    flag.NewFlagSet(DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(DefaultEnvPrefix + "_CONFIG_FILE"),
@@ -135,15 +119,6 @@ func (f *Flags) ParseArgs(args []string) {
 
 // Start runs the app.
 func Start() error {
-	err := start()
-	if err != nil {
-		_, _ = ui.Error(Title, err.Error())
-	}
-
-	return err
-}
-
-func start() error {
 	c := NewDefaults()
 	c.Flags.ParseArgs(os.Args[1:])
 
@@ -152,7 +127,24 @@ func start() error {
 		return nil // print version and exit.
 	}
 
-	msg := c.findAndSetConfigFile()
+	if err := c.config(); err != nil {
+		_, _ = ui.Error(Title, err.Error())
+		return err
+	}
+
+	if err := c.start(); err != nil {
+		_, _ = ui.Error(Title, err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) config() error {
+	var msg string
+
+	// Find or write a config file. This does not parse it.
+	c.Flags.ConfigFile, c.newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, !c.Flags.restart && ui.HasGUI())
 
 	if c.Flags.restart {
 		return update.Restart(&update.Command{ //nolint:wrapcheck
@@ -161,7 +153,8 @@ func start() error {
 		})
 	}
 
-	if err := c.getConfig(); err != nil {
+	// Parse the config file and environment variables.
+	if err := c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix); err != nil {
 		return fmt.Errorf("%s: %w", msg, err)
 	}
 
@@ -175,6 +168,10 @@ func start() error {
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
 	c.Printf("==> %s", msg)
 
+	return nil
+}
+
+func (c *Client) start() error {
 	if c.Flags.updated {
 		c.printUpdateMessage()
 	}
@@ -189,17 +186,34 @@ func start() error {
 
 	if c.Config.APIKey == "" {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
+	} else if _, err := c.runServices(); err != nil {
+		return err
 	} else if err := c.notify.CheckAPIKey(); err != nil {
 		c.Print("[WARNING] API Key may be invalid:", err)
 	}
 
-	return c.run(strings.HasPrefix(msg, msgConfigCreate))
+	/* // Testing!
+	fmt.Println(configfile.Template.Execute(os.Stderr, c.Config))
+	os.Exit(1)
+	/**/
+
+	return c.run()
 }
 
-func (c *Client) run(newConfig bool) error {
-	c.PrintStartupInfo()
-	c.checkPlex()
+// runServices is called on startup and on reload.
+func (c *Client) runServices() (bool, error) {
+	c.notify = &notifiarr.Config{
+		Apps:    c.Config.Apps,
+		Plex:    c.Config.Plex,
+		Snap:    c.Config.Snapshot,
+		Logger:  c.Logger,
+		URL:     notifiarr.ProdURL,
+		Timeout: c.Config.Timeout.Duration,
+	}
+
 	c.Config.Snapshot.Validate()
+	c.PrintStartupInfo()
+	failed := c.checkPlex()
 	c.notify.Start(c.Flags.Mode)
 
 	c.Config.Services.Logger = c.Logger
@@ -207,25 +221,25 @@ func (c *Client) run(newConfig bool) error {
 	c.Config.Services.Notify = c.notify
 
 	if err := c.Config.Services.Start(c.Config.Service); err != nil {
-		return fmt.Errorf("service checks: %w", err)
+		return failed, fmt.Errorf("service checks: %w", err)
 	}
 
-	/* // Testing!
-		fmt.Println(configfile.Template.Execute(os.Stdout, c.Config))
-		os.Exit(1)
-	/**/
+	return failed, nil
+}
 
+// run turns on the auto updater if enabled, and starts the web server, and system tray icon.
+func (c *Client) run() error {
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 
-	if newConfig {
+	if c.newCon {
 		_ = ui.OpenFile(c.Flags.ConfigFile)
 		_, _ = ui.Warning(Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
 			"Please edit the file and reload this application using the tray menu.")
 	}
 
-	if c.Config.AutoUpdate != "" && runtime.GOOS == windows {
+	if c.Config.AutoUpdate != "" {
 		go c.AutoWatchUpdate()
 	}
 
