@@ -199,3 +199,21 @@ func (c *Client) sendSystemSnapshot(url string) {
 		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, string(body))
 	}
 }
+
+func (c *Client) writeConfigFile() {
+	if c.Flags.ConfigFile == "" {
+		_, _ = ui.Error(Title+" Error", "No Config File Provided")
+		return
+	}
+
+	c.Print("[user requested] Writing Config File!")
+
+	if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
+		c.Errorf("Writing Config File: %v", err)
+		_, _ = ui.Error(Title+" Error", "Writing Config File: "+err.Error())
+
+		return
+	}
+
+	_, _ = ui.Info(Title, "Wrote Config File: "+c.Flags.ConfigFile)
+}

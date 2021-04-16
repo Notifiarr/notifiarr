@@ -200,7 +200,7 @@ func (c *Config) setup(services []*Service, run bool) error {
 }
 
 // collectApps turns app configs into service checks if they have a name.
-func (c *Config) collectApps() []*Service {
+func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 	svcs := []*Service{}
 
 	for _, a := range c.Apps.Lidarr {

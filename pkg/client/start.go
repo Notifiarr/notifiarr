@@ -230,7 +230,7 @@ func (c *Client) runServices() (bool, error) {
 // run turns on the auto updater if enabled, and starts the web server, and system tray icon.
 func (c *Client) run() error {
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
-	signal.Notify(c.sighup, syscall.SIGHUP)
+	signal.Notify(c.sighup, syscall.SIGUSR1, syscall.SIGHUP)
 
 	if c.newCon {
 		_ = ui.OpenFile(c.Flags.ConfigFile)

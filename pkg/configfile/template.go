@@ -20,6 +20,7 @@ func Funcs() template.FuncMap {
 	}
 }
 
+//nolint:lll
 const tmpl = `################################################
 # Notifiarr Client Example Configuration File #
 # Created by Notifiarr {{version}} #
@@ -176,7 +177,7 @@ timeout = "{{.Timeout}}"
 ##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 ##
 [snapshot]
-  interval          = "{{.Snapshot.Interval}}"  # how often to send a snapshot, 0 = off
+  interval          = "{{.Snapshot.Interval}}"  # how often to send a snapshot, 0 = off, 30m - 2h recommended
   timeout           = "{{.Snapshot.Timeout}}" # how long a snapshot may take
   monitor_raid      = {{.Snapshot.Raid}} # mdadm / megacli
   monitor_drives    = {{.Snapshot.DriveData}} # smartctl: age, temp, health

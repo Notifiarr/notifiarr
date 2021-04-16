@@ -101,6 +101,7 @@ func (c *Config) setup() {
 	}
 }
 
+// FindAndReturn return a config file. Write one if requested.
 func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, string) {
 	var confFile string
 
@@ -125,7 +126,7 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, str
 		return configFile, false, MsgNoConfigFile
 	}
 
-	findFile, err := c.write(defaultConfigFile)
+	findFile, err := c.Write(defaultConfigFile)
 	if err != nil {
 		return configFile, true, MsgConfigFailed + err.Error()
 	} else if findFile == "" {
@@ -139,7 +140,8 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, str
 	return findFile, true, MsgConfigCreate + findFile
 }
 
-func (c *Config) write(file string) (string, error) {
+// Write config to a file.
+func (c *Config) Write(file string) (string, error) {
 	if file == "" {
 		return "", nil
 	}

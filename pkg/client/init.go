@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"path"
+	"syscall"
 
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
@@ -71,8 +72,16 @@ func (c *Client) Exit() (err error) {
 		case sigc := <-c.sigkil:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
 			return
-		case <-c.sighup:
-			c.reloadConfiguration("caught signal: sighup")
+		case sigc := <-c.sighup:
+			if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {
+				c.Printf("Writing Config File! Caught Signal: %v", sigc)
+
+				if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
+					c.Errorf("Writing Config File: %v", err)
+				}
+			} else {
+				c.reloadConfiguration("caught signal: sighup")
+			}
 		}
 	}
 }
