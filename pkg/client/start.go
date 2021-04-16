@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
@@ -208,6 +209,11 @@ func (c *Client) run(newConfig bool) error {
 	if err := c.Config.Services.Start(c.Config.Service); err != nil {
 		return fmt.Errorf("service checks: %w", err)
 	}
+
+	/* // Testing!
+		fmt.Println(configfile.Template.Execute(os.Stdout, c.Config))
+		os.Exit(1)
+	/**/
 
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	signal.Notify(c.sighup, syscall.SIGHUP)

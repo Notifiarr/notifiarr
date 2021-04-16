@@ -200,6 +200,10 @@ func (c *Config) collectApps() []*Service {
 	svcs := []*Service{}
 
 	for _, a := range c.Apps.Lidarr {
+		if a.Interval.Duration == 0 {
+			a.Interval.Duration = DefaultCheckInterval
+		}
+
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
@@ -213,6 +217,10 @@ func (c *Config) collectApps() []*Service {
 	}
 
 	for _, a := range c.Apps.Radarr {
+		if a.Interval.Duration == 0 {
+			a.Interval.Duration = DefaultCheckInterval
+		}
+
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
@@ -226,6 +234,10 @@ func (c *Config) collectApps() []*Service {
 	}
 
 	for _, a := range c.Apps.Readarr {
+		if a.Interval.Duration == 0 {
+			a.Interval.Duration = DefaultCheckInterval
+		}
+
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
@@ -239,6 +251,10 @@ func (c *Config) collectApps() []*Service {
 	}
 
 	for _, a := range c.Apps.Sonarr {
+		if a.Interval.Duration == 0 {
+			a.Interval.Duration = DefaultCheckInterval
+		}
+
 		if a.Name != "" {
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
