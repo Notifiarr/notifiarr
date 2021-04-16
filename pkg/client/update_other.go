@@ -25,6 +25,5 @@ func (c *Client) checkReloadSignal(sigc os.Signal) {
 }
 
 func (c *Client) setReloadSignals() {
-	signal.Notify(c.sighup, syscall.SIGHUP)
-	signal.Notify(c.sighup, syscall.SIGUSR1)
+	signal.Notify(c.sighup, syscall.SIGHUP, syscall.SIGUSR1)
 }
