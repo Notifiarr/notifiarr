@@ -3,7 +3,6 @@ module github.com/Notifiarr/notifiarr
 go 1.16
 
 require (
-	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/gen2brain/dlgs v0.0.0-20210406143744-f512297a108e
 	github.com/getlantern/golog v0.0.0-20201105130739-9586b8bde3a9 // indirect
