@@ -3,7 +3,9 @@ package client
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
@@ -18,6 +20,14 @@ import (
 const (
 	oneDay = 24 * time.Hour
 )
+
+func (c *Client) checkReloadSignal(sigc os.Signal) {
+	c.reloadConfiguration("caught signal: " + sigc.String())
+}
+
+func (c *Client) setReloadSignals() {
+	signal.Notify(c.sighup, syscall.SIGHUP)
+}
 
 // This is the pop-up a user sees when they click update in the menu.
 func (c *Client) upgradeWindows(update *update.Update) {

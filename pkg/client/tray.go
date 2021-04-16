@@ -5,7 +5,6 @@ package client
 import (
 	"encoding/json"
 	"os"
-	"syscall"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
@@ -110,16 +109,8 @@ func (c *Client) watchKillerChannels() {
 	for {
 		select {
 		case sigc := <-c.sighup:
-			if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {
-				c.Printf("Writing Config File! Caught Signal: %v", sigc)
-
-				if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
-					c.Errorf("Writing Config File: %v", err)
-				}
-			} else {
-				c.Printf("Caught Signal: %v (reloading configuration)", sigc)
-				c.reloadConfiguration("caught signal " + sigc.String())
-			}
+			c.Printf("Caught Signal: %v (reloading configuration)", sigc)
+			c.reloadConfiguration("caught signal " + sigc.String())
 		case sigc := <-c.sigkil:
 			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
 			return
