@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hako/durafmt"
 	"github.com/shirou/gopsutil/v3/process"
 )
 
@@ -52,7 +53,10 @@ func (s *Service) checkProccess() *result {
 }
 
 func (s *Service) getProcessResults(ctx context.Context, processes []*process.Process) *result {
-	var found []int32
+	var (
+		found []int32
+		ages  []time.Time
+	)
 
 	// Loop each process/pid, get the command line name, and check for a match.
 	for _, proc := range processes {
@@ -65,6 +69,7 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 		if strings.Contains(procinfo.cmdline, s.Value) ||
 			(s.proc.checkRE != nil && s.proc.checkRE.FindString(procinfo.cmdline) != "") {
 			found = append(found, proc.Pid)
+			ages = append(ages, procinfo.created)
 
 			// log.Printf("pid: %d, age: %v, cmd: %v",
 			// 	proc.Pid, time.Since(procinfo.created).Round(time.Second), procinfo.cmdline)
@@ -79,16 +84,22 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 		}
 	}
 
-	return s.checkProcessCounts(found)
+	return s.checkProcessCounts(found, ages)
 }
 
-//
-func (s *Service) checkProcessCounts(pids []int32) *result {
+// checkProcessCounts validates process check thresholds.
+func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 	count := len(pids)
+
+	agesText := ""
+	if len(ages) == 1 {
+		agesText = fmt.Sprintf(", age: %v", durafmt.ParseShort(time.Since(ages[0]).Round(time.Second)))
+	}
+
 	r := &result{
 		state: StateOK,
-		output: fmt.Sprintf("%s: found %d processes; min %d, max: %d, pids: %v",
-			s.Value, count, s.proc.countMin, s.proc.countMax, pids),
+		output: fmt.Sprintf("%s: found %d processes; min %d, max: %d%s, pids: %v",
+			s.Value, count, s.proc.countMin, s.proc.countMax, agesText, pids),
 	}
 
 	switch {
@@ -98,7 +109,8 @@ func (s *Service) checkProcessCounts(pids []int32) *result {
 		r.state = StateCritical
 	case s.proc.running && count > 0:
 		r.state = StateCritical
-		r.output = fmt.Sprintf("%s: found %d processes; max 0 (should not be running), pids: %v", s.Value, count, pids)
+		r.output = fmt.Sprintf("%s: found %d processes; max 0 (should not be running)%s, pids: %v",
+			s.Value, count, agesText, pids)
 	case !s.proc.running && count == 0:
 		r.state = StateCritical
 		r.output = s.Value + ": not running!"

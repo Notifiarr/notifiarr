@@ -9,9 +9,9 @@ import (
 
 // Custom errors.
 var (
-	ErrProcExpect       = fmt.Errorf("invalid process expect type")
-	ErrNoProcVal        = fmt.Errorf("process 'check' must not be empty")
-	ErrCountWithRestart = fmt.Errorf("process 'count' may not be used with 'restart' or 'running'")
+	ErrProcExpect = fmt.Errorf("invalid process expect type")
+	ErrNoProcVal  = fmt.Errorf("process 'check' must not be empty")
+	ErrCountZero  = fmt.Errorf("process 'count' may not be used with 'running'")
 )
 
 /* These all run once at startup to fill our check data. */
@@ -23,8 +23,8 @@ func (s *Service) checkProcValues() error {
 		return err
 	} else if err = s.fillExpectRegex(); err != nil {
 		return err
-	} else if (s.proc.countMin != 0 || s.proc.countMax != 0) && (s.proc.restarts || s.proc.running) {
-		return ErrCountWithRestart
+	} else if (s.proc.countMin != 0 || s.proc.countMax != 0) && s.proc.running {
+		return ErrCountZero
 	}
 
 	return nil
