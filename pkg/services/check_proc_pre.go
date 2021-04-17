@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -12,6 +13,7 @@ var (
 	ErrProcExpect = fmt.Errorf("invalid process expect type")
 	ErrNoProcVal  = fmt.Errorf("process 'check' must not be empty")
 	ErrCountZero  = fmt.Errorf("process 'count' may not be used with 'running'")
+	ErrBSDRestart = fmt.Errorf("process 'restart' check does not work on FreeBSD") // one day.
 )
 
 /* These all run once at startup to fill our check data. */
@@ -42,6 +44,10 @@ func (s *Service) fillExpect() (err error) {
 			}
 		case strings.EqualFold(str, "restart"):
 			s.proc.restarts = true
+
+			if runtime.GOOS == "freebsd" {
+				return ErrBSDRestart
+			}
 		case strings.EqualFold(str, "running"):
 			s.proc.running = true
 		default:

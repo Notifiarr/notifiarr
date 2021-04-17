@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 	"fmt"
-	"log"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -97,8 +97,8 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 			found = append(found, proc.Pid)
 			ages = append(ages, procinfo.Created)
 
-			log.Printf("pid: %d, age: %v, cmd: %v",
-				proc.Pid, time.Since(procinfo.Created).Round(time.Second), procinfo.CmdLine)
+			// log.Printf("pid: %d, age: %v, cmd: %v",
+			// 	proc.Pid, time.Since(procinfo.Created).Round(time.Second), procinfo.CmdLine)
 
 			if s.proc.running && time.Since(procinfo.Created) > s.Interval.Duration {
 				return &result{
@@ -114,11 +114,11 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 }
 
 // checkProcessCounts validates process check thresholds.
-func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
+func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result { //nolint:cyclop
 	count := len(pids)
-
 	agesText := ""
-	if len(ages) == 1 {
+
+	if len(ages) == 1 && !ages[0].IsZero() {
 		agesText = fmt.Sprintf(", age: %v", durafmt.ParseShort(time.Since(ages[0]).Round(time.Second)))
 	}
 
@@ -155,6 +155,11 @@ func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, error) {
 	procinfo.CmdLine, err = p.CmdlineWithContext(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("CmdlineWithContext: %w", err)
+	}
+
+	// FreeBSD doesn't have create time.
+	if runtime.GOOS == "freebsd" {
+		return &procinfo, nil
 	}
 
 	created, err := p.CreateTimeWithContext(ctx)

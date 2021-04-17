@@ -152,16 +152,7 @@ func start() error {
 		fmt.Println(version.Print(c.Flags.Name()))
 		return nil // print version and exit.
 	} else if c.Flags.pslist {
-		pslist, err := services.GetAllProcesses()
-		if err != nil {
-			return fmt.Errorf("unable to get processes: %w", err)
-		}
-
-		for _, p := range pslist {
-			fmt.Printf("[%-5d] %-11s: %s\n", p.PID, time.Since(p.Created).Round(time.Second), p.CmdLine)
-		}
-
-		return nil
+		return printProcessList()
 	}
 
 	msg := c.findAndSetConfigFile()
@@ -206,6 +197,23 @@ func start() error {
 	}
 
 	return c.run(strings.HasPrefix(msg, msgConfigCreate))
+}
+
+func printProcessList() error {
+	pslist, err := services.GetAllProcesses()
+	if err != nil {
+		return fmt.Errorf("unable to get processes: %w", err)
+	}
+
+	for _, p := range pslist {
+		if runtime.GOOS == "freebsd" {
+			fmt.Printf("[%-5d] %s\n", p.PID, p.CmdLine)
+		} else {
+			fmt.Printf("[%-5d] %-11s: %s\n", p.PID, time.Since(p.Created).Round(time.Second), p.CmdLine)
+		}
+	}
+
+	return nil
 }
 
 func (c *Client) run(newConfig bool) error {
