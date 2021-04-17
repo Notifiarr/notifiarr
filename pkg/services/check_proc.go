@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -11,10 +12,11 @@ import (
 	"github.com/shirou/gopsutil/v3/process"
 )
 
-// procInfo is derived from a pid.
-type procInfo struct {
-	cmdline string
-	created time.Time
+// ProcInfo is derived from a pid.
+type ProcInfo struct {
+	CmdLine string
+	Created time.Time
+	PID     int32
 	/* // these are possibly available..
 		cmdlineslice []string
 		cwd          string
@@ -35,6 +37,30 @@ type procExpect struct {
 }
 
 const epochOffset = 1000
+
+func GetAllProcesses() ([]*ProcInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
+	defer cancel()
+
+	processes, err := process.ProcessesWithContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("getting process list: %w", err)
+	}
+
+	p := []*ProcInfo{}
+
+	for _, proc := range processes {
+		procinfo, err := getProcInfo(ctx, proc)
+		if err != nil {
+			continue
+		}
+
+		procinfo.PID = proc.Pid
+		p = append(p, procinfo)
+	}
+
+	return p, nil
+}
 
 // start a loop through processes to find the one we care about.
 func (s *Service) checkProccess() *result {
@@ -66,19 +92,19 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 		}
 
 		// Look for a match for our process.
-		if strings.Contains(procinfo.cmdline, s.Value) ||
-			(s.proc.checkRE != nil && s.proc.checkRE.FindString(procinfo.cmdline) != "") {
+		if strings.Contains(procinfo.CmdLine, s.Value) ||
+			(s.proc.checkRE != nil && s.proc.checkRE.FindString(procinfo.CmdLine) != "") {
 			found = append(found, proc.Pid)
-			ages = append(ages, procinfo.created)
+			ages = append(ages, procinfo.Created)
 
-			// log.Printf("pid: %d, age: %v, cmd: %v",
-			// 	proc.Pid, time.Since(procinfo.created).Round(time.Second), procinfo.cmdline)
+			log.Printf("pid: %d, age: %v, cmd: %v",
+				proc.Pid, time.Since(procinfo.Created).Round(time.Second), procinfo.CmdLine)
 
-			if s.proc.running && time.Since(procinfo.created) > s.Interval.Duration {
+			if s.proc.running && time.Since(procinfo.Created) > s.Interval.Duration {
 				return &result{
 					state: StateCritical,
 					output: fmt.Sprintf("%s: process restarted since last check, age: %v, pid: %d, proc: %s",
-						s.Value, time.Since(procinfo.created), proc.Pid, procinfo.cmdline),
+						s.Value, time.Since(procinfo.Created), proc.Pid, procinfo.CmdLine),
 				}
 			}
 		}
@@ -120,13 +146,13 @@ func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 }
 
 // getProcInfo returns age and cli args for a process.
-func getProcInfo(ctx context.Context, p *process.Process) (*procInfo, error) {
+func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, error) {
 	var (
 		err      error
-		procinfo procInfo
+		procinfo ProcInfo
 	)
 
-	procinfo.cmdline, err = p.CmdlineWithContext(ctx)
+	procinfo.CmdLine, err = p.CmdlineWithContext(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("CmdlineWithContext: %w", err)
 	}
@@ -136,7 +162,7 @@ func getProcInfo(ctx context.Context, p *process.Process) (*procInfo, error) {
 		return nil, fmt.Errorf("CreateTimeWithContext: %w", err)
 	}
 
-	procinfo.created = time.Unix(created/epochOffset, 0).Round(time.Millisecond)
+	procinfo.Created = time.Unix(created/epochOffset, 0).Round(time.Millisecond)
 
 	/*
 			procinfo.cmdlineslice, err = p.CmdlineSliceWithContext(ctx)
