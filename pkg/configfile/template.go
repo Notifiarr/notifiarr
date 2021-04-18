@@ -21,10 +21,10 @@ func Funcs() template.FuncMap {
 }
 
 //nolint:lll
-const tmpl = `################################################
+const tmpl = `###############################################
 # Notifiarr Client Example Configuration File #
 # Created by Notifiarr {{version}} #
-################################################
+###############################################
 
 # This API key must be copied from your notifiarr.com account.
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}
@@ -65,12 +65,12 @@ urlbase = "{{.URLBase}}"
 ## Uncomment both lines and add valid file paths. Make sure this app can read them.
 ##
 {{if .SSLKeyFile}}ssl_key_file  = "{{.SSLKeyFile}}"{{else}}#ssl_key_file  = "/path/to/cert.key"{{end}}
-{{if .SSLCrtFile}}ssl_cert_file  = "{{.SSLCrtFile}}"{{else}}#ssl_cert_file  = "/path/to/cert.key"{{end}}
+{{if .SSLCrtFile}}ssl_cert_file = "{{.SSLCrtFile}}"{{else}}#ssl_cert_file = "/path/to/cert.key"{{end}}
 
 ## If you set these, logs will be written to these files.
 ## If blank on windows or macOS, log file paths are chosen for you.
-{{if .LogFile}}log_file  = "{{.LogFile}}"{{else}}#log_file  = "~/.notifiarr/notifiarr.log"{{end}}
-{{if .HTTPLog}}http_log  = "{{.HTTPLog}}"{{else}}#http_log  = "~/.notifiarr/notifiarr.http.log"{{end}}
+{{if .LogFile}}log_file = "{{.LogFile}}"{{else}}#log_file = "~/.notifiarr/notifiarr.log"{{end}}
+{{if .HTTPLog}}http_log = "{{.HTTPLog}}"{{else}}#http_log = "~/.notifiarr/notifiarr.http.log"{{end}}
 ##
 ## Set this to the number of megabytes to rotate files.
 log_file_mb = {{.LogFileMb}}
@@ -165,6 +165,7 @@ timeout = "{{.Timeout}}"
   series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 {{- end }}
 
+
 #####################
 # Snapshot Settings #
 #####################
@@ -213,15 +214,7 @@ timeout = "{{.Timeout}}"
 ## Uncomment the following section to create a service check on a URL or IP:port.
 ## You may include as many [[service]] sections as you have services to check.
 ## Do not add Radarr, Sonarr, Readarr or Lidarr here! Add a name to enable their checks.
-##{{range .Service}}
-[[service]]
-  name     = "{{.Name}}"
-  type     = "{{.Type}}"
-  check    = "{{.Value}}"
-  expect   = "{{.Expect}}"
-  timeout  = "{{.Timeout}}"
-  interval = "{{.Interval}}"{{end}}
-
+##
 ## Example with comments follows.
 #[[service]]
 #  name     = "MyServer"          # name must be unique
@@ -230,13 +223,23 @@ timeout = "{{.Timeout}}"
 #  expect   = "200"               # return code to expect (for http only)
 #  timeout  = "10s"               # how long to wait for tcp or http checks.
 #  interval = "5m"                # how often to check this service.
-
-{{if not .Service}}## Another example. Remember to uncomment [[service]] if you use this!
+{{if not .Service}}
+## Another example. Remember to uncomment [[service]] if you use this!
 ##
 #[[service]]
 #  name    = "Bazarr"
 #  type    = "http"
 #  check   = "http://10.1.1.2:6767/series/"
 #  expect  = "200"
-#  timeout = "10s"{{end}}
+#  timeout = "10s"{{else}}
+## Configured Service Checks:
+##{{range .Service}}
+[[service]]
+  name     = "{{.Name}}"
+  type     = "{{.Type}}"
+  check    = "{{.Value}}"
+  expect   = "{{.Expect}}"
+  timeout  = "{{.Timeout}}"
+  interval = "{{.Interval}}"
+{{end}}{{end}}
 `
