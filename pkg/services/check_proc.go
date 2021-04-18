@@ -1,0 +1,216 @@
+package services
+
+import (
+	"context"
+	"fmt"
+	"regexp"
+	"runtime"
+	"strings"
+	"time"
+
+	"github.com/hako/durafmt"
+	"github.com/shirou/gopsutil/v3/process"
+)
+
+// ProcInfo is derived from a pid.
+type ProcInfo struct {
+	CmdLine string
+	Created time.Time
+	PID     int32
+	/* // these are possibly available..
+		cmdlineslice []string
+		cwd          string
+		exe          string
+		meminfo      *process.MemoryInfoStat
+		memperc      float32
+		name         string
+	/**/
+}
+
+// procExpect is setup for each 'process' service from input data on initialization.
+type procExpect struct {
+	checkRE  *regexp.Regexp
+	countMin int
+	countMax int
+	restarts bool
+	running  bool
+}
+
+const epochOffset = 1000
+
+func GetAllProcesses() ([]*ProcInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
+	defer cancel()
+
+	processes, err := process.ProcessesWithContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("getting process list: %w", err)
+	}
+
+	p := []*ProcInfo{}
+
+	for _, proc := range processes {
+		procinfo, err := getProcInfo(ctx, proc)
+		if err != nil {
+			continue
+		}
+
+		procinfo.PID = proc.Pid
+		p = append(p, procinfo)
+	}
+
+	return p, nil
+}
+
+// start a loop through processes to find the one we care about.
+func (s *Service) checkProccess() *result {
+	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
+	defer cancel()
+
+	processes, err := process.ProcessesWithContext(ctx)
+	if err != nil {
+		return &result{
+			state:  StateUnknown,
+			output: "process list error: " + err.Error(),
+		}
+	}
+
+	return s.getProcessResults(ctx, processes)
+}
+
+func (s *Service) getProcessResults(ctx context.Context, processes []*process.Process) *result {
+	var (
+		found []int32
+		ages  []time.Time
+	)
+
+	// Loop each process/pid, get the command line name, and check for a match.
+	for _, proc := range processes {
+		procinfo, err := getProcInfo(ctx, proc)
+		if err != nil {
+			continue
+		}
+
+		// Look for a match for our process.
+		if strings.Contains(procinfo.CmdLine, s.Value) ||
+			(s.proc.checkRE != nil && s.proc.checkRE.FindString(procinfo.CmdLine) != "") {
+			found = append(found, proc.Pid)
+			ages = append(ages, procinfo.Created)
+
+			// log.Printf("pid: %d, age: %v, cmd: %v",
+			// 	proc.Pid, time.Since(procinfo.Created).Round(time.Second), procinfo.CmdLine)
+
+			if s.proc.running && time.Since(procinfo.Created) > s.Interval.Duration {
+				return &result{
+					state: StateCritical,
+					output: fmt.Sprintf("%s: process restarted since last check, age: %v, pid: %d, proc: %s",
+						s.Value, time.Since(procinfo.Created), proc.Pid, procinfo.CmdLine),
+				}
+			}
+		}
+	}
+
+	return s.checkProcessCounts(found, ages)
+}
+
+// checkProcessCounts validates process check thresholds.
+func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
+	min, max, age, pid := s.getProcessStrings(pids, ages)
+
+	switch count := len(pids); {
+	case !s.proc.running && count == 0: // not running!
+		fallthrough
+	case s.proc.countMax != 0 && count > s.proc.countMax: // too many running!
+		fallthrough
+	case count < s.proc.countMin: // not enough running!
+		return &result{
+			state:  StateCritical,
+			output: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid),
+		}
+	case s.proc.running && count > 0: // running but should not be!
+		return &result{
+			state:  StateCritical,
+			output: fmt.Sprintf("%s: found %d processes; expected: 0%s%s", s.Value, count, age, pid),
+		}
+	default: // running within thresholds!
+		return &result{
+			state:  StateOK,
+			output: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid),
+		}
+	}
+}
+
+// getProcessStrings compiles output strings for a process service check.
+func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, age, pid string) {
+	if min = "min: 1"; s.proc.countMin > 0 { // min always exists.
+		min = fmt.Sprintf("min: %d", s.proc.countMin)
+	}
+
+	if s.proc.countMax > 0 {
+		max = fmt.Sprintf(", max: %d", s.proc.countMax)
+	}
+
+	if len(ages) == 1 && !ages[0].IsZero() {
+		age = fmt.Sprintf(", age: %v", durafmt.ParseShort(time.Since(ages[0]).Round(time.Second)))
+	}
+
+	for _, p := range pids {
+		if pid == "" {
+			pid = ", pids: "
+		} else {
+			pid += ";"
+		}
+
+		pid += fmt.Sprintf("%v", p)
+	}
+
+	return
+}
+
+// getProcInfo returns age and cli args for a process.
+func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, error) {
+	var (
+		err      error
+		procinfo ProcInfo
+	)
+
+	procinfo.CmdLine, err = p.CmdlineWithContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CmdlineWithContext: %w", err)
+	}
+
+	// FreeBSD doesn't have create time.
+	if runtime.GOOS != "freebsd" {
+		created, err := p.CreateTimeWithContext(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("CreateTimeWithContext: %w", err)
+		}
+
+		procinfo.Created = time.Unix(created/epochOffset, 0).Round(time.Millisecond)
+	}
+
+	/*
+			procinfo.cmdlineslice, err = p.CmdlineSliceWithContext(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("CmdlineSliceWithContext: %w", err)
+			}
+		  procinfo.name, err = p.NameWithContext(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("NameWithContext: %w", err)
+			}
+			procinfo.exe, err = p.ExeWithContext(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("ExeWithContext: %w", err)
+			}
+			procinfo.meminfo, err = p.MemoryInfoWithContext(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("MemoryInfoWithContext: %w", err)
+			}
+			procinfo.memperc, err = p.MemoryPercentWithContext(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("MemoryPercentWithContext: %w", err)
+			}
+	*/
+
+	return &procinfo, nil
+}

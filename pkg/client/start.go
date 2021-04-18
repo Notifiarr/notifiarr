@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
@@ -41,6 +42,7 @@ type Flags struct {
 	testSnaps  bool
 	restart    bool
 	updated    bool
+	pslist     bool
 	ConfigFile string
 	EnvPrefix  string
 	Mode       string
@@ -108,6 +110,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.Mode, "mode", "m", "prod", "Selects Notifiarr URL: test, dev, prod")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
+	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks")
 
 	if runtime.GOOS == windows {
 		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it")
@@ -125,6 +128,8 @@ func Start() error {
 	if c.Flags.verReq {
 		fmt.Println(version.Print(c.Flags.Name()))
 		return nil // print version and exit.
+	} else if c.Flags.pslist {
+		return printProcessList()
 	}
 
 	if err := c.config(); err != nil {
@@ -192,12 +197,24 @@ func (c *Client) start() error {
 		c.Print("[WARNING] API Key may be invalid:", err)
 	}
 
-	/* // Testing!
-	fmt.Println(configfile.Template.Execute(os.Stderr, c.Config))
-	os.Exit(1)
-	/**/
-
 	return c.run()
+}
+
+func printProcessList() error {
+	pslist, err := services.GetAllProcesses()
+	if err != nil {
+		return fmt.Errorf("unable to get processes: %w", err)
+	}
+
+	for _, p := range pslist {
+		if runtime.GOOS == "freebsd" {
+			fmt.Printf("[%-5d] %s\n", p.PID, p.CmdLine)
+		} else {
+			fmt.Printf("[%-5d] %-11s: %s\n", p.PID, time.Since(p.Created).Round(time.Second), p.CmdLine)
+		}
+	}
+
+	return nil
 }
 
 // runServices is called on startup and on reload.

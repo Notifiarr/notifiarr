@@ -28,7 +28,7 @@ const (
 var (
 	ErrNoName      = fmt.Errorf("service check is missing a unique name")
 	ErrNoCheck     = fmt.Errorf("service check is missing a check value")
-	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s", CheckTCP, CheckHTTP)
+	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s, %s", CheckTCP, CheckHTTP, CheckPROC)
 	ErrBadTCP      = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
 )
 
@@ -55,6 +55,7 @@ const (
 	CheckHTTP CheckType = "http"
 	CheckTCP  CheckType = "tcp"
 	CheckPING CheckType = "ping"
+	CheckPROC CheckType = "process"
 )
 
 // CheckState represents the current state of a service check.
@@ -100,6 +101,7 @@ type Service struct {
 	state     CheckState
 	since     time.Time
 	lastCheck time.Time
+	proc      *procExpect // only used for process checks.
 }
 
 func (c *Config) Start(services []*Service) error {

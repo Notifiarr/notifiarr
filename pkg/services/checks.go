@@ -17,6 +17,8 @@ type result struct {
 }
 
 func (s *Service) validate() error { //nolint:cyclop
+	s.state = StateUnknown
+
 	if s.Name == "" {
 		return fmt.Errorf("%s: %w", s.Value, ErrNoName)
 	} else if s.Value == "" {
@@ -31,6 +33,10 @@ func (s *Service) validate() error { //nolint:cyclop
 	case CheckTCP:
 		if !strings.Contains(s.Value, ":") {
 			return ErrBadTCP
+		}
+	case CheckPROC:
+		if err := s.checkProcValues(); err != nil {
+			return err
 		}
 	case CheckPING:
 	default:
@@ -61,6 +67,8 @@ func (s *Service) check() bool {
 		return s.update(s.checkTCP())
 	case CheckPING:
 		return s.update(s.checkPING())
+	case CheckPROC:
+		return s.update(s.checkProccess())
 	default:
 		return false
 	}
