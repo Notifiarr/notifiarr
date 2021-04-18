@@ -63,6 +63,7 @@ func (c *Client) makeChannels() {
 	c.menu["conf"] = ui.WrapMenu(conf)
 	c.menu["view"] = ui.WrapMenu(conf.AddSubMenuItem("View", "show configuration"))
 	c.menu["edit"] = ui.WrapMenu(conf.AddSubMenuItem("Edit", "edit configuration"))
+	c.menu["write"] = ui.WrapMenu(conf.AddSubMenuItem("Write", "write config file"))
 	c.menu["key"] = ui.WrapMenu(conf.AddSubMenuItem("API Key", "set API Key"))
 	c.menu["load"] = ui.WrapMenu(conf.AddSubMenuItem("Reload", "reload configuration"))
 
@@ -143,6 +144,8 @@ func (c *Client) watchGuiChannels() {
 			ui.OpenFile(c.Flags.ConfigFile)
 		case <-c.menu["load"].Clicked():
 			c.reloadConfiguration("UI requested")
+		case <-c.menu["write"].Clicked():
+			c.writeConfigFile()
 		case <-c.menu["key"].Clicked():
 			c.changeKey()
 		case <-c.menu["logs_view"].Clicked():

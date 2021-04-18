@@ -99,7 +99,7 @@ func (c *Client) downloadOther(update *update.Update) {
 func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 	s = "Config File: " + c.Flags.ConfigFile
 	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
-	s += fmt.Sprintf("\nUpstreams: %v", c.allow)
+	s += fmt.Sprintf("\nUpstreams: %v", c.Config.Allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		s += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))
@@ -198,4 +198,22 @@ func (c *Client) sendSystemSnapshot(url string) {
 	} else {
 		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, string(body))
 	}
+}
+
+func (c *Client) writeConfigFile() {
+	if c.Flags.ConfigFile == "" {
+		_, _ = ui.Error(Title+" Error", "No Config File Provided")
+		return
+	}
+
+	c.Print("[user requested] Writing Config File!")
+
+	if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
+		c.Errorf("Writing Config File: %v", err)
+		_, _ = ui.Error(Title+" Error", "Writing Config File: "+err.Error())
+
+		return
+	}
+
+	_, _ = ui.Info(Title, "Wrote Config File: "+c.Flags.ConfigFile)
 }
