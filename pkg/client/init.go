@@ -7,7 +7,10 @@ package client
 
 import (
 	"context"
+	"errors"
 	"path"
+
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
 const helpLink = "GoLift Discord: https://golift.io/discord"
@@ -22,7 +25,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printLidarr()
 	c.printReadarr()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
-	c.Printf(" => Trusted Upstream Networks: %v", c.allow)
+	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
@@ -68,9 +71,43 @@ func (c *Client) Exit() (err error) {
 		case sigc := <-c.sigkil:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
 			return
-		case <-c.sighup:
-			c.reloadConfiguration("caught signal: sighup")
+		case sigc := <-c.sighup:
+			c.checkReloadSignal(sigc)
 		}
+	}
+}
+
+// reloadConfiguration is called from a menu tray item or when a HUP signal is received.
+// Re-reads the configuration file and stops/starts all the internal routines.
+func (c *Client) reloadConfiguration(msg string) {
+	c.Print("==> Reloading Configuration: " + msg)
+	c.notify.Stop()
+	c.Config.Services.Stop()
+
+	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
+		c.Errorf("Unable to reload configuration: %v", err)
+		return
+	} else if !errors.Is(err, ErrNoServer) {
+		defer c.StartWebServer()
+	}
+
+	if err := c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix); err != nil {
+		c.Errorf("Reloading Config: %v", err)
+		panic(err)
+	}
+
+	failed, err := c.runServices()
+	if err != nil {
+		c.Errorf("Reloading Config: %v", err)
+		panic(err)
+	}
+
+	c.Print("==> Configuration Reloaded!")
+
+	if failed {
+		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.")
+	} else {
+		_, _ = ui.Info(Title, "Configuration Reloaded!")
 	}
 }
 

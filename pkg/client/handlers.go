@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"runtime"
 	"strings"
@@ -14,9 +13,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"golift.io/version"
 )
-
-// allowedIPs determines who can set x-forwarded-for.
-type allowedIPs []*net.IPNet
 
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
@@ -156,7 +152,7 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := strings.Trim(r.RemoteAddr[:strings.LastIndex(r.RemoteAddr, ":")], "[]")
-		if x := r.Header.Get("X-Forwarded-For"); x == "" || !c.allow.contains(ip) {
+		if x := r.Header.Get("X-Forwarded-For"); x == "" || !c.Config.Allow.Contains(ip) {
 			r.Header.Set("X-Forwarded-For", ip)
 		} else if l := strings.LastIndexAny(x, ", "); l != -1 {
 			r.Header.Set("X-Forwarded-For", strings.Trim(x[l:len(x)-1], ", "))
@@ -164,33 +160,4 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-var _ = fmt.Stringer(allowedIPs(nil))
-
-// String turns a list of allowedIPs into a printable masterpiece.
-func (n allowedIPs) String() (s string) {
-	if len(n) < 1 {
-		return "(none)"
-	}
-
-	for i := range n {
-		if s != "" {
-			s += ", "
-		}
-
-		s += n[i].String()
-	}
-
-	return s
-}
-
-func (n allowedIPs) contains(ip string) bool {
-	for i := range n {
-		if n[i].Contains(net.ParseIP(ip)) {
-			return true
-		}
-	}
-
-	return false
 }

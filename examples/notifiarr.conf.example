@@ -113,14 +113,14 @@ series_percent_complete = 0 # 0, 70-99, send notifications when an episode sessi
 ##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 #
 [snapshot]
-interval          = "30m" # how often to send a snapshot, 0 = off
+interval          = "30m" # how often to send a snapshot, 0 = off, 30m - 2h recommended
 timeout           = "30s" # how long a snapshot may take
-monitor_raid      = true  # mdadm / megacli
-monitor_drives    = true  # smartctl: age, temp, health
-monitor_space     = true  # disk usage for all partitions
-monitor_uptime    = true  # system data, users, hostname, uptime, os, build
-monitor_cpuMemory = true  # literally cpu usage, load averages, and memory
-monitor_cpuTemp   = true  # cpu temperatures, not available on all platforms
+monitor_raid      = false  # mdadm / megacli
+monitor_drives    = false  # smartctl: age, temp, health
+monitor_space     = false  # disk usage for all partitions
+monitor_uptime    = false  # system data, users, hostname, uptime, os, build
+monitor_cpuMemory = false  # literally cpu usage, load averages, and memory
+monitor_cpuTemp   = false  # cpu temperatures, not available on all platforms
 zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
 use_sudo          = false # sudo is needed on unix when monitor_drives=true or for megacli.
 # Example sudoers entries follow. Fix the paths to smartctl and MegaCli.
@@ -139,7 +139,7 @@ use_sudo          = false # sudo is needed on unix when monitor_drives=true or f
 
 [services]
   disabled = false # Setting this to true disables all service checking routines.
-  interval = "10m" # How often to service states to Notifiarr.com. Minimum = 5m.
+  interval = "10m" # How often to send service states to Notifiarr.com. Minimum = 5m.
   parallel = 1     # How many services to check concurrently. 1 should be enough.
 
 ## Uncomment the following section to create a service check on a URL or IP:port.

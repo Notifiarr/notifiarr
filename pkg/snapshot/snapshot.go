@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	defaultTimeout  = 10 * time.Second
+	DefaultTimeout  = 30 * time.Second
 	minimumTimeout  = 5 * time.Second
 	minimumInterval = 10 * time.Minute
 )
@@ -82,7 +82,9 @@ type Partition struct {
 }
 
 func (c *Config) Validate() {
-	if c.Timeout.Duration < minimumTimeout {
+	if c.Timeout.Duration == 0 {
+		c.Timeout.Duration = DefaultTimeout
+	} else if c.Timeout.Duration < minimumTimeout {
 		c.Timeout.Duration = minimumTimeout
 	}
 
@@ -104,7 +106,7 @@ func (c *Config) Validate() {
 // GetSnapshot returns a system snapshot based on requested data in the config.
 func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	if c.Timeout.Duration == 0 {
-		c.Timeout.Duration = defaultTimeout
+		c.Timeout.Duration = DefaultTimeout
 	} else if c.Timeout.Duration < minimumTimeout {
 		c.Timeout.Duration = minimumTimeout
 	}

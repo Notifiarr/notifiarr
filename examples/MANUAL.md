@@ -48,6 +48,13 @@ CONFIGURATION
 The default configuration file location changes depending on operating system.
 See the provided example configuration file for parameter information.
 
+INPUT
+---
+
+On Windows and with the App version on macOS you can work with the app using the
+system tray menu. On Unix OSes you can send a USR1 signal to re-write the config
+file using a built-in template. Backup your existing config file first.
+
 AUTHOR
 ---
 *   David Newhall II - 12/2020
