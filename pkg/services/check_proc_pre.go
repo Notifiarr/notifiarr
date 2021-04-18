@@ -50,8 +50,10 @@ func (s *Service) fillExpect() (err error) {
 			}
 		case strings.EqualFold(str, "running"):
 			s.proc.running = true
+		case str == "":
+			continue
 		default:
-			return fmt.Errorf("%w: %s", ErrProcExpect, str)
+			return fmt.Errorf("%s: %w: %s", s.Name, ErrProcExpect, str)
 		}
 	}
 

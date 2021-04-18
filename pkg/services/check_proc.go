@@ -114,35 +114,57 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 }
 
 // checkProcessCounts validates process check thresholds.
-func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result { //nolint:cyclop
-	count := len(pids)
-	agesText := ""
+func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
+	min, max, age, pid := s.getProcessStrings(pids, ages)
+
+	switch count := len(pids); {
+	case !s.proc.running && count == 0: // not running!
+		fallthrough
+	case s.proc.countMax != 0 && count > s.proc.countMax: // too many running!
+		fallthrough
+	case count < s.proc.countMin: // not enough running!
+		return &result{
+			state:  StateCritical,
+			output: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid),
+		}
+	case s.proc.running && count > 0: // running but should not be!
+		return &result{
+			state:  StateCritical,
+			output: fmt.Sprintf("%s: found %d processes; expected: 0%s%s", s.Value, count, age, pid),
+		}
+	default: // running within thresholds!
+		return &result{
+			state:  StateOK,
+			output: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid),
+		}
+	}
+}
+
+// getProcessStrings compiles output strings for a process service check.
+func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, age, pid string) {
+	if min = "min: 1"; s.proc.countMin > 0 { // min always exists.
+		min = fmt.Sprintf("min: %d", s.proc.countMin)
+	}
+
+	if s.proc.countMax > 0 {
+		max = fmt.Sprintf(", max: %d", s.proc.countMax)
+	}
 
 	if len(ages) == 1 && !ages[0].IsZero() {
-		agesText = fmt.Sprintf(", age: %v", durafmt.ParseShort(time.Since(ages[0]).Round(time.Second)))
+		age = fmt.Sprintf(", age: %v", durafmt.ParseShort(time.Since(ages[0]).Round(time.Second)))
 	}
 
-	r := &result{
-		state: StateOK,
-		output: fmt.Sprintf("%s: found %d processes; min %d, max: %d%s, pids: %v",
-			s.Value, count, s.proc.countMin, s.proc.countMax, agesText, pids),
+	for _, p := range pids {
+		if pid == "" {
+			pid = ", pids: "
+		} else {
+			pid += ";"
+		}
+
+		pid += fmt.Sprintf("%v", p)
 	}
 
-	switch {
-	case s.proc.countMax != 0 && count > s.proc.countMax:
-		r.state = StateCritical
-	case s.proc.countMin != 0 && count < s.proc.countMin:
-		r.state = StateCritical
-	case s.proc.running && count > 0:
-		r.state = StateCritical
-		r.output = fmt.Sprintf("%s: found %d processes; max 0 (should not be running)%s, pids: %v",
-			s.Value, count, agesText, pids)
-	case !s.proc.running && count == 0:
-		r.state = StateCritical
-		r.output = s.Value + ": not running!"
-	}
-
-	return r
+	return
 }
 
 // getProcInfo returns age and cli args for a process.
@@ -158,40 +180,32 @@ func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, error) {
 	}
 
 	// FreeBSD doesn't have create time.
-	if runtime.GOOS == "freebsd" {
-		return &procinfo, nil
-	}
+	if runtime.GOOS != "freebsd" {
+		created, err := p.CreateTimeWithContext(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("CreateTimeWithContext: %w", err)
+		}
 
-	created, err := p.CreateTimeWithContext(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("CreateTimeWithContext: %w", err)
+		procinfo.Created = time.Unix(created/epochOffset, 0).Round(time.Millisecond)
 	}
-
-	procinfo.Created = time.Unix(created/epochOffset, 0).Round(time.Millisecond)
 
 	/*
 			procinfo.cmdlineslice, err = p.CmdlineSliceWithContext(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("CmdlineSliceWithContext: %w", err)
 			}
-
 		  procinfo.name, err = p.NameWithContext(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("NameWithContext: %w", err)
 			}
-
-
-
 			procinfo.exe, err = p.ExeWithContext(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("ExeWithContext: %w", err)
 			}
-
 			procinfo.meminfo, err = p.MemoryInfoWithContext(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("MemoryInfoWithContext: %w", err)
 			}
-
 			procinfo.memperc, err = p.MemoryPercentWithContext(ctx)
 			if err != nil {
 				return nil, fmt.Errorf("MemoryPercentWithContext: %w", err)
