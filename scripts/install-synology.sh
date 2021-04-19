@@ -49,15 +49,15 @@ FILE=linux.gz
 # curl or wget?
 curl --version > /dev/null 2>&1
 if [ "$?" = "0" ]; then
-  CMD="curl -sSL"
+  WGET="curl -sSL"
 else
   wget --version > /dev/null 2>&1
   if [ "$?" = "0" ]; then
-    CMD="wget -qO-"
+    WGET="wget -qO-"
   fi
 fi
 
-if [ "$CMD" = "" ]; then
+if [ "$WGET" = "" ]; then
   echo "${P} [ERROR] Could not locate curl nor wget - please install one to download files!"
   exit 1
 fi
@@ -65,14 +65,14 @@ fi
 INSTALLED=$(/usr/bin/notifiarr -v 2>/dev/null | head -n1 | cut -d' ' -f3)
 
 # Grab latest release file from github.
-PAYLOAD=$($CMD ${LATEST})
+PAYLOAD=$($WGET ${LATEST})
 URL=$(echo "$PAYLOAD" | egrep "browser_download_url.*(${ARCH})\.${FILE}\"" | cut -d\" -f 4)
 TAG=$(echo "$PAYLOAD" | grep 'tag_name' | cut -d\" -f4 | tr -d v)
 
 if [ "$?" != "0" ] || [ "$URL" = "" ]; then
   echo "${P} [ERROR] Missing latest release for '${FILE}' file ($OS/${ARCH}) at ${LATEST}"
   echo "${P} $(uname -a)"
-  echo "${P} Please report error this, along with the above OS details:"
+  echo "${P} Please report this error, along with the above OS details:"
   echo "     ${ISSUES}"
   exit 1
 fi
@@ -116,7 +116,7 @@ esac
 FILE=$(basename ${URL})
 echo "${P} Downloading: ${URL}"
 echo "${P} To Location: /tmp/${FILE}"
-$CMD ${URL} > /tmp/${FILE}
+$WGET ${URL} > /tmp/${FILE}
 
 if [ "$(id -u)" != "0" ]; then
   echo "${P} Downloaded, but no root access. Install the file manually to /usr/bin/notifiarr"
@@ -145,7 +145,7 @@ fi
 
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
 echo "${P} Ensuring config file: ${CONFIGFILE} and log dir: /var/log/notifiarr"
-[ -f "${CONFIGFILE}" ] || $CMD https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
+[ -f "${CONFIGFILE}" ] || $WGET https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers

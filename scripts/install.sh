@@ -48,7 +48,7 @@ elif [[ $ARCH = *armv6* ]] || [[ $ARCH = *armv7* ]]; then
 else
   echo "${P} [ERROR] Unknown Architecture: ${ARCH}"
   echo "${P} $(uname -a)"
-  echo "${P} Please report this, along with the above OS details:"
+  echo "${P} Please report this error, along with the above OS details:"
   echo "     ${ISSUES}"
   exit 1
 fi
