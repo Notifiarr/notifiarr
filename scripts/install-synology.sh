@@ -49,7 +49,7 @@ FILE=linux.gz
 # curl or wget?
 curl --version > /dev/null 2>&1
 if [ "$?" = "0" ]; then
-  CMD="curl -sL"
+  CMD="curl -sSL"
 else
   wget --version > /dev/null 2>&1
   if [ "$?" = "0" ]; then
@@ -128,19 +128,24 @@ fi
 # Install it.
 echo "${P} Downloaded. Installing the binary to /usr/bin/notifiarr"
 
+mkdir -p /etc/notifiarr /var/log/notifiarr
 gunzip -c /tmp/${FILE} > /usr/bin/notifiarr
 rm /tmp/${FILE}
-chmod 0755 /usr/bin/notifiarr
+chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
+chown notifiarr: /var/log/notifiarr
 
-echo "${P} Ensuring config file: /etc/notifiarr/notifiarr.conf (File exists error after this is OK!)"
-mkdir /etc/notifiarr 2>/dev/null || \
-  $CMD https://notifiarr.com/scripts/notifiarr-client.conf > /etc/notifiarr/notifiarr.conf
+ID=$(id notifiarr 2>&1)
+if [ "$?" != "0" ]; then
+  echo "${P} Adding notifiarr user: synouser --add notifiarr Notifiarr 0 support@notifiarr.com 0"
+  pass="${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
+  synouser --add notifiarr "${pass}" Notifiarr 0 support@notifiarr.com 0
+else
+  echo "${P} User notifiarr already exists: ${ID}"
+fi
 
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
-if [ -d /volume1/data ]; then
-  CONFIGFILE=/volume1/data/notifiarr.conf
-  [ -f /volume1/data/notifiarr.conf ] || cp /etc/notifiarr/notifiarr.conf ${CONFIGFILE}
-fi
+echo "${P} Ensuring config file: ${CONFIGFILE} and log dir: /var/log/notifiarr"
+[ -f "${CONFIGFILE}" ] || $CMD https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
@@ -157,21 +162,8 @@ respawn
 respawn limit 5 10
 
 setuid notifiarr
-exec /usr/bin/notifiarr -c /volume1/data/notifiarr.conf
+exec /usr/bin/notifiarr -c ${CONFIGFILE}
 EOT
-
-ID=$(id notifiarr 2>&1)
-if [ "$?" != "0" ]; then
-  echo "${P} Adding notifiarr user: synouser --add notifiarr Notifiarr 0 support@notifiarr.com 0"
-  pass="${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
-  synouser --add notifiarr "${pass}" Notifiarr 0 support@notifiarr.com 0
-  if [ "${CONFIGFILE}" != "/etc/notifiarr/notifiarr.conf" ]; then
-    echo "${P} Authorizing notifiarr user: synoacltool -add /volume1/data user:notifiarr:allow:r--------------:fd--"
-    synoacltool -add /volume1/data user:notifiarr:allow:r--------------:fd--
-  fi
-else
-  echo "${P} User notifiarr already exists: ${ID}"
-fi
 
 echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
 status notifiarr
@@ -182,6 +174,7 @@ fi
 
 if [ "${INSTALLED}" = "" ]; then
   echo "${P} Installed. Edit your config file: ${CONFIGFILE}"
+  echo "${P} Log files are written to: /var/log/notifiarr"
   echo "${P} start the service with:  start notifiarr"
   echo "${P} stop the service with:   stop notifiarr"
   echo "${P} to check service status: status notifiarr"
