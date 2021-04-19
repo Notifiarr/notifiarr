@@ -209,9 +209,15 @@ func printProcessList() error {
 	for _, p := range pslist {
 		if runtime.GOOS == "freebsd" {
 			fmt.Printf("[%-5d] %s\n", p.PID, p.CmdLine)
-		} else {
-			fmt.Printf("[%-5d] %-11s: %s\n", p.PID, time.Since(p.Created).Round(time.Second), p.CmdLine)
+			continue
 		}
+
+		t := "unknown"
+		if !p.Created.IsZero() {
+			t = time.Since(p.Created).Round(time.Second).String()
+		}
+
+		fmt.Printf("[%-5d] %-11s: %s\n", p.PID, t, p.CmdLine)
 	}
 
 	return nil

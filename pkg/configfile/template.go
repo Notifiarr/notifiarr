@@ -64,13 +64,13 @@ urlbase = "{{.URLBase}}"
 ## If you provide a cert and key file (pem) paths, this app will listen with SSL/TLS.
 ## Uncomment both lines and add valid file paths. Make sure this app can read them.
 ##
-{{if .SSLKeyFile}}ssl_key_file  = "{{.SSLKeyFile}}"{{else}}#ssl_key_file  = "/path/to/cert.key"{{end}}
-{{if .SSLCrtFile}}ssl_cert_file = "{{.SSLCrtFile}}"{{else}}#ssl_cert_file = "/path/to/cert.key"{{end}}
+{{if .SSLKeyFile}}ssl_key_file  = '{{.SSLKeyFile}}'{{else}}#ssl_key_file  = '/path/to/cert.key'{{end}}
+{{if .SSLCrtFile}}ssl_cert_file = '{{.SSLCrtFile}}'{{else}}#ssl_cert_file = '/path/to/cert.key'{{end}}
 
 ## If you set these, logs will be written to these files.
 ## If blank on windows or macOS, log file paths are chosen for you.
-{{if .LogFile}}log_file = "{{.LogFile}}"{{else}}#log_file = "~/.notifiarr/notifiarr.log"{{end}}
-{{if .HTTPLog}}http_log = "{{.HTTPLog}}"{{else}}#http_log = "~/.notifiarr/notifiarr.http.log"{{end}}
+{{if .LogFile}}log_file = '{{.LogFile}}'{{else}}#log_file = '~/.notifiarr/notifiarr.log'{{end}}
+{{if .HTTPLog}}http_log = '{{.HTTPLog}}'{{else}}#http_log = '~/.notifiarr/notifiarr.http.log'{{end}}
 ##
 ## Set this to the number of megabytes to rotate files.
 log_file_mb = {{.LogFileMb}}
@@ -219,7 +219,7 @@ timeout = "{{.Timeout}}"
 #[[service]]
 #  name     = "MyServer"          # name must be unique
 #  type     = "http"              # type can be "http" or "tcp"
-#  check    = "http://127.0.0.1"  # url for 'http', host/IP:port for 'tcp'
+#  check    = 'http://127.0.0.1'  # url for 'http', host/IP:port for 'tcp'
 #  expect   = "200"               # return code to expect (for http only)
 #  timeout  = "10s"               # how long to wait for tcp or http checks.
 #  interval = "5m"                # how often to check this service.
@@ -229,7 +229,7 @@ timeout = "{{.Timeout}}"
 #[[service]]
 #  name    = "Bazarr"
 #  type    = "http"
-#  check   = "http://10.1.1.2:6767/series/"
+#  check   = 'http://10.1.1.2:6767/series/'
 #  expect  = "200"
 #  timeout = "10s"{{else}}
 ## Configured Service Checks:
@@ -237,7 +237,7 @@ timeout = "{{.Timeout}}"
 [[service]]
   name     = "{{.Name}}"
   type     = "{{.Type}}"
-  check    = "{{.Value}}"
+  check    = '{{.Value}}'
   expect   = "{{.Expect}}"
   timeout  = "{{.Timeout}}"
   interval = "{{.Interval}}"

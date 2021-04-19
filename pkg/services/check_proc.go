@@ -50,10 +50,14 @@ func GetAllProcesses() ([]*ProcInfo, error) {
 	p := []*ProcInfo{}
 
 	for _, proc := range processes {
-		procinfo, err := getProcInfo(ctx, proc)
-		if err != nil {
-			continue
-		}
+		procinfo, errs := getProcInfo(ctx, proc)
+		if len(errs) != 0 {
+			if procinfo == nil || procinfo.CmdLine == "" {
+				// log.Printf("DEBUG: [pid: %d] proc errs: %v", proc.Pid, errs)
+				continue
+			}
+			// log.Printf("DEBUG: [pid: %d] proc errs: %v, cmd: %s", proc.Pid, errs, procinfo.CmdLine)
+		} //nolint:wsl
 
 		procinfo.PID = proc.Pid
 		p = append(p, procinfo)
@@ -86,8 +90,8 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 
 	// Loop each process/pid, get the command line name, and check for a match.
 	for _, proc := range processes {
-		procinfo, err := getProcInfo(ctx, proc)
-		if err != nil {
+		procinfo, _ := getProcInfo(ctx, proc)
+		if procinfo.CmdLine == "" {
 			continue
 		}
 
@@ -100,7 +104,7 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 			// log.Printf("pid: %d, age: %v, cmd: %v",
 			// 	proc.Pid, time.Since(procinfo.Created).Round(time.Second), procinfo.CmdLine)
 
-			if s.proc.running && time.Since(procinfo.Created) > s.Interval.Duration {
+			if !procinfo.Created.IsZero() && time.Since(procinfo.Created) > s.Interval.Duration {
 				return &result{
 					state: StateCritical,
 					output: fmt.Sprintf("%s: process restarted since last check, age: %v, pid: %d, proc: %s",
@@ -168,25 +172,32 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, a
 }
 
 // getProcInfo returns age and cli args for a process.
-func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, error) {
+func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, []error) {
 	var (
 		err      error
+		errs     []error
 		procinfo ProcInfo
 	)
 
 	procinfo.CmdLine, err = p.CmdlineWithContext(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("CmdlineWithContext: %w", err)
+		errs = append(errs, fmt.Errorf("CmdlineWithContext: %w", err))
+	}
+
+	if procinfo.CmdLine == "" {
+		if procinfo.CmdLine, err = p.NameWithContext(ctx); err != nil {
+			errs = append(errs, fmt.Errorf("NameWithContext: %w", err))
+		}
 	}
 
 	// FreeBSD doesn't have create time.
 	if runtime.GOOS != "freebsd" {
 		created, err := p.CreateTimeWithContext(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("CreateTimeWithContext: %w", err)
+			errs = append(errs, fmt.Errorf("CreateTimeWithContext: %w", err))
+		} else {
+			procinfo.Created = time.Unix(created/epochOffset, 0).Round(time.Millisecond)
 		}
-
-		procinfo.Created = time.Unix(created/epochOffset, 0).Round(time.Millisecond)
 	}
 
 	/*
@@ -212,5 +223,5 @@ func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, error) {
 			}
 	*/
 
-	return &procinfo, nil
+	return &procinfo, errs
 }
