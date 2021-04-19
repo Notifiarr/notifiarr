@@ -139,7 +139,7 @@ mkdir /etc/notifiarr 2>/dev/null || \
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
 if [ -d /volume1/data ]; then
   CONFIGFILE=/volume1/data/notifiarr.conf
-  [ -f /volume1/data/otifiarr.conf ] || cp /etc/notifiarr/notifiarr.conf ${CONFIGFILE}
+  [ -f /volume1/data/notifiarr.conf ] || cp /etc/notifiarr/notifiarr.conf ${CONFIGFILE}
 fi
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
