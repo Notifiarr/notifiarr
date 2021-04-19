@@ -180,7 +180,7 @@ if [ "$?" = "0" ]; then
   start notifiarr
 fi
 
-if [ "${INSTALLED}" == "" ]; then
+if [ "${INSTALLED}" = "" ]; then
   echo "${P} Installed. Edit your config file: ${CONFIGFILE}"
   echo "${P} start the service with:  start notifiarr"
   echo "${P} stop the service with:   stop notifiarr"
