@@ -165,7 +165,7 @@ if [ "$?" != "0" ]; then
   echo "${P} Adding notifiarr user: synouser --add notifiarr Notifiarr 0 support@notifiarr.com 0"
   pass="${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}${RANDOM}"
   synouser --add notifiarr "${pass}" Notifiarr 0 support@notifiarr.com 0
-  if [ "${CONFIGFILE}" != "/etc/notifiarr/notifiarr.conf" ] then
+  if [ "${CONFIGFILE}" != "/etc/notifiarr/notifiarr.conf" ]; then
     echo "${P} Authorizing notifiarr user: synoacltool -add /volume1/data user:notifiarr:allow:r--------------:fd--"
     synoacltool -add /volume1/data user:notifiarr:allow:r--------------:fd--
   fi
