@@ -171,10 +171,10 @@ timeout = "{{.Timeout}}"
 #####################
 
 ## Install package(s)
-##	- Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
-##	- Linux:    apt install smartmontools || yum install smartmontools
-##	- Synology: opkg install smartmontools
-##	- Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
+##  - Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
+##  - Linux:    apt install smartmontools || yum install smartmontools
+##  - Synology: opkg install smartmontools
+##  - Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 ##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 ##
 [snapshot]
