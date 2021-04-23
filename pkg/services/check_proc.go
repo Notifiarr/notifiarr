@@ -104,7 +104,7 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 			// log.Printf("pid: %d, age: %v, cmd: %v",
 			// 	proc.Pid, time.Since(procinfo.Created).Round(time.Second), procinfo.CmdLine)
 
-			if !procinfo.Created.IsZero() && time.Since(procinfo.Created) > s.Interval.Duration {
+			if !procinfo.Created.IsZero() && s.proc.restarts && time.Since(procinfo.Created) < s.Interval.Duration {
 				return &result{
 					state: StateCritical,
 					output: fmt.Sprintf("%s: process restarted since last check, age: %v, pid: %d, proc: %s",
