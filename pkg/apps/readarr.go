@@ -50,16 +50,19 @@ func (r *ReadarrConfig) setup(timeout time.Duration) {
 func readarrAddBook(r *http.Request) (int, interface{}) {
 	payload := &readarr.AddBookInput{}
 	// Extract payload and check for GRID ID.
-	err := json.NewDecoder(r.Body).Decode(payload)
-	if err != nil {
+	switch err := json.NewDecoder(r.Body).Decode(payload); {
+	case err != nil:
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	} else if payload.ForeignBookID == "" {
+	case len(payload.Editions) != 1:
+		return http.StatusUnprocessableEntity,
+			fmt.Errorf("invalid editions count; only 1 allowed: %d, %w", len(payload.Editions), ErrNoGRID)
+	case payload.Editions[0].ForeignEditionID == "":
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
 	}
 
 	app := getReadarr(r)
 	// Check for existing book.
-	m, err := app.GetBook(payload.ForeignBookID)
+	m, err := app.GetBook(payload.Editions[0].ForeignEditionID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
