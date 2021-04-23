@@ -55,19 +55,16 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	var payload lidarr.AddAlbumInput
 
-	switch err := json.NewDecoder(r.Body).Decode(&payload); {
-	case err != nil:
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
-	case len(payload.Releases) != 1:
-		return http.StatusUnprocessableEntity,
-			fmt.Errorf("invalid releases count; only 1 allowed: %d, %w", len(payload.Releases), ErrNoMBID)
-	case payload.Releases[0].ForeignReleaseID == "":
+	} else if payload.ForeignAlbumID == "" {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoMBID)
 	}
 
 	app := getLidarr(r)
 	// Check for existing album.
-	m, err := app.GetAlbum(payload.Releases[0].ForeignReleaseID)
+	m, err := app.GetAlbum(payload.ForeignAlbumID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
