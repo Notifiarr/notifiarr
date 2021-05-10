@@ -46,6 +46,7 @@ const (
 	Readarr App = "readarr"
 	Radarr  App = "radarr"
 	Lidarr  App = "lidarr"
+	Generic App = "ProvidedID"
 )
 
 // Errors sent to client web requests.
@@ -81,7 +82,7 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
-func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
+func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc { //nolint:cyclop
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			msg   interface{}
@@ -113,7 +114,8 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 		case app == Readarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, Readarr, a.Readarr[id])))
 		default:
-			code, msg = api(r) // unknown app, just run the handler.
+			// unknown app, add the ID to the context and run the handler.
+			code, msg = api(r.WithContext(context.WithValue(ctx, Generic, id)))
 		}
 
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
