@@ -126,6 +126,8 @@ golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9 h1:j/WeLF6Ew1lc/m8/bh5qleZ
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9/go.mod h1:EZevRvIGRh8jDMwuYL0/tlPns0KynquPZzb0SerIC1s=
 golift.io/starr v0.9.10 h1:1XJRImHcIrr8iTzoH0e439XTwnlhnYt5J/LwyAAH92U=
 golift.io/starr v0.9.10/go.mod h1:oaAjRa9vIpsj0lTR79vDDRVqXuq6ID6RXbQIoFljhbM=
+golift.io/starr v0.9.11-0.20210510043850-4cbc75e9fe8b h1:2pl5UTK5d7TjU27WAnz380zBj1GHf/nu0sRs59gYSy8=
+golift.io/starr v0.9.11-0.20210510043850-4cbc75e9fe8b/go.mod h1:oaAjRa9vIpsj0lTR79vDDRVqXuq6ID6RXbQIoFljhbM=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

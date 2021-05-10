@@ -20,7 +20,12 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/check/{tvdbid:[0-9]+}", sonarrCheckSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/get/{seriesid:[0-9]+}", sonarrGetSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/languageProfiles", sonarrLangProfiles, "GET")
-	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrProfiles, "GET")
+	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrGetQualityProfiles, "GET")
+	a.HandleAPIpath(Sonarr, "/qualityProfile", sonarrAddQualityProfile, "POST")
+	a.HandleAPIpath(Sonarr, "/qualityProfile/{profileID:[0-9]+}", sonarrUpdateQualityProfile, "PUT")
+	a.HandleAPIpath(Sonarr, "/releaseProfiles", sonarrGetReleaseProfiles, "GET")
+	a.HandleAPIpath(Sonarr, "/releaseProfile", sonarrAddReleaseProfile, "POST")
+	a.HandleAPIpath(Sonarr, "/releaseProfile/{profileID:[0-9]+}", sonarrUpdateReleaseProfile, "PUT")
 	a.HandleAPIpath(Sonarr, "/rootFolder", sonarrRootFolders, "GET")
 	a.HandleAPIpath(Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/tag", sonarrGetTags, "GET")
@@ -139,7 +144,7 @@ func sonarrLangProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func sonarrProfiles(r *http.Request) (int, interface{}) {
+func sonarrGetQualityProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(r).GetQualityProfiles()
 	if err != nil {
@@ -153,6 +158,98 @@ func sonarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func sonarrAddQualityProfile(r *http.Request) (int, interface{}) {
+	var profile sonarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	// Get the profiles from radarr.
+	id, err := getSonarr(r).AddQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+	}
+
+	return http.StatusOK, id
+}
+
+func sonarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
+	var profile sonarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	if profile.ID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Get the profiles from radarr.
+	err = getSonarr(r).UpdateQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
+}
+
+func sonarrGetReleaseProfiles(r *http.Request) (int, interface{}) {
+	// Get the profiles from sonarr.
+	profiles, err := getSonarr(r).GetReleaseProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	return http.StatusOK, profiles
+}
+
+func sonarrAddReleaseProfile(r *http.Request) (int, interface{}) {
+	var profile sonarr.ReleaseProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	// Get the profiles from radarr.
+	id, err := getSonarr(r).AddReleaseProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+	}
+
+	return http.StatusOK, id
+}
+
+func sonarrUpdateReleaseProfile(r *http.Request) (int, interface{}) {
+	var profile sonarr.ReleaseProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	if profile.ID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Get the profiles from radarr.
+	err = getSonarr(r).UpdateReleaseProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
 }
 
 func sonarrRootFolders(r *http.Request) (int, interface{}) {
