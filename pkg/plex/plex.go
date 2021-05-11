@@ -38,7 +38,7 @@ const WaitTime = 10 * time.Second
 var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
 
 // Start checks input values and starts the cron interval if it's configured.
-func (s *Server) Validate() error {
+func (s *Server) Validate() error { //nolint:cyclop
 	if s == nil || s.URL == "" || s.Token == "" {
 		return ErrNoURLToken
 	}
