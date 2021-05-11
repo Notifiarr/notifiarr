@@ -65,7 +65,7 @@ var (
 type APIHandler func(r *http.Request) (int, interface{})
 
 // HandleAPIpath makes adding API paths a little cleaner.
-func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) {
+func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) *mux.Route {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
@@ -76,12 +76,13 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 	}
 
 	uri = path.Join("/", a.URLBase, "api", string(app), id, uri)
-	a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
+
+	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
-func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
+func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc { //nolint:cyclop
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			msg   interface{}
@@ -105,15 +106,19 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc {
 		// Store the application configuration (starr) in a context then pass that into the api() method.
 		// Retrieve the return code and output, and send a response via a.Respond().
 		case app == Radarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Radarr, a.Radarr[id])))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Radarr[id])))
 		case app == Lidarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Lidarr, a.Lidarr[id])))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Lidarr[id])))
 		case app == Sonarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Sonarr, a.Sonarr[id])))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[id])))
 		case app == Readarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Readarr, a.Readarr[id])))
-		default:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Readarr[id])))
+		case app == "":
+			// no app, just run the handler.
 			code, msg = api(r) // unknown app, just run the handler.
+		default:
+			// unknown app, add the ID to the context and run the handler.
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, id)))
 		}
 
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))

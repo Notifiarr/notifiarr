@@ -58,6 +58,10 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 }
 
 func (s *Server) GetSessions() ([]*Session, error) {
+	return s.GetSessionsWithContext(context.Background())
+}
+
+func (s *Server) GetSessionsWithContext(ctx context.Context) ([]*Session, error) {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return nil, ErrNoURLToken
 	}
@@ -68,7 +72,7 @@ func (s *Server) GetSessions() ([]*Session, error) {
 		} `json:"MediaContainer"`
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
 	data, err := s.getPlexSessions(ctx, map[string]string{"Accept": "application/json"})
@@ -112,6 +116,48 @@ func (s *Server) getPlexSessions(ctx context.Context, headers map[string]string)
 	}
 
 	return body, nil
+}
+
+func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) error {
+	if s == nil || s.URL == "" || s.Token == "" {
+		return ErrNoURLToken
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+"/status/sessions/terminate", nil)
+	if err != nil {
+		return fmt.Errorf("creating http request: %w", err)
+	}
+
+	req.Header.Set("X-Plex-Token", s.Token)
+
+	q := req.URL.Query()
+	q.Add("sessionId", sessionID)
+	q.Add("reason", reason)
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := s.getClient().Do(req)
+	if err != nil {
+		return fmt.Errorf("making http request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("reading http response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("%w: %s", ErrBadStatus, string(body))
+	}
+
+	return nil
+}
+
+func (s *Server) KillSession(sessionID, reason string) error {
+	return s.KillSessionWithContext(context.Background(), sessionID, reason)
 }
 
 func (s *Server) getClient() *http.Client {
