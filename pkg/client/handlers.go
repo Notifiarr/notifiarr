@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"golift.io/version"
 )
@@ -23,8 +24,8 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 
 	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
-		c.Config.HandleAPIpath("plex", "sessions", c.Config.Plex.HandleSessions, "GET")
-		c.Config.HandleAPIpath("plex", "kill", c.Config.Plex.HandleKillSession, "GET")
+		c.Config.HandleAPIpath(plex.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
+		c.Config.HandleAPIpath(plex.Plex, "kill", c.Config.Plex.HandleKillSession, "GET")
 
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.Handle("/plex",

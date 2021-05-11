@@ -46,7 +46,6 @@ const (
 	Readarr App = "readarr"
 	Radarr  App = "radarr"
 	Lidarr  App = "lidarr"
-	Generic App = "ProvidedID"
 )
 
 // Errors sent to client web requests.
@@ -106,16 +105,19 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc { //nolint:cy
 		// Store the application configuration (starr) in a context then pass that into the api() method.
 		// Retrieve the return code and output, and send a response via a.Respond().
 		case app == Radarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Radarr, a.Radarr[id])))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Radarr[id])))
 		case app == Lidarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Lidarr, a.Lidarr[id])))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Lidarr[id])))
 		case app == Sonarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Sonarr, a.Sonarr[id])))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[id])))
 		case app == Readarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, Readarr, a.Readarr[id])))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Readarr[id])))
+		case app == "":
+			// no app, just run the handler.
+			code, msg = api(r) // unknown app, just run the handler.
 		default:
 			// unknown app, add the ID to the context and run the handler.
-			code, msg = api(r.WithContext(context.WithValue(ctx, Generic, id)))
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, id)))
 		}
 
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
