@@ -27,7 +27,7 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
 		ctx       = r.Context()
 		plexID, _ = ctx.Value(Plex).(int)
-		sessionID = mux.Vars(r)["sessionID"]
+		sessionID = mux.Vars(r)["sessionId"]
 		reason    = mux.Vars(r)["reason"]
 	)
 

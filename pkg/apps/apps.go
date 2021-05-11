@@ -65,7 +65,7 @@ var (
 type APIHandler func(r *http.Request) (int, interface{})
 
 // HandleAPIpath makes adding API paths a little cleaner.
-func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) {
+func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) *mux.Route {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
@@ -76,7 +76,8 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 	}
 
 	uri = path.Join("/", a.URLBase, "api", string(app), id, uri)
-	a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
+
+	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
