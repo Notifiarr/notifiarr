@@ -122,7 +122,7 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, str
 		return configFile, false, MsgConfigFound + configFile
 	}
 
-	if !write {
+	if defaultConfigFile == "" || !write {
 		return configFile, false, MsgNoConfigFile
 	}
 
