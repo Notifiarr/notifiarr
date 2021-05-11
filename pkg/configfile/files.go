@@ -15,7 +15,7 @@ func defaultLocactions() (string, []string) {
 	if os.Getenv("NOTIFIARR_IN_DOCKER") == "true" {
 		// Provide a default config on Docker if /config dir exists.
 		if f, err := os.Stat("/config"); err == nil && f.IsDir() {
-			defaultConf = "/config/notifiarr/notifiarr.conf"
+			defaultConf = "/config/notifiarr.conf"
 		}
 	} else if _, err := os.Stat(snapshot.SynologyConf); err == nil {
 		// Provide a default config on Synology.

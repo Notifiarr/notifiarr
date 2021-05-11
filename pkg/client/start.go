@@ -149,7 +149,8 @@ func (c *Client) config() error {
 	var msg string
 
 	// Find or write a config file. This does not parse it.
-	c.Flags.ConfigFile, c.newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, !c.Flags.restart && ui.HasGUI())
+	write := (!c.Flags.restart && ui.HasGUI()) || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
+	c.Flags.ConfigFile, c.newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
 
 	if c.Flags.restart {
 		return update.Restart(&update.Command{ //nolint:wrapcheck
@@ -256,6 +257,7 @@ func (c *Client) run() error {
 	c.setReloadSignals()
 
 	if c.newCon {
+		_, _ = c.Config.Write(c.Flags.ConfigFile)
 		_ = ui.OpenFile(c.Flags.ConfigFile)
 		_, _ = ui.Warning(Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
