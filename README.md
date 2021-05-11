@@ -285,6 +285,11 @@ location /notifiarr/ {
 Make sure the `location` path matches the `urlbase` and ends with a `/`.
 That's all there is to it.
 
+Here are two more example Nginx configs:
+
+- [TRaSH-'s Swag](https://gist.github.com/TRaSH-/037235b0440b38c8964a2cbb64179cf3) - A drop-in for Swag users.
+- [Captain's Custom](https://github.com/Go-Lift-TV/organizr-nginx/blob/master/golift/notifiarr.conf) - Fits into Captain's Go Lift setup. Not for everyone.
+
 ## Troubleshooting
 
 - Find help on [GoLift Discord](https://golift.io/discord).
