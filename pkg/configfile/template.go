@@ -93,8 +93,8 @@ timeout = "{{.Timeout}}"
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
-
-{{if .Radarr}}{{range .Radarr}}[[radarr]]
+{{if .Radarr}}{{range .Radarr}}
+[[radarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
@@ -105,7 +105,8 @@ timeout = "{{.Timeout}}"
 #url     = "http://127.0.0.1:7878/radarr"
 #api_key = ""{{end}}
 
-{{if .Readarr}}{{range .Readarr}}[[readarr]]
+{{if .Readarr}}{{range .Readarr}}
+[[readarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
@@ -116,7 +117,8 @@ timeout = "{{.Timeout}}"
 #url     = "http://127.0.0.1:8787/readarr"
 #api_key = ""{{end}}
 
-{{if .Sonarr}}{{range .Sonarr}}[[sonarr]]
+{{if .Sonarr}}{{range .Sonarr}}
+[[sonarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
@@ -127,7 +129,8 @@ timeout = "{{.Timeout}}"
 #url     = "http://sonarr:8989/"
 #api_key = ""{{end}}
 
-{{if .Lidarr}}{{range .Lidarr}}[[lidarr]]
+{{if .Lidarr}}{{range .Lidarr}}
+[[lidarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
