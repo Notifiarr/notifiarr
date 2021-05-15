@@ -3,6 +3,7 @@ package plex
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/gorilla/mux"
@@ -20,7 +21,11 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 		return http.StatusInternalServerError, fmt.Errorf("unable to get sessions (%d): %w", plexID, err)
 	}
 
-	return http.StatusOK, sessions
+	return http.StatusOK, &Sessions{
+		Name:       s.Name,
+		AccountMap: strings.Split(s.AccountMap, "|"),
+		Sessions:   sessions,
+	}
 }
 
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {

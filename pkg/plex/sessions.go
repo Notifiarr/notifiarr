@@ -13,7 +13,7 @@ type Sessions struct {
 	Name       string     `json:"server"`
 	AccountMap []string   `json:"account_map"`
 	Sessions   []*Session `json:"sessions"`
-	XML        string     `json:"sessions_xml"`
+	XML        string     `json:"sessions_xml,omitempty"`
 }
 
 var ErrBadStatus = fmt.Errorf("status code not 200")
