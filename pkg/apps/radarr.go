@@ -21,6 +21,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/get/{movieid:[0-9]+}", radarrGetMovie, "GET")
 	a.HandleAPIpath(Radarr, "/get", radarrGetAllMovies, "GET")
 	a.HandleAPIpath(Radarr, "/qualityProfiles", radarrQualityProfiles, "GET")
+	a.HandleAPIpath(Radarr, "/qualityProfile", radarrQualityProfile, "GET")
 	a.HandleAPIpath(Radarr, "/qualityProfile", radarrAddQualityProfile, "POST")
 	a.HandleAPIpath(Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(Radarr, "/rootFolder", radarrRootFolders, "GET")
@@ -143,6 +144,16 @@ func radarrGetAllMovies(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, movies
+}
+
+func radarrQualityProfile(r *http.Request) (int, interface{}) {
+	// Get the profiles from radarr.
+	profiles, err := getRadarr(r).GetQualityProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	return http.StatusOK, profiles
 }
 
 func radarrQualityProfiles(r *http.Request) (int, interface{}) {

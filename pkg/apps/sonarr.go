@@ -21,6 +21,7 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/get/{seriesid:[0-9]+}", sonarrGetSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/languageProfiles", sonarrLangProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrGetQualityProfiles, "GET")
+	a.HandleAPIpath(Sonarr, "/qualityProfile", sonarrGetQualityProfile, "GET")
 	a.HandleAPIpath(Sonarr, "/qualityProfile", sonarrAddQualityProfile, "POST")
 	a.HandleAPIpath(Sonarr, "/qualityProfile/{profileID:[0-9]+}", sonarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(Sonarr, "/releaseProfiles", sonarrGetReleaseProfiles, "GET")
@@ -142,6 +143,16 @@ func sonarrLangProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func sonarrGetQualityProfile(r *http.Request) (int, interface{}) {
+	// Get the profiles from sonarr.
+	profiles, err := getSonarr(r).GetQualityProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	return http.StatusOK, profiles
 }
 
 func sonarrGetQualityProfiles(r *http.Request) (int, interface{}) {
