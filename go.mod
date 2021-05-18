@@ -29,7 +29,7 @@ require (
 	golang.org/x/sys v0.0.0-20210403161142-5e06dd20ab57
 	golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.9.11-0.20210510043850-4cbc75e9fe8b
+	golift.io/starr v0.9.11
 	golift.io/version v0.0.2
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 	gopkg.in/yaml.v2 v2.4.0 // indirect
