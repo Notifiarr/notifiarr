@@ -21,7 +21,10 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(Readarr, "/check/{grid:[0-9]+}", readarrCheckBook, "GET")
 	a.HandleAPIpath(Readarr, "/get/{bookid:[0-9]+}", readarrGetBook, "GET")
 	a.HandleAPIpath(Readarr, "/metadataProfiles", readarrMetaProfiles, "GET")
-	a.HandleAPIpath(Readarr, "/qualityProfiles", readarrProfiles, "GET")
+	a.HandleAPIpath(Readarr, "/qualityProfiles", readarrQualityProfiles, "GET")
+	a.HandleAPIpath(Readarr, "/qualityProfile", readarrGetQualityProfile, "GET")
+	a.HandleAPIpath(Readarr, "/qualityProfile", readarrAddQualityProfile, "POST")
+	a.HandleAPIpath(Readarr, "/qualityProfile/{profileID:[0-9]+}", readarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(Readarr, "/rootFolder", readarrRootFolders, "GET")
 	a.HandleAPIpath(Readarr, "/search/{query}", readarrSearchBook, "GET")
 	a.HandleAPIpath(Readarr, "/update", readarrUpdateBook, "PUT")
@@ -157,8 +160,8 @@ func readarrMetaProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-// Get the profiles from readarr.
-func readarrProfiles(r *http.Request) (int, interface{}) {
+// Get the quality profiles from readarr.
+func readarrQualityProfiles(r *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(r).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
@@ -171,6 +174,57 @@ func readarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+// Get the all quality profiles data from readarr.
+func readarrGetQualityProfile(r *http.Request) (int, interface{}) {
+	profiles, err := getReadarr(r).GetQualityProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	return http.StatusOK, profiles
+}
+
+func readarrAddQualityProfile(r *http.Request) (int, interface{}) {
+	var profile readarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	// Get the profiles from radarr.
+	id, err := getReadarr(r).AddQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+	}
+
+	return http.StatusOK, id
+}
+
+func readarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
+	var profile readarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	if profile.ID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Get the profiles from radarr.
+	err = getReadarr(r).UpdateQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
 }
 
 // Get folder list from Readarr.
