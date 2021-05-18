@@ -20,7 +20,10 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(Radarr, "/check/{tmdbid:[0-9]+}", radarrCheckMovie, "GET")
 	a.HandleAPIpath(Radarr, "/get/{movieid:[0-9]+}", radarrGetMovie, "GET")
 	a.HandleAPIpath(Radarr, "/get", radarrGetAllMovies, "GET")
-	a.HandleAPIpath(Radarr, "/qualityProfiles", radarrProfiles, "GET")
+	a.HandleAPIpath(Radarr, "/qualityProfiles", radarrQualityProfiles, "GET")
+	a.HandleAPIpath(Radarr, "/qualityProfile", radarrQualityProfile, "GET")
+	a.HandleAPIpath(Radarr, "/qualityProfile", radarrAddQualityProfile, "POST")
+	a.HandleAPIpath(Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(Radarr, "/rootFolder", radarrRootFolders, "GET")
 	a.HandleAPIpath(Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(Radarr, "/tag", radarrGetTags, "GET")
@@ -143,7 +146,17 @@ func radarrGetAllMovies(r *http.Request) (int, interface{}) {
 	return http.StatusOK, movies
 }
 
-func radarrProfiles(r *http.Request) (int, interface{}) {
+func radarrQualityProfile(r *http.Request) (int, interface{}) {
+	// Get the profiles from radarr.
+	profiles, err := getRadarr(r).GetQualityProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	return http.StatusOK, profiles
+}
+
+func radarrQualityProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from radarr.
 	profiles, err := getRadarr(r).GetQualityProfiles()
 	if err != nil {
@@ -157,6 +170,47 @@ func radarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func radarrAddQualityProfile(r *http.Request) (int, interface{}) {
+	var profile radarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	// Get the profiles from radarr.
+	id, err := getRadarr(r).AddQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+	}
+
+	return http.StatusOK, id
+}
+
+func radarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
+	var profile radarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	if profile.ID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Get the profiles from radarr.
+	err = getRadarr(r).UpdateQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
 }
 
 func radarrRootFolders(r *http.Request) (int, interface{}) {

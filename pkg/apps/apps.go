@@ -59,6 +59,7 @@ var (
 	ErrNoLidarr  = fmt.Errorf("configured %s ID not found", Lidarr)
 	ErrNoReadarr = fmt.Errorf("configured %s ID not found", Readarr)
 	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
+	ErrNonZeroID = fmt.Errorf("provided ID must be non-zero")
 )
 
 // APIHandler is our custom handler function for APIs.

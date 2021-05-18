@@ -26,7 +26,10 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(Lidarr, "/get/{albumid:[0-9]+}", lidarrGetAlbum, "GET")
 	a.HandleAPIpath(Lidarr, "/metadataProfiles", lidarrMetadata, "GET")
 	a.HandleAPIpath(Lidarr, "/qualityDefinitions", lidarrQualityDefs, "GET")
-	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrProfiles, "GET")
+	a.HandleAPIpath(Lidarr, "/qualityProfiles", lidarrQualityProfiles, "GET")
+	a.HandleAPIpath(Lidarr, "/qualityProfile", lidarrGetQualityProfile, "GET")
+	a.HandleAPIpath(Lidarr, "/qualityProfile", lidarrAddQualityProfile, "POST")
+	a.HandleAPIpath(Lidarr, "/qualityProfile/{profileID:[0-9]+}", lidarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(Lidarr, "/rootFolder", lidarrRootFolders, "GET")
 	a.HandleAPIpath(Lidarr, "/search/{query}", lidarrSearchAlbum, "GET")
 	a.HandleAPIpath(Lidarr, "/tag", lidarrGetTags, "GET")
@@ -172,7 +175,7 @@ func lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func lidarrProfiles(r *http.Request) (int, interface{}) {
+func lidarrQualityProfiles(r *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
 	profiles, err := getLidarr(r).GetQualityProfiles()
 	if err != nil {
@@ -186,6 +189,57 @@ func lidarrProfiles(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+func lidarrGetQualityProfile(r *http.Request) (int, interface{}) {
+	// Get the profiles from lidarr.
+	profiles, err := getLidarr(r).GetQualityProfiles()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	return http.StatusOK, profiles
+}
+
+func lidarrAddQualityProfile(r *http.Request) (int, interface{}) {
+	var profile lidarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	// Get the profiles from radarr.
+	id, err := getLidarr(r).AddQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+	}
+
+	return http.StatusOK, id
+}
+
+func lidarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
+	var profile lidarr.QualityProfile
+
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&profile)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	if profile.ID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Get the profiles from radarr.
+	err = getLidarr(r).UpdateQualityProfile(&profile)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
 }
 
 func lidarrRootFolders(r *http.Request) (int, interface{}) {
