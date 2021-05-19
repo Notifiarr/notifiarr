@@ -84,6 +84,11 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 
 // versionResponse returns application run and build time data: /api/version.
 func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
+	numPlex := 0 // maybe one day we'll support more than 1 plex.
+	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
+		numPlex = 1
+	}
+
 	return http.StatusOK, map[string]interface{}{
 		"version":        version.Version,
 		"os_arch":        runtime.GOOS + "." + runtime.GOARCH,
@@ -98,6 +103,7 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 		"num_sonarr":     len(c.Config.Apps.Sonarr),
 		"num_radarr":     len(c.Config.Apps.Radarr),
 		"num_readarr":    len(c.Config.Apps.Readarr),
+		"num_plex":       numPlex,
 	}
 }
 
