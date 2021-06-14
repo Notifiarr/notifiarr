@@ -45,6 +45,7 @@ func (c *Client) readyTray() {
 	systray.SetTooltip(c.Flags.Name() + " v" + version.Version)
 
 	c.makeChannels() // make these before starting the web server.
+	c.makeMoreChannels()
 	c.menu["info"].Disable()
 	c.menu["dninfo"].Hide()
 	c.menu["alert"].Hide() // currently unused.
@@ -55,7 +56,6 @@ func (c *Client) readyTray() {
 	c.watchGuiChannels()
 }
 
-//nolint:lll
 func (c *Client) makeChannels() {
 	c.menu["stat"] = ui.WrapMenu(systray.AddMenuItem("Running", "web server state unknown"))
 
@@ -81,9 +81,13 @@ func (c *Client) makeChannels() {
 	c.menu["logs_view"] = ui.WrapMenu(logs.AddSubMenuItem("View", "view the application log"))
 	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
+}
 
+//nolint:lll
+func (c *Client) makeMoreChannels() {
 	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, service checks")
 	c.menu["data"] = ui.WrapMenu(data)
+	c.menu["sync_cf"] = ui.WrapMenu(data.AddSubMenuItem("Sync Custom Formats", "[premium feature] trigger custom format sync"))
 	c.menu["snap_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Full Snapshot", "write snapshot data to log file"))
 	c.menu["svcs_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Service Checks", "check all services and log results"))
 	c.menu["svcs_prod"] = ui.WrapMenu(data.AddSubMenuItem("Check Services", "check all services and send results to notifiarr"))
@@ -94,6 +98,12 @@ func (c *Client) makeChannels() {
 	c.menu["snap_test"] = ui.WrapMenu(data.AddSubMenuItem("Test System Snapshot", "send system snapshot to notifiarr test endpoint"))
 	c.menu["plex_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Plex Sessions", "send plex sessions to notifiarr dev endpoint"))
 	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
+
+	if c.Config.Debug {
+		debug := systray.AddMenuItem("Debug", "Debug Menu")
+		c.menu["debug"] = ui.WrapMenu(debug)
+		c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic"))
+	}
 
 	// These start hidden.
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
@@ -117,6 +127,12 @@ func (c *Client) watchKillerChannels() {
 		case <-c.menu["exit"].Clicked():
 			c.Errorf("Need help? %s\n=====> Exiting! User Requested", helpLink)
 			return
+		case <-c.menu["debug"].Clicked():
+			// turn on and off debug?
+			// u.menu["debug"].Check()
+		case <-c.menu["debug_panic"].Clicked():
+			c.Printf("User Requested Application Panic, good bye.")
+			panic("user requested panic")
 		}
 	}
 }
@@ -168,6 +184,10 @@ func (c *Client) watchGuiChannels() {
 func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 	for {
 		select {
+		case <-c.menu["sync_cf"].Clicked():
+			c.Printf("[user requested] Triggering Custom Formats and Quality Profiles Sync for Radarr and Sonarr.")
+			c.notify.SyncRadarrCF()
+			c.notify.SyncSonarrCF()
 		case <-c.menu["snap_log"].Clicked():
 			c.logSnaps()
 		case <-c.menu["svcs_log"].Clicked():

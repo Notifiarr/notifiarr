@@ -68,11 +68,11 @@ func (c *Config) Start(mode string) {
 	switch mode {
 	default:
 		fallthrough
-	case "test", "testing":
-		c.URL = TestURL
-		c.BaseURL = BaseURL
 	case "prod", "production":
 		c.URL = ProdURL
+		c.BaseURL = BaseURL
+	case "test", "testing":
+		c.URL = TestURL
 		c.BaseURL = BaseURL
 	case "dev", "development":
 		c.URL = DevURL
