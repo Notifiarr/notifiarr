@@ -98,6 +98,8 @@ timeout = "{{.Timeout}}"
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
+  {{if .DisableCF}}disable_cf = true
+  {{end -}}
   interval = "{{.Interval}}" # service check duration (if name is not empty)
   timeout  = "{{.Timeout}}"{{end -}}
 {{else}}#[[radarr]]
@@ -122,6 +124,8 @@ timeout = "{{.Timeout}}"
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
+  {{if .DisableCF}}disable_cf = true
+  {{end -}}
   interval = "{{.Interval}}" # service check duration (if name is not empty)
   timeout  = "{{.Timeout}}"{{end -}}
 {{else}}#[[sonarr]]

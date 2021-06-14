@@ -9,12 +9,12 @@ SYNOPSIS
 This service runs a web server that allows notifiarr.com's Media Bot to
 communicate with Radarr, Lidarr, Readarr and Sonarr. This provides the ability
 to add new content to your libraries from within Discord. This client also sends
-system snapshot and Plex session data to Notifiarr for Discord notifictaions.
+system snapshot and Plex session data to Notifiarr for Discord notifications.
 
 OPTIONS
 ---
 
-`notifiarr [-c <config file>] [-m <mode>] [--snaps] [--ps] [-h] [-v]`
+`notifiarr [-c <file>] [-m <mode>] [--snaps] [--ps] [--cfsync] [--curl <url>] [-h] [-v]`
 
     -c, --config <config file>
         Provide a configuration file (instead of the default).
@@ -35,6 +35,14 @@ OPTIONS
     --ps
         This flags makes the application output the system process list and exit.
         Useful for debugging and testing 'process' service checks.
+
+    --cfsync
+        This flag makes the application send a Custom Format request to
+        Notifiarr.com. Then it exits.
+
+    --curl <url>
+        This flags allows you to make the application GET a URL and print
+        the response. Very simple and similar to curl.
 
     -v, --version
         Display version and exit.
