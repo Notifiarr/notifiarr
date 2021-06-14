@@ -38,14 +38,15 @@ func (a *Apps) sonarrHandlers() {
 
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
-	Name     string
-	Interval cnfg.Duration
+	Name      string        `toml:"name"`
+	Interval  cnfg.Duration `toml:"interval"`
+	DisableCF bool          `toml:"disable_cf"`
 	*starr.Config
-	sonarr *sonarr.Sonarr
+	*sonarr.Sonarr
 }
 
 func (r *SonarrConfig) setup(timeout time.Duration) {
-	r.sonarr = sonarr.New(r.Config)
+	r.Sonarr = sonarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

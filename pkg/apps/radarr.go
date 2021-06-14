@@ -41,14 +41,15 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	Name     string
-	Interval cnfg.Duration
+	Name      string        `toml:"name"`
+	Interval  cnfg.Duration `toml:"interval"`
+	DisableCF bool          `toml:"disable_cf"`
 	*starr.Config
-	radarr *radarr.Radarr
+	*radarr.Radarr
 }
 
 func (r *RadarrConfig) setup(timeout time.Duration) {
-	r.radarr = radarr.New(r.Config)
+	r.Radarr = radarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}
