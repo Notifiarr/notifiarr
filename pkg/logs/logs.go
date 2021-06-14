@@ -169,9 +169,12 @@ func (l *Logger) setLogPaths() {
 
 func (l *Logger) openLogFile() {
 	rotate := &rotatorr.Config{
-		Filepath: l.logs.LogFile,                                  // log file name.
-		FileSize: int64(l.logs.LogFileMb) * megabyte,              // megabytes
-		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
+		Filepath: l.logs.LogFile,                     // log file name.
+		FileSize: int64(l.logs.LogFileMb) * megabyte, // megabytes
+		Rotatorr: &timerotator.Layout{
+			FileCount:  l.logs.LogFiles, // number of files to keep.
+			PostRotate: l.postLogRotate, // method to run after rotating.
+		},
 	}
 
 	switch { // only use MultiWriter if we have > 1 writer.
@@ -194,6 +197,17 @@ func (l *Logger) openLogFile() {
 
 	l.ErrorLog.SetOutput(l.InfoLog.Writer())
 	log.SetOutput(l.InfoLog.Writer())
+	l.postLogRotate("", "")
+}
+
+func (l *Logger) postLogRotate(_, newFile string) {
+	if newFile != "" {
+		go l.Printf("Rotated log file to: %s", newFile)
+	}
+
+	if l.app != nil && l.app.File != nil {
+		redirectStderr(l.app.File) // Log panics.
+	}
 }
 
 func (l *Logger) openHTTPLog() {
