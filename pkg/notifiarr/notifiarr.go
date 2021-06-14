@@ -59,8 +59,7 @@ type Config struct {
 	BaseURL      string
 	Timeout      time.Duration
 	*logs.Logger // log file writer
-	stopPlex     chan struct{}
-	stopSnap     chan struct{}
+	stopTimers   chan struct{}
 	client       *http.Client
 }
 
@@ -80,18 +79,13 @@ func (c *Config) Start(mode string) {
 		c.BaseURL = DevBaseURL
 	}
 
-	go c.startSnapCron()
-	go c.startPlexCron()
+	c.startTimers()
 }
 
 // Stop snapshot and plex cron jobs.
 func (c *Config) Stop() {
-	if c != nil && c.stopSnap != nil {
-		c.stopSnap <- struct{}{}
-	}
-
-	if c != nil && c.stopPlex != nil {
-		c.stopPlex <- struct{}{}
+	if c != nil && c.stopTimers != nil {
+		c.stopTimers <- struct{}{}
 	}
 }
 

@@ -2,35 +2,9 @@ package notifiarr
 
 import (
 	"strings"
-	"time"
 )
 
-func (c *Config) startSnapCron() {
-	if c.Snap.Interval.Duration == 0 || c.stopSnap != nil {
-		return
-	}
-
-	t := time.NewTicker(c.Snap.Interval.Duration)
-	c.stopSnap = make(chan struct{})
-	c.logStart()
-
-	defer func() {
-		t.Stop()
-		close(c.stopSnap)
-		c.stopSnap = nil
-	}()
-
-	for {
-		select {
-		case <-t.C:
-			c.sendSnapshot()
-		case <-c.stopSnap:
-			return
-		}
-	}
-}
-
-func (c *Config) logStart() {
+func (c *Config) logSnapshotStartup() {
 	var ex string
 
 	for k, v := range map[string]bool{
