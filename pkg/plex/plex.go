@@ -35,9 +35,10 @@ const (
 // WaitTime is the recommended wait time to pull plex sessions after a webhook.
 const WaitTime = 10 * time.Second
 
+// ErrNoURLToken is returned when there is no token or URL.
 var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
 
-// Start checks input values and starts the cron interval if it's configured.
+// Validate checks input values and starts the cron interval if it's configured.
 func (s *Server) Validate() error { //nolint:cyclop
 	if s == nil || s.URL == "" || s.Token == "" {
 		return ErrNoURLToken

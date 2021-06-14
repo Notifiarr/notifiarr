@@ -25,6 +25,7 @@ const (
 	NotifiarrEventType   = "service_checks"
 )
 
+// Errors returned by this package.
 var (
 	ErrNoName      = fmt.Errorf("service check is missing a unique name")
 	ErrNoCheck     = fmt.Errorf("service check is missing a check value")

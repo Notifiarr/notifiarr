@@ -14,6 +14,7 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
+// ErrNoDisks is returned when no disks are found.
 var ErrNoDisks = fmt.Errorf("no disks found")
 
 func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (errs []error) {
