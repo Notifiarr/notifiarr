@@ -19,16 +19,22 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
 
-var ErrNon200 = fmt.Errorf("return code was not 200")
+// Errors returned by this library.
+var (
+	ErrNon200 = fmt.Errorf("return code was not 200")
+)
 
 // Notifiarr URLs.
 const (
-	BaseURL = "https://notifiarr.com"
-	ProdURL = BaseURL + "/notifier.php"
-	TestURL = BaseURL + "/notifierTest.php"
-	DevURL  = "http://dev.notifiarr.com/notifier.php"
+	BaseURL     = "https://notifiarr.com"
+	ProdURL     = BaseURL + "/notifier.php"
+	TestURL     = BaseURL + "/notifierTest.php"
+	DevBaseURL  = "http://dev.notifiarr.com"
+	DevURL      = DevBaseURL + "/notifier.php"
+	APIKeyRoute = "/api/v1/user/apikey/"
 )
 
+// These are used as 'source' values in json payloads sent to the webserver.
 const (
 	PlexCron = "plexcron"
 	SnapCron = "snapcron"
@@ -36,8 +42,7 @@ const (
 	LogLocal = "loglocal"
 )
 
-// Payload is the outbound payload structure that is sent to Notifiarr.
-// No other payload formats are used for data sent to notifiarr.com.
+// Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
 type Payload struct {
 	Type string             `json:"eventType"`
 	Plex *plex.Sessions     `json:"plex,omitempty"`
@@ -51,6 +56,7 @@ type Config struct {
 	Plex         *plex.Server     // plex sessions
 	Snap         *snapshot.Config // system snapshot data
 	URL          string
+	BaseURL      string
 	Timeout      time.Duration
 	*logs.Logger // log file writer
 	stopPlex     chan struct{}
@@ -65,10 +71,13 @@ func (c *Config) Start(mode string) {
 		fallthrough
 	case "test", "testing":
 		c.URL = TestURL
+		c.BaseURL = BaseURL
 	case "prod", "production":
 		c.URL = ProdURL
+		c.BaseURL = BaseURL
 	case "dev", "development":
 		c.URL = DevURL
+		c.BaseURL = DevBaseURL
 	}
 
 	go c.startSnapCron()
@@ -168,7 +177,7 @@ func (c *Config) CheckAPIKey() error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, BaseURL+"/api/user/0/apikey/"+c.Apps.APIKey, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+APIKeyRoute+c.Apps.APIKey, nil)
 	if err != nil {
 		return fmt.Errorf("creating http request: %w", err)
 	}
