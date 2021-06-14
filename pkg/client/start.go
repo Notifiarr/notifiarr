@@ -137,7 +137,7 @@ func Start() error {
 	case c.Flags.pslist:
 		return printProcessList()
 	case c.Flags.curl != "":
-		resp, body, err := curl.Get(c.Flags.curl)
+		resp, body, err := curl.Get(c.Flags.curl) //nolint:bodyclose // it's already closed.
 		if err != nil {
 			return fmt.Errorf("getting URL '%s': %w", c.Flags.curl, err)
 		}
