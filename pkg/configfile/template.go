@@ -12,6 +12,7 @@ import (
 //nolint: gochecknoglobals
 var Template = template.Must(template.New("config").Funcs(Funcs()).Parse(tmpl))
 
+// Funcs returns our template functions.
 func Funcs() template.FuncMap {
 	return map[string]interface{}{
 		"version": func() string {

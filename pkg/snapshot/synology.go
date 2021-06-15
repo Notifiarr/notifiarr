@@ -9,8 +9,10 @@ import (
 	"strings"
 )
 
+// SynologyConf is the path to the syno config file.
 const SynologyConf = "/etc/synoinfo.conf"
 
+// Synology is the data we care about from the config file.
 type Synology struct {
 	Build   string `json:"last_admin_login_build"` // 254263
 	Manager string `json:"manager"`                // Synology DiskStation

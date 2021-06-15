@@ -48,13 +48,9 @@ const WaitTime = 10 * time.Second
 var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
 
 // Validate checks input values and starts the cron interval if it's configured.
-func (s *Server) Validate() error { //nolint:cyclop
+func (s *Server) Validate() error {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return ErrNoURLToken
-	}
-
-	if s.Interval.Duration < minimumInterval && s.Interval.Duration != 0 {
-		s.Interval.Duration = minimumInterval
 	}
 
 	if s.SeriesPC > maximumComplete {
@@ -67,6 +63,16 @@ func (s *Server) Validate() error { //nolint:cyclop
 		s.MoviesPC = maximumComplete
 	} else if s.MoviesPC != 0 && s.MoviesPC < minimumComplete {
 		s.MoviesPC = minimumComplete
+	}
+
+	s.setDefaults()
+
+	return nil
+}
+
+func (s *Server) setDefaults() {
+	if s.Interval.Duration < minimumInterval && s.Interval.Duration != 0 {
+		s.Interval.Duration = minimumInterval
 	}
 
 	if s.Timeout.Duration == 0 {
@@ -84,6 +90,4 @@ func (s *Server) Validate() error { //nolint:cyclop
 	if s.Cooldown.Duration < s.Timeout.Duration {
 		s.Cooldown.Duration = s.Timeout.Duration
 	}
-
-	return nil
 }
