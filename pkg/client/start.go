@@ -209,16 +209,14 @@ func (c *Client) start() error {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
 	} else if _, err := c.runServices(); err != nil {
 		return err
-	} else if err := c.notify.CheckAPIKey(); err != nil {
-		c.Print("[WARNING] API Key may be invalid:", err)
-	}
-
-	if c.Flags.cfsync {
+	} else if c.Flags.cfsync {
 		c.Printf("==> Flag Requested: Syncing Custom Formats (then exiting)")
 		c.notify.SyncRadarrCF()
 		c.notify.SyncSonarrCF()
 
 		return nil
+	} else if err := c.notify.CheckAPIKey(); err != nil {
+		c.Print("==> [WARNING] API Key may be invalid:", err)
 	}
 
 	return c.run()

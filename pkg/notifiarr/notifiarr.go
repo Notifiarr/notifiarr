@@ -46,9 +46,13 @@ const (
 	LogLocal = "loglocal"
 )
 
-// DefaultRetries is the number of times to attempt a request to notifiarr.com.
-// 4 means 5 total tries: 1 try + 4 retries.
-const DefaultRetries = 4
+const (
+	// DefaultRetries is the number of times to attempt a request to notifiarr.com.
+	// 4 means 5 total tries: 1 try + 4 retries.
+	DefaultRetries = 4
+	// RetryDelay is how long to Sleep between retries.
+	RetryDelay = 222 * time.Millisecond
+)
 
 // success is a ssuccessful tatus message from notifiarr.com.
 const success = "success"
@@ -267,16 +271,18 @@ func (c *Config) SendData(url string, payload interface{}) (*http.Response, []by
 
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
-	*http.Client
-	retries int
+	Retries int
 	*log.Logger
+	*http.Client
 }
 
+// getClient returns an http client for notifiarr.com. Creates one if it doesn't exist yet.
 func (c *Config) getClient() *httpClient {
 	if c.client == nil {
 		c.client = &httpClient{
+			Retries: c.Retries,
 			Logger:  c.ErrorLog,
-			retries: c.Retries, Client: &http.Client{Timeout: c.Timeout},
+			Client:  &http.Client{Timeout: c.Timeout},
 		}
 	}
 
@@ -289,18 +295,19 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		resp, err := h.Client.Do(req)
 		if err == nil && resp.StatusCode < http.StatusInternalServerError {
 			return resp, nil
-		}
-
-		if err == nil {
+		} else if err == nil { // resp.StatusCode is 500 or higher, make that en error.
+			body, _ := ioutil.ReadAll(resp.Body) // must read the entire body when err == nil
+			resp.Body.Close()                    // do not defer, because we're in a loop.
 			// shoehorn a non-200 error into the empty http error.
-			err = fmt.Errorf("%w: %s", ErrNon200, resp.Status)
+			err = fmt.Errorf("%w: %s: %s", ErrNon200, resp.Status, string(body))
 		}
 
 		switch {
-		case i == h.retries:
-			return nil, fmt.Errorf("[%d/%d] notifiarr.com req failed: %w", i+1, h.retries+1, err)
+		case i == h.Retries:
+			return nil, fmt.Errorf("[%d/%d] notifiarr.com req failed: %w", i+1, h.Retries+1, err)
 		default:
-			h.Printf("[%d/%d] Request to Notifiarr.com failed, retrying! %v", i+1, h.retries+1, err)
+			h.Printf("[%d/%d] Request to Notifiarr.com failed, retrying in %d, error: %v", i+1, h.Retries+1, RetryDelay, err)
+			time.Sleep(RetryDelay)
 		}
 	}
 }
