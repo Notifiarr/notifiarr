@@ -127,11 +127,13 @@ func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
-	if b, err := bindata.Asset("files/favicon.ico"); err != nil {
+	b, err := bindata.Asset("files/favicon.ico")
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
+		return
 	}
+
+	http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
 }
 
 // stripSecrets runs first to save a redacted URI in a special request header.

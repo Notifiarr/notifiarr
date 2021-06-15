@@ -10,6 +10,7 @@ import (
 
 func (c *Client) printUpdateMessage() {}
 
+// AutoWatchUpdate is not used on this OS.
 func (c *Client) AutoWatchUpdate() {}
 
 func (c *Client) checkReloadSignal(sigc os.Signal) {

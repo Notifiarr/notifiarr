@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// Sessions is the config input data.
 type Sessions struct {
 	Name       string     `json:"server"`
 	AccountMap []string   `json:"account_map"`
