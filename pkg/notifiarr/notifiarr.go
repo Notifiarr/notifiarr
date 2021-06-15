@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -21,7 +22,8 @@ import (
 
 // Errors returned by this library.
 var (
-	ErrNon200 = fmt.Errorf("return code was not 200")
+	ErrNon200          = fmt.Errorf("return code was not 200")
+	ErrInvalidResponse = fmt.Errorf("invalid response")
 )
 
 // Notifiarr URLs.
@@ -31,7 +33,9 @@ const (
 	TestURL     = BaseURL + "/notifierTest.php"
 	DevBaseURL  = "http://dev.notifiarr.com"
 	DevURL      = DevBaseURL + "/notifier.php"
-	APIKeyRoute = "/api/v1/user/apikey/"
+	APIKeyRoute = "/api/v1/user/apikey"
+	// CFSyncRoute is the webserver route to send sync requests to.
+	CFSyncRoute = "/api/v1/user/trash"
 )
 
 // These are used as 'source' values in json payloads sent to the webserver.
@@ -41,6 +45,13 @@ const (
 	PlexHook = "plexhook"
 	LogLocal = "loglocal"
 )
+
+// DefaultRetries is the number of times to attempt a request to notifiarr.com.
+// 4 means 5 total tries: 1 try + 4 retries.
+const DefaultRetries = 4
+
+// success is a ssuccessful tatus message from notifiarr.com.
+const success = "success"
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
 type Payload struct {
@@ -55,12 +66,15 @@ type Config struct {
 	Apps         *apps.Apps       // has API key
 	Plex         *plex.Server     // plex sessions
 	Snap         *snapshot.Config // system snapshot data
+	Retries      int
 	URL          string
 	BaseURL      string
 	Timeout      time.Duration
 	*logs.Logger // log file writer
 	stopTimers   chan struct{}
-	client       *http.Client
+	client       *httpClient
+	radarrCFs    map[int]*cfMapIDpayload
+	sonarrCFs    map[int]*cfMapIDpayload
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -78,6 +92,15 @@ func (c *Config) Start(mode string) {
 		c.URL = DevURL
 		c.BaseURL = DevBaseURL
 	}
+
+	if c.Retries < 0 {
+		c.Retries = 0
+	} else if c.Retries == 0 {
+		c.Retries = DefaultRetries
+	}
+
+	c.radarrCFs = make(map[int]*cfMapIDpayload)
+	c.sonarrCFs = make(map[int]*cfMapIDpayload)
 
 	c.startTimers()
 }
@@ -106,6 +129,14 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 	rep := make(chan error)
 	defer close(rep)
 
+	go func() {
+		for err := range rep {
+			if err != nil {
+				c.Errorf("Building Metadata: %v", err)
+			}
+		}
+	}()
+
 	wg.Add(1)
 
 	go func() {
@@ -122,7 +153,7 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 
 	wg.Wait()
 
-	_, e, err := c.SendData(url, payload)
+	_, _, e, err := c.SendData(url, payload) //nolint:bodyclose // already closed
 
 	return e, err
 }
@@ -171,10 +202,13 @@ func (c *Config) CheckAPIKey() error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+APIKeyRoute+c.Apps.APIKey, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+APIKeyRoute, nil)
 	if err != nil {
 		return fmt.Errorf("creating http request: %w", err)
 	}
+
+	c.Debugf("Checking API Key @ %s", req.URL)
+	req.Header.Set("X-API-Key", c.Apps.APIKey)
 
 	resp, err := c.getClient().Do(req)
 	if err != nil {
@@ -192,14 +226,13 @@ func (c *Config) CheckAPIKey() error {
 }
 
 // SendJSON posts a JSON payload to a URL. Returns the response body or an error.
-// The response status code is lost.
-func (c *Config) SendJSON(url string, data []byte) ([]byte, error) {
+func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
-		return nil, fmt.Errorf("creating http request: %w", err)
+		return nil, nil, fmt.Errorf("creating http request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -208,33 +241,66 @@ func (c *Config) SendJSON(url string, data []byte) ([]byte, error) {
 
 	resp, err := c.getClient().Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("making http request: %w", err)
+		return nil, nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return body, fmt.Errorf("reading http response: %w, body: %s", err, string(body))
+		return resp, body, fmt.Errorf("reading http response: %w, body: %s", err, string(body))
 	}
 
-	return body, nil
+	return resp, body, nil
 }
 
-func (c *Config) SendData(url string, payload interface{}) ([]byte, []byte, error) {
+// SendData sends raw data to a notifiarr URL as JSON.
+func (c *Config) SendData(url string, payload interface{}) (*http.Response, []byte, []byte, error) {
 	post, err := json.MarshalIndent(payload, "", " ")
 	if err != nil {
-		return nil, nil, fmt.Errorf("encoding data: %w", err)
+		return nil, nil, nil, fmt.Errorf("encoding data: %w", err)
 	}
 
-	reply, err := c.SendJSON(url, post)
+	resp, reply, err := c.SendJSON(url, post)
 
-	return post, reply, err
+	return resp, post, reply, err
 }
 
-func (c *Config) getClient() *http.Client {
+// httpClient is our custom http client to wrap Do and provide retries.
+type httpClient struct {
+	*http.Client
+	retries int
+	*log.Logger
+}
+
+func (c *Config) getClient() *httpClient {
 	if c.client == nil {
-		c.client = &http.Client{Timeout: c.Timeout}
+		c.client = &httpClient{
+			Logger:  c.ErrorLog,
+			retries: c.Retries, Client: &http.Client{Timeout: c.Timeout},
+		}
 	}
 
 	return c.client
+}
+
+// Do performs an http Request with retries and logging!
+func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
+	for i := 0; ; i++ {
+		resp, err := h.Client.Do(req)
+		if err == nil && resp.StatusCode < http.StatusInternalServerError {
+			return resp, nil
+		}
+
+		if err == nil {
+			// shoehorn a non-200 error into the empty http error.
+			err = fmt.Errorf("%w: %s", ErrNon200, resp.Status)
+		}
+
+		switch {
+		case i == h.retries:
+			return nil, fmt.Errorf("[%d/%d] notifiarr.com req failed: %w", i+1, h.retries+1, err)
+		default:
+			h.Printf("[%d/%d] Request to Notifiarr.com failed, retrying! %v", i+1, h.retries+1, err)
+		}
+	}
 }

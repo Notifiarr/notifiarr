@@ -104,7 +104,7 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 	snap := c.GetMetaSnap(ctx)
 	cancel() //nolint:wsl
 
-	_, _, err := c.SendData(c.URL, &Payload{
+	_, _, body, err := c.SendData(c.URL, &Payload{
 		Type: "plex_session_complete_" + s.Type,
 		Snap: snap,
 		Plex: &plex.Sessions{
@@ -114,7 +114,7 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 		},
 	})
 	if err != nil {
-		return statusError + ": sending to " + c.URL + ": " + err.Error()
+		return statusError + ": sending to " + c.URL + ": " + err.Error() + ": " + string(body)
 	}
 
 	return statusSending + " to " + c.URL

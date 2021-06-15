@@ -199,7 +199,7 @@ timeout = "{{.Timeout}}"
    ]    # list of zfs pools, ex: zfs_pools=["data", "data2"]{{else}}
   zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]{{end}}
   use_sudo          = {{.Snapshot.UseSudo}} # sudo is needed on unix when monitor_drives=true or for megacli.
-## Example sudoers entries follow. Fix the paths to smartctl and MegaCli.
+## Example sudoers entries follow; these go in /etc/sudoers.d. Fix the paths to smartctl and MegaCli.
 ## notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
 ## notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 

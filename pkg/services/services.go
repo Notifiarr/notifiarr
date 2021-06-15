@@ -331,7 +331,7 @@ func (c *Config) SendResults(url string, results *Results) {
 	results.Interval = c.Interval.Seconds()
 
 	data, _ := json.MarshalIndent(results, "", " ")
-	if _, err := c.Notify.SendJSON(url, data); err != nil {
+	if _, _, err := c.Notify.SendJSON(url, data); err != nil {
 		c.Errorf("Sending service check update to %s: %v", url, err)
 	} else {
 		c.Printf("Sent %d service check states to %s", len(results.Svcs), url)
