@@ -1,3 +1,8 @@
+// Package snapshot generates system reports and sends them to notifiarr.com.
+// The reports include zfs data, cpu, memory, mdadm info, megaraid arrays,
+// smart status, mounted volume (disk) usage, cpu temp, other temps, uptime,
+// drive age/health, logged on user count, etc. Works across most platforms.
+// These snapshots are posted to a user's Chatroom on request.
 package snapshot
 
 import (
@@ -83,6 +88,7 @@ type Partition struct {
 	Free   uint64 `json:"free"`
 }
 
+// Validate makes sure the snapshot configuration is valid.
 func (c *Config) Validate() {
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = DefaultTimeout

@@ -25,6 +25,7 @@ type Synology struct {
  "platformVersion": "6.2.3-254263",
 */
 
+// GetSynology checks if the app is running on a Synology, and gets system info.
 func (s *Snapshot) GetSynology(run bool) error { //nolint:cyclop
 	if !run || !s.synology {
 		return nil

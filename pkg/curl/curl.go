@@ -1,3 +1,5 @@
+// Package curl is dead simple package to GET a URL and return the contents.
+// This is used strictly for debugging network and connectivity issues.
 package curl
 
 import (

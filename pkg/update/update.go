@@ -1,3 +1,7 @@
+// Package update checks for an available update on GitHub.
+// It has baked in assumptions, but is mostly portable.
+// Makes it easy for the notifiarr client application to send a
+// notifiation when a new version is available.
 package update
 
 import (

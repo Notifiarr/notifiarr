@@ -4,6 +4,7 @@ import "os"
 
 /* A fake signal, because why not. */
 
+// Signal provides a fake signal to close the app when an upgrade is requested.
 type Signal struct {
 	Text string
 }

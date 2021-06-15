@@ -1,5 +1,3 @@
-// Package update checks for an available update on GitHub.
-// It has baked in assumptions, but is mostly portable.
 package update
 
 import (

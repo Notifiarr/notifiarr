@@ -1,3 +1,6 @@
+// Package services provides services checks to the notifiarr client application.
+// This package spins up go routines to check http endpoints, running process, tcp
+// ports, etc. The configuration comes directly from the config file.
 package services
 
 import (
@@ -33,7 +36,7 @@ var (
 	ErrBadTCP      = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
 )
 
-// Config for this plugin.
+// Config for this plugin comes from a config file.
 type Config struct {
 	Interval     cnfg.Duration     `toml:"interval" xml:"interval"`
 	Parallel     uint              `toml:"parallel" xml:"parallel"`
@@ -105,6 +108,7 @@ type Service struct {
 	proc      *procExpect // only used for process checks.
 }
 
+// Start begins the service check routines.
 func (c *Config) Start(services []*Service) error {
 	services = append(services, c.collectApps()...)
 	if c.Disabled || len(services) == 0 {
@@ -302,6 +306,7 @@ func (c *Config) RunChecks(forceAll bool) bool {
 	return stateChange
 }
 
+// GetResults creates a copy of all the results and returns them.
 func (c *Config) GetResults() []*CheckResult {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -338,6 +343,7 @@ func (c *Config) SendResults(url string, results *Results) {
 	}
 }
 
+// Stop ends all service checker routines.
 func (c *Config) Stop() {
 	if c.stopChan == nil {
 		return
@@ -358,6 +364,7 @@ func (c *Config) Stop() {
 	c.done = nil
 }
 
+// String turns a check status into a human string.
 func (c CheckState) String() string {
 	switch c {
 	default:

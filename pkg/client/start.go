@@ -1,3 +1,8 @@
+// Package client provides the low level assembly of the Notifiarr client application.
+// This package orchestrates reading in of configuration, parsing cli flags, actioning
+// those cli flags, setting up logging, and finally the starting of internal service
+// routines for the webserver, plex sessions, snapshots, service checks and others.
+// This package sets everything up for the client application.
 package client
 
 import (

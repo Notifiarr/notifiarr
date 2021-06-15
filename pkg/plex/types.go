@@ -2,6 +2,7 @@ package plex
 
 /* This file contains all the types for Plex Sessions API response. */
 
+// Session is a Plex json struct.
 type Session struct {
 	User                 User      `json:"User"`
 	Player               Player    `json:"Player"`
@@ -66,12 +67,14 @@ type Session struct {
 	*/
 }
 
+// User is part of a Plex Session.
 type User struct {
 	ID    string `json:"id"`
 	Thumb string `json:"thumb"`
 	Title string `json:"title"`
 }
 
+// Player is part of a Plex Session.
 type Player struct {
 	Address     string `json:"address"`
 	Device      string `json:"device"`
@@ -92,6 +95,7 @@ type Player struct {
 	Secure      bool   `json:"secure"`
 }
 
+// Country is part of a Plex Session.
 type Country struct {
 	Count  string      `json:"count"`
 	Filter string      `json:"filter"`
@@ -99,12 +103,14 @@ type Country struct {
 	Tag    string      `json:"tag"`
 }
 
+// Director is part of a Plex Session.
 type Director struct {
 	Filter string `json:"filter"`
 	ID     string `json:"id"`
 	Tag    string `json:"tag"`
 }
 
+// Genre is part of a Plex Session.
 type Genre struct {
 	Count  string `json:"count"`
 	Filter string `json:"filter"`
@@ -112,6 +118,7 @@ type Genre struct {
 	Tag    string `json:"tag"`
 }
 
+// MediaStream is part of a Plex Session.
 type MediaStream struct {
 	AudioChannelLayout string  `json:"audioChannelLayout,omitempty"`
 	BitDepth           string  `json:"bitDepth,omitempty"`
@@ -147,6 +154,7 @@ type MediaStream struct {
 	Width              int64   `json:"width,omitempty,string"`
 }
 
+// MediaPart is part of a Plex Session.
 type MediaPart struct {
 	AudioProfile    string         `json:"audioProfile"`
 	Bitrate         int64          `json:"bitrate,string"`
@@ -167,6 +175,7 @@ type MediaPart struct {
 	Stream          []*MediaStream `json:"Stream"`
 }
 
+// Media is part of a Plex Session.
 type Media struct {
 	AspectRatio     string       `json:"aspectRatio"`
 	AudioChannels   int          `json:"audioChannels,string"`
@@ -188,12 +197,14 @@ type Media struct {
 	Part            []*MediaPart `json:"Part"`
 }
 
+// Producer is part of a Plex Session.
 type Producer struct {
 	Filter string `json:"filter"`
 	ID     string `json:"id"`
 	Tag    string `json:"tag"`
 }
 
+// Role is part of a Plex Session.
 type Role struct {
 	Count  string `json:"count,omitempty"`
 	Filter string `json:"filter"`
@@ -203,6 +214,7 @@ type Role struct {
 	Thumb  string `json:"thumb,omitempty"`
 }
 
+// Transcode is part of a Plex Session.
 type Transcode struct {
 	AudioChannels       int    `json:"audioChannels"`
 	AudioCodec          string `json:"audioCodec"`
@@ -229,12 +241,14 @@ type Transcode struct {
 	XcodeHwRequested    bool   `json:"transcodeHwRequested"`
 }
 
+// Writer is part of a Plex Session.
 type Writer struct {
 	Filter string `json:"filter"`
 	ID     string `json:"id"`
 	Tag    string `json:"tag"`
 }
 
+// Similar is part of a Plex Session.
 type Similar struct {
 	Filter string `json:"filter"`
 	ID     string `json:"id"`

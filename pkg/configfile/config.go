@@ -1,3 +1,9 @@
+// Package configfile handles all the base configuration-file routines. This
+// package also holds the conifiguration for the webserver and notifiarr packages.
+// In here you will find config file parsing, validation, and creation.
+// The application can re-write its own config file from a built-in template,
+// complete with comments. In some circumstances the application writes a brand
+// new empty config on startup.
 package configfile
 
 import (

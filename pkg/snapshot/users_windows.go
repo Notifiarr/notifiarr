@@ -7,6 +7,7 @@ import (
 	wapi "github.com/iamacarpet/go-win64api"
 )
 
+// GetUsers collects logged in users.
 func (s *Snapshot) GetUsers(ctx context.Context) error {
 	users, err := wapi.ListLoggedInUsers()
 	if err != nil {

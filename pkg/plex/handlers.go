@@ -9,10 +9,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-/* These handlers satisfy apps.APIHandler, sorry. */
-
+// Plex is used a context ID.
 const Plex apps.App = "plex"
 
+// HandleSessions provides a web handlersto the notifiarr client that returns
+// the current Plex sessions. The handler satisfies apps.APIHandler, sorry.
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(Plex).(int)
 
@@ -28,6 +29,9 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	}
 }
 
+// HandleKillSession provides a web handler to the notifiarr client allows
+// notifiarr.com (via Discord request) to end a Plex session.
+// The handler satisfies apps.APIHandler, sorry.
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
 		ctx       = r.Context()

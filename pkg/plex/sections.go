@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// LibrarySection is a plex response struct.
 type LibrarySection struct {
 	Size                int    `json:"size"`
 	AllowSync           bool   `json:"allowSync"`
@@ -137,10 +138,12 @@ type LibrarySection struct {
 	} `json:"Metadata"`
 }
 
+// GUID is a reusable type from the Section library.
 type GUID struct {
 	ID string `json:"id"`
 }
 
+// GetPlexSectionKey gets a section key from Plex based on a key path.
 func (s *Server) GetPlexSectionKey(keyPath string) (*LibrarySection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()

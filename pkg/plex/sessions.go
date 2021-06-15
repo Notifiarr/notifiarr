@@ -19,6 +19,7 @@ type Sessions struct {
 // ErrBadStatus is returned when plex returns an invalid status code.
 var ErrBadStatus = fmt.Errorf("status code not 200")
 
+// GetXMLSessions returns the Plex sessions in XML format.
 func (s *Server) GetXMLSessions() (*Sessions, error) {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return nil, ErrNoURLToken
@@ -58,10 +59,12 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 	}, nil
 }
 
+// GetSessions returns the Plex sessions in JSON format, no timeout.
 func (s *Server) GetSessions() ([]*Session, error) {
 	return s.GetSessionsWithContext(context.Background())
 }
 
+// GetSessionsWithContext returns the Plex sessions in JSON format.
 func (s *Server) GetSessionsWithContext(ctx context.Context) ([]*Session, error) {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return nil, ErrNoURLToken
@@ -119,6 +122,7 @@ func (s *Server) getPlexSessions(ctx context.Context, headers map[string]string)
 	return body, nil
 }
 
+// KillSessionWithContext kills a Plex session.
 func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) error {
 	if s == nil || s.URL == "" || s.Token == "" {
 		return ErrNoURLToken
@@ -157,6 +161,7 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 	return nil
 }
 
+// KillSession kills a Plex session.
 func (s *Server) KillSession(sessionID, reason string) error {
 	return s.KillSessionWithContext(context.Background(), sessionID, reason)
 }

@@ -38,6 +38,7 @@ type procExpect struct {
 
 const epochOffset = 1000
 
+// GetAllProcesses returns all running process on the host.
 func GetAllProcesses() ([]*ProcInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
 	defer cancel()

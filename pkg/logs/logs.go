@@ -1,3 +1,9 @@
+// Package logs provides the low-level routines for directing log messages.
+// It creates several logging channels for debug, info, errors, http, etc.
+// These channels are directed to log files and/or stdout depending on how
+// the application is configured. This package reads its configuration
+// directly from a config file. In here you will find the log roatation
+// config for rotatorr, panic redirection, and external logging methods.
 package logs
 
 import (

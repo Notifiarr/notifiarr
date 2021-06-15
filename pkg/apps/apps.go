@@ -1,3 +1,8 @@
+// Package apps provides the _incoming_ HTTP methods for notifiarr.com integrations.
+// Methods are included for Radarr, Readrr, Lidarr and Sonarr. This library also
+// holds the site API Key and the base HTTP server abstraction used throughout
+// the Notifiarr client application. The configuration should be derived from
+// a config file; a Router and an Error Log logger must also be provided.
 package apps
 
 import (
@@ -17,11 +22,6 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-/* This file contains:
- *** The middleware procedure that stores the app interface in a request context.
- *** Procedures to save and fetch an app interface into/from a request content.
- */
-
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
 	APIKey   string           `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
@@ -33,8 +33,6 @@ type Apps struct {
 	Router   *mux.Router      `json:"-" toml:"-" xml:"-" yaml:"-"`
 	ErrorLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
-
-// Responder converts all our data to a JSON response.
 
 // App allows safely storing context values.
 type App string
@@ -63,9 +61,13 @@ var (
 )
 
 // APIHandler is our custom handler function for APIs.
+// The powers the middleware procedure that stores the app interface in a request context.
+// And the procedures to save and fetch an app interface into/from a request content.
 type APIHandler func(r *http.Request) (int, interface{})
 
-// HandleAPIpath makes adding API paths a little cleaner.
+// HandleAPIpath makes adding APIKey authenticated API paths a little cleaner.
+// An empty App may be passed in, but URI, API and at least one method are required.
+// Automatically adds an id route to routes with an app name. In case you have > 1 of that app.
 func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) *mux.Route {
 	if len(method) == 0 {
 		method = []string{"GET"}
