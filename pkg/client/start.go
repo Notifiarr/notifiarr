@@ -215,8 +215,10 @@ func (c *Client) start() error {
 		c.notify.SyncSonarrCF()
 
 		return nil
-	} else if err := c.notify.CheckAPIKey(); err != nil {
-		c.Print("==> [WARNING] API Key may be invalid:", err)
+	} else if msg, err := c.notify.CheckAPIKey(); err != nil {
+		c.Printf("==> [WARNING] API Key may be invalid: %v: %s", err, msg)
+	} else if msg != "" {
+		c.Printf("==> %s", msg)
 	}
 
 	return c.run()

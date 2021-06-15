@@ -7,7 +7,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -201,32 +200,43 @@ func (c *Config) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	return snap
 }
 
-// CheckAPIKey returns an error if the API key is wrong.
-func (c *Config) CheckAPIKey() error {
+// CheckAPIKey returns an error if the API key is wrong. Returns a message otherwise.
+func (c *Config) CheckAPIKey() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+APIKeyRoute, nil)
 	if err != nil {
-		return fmt.Errorf("creating http request: %w", err)
+		return "", fmt.Errorf("creating http request: %w", err)
 	}
 
-	c.Debugf("Checking API Key @ %s", req.URL)
+	c.Debugf("=> Checking API Key @ %s", req.URL)
 	req.Header.Set("X-API-Key", c.Apps.APIKey)
 
 	resp, err := c.getClient().Do(req)
 	if err != nil {
-		return fmt.Errorf("making http request: %w", err)
+		return "", fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return ErrNon200
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("reading response: %w", err)
 	}
 
-	return nil
+	var v struct {
+		Message string `json:"message"`
+	}
+
+	if err = json.Unmarshal(body, &v); err != nil {
+		return "", fmt.Errorf("parsing response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return v.Message, ErrNon200
+	}
+
+	return v.Message, nil
 }
 
 // SendJSON posts a JSON payload to a URL. Returns the response body or an error.
