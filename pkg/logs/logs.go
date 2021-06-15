@@ -21,14 +21,23 @@ import (
 
 // Logger provides some methods with baked in assumptions.
 type Logger struct {
-	ErrorLog *log.Logger // Shares a Writer with Logger.
-	DebugLog *log.Logger // Shares a Writer with Logger.
+	ErrorLog *log.Logger // Shares a Writer with InfoLog.
+	DebugLog *log.Logger // Shares a Writer with InfoLog.
 	InfoLog  *log.Logger
 	HTTPLog  *log.Logger
 	web      *rotatorr.Logger
 	app      *rotatorr.Logger
+	custom   *rotatorr.Logger
 	logs     *Logs
 }
+
+// These are used for custom logs.
+// nolint:gochecknoglobals
+var (
+	logFiles  = 1
+	logFileMb = 100
+	customLog = make(map[string]*rotatorr.Logger)
+)
 
 // satisfy gomnd.
 const (
@@ -72,6 +81,18 @@ func (l *Logger) Rotate() (errors []error) {
 	if l.app != nil {
 		if _, err := l.app.Rotate(); err != nil {
 			errors = append(errors, fmt.Errorf("rotating App Log: %w", err))
+		}
+	}
+
+	if l.custom != nil {
+		if _, err := l.custom.Rotate(); err != nil {
+			errors = append(errors, fmt.Errorf("rotating cCustom Log: %w", err))
+		}
+	} else {
+		for name, logger := range customLog {
+			if _, err := logger.Rotate(); err != nil {
+				errors = append(errors, fmt.Errorf("rotating %s Log: %w", name, err))
+			}
 		}
 	}
 
@@ -128,6 +149,8 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 
 // SetupLogging splits log writers into a file and/or stdout.
 func (l *Logger) SetupLogging(config *Logs) {
+	logFiles = config.LogFiles
+	logFileMb = config.LogFileMb
 	l.logs = config
 	l.setLogPaths()
 	l.openLogFile()
@@ -235,4 +258,40 @@ func (l *Logger) openHTTPLog() {
 		l.web = rotatorr.NewMust(rotateHTTP)
 		l.HTTPLog.SetOutput(l.web)
 	}
+}
+
+// CustomLog allows the creation of ad-hoc rotating log files from other packages.
+// This is not thread safe with Rotate(), so do not call them at the same time.
+func CustomLog(filePath, logName string) *Logger {
+	logger := &Logger{
+		DebugLog: log.New(ioutil.Discard, "[DEBUG] ", log.LstdFlags),
+		InfoLog:  log.New(ioutil.Discard, "[INFO] ", log.LstdFlags),
+		ErrorLog: log.New(ioutil.Discard, "[ERROR] ", log.LstdFlags),
+	}
+
+	if filePath == "" || logName == "" {
+		return logger
+	}
+
+	f, err := homedir.Expand(filePath)
+	if err == nil {
+		filePath = f
+	}
+
+	if f, err = filepath.Abs(filePath); err == nil {
+		filePath = f
+	}
+
+	customLog[logName] = rotatorr.NewMust(&rotatorr.Config{
+		Filepath: filePath,                                 // log file name.
+		FileSize: int64(logFileMb) * megabyte,              // megabytes
+		Rotatorr: &timerotator.Layout{FileCount: logFiles}, // number of files to keep.
+	})
+	logger.custom = customLog[logName]
+
+	logger.DebugLog.SetOutput(logger.custom)
+	logger.ErrorLog.SetOutput(logger.custom)
+	logger.InfoLog.SetOutput(logger.custom)
+
+	return logger
 }
