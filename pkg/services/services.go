@@ -1,6 +1,6 @@
-// Package services provides services checks to the notifiarr client application.
-// This package spins up go routines to check http endpoints, running process, tcp
-// ports, etc. The configuration comes directly from the config file.
+// Package services provides service-checks to the notifiarr client application.
+// This package spins up go routines to check http endpoints, running processes,
+// tcp ports, etc. The configuration comes directly from the config file.
 package services
 
 import (
