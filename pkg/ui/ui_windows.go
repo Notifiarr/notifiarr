@@ -12,10 +12,12 @@ import (
 // SystrayIcon is the icon in the system tray or task bar.
 const SystrayIcon = "files/favicon.ico"
 
+// HasGUI always returns true on Windows.
 func HasGUI() bool {
 	return true
 }
 
+// HideConsoleWindow makes the console window vanish on startup.
 func HideConsoleWindow() {
 	if console := w32.GetConsoleWindow(); console != 0 {
 		_, consoleProcID := w32.GetWindowThreadProcessId(console)

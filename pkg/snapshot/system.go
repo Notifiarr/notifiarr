@@ -12,6 +12,7 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
+// GetCPUSample gets a CPU percentage sample.
 func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
 	if !run {
 		return nil
@@ -49,6 +50,7 @@ func (s *Snapshot) getMemoryUsageShared(ctx context.Context, run bool) error {
 	return nil
 }
 
+// GetLocalData collects current username, logged in user and host info.
 func (s *Snapshot) GetLocalData(ctx context.Context, run bool) (errs []error) {
 	u, err := user.Current()
 	if err != nil {

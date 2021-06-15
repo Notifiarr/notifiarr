@@ -22,6 +22,7 @@ type memoryStatusEx struct {
 //nolint:gochecknoglobals
 var kernel = syscall.NewLazyDLL("Kernel32.dll")
 
+// GetMemoryUsage returns current host memory consumption.
 func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
 	if !run {
 		return nil

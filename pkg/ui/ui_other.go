@@ -17,6 +17,7 @@ func HasGUI() bool {
 	return false
 }
 
+// HideConsoleWindow doesn't work on most OSes.
 func HideConsoleWindow() {}
 
 // StartCmd starts a command.

@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// GetMemoryUsage returns current host memory consumption.
 func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
 	if !run {
 		return nil

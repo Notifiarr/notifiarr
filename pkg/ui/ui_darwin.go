@@ -16,6 +16,7 @@ func HasGUI() bool {
 	return hasGUI
 }
 
+// HideConsoleWindow doesn't work on maacOS.
 func HideConsoleWindow() {}
 
 // StartCmd starts a command.

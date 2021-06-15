@@ -9,6 +9,7 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 )
 
+// GetUsers collects logged in users.
 func (s *Snapshot) GetUsers(ctx context.Context) error {
 	users, err := host.UsersWithContext(ctx)
 	if err != nil {
