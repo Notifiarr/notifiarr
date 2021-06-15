@@ -16,6 +16,7 @@ type Sessions struct {
 	XML        string     `json:"sessions_xml,omitempty"`
 }
 
+// ErrBadStatus is returned when plex returns an invalid status code.
 var ErrBadStatus = fmt.Errorf("status code not 200")
 
 func (s *Server) GetXMLSessions() (*Sessions, error) {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/curl"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
@@ -42,7 +43,9 @@ type Flags struct {
 	testSnaps  bool
 	restart    bool
 	updated    bool
+	cfsync     bool
 	pslist     bool
+	curl       string
 	ConfigFile string
 	EnvPrefix  string
 	Mode       string
@@ -110,6 +113,8 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.Mode, "mode", "m", "prod", "Selects Notifiarr URL: test, dev, prod")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
+	f.BoolVar(&f.cfsync, "cfsync", false, "Trigger Custom Format sync and exit.")
+	f.StringVar(&f.curl, "curl", "", "GET a URL and display headers and payload.")
 	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks")
 
 	if runtime.GOOS == windows {
@@ -125,11 +130,21 @@ func Start() error {
 	c := NewDefaults()
 	c.Flags.ParseArgs(os.Args[1:])
 
-	if c.Flags.verReq {
+	switch {
+	case c.Flags.verReq:
 		fmt.Println(version.Print(c.Flags.Name()))
 		return nil // print version and exit.
-	} else if c.Flags.pslist {
+	case c.Flags.pslist:
 		return printProcessList()
+	case c.Flags.curl != "":
+		resp, body, err := curl.Get(c.Flags.curl) //nolint:bodyclose // it's already closed.
+		if err != nil {
+			return fmt.Errorf("getting URL '%s': %w", c.Flags.curl, err)
+		}
+
+		curl.Print(resp, body)
+
+		return nil
 	}
 
 	if err := c.config(); err != nil {
@@ -194,8 +209,16 @@ func (c *Client) start() error {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
 	} else if _, err := c.runServices(); err != nil {
 		return err
-	} else if err := c.notify.CheckAPIKey(); err != nil {
-		c.Print("[WARNING] API Key may be invalid:", err)
+	} else if c.Flags.cfsync {
+		c.Printf("==> Flag Requested: Syncing Custom Formats (then exiting)")
+		c.notify.SyncRadarrCF()
+		c.notify.SyncSonarrCF()
+
+		return nil
+	} else if msg, err := c.notify.CheckAPIKey(); err != nil {
+		c.Printf("==> [WARNING] API Key may be invalid: %v: %s", err, msg)
+	} else if msg != "" {
+		c.Printf("==> %s", msg)
 	}
 
 	return c.run()

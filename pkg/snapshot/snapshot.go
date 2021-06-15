@@ -16,8 +16,10 @@ import (
 	"golift.io/version"
 )
 
+// DefaultTimeout is used when one is not provided.
+const DefaultTimeout = 30 * time.Second
+
 const (
-	DefaultTimeout  = 30 * time.Second
 	minimumTimeout  = 5 * time.Second
 	minimumInterval = 10 * time.Minute
 )

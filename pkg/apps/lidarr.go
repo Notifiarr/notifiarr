@@ -45,11 +45,11 @@ type LidarrConfig struct {
 	Name     string
 	Interval cnfg.Duration
 	*starr.Config
-	lidarr *lidarr.Lidarr
+	*lidarr.Lidarr
 }
 
 func (r *LidarrConfig) setup(timeout time.Duration) {
-	r.lidarr = lidarr.New(r.Config)
+	r.Lidarr = lidarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

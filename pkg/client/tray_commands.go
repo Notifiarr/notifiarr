@@ -191,7 +191,7 @@ func (c *Client) sendSystemSnapshot(url string) {
 	}
 
 	b, _ := json.MarshalIndent(&notifiarr.Payload{Type: notifiarr.SnapCron, Snap: snaps}, "", "  ")
-	if body, err := c.notify.SendJSON(url, b); err != nil {
+	if _, body, err := c.notify.SendJSON(url, b); err != nil {
 		c.Errorf("[user requested] Sending System Snapshot to %s: %v: %s", url, err, string(body))
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, fields[3])

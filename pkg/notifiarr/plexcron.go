@@ -4,63 +4,9 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
-
-// This cron tab runs every 10-60 minutes to send a report of who's currently watching.
-func (c *Config) startPlexCron() {
-	if c.Plex == nil || c.Plex.Interval.Duration == 0 || c.Plex.URL == "" || c.Plex.Token == "" {
-		return
-	}
-
-	// Add a little splay to the timers to not hit plex at the same time too often.
-	timer1 := time.NewTicker(c.Plex.Interval.Duration + 139*time.Millisecond)
-	timer2 := time.NewTicker(time.Minute + 179*time.Millisecond)
-	c.stopPlex = make(chan struct{})
-
-	defer func() {
-		timer1.Stop()
-		close(c.stopPlex)
-		c.stopPlex = nil
-	}()
-
-	c.Printf("==> Plex Sessions Collection Started, URL: %s, interval: %v, timeout: %v, webhook cooldown: %v",
-		c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown)
-
-	if c.Plex.MoviesPC != 0 || c.Plex.SeriesPC != 0 {
-		defer timer2.Stop()
-		c.Printf("==> Plex Completed Items Started, URL: %s, interval: 1m, timeout: %v movies: %d%%, series: %d%%",
-			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
-	} else {
-		timer2.Stop() // nothing to check, so turn off this timer.
-	}
-
-	c.plexCron(timer1, timer2)
-}
-
-// Do not call this directly. Called from above, only.
-func (c *Config) plexCron(timer1, timer2 *time.Ticker) {
-	sent := make(map[string]struct{})
-
-	for {
-		select {
-		case <-timer1.C:
-			if body, err := c.SendMeta(PlexCron, c.URL, nil, 0); err != nil {
-				c.Errorf("Sending Plex Session to %s: %v: %v", c.URL, err, string(body))
-			} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-				c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, fields[3])
-			} else {
-				c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, string(body))
-			}
-		case <-timer2.C:
-			c.checkForFinishedItems(sent)
-		case <-c.stopPlex:
-			return
-		}
-	}
-}
 
 // Statuses for an item being played on Plex.
 const (
@@ -75,6 +21,17 @@ const (
 	movie   = "movie"
 	episode = "episode"
 )
+
+// sendPlexSessions is fired by a timer if plex monitoring is enabled.
+func (c *Config) sendPlexSessions() {
+	if body, err := c.SendMeta(PlexCron, c.URL, nil, 0); err != nil {
+		c.Errorf("Sending Plex Session to %s: %v: %v", c.URL, err, string(body))
+	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
+		c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, fields[3])
+	} else {
+		c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, string(body))
+	}
+}
 
 // This cron tab runs every minute to send a report when a user gets to the end of a movie or tv show.
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
@@ -147,7 +104,7 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 	snap := c.GetMetaSnap(ctx)
 	cancel() //nolint:wsl
 
-	_, _, err := c.SendData(c.URL, &Payload{
+	_, _, body, err := c.SendData(c.URL, &Payload{
 		Type: "plex_session_complete_" + s.Type,
 		Snap: snap,
 		Plex: &plex.Sessions{
@@ -157,7 +114,7 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 		},
 	})
 	if err != nil {
-		return statusError + ": sending to " + c.URL + ": " + err.Error()
+		return statusError + ": sending to " + c.URL + ": " + err.Error() + ": " + string(body)
 	}
 
 	return statusSending + " to " + c.URL

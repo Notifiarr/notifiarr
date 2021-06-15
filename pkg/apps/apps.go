@@ -198,17 +198,17 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) {
 /* Every API call runs one of these methods to find the interface for the respective app. */
 
 func getLidarr(r *http.Request) *lidarr.Lidarr {
-	return r.Context().Value(Lidarr).(*LidarrConfig).lidarr
+	return r.Context().Value(Lidarr).(*LidarrConfig).Lidarr
 }
 
 func getRadarr(r *http.Request) *radarr.Radarr {
-	return r.Context().Value(Radarr).(*RadarrConfig).radarr
+	return r.Context().Value(Radarr).(*RadarrConfig).Radarr
 }
 
 func getReadarr(r *http.Request) *readarr.Readarr {
-	return r.Context().Value(Readarr).(*ReadarrConfig).readarr
+	return r.Context().Value(Readarr).(*ReadarrConfig).Readarr
 }
 
 func getSonarr(r *http.Request) *sonarr.Sonarr {
-	return r.Context().Value(Sonarr).(*SonarrConfig).sonarr
+	return r.Context().Value(Sonarr).(*SonarrConfig).Sonarr
 }

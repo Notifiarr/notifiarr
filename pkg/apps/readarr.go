@@ -40,11 +40,11 @@ type ReadarrConfig struct {
 	Name     string
 	Interval cnfg.Duration
 	*starr.Config
-	readarr *readarr.Readarr
+	*readarr.Readarr
 }
 
 func (r *ReadarrConfig) setup(timeout time.Duration) {
-	r.readarr = readarr.New(r.Config)
+	r.Readarr = readarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

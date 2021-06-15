@@ -110,7 +110,7 @@ func (c *Client) AutoWatchUpdate() {
 		}
 	}
 
-	c.Print("Auto-updater enabled. Check interval:", durafmt.Parse(dur).String(), false)
+	c.Print("Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
 
 	ticker := time.NewTimer(dur)
 	for range ticker.C {
