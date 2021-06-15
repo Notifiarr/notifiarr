@@ -3,7 +3,7 @@
 // find the _things_ we compress into base64 inside the files/ directory, and you
 // will find the base64 files in the bindata.go file. The generate.go file contains
 // the command that creates the binary data. Requires installing go-bindata binary.
-// See: https://github.com/kevinburke/go-bindata
+// See: https://github.com/kevinburke/go-bindata or the README.md file.
 package bindata
 
 //go:generate go-bindata -pkg bindata -modtime 1587356420 -o bindata.go files/

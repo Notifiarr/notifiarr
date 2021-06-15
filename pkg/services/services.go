@@ -1,6 +1,6 @@
-// Package services provides services checks to the notifiarr client application.
-// This package spins up go routines to check http endpoints, running process, tcp
-// ports, etc. The configuration comes directly from the config file.
+// Package services provides service-checks to the notifiarr client application.
+// This package spins up go routines to check http endpoints, running processes,
+// tcp ports, etc. The configuration comes directly from the config file.
 package services
 
 import (
@@ -41,6 +41,7 @@ type Config struct {
 	Interval     cnfg.Duration     `toml:"interval" xml:"interval"`
 	Parallel     uint              `toml:"parallel" xml:"parallel"`
 	Disabled     bool              `toml:"disabled" xml:"disabled"`
+	LogFile      string            `toml:"log_file" xml:"log_file"`
 	Apps         *apps.Apps        `toml:"-"`
 	Notify       *notifiarr.Config `toml:"-"`
 	*logs.Logger `json:"-"`        // log file writer
@@ -179,6 +180,10 @@ func (c *Config) setup(services []*Service, run bool) error {
 		c.checks = make(chan *Service, DefaultBuffer)
 		c.done = make(chan bool)
 		c.stopChan = make(chan struct{})
+	}
+
+	if c.LogFile != "" {
+		c.Logger = logs.CustomLog(c.LogFile, "Services")
 	}
 
 	for i := range services {

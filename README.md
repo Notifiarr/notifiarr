@@ -246,9 +246,12 @@ snapshot.use_sudo|`DN_SNAPSHOT_USE_SUDO`|Set `true` if `monitor_drives=true` or 
 
 The Notifiarr client can also check URLs for health. If you set names on your
 Starr apps they will be automatically checked and reports sent to Notifiarr.
+If you provide a log file for service checks, those logs will no longer write
+to the app log nor to console stdout.
 
 |Config Name|Variable Name|Note|
 |---|---|---|
+services.log_file|`DN_SERVICES_LOG_FILE`|If a file path is provided, service check logs write there|
 services.interval|`DN_SERVICES_INTERVAL`|`10m`, How often to check service health; minimum: `5m`|
 services.parallel|`DN_SERVICES_PARALLE`|`1`, How many services can be checked at once; 1 is plenty|
 
