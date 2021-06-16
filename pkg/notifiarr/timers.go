@@ -11,24 +11,30 @@ func (c *Config) startTimers() {
 		return // Already running.
 	}
 
-	var ( // Empty tickers.
-		snapTimer  = &time.Ticker{C: make(<-chan time.Time)}
-		syncTimer  = &time.Ticker{C: make(<-chan time.Time)}
+	snapTimer := c.getSnapTimer()
+	syncTimer := c.getSyncTimer()
+	plexTimer1, plexTimer2 := c.getPlexTimers()
+	c.stopTimers = make(chan struct{})
+
+	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2)
+}
+
+func (c *Config) getSyncTimer() *time.Ticker {
+	ci, err := c.GetClientInfo()
+	if err != nil || !ci.IsASub() || ci.Message.CFSync < 1 {
+		return &time.Ticker{C: make(<-chan time.Time)}
+	}
+
+	c.Printf("==> Keeping %d Radarr Custom Formats and 0 Sonarr Release Profiles synced", ci.Message.CFSync)
+
+	return time.NewTicker(cfSyncTimer)
+}
+
+func (c *Config) getPlexTimers() (*time.Ticker, *time.Ticker) {
+	var (
 		plexTimer1 = &time.Ticker{C: make(<-chan time.Time)}
 		plexTimer2 = &time.Ticker{C: make(<-chan time.Time)}
 	)
-
-	c.stopTimers = make(chan struct{})
-
-	if ci, err := c.GetClientInfo(); err == nil && ci.IsASub() && ci.Message.CFSync > 0 {
-		c.Printf("==> Radarr Custom Format and Sonarr Release Profile sync activated")
-		syncTimer = time.NewTicker(cfSyncTimer) //nolint:wsl
-	}
-
-	if c.Snap.Interval.Duration > 0 {
-		snapTimer = time.NewTicker(c.Snap.Interval.Duration)
-		c.logSnapshotStartup()
-	}
 
 	if c.Plex != nil && c.Plex.Interval.Duration > 0 && c.Plex.URL != "" && c.Plex.Token != "" {
 		// Add a little splay to the timers to not hit plex at the same time too often.
@@ -45,7 +51,17 @@ func (c *Config) startTimers() {
 		}
 	}
 
-	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2)
+	return plexTimer1, plexTimer2
+}
+
+func (c *Config) getSnapTimer() *time.Ticker {
+	if c.Snap.Interval.Duration < 1 {
+		return &time.Ticker{C: make(<-chan time.Time)}
+	}
+
+	c.logSnapshotStartup()
+
+	return time.NewTicker(c.Snap.Interval.Duration)
 }
 
 func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2 *time.Ticker) {
