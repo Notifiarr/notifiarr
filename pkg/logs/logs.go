@@ -22,13 +22,14 @@ import (
 // Logger provides some methods with baked in assumptions.
 type Logger struct {
 	ErrorLog *log.Logger // Shares a Writer with InfoLog.
-	DebugLog *log.Logger // Shares a Writer with InfoLog.
+	DebugLog *log.Logger // Shares a Writer with InfoLog by default. Changeable.
 	InfoLog  *log.Logger
 	HTTPLog  *log.Logger
 	web      *rotatorr.Logger
 	app      *rotatorr.Logger
+	debug    *rotatorr.Logger
 	custom   *rotatorr.Logger
-	logs     *Logs
+	logs     *LogConfig
 }
 
 // These are used for custom logs.
@@ -47,11 +48,12 @@ const (
 	httpExt   = ".http.log"
 )
 
-// Logs allows sending logs to rotating files.
+// LogConfig allows sending logs to rotating files.
 // Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
-type Logs struct {
+type LogConfig struct {
 	AppName   string `json:"-"`
 	LogFile   string `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
+	DebugLog  string `json:"debug_log" toml:"debug_log" xml:"debug_log" yaml:"debug_log"`
 	HTTPLog   string `json:"http_log" toml:"http_log" xml:"http_log" yaml:"http_log"`
 	LogFiles  int    `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
 	LogFileMb int    `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
@@ -66,7 +68,7 @@ func New() *Logger {
 		InfoLog:  log.New(os.Stdout, "[INFO] ", log.LstdFlags),
 		ErrorLog: log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
 		HTTPLog:  log.New(os.Stdout, "", log.LstdFlags),
-		logs:     &Logs{},
+		logs:     &LogConfig{},
 	}
 }
 
@@ -81,6 +83,12 @@ func (l *Logger) Rotate() (errors []error) {
 	if l.app != nil {
 		if _, err := l.app.Rotate(); err != nil {
 			errors = append(errors, fmt.Errorf("rotating App Log: %w", err))
+		}
+	}
+
+	if l.debug != nil {
+		if _, err := l.debug.Rotate(); err != nil {
+			errors = append(errors, fmt.Errorf("rotating Debug Log: %w", err))
 		}
 	}
 
@@ -148,24 +156,27 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 }
 
 // SetupLogging splits log writers into a file and/or stdout.
-func (l *Logger) SetupLogging(config *Logs) {
+func (l *Logger) SetupLogging(config *LogConfig) {
 	logFiles = config.LogFiles
 	logFileMb = config.LogFileMb
 	l.logs = config
 	l.setLogPaths()
 	l.openLogFile()
 	l.openHTTPLog()
+	l.openDebugLog()
 }
 
+// setLogPaths sets the log paths for app and http logs.
+// These are enforced on GUI OSes (like macOS.app and Windows).
 func (l *Logger) setLogPaths() {
 	// Make sure log file paths exist if AppName is provided.
 	if l.logs.AppName != "" {
 		if l.logs.LogFile == "" {
-			l.logs.LogFile = filepath.Join("~", ".dnclient", l.logs.AppName+defExt)
+			l.logs.LogFile = filepath.Join("~", ".notifiarr", l.logs.AppName+defExt)
 		}
 
 		if l.logs.HTTPLog == "" {
-			l.logs.HTTPLog = filepath.Join("~", ".dnclient", l.logs.AppName+httpExt)
+			l.logs.HTTPLog = filepath.Join("~", ".notifiarr", l.logs.AppName+httpExt)
 		}
 	}
 
@@ -220,7 +231,7 @@ func (l *Logger) openLogFile() {
 	}
 
 	// Don't forget errors log, and do standard logger too.
-	if l.logs.Debug {
+	if l.logs.Debug && l.logs.DebugLog == "" {
 		l.DebugLog.SetOutput(l.InfoLog.Writer())
 	}
 
@@ -236,6 +247,33 @@ func (l *Logger) postLogRotate(_, newFile string) {
 
 	if l.app != nil && l.app.File != nil {
 		redirectStderr(l.app.File) // Log panics.
+	}
+}
+
+func (l *Logger) openDebugLog() {
+	if !l.logs.Debug || l.logs.DebugLog == "" {
+		return
+	}
+
+	if f, err := homedir.Expand(l.logs.DebugLog); err == nil {
+		l.logs.DebugLog = f
+	}
+
+	if f, err := filepath.Abs(l.logs.DebugLog); err == nil {
+		l.logs.DebugLog = f
+	}
+
+	rotateDebug := &rotatorr.Config{
+		Filepath: l.logs.DebugLog,                                 // log file name.
+		FileSize: int64(l.logs.LogFileMb) * megabyte,              // megabytes
+		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
+	}
+	l.debug = rotatorr.NewMust(rotateDebug)
+
+	if l.logs.Quiet {
+		l.DebugLog.SetOutput(l.debug)
+	} else {
+		l.DebugLog.SetOutput(io.MultiWriter(l.debug, os.Stdout))
 	}
 }
 

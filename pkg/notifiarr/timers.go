@@ -11,14 +11,19 @@ func (c *Config) startTimers() {
 		return // Already running.
 	}
 
-	var (
+	var ( // Empty tickers.
 		snapTimer  = &time.Ticker{C: make(<-chan time.Time)}
-		syncTimer  = time.NewTicker(cfSyncTimer)
+		syncTimer  = &time.Ticker{C: make(<-chan time.Time)}
 		plexTimer1 = &time.Ticker{C: make(<-chan time.Time)}
 		plexTimer2 = &time.Ticker{C: make(<-chan time.Time)}
 	)
 
 	c.stopTimers = make(chan struct{})
+
+	if ci, err := c.GetClientInfo(); err == nil && ci.IsASub() {
+		c.Printf("==> Radarr Custom Format and Sonarr Release Profile sync actived")
+		syncTimer = time.NewTicker(cfSyncTimer) //nolint:wsl
+	}
 
 	if c.Snap.Interval.Duration > 0 {
 		snapTimer = time.NewTicker(c.Snap.Interval.Duration)

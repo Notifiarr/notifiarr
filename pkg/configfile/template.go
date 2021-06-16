@@ -71,7 +71,10 @@ urlbase = "{{.URLBase}}"
 ## If you set these, logs will be written to these files.
 ## If blank on windows or macOS, log file paths are chosen for you.
 {{if .LogFile}}log_file = '{{.LogFile}}'{{else}}#log_file = '~/.notifiarr/notifiarr.log'{{end}}
-{{if .HTTPLog}}http_log = '{{.HTTPLog}}'{{else}}#http_log = '~/.notifiarr/notifiarr.http.log'{{end}}
+{{if .HTTPLog}}http_log = '{{.HTTPLog}}'{{else}}#http_log = '~/.notifiarr/notifiarr.http.log'{{end}}{{if or .DebugLog .Debug}}
+## Debug Log is optional. By default, debug logs write to the app log (above).
+## Change that by setting a debug log file path here.
+{{if .DebugLog}}debug_log = '{{.DebugLog}}'{{else}}#debug_log = '~/.notifiarr/debug.log'{{end}}{{end}}
 ##
 ## Set this to the number of megabytes to rotate files.
 log_file_mb = {{.LogFileMb}}

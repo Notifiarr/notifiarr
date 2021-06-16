@@ -98,7 +98,7 @@ func NewDefaults() *Client {
 			Snapshot: &snapshot.Config{
 				Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
 			},
-			Logs: &logs.Logs{
+			LogConfig: &logs.LogConfig{
 				LogFiles:  DefaultLogFiles,
 				LogFileMb: DefaultLogFileMb,
 			},
@@ -187,10 +187,10 @@ func (c *Client) config() error {
 	if ui.HasGUI() {
 		// Setting AppName forces log files (even if not configured).
 		// Used for GUI apps that have no console output.
-		c.Config.Logs.AppName = c.Flags.Name()
+		c.Config.LogConfig.AppName = c.Flags.Name()
 	}
 
-	c.Logger.SetupLogging(c.Config.Logs)
+	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
 	c.Printf("==> %s", msg)
 
@@ -212,18 +212,24 @@ func (c *Client) start() error {
 
 	if c.Config.APIKey == "" {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
-	} else if _, err := c.runServices(); err != nil {
+	}
+
+	if _, err := c.runServices(); err != nil {
 		return err
-	} else if c.Flags.cfsync {
+	}
+
+	if c.Flags.cfsync {
 		c.Printf("==> Flag Requested: Syncing Custom Formats (then exiting)")
 		c.notify.SyncRadarrCF()
 		c.notify.SyncSonarrCF()
 
 		return nil
-	} else if msg, err := c.notify.CheckAPIKey(); err != nil {
-		c.Printf("==> [WARNING] API Key may be invalid: %v: %s", err, msg)
-	} else if msg != "" {
-		c.Printf("==> %s", msg)
+	}
+
+	if ci, err := c.notify.GetClientInfo(); err != nil {
+		c.Printf("==> [WARNING] API Key may be invalid: %v: %s", err, ci)
+	} else if ci != nil {
+		c.Printf("==> %s", ci)
 	}
 
 	return c.run()

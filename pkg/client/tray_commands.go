@@ -206,7 +206,7 @@ func (c *Client) writeConfigFile() {
 		return
 	}
 
-	c.Print("[user requested] Writing Config File!")
+	c.Print("[user requested] Writing Config File:", c.Flags.ConfigFile)
 
 	if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
 		c.Errorf("Writing Config File: %v", err)

@@ -35,7 +35,7 @@ const (
 	TestURL     = BaseURL + "/notifierTest.php"
 	DevBaseURL  = "http://dev.notifiarr.com"
 	DevURL      = DevBaseURL + "/notifier.php"
-	APIKeyRoute = "/api/v1/user/apikey"
+	ClientRoute = "/api/v1/user/client"
 	// CFSyncRoute is the webserver route to send sync requests to.
 	CFSyncRoute = "/api/v1/user/trash"
 )
@@ -76,6 +76,7 @@ type Config struct {
 	URL          string
 	BaseURL      string
 	Timeout      time.Duration
+	ClientInfo   *ClientInfo
 	*logs.Logger // log file writer
 	stopTimers   chan struct{}
 	client       *httpClient
@@ -203,14 +204,42 @@ func (c *Config) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	return snap
 }
 
-// CheckAPIKey returns an error if the API key is wrong. Returns a message otherwise.
-func (c *Config) CheckAPIKey() (string, error) {
+// ClientInfo is the reply from the ClienRoute endpoint.
+type ClientInfo struct {
+	Status  string `json:"status"`
+	Message struct {
+		Text       string `json:"text"`
+		Subscriber bool   `json:"subscriber"`
+		CFSync     int64  `json:"cfSync"`
+	} `json:"message"`
+}
+
+// String returns the message text for a client info response.
+func (c *ClientInfo) String() string {
+	if c == nil {
+		return ""
+	}
+
+	return c.Message.Text
+}
+
+// IsASub returns true if the client is a subscriber. False otherwise.
+func (c *ClientInfo) IsASub() bool {
+	return c != nil && c.Message.Subscriber
+}
+
+// GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
+func (c *Config) GetClientInfo() (*ClientInfo, error) {
+	if c.ClientInfo != nil {
+		return c.ClientInfo, nil
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+APIKeyRoute, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+ClientRoute, nil)
 	if err != nil {
-		return "", fmt.Errorf("creating http request: %w", err)
+		return nil, fmt.Errorf("creating http request: %w", err)
 	}
 
 	c.Debugf("=> Checking API Key @ %s", req.URL)
@@ -218,28 +247,28 @@ func (c *Config) CheckAPIKey() (string, error) {
 
 	resp, err := c.getClient().Do(req)
 	if err != nil {
-		return "", fmt.Errorf("making http request: %w", err)
+		return nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("reading response: %w", err)
+		return nil, fmt.Errorf("reading response: %w", err)
 	}
 
-	var v struct {
-		Message string `json:"message"`
-	}
-
+	v := ClientInfo{}
 	if err = json.Unmarshal(body, &v); err != nil {
-		return "", fmt.Errorf("parsing response: %w", err)
+		return &v, fmt.Errorf("parsing response: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return v.Message, ErrNon200
+		return &v, ErrNon200
 	}
 
-	return v.Message, nil
+	// Only set this if there was no error.
+	c.ClientInfo = &v
+
+	return c.ClientInfo, nil
 }
 
 // SendJSON posts a JSON payload to a URL. Returns the response body or an error.

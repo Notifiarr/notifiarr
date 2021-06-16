@@ -51,7 +51,7 @@ type Config struct {
 	Snapshot   *snapshot.Config    `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
 	Services   *services.Config    `json:"services" toml:"services" xml:"services" yaml:"services"`
 	Service    []*services.Service `json:"service" toml:"service" xml:"service" yaml:"service"`
-	*logs.Logs
+	*logs.LogConfig
 	*apps.Apps
 	Allow AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
 }

@@ -34,6 +34,10 @@ func (c *Client) PrintStartupInfo() {
 		c.Print(" => Web HTTP Listen:", "http://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
 	}
 
+	c.printLogFileInfo()
+}
+
+func (c *Client) printLogFileInfo() {
 	if c.Config.LogFile != "" {
 		if c.Config.LogFiles > 0 {
 			c.Printf(" => Log File: %s (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
@@ -47,6 +51,22 @@ func (c *Client) PrintStartupInfo() {
 			c.Printf(" => HTTP Log: %s (%d @ %dMb)", c.Config.HTTPLog, c.Config.LogFiles, c.Config.LogFileMb)
 		} else {
 			c.Printf(" => HTTP Log: %s (no rotation)", c.Config.HTTPLog)
+		}
+	}
+
+	if c.Config.Debug && c.Config.DebugLog != "" {
+		if c.Config.LogFiles > 0 {
+			c.Printf(" => Debug Log: %s (%d @ %dMb)", c.Config.DebugLog, c.Config.LogFiles, c.Config.LogFileMb)
+		} else {
+			c.Printf(" => Debug Log: %s (no rotation)", c.Config.DebugLog)
+		}
+	}
+
+	if c.Config.Services.LogFile != "" && !c.Config.Services.Disabled && len(c.Config.Service) > 0 {
+		if c.Config.LogFiles > 0 {
+			c.Printf(" => Service Checks Log: %s (%d @ %dMb)", c.Config.Services.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
+		} else {
+			c.Printf(" => Service Checks Log: %s (no rotation)", c.Config.Services.LogFile)
 		}
 	}
 }
