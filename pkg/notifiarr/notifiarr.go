@@ -242,7 +242,6 @@ func (c *Config) GetClientInfo() (*ClientInfo, error) {
 		return nil, fmt.Errorf("creating http request: %w", err)
 	}
 
-	c.Debugf("=> Checking API Key @ %s", req.URL)
 	req.Header.Set("X-API-Key", c.Apps.APIKey)
 
 	resp, err := c.getClient().Do(req)

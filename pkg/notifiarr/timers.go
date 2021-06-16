@@ -20,8 +20,8 @@ func (c *Config) startTimers() {
 
 	c.stopTimers = make(chan struct{})
 
-	if ci, err := c.GetClientInfo(); err == nil && ci.IsASub() {
-		c.Printf("==> Radarr Custom Format and Sonarr Release Profile sync actived")
+	if ci, err := c.GetClientInfo(); err == nil && ci.IsASub() && ci.Message.CFSync > 0 {
+		c.Printf("==> Radarr Custom Format and Sonarr Release Profile sync activated")
 		syncTimer = time.NewTicker(cfSyncTimer) //nolint:wsl
 	}
 
