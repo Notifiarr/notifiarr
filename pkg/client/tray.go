@@ -82,7 +82,12 @@ func (c *Client) makeChannels() {
 	c.menu["logs"] = ui.WrapMenu(logs)
 	c.menu["logs_view"] = ui.WrapMenu(logs.AddSubMenuItem("View", "view the application log"))
 	c.menu["logs_http"] = ui.WrapMenu(logs.AddSubMenuItem("HTTP", "view the HTTP log"))
+	c.menu["logs_svcs"] = ui.WrapMenu(logs.AddSubMenuItem("Services", "view the Services log"))
 	c.menu["logs_rotate"] = ui.WrapMenu(logs.AddSubMenuItem("Rotate", "rotate both log files"))
+
+	if c.Config.Services.LogFile == "" {
+		c.menu["logs_svcs"].Hide()
+	}
 }
 
 //nolint:lll
@@ -196,6 +201,9 @@ func (c *Client) watchLogsChannels() {
 		case <-c.menu["logs_http"].Clicked():
 			c.Print("User Viewing Log File:", c.Config.HTTPLog)
 			ui.OpenLog(c.Config.HTTPLog)
+		case <-c.menu["logs_svcs"].Clicked():
+			c.Print("User Viewing Service File:", c.Config.Services.LogFile)
+			ui.OpenLog(c.Config.Services.LogFile)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
