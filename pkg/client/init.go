@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"path"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
@@ -34,6 +35,10 @@ func (c *Client) PrintStartupInfo() {
 		c.Print(" => Web HTTP Listen:", "http://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))
 	}
 
+	c.printLogFileInfo()
+}
+
+func (c *Client) printLogFileInfo() {
 	if c.Config.LogFile != "" {
 		if c.Config.LogFiles > 0 {
 			c.Printf(" => Log File: %s (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
@@ -47,6 +52,22 @@ func (c *Client) PrintStartupInfo() {
 			c.Printf(" => HTTP Log: %s (%d @ %dMb)", c.Config.HTTPLog, c.Config.LogFiles, c.Config.LogFileMb)
 		} else {
 			c.Printf(" => HTTP Log: %s (no rotation)", c.Config.HTTPLog)
+		}
+	}
+
+	if c.Config.Debug && c.Config.DebugLog != "" {
+		if c.Config.LogFiles > 0 {
+			c.Printf(" => Debug Log: %s (%d @ %dMb)", c.Config.DebugLog, c.Config.LogFiles, c.Config.LogFileMb)
+		} else {
+			c.Printf(" => Debug Log: %s (no rotation)", c.Config.DebugLog)
+		}
+	}
+
+	if c.Config.Services.LogFile != "" && !c.Config.Services.Disabled && len(c.Config.Service) > 0 {
+		if c.Config.LogFiles > 0 {
+			c.Printf(" => Service Checks Log: %s (%d @ %dMb)", c.Config.Services.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
+		} else {
+			c.Printf(" => Service Checks Log: %s (no rotation)", c.Config.Services.LogFile)
 		}
 	}
 }
@@ -79,32 +100,42 @@ func (c *Client) Exit() (err error) {
 
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
+// Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(msg string) {
 	c.Print("==> Reloading Configuration: " + msg)
 	c.notify.Stop()
 	c.Config.Services.Stop()
 
 	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
-		c.Errorf("Unable to reload configuration: %v", err)
-		return
+		c.Errorf("Reloading Config (1): %v\nNotifiarr EXITING!", err)
+		panic(err)
 	} else if !errors.Is(err, ErrNoServer) {
 		defer c.StartWebServer()
 	}
 
 	if err := c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix); err != nil {
-		c.Errorf("Reloading Config: %v", err)
+		c.Errorf("Reloading Config (2): %v\nNotifiarr EXITING!", err)
 		panic(err)
 	}
 
-	failed, err := c.runServices()
+	if errs := c.Logger.Close(); len(errs) > 0 {
+		// in a go routine in case logging is blocked
+		go c.Errorf("Reloading Config (3): %v\nNotifiarr EXITING!", errs)
+		time.Sleep(1 * time.Second)
+		panic(errs)
+	}
+
+	c.Logger.SetupLogging(c.Config.LogConfig)
+
+	plexFailed, err := c.runServices()
 	if err != nil {
-		c.Errorf("Reloading Config: %v", err)
+		c.Errorf("Reloading Config (4): %v\nNotifiarr EXITING!", err)
 		panic(err)
 	}
 
-	c.Print("==> Configuration Reloaded!")
+	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
-	if failed {
+	if plexFailed {
 		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.")
 	} else {
 		_, _ = ui.Info(Title, "Configuration Reloaded!")

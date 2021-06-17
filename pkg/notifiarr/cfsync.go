@@ -37,6 +37,11 @@ type RadarrCustomFormatPayload struct {
 
 // SyncRadarrCF triggers a custom format sync for Radarr.
 func (c *Config) SyncRadarrCF() {
+	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
+		c.Debugf("Cannot sync Radarr Custom Formats. Not a subscriber, or error: %v", err)
+		return
+	}
+
 	for i, r := range c.Apps.Radarr {
 		if r.DisableCF || r.URL == "" || r.APIKey == "" {
 			continue
@@ -177,6 +182,11 @@ type SonarrCustomFormatPayload struct {
 
 // SyncSonarrCF triggers a custom format sync for Sonarr.
 func (c *Config) SyncSonarrCF() {
+	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
+		c.Debugf("Cannot sync Sonarr Release Profiles. Not a subscriber, or error: %v", err)
+		return
+	}
+
 	for i, s := range c.Apps.Sonarr {
 		if s.DisableCF || s.URL == "" || s.APIKey == "" {
 			continue

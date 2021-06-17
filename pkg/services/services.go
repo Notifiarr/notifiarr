@@ -128,6 +128,15 @@ func (c *Config) Start(services []*Service) error {
 
 // start runs Parallel checkers and the check reporter.
 func (c *Config) start() {
+	if c.LogFile != "" {
+		c.Logger = logs.CustomLog(c.LogFile, "Services")
+		c.Printf("==> Service Checks Log File: %s", c.LogFile)
+
+		for i := range c.services {
+			c.services[i].log = c.Logger
+		}
+	}
+
 	for i := uint(0); i < c.Parallel; i++ {
 		go func() {
 			for check := range c.checks {
@@ -139,10 +148,10 @@ func (c *Config) start() {
 	}
 
 	go c.runServiceChecker()
+	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
 }
 
 func (c *Config) runServiceChecker() {
-	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
 	c.RunChecks(true)
 	c.SendResults(notifiarr.ProdURL, &Results{
 		What: "start",
@@ -180,10 +189,6 @@ func (c *Config) setup(services []*Service, run bool) error {
 		c.checks = make(chan *Service, DefaultBuffer)
 		c.done = make(chan bool)
 		c.stopChan = make(chan struct{})
-	}
-
-	if c.LogFile != "" {
-		c.Logger = logs.CustomLog(c.LogFile, "Services")
 	}
 
 	for i := range services {

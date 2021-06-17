@@ -52,6 +52,8 @@ func (c *Client) readyTray() {
 
 	go c.watchKillerChannels()
 	go c.watchNotifiarrMenu()
+	go c.watchLogsChannels()
+	go c.watchConfigChannels()
 	c.StartWebServer()
 	c.watchGuiChannels()
 }
@@ -103,6 +105,10 @@ func (c *Client) makeMoreChannels() {
 		debug := systray.AddMenuItem("Debug", "Debug Menu")
 		c.menu["debug"] = ui.WrapMenu(debug)
 		c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic"))
+
+		if c.Config.DebugLog != "" {
+			c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("HTTP", "view the Debug log"))
+		}
 	}
 
 	// These start hidden.
@@ -133,11 +139,14 @@ func (c *Client) watchKillerChannels() {
 		case <-c.menu["debug_panic"].Clicked():
 			c.Printf("User Requested Application Panic, good bye.")
 			panic("user requested panic")
+		case <-c.menu["debug_logs"].Clicked():
+			c.Print("User Viewing Debug File:", c.Config.DebugLog)
+			_ = ui.OpenLog(c.Config.DebugLog)
 		}
 	}
 }
 
-// nolint:errcheck,cyclop
+// nolint:errcheck
 func (c *Client) watchGuiChannels() {
 	for {
 		select {
@@ -153,6 +162,14 @@ func (c *Client) watchGuiChannels() {
 			ui.OpenURL("https://discord.gg/AURf8Yz")
 		case <-c.menu["disc2"].Clicked():
 			ui.OpenURL("https://golift.io/discord")
+		}
+	}
+}
+
+// nolint:errcheck
+func (c *Client) watchConfigChannels() {
+	for {
+		select {
 		case <-c.menu["view"].Clicked():
 			ui.Info(Title+": Configuration", c.displayConfig())
 		case <-c.menu["edit"].Clicked():
@@ -164,6 +181,14 @@ func (c *Client) watchGuiChannels() {
 			c.writeConfigFile()
 		case <-c.menu["key"].Clicked():
 			c.changeKey()
+		}
+	}
+}
+
+// nolint:errcheck
+func (c *Client) watchLogsChannels() {
+	for {
+		select {
 		case <-c.menu["logs_view"].Clicked():
 			c.Print("User Viewing Log File:", c.Config.LogFile)
 			ui.OpenLog(c.Config.LogFile)

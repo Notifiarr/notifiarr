@@ -22,13 +22,14 @@ import (
 // Logger provides some methods with baked in assumptions.
 type Logger struct {
 	ErrorLog *log.Logger // Shares a Writer with InfoLog.
-	DebugLog *log.Logger // Shares a Writer with InfoLog.
+	DebugLog *log.Logger // Shares a Writer with InfoLog by default. Changeable.
 	InfoLog  *log.Logger
 	HTTPLog  *log.Logger
 	web      *rotatorr.Logger
 	app      *rotatorr.Logger
-	custom   *rotatorr.Logger
-	logs     *Logs
+	debug    *rotatorr.Logger
+	custom   *rotatorr.Logger // must not be set when web/app/debug are set.
+	logs     *LogConfig
 }
 
 // These are used for custom logs.
@@ -39,6 +40,11 @@ var (
 	customLog = make(map[string]*rotatorr.Logger)
 )
 
+// Custom errors.
+var (
+	ErrCloseCustom = fmt.Errorf("cannot close custom logs directly")
+)
+
 // satisfy gomnd.
 const (
 	callDepth = 2 // log the line that called us.
@@ -47,11 +53,12 @@ const (
 	httpExt   = ".http.log"
 )
 
-// Logs allows sending logs to rotating files.
+// LogConfig allows sending logs to rotating files.
 // Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
-type Logs struct {
+type LogConfig struct {
 	AppName   string `json:"-"`
 	LogFile   string `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
+	DebugLog  string `json:"debug_log" toml:"debug_log" xml:"debug_log" yaml:"debug_log"`
 	HTTPLog   string `json:"http_log" toml:"http_log" xml:"http_log" yaml:"http_log"`
 	LogFiles  int    `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
 	LogFileMb int    `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
@@ -66,34 +73,67 @@ func New() *Logger {
 		InfoLog:  log.New(os.Stdout, "[INFO] ", log.LstdFlags),
 		ErrorLog: log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
 		HTTPLog:  log.New(os.Stdout, "", log.LstdFlags),
-		logs:     &Logs{},
+		logs:     &LogConfig{},
 	}
 }
 
-// Rotate rotates the log files.
+// Rotate rotates the log files. If called on a custom log, only rotates that log file.
 func (l *Logger) Rotate() (errors []error) {
-	if l.web != nil {
-		if _, err := l.web.Rotate(); err != nil {
-			errors = append(errors, fmt.Errorf("rotating HTTP Log: %w", err))
-		}
-	}
-
-	if l.app != nil {
-		if _, err := l.app.Rotate(); err != nil {
-			errors = append(errors, fmt.Errorf("rotating App Log: %w", err))
-		}
-	}
-
 	if l.custom != nil {
 		if _, err := l.custom.Rotate(); err != nil {
-			errors = append(errors, fmt.Errorf("rotating cCustom Log: %w", err))
+			return []error{fmt.Errorf("rotating cCustom Log: %w", err)}
 		}
-	} else {
-		for name, logger := range customLog {
+	}
+
+	for name, logger := range map[string]*rotatorr.Logger{
+		"HTTP":  l.web,
+		"App":   l.app,
+		"Debug": l.debug,
+	} {
+		if logger != nil {
 			if _, err := logger.Rotate(); err != nil {
-				errors = append(errors, fmt.Errorf("rotating %s Log: %w", name, err))
+				errors = append(errors, fmt.Errorf("closing %s Log: %w", name, err))
 			}
 		}
+	}
+
+	for name, logger := range customLog {
+		if _, err := logger.Rotate(); err != nil {
+			errors = append(errors, fmt.Errorf("rotating %s Log: %w", name, err))
+		}
+	}
+
+	return errors
+}
+
+// Close closes all open log files. Does not work on custom logs.
+func (l *Logger) Close() (errors []error) {
+	if l.custom != nil {
+		return []error{ErrCloseCustom}
+	}
+
+	for name, logger := range map[string]*rotatorr.Logger{
+		"HTTP":  l.web,
+		"App":   l.app,
+		"Debug": l.debug,
+	} {
+		if logger != nil {
+			if err := logger.Close(); err != nil {
+				errors = append(errors, fmt.Errorf("closing %s Log: %w", name, err))
+			}
+		}
+	}
+
+	l.web = nil
+	l.app = nil
+	l.debug = nil
+
+	for name, logger := range customLog {
+		if err := logger.Close(); err != nil {
+			errors = append(errors, fmt.Errorf("closing %s Log: %w", name, err))
+		}
+
+		delete(customLog, name)
 	}
 
 	return errors
@@ -148,27 +188,34 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 }
 
 // SetupLogging splits log writers into a file and/or stdout.
-func (l *Logger) SetupLogging(config *Logs) {
+func (l *Logger) SetupLogging(config *LogConfig) {
 	logFiles = config.LogFiles
 	logFileMb = config.LogFileMb
 	l.logs = config
+	l.setDefaultLogPaths()
 	l.setLogPaths()
 	l.openLogFile()
 	l.openHTTPLog()
+	l.openDebugLog()
 }
 
-func (l *Logger) setLogPaths() {
-	// Make sure log file paths exist if AppName is provided.
+// setDefaultLogPaths makes sure a GUI app has log files defined.
+// These are enforced on GUI OSes (like macOS.app and Windows).
+func (l *Logger) setDefaultLogPaths() {
+	// Make sure log file paths exist if AppName is provided; this indicates GUI OS.
 	if l.logs.AppName != "" {
 		if l.logs.LogFile == "" {
-			l.logs.LogFile = filepath.Join("~", ".dnclient", l.logs.AppName+defExt)
+			l.logs.LogFile = filepath.Join("~", ".notifiarr", l.logs.AppName+defExt)
 		}
 
 		if l.logs.HTTPLog == "" {
-			l.logs.HTTPLog = filepath.Join("~", ".dnclient", l.logs.AppName+httpExt)
+			l.logs.HTTPLog = filepath.Join("~", ".notifiarr", l.logs.AppName+httpExt)
 		}
 	}
+}
 
+// setLogPaths sets the log paths for app and http logs.
+func (l *Logger) setLogPaths() {
 	// Regular log file.
 	if l.logs.LogFile != "" {
 		if f, err := homedir.Expand(l.logs.LogFile); err == nil {
@@ -220,7 +267,7 @@ func (l *Logger) openLogFile() {
 	}
 
 	// Don't forget errors log, and do standard logger too.
-	if l.logs.Debug {
+	if l.logs.Debug && l.logs.DebugLog == "" {
 		l.DebugLog.SetOutput(l.InfoLog.Writer())
 	}
 
@@ -236,6 +283,33 @@ func (l *Logger) postLogRotate(_, newFile string) {
 
 	if l.app != nil && l.app.File != nil {
 		redirectStderr(l.app.File) // Log panics.
+	}
+}
+
+func (l *Logger) openDebugLog() {
+	if !l.logs.Debug || l.logs.DebugLog == "" {
+		return
+	}
+
+	if f, err := homedir.Expand(l.logs.DebugLog); err == nil {
+		l.logs.DebugLog = f
+	}
+
+	if f, err := filepath.Abs(l.logs.DebugLog); err == nil {
+		l.logs.DebugLog = f
+	}
+
+	rotateDebug := &rotatorr.Config{
+		Filepath: l.logs.DebugLog,                                 // log file name.
+		FileSize: int64(l.logs.LogFileMb) * megabyte,              // megabytes
+		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
+	}
+	l.debug = rotatorr.NewMust(rotateDebug)
+
+	if l.logs.Quiet {
+		l.DebugLog.SetOutput(l.debug)
+	} else {
+		l.DebugLog.SetOutput(io.MultiWriter(l.debug, os.Stdout))
 	}
 }
 
@@ -263,14 +337,13 @@ func (l *Logger) openHTTPLog() {
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
 // This is not thread safe with Rotate(), so do not call them at the same time.
 func CustomLog(filePath, logName string) *Logger {
-	logger := &Logger{
-		DebugLog: log.New(ioutil.Discard, "[DEBUG] ", log.LstdFlags),
-		InfoLog:  log.New(ioutil.Discard, "[INFO] ", log.LstdFlags),
-		ErrorLog: log.New(ioutil.Discard, "[ERROR] ", log.LstdFlags),
-	}
-
 	if filePath == "" || logName == "" {
-		return logger
+		return &Logger{
+			DebugLog: log.New(ioutil.Discard, "", 0),
+			InfoLog:  log.New(ioutil.Discard, "", 0),
+			ErrorLog: log.New(ioutil.Discard, "", 0),
+			HTTPLog:  log.New(ioutil.Discard, "", 0),
+		}
 	}
 
 	f, err := homedir.Expand(filePath)
@@ -287,11 +360,12 @@ func CustomLog(filePath, logName string) *Logger {
 		FileSize: int64(logFileMb) * megabyte,              // megabytes
 		Rotatorr: &timerotator.Layout{FileCount: logFiles}, // number of files to keep.
 	})
-	logger.custom = customLog[logName]
 
-	logger.DebugLog.SetOutput(logger.custom)
-	logger.ErrorLog.SetOutput(logger.custom)
-	logger.InfoLog.SetOutput(logger.custom)
-
-	return logger
+	return &Logger{
+		custom:   customLog[logName],
+		DebugLog: log.New(customLog[logName], "[DEBUG] ", log.LstdFlags),
+		InfoLog:  log.New(customLog[logName], "[INFO] ", log.LstdFlags),
+		ErrorLog: log.New(customLog[logName], "[ERROR] ", log.LstdFlags),
+		HTTPLog:  log.New(customLog[logName], "[HTTP] ", log.LstdFlags),
+	}
 }
