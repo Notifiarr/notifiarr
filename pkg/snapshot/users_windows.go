@@ -14,7 +14,11 @@ func (s *Snapshot) GetUsers(ctx context.Context) error {
 		return fmt.Errorf("getting userlist: %w", err)
 	}
 
-	s.System.Users = len(users)
+	count = len(users)
+
+	if s.System != nil {
+		s.System.Users = len(users)
+	}
 
 	return nil
 }

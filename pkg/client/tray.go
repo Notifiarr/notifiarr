@@ -105,9 +105,10 @@ func (c *Client) makeMoreChannels() {
 		debug := systray.AddMenuItem("Debug", "Debug Menu")
 		c.menu["debug"] = ui.WrapMenu(debug)
 		c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic"))
+		c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Log", "view the Debug log"))
 
-		if c.Config.DebugLog != "" {
-			c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("HTTP", "view the Debug log"))
+		if c.Config.DebugLog == "" {
+			c.menu["debug_logs"].Hide()
 		}
 	}
 
