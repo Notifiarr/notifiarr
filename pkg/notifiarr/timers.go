@@ -11,10 +11,10 @@ func (c *Config) startTimers() {
 		return // Already running.
 	}
 
+	c.stopTimers = make(chan struct{})
 	snapTimer := c.getSnapTimer()
 	syncTimer := c.getSyncTimer()
 	plexTimer1, plexTimer2 := c.getPlexTimers()
-	c.stopTimers = make(chan struct{})
 
 	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2)
 }

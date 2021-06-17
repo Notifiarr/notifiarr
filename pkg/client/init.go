@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"path"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
@@ -99,32 +100,42 @@ func (c *Client) Exit() (err error) {
 
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
+// Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(msg string) {
 	c.Print("==> Reloading Configuration: " + msg)
 	c.notify.Stop()
 	c.Config.Services.Stop()
 
 	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
-		c.Errorf("Unable to reload configuration: %v", err)
-		return
+		c.Errorf("Reloading Config (1): %v\nNotifiarr EXITING!", err)
+		panic(err)
 	} else if !errors.Is(err, ErrNoServer) {
 		defer c.StartWebServer()
 	}
 
 	if err := c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix); err != nil {
-		c.Errorf("Reloading Config: %v", err)
+		c.Errorf("Reloading Config (2): %v\nNotifiarr EXITING!", err)
 		panic(err)
 	}
 
-	failed, err := c.runServices()
+	if errs := c.Logger.Close(); len(errs) > 0 {
+		// in a go routine in case logging is blocked
+		go c.Errorf("Reloading Config (3): %v\nNotifiarr EXITING!", errs)
+		time.Sleep(1 * time.Second)
+		panic(errs)
+	}
+
+	c.Logger.SetupLogging(c.Config.LogConfig)
+
+	plexFailed, err := c.runServices()
 	if err != nil {
-		c.Errorf("Reloading Config: %v", err)
+		c.Errorf("Reloading Config (4): %v\nNotifiarr EXITING!", err)
 		panic(err)
 	}
 
-	c.Print("==> Configuration Reloaded!")
+	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
-	if failed {
+	if plexFailed {
 		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.")
 	} else {
 		_, _ = ui.Info(Title, "Configuration Reloaded!")
