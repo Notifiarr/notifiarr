@@ -157,9 +157,9 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["hp"].Clicked():
 			ui.OpenURL("https://notifiarr.com/")
 		case <-c.menu["wiki"].Clicked():
-			ui.OpenURL("https://trash-guides.info/Misc/Discord-Notifier-Basic-Setup/")
+			ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/")
 		case <-c.menu["disc1"].Clicked():
-			ui.OpenURL("https://discord.gg/AURf8Yz")
+			ui.OpenURL("https://notifiarr.com/discord")
 		case <-c.menu["disc2"].Clicked():
 			ui.OpenURL("https://golift.io/discord")
 		}
