@@ -7,6 +7,8 @@ import (
 	wapi "github.com/iamacarpet/go-win64api"
 )
 
+var ErrNilUsers = fmt.Errorf("user list was nil")
+
 // GetUsers collects logged in users.
 func (s *Snapshot) GetUsers(ctx context.Context) error {
 	users, err := wapi.ListLoggedInUsers()
@@ -14,11 +16,12 @@ func (s *Snapshot) GetUsers(ctx context.Context) error {
 		return fmt.Errorf("getting userlist: %w", err)
 	}
 
-	count = len(users)
-
-	if s.System != nil {
-		s.System.Users = len(users)
+	if users == nil {
+		return fmt.Errorf("getting userlist: %w", ErrNilUsers)
 	}
+
+	count := len(users)
+	s.System.Users = count
 
 	return nil
 }
