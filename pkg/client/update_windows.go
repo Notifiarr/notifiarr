@@ -112,7 +112,7 @@ func (c *Client) AutoWatchUpdate() {
 
 	c.Print("Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
 
-	ticker := time.NewTimer(dur)
+	ticker := time.NewTicker(dur)
 	for range ticker.C {
 		c.Debugf("Checking GitHub for Update.")
 
