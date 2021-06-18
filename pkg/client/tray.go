@@ -202,7 +202,7 @@ func (c *Client) watchLogsChannels() {
 			c.Print("User Viewing Log File:", c.Config.HTTPLog)
 			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_svcs"].Clicked():
-			c.Print("User Viewing Service File:", c.Config.Services.LogFile)
+			c.Print("User Viewing Log File:", c.Config.Services.LogFile)
 			ui.OpenLog(c.Config.Services.LogFile)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()

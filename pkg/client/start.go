@@ -155,6 +155,8 @@ func Start() error {
 	if err := c.config(); err != nil {
 		_, _ = ui.Error(Title, err.Error())
 		return err
+	} else if c.Flags.restart {
+		return nil
 	}
 
 	if err := c.start(); err != nil {

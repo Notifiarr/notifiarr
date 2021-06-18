@@ -112,22 +112,33 @@ func (c *Client) AutoWatchUpdate() {
 
 	c.Print("Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
 
+	go func() {
+		// Check for update on startup.
+		time.Sleep(5 * time.Second)
+		c.checkAndUpdate("startup check")
+	}()
+
 	ticker := time.NewTicker(dur)
 	for range ticker.C {
-		c.Debugf("Checking GitHub for Update.")
-
-		u, err := update.Check(userRepo, version.Version)
-		if err != nil {
-			c.Errorf("Checking GitHub for Update: %v", err)
-		} else if !u.Outdate {
-			continue
-		} else if err = c.updateNow(u, "automatic"); err != nil {
-			c.Errorf("Update Failed: %v", err)
-			continue
+		if err := c.checkAndUpdate("automatic"); err != nil {
+			c.Errorf("Auto-Update Failed: %v", err)
 		}
-
-		return
 	}
+}
+
+func (c *Client) checkAndUpdate(how string) error {
+	c.Debugf("Checking GitHub for Update.")
+
+	u, err := update.Check(userRepo, version.Version)
+	if err != nil {
+		return fmt.Errorf("checking GitHub for update: %w", err)
+	} else if !u.Outdate {
+		return nil
+	} else if err = c.updateNow(u, how); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *Client) updateNow(u *update.Update, msg string) error {
@@ -155,7 +166,7 @@ func (c *Client) updateNow(u *update.Update, msg string) error {
 
 	c.Printf("Update installed to %s restarting! Backup: %s", uc.Path, backupFile)
 	// And exit, so we can restart.
-	c.sigkil <- &update.Signal{Text: "upgrade request"}
+	c.sigkil <- &update.Signal{Text: "upgrade request: " + msg}
 
 	return nil
 }

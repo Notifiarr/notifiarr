@@ -134,12 +134,12 @@ func (c *Client) reloadConfiguration(msg string) {
 		panic(fmt.Errorf("service checks: %w", err))
 	}
 
-	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
-
 	if plexFailed {
-		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.")
+		c.Print("==> Configuration Reloaded with Plex error (plex disabled)! Config File:", c.Flags.ConfigFile)
+		ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.") //nolint:errcheck
 	} else {
-		_, _ = ui.Info(Title, "Configuration Reloaded!")
+		c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
+		ui.Info(Title, "Configuration Reloaded!") //nolint:errcheck
 	}
 }
 
