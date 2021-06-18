@@ -214,9 +214,7 @@ func (c *Client) start() error {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
 	}
 
-	if _, err := c.runServices(); err != nil {
-		return err
-	}
+	c.configureServices()
 
 	if c.Flags.cfsync {
 		c.Printf("==> Flag Requested: Syncing Custom Formats (then exiting)")
@@ -224,6 +222,10 @@ func (c *Client) start() error {
 		c.notify.SyncSonarrCF()
 
 		return nil
+	}
+
+	if err := c.Config.Services.Start(c.Config.Service); err != nil {
+		return fmt.Errorf("service checks: %w", err)
 	}
 
 	if ci, err := c.notify.GetClientInfo(); err != nil {
@@ -258,8 +260,8 @@ func printProcessList() error {
 	return nil
 }
 
-// runServices is called on startup and on reload.
-func (c *Client) runServices() (bool, error) {
+// configureServices is called on startup and on reload.
+func (c *Client) configureServices() bool {
 	c.notify = &notifiarr.Config{
 		Apps:    c.Config.Apps,
 		Plex:    c.Config.Plex,
@@ -270,19 +272,15 @@ func (c *Client) runServices() (bool, error) {
 	}
 
 	c.Config.Snapshot.Validate()
-	c.PrintStartupInfo()
 	failed := c.checkPlex()
+	c.PrintStartupInfo()
 	c.notify.Start(c.Flags.Mode)
 
 	c.Config.Services.Logger = c.Logger
 	c.Config.Services.Apps = c.Config.Apps
 	c.Config.Services.Notify = c.notify
 
-	if err := c.Config.Services.Start(c.Config.Service); err != nil {
-		return failed, fmt.Errorf("service checks: %w", err)
-	}
-
-	return failed, nil
+	return failed
 }
 
 // run turns on the auto updater if enabled, and starts the web server, and system tray icon.

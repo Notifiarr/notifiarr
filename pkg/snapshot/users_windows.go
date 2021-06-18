@@ -7,6 +7,7 @@ import (
 	wapi "github.com/iamacarpet/go-win64api"
 )
 
+// ErrNilUsers is a custom error to hopefully avoid a stack trace panic. Not sure.
 var ErrNilUsers = fmt.Errorf("user list was nil")
 
 // GetUsers collects logged in users.

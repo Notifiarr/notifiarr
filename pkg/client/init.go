@@ -8,6 +8,7 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path"
 	"time"
 
@@ -126,11 +127,11 @@ func (c *Client) reloadConfiguration(msg string) {
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
+	plexFailed := c.configureServices()
 
-	plexFailed, err := c.runServices()
-	if err != nil {
+	if err := c.Config.Services.Start(c.Config.Service); err != nil {
 		c.Errorf("Reloading Config (4): %v\nNotifiarr EXITING!", err)
-		panic(err)
+		panic(fmt.Errorf("service checks: %w", err))
 	}
 
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)

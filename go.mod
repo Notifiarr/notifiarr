@@ -11,7 +11,7 @@ require (
 	github.com/getlantern/systray v1.1.0
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/gonutz/w32 v1.0.0
-	github.com/gopherjs/gopherjs v0.0.0-20210603182125-eeedf4a0e899 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20210614142143-03070f63dd63 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/iamacarpet/go-win64api v0.0.0-20210311141720-fe38760bed28
@@ -26,10 +26,10 @@ require (
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.6 // indirect
 	golang.org/x/mod v0.4.2
-	golang.org/x/sys v0.0.0-20210611083646-a4fc73990273
+	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
 	golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.10.0
+	golift.io/starr v0.10.1
 	golift.io/version v0.0.2
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
