@@ -136,10 +136,10 @@ func (c *Client) reloadConfiguration(msg string) {
 
 	if plexFailed {
 		c.Print("==> Configuration Reloaded with Plex error (plex disabled)! Config File:", c.Flags.ConfigFile)
-		ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.") //nolint:errcheck
+		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.") //nolint:wsl
 	} else {
 		c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
-		ui.Info(Title, "Configuration Reloaded!") //nolint:errcheck
+		_, _ = ui.Info(Title, "Configuration Reloaded!")
 	}
 }
 

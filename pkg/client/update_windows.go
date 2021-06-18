@@ -113,9 +113,11 @@ func (c *Client) AutoWatchUpdate() {
 	c.Print("Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
 
 	go func() {
+		time.Sleep(update.SleepTime)
 		// Check for update on startup.
-		time.Sleep(5 * time.Second)
-		c.checkAndUpdate("startup check")
+		if err := c.checkAndUpdate("startup check"); err != nil {
+			c.Errorf("Auto-Update Failed: %v", err)
+		}
 	}()
 
 	ticker := time.NewTicker(dur)
@@ -142,7 +144,7 @@ func (c *Client) checkAndUpdate(how string) error {
 }
 
 func (c *Client) updateNow(u *update.Update, msg string) error {
-	c.Printf("[%s] Downloading and installing update! %s => %s: %s", msg, u.Version, u.Current, u.CurrURL)
+	c.Printf("[UPDATE] Downloading and installing update! %s => %s: %s", u.Version, u.Current, u.CurrURL)
 
 	uc := &update.Command{
 		URL:    u.CurrURL,
