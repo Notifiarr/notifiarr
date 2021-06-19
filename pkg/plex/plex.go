@@ -8,7 +8,9 @@
 package plex
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -90,4 +92,39 @@ func (s *Server) setDefaults() {
 	if s.Cooldown.Duration < s.Timeout.Duration {
 		s.Cooldown.Duration = s.Timeout.Duration
 	}
+}
+
+func (s *Server) getPlexURL(ctx context.Context, url string, headers map[string]string) ([]byte, error) {
+	if s == nil || s.URL == "" || s.Token == "" {
+		return nil, ErrNoURLToken
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating http request: %w", err)
+	}
+
+	req.Header.Set("X-Plex-Token", s.Token)
+	req.Header.Set("Accept", "application/json")
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
+	resp, err := s.getClient().Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("making http request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("reading http response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return body, ErrBadStatus
+	}
+
+	return body, nil
 }

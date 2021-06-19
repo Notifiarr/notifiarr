@@ -22,14 +22,10 @@ var ErrBadStatus = fmt.Errorf("status code not 200")
 
 // GetXMLSessions returns the Plex sessions in XML format.
 func (s *Server) GetXMLSessions() (*Sessions, error) {
-	if s == nil || s.URL == "" || s.Token == "" {
-		return nil, ErrNoURLToken
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
 
-	xml, err := s.getPlexSessions(ctx, map[string]string{"Accept": "application/xml"})
+	xml, err := s.getPlexURL(ctx, s.URL+"/status/sessions", map[string]string{"Accept": "application/xml"})
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +37,7 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 	}
 
 	if s.ReturnJSON {
-		data, err := s.getPlexSessions(ctx, map[string]string{"Accept": "application/json"})
+		data, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
 		if err != nil {
 			return nil, err
 		}
@@ -67,10 +63,6 @@ func (s *Server) GetSessions() ([]*Session, error) {
 
 // GetSessionsWithContext returns the Plex sessions in JSON format.
 func (s *Server) GetSessionsWithContext(ctx context.Context) ([]*Session, error) {
-	if s == nil || s.URL == "" || s.Token == "" {
-		return nil, ErrNoURLToken
-	}
-
 	var v struct {
 		MediaContainer struct {
 			Sessions []*Session `json:"Metadata"`
@@ -80,7 +72,7 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) ([]*Session, error)
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
-	data, err := s.getPlexSessions(ctx, map[string]string{"Accept": "application/json"})
+	data, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -91,36 +83,6 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) ([]*Session, error)
 	}
 
 	return v.MediaContainer.Sessions, nil
-}
-
-func (s *Server) getPlexSessions(ctx context.Context, headers map[string]string) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+"/status/sessions", nil)
-	if err != nil {
-		return nil, fmt.Errorf("creating http request: %w", err)
-	}
-
-	req.Header.Set("X-Plex-Token", s.Token)
-
-	for k, v := range headers {
-		req.Header.Set(k, v)
-	}
-
-	resp, err := s.getClient().Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("making http request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("reading http response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return body, ErrBadStatus
-	}
-
-	return body, nil
 }
 
 // KillSessionWithContext kills a Plex session.

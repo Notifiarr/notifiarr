@@ -82,14 +82,28 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 	return code, err
 }
 
-// versionResponse returns application run and build time data: /api/version.
-func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
+type appStatus struct {
+	Radarr  []*conTest `json:"radarr"`
+	Readarr []*conTest `json:"readarr"`
+	Sonarr  []*conTest `json:"sonarr"`
+	Lidarr  []*conTest `json:"lidarr"`
+	Plex    []*conTest `json:"plex"`
+}
+
+type conTest struct {
+	Instance int         `json:"instance"`
+	Up       bool        `json:"up"`
+	Status   interface{} `json:"systemStatus,omitempty"`
+}
+
+// getVersion returns application run and build time data.
+func (c *Client) getVersion() map[string]interface{} {
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
 	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
 		numPlex = 1
 	}
 
-	return http.StatusOK, map[string]interface{}{
+	return map[string]interface{}{
 		"version":        version.Version,
 		"os_arch":        runtime.GOOS + "." + runtime.GOARCH,
 		"uptime":         time.Since(version.Started).Round(time.Second).String(),
@@ -105,6 +119,63 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 		"num_readarr":    len(c.Config.Apps.Readarr),
 		"num_plex":       numPlex,
 	}
+}
+
+// versionResponse returns application run and build time data and application statuses: /api/version.
+func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
+	var (
+		output = c.getVersion()
+		rad    = make([]*conTest, len(c.Config.Radarr))
+		read   = make([]*conTest, len(c.Config.Readarr))
+		son    = make([]*conTest, len(c.Config.Sonarr))
+		lid    = make([]*conTest, len(c.Config.Lidarr))
+		status = &appStatus{Radarr: rad, Readarr: read, Sonarr: son, Lidarr: lid}
+	)
+
+	for i, app := range c.Config.Radarr {
+		stat, err := app.GetSystemStatus()
+		rad[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	for i, app := range c.Config.Readarr {
+		stat, err := app.GetSystemStatus()
+		read[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	for i, app := range c.Config.Sonarr {
+		stat, err := app.GetSystemStatus()
+		son[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	for i, app := range c.Config.Lidarr {
+		stat, err := app.GetSystemStatus()
+		lid[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	if c.Config.Plex != nil && c.Config.Plex.URL != "" && c.Config.Plex.Token != "" {
+		stat, err := c.Config.Plex.GetInfo()
+		status.Plex = []*conTest{{
+			Instance: 1,
+			Up:       err == nil,
+			Status: map[string]interface{}{
+				"friendlyName":             stat.FriendlyName,
+				"version":                  stat.Version,
+				"updatedAt":                stat.UpdatedAt,
+				"platform":                 stat.Platform,
+				"platformVersion":          stat.PlatformVersion,
+				"size":                     stat.Size,
+				"myPlexSigninState":        stat.MyPlexSigninState,
+				"myPlexSubscription":       stat.MyPlexSubscription,
+				"pushNotifications":        stat.PushNotifications,
+				"streamingBrainVersion":    stat.StreamingBrainVersion,
+				"streamingBrainABRVersion": stat.StreamingBrainABRVersion,
+			},
+		}}
+	}
+
+	output["app_status"] = status
+
+	return http.StatusOK, output
 }
 
 // notFound is the handler for paths that are not found: 404s.
