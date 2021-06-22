@@ -211,6 +211,7 @@ type ClientInfo struct {
 		Text       string `json:"text"`
 		Subscriber bool   `json:"subscriber"`
 		CFSync     int64  `json:"cfSync"`
+		QRSync     int64  `json:"qrSync"`
 	} `json:"message"`
 }
 

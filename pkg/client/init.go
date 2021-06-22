@@ -151,7 +151,7 @@ func (c *Client) printPlex() {
 		name = "<possible connection error>"
 	}
 
-	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming plex APIs and webhook)", name, p.URL)
+	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming APIs and webhook)", name, p.URL)
 }
 
 // printLidarr is called on startup to print info about each configured server.

@@ -40,6 +40,8 @@ func (c *Config) SyncRadarrCF() {
 	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
 		c.Debugf("Cannot sync Radarr Custom Formats. Not a subscriber, or error: %v", err)
 		return
+	} else if ci.Message.CFSync < 1 {
+		return
 	}
 
 	for i, r := range c.Apps.Radarr {
@@ -184,6 +186,8 @@ type SonarrCustomFormatPayload struct {
 func (c *Config) SyncSonarrCF() {
 	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Not a subscriber, or error: %v", err)
+		return
+	} else if ci.Message.QRSync < 1 {
 		return
 	}
 
