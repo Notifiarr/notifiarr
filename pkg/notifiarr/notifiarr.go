@@ -81,7 +81,7 @@ type Config struct {
 	stopTimers   chan struct{}
 	client       *httpClient
 	radarrCFs    map[int]*cfMapIDpayload
-	sonarrCFs    map[int]*cfMapIDpayload
+	sonarrQRs    map[int]*cfMapIDpayload
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -107,7 +107,7 @@ func (c *Config) Start(mode string) {
 	}
 
 	c.radarrCFs = make(map[int]*cfMapIDpayload)
-	c.sonarrCFs = make(map[int]*cfMapIDpayload)
+	c.sonarrQRs = make(map[int]*cfMapIDpayload)
 
 	c.startTimers()
 }

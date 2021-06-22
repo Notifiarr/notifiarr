@@ -182,8 +182,8 @@ type SonarrCustomFormatPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
-// SyncSonarrCF triggers a custom format sync for Sonarr.
-func (c *Config) SyncSonarrCF() {
+// SyncSonarrQR triggers a custom format sync for Sonarr.
+func (c *Config) SyncSonarrQR() {
 	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Not a subscriber, or error: %v", err)
 		return
@@ -196,7 +196,7 @@ func (c *Config) SyncSonarrCF() {
 			continue
 		}
 
-		switch synced, err := c.syncSonarrCF(i+1, s); {
+		switch synced, err := c.syncSonarrQR(i+1, s); {
 		case err != nil:
 			c.Errorf("Sonarr Release Profiles sync for '%d:%s' failed: %v", i+1, s.URL, err)
 		case synced:
@@ -207,10 +207,10 @@ func (c *Config) SyncSonarrCF() {
 	}
 }
 
-func (c *Config) syncSonarrCF(instance int, s *apps.SonarrConfig) (bool, error) {
+func (c *Config) syncSonarrQR(instance int, s *apps.SonarrConfig) (bool, error) {
 	var (
 		err     error
-		payload = SonarrCustomFormatPayload{Instance: instance, NewMaps: c.sonarrCFs[instance]}
+		payload = SonarrCustomFormatPayload{Instance: instance, NewMaps: c.sonarrQRs[instance]}
 	)
 
 	payload.QualityProfiles, err = s.Sonarr.GetQualityProfiles()
@@ -234,7 +234,7 @@ func (c *Config) syncSonarrCF(instance int, s *apps.SonarrConfig) (bool, error) 
 		c.Debugf("Response Payload: %s: %s", resp.Status, string(body))
 	}
 
-	c.sonarrCFs[instance] = nil
+	c.sonarrQRs[instance] = nil
 
 	if len(body) < 1 {
 		return false, nil
@@ -305,10 +305,10 @@ func (c *Config) postbackSonarrCFs(instance int, maps *cfMapIDpayload) error {
 		})
 
 		if err != nil {
-			c.sonarrCFs[instance] = maps
+			c.sonarrQRs[instance] = maps
 			return fmt.Errorf("updating release profiles ID map: %w: %s", err, string(body))
 		} else if resp.StatusCode != http.StatusOK {
-			c.sonarrCFs[instance] = maps
+			c.sonarrQRs[instance] = maps
 			return fmt.Errorf("updating custom format ID map: %w: %s: %s", ErrNon200, resp.Status, string(body))
 		}
 	}
