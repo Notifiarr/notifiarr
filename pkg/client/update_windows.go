@@ -94,6 +94,8 @@ func (c *Client) AutoWatchUpdate() {
 	var dur time.Duration
 
 	switch c.Config.AutoUpdate {
+	case "off", "no", "disabled", "disable", "false", "", "-", "0", "0s":
+		return
 	case "hourly":
 		dur = time.Hour
 	case "daily":
