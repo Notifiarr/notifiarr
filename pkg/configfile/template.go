@@ -2,6 +2,7 @@ package configfile
 
 import (
 	"fmt"
+	"runtime"
 	"text/template"
 	"time"
 
@@ -15,6 +16,7 @@ var Template = template.Must(template.New("config").Funcs(Funcs()).Parse(tmpl))
 // Funcs returns our template functions.
 func Funcs() template.FuncMap {
 	return map[string]interface{}{
+		"os": func() string { return runtime.GOOS },
 		"version": func() string {
 			return fmt.Sprintf("v%-7s @ %s", version.Version, time.Now().UTC().Format("060201T1504"))
 		},
@@ -36,11 +38,12 @@ const tmpl = `###############################################
 ## This will be used in Media Requests for example to send payloads, Example: http://your-domain.com:5454
 ##
 bind_addr = "{{.BindAddr}}"
-{{if .AutoUpdate}}
+{{if eq os "windows"}}
 ## This application can update itself on Windows systems.
 ## Set this to "daily" to check GitHub every day for updates.
 ## You may also set it to a Go duration like "12h" or "72h".
-auto_update = "{{.AutoUpdate}}"
+## THIS ONLY WORKS ON WINDOWS
+{{if .AutoUpdate}}auto_update = "{{.AutoUpdate}}"{{else}}auto_update="off"{{end}}
 {{end}}
 ## Quiet makes the app not log anything to output.
 ## Recommend setting log files if you make the app quiet.
@@ -163,7 +166,6 @@ timeout = "{{.Timeout}}"
   interval    = "{{.Plex.Interval}}"  # how often to send session data, 0 = off
   cooldown    = "{{.Plex.Cooldown}}"  # how often plex webhooks may trigger session hooks
   account_map = "{{.Plex.AccountMap}}"     # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  server      = "{{.Plex.Name}}" # optional name of the server the notifications are from
   movies_percent_complete = {{.Plex.MoviesPC}} # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = {{.Plex.SeriesPC}} # 0, 70-99, send notifications when an episode session is this % complete.
 {{- else}}
@@ -172,7 +174,6 @@ timeout = "{{.Timeout}}"
   interval    = "30m"  # how often to send session data, 0 = off
   cooldown    = "15s"  # how often plex webhooks may trigger session hooks
   account_map = ""     # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  server      = "plex" # optional name of the server the notifications are from
   movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 {{- end }}

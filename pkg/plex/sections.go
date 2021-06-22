@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 )
 
 // LibrarySection is a plex response struct.
@@ -148,7 +146,7 @@ func (s *Server) GetPlexSectionKey(keyPath string) (*LibrarySection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
 
-	data, err := s.getPlexSectionKey(ctx, s.URL+keyPath)
+	data, err := s.getPlexURL(ctx, s.URL+keyPath, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -162,31 +160,4 @@ func (s *Server) GetPlexSectionKey(keyPath string) (*LibrarySection, error) {
 	}
 
 	return v.MediaContainer, nil
-}
-
-func (s *Server) getPlexSectionKey(ctx context.Context, url string) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("creating http request: %w", err)
-	}
-
-	req.Header.Set("X-Plex-Token", s.Token)
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := s.getClient().Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("making http request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("reading http response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return body, ErrBadStatus
-	}
-
-	return body, nil
 }

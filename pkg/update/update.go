@@ -23,9 +23,11 @@ import (
 	"time"
 )
 
+// SleepTime is how long we wait after updating before exiting.
+const SleepTime = 5 * time.Second
+
 const (
 	downloadTimeout = 5 * time.Minute
-	sleepTime       = 5 * time.Second
 	windows         = "windows"
 )
 
@@ -39,8 +41,8 @@ type Command struct {
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
 func Restart(u *Command) error {
-	fmt.Printf("Sleeping %v before restarting.", sleepTime)
-	time.Sleep(sleepTime)
+	fmt.Printf("Sleeping %v before restarting.", SleepTime)
+	time.Sleep(SleepTime)
 
 	if err := exec.Command(u.Path, u.Args...).Start(); err != nil { //nolint:gosec
 		return fmt.Errorf("executing command %w", err)
