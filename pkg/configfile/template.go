@@ -163,7 +163,6 @@ timeout = "{{.Timeout}}"
   interval    = "{{.Plex.Interval}}"  # how often to send session data, 0 = off
   cooldown    = "{{.Plex.Cooldown}}"  # how often plex webhooks may trigger session hooks
   account_map = "{{.Plex.AccountMap}}"     # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  server      = "{{.Plex.Name}}" # optional name of the server the notifications are from
   movies_percent_complete = {{.Plex.MoviesPC}} # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = {{.Plex.SeriesPC}} # 0, 70-99, send notifications when an episode session is this % complete.
 {{- else}}
@@ -172,7 +171,6 @@ timeout = "{{.Timeout}}"
   interval    = "30m"  # how often to send session data, 0 = off
   cooldown    = "15s"  # how often plex webhooks may trigger session hooks
   account_map = ""     # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  server      = "plex" # optional name of the server the notifications are from
   movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 {{- end }}

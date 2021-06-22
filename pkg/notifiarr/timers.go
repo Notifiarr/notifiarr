@@ -33,7 +33,8 @@ func (c *Config) getSyncTimer() *time.Ticker {
 func (c *Config) getPlexTimers() (*time.Ticker, *time.Ticker) {
 	empty := &time.Ticker{C: make(<-chan time.Time)}
 
-	if c.Plex == nil || c.Plex.Interval.Duration < 1 || c.Plex.URL == "" || c.Plex.Token != "" {
+	if !c.Plex.Configured() || c.Plex.Interval.Duration < 1 {
+		c.Print("foo")
 		return empty, empty
 	}
 

@@ -23,7 +23,7 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 
-	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
+	if c.Config.Plex.Configured() {
 		c.Config.HandleAPIpath(plex.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
 		c.Config.HandleAPIpath(plex.Plex, "kill", c.Config.Plex.HandleKillSession, "GET").
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:[0-9a-z-]+}")
@@ -99,7 +99,7 @@ type conTest struct {
 // getVersion returns application run and build time data.
 func (c *Client) getVersion() map[string]interface{} {
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
-	if c.Config.Plex != nil && c.Config.Plex.Token != "" && c.Config.Plex.URL != "" {
+	if c.Config.Plex.Configured() {
 		numPlex = 1
 	}
 
@@ -152,7 +152,7 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 		lid[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
 	}
 
-	if c.Config.Plex != nil && c.Config.Plex.URL != "" && c.Config.Plex.Token != "" {
+	if c.Config.Plex.Configured() {
 		stat, err := c.Config.Plex.GetInfo()
 		status.Plex = []*conTest{{
 			Instance: 1,

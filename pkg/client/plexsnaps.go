@@ -88,7 +88,7 @@ func (c *Client) logSnaps() {
 		err  error
 	)
 
-	if c.Config.Plex != nil {
+	if c.Config.Plex.Configured() {
 		if plex, err = c.Config.Plex.GetXMLSessions(); err != nil {
 			c.Errorf("[user requested] %v", err)
 		}

@@ -25,7 +25,7 @@ type Server struct {
 	URL        string        `toml:"url" xml:"url"`
 	Token      string        `toml:"token" xml:"token"`
 	AccountMap string        `toml:"account_map" xml:"account_map"`
-	Name       string        `toml:"server" xml:"server"`
+	Name       string        `toml:"-" xml:"server"`
 	ReturnJSON bool          `toml:"return_json" xml:"return_json"`
 	Cooldown   cnfg.Duration `toml:"cooldown" xml:"cooldown"`
 	SeriesPC   uint          `toml:"series_percent_complete" xml:"series_percent_complete"`
@@ -49,9 +49,14 @@ const WaitTime = 10 * time.Second
 // ErrNoURLToken is returned when there is no token or URL.
 var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
 
+// Configured returns true ifthe server is configured, false otherwise.
+func (s *Server) Configured() bool {
+	return s != nil && s.URL != "" && s.Token != ""
+}
+
 // Validate checks input values and starts the cron interval if it's configured.
 func (s *Server) Validate() error {
-	if s == nil || s.URL == "" || s.Token == "" {
+	if !s.Configured() {
 		return ErrNoURLToken
 	}
 

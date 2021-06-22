@@ -26,6 +26,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printRadarr()
 	c.printLidarr()
 	c.printReadarr()
+	c.printPlex()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
 
@@ -127,20 +128,30 @@ func (c *Client) reloadConfiguration(msg string) {
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	plexFailed := c.configureServices()
+	c.configureServices(true)
 
 	if err := c.Config.Services.Start(c.Config.Service); err != nil {
 		c.Errorf("Reloading Config (4): %v\nNotifiarr EXITING!", err)
 		panic(fmt.Errorf("service checks: %w", err))
 	}
 
-	if plexFailed {
-		c.Print("==> Configuration Reloaded with Plex error (plex disabled)! Config File:", c.Flags.ConfigFile)
-		_, _ = ui.Info(Title, "Configuration Reloaded!\nERROR: Plex DISABLED due to bad config.") //nolint:wsl
-	} else {
-		c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
-		_, _ = ui.Info(Title, "Configuration Reloaded!")
+	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
+	_, _ = ui.Info(Title, "Configuration Reloaded!") //nolint:wsl
+}
+
+// printPlex is called on startup to print info about configured Plex instance(s).
+func (c *Client) printPlex() {
+	p := c.Config.Plex
+	if !p.Configured() {
+		return
 	}
+
+	name := p.Name
+	if name == "" {
+		name = "<possible connection error>"
+	}
+
+	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming plex APIs and webhook)", name, p.URL)
 }
 
 // printLidarr is called on startup to print info about each configured server.

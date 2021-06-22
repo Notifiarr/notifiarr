@@ -216,7 +216,7 @@ func (c *Client) start() error {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
 	}
 
-	c.configureServices()
+	c.configureServices(!c.Flags.cfsync) // do not collect plex info if cfsync is active.
 
 	if c.Flags.cfsync {
 		c.Printf("==> Flag Requested: Syncing Custom Formats (then exiting)")
@@ -263,7 +263,18 @@ func printProcessList() error {
 }
 
 // configureServices is called on startup and on reload.
-func (c *Client) configureServices() bool {
+func (c *Client) configureServices(getPlexInfo bool) {
+	c.checkPlex() // This runs plex.Validate().
+
+	if getPlexInfo && c.Config.Plex.Configured() {
+		if info, err := c.Config.Plex.GetInfo(); err != nil {
+			c.Config.Plex.Name = ""
+			c.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
+		} else {
+			c.Config.Plex.Name = info.FriendlyName
+		}
+	}
+
 	c.notify = &notifiarr.Config{
 		Apps:    c.Config.Apps,
 		Plex:    c.Config.Plex,
@@ -274,15 +285,12 @@ func (c *Client) configureServices() bool {
 	}
 
 	c.Config.Snapshot.Validate()
-	failed := c.checkPlex()
 	c.PrintStartupInfo()
 	c.notify.Start(c.Flags.Mode)
 
 	c.Config.Services.Logger = c.Logger
 	c.Config.Services.Apps = c.Config.Apps
 	c.Config.Services.Notify = c.notify
-
-	return failed
 }
 
 // run turns on the auto updater if enabled, and starts the web server, and system tray icon.
@@ -312,16 +320,10 @@ func (c *Client) run() error {
 	}
 }
 
-// starts plex if it's configured. logs any error.
-func (c *Client) checkPlex() bool {
-	var err error
-
-	if c.Config.Plex != nil && c.Config.Plex.URL != "" && c.Config.Plex.Token != "" {
-		if err = c.Config.Plex.Validate(); err != nil {
-			c.Errorf("plex config: %v (plex DISABLED)", err)
-			c.Config.Plex = nil
-		}
+// starts plex if it's configured.
+func (c *Client) checkPlex() {
+	if c.Config.Plex.Configured() {
+		// Validate only returns an error if Configured == false.
+		_ = c.Config.Plex.Validate()
 	}
-
-	return err != nil
 }
