@@ -25,9 +25,9 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
 
-	xml, err := s.getPlexURL(ctx, s.URL+"/status/sessions", map[string]string{"Accept": "application/xml"})
+	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", map[string]string{"Accept": "application/xml"})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
 
 	var v struct {
@@ -37,13 +37,13 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 	}
 
 	if s.ReturnJSON {
-		data, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
+		body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: %s", err, string(body))
 		}
 
 		// log.Print("DEBUG PLEX PAYLOAD:\n", string(data))
-		if err = json.Unmarshal(data, &v); err != nil {
+		if err = json.Unmarshal(body, &v); err != nil {
 			return nil, fmt.Errorf("parsing plex sessions: %w", err)
 		}
 	}
@@ -51,7 +51,7 @@ func (s *Server) GetXMLSessions() (*Sessions, error) {
 	return &Sessions{
 		Name:       s.Name,
 		AccountMap: strings.Split(s.AccountMap, "|"),
-		XML:        string(xml),
+		XML:        string(body),
 		Sessions:   v.MediaContainer.Sessions,
 	}, nil
 }
@@ -72,13 +72,13 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) ([]*Session, error)
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
-	data, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
+	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
 
 	// log.Print("DEBUG PLEX PAYLOAD:\n", string(data))
-	if err = json.Unmarshal(data, &v); err != nil {
+	if err = json.Unmarshal(body, &v); err != nil {
 		return nil, fmt.Errorf("parsing plex sessions: %w", err)
 	}
 

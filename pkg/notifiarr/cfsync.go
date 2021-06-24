@@ -149,10 +149,10 @@ func (c *Config) updateRadarrCFs(instance int, r *apps.RadarrConfig, data []byte
 		}
 	}
 
-	return c.postbackRadarrCFs(instance, maps)
+	return c.postbackRadarrCFupdates(instance, maps)
 }
 
-func (c *Config) postbackRadarrCFs(instance int, maps *cfMapIDpayload) error {
+func (c *Config) postbackRadarrCFupdates(instance int, maps *cfMapIDpayload) error {
 	if len(maps.QP) > 0 || len(maps.CF) > 0 {
 		//nolint:bodyclose // already closed.
 		resp, _, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=radarr&updateIDs=true", &RadarrCustomFormatPayload{
@@ -238,14 +238,14 @@ func (c *Config) syncSonarrQR(instance int, s *apps.SonarrConfig) (bool, error) 
 
 	if len(body) < 1 {
 		return false, nil
-	} else if err := c.updateSonarrCFs(instance, s, body); err != nil {
+	} else if err := c.updateSonarrQRs(instance, s, body); err != nil {
 		return false, fmt.Errorf("updating application: %w", err)
 	}
 
 	return true, nil
 }
 
-func (c *Config) updateSonarrCFs(instance int, s *apps.SonarrConfig, data []byte) error {
+func (c *Config) updateSonarrQRs(instance int, s *apps.SonarrConfig, data []byte) error {
 	payload := struct {
 		Response string `json:"response"`
 		Message  struct {
@@ -293,10 +293,10 @@ func (c *Config) updateSonarrCFs(instance int, s *apps.SonarrConfig, data []byte
 		}
 	}
 
-	return c.postbackSonarrCFs(instance, maps)
+	return c.postbackSonarrQPupdates(instance, maps)
 }
 
-func (c *Config) postbackSonarrCFs(instance int, maps *cfMapIDpayload) error {
+func (c *Config) postbackSonarrQPupdates(instance int, maps *cfMapIDpayload) error {
 	if len(maps.QP) > 0 || len(maps.RP) > 0 {
 		//nolint:bodyclose // already closed
 		resp, _, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=sonarr&updateIDs=true", &SonarrCustomFormatPayload{
@@ -306,10 +306,10 @@ func (c *Config) postbackSonarrCFs(instance int, maps *cfMapIDpayload) error {
 
 		if err != nil {
 			c.sonarrQRs[instance] = maps
-			return fmt.Errorf("updating release profiles ID map: %w: %s", err, string(body))
+			return fmt.Errorf("updating quality release ID map: %w: %s", err, string(body))
 		} else if resp.StatusCode != http.StatusOK {
 			c.sonarrQRs[instance] = maps
-			return fmt.Errorf("updating custom format ID map: %w: %s: %s", ErrNon200, resp.Status, string(body))
+			return fmt.Errorf("updating quality release ID map: %w: %s: %s", ErrNon200, resp.Status, string(body))
 		}
 	}
 
