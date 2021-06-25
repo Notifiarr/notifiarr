@@ -2,7 +2,6 @@ module github.com/Notifiarr/notifiarr
 
 go 1.16
 
-
 require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/gen2brain/dlgs v0.0.0-20210609125024-bf6c92aaa984
@@ -12,7 +11,7 @@ require (
 	github.com/getlantern/systray v1.1.0
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/gonutz/w32 v1.0.0
-	github.com/gopherjs/gopherjs v0.0.0-20210614142143-03070f63dd63 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20210621113107-84c6004145de // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/iamacarpet/go-win64api v0.0.0-20210311141720-fe38760bed28

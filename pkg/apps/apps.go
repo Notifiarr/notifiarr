@@ -58,6 +58,8 @@ var (
 	ErrNoReadarr = fmt.Errorf("configured %s ID not found", Readarr)
 	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
 	ErrNonZeroID = fmt.Errorf("provided ID must be non-zero")
+	// ErrWrongCount is returned when an app returns the wrong item count.
+	ErrWrongCount = fmt.Errorf("wrong item count returned")
 )
 
 // APIHandler is our custom handler function for APIs.
