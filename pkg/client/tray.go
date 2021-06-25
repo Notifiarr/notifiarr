@@ -106,15 +106,17 @@ func (c *Client) makeMoreChannels() {
 	c.menu["plex_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Plex Sessions", "send plex sessions to notifiarr dev endpoint"))
 	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
 
-	if c.Config.Debug {
-		debug := systray.AddMenuItem("Debug", "Debug Menu")
-		c.menu["debug"] = ui.WrapMenu(debug)
-		c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic"))
-		c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Log", "view the Debug log"))
+	debug := systray.AddMenuItem("Debug", "Debug Menu")
+	c.menu["debug"] = ui.WrapMenu(debug)
+	c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic"))
+	c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Log", "view the Debug log"))
 
-		if c.Config.DebugLog == "" {
-			c.menu["debug_logs"].Hide()
-		}
+	if !c.Config.Debug {
+		c.menu["debug"].Hide()
+	}
+
+	if c.Config.DebugLog == "" {
+		c.menu["debug_logs"].Hide()
 	}
 
 	// These start hidden.
@@ -221,7 +223,7 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 		case <-c.menu["sync_cf"].Clicked():
 			c.Printf("[user requested] Triggering Custom Formats and Quality Profiles Sync for Radarr and Sonarr.")
 			c.notify.SyncRadarrCF()
-			c.notify.SyncSonarrCF()
+			c.notify.SyncSonarrQP()
 		case <-c.menu["snap_log"].Clicked():
 			c.logSnaps()
 		case <-c.menu["svcs_log"].Clicked():

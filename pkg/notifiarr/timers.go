@@ -21,11 +21,12 @@ func (c *Config) startTimers() {
 
 func (c *Config) getSyncTimer() *time.Ticker {
 	ci, err := c.GetClientInfo()
-	if err != nil || !ci.IsASub() || ci.Message.CFSync < 1 {
+	if err != nil || !ci.IsASub() || (ci.Message.CFSync < 1 && ci.Message.QPSync < 1) {
 		return &time.Ticker{C: make(<-chan time.Time)}
 	}
 
-	c.Printf("==> Keeping %d Radarr Custom Formats and 0 Sonarr Release Profiles synced", ci.Message.CFSync)
+	c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced",
+		ci.Message.CFSync, ci.Message.QPSync)
 
 	return time.NewTicker(cfSyncTimer)
 }
@@ -34,7 +35,6 @@ func (c *Config) getPlexTimers() (*time.Ticker, *time.Ticker) {
 	empty := &time.Ticker{C: make(<-chan time.Time)}
 
 	if !c.Plex.Configured() || c.Plex.Interval.Duration < 1 {
-		c.Print("foo")
 		return empty, empty
 	}
 
@@ -78,7 +78,7 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2 *time
 		select {
 		case <-syncTimer.C:
 			c.SyncRadarrCF()
-			// c.SyncSonarrCF() // later...
+			c.SyncSonarrQP()
 		case <-snapTimer.C:
 			c.sendSnapshot()
 		case <-plexTimer1.C:
