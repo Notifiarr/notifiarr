@@ -19,6 +19,8 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(Sonarr, "/add", sonarrAddSeries, "POST")
 	a.HandleAPIpath(Sonarr, "/check/{tvdbid:[0-9]+}", sonarrCheckSeries, "GET")
 	a.HandleAPIpath(Sonarr, "/get/{seriesid:[0-9]+}", sonarrGetSeries, "GET")
+	a.HandleAPIpath(Sonarr, "/getEpisodes/{seriesid:[0-9]+}", sonarrGetEpisodes, "GET")
+	a.HandleAPIpath(Sonarr, "/unmonitor/{episodeid:[0-9]+}", sonarrUnmonitorEpisode, "GET")
 	a.HandleAPIpath(Sonarr, "/languageProfiles", sonarrLangProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/qualityProfiles", sonarrGetQualityProfiles, "GET")
 	a.HandleAPIpath(Sonarr, "/qualityProfile", sonarrGetQualityProfile, "GET")
@@ -114,6 +116,30 @@ func sonarrGetSeries(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, series
+}
+
+func sonarrGetEpisodes(r *http.Request) (int, interface{}) {
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
+
+	episodes, err := getSonarr(r).GetSeriesEpisodes(seriesID)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+	}
+
+	return http.StatusOK, episodes
+}
+
+func sonarrUnmonitorEpisode(r *http.Request) (int, interface{}) {
+	episodeID, _ := strconv.ParseInt(mux.Vars(r)["episodeid"], 10, 64)
+
+	episodes, err := getSonarr(r).MonitorEpisode([]int64{episodeID}, false)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+	} else if len(episodes) != 1 {
+		return http.StatusServiceUnavailable, fmt.Errorf("%w (%d): %v", ErrWrongCount, len(episodes), episodes)
+	}
+
+	return http.StatusOK, episodes[0]
 }
 
 func sonarrTriggerSearchSeries(r *http.Request) (int, interface{}) {

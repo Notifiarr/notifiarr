@@ -103,8 +103,8 @@ github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm4
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
-github.com/gopherjs/gopherjs v0.0.0-20210614142143-03070f63dd63 h1:IxKfgP3jODaJyBERaZlpcoGLXjtH0tYsYdzIPzRxjN0=
-github.com/gopherjs/gopherjs v0.0.0-20210614142143-03070f63dd63/go.mod h1:MtKwTfDNYAP5EtbQSMYjTSqvj1aXJKQRASWq3bwaP+g=
+github.com/gopherjs/gopherjs v0.0.0-20210621113107-84c6004145de h1:q+tIagAgwJBQPaeOPvis2b+cxfaZ5HNkzoctl7SMxDQ=
+github.com/gopherjs/gopherjs v0.0.0-20210621113107-84c6004145de/go.mod h1:MtKwTfDNYAP5EtbQSMYjTSqvj1aXJKQRASWq3bwaP+g=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
@@ -375,8 +375,8 @@ golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93 h1:6zgmt5vpnqltfJ7Wfj16NT+rg
 golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93/go.mod h1:AsB0DJe7nv0bizKaoy3e3MjjOF7upTpMOMvsfv4CNNk=
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9 h1:j/WeLF6Ew1lc/m8/bh5qleZ66aSeJ72B1fUWigF69OE=
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9/go.mod h1:EZevRvIGRh8jDMwuYL0/tlPns0KynquPZzb0SerIC1s=
-golift.io/starr v0.10.1 h1:3CDs552OLQ6b+9iLNVRwReKpTnHFKJ660wrHV6PvRlQ=
-golift.io/starr v0.10.1/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
+golift.io/starr v0.10.2-0.20210625072432-040e53eb75d0 h1:eq2BL1+PN21ZUN1Riin6ojVXmoaVke6/0QsetFD4j0U=
+golift.io/starr v0.10.2-0.20210625072432-040e53eb75d0/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 google.golang.org/api v0.4.0/go.mod h1:8k5glujaEP+g9n7WNsDg8QP6cUVNI86fCNMcbazEtwE=
