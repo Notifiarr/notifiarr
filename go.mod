@@ -2,6 +2,7 @@ module github.com/Notifiarr/notifiarr
 
 go 1.16
 
+
 require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/gen2brain/dlgs v0.0.0-20210609125024-bf6c92aaa984
@@ -29,7 +30,7 @@ require (
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
 	golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.10.1
+	golift.io/starr v0.10.2-0.20210625072432-040e53eb75d0
 	golift.io/version v0.0.2
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect

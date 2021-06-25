@@ -80,8 +80,8 @@ type Config struct {
 	*logs.Logger // log file writer
 	stopTimers   chan struct{}
 	client       *httpClient
-	radarrCFs    map[int]*cfMapIDpayload
-	sonarrQRs    map[int]*cfMapIDpayload
+	radarrCF     map[int]*cfMapIDpayload
+	sonarrQP     map[int]*cfMapIDpayload
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -106,8 +106,8 @@ func (c *Config) Start(mode string) {
 		c.Retries = DefaultRetries
 	}
 
-	c.radarrCFs = make(map[int]*cfMapIDpayload)
-	c.sonarrQRs = make(map[int]*cfMapIDpayload)
+	c.radarrCF = make(map[int]*cfMapIDpayload)
+	c.sonarrQP = make(map[int]*cfMapIDpayload)
 
 	c.startTimers()
 }
@@ -211,7 +211,7 @@ type ClientInfo struct {
 		Text       string `json:"text"`
 		Subscriber bool   `json:"subscriber"`
 		CFSync     int64  `json:"cfSync"`
-		QRSync     int64  `json:"qrSync"`
+		QPSync     int64  `json:"qpSync"`
 	} `json:"message"`
 }
 
