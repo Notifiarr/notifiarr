@@ -4,7 +4,10 @@ import (
 	"time"
 )
 
-const cfSyncTimer = 30 * time.Minute
+const (
+	cfSyncTimer = 30 * time.Minute
+	stuckTimer  = 5*time.Minute + 327*time.Millisecond
+)
 
 func (c *Config) startTimers() {
 	if c.stopTimers != nil {
@@ -15,8 +18,9 @@ func (c *Config) startTimers() {
 	snapTimer := c.getSnapTimer()
 	syncTimer := c.getSyncTimer()
 	plexTimer1, plexTimer2 := c.getPlexTimers()
+	stuckItemTimer := time.NewTicker(stuckTimer)
 
-	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2)
+	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckItemTimer)
 }
 
 func (c *Config) getSyncTimer() *time.Ticker {
@@ -62,12 +66,13 @@ func (c *Config) getSnapTimer() *time.Ticker {
 	return time.NewTicker(c.Snap.Interval.Duration)
 }
 
-func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2 *time.Ticker) {
+func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer *time.Ticker) {
 	defer func() {
 		snapTimer.Stop()
 		syncTimer.Stop()
 		plexTimer1.Stop()
 		plexTimer2.Stop()
+		stuckTimer.Stop()
 		close(c.stopTimers)
 		c.stopTimers = nil
 	}()
@@ -85,6 +90,8 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2 *time
 			c.sendPlexSessions()
 		case <-plexTimer2.C:
 			c.checkForFinishedItems(sent)
+		case <-stuckTimer.C:
+			c.SendFinishedQueueItems(c.BaseURL)
 		case <-c.stopTimers:
 			return
 		}

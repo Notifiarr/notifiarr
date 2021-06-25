@@ -105,6 +105,8 @@ func (c *Client) makeMoreChannels() {
 	c.menu["snap_test"] = ui.WrapMenu(data.AddSubMenuItem("Test System Snapshot", "send system snapshot to notifiarr test endpoint"))
 	c.menu["plex_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev Plex Sessions", "send plex sessions to notifiarr dev endpoint"))
 	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
+	c.menu["app_ques"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Items Check", "check app queues for stuck items and send to notifiarr"))
+	c.menu["app_ques_dev"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Items Check (Dev)", "check app queues for stuck items and send to notifiarr dev"))
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	c.menu["debug"] = ui.WrapMenu(debug)
@@ -113,6 +115,12 @@ func (c *Client) makeMoreChannels() {
 
 	if !c.Config.Debug {
 		c.menu["debug"].Hide()
+		c.menu["svcs_test"].Hide()
+		c.menu["plex_test"].Hide()
+		c.menu["snap_test"].Hide()
+		c.menu["plex_dev"].Hide()
+		c.menu["snap_dev"].Hide()
+		c.menu["app_ques_dev"].Hide()
 	}
 
 	if c.Config.DebugLog == "" {
@@ -259,6 +267,10 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 			c.sendPlexSessions(notifiarr.DevURL)
 		case <-c.menu["snap_dev"].Clicked():
 			c.sendSystemSnapshot(notifiarr.DevURL)
+		case <-c.menu["app_ques"].Clicked():
+			c.notify.SendFinishedQueueItems(notifiarr.BaseURL)
+		case <-c.menu["app_ques_dev"].Clicked():
+			c.notify.SendFinishedQueueItems(notifiarr.DevBaseURL)
 		case <-c.menu["plex_prod"].Clicked():
 			c.sendPlexSessions(notifiarr.ProdURL)
 		case <-c.menu["snap_prod"].Clicked():

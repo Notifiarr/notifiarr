@@ -41,6 +41,7 @@ type SonarrConfig struct {
 	Name      string        `toml:"name"`
 	Interval  cnfg.Duration `toml:"interval"`
 	DisableCF bool          `toml:"disable_cf"`
+	StuckItem bool          `toml:"stuck_items"`
 	*starr.Config
 	*sonarr.Sonarr
 }

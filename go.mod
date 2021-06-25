@@ -2,7 +2,6 @@ module github.com/Notifiarr/notifiarr
 
 go 1.16
 
-
 require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/gen2brain/dlgs v0.0.0-20210609125024-bf6c92aaa984

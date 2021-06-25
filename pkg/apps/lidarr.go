@@ -42,8 +42,9 @@ func (a *Apps) lidarrHandlers() {
 
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
-	Name     string
-	Interval cnfg.Duration
+	Name      string        `toml:"name"`
+	Interval  cnfg.Duration `toml:"interval"`
+	StuckItem bool          `toml:"stuck_items"`
 	*starr.Config
 	*lidarr.Lidarr
 }

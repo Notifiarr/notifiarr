@@ -109,11 +109,13 @@ timeout = "{{.Timeout}}"
   {{if .DisableCF}}disable_cf = true
   {{end -}}
   interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"{{end -}}
+	timeout  = "{{.Timeout}}"
+	stuck_items = {{.StuckItem}}{{end -}}
 {{else}}#[[radarr]]
 #name    = "" # set a name to enable checks of your service.
 #url     = "http://127.0.0.1:7878/radarr"
-#api_key = ""{{end}}
+#api_key = ""
+#stuck_items = false{{end}}
 
 {{if .Readarr}}{{range .Readarr}}
 [[readarr]]
@@ -121,11 +123,13 @@ timeout = "{{.Timeout}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"{{end -}}
+  timeout  = "{{.Timeout}}"
+	stuck_items = {{.StuckItem}}{{end -}}
 {{else}}#[[readarr]]
 #name    = "" # set a name to enable checks of your service.
 #url     = "http://127.0.0.1:8787/readarr"
-#api_key = ""{{end}}
+#api_key = ""
+#stuck_items = false{{end}}
 
 {{if .Sonarr}}{{range .Sonarr}}
 [[sonarr]]
@@ -135,11 +139,13 @@ timeout = "{{.Timeout}}"
   {{if .DisableCF}}disable_cf = true
   {{end -}}
   interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"{{end -}}
+  timeout  = "{{.Timeout}}"
+	stuck_items = {{.StuckItem}}{{end -}}
 {{else}}#[[sonarr]]
 #name    = "" # set a name to enable checks of your service.
 #url     = "http://sonarr:8989/"
-#api_key = ""{{end}}
+#api_key = ""
+#stuck_items = false{{end}}
 
 {{if .Lidarr}}{{range .Lidarr}}
 [[lidarr]]
@@ -147,11 +153,13 @@ timeout = "{{.Timeout}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"{{end -}}
+  timeout  = "{{.Timeout}}"
+	stuck_items = {{.StuckItem}}{{end -}}
 {{else}}#[[lidarr]]
 #name    = "" # set a name to enable checks of your service.
 #url     = "http://lidarr:8989/"
-#api_key = ""{{end}}
+#api_key = ""
+#stuck_items = false{{end}}
 
 
 #################
