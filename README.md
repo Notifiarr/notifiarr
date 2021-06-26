@@ -139,13 +139,13 @@ log_file_mb|`DN_LOG_FILE_MB`|`100` / Max size of log files in megabytes|
 log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation|
 timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
 
-#### Sonarr
+#### Lidarr
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enabled service checks.|
-sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
-sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
+lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enabled service checks.|
+lidarr.url|`DN_LIDARR_0_URL`|No Default. Something like: `http://lidarr:8686`|
+lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
 #### Radarr
 
@@ -154,6 +154,7 @@ sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you 
 radarr.name|`DN_RADARR_0_NAME`|No Default. Setting a name enabled service checks.|
 radarr.url|`DN_RADARR_0_URL`|No Default. Something like: `http://localhost:7878`|
 radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you use Radarr|
+radarr.disable_cf|`DN_RADARR_0_DISABLE_CF`|`false` / Setting true disables custom format sync.|
 
 #### Readarr
 
@@ -163,13 +164,14 @@ readarr.name|`DN_READARR_0_NAME`|No Default. Setting a name enabled service chec
 readarr.url|`DN_READARR_0_URL`|No Default. Something like: `http://localhost:8787`|
 readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
-#### Lidarr
+#### Sonarr
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enabled service checks.|
-lidarr.url|`DN_LIDARR_0_URL`|No Default. Something like: `http://lidarr:8686`|
-lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
+sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enabled service checks.|
+sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
+sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
+sonarr.disable_cf|`DN_SONARR_0_DISABLE_CF`|`false` / Setting true disables release profile sync.|
 
 #### Plex
 
@@ -198,7 +200,6 @@ plex.token|`DN_PLEX_TOKEN`|Required. [Must provide Plex Token](https://support.p
 plex.interval|`DN_PLEX_INTERVAL`|`30m`, How often to notify on all session data (cron)|
 plex.cooldown|`DN_PLEX_COOLDOWN`|`10s`, Maximum rate of notifications is 1 every cooldown interval|
 plex.account_map|`DN_PLEX_ACCOUNT_MAP`|map an email to a name, ex: `"som@ema.il,Name|some@ther.mail,name"`|
-plex.server|`DN_PLEX_SERVER`|Optional name of this server; discovered automatically otherwise|
 plex.movies_percent_complete|`DN_PLEX_MOVIES_PERCENT_COMPLETE`|Send complete notice when a movie reaches this percent.|
 plex.series_percent_complete|`DN_PLEX_SERIES_PERCENT_COMPLETE`|Send complete notice when a show reaches this percent.|
 
@@ -221,6 +222,7 @@ notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 
   - **Windows**:  `smartmontools` - get it here https://sourceforge.net/projects/smartmontools/
   - **Linux**:    Debian/Ubuntu: `apt install smartmontools`, RedHat/CentOS: `yum install smartmontools`
+  - **Docker**:    It's already in the container. Lucky you! Just run it in `--privileged` mode.
   - **Synology**: `opkg install smartmontools`, but first get Entware:
     - Entware (synology):  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
     - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS

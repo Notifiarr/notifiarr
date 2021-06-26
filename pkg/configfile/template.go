@@ -101,6 +101,18 @@ timeout = "{{.Timeout}}"
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
+{{if .Lidarr}}{{range .Lidarr}}
+[[lidarr]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # service check duration (if name is not empty)
+  timeout  = "{{.Timeout}}"{{end -}}
+{{else}}#[[lidarr]]
+#name    = "" # set a name to enable checks of your service.
+#url     = "http://lidarr:8989/"
+#api_key = ""{{end}}
+
 {{if .Radarr}}{{range .Radarr}}
 [[radarr]]
   name     = "{{.Name}}"
@@ -139,18 +151,6 @@ timeout = "{{.Timeout}}"
 {{else}}#[[sonarr]]
 #name    = "" # set a name to enable checks of your service.
 #url     = "http://sonarr:8989/"
-#api_key = ""{{end}}
-
-{{if .Lidarr}}{{range .Lidarr}}
-[[lidarr]]
-  name     = "{{.Name}}"
-  url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
-  interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"{{end -}}
-{{else}}#[[lidarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://lidarr:8989/"
 #api_key = ""{{end}}
 
 

@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.1.4   @ 211205T0247 #
+# Created by Notifiarr v0.1.7   @ 212606T0237 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -12,6 +12,12 @@ api_key = "api-key-from-notifiarr.com"
 ## This will be used in Media Requests for example to send payloads, Example: http://your-domain.com:5454
 ##
 bind_addr = "0.0.0.0:5454"
+
+## This application can update itself on Windows systems.
+## Set this to "daily" to check GitHub every day for updates.
+## You may also set it to a Go duration like "12h" or "72h".
+## THIS ONLY WORKS ON WINDOWS
+auto_update = "off"
 
 ## Quiet makes the app not log anything to output.
 ## Recommend setting log files if you make the app quiet.
@@ -63,13 +69,15 @@ timeout = "1m0s"
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
+#[[lidarr]]
+#name    = "" # set a name to enable checks of your service.
+#url     = "http://lidarr:8989/"
+#api_key = ""
 
-[[radarr]]
-  name     = ""
-  url      = "http://127.0.0.1:7878/radarr"
-  api_key  = ""
-  interval = "5m0s" # service check duration (if name is not empty)
-  timeout  = "1m0s"
+#[[radarr]]
+#name    = "" # set a name to enable checks of your service.
+#url     = "http://127.0.0.1:7878/radarr"
+#api_key = ""
 
 #[[readarr]]
 #name    = "" # set a name to enable checks of your service.
@@ -79,11 +87,6 @@ timeout = "1m0s"
 #[[sonarr]]
 #name    = "" # set a name to enable checks of your service.
 #url     = "http://sonarr:8989/"
-#api_key = ""
-
-#[[lidarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://lidarr:8989/"
 #api_key = ""
 
 
@@ -99,7 +102,6 @@ timeout = "1m0s"
   interval    = "30m0s"  # how often to send session data, 0 = off
   cooldown    = "15s"  # how often plex webhooks may trigger session hooks
   account_map = ""     # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  server      = "plex" # optional name of the server the notifications are from
   movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 
@@ -126,7 +128,7 @@ timeout = "1m0s"
   monitor_cpuTemp   = false # cpu temperatures, not available on all platforms
   zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
   use_sudo          = false # sudo is needed on unix when monitor_drives=true or for megacli.
-## Example sudoers entries follow. Fix the paths to smartctl and MegaCli.
+## Example sudoers entries follow; these go in /etc/sudoers.d. Fix the paths to smartctl and MegaCli.
 ## notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
 ## notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 
@@ -144,6 +146,7 @@ timeout = "1m0s"
   disabled = false   # Setting this to true disables all service checking routines.
   parallel = 1       # How many services to check concurrently. 1 should be enough.
   interval = "10m0s" # How often to send service states to Notifiarr.com. Minimum = 5m.
+  log_file = ''      # Service Check logs go to the app log by default. Change that by setting a services.log file here.
 
 ## Uncomment the following section to create a service check on a URL or IP:port.
 ## You may include as many [[service]] sections as you have services to check.
