@@ -221,7 +221,7 @@ func (c *Client) start() error {
 	if c.Flags.cfsync {
 		c.Printf("==> Flag Requested: Syncing Custom Formats and Quality Profiles (then exiting)")
 		c.notify.SyncRadarrCF()
-		c.notify.SyncSonarrQP()
+		c.notify.SyncSonarrRP()
 
 		return nil
 	}

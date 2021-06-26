@@ -81,7 +81,18 @@ type Config struct {
 	stopTimers   chan struct{}
 	client       *httpClient
 	radarrCF     map[int]*cfMapIDpayload
-	sonarrQP     map[int]*cfMapIDpayload
+	sonarrRP     map[int]*cfMapIDpayload
+}
+
+// ClientInfo is the reply from the ClienRoute endpoint.
+type ClientInfo struct {
+	Status  string `json:"status"`
+	Message struct {
+		Text       string `json:"text"`
+		Subscriber bool   `json:"subscriber"`
+		CFSync     int64  `json:"cfSync"`
+		RPSync     int64  `json:"rpSync"`
+	} `json:"message"`
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -107,7 +118,7 @@ func (c *Config) Start(mode string) {
 	}
 
 	c.radarrCF = make(map[int]*cfMapIDpayload)
-	c.sonarrQP = make(map[int]*cfMapIDpayload)
+	c.sonarrRP = make(map[int]*cfMapIDpayload)
 
 	c.startTimers()
 }
@@ -202,17 +213,6 @@ func (c *Config) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	wg.Wait()
 
 	return snap
-}
-
-// ClientInfo is the reply from the ClienRoute endpoint.
-type ClientInfo struct {
-	Status  string `json:"status"`
-	Message struct {
-		Text       string `json:"text"`
-		Subscriber bool   `json:"subscriber"`
-		CFSync     int64  `json:"cfSync"`
-		QPSync     int64  `json:"qpSync"`
-	} `json:"message"`
 }
 
 // String returns the message text for a client info response.
