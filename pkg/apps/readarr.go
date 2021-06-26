@@ -37,8 +37,9 @@ func (a *Apps) readarrHandlers() {
 
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
-	Name     string
-	Interval cnfg.Duration
+	Name      string        `toml:"name"`
+	Interval  cnfg.Duration `toml:"interval"`
+	StuckItem bool          `toml:"stuck_items"`
 	*starr.Config
 	*readarr.Readarr
 }
