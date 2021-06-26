@@ -219,7 +219,7 @@ func (c *Client) start() error {
 	c.configureServices(!c.Flags.cfsync) // do not collect plex info if cfsync is active.
 
 	if c.Flags.cfsync {
-		c.Printf("==> Flag Requested: Syncing Custom Formats and Quality Profiles (then exiting)")
+		c.Printf("==> Flag Requested: Syncing Custom Formats and Release Profiles (then exiting)")
 		c.notify.SyncRadarrCF()
 		c.notify.SyncSonarrRP()
 
