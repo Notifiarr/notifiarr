@@ -9,15 +9,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golang.org/x/mod/semver"
 )
 
 // OSsuffixMap is the OS to file suffix map for downloads.
 var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
-	"darwin":  ".dmg",
-	windows:   ".exe.zip",
-	"freebsd": ".txz",
-	"linux":   "", // too many variants right now.
+	"darwin":    ".dmg",
+	mnd.Windows: ".exe.zip",
+	"freebsd":   ".txz",
+	"linux":     "", // too many variants right now.
 }
 
 // Custom errors.

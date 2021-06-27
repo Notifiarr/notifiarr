@@ -21,6 +21,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // SleepTime is how long we wait after updating before exiting.
@@ -28,7 +30,6 @@ const SleepTime = 5 * time.Second
 
 const (
 	downloadTimeout = 5 * time.Minute
-	windows         = "windows"
 )
 
 // Command is the input data to perform an in-place update.
@@ -110,8 +111,8 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	if runtime.GOOS != windows {
-		_ = os.Chmod(tempFile, 0755)
+	if runtime.GOOS != mnd.Windows {
+		_ = os.Chmod(tempFile, mnd.Mode0755)
 	}
 
 	backupFile := u.Path + ".backup." + time.Now().Format("060102T150405")
@@ -211,7 +212,7 @@ func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error
 
 	// Find the exe file and write that.
 	for _, zipFile := range zipReader.File {
-		if runtime.GOOS == windows && strings.HasSuffix(zipFile.Name, ".exe") {
+		if runtime.GOOS == mnd.Windows && strings.HasSuffix(zipFile.Name, ".exe") {
 			f, err := zipFile.Open()
 			if err != nil {
 				return fmt.Errorf("reading zipped exe file: %w", err)

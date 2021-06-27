@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -144,10 +145,10 @@ func (c *Client) watchKillerChannels() {
 			c.Printf("Caught Signal: %v (reloading configuration)", sigc)
 			c.reloadConfiguration("caught signal " + sigc.String())
 		case sigc := <-c.sigkil:
-			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", helpLink, sigc)
+			c.Errorf("Need help? %s\n=====> Exiting! Caught Signal: %v", mnd.HelpLink, sigc)
 			return
 		case <-c.menu["exit"].Clicked():
-			c.Errorf("Need help? %s\n=====> Exiting! User Requested", helpLink)
+			c.Errorf("Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
 			return
 		case <-c.menu["debug"].Clicked():
 			// turn on and off debug?
@@ -187,7 +188,7 @@ func (c *Client) watchConfigChannels() {
 	for {
 		select {
 		case <-c.menu["view"].Clicked():
-			ui.Info(Title+": Configuration", c.displayConfig())
+			ui.Info(mnd.Title+": Configuration", c.displayConfig())
 		case <-c.menu["edit"].Clicked():
 			c.Print("User Editing Config File:", c.Flags.ConfigFile)
 			ui.OpenFile(c.Flags.ConfigFile)
@@ -220,7 +221,7 @@ func (c *Client) watchLogsChannels() {
 			c.checkForUpdate()
 		case <-c.menu["dninfo"].Clicked():
 			c.menu["dninfo"].Hide()
-			ui.Info(Title, "INFO: "+c.info)
+			ui.Info(mnd.Title, "INFO: "+c.info)
 		}
 	}
 }

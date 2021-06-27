@@ -18,6 +18,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/curl"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
@@ -26,19 +27,6 @@ import (
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
 	"golift.io/version"
-)
-
-// Application Defaults.
-const (
-	Title            = "Notifiarr"
-	DefaultName      = "notifiarr"
-	DefaultLogFileMb = 100
-	DefaultLogFiles  = 0 // delete none
-	DefaultEnvPrefix = "DN"
-)
-
-const (
-	windows = "windows"
 )
 
 // Flags are our CLI input flags.
@@ -94,35 +82,35 @@ func NewDefaults() *Client {
 				Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
 				Parallel: 1,
 			},
-			BindAddr: configfile.DefaultBindAddr,
+			BindAddr: mnd.DefaultBindAddr,
 			Snapshot: &snapshot.Config{
 				Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
 			},
 			LogConfig: &logs.LogConfig{
-				LogFiles:  DefaultLogFiles,
-				LogFileMb: DefaultLogFileMb,
+				LogFiles:  mnd.DefaultLogFiles,
+				LogFileMb: mnd.DefaultLogFileMb,
 			},
-			Timeout: cnfg.Duration{Duration: configfile.DefaultTimeout},
+			Timeout: cnfg.Duration{Duration: mnd.DefaultTimeout},
 		}, Flags: &Flags{
-			FlagSet:    flag.NewFlagSet(DefaultName, flag.ExitOnError),
-			ConfigFile: os.Getenv(DefaultEnvPrefix + "_CONFIG_FILE"),
-			EnvPrefix:  DefaultEnvPrefix,
+			FlagSet:    flag.NewFlagSet(mnd.DefaultName, flag.ExitOnError),
+			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
+			EnvPrefix:  mnd.DefaultEnvPrefix,
 		},
 	}
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
+	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
 	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots")
 	f.StringVarP(&f.Mode, "mode", "m", "prod", "Selects Notifiarr URL: test, dev, prod")
-	f.StringVarP(&f.EnvPrefix, "prefix", "p", DefaultEnvPrefix, "Environment Variable Prefix")
+	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.BoolVar(&f.cfsync, "cfsync", false, "Trigger Custom Format sync and exit.")
 	f.StringVar(&f.curl, "curl", "", "GET a URL and display headers and payload.")
 	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks")
 
-	if runtime.GOOS == windows {
+	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it")
 		f.BoolVar(&f.updated, "updated", false, "This flags causes the app to print an updated message")
 	}
@@ -153,14 +141,14 @@ func Start() error {
 	}
 
 	if err := c.config(); err != nil {
-		_, _ = ui.Error(Title, err.Error())
+		_, _ = ui.Error(mnd.Title, err.Error())
 		return err
 	} else if c.Flags.restart {
 		return nil
 	}
 
 	if err := c.start(); err != nil {
-		_, _ = ui.Error(Title, err.Error())
+		_, _ = ui.Error(mnd.Title, err.Error())
 		return err
 	}
 
@@ -302,7 +290,7 @@ func (c *Client) run() error {
 	if c.newCon {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
 		_ = ui.OpenFile(c.Flags.ConfigFile)
-		_, _ = ui.Warning(Title, "A new configuration file was created @ "+
+		_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
 			"Please edit the file and reload this application using the tray menu.")
 	}

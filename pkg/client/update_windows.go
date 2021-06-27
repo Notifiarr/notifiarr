@@ -9,16 +9,13 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/hako/durafmt"
 	"github.com/kardianos/osext"
 	"golift.io/version"
 	"gopkg.in/toast.v1"
-)
-
-const (
-	oneDay = 24 * time.Hour
 )
 
 func (c *Client) checkReloadSignal(sigc os.Signal) {
@@ -31,7 +28,7 @@ func (c *Client) setReloadSignals() {
 
 // This is the pop-up a user sees when they click update in the menu.
 func (c *Client) upgradeWindows(update *update.Update) {
-	yes, _ := ui.Question(Title, "An Update is available! Upgrade Now?\n\n"+
+	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
 		"Your Version: "+update.Version+"\n"+
 		"New Version: "+update.Current+"\n"+
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
@@ -39,7 +36,7 @@ func (c *Client) upgradeWindows(update *update.Update) {
 	if yes {
 		if err := c.updateNow(update, "user requested"); err != nil {
 			c.Errorf("Update Failed: %v", err)
-			_, _ = ui.Error(Title+" ERROR", "Updating Notifiarr:\n"+err.Error()+"\n")
+			_, _ = ui.Error(mnd.Title+" ERROR", "Updating Notifiarr:\n"+err.Error()+"\n")
 		}
 	}
 }
@@ -70,7 +67,7 @@ func (c *Client) getPNG() string {
 		return ""
 	}
 
-	if err := os.WriteFile(pngPath, data, 0600); err != nil {
+	if err := os.WriteFile(pngPath, data, mnd.Mode0600); err != nil {
 		c.Debug("Error Writing file:", err) // purposely debug and not error
 		return ""
 	}
@@ -80,9 +77,9 @@ func (c *Client) getPNG() string {
 
 func (c *Client) printUpdateMessage() {
 	err := (&toast.Notification{
-		AppID:   Title,
-		Title:   Title + " Upgraded!",
-		Message: Title + " updated to version " + version.Version,
+		AppID:   mnd.Title,
+		Title:   mnd.Title + " Upgraded!",
+		Message: mnd.Title + " updated to version " + version.Version,
 		Icon:    c.getPNG(),
 	}).Push()
 	if err != nil {
@@ -99,11 +96,11 @@ func (c *Client) AutoWatchUpdate() {
 	case "hourly":
 		dur = time.Hour
 	case "daily":
-		dur = oneDay
+		dur = mnd.OneDay
 	default:
 		var err error
 		if dur, err = time.ParseDuration(c.Config.AutoUpdate); err != nil {
-			dur = oneDay
+			dur = mnd.OneDay
 			break
 		}
 
@@ -133,7 +130,7 @@ func (c *Client) AutoWatchUpdate() {
 func (c *Client) checkAndUpdate(how string) error {
 	c.Debugf("Checking GitHub for Update.")
 
-	u, err := update.Check(userRepo, version.Version)
+	u, err := update.Check(mnd.UserRepo, version.Version)
 	if err != nil {
 		return fmt.Errorf("checking GitHub for update: %w", err)
 	} else if !u.Outdate {

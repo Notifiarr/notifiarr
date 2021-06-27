@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"golift.io/version"
@@ -75,7 +76,7 @@ func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
 	}
 
 	go func() {
-		_, _ = ui.Warning(Title+" Alert", body)
+		_, _ = ui.Warning(mnd.Title+" Alert", body)
 		c.alert.Done() //nolint:wsl
 	}()
 

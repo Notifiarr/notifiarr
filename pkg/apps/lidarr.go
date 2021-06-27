@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/cnfg"
 	"golift.io/starr"
@@ -84,7 +85,7 @@ func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 }
 
 func lidarrGetArtist(r *http.Request) (int, interface{}) {
-	artistID, _ := strconv.ParseInt(mux.Vars(r)["artistid"], 10, 64)
+	artistID, _ := strconv.ParseInt(mux.Vars(r)["artistid"], mnd.Base10, mnd.Bits64)
 
 	artist, err := getLidarr(r).GetArtistByID(artistID)
 	if err != nil {
@@ -121,7 +122,7 @@ func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
 }
 
 func lidarrGetAlbum(r *http.Request) (int, interface{}) {
-	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], 10, 64)
+	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], mnd.Base10, mnd.Bits64)
 
 	album, err := getLidarr(r).GetAlbumByID(albumID)
 	if err != nil {
@@ -132,7 +133,7 @@ func lidarrGetAlbum(r *http.Request) (int, interface{}) {
 }
 
 func lidarrTriggerSearchAlbum(r *http.Request) (int, interface{}) {
-	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], 10, 64)
+	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getLidarr(r).SendCommand(&lidarr.CommandRequest{
 		Name:     "AlbumSearch",
@@ -229,7 +230,7 @@ func lidarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}

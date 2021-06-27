@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/cnfg"
 	"golift.io/starr"
@@ -96,7 +97,7 @@ func sonarrData(series *sonarr.Series) map[string]interface{} {
 }
 
 func sonarrCheckSeries(r *http.Request) (int, interface{}) {
-	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], 10, 64)
+	tvdbid, _ := strconv.ParseInt(mux.Vars(r)["tvdbid"], mnd.Base10, mnd.Bits64)
 	// Check for existing series.
 	m, err := getSonarr(r).GetSeries(tvdbid)
 	if err != nil {
@@ -109,7 +110,7 @@ func sonarrCheckSeries(r *http.Request) (int, interface{}) {
 }
 
 func sonarrGetSeries(r *http.Request) (int, interface{}) {
-	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], mnd.Base10, mnd.Bits64)
 
 	series, err := getSonarr(r).GetSeriesByID(seriesID)
 	if err != nil {
@@ -120,7 +121,7 @@ func sonarrGetSeries(r *http.Request) (int, interface{}) {
 }
 
 func sonarrGetEpisodes(r *http.Request) (int, interface{}) {
-	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], mnd.Base10, mnd.Bits64)
 
 	episodes, err := getSonarr(r).GetSeriesEpisodes(seriesID)
 	if err != nil {
@@ -131,7 +132,7 @@ func sonarrGetEpisodes(r *http.Request) (int, interface{}) {
 }
 
 func sonarrUnmonitorEpisode(r *http.Request) (int, interface{}) {
-	episodeID, _ := strconv.ParseInt(mux.Vars(r)["episodeid"], 10, 64)
+	episodeID, _ := strconv.ParseInt(mux.Vars(r)["episodeid"], mnd.Base10, mnd.Bits64)
 
 	episodes, err := getSonarr(r).MonitorEpisode([]int64{episodeID}, false)
 	if err != nil {
@@ -144,7 +145,7 @@ func sonarrUnmonitorEpisode(r *http.Request) (int, interface{}) {
 }
 
 func sonarrTriggerSearchSeries(r *http.Request) (int, interface{}) {
-	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], 10, 64)
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getSonarr(r).SendCommand(&sonarr.CommandRequest{
 		Name:     "SeriesSearch",
@@ -226,7 +227,7 @@ func sonarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
@@ -277,7 +278,7 @@ func sonarrUpdateReleaseProfile(r *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}

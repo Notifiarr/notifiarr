@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // GetMemoryUsage returns current host memory consumption.
@@ -28,9 +30,9 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
 		case len(fields) < 3: //nolint:gomnd
 			continue
 		case strings.EqualFold(fields[0], "MemTotal:"):
-			s.System.MemTotal, _ = strconv.ParseUint(fields[1], 10, 64)
+			s.System.MemTotal, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)
 		case strings.EqualFold(fields[0], "MemAvailable:"):
-			s.System.MemFree, _ = strconv.ParseUint(fields[1], 10, 64)
+			s.System.MemFree, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)
 		}
 	}
 
