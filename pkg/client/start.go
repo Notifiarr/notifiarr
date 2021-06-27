@@ -220,6 +220,7 @@ func (c *Client) start() error {
 
 	if c.Flags.cfsync {
 		c.Printf("==> Flag Requested: Syncing Custom Formats and Release Profiles (then exiting)")
+		// c.notify.SendFinishedQueueItems(c.notify.BaseURL)
 		c.notify.SyncRadarrCF()
 		c.notify.SyncSonarrRP()
 
