@@ -3,6 +3,7 @@ package mnd
 
 import "time"
 
+// Application Constants.
 const (
 	Mode0755 = 0755
 	Mode0750 = 0750
@@ -15,6 +16,7 @@ const (
 	Bits32   = 32
 	Windows  = "windows"
 	HelpLink = "GoLift Discord: https://golift.io/discord"
+	UserRepo = "Notifiarr/notifiarr"
 )
 
 // Application Defaults.
@@ -24,7 +26,6 @@ const (
 	DefaultLogFileMb = 100
 	DefaultLogFiles  = 0 // delete none
 	DefaultEnvPrefix = "DN"
-	UserRepo         = "Notifiarr/notifiarr"
 	DefaultTimeout   = time.Minute
 	DefaultBindAddr  = "0.0.0.0:5454"
 )
