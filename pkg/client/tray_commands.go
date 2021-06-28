@@ -11,14 +11,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/hako/durafmt"
 	"golift.io/version"
 )
-
-const userRepo = "Notifiarr/notifiarr"
 
 func (c *Client) toggleServer() {
 	if c.server == nil {
@@ -48,7 +47,7 @@ func (c *Client) rotateLogs() {
 // changeKey shuts down the web server and changes the API key.
 // The server has to shut down to avoid race conditions.
 func (c *Client) changeKey() {
-	key, ok, err := ui.Entry(Title+": Configuration", "API Key", c.Config.APIKey)
+	key, ok, err := ui.Entry(mnd.Title+": Configuration", "API Key", c.Config.APIKey)
 	if err != nil {
 		c.Errorf("Updating API Key: %v", err)
 	} else if !ok || key == c.Config.APIKey {
@@ -70,23 +69,23 @@ func (c *Client) changeKey() {
 func (c *Client) checkForUpdate() {
 	c.Print("[user requested] GitHub Update Check")
 
-	switch update, err := update.Check(userRepo, version.Version); {
+	switch update, err := update.Check(mnd.UserRepo, version.Version); {
 	case err != nil:
 		c.Errorf("Update Check: %v", err)
-		_, _ = ui.Error(Title+" ERROR", "Checking version on GitHub: "+err.Error())
-	case update.Outdate && runtime.GOOS == windows:
+		_, _ = ui.Error(mnd.Title+" ERROR", "Checking version on GitHub: "+err.Error())
+	case update.Outdate && runtime.GOOS == mnd.Windows:
 		c.upgradeWindows(update)
 	case update.Outdate:
 		c.downloadOther(update)
 	default:
-		_, _ = ui.Info(Title, "You're up to date! Version: "+update.Version+"\n"+
+		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+update.Version+"\n"+
 			"Updated: "+update.RelDate.Format("Jan 2, 2006")+" ("+
 			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)")
 	}
 }
 
 func (c *Client) downloadOther(update *update.Update) {
-	yes, _ := ui.Question(Title, "An Update is available! Download?\n\n"+
+	yes, _ := ui.Question(mnd.Title, "An Update is available! Download?\n\n"+
 		"Your Version: "+update.Version+"\n"+
 		"New Version: "+update.Current+"\n"+
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
@@ -202,7 +201,7 @@ func (c *Client) sendSystemSnapshot(url string) {
 
 func (c *Client) writeConfigFile() {
 	if c.Flags.ConfigFile == "" {
-		_, _ = ui.Error(Title+" Error", "No Config File Provided")
+		_, _ = ui.Error(mnd.Title+" Error", "No Config File Provided")
 		return
 	}
 
@@ -210,10 +209,10 @@ func (c *Client) writeConfigFile() {
 
 	if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
 		c.Errorf("Writing Config File: %v", err)
-		_, _ = ui.Error(Title+" Error", "Writing Config File: "+err.Error())
+		_, _ = ui.Error(mnd.Title+" Error", "Writing Config File: "+err.Error())
 
 		return
 	}
 
-	_, _ = ui.Info(Title, "Wrote Config File: "+c.Flags.ConfigFile)
+	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+c.Flags.ConfigFile)
 }

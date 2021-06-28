@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/cnfg"
 	"golift.io/starr"
@@ -77,7 +78,7 @@ func radarrAddMovie(r *http.Request) (int, interface{}) {
 
 	if payload.Title == "" {
 		// Title must exist, even if it's wrong.
-		payload.Title = strconv.FormatInt(payload.TmdbID, 10)
+		payload.Title = strconv.FormatInt(payload.TmdbID, mnd.Base10)
 	}
 
 	if payload.MinimumAvailability == "" {
@@ -102,7 +103,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 }
 
 func radarrCheckMovie(r *http.Request) (int, interface{}) {
-	tmdbID, _ := strconv.ParseInt(mux.Vars(r)["tmdbid"], 10, 64)
+	tmdbID, _ := strconv.ParseInt(mux.Vars(r)["tmdbid"], mnd.Base10, mnd.Bits64)
 	// Check for existing movie.
 	m, err := getRadarr(r).GetMovie(tmdbID)
 	if err != nil {
@@ -115,7 +116,7 @@ func radarrCheckMovie(r *http.Request) (int, interface{}) {
 }
 
 func radarrGetMovie(r *http.Request) (int, interface{}) {
-	movieID, _ := strconv.ParseInt(mux.Vars(r)["movieid"], 10, 64)
+	movieID, _ := strconv.ParseInt(mux.Vars(r)["movieid"], mnd.Base10, mnd.Bits64)
 
 	movie, err := getRadarr(r).GetMovieByID(movieID)
 	if err != nil {
@@ -126,7 +127,7 @@ func radarrGetMovie(r *http.Request) (int, interface{}) {
 }
 
 func radarrTriggerSearchMovie(r *http.Request) (int, interface{}) {
-	movieID, _ := strconv.ParseInt(mux.Vars(r)["movieid"], 10, 64)
+	movieID, _ := strconv.ParseInt(mux.Vars(r)["movieid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getRadarr(r).SendCommand(&radarr.CommandRequest{
 		Name:     "MoviesSearch",
@@ -201,7 +202,7 @@ func radarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
@@ -356,7 +357,7 @@ func radarrDelExclusions(r *http.Request) (int, interface{}) {
 	exclusions := []int64{}
 
 	for _, s := range strings.Split(ids, ",") {
-		if i, err := strconv.ParseInt(s, 10, 64); err == nil {
+		if i, err := strconv.ParseInt(s, mnd.Base10, mnd.Bits64); err == nil {
 			exclusions = append(exclusions, i)
 		}
 	}

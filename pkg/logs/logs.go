@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -48,7 +49,6 @@ var (
 // satisfy gomnd.
 const (
 	callDepth = 2 // log the line that called us.
-	megabyte  = 1024 * 1024
 	defExt    = ".log"
 	httpExt   = ".http.log"
 )
@@ -245,8 +245,8 @@ func (l *Logger) setLogPaths() {
 
 func (l *Logger) openLogFile() {
 	rotate := &rotatorr.Config{
-		Filepath: l.logs.LogFile,                     // log file name.
-		FileSize: int64(l.logs.LogFileMb) * megabyte, // megabytes
+		Filepath: l.logs.LogFile,                         // log file name.
+		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
 		Rotatorr: &timerotator.Layout{
 			FileCount:  l.logs.LogFiles, // number of files to keep.
 			PostRotate: l.postLogRotate, // method to run after rotating.
@@ -301,7 +301,7 @@ func (l *Logger) openDebugLog() {
 
 	rotateDebug := &rotatorr.Config{
 		Filepath: l.logs.DebugLog,                                 // log file name.
-		FileSize: int64(l.logs.LogFileMb) * megabyte,              // megabytes
+		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
 		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
 	}
 	l.debug = rotatorr.NewMust(rotateDebug)
@@ -316,7 +316,7 @@ func (l *Logger) openDebugLog() {
 func (l *Logger) openHTTPLog() {
 	rotateHTTP := &rotatorr.Config{
 		Filepath: l.logs.HTTPLog,                                  // log file name.
-		FileSize: int64(l.logs.LogFileMb) * megabyte,              // megabytes
+		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
 		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
 	}
 
@@ -357,7 +357,7 @@ func CustomLog(filePath, logName string) *Logger {
 
 	customLog[logName] = rotatorr.NewMust(&rotatorr.Config{
 		Filepath: filePath,                                 // log file name.
-		FileSize: int64(logFileMb) * megabyte,              // megabytes
+		FileSize: int64(logFileMb) * mnd.Megabyte,          // mnd.Megabytes
 		Rotatorr: &timerotator.Layout{FileCount: logFiles}, // number of files to keep.
 	})
 

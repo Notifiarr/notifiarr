@@ -9,16 +9,22 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golang.org/x/mod/semver"
 )
 
 // OSsuffixMap is the OS to file suffix map for downloads.
 var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
-	"darwin":  ".dmg",
-	windows:   ".exe.zip",
-	"freebsd": ".txz",
-	"linux":   "", // too many variants right now.
+	"darwin":    ".dmg",
+	mnd.Windows: ".exe.zip",
+	"freebsd":   ".txz",
+	"linux":     "", // too many variants right now.
 }
+
+// Custom errors.
+var (
+	ErrNoFile = fmt.Errorf("no downloadable file found in release")
+)
 
 // Latest is where we find the latest release.
 const Latest = "https://api.github.com/repos/%s/releases/latest"
@@ -43,7 +49,7 @@ func Check(userRepo string, version string) (*Update, error) {
 		return nil, err
 	}
 
-	return FillUpdate(release, version), nil
+	return FillUpdate(release, version)
 }
 
 // GetRelease returns a GitHub release. See Check for an example on how to use it.
@@ -71,7 +77,7 @@ func GetRelease(uri string) (*GitHubReleasesLatest, error) {
 }
 
 // FillUpdate compares a current version with the latest GitHub release.
-func FillUpdate(release *GitHubReleasesLatest, version string) *Update {
+func FillUpdate(release *GitHubReleasesLatest, version string) (*Update, error) {
 	u := &Update{
 		RelDate: release.PublishedAt,
 		CurrURL: release.HTMLURL,
@@ -97,10 +103,16 @@ func FillUpdate(release *GitHubReleasesLatest, version string) *Update {
 		if strings.HasSuffix(file.BrowserDownloadURL, suffix) {
 			u.CurrURL = file.BrowserDownloadURL
 			u.RelDate = file.UpdatedAt
+
+			break
 		}
 	}
 
-	return u
+	if release.HTMLURL == u.CurrURL {
+		return u, fmt.Errorf("%w: %s", ErrNoFile, u.CurrURL)
+	}
+
+	return u, nil
 }
 
 // GitHubReleasesLatest is the output from the releases/latest API on GitHub.

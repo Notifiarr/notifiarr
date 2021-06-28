@@ -13,22 +13,16 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
-)
-
-// Application Defaults.
-const (
-	DefaultTimeout  = time.Minute
-	DefaultBindAddr = "0.0.0.0:5454"
 )
 
 // Return prefixes from FindAndReturn.
@@ -76,7 +70,7 @@ func (c *Config) Get(configFile, envPrefix string) error {
 
 func (c *Config) setup() {
 	if c.Timeout.Duration == 0 {
-		c.Timeout.Duration = DefaultTimeout
+		c.Timeout.Duration = mnd.DefaultTimeout
 	}
 
 	if c.AutoUpdate != "" && runtime.GOOS != "windows" {
@@ -87,7 +81,7 @@ func (c *Config) setup() {
 	c.Apps.Setup(c.Timeout.Duration)
 
 	if c.BindAddr == "" {
-		c.BindAddr = DefaultBindAddr
+		c.BindAddr = mnd.DefaultBindAddr
 	} else if !strings.Contains(c.BindAddr, ":") {
 		c.BindAddr = "0.0.0.0:" + c.BindAddr
 	}
@@ -162,7 +156,7 @@ func (c *Config) Write(file string) (string, error) {
 	}
 
 	dir := filepath.Dir(file)
-	if err := os.MkdirAll(dir, 0750); err != nil {
+	if err := os.MkdirAll(dir, mnd.Mode0750); err != nil {
 		return "", fmt.Errorf("making config dir: %w", err)
 	}
 

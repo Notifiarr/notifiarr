@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
@@ -67,8 +68,8 @@ func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 			for _, pool := range pools {
 				if len(fields) > 3 && strings.EqualFold(fields[0], pool) {
 					s.ZFSPool[pool] = &Partition{Device: fields[4]}
-					s.ZFSPool[pool].Total, _ = strconv.ParseUint(fields[1], 10, 64)
-					s.ZFSPool[pool].Free, _ = strconv.ParseUint(fields[3], 10, 64)
+					s.ZFSPool[pool].Total, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)
+					s.ZFSPool[pool].Free, _ = strconv.ParseUint(fields[3], mnd.Base10, mnd.Bits64)
 				}
 			}
 		}

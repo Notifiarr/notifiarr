@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/cnfg"
 	"golift.io/starr"
@@ -83,7 +84,7 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 }
 
 func readarrGetAuthor(r *http.Request) (int, interface{}) {
-	authorID, _ := strconv.ParseInt(mux.Vars(r)["authorid"], 10, 64)
+	authorID, _ := strconv.ParseInt(mux.Vars(r)["authorid"], mnd.Base10, mnd.Bits64)
 
 	author, err := getReadarr(r).GetAuthorByID(authorID)
 	if err != nil {
@@ -121,7 +122,7 @@ func readarrCheckBook(r *http.Request) (int, interface{}) {
 }
 
 func readarrGetBook(r *http.Request) (int, interface{}) {
-	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], 10, 64)
+	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], mnd.Base10, mnd.Bits64)
 
 	book, err := getReadarr(r).GetBookByID(bookID)
 	if err != nil {
@@ -132,7 +133,7 @@ func readarrGetBook(r *http.Request) (int, interface{}) {
 }
 
 func readarrTriggerSearchBook(r *http.Request) (int, interface{}) {
-	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], 10, 64)
+	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getReadarr(r).SendCommand(&readarr.CommandRequest{
 		Name:    "BookSearch",
@@ -214,7 +215,7 @@ func readarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], 10, 64)
+	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}

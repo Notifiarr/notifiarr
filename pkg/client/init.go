@@ -12,15 +12,14 @@ import (
 	"path"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
-
-const helpLink = "GoLift Discord: https://golift.io/discord"
 
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
 func (c *Client) PrintStartupInfo() {
-	c.Printf("==> %s <==", helpLink)
+	c.Printf("==> %s <==", mnd.HelpLink)
 	c.Print("==> Startup Settings <==")
 	c.printSonarr()
 	c.printRadarr()
@@ -92,7 +91,7 @@ func (c *Client) Exit() (err error) {
 	for {
 		select {
 		case sigc := <-c.sigkil:
-			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), helpLink, sigc)
+			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
 			return
 		case sigc := <-c.sighup:
 			c.checkReloadSignal(sigc)
@@ -136,7 +135,7 @@ func (c *Client) reloadConfiguration(msg string) {
 	}
 
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
-	_, _ = ui.Info(Title, "Configuration Reloaded!") //nolint:wsl
+	_, _ = ui.Info(mnd.Title, "Configuration Reloaded!") //nolint:wsl
 }
 
 // printPlex is called on startup to print info about configured Plex instance(s).
