@@ -229,7 +229,7 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v1/system/status?API-Key=" + a.APIKey,
+				Value:    a.URL + "/api/v1/system/status?apikey=" + a.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
 				Interval: a.Interval,
@@ -246,7 +246,7 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v3/system/status?API-Key=" + a.APIKey,
+				Value:    a.URL + "/api/v3/system/status?apikey=" + a.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
 				Interval: a.Interval,
@@ -263,7 +263,7 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v1/system/status?API-Key=" + a.APIKey,
+				Value:    a.URL + "/api/v1/system/status?apikey=" + a.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
 				Interval: a.Interval,
@@ -280,7 +280,7 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 			svcs = append(svcs, &Service{
 				Name:     a.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v3/system/status?API-Key=" + a.APIKey,
+				Value:    a.URL + "/api/v3/system/status?apikey=" + a.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
 				Interval: a.Interval,
