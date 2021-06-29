@@ -69,6 +69,7 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 
 		for _, item := range queue.Records {
 			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
+				item.Quality = nil
 				stuck[i+1] = append(stuck[i+1], item)
 			}
 		}
@@ -96,6 +97,9 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 
 		for _, item := range queue.Records {
 			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
+				item.Quality = nil
+				item.CustomFormats = nil
+				item.Languages = nil
 				stuck[i+1] = append(stuck[i+1], item)
 			}
 		}
@@ -123,6 +127,7 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 
 		for j, item := range queue.Records {
 			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
+				queue.Records[j].Quality = nil
 				stuck[i+1] = append(stuck[i+1], &queue.Records[j])
 			}
 		}
@@ -150,6 +155,8 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 
 		for _, item := range queue.Records {
 			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
+				item.Quality = nil
+				item.Language = nil
 				stuck[i+1] = append(stuck[i+1], item)
 			}
 		}
