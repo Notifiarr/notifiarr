@@ -2,6 +2,8 @@ package notifiarr
 
 import (
 	"strings"
+
+	"golift.io/starr/sonarr"
 )
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
@@ -153,10 +155,18 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 			continue
 		}
 
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*sonarr.QueueRecord)
+
 		for _, item := range queue.Records {
 			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
+				if repeatStomper[item.DownloadID] != nil {
+					continue
+				}
+
 				item.Quality = nil
 				item.Language = nil
+				repeatStomper[item.DownloadID] = item
 				stuck[i+1] = append(stuck[i+1], item)
 			}
 		}
