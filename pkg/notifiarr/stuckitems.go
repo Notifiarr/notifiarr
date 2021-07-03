@@ -15,7 +15,12 @@ const (
 	completed = "completed"
 )
 
-type ItemList map[int][]interface{}
+type custom struct {
+	Repeat uint          `json:"repeat"`
+	Queue  []interface{} `json:"queue"`
+}
+
+type ItemList map[int]custom
 
 type QueuePayload struct {
 	Type    string   `json:"type"`
@@ -29,7 +34,7 @@ const getItemsMax = 100
 
 func (i ItemList) Len() (count int) {
 	for _, v := range i {
-		count += len(v)
+		count += len(v.Queue)
 	}
 
 	return count
@@ -66,7 +71,7 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 	stuck := make(ItemList)
 
 	for i, l := range c.Apps.Lidarr {
-		if !l.StuckItem {
+		if l.CheckQ == nil {
 			continue
 		}
 
@@ -83,11 +88,14 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 			}
 
 			item.Quality = nil
-			stuck[i+1] = append(stuck[i+1], item)
+			instance := stuck[i+1]
+			instance.Repeat = *l.CheckQ
+			instance.Queue = append(instance.Queue, item)
+			stuck[i+1] = instance
 		}
 
 		c.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			i+1, len(queue.Records), len(stuck[i+1]))
+			i+1, len(queue.Records), len(stuck[i+1].Queue))
 	}
 
 	return stuck
@@ -97,7 +105,7 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 	stuck := make(ItemList)
 
 	for i, l := range c.Apps.Radarr {
-		if !l.StuckItem {
+		if l.CheckQ == nil {
 			continue
 		}
 
@@ -116,11 +124,14 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 			item.Quality = nil
 			item.CustomFormats = nil
 			item.Languages = nil
-			stuck[i+1] = append(stuck[i+1], item)
+			instance := stuck[i+1]
+			instance.Repeat = *l.CheckQ
+			instance.Queue = append(instance.Queue, item)
+			stuck[i+1] = instance
 		}
 
 		c.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			i+1, len(queue.Records), len(stuck[i+1]))
+			i+1, len(queue.Records), len(stuck[i+1].Queue))
 	}
 
 	return stuck
@@ -130,7 +141,7 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 	stuck := make(ItemList)
 
 	for i, l := range c.Apps.Readarr {
-		if !l.StuckItem {
+		if l.CheckQ == nil {
 			continue
 		}
 
@@ -147,11 +158,14 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 			}
 
 			item.Quality = nil
-			stuck[i+1] = append(stuck[i+1], item)
+			instance := stuck[i+1]
+			instance.Repeat = *l.CheckQ
+			instance.Queue = append(instance.Queue, item)
+			stuck[i+1] = instance
 		}
 
 		c.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			i+1, len(queue.Records), len(stuck[i+1]))
+			i+1, len(queue.Records), len(stuck[i+1].Queue))
 	}
 
 	return stuck
@@ -161,7 +175,7 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 	stuck := make(ItemList)
 
 	for i, l := range c.Apps.Sonarr {
-		if !l.StuckItem {
+		if l.CheckQ == nil {
 			continue
 		}
 
@@ -185,11 +199,14 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 			item.Quality = nil
 			item.Language = nil
 			repeatStomper[item.DownloadID] = item
-			stuck[i+1] = append(stuck[i+1], item)
+			instance := stuck[i+1]
+			instance.Repeat = *l.CheckQ
+			instance.Queue = append(instance.Queue, item)
+			stuck[i+1] = instance
 		}
 
 		c.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			i+1, len(queue.Records), len(stuck[i+1]))
+			i+1, len(queue.Records), len(stuck[i+1].Queue))
 	}
 
 	return stuck

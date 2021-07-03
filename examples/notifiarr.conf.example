@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.1.7   @ 212606T0237 #
+# Created by Notifiarr v0.1.10  @ 210307T0521 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -70,24 +70,30 @@ timeout = "1m0s"
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
 #[[lidarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://lidarr:8989/"
-#api_key = ""
+#name        = "" # Set a name to enable checks of your service.
+#url         = "http://lidarr:8989/"
+#api_key     = ""
+#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
 
 #[[radarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://127.0.0.1:7878/radarr"
-#api_key = ""
+#name        = "" # Set a name to enable checks of your service.
+#url         = "http://127.0.0.1:7878/radarr"
+#api_key     = ""
+#disable_cf  = true  # Disable custom format sync.
+#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
 
 #[[readarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://127.0.0.1:8787/readarr"
-#api_key = ""
+#name        = "" # Set a name to enable checks of your service.
+#url         = "http://127.0.0.1:8787/readarr"
+#api_key     = ""
+#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
 
 #[[sonarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://sonarr:8989/"
-#api_key = ""
+#name        = ""  # Set a name to enable checks of your service.
+#url         = "http://sonarr:8989/"
+#api_key     = ""
+#disable_cf  = true # Disable release profile sync.
+#check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
 
 
 #################
@@ -98,10 +104,10 @@ timeout = "1m0s"
 ##
 [plex]
   url         = "http://localhost:32400" # Your plex URL
-  token       = ""     # your plex token; get this from a web inspector
-  interval    = "30m0s"  # how often to send session data, 0 = off
-  cooldown    = "15s"  # how often plex webhooks may trigger session hooks
-  account_map = ""     # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
+  token       = ""            # your plex token; get this from a web inspector
+  interval    = "30m0s"       # how often to send session data, 0 = off
+  cooldown    = "15s"         # how often plex webhooks may trigger session hooks
+  account_map = ""            # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
   movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 
@@ -113,12 +119,13 @@ timeout = "1m0s"
 ## Install package(s)
 ##  - Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
 ##  - Linux:    apt install smartmontools || yum install smartmontools
+##  - Docker:   Already Included. Run in --privileged mode.
 ##  - Synology: opkg install smartmontools
 ##  - Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 ##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 ##
 [snapshot]
-  interval          = "30m0s"  # how often to send a snapshot, 0 = off, 30m - 2h recommended
+  interval          = "30m0s" # how often to send a snapshot, 0 = off, 30m - 2h recommended
   timeout           = "30s" # how long a snapshot may take
   monitor_raid      = false # mdadm / megacli
   monitor_drives    = false # smartctl: age, temp, health

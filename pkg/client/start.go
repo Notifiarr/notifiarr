@@ -38,6 +38,7 @@ type Flags struct {
 	updated    bool
 	cfsync     bool
 	pslist     bool
+	write      string
 	curl       string
 	ConfigFile string
 	EnvPrefix  string
@@ -107,6 +108,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.BoolVar(&f.cfsync, "cfsync", false, "Trigger Custom Format sync and exit.")
 	f.StringVar(&f.curl, "curl", "", "GET a URL and display headers and payload.")
 	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks")
+	f.StringVar(&f.write, "write", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
 
 	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it")
@@ -141,7 +143,7 @@ func Start() error {
 	if err := c.config(); err != nil {
 		_, _ = ui.Error(mnd.Title, err.Error())
 		return err
-	} else if c.Flags.restart {
+	} else if c.Flags.restart || c.Flags.write != "" {
 		return nil
 	}
 
@@ -157,6 +159,8 @@ func (c *Client) config() error {
 	var msg string
 
 	// Find or write a config file. This does not parse it.
+	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
+	// And in the case of Docker, only if `/config` is a mounted volume.
 	write := (!c.Flags.restart && ui.HasGUI()) || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
 	c.Flags.ConfigFile, c.newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
 
@@ -172,6 +176,43 @@ func (c *Client) config() error {
 		return fmt.Errorf("%s: %w", msg, err)
 	}
 
+	// If c.Flags.write is set it will force-write the read-config to the provided file path.
+	if c.Flags.write != "" {
+		return c.forceWriteWithExit(c.Flags.write, msg)
+	}
+
+	c.startupMessage([]string{msg})
+
+	return nil
+}
+
+func (c *Client) forceWriteWithExit(f, msg string) error {
+	if f == "-" {
+		f = c.Flags.ConfigFile
+	} else if f == "example" || f == "--" {
+		// Bubilding a default template.
+		f = c.Flags.ConfigFile
+		c.Config.LogFile = ""
+		c.Config.DebugLog = ""
+		c.Config.HTTPLog = ""
+		c.Config.Debug = false
+		c.Config.Snapshot.Interval.Duration = mnd.HalfHour
+		configfile.ForceAllTmpl = true
+	}
+
+	c.Printf("%s", msg)
+
+	f, err := c.Config.Write(f)
+	if err != nil { // f purposely shadowed.
+		return fmt.Errorf("writing config: %s: %w", f, err)
+	}
+
+	c.Print("Wrote Config File:", f)
+
+	return nil
+}
+
+func (c *Client) startupMessage(msg []string) {
 	if ui.HasGUI() {
 		// Setting AppName forces log files (even if not configured).
 		// Used for GUI apps that have no console output.
@@ -180,9 +221,10 @@ func (c *Client) config() error {
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
-	c.Printf("==> %s", msg)
 
-	return nil
+	for _, m := range msg {
+		c.Printf("==> %s", m)
+	}
 }
 
 func (c *Client) start() error {

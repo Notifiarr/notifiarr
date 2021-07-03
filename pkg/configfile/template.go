@@ -9,6 +9,9 @@ import (
 	"golift.io/version"
 )
 
+// ForceAllTmpl allows you to force some specific settings. Used to build a default template.
+var ForceAllTmpl = false // nolint:gochecknoglobals
+
 // Template is the config file template.
 //nolint: gochecknoglobals
 var Template = template.Must(template.New("config").Funcs(Funcs()).Parse(tmpl))
@@ -16,7 +19,8 @@ var Template = template.Must(template.New("config").Funcs(Funcs()).Parse(tmpl))
 // Funcs returns our template functions.
 func Funcs() template.FuncMap {
 	return map[string]interface{}{
-		"os": func() string { return runtime.GOOS },
+		"os":    func() string { return runtime.GOOS },
+		"force": func() bool { return ForceAllTmpl },
 		"version": func() string {
 			return fmt.Sprintf("v%-7s @ %s", version.Version, time.Now().UTC().Format("060201T1504"))
 		},
@@ -38,12 +42,12 @@ const tmpl = `###############################################
 ## This will be used in Media Requests for example to send payloads, Example: http://your-domain.com:5454
 ##
 bind_addr = "{{.BindAddr}}"
-{{if eq os "windows"}}
+{{if or (eq os "windows") (force)}}
 ## This application can update itself on Windows systems.
 ## Set this to "daily" to check GitHub every day for updates.
 ## You may also set it to a Go duration like "12h" or "72h".
 ## THIS ONLY WORKS ON WINDOWS
-{{if .AutoUpdate}}auto_update = "{{.AutoUpdate}}"{{else}}auto_update="off"{{end}}
+{{if .AutoUpdate}}auto_update = "{{.AutoUpdate}}"{{else}}auto_update = "off"{{end}}
 {{end}}
 ## Quiet makes the app not log anything to output.
 ## Recommend setting log files if you make the app quiet.
@@ -51,6 +55,8 @@ bind_addr = "{{.BindAddr}}"
 ## Log files are automatically written on those platforms.
 ##
 quiet = {{.Quiet}}{{if .Debug}}
+
+## Debug prints more data and json payloads. Recommend setting debug_log if enabled.
 debug = true{{end}}{{if .Mode}}
 
 ## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
@@ -106,63 +112,67 @@ timeout = "{{.Timeout}}"
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
 {{if .Lidarr}}{{range .Lidarr}}
 [[lidarr]]
-  name     = "{{.Name}}"
-  url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
-  interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"
-	stuck_items = {{.StuckItem}}{{end -}}
+  name        = "{{.Name}}"
+  url         = "{{.URL}}"
+  api_key     = "{{.APIKey}}"
+  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout     = "{{.Timeout}}"{{if .CheckQ}}
+  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[lidarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://lidarr:8989/"
-#api_key = ""
-#stuck_items = false{{end}}
+#name        = "" # Set a name to enable checks of your service.
+#url         = "http://lidarr:8989/"
+#api_key     = ""
+#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 {{if .Radarr}}{{range .Radarr}}
 [[radarr]]
-  name     = "{{.Name}}"
-  url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
-  {{if .DisableCF}}disable_cf = true
-  {{end -}}
-  interval = "{{.Interval}}" # service check duration (if name is not empty)
-	timeout  = "{{.Timeout}}"
-	stuck_items = {{.StuckItem}}{{end -}}
+  name        = "{{.Name}}"
+  url         = "{{.URL}}"
+  api_key     = "{{.APIKey}}"
+  disable_cf  = {{.DisableCF}} # Disable custom format sync.
+  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout     = "{{.Timeout}}"{{if .CheckQ}}
+  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[radarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://127.0.0.1:7878/radarr"
-#api_key = ""
-#stuck_items = false{{end}}
+#name        = "" # Set a name to enable checks of your service.
+#url         = "http://127.0.0.1:7878/radarr"
+#api_key     = ""
+#disable_cf  = true  # Disable custom format sync.
+#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 {{if .Readarr}}{{range .Readarr}}
 [[readarr]]
-  name     = "{{.Name}}"
-  url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
-  interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"
-	stuck_items = {{.StuckItem}}{{end -}}
+  name        = "{{.Name}}"
+  url         = "{{.URL}}"
+  api_key     = "{{.APIKey}}"
+  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout     = "{{.Timeout}}"{{if .CheckQ}}
+  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[readarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://127.0.0.1:8787/readarr"
-#api_key = ""
-#stuck_items = false{{end}}
+#name        = "" # Set a name to enable checks of your service.
+#url         = "http://127.0.0.1:8787/readarr"
+#api_key     = ""
+#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 {{if .Sonarr}}{{range .Sonarr}}
 [[sonarr]]
-  name     = "{{.Name}}"
-  url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
-  {{if .DisableCF}}disable_cf = true
-  {{end -}}
-  interval = "{{.Interval}}" # service check duration (if name is not empty)
-  timeout  = "{{.Timeout}}"
-	stuck_items = {{.StuckItem}}{{end -}}
+  name        = "{{.Name}}"
+  url         = "{{.URL}}"
+  api_key     = "{{.APIKey}}"
+  disable_cf  = {{.DisableCF}}  # Disable release profile sync.
+  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout     = "{{.Timeout}}"{{if .CheckQ}}
+  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[sonarr]]
-#name    = "" # set a name to enable checks of your service.
-#url     = "http://sonarr:8989/"
-#api_key = ""
-#stuck_items = false{{end}}
+#name        = ""  # Set a name to enable checks of your service.
+#url         = "http://sonarr:8989/"
+#api_key     = ""
+#disable_cf  = true # Disable release profile sync.
+#check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 
 #################
@@ -171,20 +181,20 @@ timeout = "{{.Timeout}}"
 
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
-[plex]{{if .Plex}}
-  url         = "{{.Plex.URL}}" # Your plex URL
-  token       = "{{.Plex.Token}}"     # your plex token; get this from a web inspector
+[plex]{{if and .Plex (not force)}}
+  url         = "{{.Plex.URL}}"  # Your plex URL
+  token       = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
   interval    = "{{.Plex.Interval}}"  # how often to send session data, 0 = off
   cooldown    = "{{.Plex.Cooldown}}"  # how often plex webhooks may trigger session hooks
-  account_map = "{{.Plex.AccountMap}}"     # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  movies_percent_complete = {{.Plex.MoviesPC}} # 0, 70-99, send notifications when a movie session is this % complete.
-  series_percent_complete = {{.Plex.SeriesPC}} # 0, 70-99, send notifications when an episode session is this % complete.
+  account_map = "{{.Plex.AccountMap}}"  # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
+  movies_percent_complete = {{.Plex.MoviesPC}}  # 0, 70-99, send notifications when a movie session is this % complete.
+  series_percent_complete = {{.Plex.SeriesPC}}  # 0, 70-99, send notifications when an episode session is this % complete.
 {{- else}}
   url         = "http://localhost:32400" # Your plex URL
-  token       = ""     # your plex token; get this from a web inspector
-  interval    = "30m"  # how often to send session data, 0 = off
-  cooldown    = "15s"  # how often plex webhooks may trigger session hooks
-  account_map = ""     # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
+  token       = ""            # your plex token; get this from a web inspector
+  interval    = "30m0s"       # how often to send session data, 0 = off
+  cooldown    = "15s"         # how often plex webhooks may trigger session hooks
+  account_map = ""            # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
   movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 {{- end }}
@@ -197,12 +207,13 @@ timeout = "{{.Timeout}}"
 ## Install package(s)
 ##  - Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
 ##  - Linux:    apt install smartmontools || yum install smartmontools
+##  - Docker:   Already Included. Run in --privileged mode.
 ##  - Synology: opkg install smartmontools
 ##  - Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 ##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 ##
 [snapshot]
-  interval          = "{{.Snapshot.Interval}}"  # how often to send a snapshot, 0 = off, 30m - 2h recommended
+  interval          = "{{.Snapshot.Interval}}" # how often to send a snapshot, 0 = off, 30m - 2h recommended
   timeout           = "{{.Snapshot.Timeout}}" # how long a snapshot may take
   monitor_raid      = {{.Snapshot.Raid}} # mdadm / megacli
   monitor_drives    = {{.Snapshot.DriveData}} # smartctl: age, temp, health
