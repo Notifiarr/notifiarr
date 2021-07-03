@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
@@ -14,7 +15,7 @@ import (
 func (c *Client) plexIncoming(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 
-	if err := r.ParseMultipartForm(1000 * 100); err != nil { // nolint:gomnd // 100kbyte memory usage
+	if err := r.ParseMultipartForm(mnd.KB100); err != nil {
 		c.Errorf("Parsing Multipart Form (plex): %v", err)
 		c.Config.Respond(w, http.StatusBadRequest, "form parse error")
 
@@ -102,7 +103,7 @@ func (c *Client) logSnaps() {
 	c.Printf("[user requested] Snapshot Data:\n%s", string(b))
 }
 
-// sendSystemSnapshot is triggered from a menu-bar item.
+// sendSystemSnapshot is triggered from a menu-bar item, and from --send cli arg.
 func (c *Client) sendSystemSnapshot(url string) string {
 	c.Printf("[user requested] Sending System Snapshot to %s", url)
 
