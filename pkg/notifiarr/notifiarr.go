@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -97,7 +98,7 @@ type ClientInfo struct {
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
 func (c *Config) Start(mode string) {
-	switch mode {
+	switch strings.ToLower(mode) {
 	default:
 		fallthrough
 	case "prod", "production":
@@ -106,7 +107,7 @@ func (c *Config) Start(mode string) {
 	case "test", "testing":
 		c.URL = TestURL
 		c.BaseURL = BaseURL
-	case "dev", "development":
+	case "dev", "devel", "development":
 		c.URL = DevURL
 		c.BaseURL = DevBaseURL
 	}

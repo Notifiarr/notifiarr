@@ -14,7 +14,7 @@ system snapshot and Plex session data to Notifiarr for Discord notifications.
 OPTIONS
 ---
 
-`notifiarr [-c <file>] [-m <mode>] [--snaps] [--ps] [--cfsync] [--curl <url>] [-h] [-v]`
+`notifiarr [-c <file>] [--snaps] [--ps] [--cfsync] [--curl <url>] [-h] [-v]`
 
     -c, --config <config file>
         Provide a configuration file (instead of the default).
@@ -23,10 +23,6 @@ OPTIONS
     -p, --prefix
         The default environment variable configuration prefix is `DN`.
         Use this tunable to change it.
-
-    -m, --mode <prod|test|dev>
-        There are three modes.
-        This setting selects which notifiarr server receives payloads.
 
     --snaps
         This flag makes the application output a system snapshot and exit.

@@ -41,7 +41,6 @@ type Flags struct {
 	curl       string
 	ConfigFile string
 	EnvPrefix  string
-	Mode       string
 }
 
 // Client stores all the running data.
@@ -103,7 +102,6 @@ func NewDefaults() *Client {
 func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
 	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots")
-	f.StringVarP(&f.Mode, "mode", "m", "prod", "Selects Notifiarr URL: test, dev, prod")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.BoolVar(&f.cfsync, "cfsync", false, "Trigger Custom Format sync and exit.")
@@ -275,7 +273,7 @@ func (c *Client) configureServices(getPlexInfo bool) {
 
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo()
-	c.notify.Start(c.Flags.Mode)
+	c.notify.Start(c.Config.Mode)
 
 	c.Config.Services.Logger = c.Logger
 	c.Config.Services.Apps = c.Config.Apps

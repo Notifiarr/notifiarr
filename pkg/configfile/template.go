@@ -51,7 +51,10 @@ bind_addr = "{{.BindAddr}}"
 ## Log files are automatically written on those platforms.
 ##
 quiet = {{.Quiet}}{{if .Debug}}
-debug = true{{end}}
+debug = true{{end}}{{if .Mode}}
+
+## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
+mode  = "{{.Mode}}"{{end}}
 
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
 ## Change it to /somethingelse/api by setting urlbase to "/somethingelse"
