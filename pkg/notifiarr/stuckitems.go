@@ -8,6 +8,13 @@ import (
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
 
+const (
+	errorstr  = "error"
+	failed    = "failed"
+	warning   = "warning"
+	completed = "completed"
+)
+
 type ItemList map[int][]interface{}
 
 type QueuePayload struct {
@@ -70,10 +77,13 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 		}
 
 		for _, item := range queue.Records {
-			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
-				item.Quality = nil
-				stuck[i+1] = append(stuck[i+1], item)
+			if s := strings.ToLower(item.Status); s != completed && s != warning &&
+				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
+				continue
 			}
+
+			item.Quality = nil
+			stuck[i+1] = append(stuck[i+1], item)
 		}
 
 		c.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
@@ -98,12 +108,15 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 		}
 
 		for _, item := range queue.Records {
-			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
-				item.Quality = nil
-				item.CustomFormats = nil
-				item.Languages = nil
-				stuck[i+1] = append(stuck[i+1], item)
+			if s := strings.ToLower(item.Status); s != completed && s != warning &&
+				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
+				continue
 			}
+
+			item.Quality = nil
+			item.CustomFormats = nil
+			item.Languages = nil
+			stuck[i+1] = append(stuck[i+1], item)
 		}
 
 		c.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
@@ -127,11 +140,14 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 			continue
 		}
 
-		for j, item := range queue.Records {
-			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
-				queue.Records[j].Quality = nil
-				stuck[i+1] = append(stuck[i+1], &queue.Records[j])
+		for _, item := range queue.Records {
+			if s := strings.ToLower(item.Status); s != completed && s != warning &&
+				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
+				continue
 			}
+
+			item.Quality = nil
+			stuck[i+1] = append(stuck[i+1], item)
 		}
 
 		c.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
@@ -159,16 +175,17 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if strings.EqualFold(item.Status, "completed") || len(item.StatusMessages) > 0 {
-				if repeatStomper[item.DownloadID] != nil {
-					continue
-				}
-
-				item.Quality = nil
-				item.Language = nil
-				repeatStomper[item.DownloadID] = item
-				stuck[i+1] = append(stuck[i+1], item)
+			if s := strings.ToLower(item.Status); s != completed && s != warning &&
+				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
+				continue
+			} else if repeatStomper[item.DownloadID] != nil {
+				continue
 			}
+
+			item.Quality = nil
+			item.Language = nil
+			repeatStomper[item.DownloadID] = item
+			stuck[i+1] = append(stuck[i+1], item)
 		}
 
 		c.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
