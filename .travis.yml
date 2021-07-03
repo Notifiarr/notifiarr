@@ -1,7 +1,8 @@
 # Powered by Application Builder: https://github.com/golift/application-builder
 jobs:
   include:
-  - os: osx
+  - if: tag IS present
+    os: osx
     osx_image: xcode12
     language: go
     go: 1.16.x
