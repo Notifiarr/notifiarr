@@ -101,3 +101,32 @@ func (c *Client) logSnaps() {
 	}, "", "  ")
 	c.Printf("[user requested] Snapshot Data:\n%s", string(b))
 }
+
+// sendSystemSnapshot is triggered from a menu-bar item.
+func (c *Client) sendSystemSnapshot(url string) string {
+	c.Printf("[user requested] Sending System Snapshot to %s", url)
+
+	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
+	for _, err := range errs {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	for _, err := range debug {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	b, _ := json.MarshalIndent(&notifiarr.Payload{Type: notifiarr.SnapCron, Snap: snaps}, "", "  ")
+	if _, body, err := c.notify.SendJSON(url, b); err != nil { //nolint:bodyclose // body already closed
+		c.Errorf("[user requested] Sending System Snapshot to %s: %v: %s", url, err, string(body))
+	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
+		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, fields[3])
+	} else {
+		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, string(body))
+	}
+
+	return string(b)
+}

@@ -34,6 +34,7 @@ type Flags struct {
 	*flag.FlagSet
 	verReq     bool
 	testSnaps  bool
+	sendSnaps  bool
 	restart    bool
 	updated    bool
 	cfsync     bool
@@ -101,18 +102,19 @@ func NewDefaults() *Client {
 
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
-	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots")
-	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix")
+	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File.")
+	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots.")
+	f.BoolVar(&f.sendSnaps, "send", false, f.Name()+"Send Snapshots; must also pass --snaps for this to work.")
+	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix.")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.BoolVar(&f.cfsync, "cfsync", false, "Trigger Custom Format sync and exit.")
 	f.StringVar(&f.curl, "curl", "", "GET a URL and display headers and payload.")
-	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks")
+	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks.")
 	f.StringVar(&f.write, "write", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
 
 	if runtime.GOOS == mnd.Windows {
-		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it")
-		f.BoolVar(&f.updated, "updated", false, "This flags causes the app to print an updated message")
+		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it.")
+		f.BoolVar(&f.updated, "updated", false, "This flag causes the app to print an 'updated' message.")
 	}
 
 	f.Parse(args) // nolint: errcheck
@@ -235,7 +237,14 @@ func (c *Client) start() error {
 	if c.Flags.testSnaps {
 		c.checkPlex()
 		c.Config.Snapshot.Validate()
-		c.logSnaps()
+
+		if c.Flags.sendSnaps {
+			c.configureNotifiarr()
+			c.notify.Start(c.Config.Mode)
+			c.Printf("[user requested] Snapshot Data:\n%s", c.sendSystemSnapshot(c.notify.URL))
+		} else {
+			c.logSnaps()
+		}
 
 		return nil
 	}
@@ -304,6 +313,17 @@ func (c *Client) configureServices(getPlexInfo bool) {
 		}
 	}
 
+	c.configureNotifiarr()
+	c.Config.Snapshot.Validate()
+	c.PrintStartupInfo()
+	c.notify.Start(c.Config.Mode)
+
+	c.Config.Services.Logger = c.Logger
+	c.Config.Services.Apps = c.Config.Apps
+	c.Config.Services.Notify = c.notify
+}
+
+func (c *Client) configureNotifiarr() {
 	c.notify = &notifiarr.Config{
 		Apps:    c.Config.Apps,
 		Plex:    c.Config.Plex,
@@ -312,14 +332,6 @@ func (c *Client) configureServices(getPlexInfo bool) {
 		URL:     notifiarr.ProdURL,
 		Timeout: c.Config.Timeout.Duration,
 	}
-
-	c.Config.Snapshot.Validate()
-	c.PrintStartupInfo()
-	c.notify.Start(c.Config.Mode)
-
-	c.Config.Services.Logger = c.Logger
-	c.Config.Services.Apps = c.Config.Apps
-	c.Config.Services.Notify = c.notify
 }
 
 // run turns on the auto updater if enabled, and starts the web server, and system tray icon.
