@@ -62,7 +62,7 @@ type Client struct {
 
 // Errors returned by this package.
 var (
-	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file or with environment variable")
+	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file, OR with environment variable")
 )
 
 // NewDefaults returns a new Client pointer with default settings.
@@ -189,7 +189,7 @@ func (c *Client) config() error {
 func (c *Client) forceWriteWithExit(f, msg string) error {
 	if f == "-" {
 		f = c.Flags.ConfigFile
-	} else if f == "example" || f == "--" {
+	} else if f == "example" || f == "---" {
 		// Bubilding a default template.
 		f = c.Flags.ConfigFile
 		c.Config.LogFile = ""

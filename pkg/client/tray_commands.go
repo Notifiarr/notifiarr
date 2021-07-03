@@ -200,19 +200,21 @@ func (c *Client) sendSystemSnapshot(url string) {
 }
 
 func (c *Client) writeConfigFile() {
-	if c.Flags.ConfigFile == "" {
+	val, _, _ := ui.Entry(mnd.Title, "Enter path to write config file:", c.Flags.ConfigFile)
+
+	if val == "" {
 		_, _ = ui.Error(mnd.Title+" Error", "No Config File Provided")
 		return
 	}
 
-	c.Print("[user requested] Writing Config File:", c.Flags.ConfigFile)
+	c.Print("[user requested] Writing Config File:", val)
 
-	if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
+	if _, err := c.Config.Write(val); err != nil {
 		c.Errorf("Writing Config File: %v", err)
 		_, _ = ui.Error(mnd.Title+" Error", "Writing Config File: "+err.Error())
 
 		return
 	}
 
-	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+c.Flags.ConfigFile)
+	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+val)
 }
