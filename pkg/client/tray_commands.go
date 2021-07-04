@@ -3,7 +3,6 @@
 package client
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"path"
@@ -172,47 +171,22 @@ func (c *Client) sendPlexSessions(url string) {
 	}
 }
 
-// sendSystemSnapshot is triggered from a menu-bar item.
-func (c *Client) sendSystemSnapshot(url string) {
-	c.Printf("[user requested] Sending System Snapshot to %s", url)
-
-	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
-	for _, err := range errs {
-		if err != nil {
-			c.Errorf("[user requested] %v", err)
-		}
-	}
-
-	for _, err := range debug {
-		if err != nil {
-			c.Errorf("[user requested] %v", err)
-		}
-	}
-
-	b, _ := json.MarshalIndent(&notifiarr.Payload{Type: notifiarr.SnapCron, Snap: snaps}, "", "  ")
-	if _, body, err := c.notify.SendJSON(url, b); err != nil {
-		c.Errorf("[user requested] Sending System Snapshot to %s: %v: %s", url, err, string(body))
-	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, fields[3])
-	} else {
-		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, string(body))
-	}
-}
-
 func (c *Client) writeConfigFile() {
-	if c.Flags.ConfigFile == "" {
+	val, _, _ := ui.Entry(mnd.Title, "Enter path to write config file:", c.Flags.ConfigFile)
+
+	if val == "" {
 		_, _ = ui.Error(mnd.Title+" Error", "No Config File Provided")
 		return
 	}
 
-	c.Print("[user requested] Writing Config File:", c.Flags.ConfigFile)
+	c.Print("[user requested] Writing Config File:", val)
 
-	if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
+	if _, err := c.Config.Write(val); err != nil {
 		c.Errorf("Writing Config File: %v", err)
 		_, _ = ui.Error(mnd.Title+" Error", "Writing Config File: "+err.Error())
 
 		return
 	}
 
-	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+c.Flags.ConfigFile)
+	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+val)
 }

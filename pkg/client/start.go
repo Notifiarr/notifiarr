@@ -34,14 +34,15 @@ type Flags struct {
 	*flag.FlagSet
 	verReq     bool
 	testSnaps  bool
+	sendSnaps  bool
 	restart    bool
 	updated    bool
 	cfsync     bool
 	pslist     bool
+	write      string
 	curl       string
 	ConfigFile string
 	EnvPrefix  string
-	Mode       string
 }
 
 // Client stores all the running data.
@@ -62,7 +63,7 @@ type Client struct {
 
 // Errors returned by this package.
 var (
-	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file or with environment variable")
+	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file, OR with environment variable")
 )
 
 // NewDefaults returns a new Client pointer with default settings.
@@ -101,18 +102,19 @@ func NewDefaults() *Client {
 
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File")
-	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots")
-	f.StringVarP(&f.Mode, "mode", "m", "prod", "Selects Notifiarr URL: test, dev, prod")
-	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix")
+	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File.")
+	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots.")
+	f.BoolVar(&f.sendSnaps, "send", false, f.Name()+"Send Snapshots; must also pass --snaps for this to work.")
+	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix.")
 	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
 	f.BoolVar(&f.cfsync, "cfsync", false, "Trigger Custom Format sync and exit.")
 	f.StringVar(&f.curl, "curl", "", "GET a URL and display headers and payload.")
-	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks")
+	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks.")
+	f.StringVar(&f.write, "write", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
 
 	if runtime.GOOS == mnd.Windows {
-		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it")
-		f.BoolVar(&f.updated, "updated", false, "This flags causes the app to print an updated message")
+		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it.")
+		f.BoolVar(&f.updated, "updated", false, "This flag causes the app to print an 'updated' message.")
 	}
 
 	f.Parse(args) // nolint: errcheck
@@ -143,7 +145,7 @@ func Start() error {
 	if err := c.config(); err != nil {
 		_, _ = ui.Error(mnd.Title, err.Error())
 		return err
-	} else if c.Flags.restart {
+	} else if c.Flags.restart || c.Flags.write != "" {
 		return nil
 	}
 
@@ -159,6 +161,8 @@ func (c *Client) config() error {
 	var msg string
 
 	// Find or write a config file. This does not parse it.
+	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
+	// And in the case of Docker, only if `/config` is a mounted volume.
 	write := (!c.Flags.restart && ui.HasGUI()) || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
 	c.Flags.ConfigFile, c.newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
 
@@ -174,6 +178,43 @@ func (c *Client) config() error {
 		return fmt.Errorf("%s: %w", msg, err)
 	}
 
+	// If c.Flags.write is set it will force-write the read-config to the provided file path.
+	if c.Flags.write != "" {
+		return c.forceWriteWithExit(c.Flags.write, msg)
+	}
+
+	c.startupMessage([]string{msg})
+
+	return nil
+}
+
+func (c *Client) forceWriteWithExit(f, msg string) error {
+	if f == "-" {
+		f = c.Flags.ConfigFile
+	} else if f == "example" || f == "---" {
+		// Bubilding a default template.
+		f = c.Flags.ConfigFile
+		c.Config.LogFile = ""
+		c.Config.DebugLog = ""
+		c.Config.HTTPLog = ""
+		c.Config.Debug = false
+		c.Config.Snapshot.Interval.Duration = mnd.HalfHour
+		configfile.ForceAllTmpl = true
+	}
+
+	c.Printf("%s", msg)
+
+	f, err := c.Config.Write(f)
+	if err != nil { // f purposely shadowed.
+		return fmt.Errorf("writing config: %s: %w", f, err)
+	}
+
+	c.Print("Wrote Config File:", f)
+
+	return nil
+}
+
+func (c *Client) startupMessage(msg []string) {
 	if ui.HasGUI() {
 		// Setting AppName forces log files (even if not configured).
 		// Used for GUI apps that have no console output.
@@ -182,9 +223,10 @@ func (c *Client) config() error {
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.Printf("%s v%s-%s Starting! [PID: %v]", c.Flags.Name(), version.Version, version.Revision, os.Getpid())
-	c.Printf("==> %s", msg)
 
-	return nil
+	for _, m := range msg {
+		c.Printf("==> %s", m)
+	}
 }
 
 func (c *Client) start() error {
@@ -195,7 +237,14 @@ func (c *Client) start() error {
 	if c.Flags.testSnaps {
 		c.checkPlex()
 		c.Config.Snapshot.Validate()
-		c.logSnaps()
+
+		if c.Flags.sendSnaps {
+			c.configureNotifiarr()
+			c.notify.Start(c.Config.Mode)
+			c.Printf("[user requested] Snapshot Data:\n%s", c.sendSystemSnapshot(c.notify.URL))
+		} else {
+			c.logSnaps()
+		}
 
 		return nil
 	}
@@ -264,6 +313,17 @@ func (c *Client) configureServices(getPlexInfo bool) {
 		}
 	}
 
+	c.configureNotifiarr()
+	c.Config.Snapshot.Validate()
+	c.PrintStartupInfo()
+	c.notify.Start(c.Config.Mode)
+
+	c.Config.Services.Logger = c.Logger
+	c.Config.Services.Apps = c.Config.Apps
+	c.Config.Services.Notify = c.notify
+}
+
+func (c *Client) configureNotifiarr() {
 	c.notify = &notifiarr.Config{
 		Apps:    c.Config.Apps,
 		Plex:    c.Config.Plex,
@@ -272,14 +332,6 @@ func (c *Client) configureServices(getPlexInfo bool) {
 		URL:     notifiarr.ProdURL,
 		Timeout: c.Config.Timeout.Duration,
 	}
-
-	c.Config.Snapshot.Validate()
-	c.PrintStartupInfo()
-	c.notify.Start(c.Flags.Mode)
-
-	c.Config.Services.Logger = c.Logger
-	c.Config.Services.Apps = c.Config.Apps
-	c.Config.Services.Notify = c.notify
 }
 
 // run turns on the auto updater if enabled, and starts the web server, and system tray icon.

@@ -39,6 +39,7 @@ type Config struct {
 	SSLCrtFile string              `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
 	SSLKeyFile string              `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
 	AutoUpdate string              `json:"auto_update" toml:"auto_update" xml:"auto_update" yaml:"auto_update"`
+	Mode       string              `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
 	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Plex       *plex.Server        `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`

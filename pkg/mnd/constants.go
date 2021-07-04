@@ -9,7 +9,9 @@ const (
 	Mode0750 = 0750
 	Mode0600 = 0600
 	Megabyte = 1024 * 1024
+	KB100    = 1024 * 100
 	OneDay   = 24 * time.Hour
+	HalfHour = 30 * time.Minute
 	Base10   = 10
 	Base8    = 8
 	Bits64   = 64

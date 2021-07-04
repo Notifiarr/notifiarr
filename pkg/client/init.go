@@ -10,11 +10,14 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
+
+const disabled = "disabled"
 
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
@@ -155,60 +158,116 @@ func (c *Client) printPlex() {
 
 // printLidarr is called on startup to print info about each configured server.
 func (c *Client) printLidarr() {
-	if count := len(c.Config.Lidarr); count == 1 {
-		c.Printf(" => Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Lidarr[0].URL, c.Config.Lidarr[0].APIKey != "", c.Config.Lidarr[0].Timeout, c.Config.Lidarr[0].ValidSSL)
-	} else {
-		c.Print(" => Lidarr Config:", count, "servers")
+	if len(c.Config.Lidarr) == 1 {
+		f := c.Config.Lidarr[0]
 
-		for _, f := range c.Config.Lidarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
+
+		c.Printf(" => Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+
+		return
+	}
+
+	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "servers")
+
+	for _, f := range c.Config.Lidarr {
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
+		}
+
+		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
 	}
 }
 
 // printRadarr is called on startup to print info about each configured server.
 func (c *Client) printRadarr() {
-	if count := len(c.Config.Radarr); count == 1 {
-		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Radarr[0].URL, c.Config.Radarr[0].APIKey != "", c.Config.Radarr[0].Timeout, c.Config.Radarr[0].ValidSSL)
-	} else {
-		c.Print(" => Radarr Config:", count, "servers")
+	if len(c.Config.Radarr) == 1 {
+		f := c.Config.Radarr[0]
 
-		for _, f := range c.Config.Radarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
+
+		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+
+		return
+	}
+
+	c.Print(" => Radarr Config:", len(c.Config.Lidarr), "servers")
+
+	for _, f := range c.Config.Radarr {
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
+		}
+
+		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
 	}
 }
 
 // printReadarr is called on startup to print info about each configured server.
 func (c *Client) printReadarr() {
-	if count := len(c.Config.Readarr); count == 1 {
-		c.Printf(" => Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Readarr[0].URL, c.Config.Readarr[0].APIKey != "", c.Config.Readarr[0].Timeout, c.Config.Readarr[0].ValidSSL)
-	} else {
-		c.Print(" => Readarr Config:", count, "servers")
+	if len(c.Config.Readarr) == 1 {
+		f := c.Config.Readarr[0]
 
-		for _, f := range c.Config.Readarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
+
+		c.Printf(" => Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+
+		return
+	}
+
+	c.Print(" => Readarr Config:", len(c.Config.Lidarr), "servers")
+
+	for _, f := range c.Config.Readarr {
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
+		}
+
+		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
 	}
 }
 
 // printSonarr is called on startup to print info about each configured server.
 func (c *Client) printSonarr() {
-	if count := len(c.Config.Sonarr); count == 1 {
-		c.Printf(" => Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Sonarr[0].URL, c.Config.Sonarr[0].APIKey != "", c.Config.Sonarr[0].Timeout, c.Config.Sonarr[0].ValidSSL)
-	} else {
-		c.Print(" => Sonarr Config:", count, "servers")
+	if len(c.Config.Sonarr) == 1 {
+		f := c.Config.Sonarr[0]
 
-		for _, f := range c.Config.Sonarr {
-			c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL)
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
+
+		c.Printf(" => Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+
+		return
+	}
+
+	c.Print(" => Sonarr Config:", len(c.Config.Lidarr), "servers")
+
+	for _, f := range c.Config.Sonarr {
+		checkQ := disabled
+		if f.CheckQ != nil {
+			checkQ = strconv.Itoa(int(*f.CheckQ))
+		}
+
+		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
 	}
 }

@@ -46,6 +46,7 @@ type LidarrConfig struct {
 	Name      string        `toml:"name"`
 	Interval  cnfg.Duration `toml:"interval"`
 	StuckItem bool          `toml:"stuck_items"`
+	CheckQ    *uint         `toml:"check_q"`
 	*starr.Config
 	*lidarr.Lidarr
 }
@@ -54,6 +55,12 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.Lidarr = lidarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
+	}
+
+	// These things are not used in this package but this package configures them.
+	if r.StuckItem && r.CheckQ == nil {
+		i := uint(0)
+		r.CheckQ = &i
 	}
 }
 
