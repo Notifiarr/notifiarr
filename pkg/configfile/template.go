@@ -36,10 +36,9 @@ const tmpl = `###############################################
 # This API key must be copied from your notifiarr.com account.
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}
 
-## The ip:port or port to listen on for incoming web requests.
-## You can use 127.0.0.1:5454 to listen only on localhost.
-## This will be used in Plex for example to send webhooks, Example: http://localhost:5454
-## This will be used in Media Requests for example to send payloads, Example: http://your-domain.com:5454
+## The port to listen on for incoming web requests.
+## You can use "127.0.0.1:5454" to listen only on localhost.
+## This is used to Plex receive webhooks, and to receive Media Request commands.
 ##
 bind_addr = "{{.BindAddr}}"
 {{if or (eq os "windows") (force)}}
