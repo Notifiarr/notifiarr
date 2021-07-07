@@ -190,3 +190,13 @@ func (c *Client) writeConfigFile() {
 
 	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+val)
 }
+
+func (c *Client) menuPanic() {
+	yes, err := ui.Question(mnd.Title, "You really want to panic?", true)
+	if !yes || err != nil {
+		return
+	}
+
+	defer c.Printf("User Requested Application Panic, good bye.")
+	panic("user requested panic")
+}

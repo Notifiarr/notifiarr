@@ -11,12 +11,12 @@ import (
 var (
 	kernel    = syscall.MustLoadDLL("kernel32.dll")
 	setHandle = kernel.MustFindProc("SetStdHandle")
+	stderr    = syscall.STD_ERROR_HANDLE
 )
 
 //nolint:errcheck
 func redirectStderr(file *os.File) {
 	os.Stderr = file
-	stderr := syscall.STD_ERROR_HANDLE
 
 	const noIdeaWhatThisIs = 2
 

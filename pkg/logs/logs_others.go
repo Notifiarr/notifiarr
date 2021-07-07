@@ -9,8 +9,11 @@ import (
 	"syscall"
 )
 
+// nolint:gochecknoglobals
+var stderr = os.Stderr.Fd()
+
 func redirectStderr(file *os.File) {
-	os.Stderr = file
 	// This works on darwin and freebsd, maybe others.
-	_ = syscall.Dup2(int(file.Fd()), syscall.Stderr)
+	_ = syscall.Dup2(int(file.Fd()), int(stderr))
+	os.Stderr = file
 }

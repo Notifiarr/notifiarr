@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -23,10 +24,12 @@ func (c *Client) StartWebServer() {
 	// Create a request router.
 	c.Config.Apps.Router = mux.NewRouter()
 	c.Config.Apps.ErrorLog = c.Logger.ErrorLog
+	// Cleanup user input.
+	bindAddr := strings.TrimPrefix(strings.TrimPrefix(strings.TrimRight(c.Config.BindAddr, "/"), "http://"), "https://")
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
 		Handler:           c.stripSecrets(l.Wrap(c.fixForwardedFor(c.Config.Apps.Router), c.Logger.HTTPLog.Writer())),
-		Addr:              c.Config.BindAddr,
+		Addr:              bindAddr,
 		IdleTimeout:       time.Minute,
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,

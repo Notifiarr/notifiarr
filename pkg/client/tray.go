@@ -111,21 +111,23 @@ func (c *Client) makeMoreChannels() {
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	c.menu["debug"] = ui.WrapMenu(debug)
-	c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic"))
 	c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Log", "view the Debug log"))
+	// debug.AddSeparator() // not exist: https://github.com/getlantern/systray/issues/170
+	ui.WrapMenu(debug.AddSubMenuItem("__________", "")).Disable() // fake separator.
+	c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic"))
+
+	if c.Config.DebugLog == "" {
+		c.menu["debug_logs"].Hide()
+	}
 
 	if !c.Config.Debug {
-		c.menu["debug"].Hide()
 		c.menu["svcs_test"].Hide()
 		c.menu["plex_test"].Hide()
 		c.menu["snap_test"].Hide()
 		c.menu["plex_dev"].Hide()
 		c.menu["snap_dev"].Hide()
 		c.menu["app_ques_dev"].Hide()
-	}
-
-	if c.Config.DebugLog == "" {
-		c.menu["debug_logs"].Hide()
+		c.menu["debug"].Hide()
 	}
 
 	// These start hidden.
@@ -154,8 +156,7 @@ func (c *Client) watchKillerChannels() {
 			// turn on and off debug?
 			// u.menu["debug"].Check()
 		case <-c.menu["debug_panic"].Clicked():
-			c.Printf("User Requested Application Panic, good bye.")
-			panic("user requested panic")
+			c.menuPanic()
 		case <-c.menu["debug_logs"].Clicked():
 			c.Print("User Viewing Debug File:", c.Config.DebugLog)
 			_ = ui.OpenLog(c.Config.DebugLog)
