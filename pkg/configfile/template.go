@@ -36,9 +36,9 @@ const tmpl = `###############################################
 # This API key must be copied from your notifiarr.com account.
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}
 
-## The port to listen on for incoming web requests.
-## You can use "127.0.0.1:5454" to listen only on localhost.
-## This is used to Plex receive webhooks, and to receive Media Request commands.
+## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
+## You may use "127.0.0.1:5454" to listen only on localhost; good if using a local proxy.
+## This is used to receive Plex webhooks and Media Request commands.
 ##
 bind_addr = "{{.BindAddr}}"
 {{if or (eq os "windows") (force)}}
