@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"runtime"
 	"strings"
 	"time"
@@ -32,11 +33,26 @@ func (c *Client) internalHandlers() {
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.Handle("/plex",
 			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", tokens)
+
+		if c.Config.URLBase != "/" {
+			// Allow plex to use the base url too.
+			// If this causes a panic, they probably set urlbase to "//" or something.
+			c.Config.Router.Handle(path.Join(c.Config.URLBase, "plex"),
+				http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", tokens)
+		}
 	}
 
 	// Initialize internal-only paths.
-	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))   // built-in icon.
-	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))                // "hi" page on /
+	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon)) // built-in icon.
+	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))              // "hi" page on /
+
+	if base := c.Config.URLBase; !strings.EqualFold(base, "/") {
+		// Handle the same URLs on the different base URL too.
+		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
+		c.Config.Router.Handle(base, http.HandlerFunc(c.slash))     // "hi" page on /urlbase
+		c.Config.Router.Handle(base+"/", http.HandlerFunc(c.slash)) // "hi" page on /urlbase/
+	}
+
 	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
 }
 
@@ -155,6 +171,10 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 
 	if c.Config.Plex.Configured() {
 		stat, err := c.Config.Plex.GetInfo()
+		if stat == nil {
+			stat = &plex.PMSInfo{}
+		}
+
 		status.Plex = []*conTest{{
 			Instance: 1,
 			Up:       err == nil,

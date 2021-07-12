@@ -80,7 +80,7 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 		id = ""
 	}
 
-	uri = path.Join("/", a.URLBase, "api", string(app), id, uri)
+	uri = path.Join(a.URLBase, "api", string(app), id, uri)
 
 	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }

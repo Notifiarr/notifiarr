@@ -7,7 +7,9 @@ import (
 	"syscall"
 )
 
+var stderr = os.Stderr.Fd() // nolint:gochecknoglobals
+
 func redirectStderr(file *os.File) {
 	os.Stderr = file
-	_ = syscall.Dup3(int(file.Fd()), syscall.Stderr, 0)
+	_ = syscall.Dup3(int(file.Fd()), int(stderr), 0)
 }

@@ -5,7 +5,6 @@ package client
 import (
 	"errors"
 	"fmt"
-	"path"
 	"runtime"
 	"strings"
 	"time"
@@ -100,11 +99,11 @@ func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 	s += fmt.Sprintf("\nUpstreams: %v", c.Config.Allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
-		s += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))
+		s += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, c.Config.URLBase)
 		s += fmt.Sprintf("\nCert File: %v", c.Config.SSLCrtFile)
 		s += fmt.Sprintf("\nCert Key: %v", c.Config.SSLKeyFile)
 	} else {
-		s += fmt.Sprintf("\nHTTP: http://%s%s", c.Config.BindAddr, path.Join("/", c.Config.URLBase))
+		s += fmt.Sprintf("\nHTTP: http://%s%s", c.Config.BindAddr, c.Config.URLBase)
 	}
 
 	if c.Config.LogFiles > 0 {
@@ -189,4 +188,14 @@ func (c *Client) writeConfigFile() {
 	}
 
 	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+val)
+}
+
+func (c *Client) menuPanic() {
+	yes, err := ui.Question(mnd.Title, "You really want to panic?", true)
+	if !yes || err != nil {
+		return
+	}
+
+	defer c.Printf("User Requested Application Panic, good bye.")
+	panic("user requested panic")
 }
