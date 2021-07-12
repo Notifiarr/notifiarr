@@ -155,6 +155,10 @@ func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 
 	if c.Config.Plex.Configured() {
 		stat, err := c.Config.Plex.GetInfo()
+		if stat == nil {
+			stat = &plex.PMSInfo{}
+		}
+
 		status.Plex = []*conTest{{
 			Instance: 1,
 			Up:       err == nil,
