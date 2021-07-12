@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -86,6 +87,8 @@ func (c *Config) setup() {
 	} else if !strings.Contains(c.BindAddr, ":") {
 		c.BindAddr = "0.0.0.0:" + c.BindAddr
 	}
+
+	c.URLBase = path.Join("/", c.URLBase)
 
 	for _, ip := range c.Upstreams {
 		if !strings.Contains(ip, "/") {
