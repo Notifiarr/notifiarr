@@ -172,7 +172,7 @@ func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.D
 
 	wg.Wait()
 
-	_, _, e, err := c.SendData(url, payload) //nolint:bodyclose // already closed
+	_, e, err := c.SendData(url, payload, true) //nolint:bodyclose // already closed
 
 	return e, err
 }
@@ -284,32 +284,43 @@ func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, erro
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-API-Key", c.Apps.APIKey)
-	c.Debugf("Sending JSON Payload to %s:\n%s", url, string(data))
 
 	resp, err := c.getClient().Do(req)
 	if err != nil {
+		c.Debugf("Sent JSON Payload to %s:\n%s", url, string(data))
 		return nil, nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
+
+	defer c.Debugf("Sent JSON Payload to %s:\n%s\nResponse: %s", url, string(data), string(body))
+
 	if err != nil {
-		return resp, body, fmt.Errorf("reading http response: %w, body: %s", err, string(body))
+		return resp, body, fmt.Errorf("reading http response body: %w", err)
 	}
 
 	return resp, body, nil
 }
 
 // SendData sends raw data to a notifiarr URL as JSON.
-func (c *Config) SendData(url string, payload interface{}) (*http.Response, []byte, []byte, error) {
-	post, err := json.MarshalIndent(payload, "", " ")
-	if err != nil {
-		return nil, nil, nil, fmt.Errorf("encoding data: %w", err)
+func (c *Config) SendData(url string, payload interface{}, pretty bool) (*http.Response, []byte, error) {
+	var (
+		post []byte
+		err  error
+	)
+
+	if pretty {
+		post, err = json.MarshalIndent(payload, "", " ")
+	} else {
+		post, err = json.Marshal(payload)
 	}
 
-	resp, reply, err := c.SendJSON(url, post)
+	if err != nil {
+		return nil, nil, fmt.Errorf("encoding data: %w", err)
+	}
 
-	return resp, post, reply, err
+	return c.SendJSON(url, post)
 }
 
 // httpClient is our custom http client to wrap Do and provide retries.

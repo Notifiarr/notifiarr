@@ -25,11 +25,11 @@ const (
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
 func (c *Config) sendPlexSessions() {
 	if body, err := c.SendMeta(PlexCron, c.URL, nil, 0); err != nil {
-		c.Errorf("Sending Plex Session to %s: %v: %v", c.URL, err, string(body))
+		c.Errorf("Sending Plex Session to %s: %v", c.URL, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, fields[3])
 	} else {
-		c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, string(body))
+		c.Printf("Plex Sessions sent to %s, sending again in %s", c.URL, c.Plex.Interval)
 	}
 }
 
@@ -104,7 +104,7 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 	snap := c.GetMetaSnap(ctx)
 	cancel() //nolint:wsl
 
-	_, _, body, err := c.SendData(c.URL, &Payload{
+	_, body, err := c.SendData(c.URL, &Payload{
 		Type: "plex_session_complete_" + s.Type,
 		Snap: snap,
 		Plex: &plex.Sessions{
@@ -112,7 +112,7 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 			Sessions:   []*plex.Session{s},
 			AccountMap: strings.Split(c.Plex.AccountMap, "|"),
 		},
-	})
+	}, true)
 	if err != nil {
 		return statusError + ": sending to " + c.URL + ": " + err.Error() + ": " + string(body)
 	}

@@ -24,6 +24,8 @@ func (c *Client) StartWebServer() {
 	// Create a request router.
 	c.Config.Apps.Router = mux.NewRouter()
 	c.Config.Apps.ErrorLog = c.Logger.ErrorLog
+	c.Config.Apps.Debugf = c.Logger.Debugf
+
 	// Cleanup user input.
 	bindAddr := strings.TrimPrefix(strings.TrimPrefix(strings.TrimRight(c.Config.BindAddr, "/"), "http://"), "https://")
 	// Create a server.

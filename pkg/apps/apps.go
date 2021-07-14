@@ -6,9 +6,11 @@
 package apps
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
@@ -24,14 +26,15 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey   string           `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
-	URLBase  string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	Sonarr   []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr   []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr   []*LidarrConfig  `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr  []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Router   *mux.Router      `json:"-" toml:"-" xml:"-" yaml:"-"`
-	ErrorLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
+	APIKey   string                       `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
+	URLBase  string                       `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	Sonarr   []*SonarrConfig              `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
+	Radarr   []*RadarrConfig              `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
+	Lidarr   []*LidarrConfig              `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
+	Readarr  []*ReadarrConfig             `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Router   *mux.Router                  `json:"-" toml:"-" xml:"-" yaml:"-"`
+	ErrorLog *log.Logger                  `json:"-" toml:"-" xml:"-" yaml:"-"`
+	Debugf   func(string, ...interface{}) `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
 // App allows safely storing context values.
@@ -90,12 +93,16 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc { //nolint:cyclop
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
-			msg   interface{}
-			ctx   = r.Context()
-			code  = http.StatusUnprocessableEntity
-			id, _ = strconv.Atoi(mux.Vars(r)["id"])
-			start = time.Now()
+			msg     interface{}
+			ctx     = r.Context()
+			code    = http.StatusUnprocessableEntity
+			id, _   = strconv.Atoi(mux.Vars(r)["id"])
+			start   = time.Now()
+			post, _ = ioutil.ReadAll(r.Body)
 		)
+
+		// Reset the body so it can be re-read.
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(post))
 
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
@@ -124,6 +131,10 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc { //nolint:cy
 		default:
 			// unknown app, add the ID to the context and run the handler.
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, id)))
+		}
+
+		if len(post) > 0 {
+			a.Debugf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, msg)
 		}
 
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))

@@ -76,18 +76,15 @@ func (c *Config) syncRadarrCF(instance int, r *apps.RadarrConfig) (bool, error) 
 		return false, fmt.Errorf("getting custom formats: %w", err)
 	}
 
-	resp, _, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=radarr", payload) //nolint:bodyclose // already closed
-
-	switch {
-	case err != nil:
+	//nolint:bodyclose // already closed
+	resp, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=radarr", payload, false)
+	if err != nil {
 		return false, fmt.Errorf("sending current formats: %w", err)
-	case resp.StatusCode != http.StatusOK:
-		return false, fmt.Errorf("%w: %s: %s", ErrNon200, resp.Status, string(body))
-	default:
-		c.Debugf("Response Payload: %s: %s", resp.Status, string(body))
+	} else if resp.StatusCode != http.StatusOK {
+		return false, fmt.Errorf("%w: %s", ErrNon200, resp.Status)
 	}
 
-	c.radarrCF[instance] = nil
+	delete(c.radarrCF, instance)
 
 	if len(body) < 1 {
 		return false, nil
@@ -124,6 +121,9 @@ func (c *Config) updateRadarrCF(instance int, r *apps.RadarrConfig, data []byte)
 		if _, err := r.UpdateCustomFormat(profile, id); err != nil {
 			profile.ID = 0
 
+			c.Debugf("Error Updating custom format [%d/%d] (attempting to ADD %d): %v",
+				i, len(reply.CustomFormats), id, err)
+
 			newID, err2 := r.AddCustomFormat(profile)
 			if err2 != nil {
 				return fmt.Errorf("[%d/%d] updating custom format: %d: (update) %v, (add) %w",
@@ -138,6 +138,9 @@ func (c *Config) updateRadarrCF(instance int, r *apps.RadarrConfig, data []byte)
 		if err := r.UpdateQualityProfile(profile); err != nil {
 			id := profile.ID
 			profile.ID = 0
+
+			c.Debugf("Error Updating quality profile [%d/%d] (attempting to ADD %d): %v",
+				i, len(reply.QualityProfiles), id, err)
 
 			newID, err2 := r.AddQualityProfile(profile)
 			if err2 != nil {
@@ -159,17 +162,19 @@ func (c *Config) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 	}
 
 	//nolint:bodyclose // already closed.
-	resp, _, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=radarr&updateIDs=true", &RadarrCustomFormatPayload{
+	resp, _, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=radarr&updateIDs=true", &RadarrCustomFormatPayload{
 		Instance: instance,
 		NewMaps:  maps,
-	})
+	}, false)
 	if err != nil {
 		c.radarrCF[instance] = maps
-		return fmt.Errorf("updating custom format ID map: %w: %s", err, string(body))
+		return fmt.Errorf("updating custom format ID map: %w", err)
 	} else if resp.StatusCode != http.StatusOK {
 		c.radarrCF[instance] = maps
-		return fmt.Errorf("updating custom format ID map: %w: %s: %s", ErrNon200, resp.Status, string(body))
+		return fmt.Errorf("updating custom format ID map: %w: %s", ErrNon200, resp.Status)
 	}
+
+	delete(c.radarrCF, instance)
 
 	return nil
 }
@@ -226,18 +231,15 @@ func (c *Config) syncSonarrRP(instance int, s *apps.SonarrConfig) (bool, error) 
 		return false, fmt.Errorf("getting release profiles: %w", err)
 	}
 
-	resp, _, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=sonarr", payload) //nolint:bodyclose // already closed
-
-	switch {
-	case err != nil:
+	//nolint:bodyclose // already closed
+	resp, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=sonarr", payload, false)
+	if err != nil {
 		return false, fmt.Errorf("sending current profiles: %w", err)
-	case resp.StatusCode != http.StatusOK:
-		return false, fmt.Errorf("%w: %s: %s", ErrNon200, resp.Status, string(body))
-	default:
-		c.Debugf("Response Payload: %s: %s", resp.Status, string(body))
+	} else if resp.StatusCode != http.StatusOK {
+		return false, fmt.Errorf("%w: %s", ErrNon200, resp.Status)
 	}
 
-	c.sonarrRP[instance] = nil
+	delete(c.sonarrRP, instance)
 
 	if len(body) < 1 {
 		return false, nil
@@ -274,6 +276,9 @@ func (c *Config) updateSonarrRP(instance int, s *apps.SonarrConfig, data []byte)
 			id := profile.ID
 			profile.ID = 0
 
+			c.Debugf("Error Updating release profile [%d/%d] (attempting to ADD %d): %v",
+				i, len(reply.ReleaseProfiles), id, err)
+
 			newID, err2 := s.AddReleaseProfile(profile)
 			if err2 != nil {
 				return fmt.Errorf("[%d/%d] updating release profiles: %d: (update) %v, (add) %w",
@@ -288,6 +293,9 @@ func (c *Config) updateSonarrRP(instance int, s *apps.SonarrConfig, data []byte)
 		if err := s.UpdateQualityProfile(profile); err != nil {
 			id := profile.ID
 			profile.ID = 0
+
+			c.Debugf("Error Updating quality format [%d/%d] (attempting to ADD %d): %v",
+				i, len(reply.QualityProfiles), id, err)
 
 			newID, err2 := s.AddQualityProfile(profile)
 			if err2 != nil {
@@ -309,18 +317,19 @@ func (c *Config) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
 	}
 
 	//nolint:bodyclose // already closed
-	resp, _, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=sonarr&updateIDs=true", &SonarrCustomFormatPayload{
+	resp, _, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=sonarr&updateIDs=true", &SonarrCustomFormatPayload{
 		Instance: instance,
 		NewMaps:  maps,
-	})
-
+	}, false)
 	if err != nil {
 		c.sonarrRP[instance] = maps
-		return fmt.Errorf("updating quality release ID map: %w: %s", err, string(body))
+		return fmt.Errorf("updating quality release ID map: %w", err)
 	} else if resp.StatusCode != http.StatusOK {
 		c.sonarrRP[instance] = maps
-		return fmt.Errorf("updating quality release ID map: %w: %s: %s", ErrNon200, resp.Status, string(body))
+		return fmt.Errorf("updating quality release ID map: %w: %s", ErrNon200, resp.Status)
 	}
+
+	delete(c.sonarrRP, instance)
 
 	return nil
 }

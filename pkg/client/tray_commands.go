@@ -162,11 +162,11 @@ func (c *Client) sendPlexSessions(url string) {
 	c.Printf("[user requested] Sending Plex Sessions to %s", url)
 
 	if body, err := c.notify.SendMeta(notifiarr.PlexCron, url, nil, 0); err != nil {
-		c.Errorf("[user requested] Sending Plex Sessions to %s: %v: %v", url, err, string(body))
+		c.Errorf("[user requested] Sending Plex Sessions to %s: %v", url, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("[user requested] Sent Plex Sessions to %s, reply: %s", url, fields[3])
 	} else {
-		c.Printf("[user requested] Sent Plex Sessions to %s, reply: %s", url, string(body))
+		c.Printf("[user requested] Sent Plex Sessions to %s", url)
 	}
 }
 
