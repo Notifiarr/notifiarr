@@ -24,6 +24,7 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
+	c.Config.HandleAPIpath("", "cfsync", c.handleCFSyncReq, "GET")
 
 	if c.Config.Plex.Configured() {
 		c.Config.HandleAPIpath(plex.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
@@ -265,4 +266,9 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (c *Client) handleCFSyncReq(r *http.Request) (int, interface{}) {
+	c.notify.SyncCF(false)
+	return http.StatusOK, "sync initiated"
 }

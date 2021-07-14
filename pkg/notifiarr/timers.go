@@ -81,9 +81,16 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuc
 
 	for {
 		select {
+		case reply := <-c.syncCFnow:
+			c.syncRadarr()
+			c.syncSonarr()
+
+			if reply != nil {
+				reply <- struct{}{}
+			}
 		case <-syncTimer.C:
-			c.SyncRadarrCF()
-			c.SyncSonarrRP()
+			c.syncRadarr()
+			c.syncSonarr()
 		case <-snapTimer.C:
 			c.sendSnapshot()
 		case <-plexTimer1.C:

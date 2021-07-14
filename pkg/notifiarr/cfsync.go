@@ -35,8 +35,19 @@ type RadarrCustomFormatPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
-// SyncRadarrCF triggers a custom format sync for Radarr.
-func (c *Config) SyncRadarrCF() {
+func (c *Config) SyncCF(wait bool) {
+	if !wait {
+		c.syncCFnow <- nil
+		return
+	}
+
+	reply := make(chan struct{})
+	c.syncCFnow <- reply
+	<-reply
+}
+
+// syncRadarr triggers a custom format sync for Radarr.
+func (c *Config) syncRadarr() {
 	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
 		c.Debugf("Cannot sync Radarr Custom Formats. Not a subscriber, or error: %v", err)
 		return
@@ -190,8 +201,8 @@ type SonarrCustomFormatPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
-// SyncSonarrRP triggers a custom format sync for Sonarr.
-func (c *Config) SyncSonarrRP() {
+// syncSonarr triggers a custom format sync for Sonarr.
+func (c *Config) syncSonarr() {
 	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Not a subscriber, or error: %v", err)
 		return

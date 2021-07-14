@@ -83,6 +83,7 @@ type Config struct {
 	client       *httpClient
 	radarrCF     map[int]*cfMapIDpayload
 	sonarrRP     map[int]*cfMapIDpayload
+	syncCFnow    chan chan struct{}
 }
 
 // ClientInfo is the reply from the ClienRoute endpoint.
@@ -120,6 +121,7 @@ func (c *Config) Start(mode string) {
 
 	c.radarrCF = make(map[int]*cfMapIDpayload)
 	c.sonarrRP = make(map[int]*cfMapIDpayload)
+	c.syncCFnow = make(chan chan struct{})
 
 	c.startTimers()
 }

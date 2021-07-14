@@ -232,8 +232,7 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 		select {
 		case <-c.menu["sync_cf"].Clicked():
 			c.Printf("[user requested] Triggering Custom Formats and Quality Profiles Sync for Radarr and Sonarr.")
-			c.notify.SyncRadarrCF()
-			c.notify.SyncSonarrRP()
+			c.notify.SyncCF(true)
 		case <-c.menu["snap_log"].Clicked():
 			c.logSnaps()
 		case <-c.menu["svcs_log"].Clicked():
