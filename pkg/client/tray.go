@@ -111,6 +111,7 @@ func (c *Client) makeMoreChannels() {
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	c.menu["debug"] = ui.WrapMenu(debug)
+	c.menu["debug_test"] = ui.WrapMenu(debug.AddSubMenuItem("Get States", "test state gathering code"))
 	c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Log", "view the Debug log"))
 	// debug.AddSeparator() // not exist: https://github.com/getlantern/systray/issues/170
 	ui.WrapMenu(debug.AddSubMenuItem("__________", "")).Disable() // fake separator.
@@ -157,6 +158,9 @@ func (c *Client) watchKillerChannels() {
 			// u.menu["debug"].Check()
 		case <-c.menu["debug_panic"].Clicked():
 			c.menuPanic()
+		case <-c.menu["debug_test"].Clicked():
+			c.Print("User Requested State Test")
+			c.notify.GetState()
 		case <-c.menu["debug_logs"].Clicked():
 			c.Print("User Viewing Debug File:", c.Config.DebugLog)
 			_ = ui.OpenLog(c.Config.DebugLog)
