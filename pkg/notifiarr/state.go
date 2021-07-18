@@ -3,6 +3,7 @@ package notifiarr
 import (
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -33,7 +34,7 @@ type State struct {
 	// Shared
 	Error    string      `json:"error"`
 	Instance int         `json:"instance"`
-	Missing  int64       `json:"missing"`
+	Missing  int64       `json:"missing,omitempty"`
 	Size     int64       `json:"size"`
 	Percent  float64     `json:"percent,omitempty"`
 	Upcoming int64       `json:"upcoming,omitempty"`
@@ -52,10 +53,14 @@ type State struct {
 	Albums  int64 `json:"albums,omitempty"`
 	Tracks  int64 `json:"tracks,omitempty"`
 	// Downloader
-	Seeding     int64 `json:"seeding,omitempty"`
-	Active      int64 `json:"active,omitempty"`
+	Downloads   int   `json:"downloads,omitempty"`
+	Uploaded    int64 `json:"uploaded,omitempty"`
+	Incomplete  int64 `json:"incomplete,omitempty"`
+	Downloaded  int64 `json:"downloaded,omitempty"`
 	Uploading   int64 `json:"uploading,omitempty"`
 	Downloading int64 `json:"downloading,omitempty"`
+	Seeding     int64 `json:"seeding,omitempty"`
+	Paused      int64 `json:"paused,omitempty"`
 	Errors      int64 `json:"errors,omitempty"`
 }
 
@@ -64,11 +69,15 @@ type States struct {
 	Radarr  []*State `json:"radarr"`
 	Readarr []*State `json:"readarr"`
 	Sonarr  []*State `json:"sonarr"`
+	Qbit    []*State `json:"qbit"`
+	Deluge  []*State `json:"deluge"`
 }
 
 func (c *Config) GetState() {
 	states := &States{
+		Deluge:  c.getDelugeStates(),
 		Lidarr:  c.getLidarrStates(),
+		Qbit:    c.getQbitStates(),
 		Radarr:  c.getRadarrStates(),
 		Readarr: c.getReadarrStates(),
 		Sonarr:  c.getSonarrStates(),
@@ -78,6 +87,28 @@ func (c *Config) GetState() {
 	if err != nil {
 		c.Errorf("Sending State Data: %v", err)
 	}
+}
+
+func (c *Config) getDelugeStates() []*State {
+	states := []*State{}
+
+	for instance, d := range c.Apps.Deluge {
+		if d.Deluge.URL == "" {
+			continue
+		}
+
+		c.Debugf("Getting Deluge State: %d:%s", instance, d.Deluge.URL)
+
+		state, err := c.getDelugeState(instance, d)
+		if err != nil {
+			state.Error = err.Error()
+			c.Errorf("Getting Deluge Data from %d:%s: %v", instance, d.Deluge.URL, err)
+		}
+
+		states = append(states, state)
+	}
+
+	return states
 }
 
 func (c *Config) getLidarrStates() []*State {
@@ -146,6 +177,28 @@ func (c *Config) getReadarrStates() []*State {
 	return states
 }
 
+func (c *Config) getQbitStates() []*State {
+	states := []*State{}
+
+	for instance, q := range c.Apps.Qbit {
+		if q.URL == "" {
+			continue
+		}
+
+		c.Debugf("Getting Qbit State: %d:%s", instance, q.URL)
+
+		state, err := c.getQbitState(instance, q)
+		if err != nil {
+			state.Error = err.Error()
+			c.Errorf("Getting Qbit Data from %d:%s: %v", instance, q.URL, err)
+		}
+
+		states = append(states, state)
+	}
+
+	return states
+}
+
 func (c *Config) getSonarrStates() []*State {
 	states := []*State{}
 
@@ -166,6 +219,48 @@ func (c *Config) getSonarrStates() []*State {
 	}
 
 	return states
+}
+
+func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, error) {
+	state := &State{Instance: instance}
+
+	xfers, err := d.GetXfersCompat()
+	if err != nil {
+		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
+	}
+
+	for _, xfer := range xfers {
+		state.Size += int64(xfer.TotalSize)
+		state.Uploaded += int64(xfer.TotalUploaded)
+		state.Downloaded += int64(xfer.AllTimeDownload)
+		state.Downloads++
+
+		if xfer.UploadPayloadRate > 0 {
+			state.Uploading++
+		}
+
+		if xfer.DownloadPayloadRate > 0 {
+			state.Downloading++
+		}
+
+		if !xfer.IsFinished {
+			state.Incomplete++
+		}
+
+		if xfer.IsSeed {
+			state.Seeding++
+		}
+
+		if xfer.Paused {
+			state.Paused++
+		}
+
+		if xfer.Message != "OK" {
+			state.Errors++
+		}
+	}
+
+	return state, nil
 }
 
 func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, error) {
@@ -192,6 +287,41 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 
 	state.Percent /= float64(state.Tracks)
 	state.Artists = len(artistIDs)
+
+	return state, nil
+}
+
+func (c *Config) getQbitState(instance int, q *apps.QbitConfig) (*State, error) {
+	state := &State{Instance: instance}
+
+	xfers, err := q.GetXfers()
+	if err != nil {
+		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
+	}
+
+	for _, xfer := range xfers {
+		state.Size += xfer.Size
+		state.Uploaded += xfer.Uploaded
+		state.Downloaded += int64(xfer.Downloaded)
+		state.Downloads++
+
+		switch strings.ToLower(strings.TrimSpace(xfer.State)) {
+		case "stalledup", "moving", "forcedup":
+			state.Seeding++
+		case "downloading", "forceddl":
+			state.Downloading++
+		case "uploading":
+			state.Uploading++
+		case "pausedup", "pauseddl":
+			state.Paused++
+		case "queuedup", "checkingup", "allocating", "metadl", "queueddl", "stalleddl", "checkingdl", "checkingresumedata":
+			state.Incomplete++
+		case "unknown", "missingfiles", "error":
+			state.Errors++
+		default:
+			state.Errors++
+		}
+	}
 
 	return state, nil
 }
@@ -309,42 +439,45 @@ func (c *Config) getSonarrState(instance int, r *apps.SonarrConfig) (*State, err
 
 	state.Percent /= float64(state.Shows)
 
-	if err := c.getSonarrStateUpcoming(r, state.Next); err != nil {
+	if state.Next, err = c.getSonarrStateUpcoming(r, state.Next); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
 	return state, nil
 }
 
-func (c *Config) getSonarrStateUpcoming(r *apps.SonarrConfig, next []*Sortable) error {
+func (c *Config) getSonarrStateUpcoming(r *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
 	sort.Sort(dateSorter(next))
 
-	if len(next) > showNext {
-		next = next[:showNext]
-	}
+	redo := []*Sortable{}
 
-	for i, item := range next {
+	for _, item := range next {
 		eps, err := r.GetSeriesEpisodes(item.id)
 		if err != nil {
-			return fmt.Errorf("getting series ID %d (%s): %w", item.id, item.Name, err)
+			return nil, fmt.Errorf("getting series ID %d (%s): %w", item.id, item.Name, err)
 		}
 
 		for _, ep := range eps {
-			if ep.AirDateUtc.Year() == item.Date.Year() && ep.AirDateUtc.YearDay() == item.Date.YearDay() {
-				next[i] = &Sortable{
+			if ep.AirDateUtc.Year() == item.Date.Year() && ep.AirDateUtc.YearDay() == item.Date.YearDay() &&
+				ep.SeasonNumber != 0 && ep.EpisodeNumber != 0 {
+				redo = append(redo, &Sortable{
 					Name:    item.Name,
 					Sub:     ep.Title,
 					Date:    ep.AirDateUtc,
 					Season:  ep.SeasonNumber,
 					Episode: ep.EpisodeNumber,
-				}
+				})
 
 				break
 			}
 		}
+
+		if len(redo) >= showNext {
+			break
+		}
 	}
 
-	return nil
+	return redo, nil
 }
 
 type dateSorter []*Sortable

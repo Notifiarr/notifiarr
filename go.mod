@@ -28,6 +28,8 @@ require (
 	golang.org/x/mod v0.4.2
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22
 	golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93
+	golift.io/deluge v0.9.2 // indirect
+	golift.io/qbit v0.0.0-20210717220751-d545c7a8f721 // indirect
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
 	golift.io/starr v0.10.4-0.20210703014015-e3a11890a8a9
 	golift.io/version v0.0.2

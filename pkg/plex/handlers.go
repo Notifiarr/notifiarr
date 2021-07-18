@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 )
 
 // Plex is used a context ID.
-const Plex apps.App = "plex"
+const Plex starr.App = "plex"
 
 // HandleSessions provides a web handlersto the notifiarr client that returns
 // the current Plex sessions. The handler satisfies apps.APIHandler, sorry.

@@ -55,8 +55,6 @@ type Config struct {
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 func (c *Config) Get(configFile, envPrefix string) error {
-	defer c.setup()
-
 	if configFile != "" {
 		if err := cnfgfile.Unmarshal(c, configFile); err != nil {
 			return fmt.Errorf("config file: %w", err)
@@ -67,10 +65,10 @@ func (c *Config) Get(configFile, envPrefix string) error {
 		return fmt.Errorf("environment variables: %w", err)
 	}
 
-	return nil
+	return c.setup()
 }
 
-func (c *Config) setup() {
+func (c *Config) setup() error {
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = mnd.DefaultTimeout
 	}
@@ -78,9 +76,6 @@ func (c *Config) setup() {
 	if c.AutoUpdate != "" && runtime.GOOS != "windows" {
 		c.AutoUpdate = ""
 	}
-
-	// Make sure each app has a sane timeout.
-	c.Apps.Setup(c.Timeout.Duration)
 
 	if c.BindAddr == "" {
 		c.BindAddr = mnd.DefaultBindAddr
@@ -103,6 +98,13 @@ func (c *Config) setup() {
 			c.Allow = append(c.Allow, i)
 		}
 	}
+
+	// Make sure each app has a sane timeout.
+	if err := c.Apps.Setup(c.Timeout.Duration); err != nil {
+		return fmt.Errorf("setting up app: %w", err)
+	}
+
+	return nil
 }
 
 // FindAndReturn return a config file. Write one if requested.
