@@ -83,7 +83,7 @@ func (c *Config) GetState() {
 		Sonarr:  c.getSonarrStates(),
 	}
 
-	_, _, err := c.SendData(c.URL+"/api/v1/user/state", states, true)
+	_, _, err := c.SendData(c.BaseURL+"/api/v1/user/dashboard", states, true)
 	if err != nil {
 		c.Errorf("Sending State Data: %v", err)
 	}
@@ -97,12 +97,12 @@ func (c *Config) getDelugeStates() []*State {
 			continue
 		}
 
-		c.Debugf("Getting Deluge State: %d:%s", instance, d.Deluge.URL)
+		c.Debugf("Getting Deluge State: %d:%s", instance+1, d.Deluge.URL)
 
-		state, err := c.getDelugeState(instance, d)
+		state, err := c.getDelugeState(instance+1, d)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Deluge Data from %d:%s: %v", instance, d.Deluge.URL, err)
+			c.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, d.Deluge.URL, err)
 		}
 
 		states = append(states, state)
@@ -119,12 +119,12 @@ func (c *Config) getLidarrStates() []*State {
 			continue
 		}
 
-		c.Debugf("Getting Lidarr State: %d:%s", instance, r.URL)
+		c.Debugf("Getting Lidarr State: %d:%s", instance+1, r.URL)
 
-		state, err := c.getLidarrState(instance, r)
+		state, err := c.getLidarrState(instance+1, r)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Lidarr Queue from %d:%s: %v", instance, r.URL, err)
+			c.Errorf("Getting Lidarr Queue from %d:%s: %v", instance+1, r.URL, err)
 		}
 
 		states = append(states, state)
@@ -141,12 +141,12 @@ func (c *Config) getRadarrStates() []*State {
 			continue
 		}
 
-		c.Debugf("Getting Radarr State: %d:%s", instance, r.URL)
+		c.Debugf("Getting Radarr State: %d:%s", instance+1, r.URL)
 
-		state, err := c.getRadarrState(instance, r)
+		state, err := c.getRadarrState(instance+1, r)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Radarr Queue from %d:%s: %v", instance, r.URL, err)
+			c.Errorf("Getting Radarr Queue from %d:%s: %v", instance+1, r.URL, err)
 		}
 
 		states = append(states, state)
@@ -163,12 +163,12 @@ func (c *Config) getReadarrStates() []*State {
 			continue
 		}
 
-		c.Debugf("Getting Readarr State: %d:%s", instance, r.URL)
+		c.Debugf("Getting Readarr State: %d:%s", instance+1, r.URL)
 
-		state, err := c.getReadarrState(instance, r)
+		state, err := c.getReadarrState(instance+1, r)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Readarr Queue from %d:%s: %v", instance, r.URL, err)
+			c.Errorf("Getting Readarr Queue from %d:%s: %v", instance+1, r.URL, err)
 		}
 
 		states = append(states, state)
@@ -185,12 +185,12 @@ func (c *Config) getQbitStates() []*State {
 			continue
 		}
 
-		c.Debugf("Getting Qbit State: %d:%s", instance, q.URL)
+		c.Debugf("Getting Qbit State: %d:%s", instance+1, q.URL)
 
-		state, err := c.getQbitState(instance, q)
+		state, err := c.getQbitState(instance+1, q)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Qbit Data from %d:%s: %v", instance, q.URL, err)
+			c.Errorf("Getting Qbit Data from %d:%s: %v", instance+1, q.URL, err)
 		}
 
 		states = append(states, state)
@@ -207,12 +207,12 @@ func (c *Config) getSonarrStates() []*State {
 			continue
 		}
 
-		c.Debugf("Getting Sonarr State: %d:%s", instance, s.URL)
+		c.Debugf("Getting Sonarr State: %d:%s", instance+1, s.URL)
 
-		state, err := c.getSonarrState(instance, s)
+		state, err := c.getSonarrState(instance+1, s)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Sonarr Queue from %d:%s: %v", instance, s.URL, err)
+			c.Errorf("Getting Sonarr Queue from %d:%s: %v", instance+1, s.URL, err)
 		}
 
 		states = append(states, state)
@@ -357,7 +357,7 @@ func processRadarrState(state *State, movies []*radarr.Movie) {
 			date = movie.PhysicalRelease
 		}
 
-		if date.After(time.Now()) {
+		if date.After(time.Now()) && !movie.HasFile {
 			state.Next = append(state.Next, &Sortable{Name: movie.Title, Date: date})
 		}
 

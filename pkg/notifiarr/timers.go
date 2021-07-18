@@ -5,8 +5,9 @@ import (
 )
 
 const (
-	cfSyncTimer = 30 * time.Minute
-	stuckTimer  = 5*time.Minute + 327*time.Millisecond
+	cfSyncTimer  = 30 * time.Minute
+	minDashTimer = 30 * time.Minute
+	stuckTimer   = 5*time.Minute + 327*time.Millisecond
 )
 
 func (c *Config) startTimers() {
@@ -19,8 +20,24 @@ func (c *Config) startTimers() {
 	syncTimer := c.getSyncTimer()
 	plexTimer1, plexTimer2 := c.getPlexTimers()
 	stuckItemTimer := time.NewTicker(stuckTimer)
+	dashTimer := c.getDashTimer()
 
-	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckItemTimer)
+	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckItemTimer, dashTimer)
+}
+
+func (c *Config) getDashTimer() *time.Ticker {
+	dashTimer := &time.Ticker{}
+
+	if c.DashDur > 0 && c.DashDur < minDashTimer {
+		c.DashDur = minDashTimer
+	}
+
+	if c.DashDur > 0 {
+		c.Printf("==> Sending Current State Data for Dashboard every %v", c.DashDur)
+		dashTimer = time.NewTicker(c.DashDur)
+	}
+
+	return dashTimer
 }
 
 func (c *Config) getSyncTimer() *time.Ticker {
@@ -66,13 +83,14 @@ func (c *Config) getSnapTimer() *time.Ticker {
 	return time.NewTicker(c.Snap.Interval.Duration)
 }
 
-func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer *time.Ticker) {
+func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer, dashTimer *time.Ticker) {
 	defer func() {
 		snapTimer.Stop()
 		syncTimer.Stop()
 		plexTimer1.Stop()
 		plexTimer2.Stop()
 		stuckTimer.Stop()
+		dashTimer.Stop()
 		close(c.stopTimers)
 		c.stopTimers = nil
 	}()
@@ -99,6 +117,9 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuc
 			c.checkForFinishedItems(sent)
 		case <-stuckTimer.C:
 			c.SendFinishedQueueItems(c.BaseURL)
+		case <-dashTimer.C:
+			c.Print("Gathering current state for dashboard.")
+			c.GetState()
 		case <-c.stopTimers:
 			return
 		}

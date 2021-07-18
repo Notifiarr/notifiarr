@@ -73,6 +73,7 @@ type Config struct {
 	Apps         *apps.Apps       // has API key
 	Plex         *plex.Server     // plex sessions
 	Snap         *snapshot.Config // system snapshot data
+	DashDur      time.Duration
 	Retries      int
 	URL          string
 	BaseURL      string
