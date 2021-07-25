@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"golift.io/starr"
 	"golift.io/version"
 )
 
@@ -27,8 +28,8 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "cfsync", c.handleCFSyncReq, "GET")
 
 	if c.Config.Plex.Configured() {
-		c.Config.HandleAPIpath(plex.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
-		c.Config.HandleAPIpath(plex.Plex, "kill", c.Config.Plex.HandleKillSession, "GET").
+		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
+		c.Config.HandleAPIpath(starr.Plex, "kill", c.Config.Plex.HandleKillSession, "GET").
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:[0-9a-z-]+}")
 
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)

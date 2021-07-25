@@ -2,6 +2,7 @@ package notifiarr
 
 import (
 	"fmt"
+	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -29,25 +30,28 @@ type Sortable struct {
 	Episode int64     `json:"episode,omitempty"`
 }
 
+type SortableList []*Sortable
+
 // State is partially filled out once for each app instance.
 type State struct {
 	// Shared
-	Error    string      `json:"error"`
-	Instance int         `json:"instance"`
-	Missing  int64       `json:"missing,omitempty"`
-	Size     int64       `json:"size"`
-	Percent  float64     `json:"percent,omitempty"`
-	Upcoming int64       `json:"upcoming,omitempty"`
-	Next     []*Sortable `json:"next,omitempty"`
-	Latest   []*Sortable `json:"latest,omitempty"`
+	Error    string       `json:"error"`
+	Instance int          `json:"instance"`
+	Missing  int64        `json:"missing,omitempty"`
+	Size     int64        `json:"size"`
+	Percent  float64      `json:"percent,omitempty"`
+	Upcoming int64        `json:"upcoming,omitempty"`
+	Next     SortableList `json:"next,omitempty"`
+	Latest   SortableList `json:"latest,omitempty"`
 	// Radarr
 	Movies int64 `json:"movies,omitempty"`
 	// Sonarr
 	Shows    int64 `json:"shows,omitempty"`
 	Episodes int64 `json:"episodes,omitempty"`
 	// Readarr
-	Authors int   `json:"authors,omitempty"`
-	Books   int64 `json:"books,omitempty"`
+	Authors  int   `json:"authors,omitempty"`
+	Books    int64 `json:"books,omitempty"`
+	Editions int   `json:"editions,omitempty"`
 	// Lidarr
 	Artists int   `json:"artists,omitempty"`
 	Albums  int64 `json:"albums,omitempty"`
@@ -83,9 +87,11 @@ func (c *Config) GetState() {
 		Sonarr:  c.getSonarrStates(),
 	}
 
-	_, _, err := c.SendData(c.BaseURL+"/api/v1/user/dashboard", states, true)
+	resp, body, err := c.SendData(c.BaseURL+"/api/v1/user/dashboard", states, true)
 	if err != nil {
 		c.Errorf("Sending State Data: %v", err)
+	} else if resp.StatusCode != http.StatusOK {
+		c.Errorf("Sending State Data: %v: %s", ErrNon200, string(body))
 	}
 }
 
@@ -274,6 +280,7 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 	artistIDs := make(map[int64]struct{})
 
 	for _, album := range albums {
+		have := false
 		state.Albums++
 
 		if album.Statistics != nil {
@@ -282,11 +289,23 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 			state.Size += int64(album.Statistics.SizeOnDisk)
 			state.Tracks += int64(album.Statistics.TotalTrackCount)
 			state.Missing += int64(album.Statistics.TrackCount - album.Statistics.TrackFileCount)
+			have = album.Statistics.TrackCount-album.Statistics.TrackFileCount < 1
+		}
+
+		if album.ReleaseDate.After(time.Now()) && album.Monitored && !have {
+			state.Next = append(state.Next, &Sortable{
+				id:   album.ID,
+				Name: album.Title,
+				Date: album.ReleaseDate,
+				Sub:  album.Artist.ArtistName,
+			})
 		}
 	}
 
 	state.Percent /= float64(state.Tracks)
 	state.Artists = len(artistIDs)
+	sort.Sort(dateSorter(state.Next))
+	state.Next.Shrink(showNext)
 
 	return state, nil
 }
@@ -335,8 +354,12 @@ func (c *Config) getRadarrState(instance int, r *apps.RadarrConfig) (*State, err
 	}
 
 	processRadarrState(state, movies)
+	sort.Sort(sort.Reverse(dateSorter(state.Latest)))
+	sort.Sort(dateSorter(state.Next))
+	state.Latest.Shrink(showLatest)
+	state.Next.Shrink(showNext)
 
-	return sortRadarrLists(state), nil
+	return state, nil
 }
 
 func processRadarrState(state *State, movies []*radarr.Movie) {
@@ -367,22 +390,6 @@ func processRadarrState(state *State, movies []*radarr.Movie) {
 	}
 }
 
-func sortRadarrLists(state *State) *State {
-	// Ascending: dates closer to now() at top
-	sort.Sort(sort.Reverse(dateSorter(state.Latest)))
-	sort.Sort(dateSorter(state.Next))
-
-	if len(state.Next) > showNext {
-		state.Next = state.Next[:showNext]
-	}
-
-	if len(state.Latest) > showLatest {
-		state.Latest = state.Latest[:showLatest]
-	}
-
-	return state
-}
-
 func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}}
 
@@ -394,19 +401,32 @@ func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, e
 	authorIDs := make(map[int64]struct{})
 
 	for _, book := range books {
+		have := false
 		state.Books++
 
 		if book.Statistics != nil {
 			authorIDs[book.AuthorID] = struct{}{}
-			// state.Percent += book.Statistics.PercentOfBooks
-			// state.Editions += book.Statistics.TotalBookCount
+			state.Percent += book.Statistics.PercentOfBooks
 			state.Size += int64(book.Statistics.SizeOnDisk)
+			state.Editions += book.Statistics.TotalBookCount
 			state.Missing += int64(book.Statistics.BookCount - book.Statistics.BookFileCount)
+			have = book.Statistics.BookCount-book.Statistics.BookFileCount < 1
+		}
+
+		if book.ReleaseDate.After(time.Now()) && book.Monitored && !have {
+			state.Next = append(state.Next, &Sortable{
+				id:   book.ID,
+				Name: book.Title,
+				Date: book.ReleaseDate,
+				Sub:  book.Author.AuthorName,
+			})
 		}
 	}
 
-	// state.Percent /= float64(state.Editions)
+	state.Percent /= float64(state.Editions)
 	state.Authors = len(authorIDs)
+	sort.Sort(dateSorter(state.Next))
+	state.Next.Shrink(showNext)
 
 	return state, nil
 }
@@ -492,4 +512,15 @@ func (s dateSorter) Swap(i, j int) {
 
 func (s dateSorter) Less(i, j int) bool {
 	return s[i].Date.Before(s[j].Date)
+}
+
+// Shrink a sortable list.
+func (s *SortableList) Shrink(size int) {
+	if s == nil {
+		return
+	}
+
+	if len(*s) > size {
+		*s = (*s)[:size]
+	}
 }

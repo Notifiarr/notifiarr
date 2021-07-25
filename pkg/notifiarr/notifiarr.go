@@ -93,6 +93,7 @@ type ClientInfo struct {
 	Message struct {
 		Text       string `json:"text"`
 		Subscriber bool   `json:"subscriber"`
+		Patron     bool   `json:"patron"`
 		CFSync     int64  `json:"cfSync"`
 		RPSync     int64  `json:"rpSync"`
 	} `json:"message"`
@@ -228,9 +229,14 @@ func (c *ClientInfo) String() string {
 	return c.Message.Text
 }
 
-// IsASub returns true if the client is a subscriber. False otherwise.
-func (c *ClientInfo) IsASub() bool {
+// IsSub returns true if the client is a subscriber. False otherwise.
+func (c *ClientInfo) IsSub() bool {
 	return c != nil && c.Message.Subscriber
+}
+
+// IsPatron returns true if the client is a patron. False otherwise.
+func (c *ClientInfo) IsPatron() bool {
+	return c != nil && c.Message.Patron
 }
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
@@ -297,7 +303,7 @@ func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, erro
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	defer c.Debugf("Sent JSON Payload to %s:\n%s\nResponse: %s", url, string(data), string(body))
+	defer c.Debugf("Sent JSON Payload to %s:\n%s\nResponse (%s): %s", url, string(data), resp.Status, string(body))
 
 	if err != nil {
 		return resp, body, fmt.Errorf("reading http response body: %w", err)
@@ -339,7 +345,7 @@ func (c *Config) getClient() *httpClient {
 		c.client = &httpClient{
 			Retries: c.Retries,
 			Logger:  c.ErrorLog,
-			Client:  &http.Client{Timeout: c.Timeout},
+			Client:  &http.Client{},
 		}
 	}
 

@@ -108,10 +108,10 @@ func (c *Client) makeMoreChannels() {
 	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
 	c.menu["app_ques"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Items Check", "check app queues for stuck items and send to notifiarr"))
 	c.menu["app_ques_dev"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Items Check (Dev)", "check app queues for stuck items and send to notifiarr dev"))
+	c.menu["send_dash"] = ui.WrapMenu(data.AddSubMenuItem("Send Dashboard States", "collect and send all application states for a dashboard update"))
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	c.menu["debug"] = ui.WrapMenu(debug)
-	c.menu["debug_test"] = ui.WrapMenu(debug.AddSubMenuItem("Get States", "test state gathering code"))
 	c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Log", "view the Debug log"))
 	// debug.AddSeparator() // not exist: https://github.com/getlantern/systray/issues/170
 	ui.WrapMenu(debug.AddSubMenuItem("__________", "")).Disable() // fake separator.
@@ -158,9 +158,6 @@ func (c *Client) watchKillerChannels() {
 			// u.menu["debug"].Check()
 		case <-c.menu["debug_panic"].Clicked():
 			c.menuPanic()
-		case <-c.menu["debug_test"].Clicked():
-			c.Print("User Requested State Test")
-			c.notify.GetState()
 		case <-c.menu["debug_logs"].Clicked():
 			c.Print("User Viewing Debug File:", c.Config.DebugLog)
 			_ = ui.OpenLog(c.Config.DebugLog)
@@ -280,6 +277,9 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 			c.sendPlexSessions(notifiarr.ProdURL)
 		case <-c.menu["snap_prod"].Clicked():
 			c.sendSystemSnapshot(notifiarr.ProdURL)
+		case <-c.menu["send_dash"].Clicked():
+			c.Print("User Requested State Collection for Dashboard")
+			c.notify.GetState()
 		}
 	}
 }

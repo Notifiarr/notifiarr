@@ -74,7 +74,7 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 		id = ""
 	}
 
-	uri = path.Join(a.URLBase, "api", string(app), id, uri)
+	uri = path.Join(a.URLBase, "api", app.Lower(), id, uri)
 
 	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
@@ -89,10 +89,10 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code    = http.StatusUnprocessableEntity
 			id, _   = strconv.Atoi(mux.Vars(r)["id"])
 			start   = time.Now()
-			post, _ = ioutil.ReadAll(r.Body)
+			post, _ = ioutil.ReadAll(r.Body) // swallowing this error could suck...
 		)
 
-		// Reset the body so it can be re-read.
+		r.Body.Close() // Reset the body so it can be re-read.
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(post))
 
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).

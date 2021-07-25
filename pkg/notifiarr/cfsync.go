@@ -30,6 +30,7 @@ type idMap struct {
 // to/from notifarr.com when updating custom formats for Radarr.
 type RadarrCustomFormatPayload struct {
 	Instance        int                      `json:"instance"`
+	Name            string                   `json:"name"`
 	CustomFormats   []*radarr.CustomFormat   `json:"customFormats,omitempty"`
 	QualityProfiles []*radarr.QualityProfile `json:"qualityProfiles,omitempty"`
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
@@ -48,8 +49,8 @@ func (c *Config) SyncCF(wait bool) {
 
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *Config) syncRadarr() {
-	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
-		c.Debugf("Cannot sync Radarr Custom Formats. Not a subscriber, or error: %v", err)
+	if ci, err := c.GetClientInfo(); err != nil {
+		c.Debugf("Cannot sync Radarr Custom Formats. Error: %v", err)
 		return
 	} else if ci.Message.CFSync < 1 {
 		return
@@ -74,7 +75,7 @@ func (c *Config) syncRadarr() {
 func (c *Config) syncRadarrCF(instance int, r *apps.RadarrConfig) (bool, error) {
 	var (
 		err     error
-		payload = RadarrCustomFormatPayload{Instance: instance, NewMaps: c.radarrCF[instance]}
+		payload = RadarrCustomFormatPayload{Instance: instance, Name: r.Name, NewMaps: c.radarrCF[instance]}
 	)
 
 	payload.QualityProfiles, err = r.Radarr.GetQualityProfiles()
@@ -196,6 +197,7 @@ func (c *Config) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 // to/from notifarr.com when updating custom formats for Sonarr.
 type SonarrCustomFormatPayload struct {
 	Instance        int                      `json:"instance"`
+	Name            string                   `json:"name"`
 	ReleaseProfiles []*sonarr.ReleaseProfile `json:"releaseProfiles,omitempty"`
 	QualityProfiles []*sonarr.QualityProfile `json:"qualityProfiles,omitempty"`
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
@@ -203,8 +205,8 @@ type SonarrCustomFormatPayload struct {
 
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *Config) syncSonarr() {
-	if ci, err := c.GetClientInfo(); err != nil || !ci.IsASub() {
-		c.Debugf("Cannot sync Sonarr Release Profiles. Not a subscriber, or error: %v", err)
+	if ci, err := c.GetClientInfo(); err != nil {
+		c.Debugf("Cannot sync Sonarr Release Profiles. Error: %v", err)
 		return
 	} else if ci.Message.RPSync < 1 {
 		return
@@ -229,7 +231,7 @@ func (c *Config) syncSonarr() {
 func (c *Config) syncSonarrRP(instance int, s *apps.SonarrConfig) (bool, error) {
 	var (
 		err     error
-		payload = SonarrCustomFormatPayload{Instance: instance, NewMaps: c.sonarrRP[instance]}
+		payload = SonarrCustomFormatPayload{Instance: instance, Name: s.Name, NewMaps: c.sonarrRP[instance]}
 	)
 
 	payload.QualityProfiles, err = s.Sonarr.GetQualityProfiles()

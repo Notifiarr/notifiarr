@@ -57,7 +57,7 @@ func (c *Config) SendFinishedQueueItems(url string) {
 		return
 	}
 
-	_, _, err := c.SendData(url+"/api/v1/user/client", q, true)
+	_, _, err := c.SendData(url+ClientRoute, q, true)
 	if err != nil {
 		c.Errorf("Sending Stuck Queue Items: %v", err)
 		return

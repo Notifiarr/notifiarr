@@ -398,6 +398,8 @@ golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9 h1:j/WeLF6Ew1lc/m8/bh5qleZ
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9/go.mod h1:EZevRvIGRh8jDMwuYL0/tlPns0KynquPZzb0SerIC1s=
 golift.io/starr v0.10.4 h1:n+d0wH6eprgzxDGYA/cGb6U33NA7IKE3souwhDOi5l0=
 golift.io/starr v0.10.4/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
+golift.io/starr v0.10.5 h1:MHK4vFspaQdDbwhtwPQ5JIWh/+ZEIAiMu8Gw2++mkT0=
+golift.io/starr v0.10.5/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 google.golang.org/api v0.4.0/go.mod h1:8k5glujaEP+g9n7WNsDg8QP6cUVNI86fCNMcbazEtwE=

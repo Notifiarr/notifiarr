@@ -31,7 +31,7 @@ require (
 	golift.io/deluge v0.9.2
 	golift.io/qbit v0.0.0-20210717220751-d545c7a8f721
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.10.4
+	golift.io/starr v0.10.5
 	golift.io/version v0.0.2
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect

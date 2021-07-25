@@ -42,7 +42,7 @@ func (c *Config) getDashTimer() *time.Ticker {
 
 func (c *Config) getSyncTimer() *time.Ticker {
 	ci, err := c.GetClientInfo()
-	if err != nil || !ci.IsASub() || (ci.Message.CFSync < 1 && ci.Message.RPSync < 1) {
+	if err != nil || (ci.Message.CFSync < 1 && ci.Message.RPSync < 1) {
 		return &time.Ticker{C: make(<-chan time.Time)}
 	}
 
