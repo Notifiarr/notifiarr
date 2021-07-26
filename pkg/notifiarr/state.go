@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -35,14 +36,16 @@ type SortableList []*Sortable
 // State is partially filled out once for each app instance.
 type State struct {
 	// Shared
-	Error    string       `json:"error"`
-	Instance int          `json:"instance"`
-	Missing  int64        `json:"missing,omitempty"`
-	Size     int64        `json:"size"`
-	Percent  float64      `json:"percent,omitempty"`
-	Upcoming int64        `json:"upcoming,omitempty"`
-	Next     SortableList `json:"next,omitempty"`
-	Latest   SortableList `json:"latest,omitempty"`
+	Error    string        `json:"error"`
+	Instance int           `json:"instance"`
+	Missing  int64         `json:"missing,omitempty"`
+	Size     int64         `json:"size"`
+	Percent  float64       `json:"percent,omitempty"`
+	Upcoming int64         `json:"upcoming,omitempty"`
+	Next     SortableList  `json:"next,omitempty"`
+	Latest   SortableList  `json:"latest,omitempty"`
+	Elapsed  time.Duration `json:"elapsed"` // How long it took.
+	Name     string        `json:"name"`
 	// Radarr
 	Movies int64 `json:"movies,omitempty"`
 	// Sonarr
@@ -78,21 +81,59 @@ type States struct {
 }
 
 func (c *Config) GetState() {
-	states := &States{
-		Deluge:  c.getDelugeStates(),
-		Lidarr:  c.getLidarrStates(),
-		Qbit:    c.getQbitStates(),
-		Radarr:  c.getRadarrStates(),
-		Readarr: c.getReadarrStates(),
-		Sonarr:  c.getSonarrStates(),
-	}
+	start := time.Now()
+	states := c.getStates()
+	apps := time.Since(start).Round(time.Millisecond)
 
-	resp, body, err := c.SendData(c.BaseURL+"/api/v1/user/dashboard", states, true)
-	if err != nil {
-		c.Errorf("Sending State Data: %v", err)
-	} else if resp.StatusCode != http.StatusOK {
-		c.Errorf("Sending State Data: %v: %s", ErrNon200, string(body))
+	//nolint:bodyclose // already closed
+	switch resp, body, err := c.SendData(c.BaseURL+DashRoute, states, true); {
+	case err != nil:
+		c.Errorf("Sending Dashboard State Data (apps:%s total:%s): %v",
+			apps, time.Since(start).Round(time.Millisecond), err)
+	case resp.StatusCode != http.StatusOK:
+		c.Errorf("Sending Dashboard State Data (apps:%s total:%s): %v: %s",
+			apps, time.Since(start).Round(time.Millisecond), ErrNon200, string(body))
+	default:
+		c.Debugf("Sent Dashboard State Data! Elapsed: apps:%s total:%s",
+			apps, time.Since(start).Round(time.Millisecond))
 	}
+}
+
+// getStates fires a routine for each app type and tries to get a lot of data fast!
+func (c *Config) getStates() *States {
+	s := &States{}
+
+	var wg sync.WaitGroup
+
+	wg.Add(6) //nolint:gomnd // we are polling 6 apps.
+
+	go func() {
+		s.Deluge = c.getDelugeStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		s.Lidarr = c.getLidarrStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		s.Qbit = c.getQbitStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		s.Radarr = c.getRadarrStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		s.Readarr = c.getReadarrStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		s.Sonarr = c.getSonarrStates()
+		wg.Done() //nolint:wsl
+	}()
+	wg.Wait()
+
+	return s
 }
 
 func (c *Config) getDelugeStates() []*State {
@@ -228,9 +269,12 @@ func (c *Config) getSonarrStates() []*State {
 }
 
 func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, error) {
-	state := &State{Instance: instance}
+	state := &State{Instance: instance, Name: d.Name}
+	start := time.Now()
 
 	xfers, err := d.GetXfersCompat()
+	state.Elapsed = time.Since(start)
+
 	if err != nil {
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
@@ -270,9 +314,12 @@ func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, err
 }
 
 func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, error) {
-	state := &State{Instance: instance, Next: []*Sortable{}}
+	state := &State{Instance: instance, Next: []*Sortable{}, Name: l.Name}
+	start := time.Now()
 
 	albums, err := l.GetAlbum("") // all albums
+	state.Elapsed = time.Since(start)
+
 	if err != nil {
 		return state, fmt.Errorf("getting albums from instance %d: %w", instance, err)
 	}
@@ -307,13 +354,49 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 	sort.Sort(dateSorter(state.Next))
 	state.Next.Shrink(showNext)
 
+	if state.Latest, err = c.getLidarrHistory(l); err != nil {
+		return state, fmt.Errorf("instance %d: %w", instance, err)
+	}
+
 	return state, nil
 }
 
+// getLidarrHistory is not done.
+func (c *Config) getLidarrHistory(l *apps.LidarrConfig) ([]*Sortable, error) {
+	history, err := l.GetHistory(showLatest * 40) //nolint:gomnd
+	if err != nil {
+		return nil, fmt.Errorf("getting history: %w", err)
+	}
+
+	table := []*Sortable{}
+
+	for _, rec := range history.Records {
+		if len(table) >= showLatest {
+			break
+		} else if rec.EventType != "downloadImported" {
+			continue
+		}
+
+		// An error here gets swallowed.
+		if album, err := l.GetAlbumByID(rec.AlbumID); err == nil {
+			table = append(table, &Sortable{
+				Name: album.Title,
+				Sub:  album.Artist.ArtistName,
+				Date: rec.Date,
+			})
+		}
+	}
+
+	return table, nil
+}
+
 func (c *Config) getQbitState(instance int, q *apps.QbitConfig) (*State, error) {
-	state := &State{Instance: instance}
+	state := &State{Instance: instance, Name: q.Name}
+	start := time.Now()
 
 	xfers, err := q.GetXfers()
+	state.Elapsed = time.Since(start)
+
 	if err != nil {
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
@@ -346,9 +429,12 @@ func (c *Config) getQbitState(instance int, q *apps.QbitConfig) (*State, error) 
 }
 
 func (c *Config) getRadarrState(instance int, r *apps.RadarrConfig) (*State, error) {
-	state := &State{Instance: instance, Next: []*Sortable{}, Latest: []*Sortable{}}
+	state := &State{Instance: instance, Next: []*Sortable{}, Latest: []*Sortable{}, Name: r.Name}
+	start := time.Now()
 
 	movies, err := r.GetMovie(0)
+	state.Elapsed = time.Since(start)
+
 	if err != nil {
 		return state, fmt.Errorf("getting movies from instance %d: %w", instance, err)
 	}
@@ -391,9 +477,12 @@ func processRadarrState(state *State, movies []*radarr.Movie) {
 }
 
 func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, error) {
-	state := &State{Instance: instance, Next: []*Sortable{}}
+	state := &State{Instance: instance, Next: []*Sortable{}, Name: r.Name}
+	start := time.Now()
 
 	books, err := r.GetBook("") // all books
+	state.Elapsed = time.Since(start)
+
 	if err != nil {
 		return state, fmt.Errorf("getting books from instance %d: %w", instance, err)
 	}
@@ -428,13 +517,49 @@ func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, e
 	sort.Sort(dateSorter(state.Next))
 	state.Next.Shrink(showNext)
 
+	if state.Latest, err = c.getReadarrHistory(r); err != nil {
+		return state, fmt.Errorf("instance %d: %w", instance, err)
+	}
+
 	return state, nil
 }
 
-func (c *Config) getSonarrState(instance int, r *apps.SonarrConfig) (*State, error) {
-	state := &State{Instance: instance, Next: []*Sortable{}}
+// getReadarrHistory is not done.
+func (c *Config) getReadarrHistory(r *apps.ReadarrConfig) ([]*Sortable, error) {
+	history, err := r.GetHistory(showLatest * 20) //nolint:gomnd
+	if err != nil {
+		return nil, fmt.Errorf("getting history: %w", err)
+	}
 
-	allshows, err := r.GetAllSeries()
+	table := []*Sortable{}
+
+	for _, rec := range history.Records {
+		if len(table) >= showLatest {
+			break
+		} else if rec.EventType != "bookFileImported" {
+			continue
+		}
+
+		// An error here gets swallowed.
+		if book, err := r.GetBookByID(rec.BookID); err == nil {
+			table = append(table, &Sortable{
+				Name: book.Title,
+				Sub:  book.Author.AuthorName,
+				Date: rec.Date,
+			})
+		}
+	}
+
+	return table, nil
+}
+
+func (c *Config) getSonarrState(instance int, s *apps.SonarrConfig) (*State, error) {
+	state := &State{Instance: instance, Next: []*Sortable{}, Name: s.Name}
+	start := time.Now()
+
+	allshows, err := s.GetAllSeries()
+	state.Elapsed = time.Since(start)
+
 	if err != nil {
 		return state, fmt.Errorf("getting series from instance %d: %w", instance, err)
 	}
@@ -459,20 +584,62 @@ func (c *Config) getSonarrState(instance int, r *apps.SonarrConfig) (*State, err
 
 	state.Percent /= float64(state.Shows)
 
-	if state.Next, err = c.getSonarrStateUpcoming(r, state.Next); err != nil {
+	if state.Next, err = c.getSonarrStateUpcoming(s, state.Next); err != nil {
+		return state, fmt.Errorf("instance %d: %w", instance, err)
+	}
+
+	if state.Latest, err = c.getSonarrHistory(s); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
 	return state, nil
 }
 
-func (c *Config) getSonarrStateUpcoming(r *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
+func (c *Config) getSonarrHistory(s *apps.SonarrConfig) ([]*Sortable, error) {
+	history, err := s.GetHistory(showLatest * 20) //nolint:gomnd
+	if err != nil {
+		return nil, fmt.Errorf("getting history: %w", err)
+	}
+
+	table := []*Sortable{}
+
+	for _, rec := range history.Records {
+		if len(table) >= showLatest {
+			break
+		} else if rec.EventType != "downloadFolderImported" {
+			c.Debug(rec.EventType, rec.SourceTitle)
+			continue
+		}
+
+		series, err := s.GetSeriesByID(rec.SeriesID)
+		if err != nil {
+			continue
+		}
+
+		// An error here gets swallowed.
+		if eps, err := s.GetSeriesEpisodes(rec.SeriesID); err == nil {
+			for _, ep := range eps {
+				if ep.ID == rec.EpisodeID {
+					table = append(table, &Sortable{
+						Name: series.Title,
+						Sub:  ep.Title,
+						Date: rec.Date,
+					})
+				}
+			}
+		}
+	}
+
+	return table, nil
+}
+
+func (c *Config) getSonarrStateUpcoming(s *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
 	sort.Sort(dateSorter(next))
 
 	redo := []*Sortable{}
 
 	for _, item := range next {
-		eps, err := r.GetSeriesEpisodes(item.id)
+		eps, err := s.GetSeriesEpisodes(item.id)
 		if err != nil {
 			return nil, fmt.Errorf("getting series ID %d (%s): %w", item.id, item.Name, err)
 		}

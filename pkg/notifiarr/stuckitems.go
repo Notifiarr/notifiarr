@@ -2,6 +2,8 @@ package notifiarr
 
 import (
 	"strings"
+	"sync"
+	"time"
 
 	"golift.io/starr/sonarr"
 )
@@ -16,8 +18,10 @@ const (
 )
 
 type custom struct {
-	Repeat uint          `json:"repeat"`
-	Queue  []interface{} `json:"queue"`
+	Elapsed time.Duration `json:"elapsed"`
+	Repeat  uint          `json:"repeat"`
+	Name    string        `json:"name"`
+	Queue   []interface{} `json:"queue"`
 }
 
 type ItemList map[int]custom
@@ -45,26 +49,53 @@ func (i ItemList) Empty() bool {
 }
 
 func (c *Config) SendFinishedQueueItems(url string) {
-	q := &QueuePayload{
-		Type:    "queue",
-		Lidarr:  c.getFinishedItemsLidarr(),
-		Radarr:  c.getFinishedItemsRadarr(),
-		Readarr: c.getFinishedItemsReadarr(),
-		Sonarr:  c.getFinishedItemsSonarr(),
-	}
+	start := time.Now()
+	q := c.getQueues()
+	apps := time.Since(start).Round(time.Millisecond)
 
 	if q.Lidarr.Empty() && q.Radarr.Empty() && q.Readarr.Empty() && q.Sonarr.Empty() {
 		return
 	}
 
 	_, _, err := c.SendData(url+ClientRoute, q, true)
-	if err != nil {
-		c.Errorf("Sending Stuck Queue Items: %v", err)
-		return
-	}
+	elapsed := time.Since(start).Round(time.Millisecond)
 
-	c.Printf("Sent Stuck Items: Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-		q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len())
+	if err != nil {
+		c.Errorf("Sending Stuck Queue Items (apps:%s total:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d): %v",
+			apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), err)
+	} else {
+		c.Printf("Sent Stuck Items (apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
+			apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len())
+	}
+}
+
+// getQueues fires a routine for each app type and tries to get a lot of data fast!
+func (c *Config) getQueues() *QueuePayload {
+	q := &QueuePayload{Type: "queue"}
+
+	var wg sync.WaitGroup
+
+	wg.Add(4) //nolint:gomnd // 4 is 1 for each app polled.
+
+	go func() {
+		q.Lidarr = c.getFinishedItemsLidarr()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		q.Radarr = c.getFinishedItemsRadarr()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		q.Readarr = c.getFinishedItemsReadarr()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		q.Sonarr = c.getFinishedItemsSonarr()
+		wg.Done() //nolint:wsl
+	}()
+	wg.Wait()
+
+	return q
 }
 
 func (c *Config) getFinishedItemsLidarr() ItemList {
@@ -75,11 +106,15 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 			continue
 		}
 
+		start := time.Now()
+
 		queue, err := l.GetQueue(getItemsMax)
 		if err != nil {
 			c.Errorf("Getting Lidarr Queue (%d): %v", i, err)
 			continue
 		}
+
+		instance := stuck[i+1]
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
@@ -88,11 +123,13 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 			}
 
 			item.Quality = nil
-			instance := stuck[i+1]
-			instance.Repeat = *l.CheckQ
 			instance.Queue = append(instance.Queue, item)
-			stuck[i+1] = instance
 		}
+
+		instance.Name = l.Name
+		instance.Repeat = *l.CheckQ
+		instance.Elapsed = time.Since(start)
+		stuck[i+1] = instance
 
 		c.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			i+1, len(queue.Records), len(stuck[i+1].Queue))
@@ -109,11 +146,15 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 			continue
 		}
 
+		start := time.Now()
+
 		queue, err := l.GetQueue(getItemsMax, 1)
 		if err != nil {
 			c.Errorf("Getting Radarr Queue (%d): %v", i, err)
 			continue
 		}
+
+		instance := stuck[i+1]
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
@@ -124,11 +165,13 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 			item.Quality = nil
 			item.CustomFormats = nil
 			item.Languages = nil
-			instance := stuck[i+1]
-			instance.Repeat = *l.CheckQ
 			instance.Queue = append(instance.Queue, item)
-			stuck[i+1] = instance
 		}
+
+		instance.Name = l.Name
+		instance.Repeat = *l.CheckQ
+		instance.Elapsed = time.Since(start)
+		stuck[i+1] = instance
 
 		c.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			i+1, len(queue.Records), len(stuck[i+1].Queue))
@@ -145,11 +188,15 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 			continue
 		}
 
+		start := time.Now()
+
 		queue, err := l.GetQueue(getItemsMax)
 		if err != nil {
 			c.Errorf("Getting Readarr Queue (%d): %v", i, err)
 			continue
 		}
+
+		instance := stuck[i+1]
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
@@ -158,11 +205,13 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 			}
 
 			item.Quality = nil
-			instance := stuck[i+1]
-			instance.Repeat = *l.CheckQ
 			instance.Queue = append(instance.Queue, item)
-			stuck[i+1] = instance
 		}
+
+		instance.Name = l.Name
+		instance.Repeat = *l.CheckQ
+		instance.Elapsed = time.Since(start)
+		stuck[i+1] = instance
 
 		c.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			i+1, len(queue.Records), len(stuck[i+1].Queue))
@@ -179,6 +228,8 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 			continue
 		}
 
+		start := time.Now()
+
 		queue, err := l.GetQueue(getItemsMax, 1)
 		if err != nil {
 			c.Errorf("Getting Sonarr Queue (%d): %v", i, err)
@@ -187,6 +238,7 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 
 		// repeatStomper is used to collapse duplicate download IDs.
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
+		instance := stuck[i+1]
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
@@ -199,11 +251,13 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 			item.Quality = nil
 			item.Language = nil
 			repeatStomper[item.DownloadID] = item
-			instance := stuck[i+1]
-			instance.Repeat = *l.CheckQ
 			instance.Queue = append(instance.Queue, item)
-			stuck[i+1] = instance
 		}
+
+		instance.Name = l.Name
+		instance.Repeat = *l.CheckQ
+		instance.Elapsed = time.Since(start)
+		stuck[i+1] = instance
 
 		c.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			i+1, len(queue.Records), len(stuck[i+1].Queue))
