@@ -621,9 +621,11 @@ func (c *Config) getSonarrHistory(s *apps.SonarrConfig) ([]*Sortable, error) {
 			for _, ep := range eps {
 				if ep.ID == rec.EpisodeID {
 					table = append(table, &Sortable{
-						Name: series.Title,
-						Sub:  ep.Title,
-						Date: rec.Date,
+						Name:    series.Title,
+						Sub:     ep.Title,
+						Date:    rec.Date,
+						Season:  ep.SeasonNumber,
+						Episode: ep.EpisodeNumber,
 					})
 				}
 			}
