@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.1.11  @ 211207T0621 #
+# Created by Notifiarr v0.1.13  @ 212707T0741 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -53,6 +53,10 @@ log_file_mb = 100
 ## How many files to keep? 0 = all.
 log_files = 10
 
+## How often to send current application states for the dashboard.
+##
+send_dash = "0s"
+
 ## Web server and application timeouts.
 ##
 timeout = "1m0s"
@@ -93,6 +97,21 @@ timeout = "1m0s"
 #api_key     = ""
 #disable_cf  = true # Disable release profile sync.
 #check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
+
+
+# Download Client Configs (below) are used for dashboard state and service checks.
+
+#[[deluge]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://deluge:8112/"
+#password = ""
+
+
+#[[qbit]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://qbit:8080/"
+#user     = ""
+#pass     = ""
 
 
 #################

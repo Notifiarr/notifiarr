@@ -92,11 +92,11 @@ urlbase = "{{.URLBase}}"
 log_file_mb = {{.LogFileMb}}
 ##
 ## How many files to keep? 0 = all.
-log_files = {{.LogFiles}}{{if .SendDash}}
+log_files = {{.LogFiles}}
 
 ## How often to send current application states for the dashboard.
 ##
-send_dash = "{{.SendDash}}"{{end}}
+send_dash = "{{.SendDash}}"
 
 ## Web server and application timeouts.
 ##
