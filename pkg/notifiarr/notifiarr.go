@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -39,6 +40,7 @@ const (
 	ClientRoute = "/api/v1/user/client"
 	// CFSyncRoute is the webserver route to send sync requests to.
 	CFSyncRoute = "/api/v1/user/trash"
+	DashRoute   = "/api/v1/user/dashboard"
 )
 
 // These are used as 'source' values in json payloads sent to the webserver.
@@ -73,6 +75,7 @@ type Config struct {
 	Apps         *apps.Apps       // has API key
 	Plex         *plex.Server     // plex sessions
 	Snap         *snapshot.Config // system snapshot data
+	DashDur      time.Duration
 	Retries      int
 	URL          string
 	BaseURL      string
@@ -92,6 +95,7 @@ type ClientInfo struct {
 	Message struct {
 		Text       string `json:"text"`
 		Subscriber bool   `json:"subscriber"`
+		Patron     bool   `json:"patron"`
 		CFSync     int64  `json:"cfSync"`
 		RPSync     int64  `json:"rpSync"`
 	} `json:"message"`
@@ -227,9 +231,14 @@ func (c *ClientInfo) String() string {
 	return c.Message.Text
 }
 
-// IsASub returns true if the client is a subscriber. False otherwise.
-func (c *ClientInfo) IsASub() bool {
+// IsSub returns true if the client is a subscriber. False otherwise.
+func (c *ClientInfo) IsSub() bool {
 	return c != nil && c.Message.Subscriber
+}
+
+// IsPatron returns true if the client is a patron. False otherwise.
+func (c *ClientInfo) IsPatron() bool {
+	return c != nil && c.Message.Patron
 }
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
@@ -287,16 +296,30 @@ func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, erro
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-API-Key", c.Apps.APIKey)
 
+	start := time.Now()
+
 	resp, err := c.getClient().Do(req)
 	if err != nil {
-		c.Debugf("Sent JSON Payload to %s:\n%s", url, string(data))
+		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (0): %s",
+			url, time.Since(start).Round(time.Microsecond), string(data), err)
 		return nil, nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	defer c.Debugf("Sent JSON Payload to %s:\n%s\nResponse: %s", url, string(data), string(body))
+	defer func() {
+		headers := ""
+
+		for k, vs := range resp.Header {
+			for _, v := range vs {
+				headers += k + ": " + v + "\n"
+			}
+		}
+
+		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
+			url, time.Since(start).Round(time.Microsecond), string(data), resp.Status, headers, string(body))
+	}()
 
 	if err != nil {
 		return resp, body, fmt.Errorf("reading http response body: %w", err)
@@ -319,7 +342,7 @@ func (c *Config) SendData(url string, payload interface{}, pretty bool) (*http.R
 	}
 
 	if err != nil {
-		return nil, nil, fmt.Errorf("encoding data: %w", err)
+		return nil, nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
 	}
 
 	return c.SendJSON(url, post)
@@ -338,7 +361,7 @@ func (c *Config) getClient() *httpClient {
 		c.client = &httpClient{
 			Retries: c.Retries,
 			Logger:  c.ErrorLog,
-			Client:  &http.Client{Timeout: c.Timeout},
+			Client:  &http.Client{},
 		}
 	}
 
@@ -347,6 +370,13 @@ func (c *Config) getClient() *httpClient {
 
 // Do performs an http Request with retries and logging!
 func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
+	deadline, ok := req.Context().Deadline()
+	if !ok {
+		deadline = time.Now().Add(h.Timeout)
+	}
+
+	timeout := time.Until(deadline)
+
 	for i := 0; ; i++ {
 		resp, err := h.Client.Do(req)
 		if err == nil && resp.StatusCode < http.StatusInternalServerError {
@@ -359,10 +389,17 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		}
 
 		switch {
+		case errors.Is(err, context.DeadlineExceeded):
+			if i == 0 {
+				return nil, fmt.Errorf("notifiarr.com req timed out after %s: %w", timeout, err)
+			}
+
+			return nil, fmt.Errorf("[%d/%d] notifiarr.com reqs timed out after %s, giving up: %w",
+				i+1, h.Retries+1, timeout, err)
 		case i == h.Retries:
 			return nil, fmt.Errorf("[%d/%d] notifiarr.com req failed: %w", i+1, h.Retries+1, err)
 		default:
-			h.Printf("[%d/%d] Request to Notifiarr.com failed, retrying in %d, error: %v", i+1, h.Retries+1, RetryDelay, err)
+			h.Printf("[%d/%d] Request to Notifiarr.com failed, retrying in %s, error: %v", i+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}

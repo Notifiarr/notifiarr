@@ -92,7 +92,11 @@ urlbase = "{{.URLBase}}"
 log_file_mb = {{.LogFileMb}}
 ##
 ## How many files to keep? 0 = all.
-log_files = {{.LogFiles}}
+log_files = {{.LogFiles}}{{if .SendDash}}
+
+## How often to send current application states for the dashboard.
+##
+send_dash = "{{.SendDash}}"{{end}}
 
 ## Web server and application timeouts.
 ##
@@ -173,6 +177,35 @@ timeout = "{{.Timeout}}"
 #disable_cf  = true # Disable release profile sync.
 #check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
+
+# Download Client Configs (below) are used for dashboard state and service checks.
+
+{{if .Deluge}}{{range .Deluge -}}
+[[deluge]]
+  name     = "{{.Name}}"
+  url      = "{{.Config.URL}}"
+  password = "{{.Password}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{end}}{{else}}#[[deluge]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://deluge:8112/"
+#password = ""{{end}}
+
+{{if .Qbit}}{{range .Qbit}}
+[[qbit]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  user     = "{{.User}}"
+  pass     = "{{.Pass}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{end}}
+{{else}}
+#[[qbit]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://qbit:8080/"
+#user     = ""
+#pass     = ""
+{{end}}
 
 #################
 # Plex Settings #

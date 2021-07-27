@@ -330,6 +330,7 @@ func (c *Client) configureNotifiarr() {
 		Logger:  c.Logger,
 		URL:     notifiarr.ProdURL,
 		Timeout: c.Config.Timeout.Duration,
+		DashDur: c.Config.SendDash.Duration,
 	}
 }
 

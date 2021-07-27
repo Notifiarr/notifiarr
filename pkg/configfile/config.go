@@ -40,6 +40,7 @@ type Config struct {
 	SSLCrtFile string              `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
 	SSLKeyFile string              `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
 	AutoUpdate string              `json:"auto_update" toml:"auto_update" xml:"auto_update" yaml:"auto_update"`
+	SendDash   cnfg.Duration       `json:"send_dash" toml:"send_dash" xml:"send_dash" yaml:"send_dash"`
 	Mode       string              `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
 	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
@@ -55,8 +56,6 @@ type Config struct {
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 func (c *Config) Get(configFile, envPrefix string) error {
-	defer c.setup()
-
 	if configFile != "" {
 		if err := cnfgfile.Unmarshal(c, configFile); err != nil {
 			return fmt.Errorf("config file: %w", err)
@@ -67,10 +66,10 @@ func (c *Config) Get(configFile, envPrefix string) error {
 		return fmt.Errorf("environment variables: %w", err)
 	}
 
-	return nil
+	return c.setup()
 }
 
-func (c *Config) setup() {
+func (c *Config) setup() error {
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = mnd.DefaultTimeout
 	}
@@ -78,9 +77,6 @@ func (c *Config) setup() {
 	if c.AutoUpdate != "" && runtime.GOOS != "windows" {
 		c.AutoUpdate = ""
 	}
-
-	// Make sure each app has a sane timeout.
-	c.Apps.Setup(c.Timeout.Duration)
 
 	if c.BindAddr == "" {
 		c.BindAddr = mnd.DefaultBindAddr
@@ -103,6 +99,13 @@ func (c *Config) setup() {
 			c.Allow = append(c.Allow, i)
 		}
 	}
+
+	// Make sure each app has a sane timeout.
+	if err := c.Apps.Setup(c.Timeout.Duration); err != nil {
+		return fmt.Errorf("setting up app: %w", err)
+	}
+
+	return nil
 }
 
 // FindAndReturn return a config file. Write one if requested.

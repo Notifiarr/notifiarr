@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
@@ -32,22 +33,12 @@ type Apps struct {
 	Radarr   []*RadarrConfig              `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
 	Lidarr   []*LidarrConfig              `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
 	Readarr  []*ReadarrConfig             `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Deluge   []*DelugeConfig              `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
+	Qbit     []*QbitConfig                `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
 	Router   *mux.Router                  `json:"-" toml:"-" xml:"-" yaml:"-"`
 	ErrorLog *log.Logger                  `json:"-" toml:"-" xml:"-" yaml:"-"`
 	Debugf   func(string, ...interface{}) `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
-
-// App allows safely storing context values.
-type App string
-
-// Constant for each app to unique identify itself.
-// These strings are also used as a suffix to the /api/ web path.
-const (
-	Sonarr  App = "sonarr"
-	Readarr App = "readarr"
-	Radarr  App = "radarr"
-	Lidarr  App = "lidarr"
-)
 
 // Errors sent to client web requests.
 var (
@@ -55,10 +46,10 @@ var (
 	ErrNoGRID    = fmt.Errorf("GRID ID must not be empty")
 	ErrNoTVDB    = fmt.Errorf("TVDB ID must not be empty")
 	ErrNoMBID    = fmt.Errorf("MBID ID must not be empty")
-	ErrNoRadarr  = fmt.Errorf("configured %s ID not found", Radarr)
-	ErrNoSonarr  = fmt.Errorf("configured %s ID not found", Sonarr)
-	ErrNoLidarr  = fmt.Errorf("configured %s ID not found", Lidarr)
-	ErrNoReadarr = fmt.Errorf("configured %s ID not found", Readarr)
+	ErrNoRadarr  = fmt.Errorf("configured %s ID not found", starr.Radarr)
+	ErrNoSonarr  = fmt.Errorf("configured %s ID not found", starr.Sonarr)
+	ErrNoLidarr  = fmt.Errorf("configured %s ID not found", starr.Lidarr)
+	ErrNoReadarr = fmt.Errorf("configured %s ID not found", starr.Readarr)
 	ErrNotFound  = fmt.Errorf("the request returned an empty payload")
 	ErrNonZeroID = fmt.Errorf("provided ID must be non-zero")
 	// ErrWrongCount is returned when an app returns the wrong item count.
@@ -73,7 +64,7 @@ type APIHandler func(r *http.Request) (int, interface{})
 // HandleAPIpath makes adding APIKey authenticated API paths a little cleaner.
 // An empty App may be passed in, but URI, API and at least one method are required.
 // Automatically adds an id route to routes with an app name. In case you have > 1 of that app.
-func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...string) *mux.Route {
+func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method ...string) *mux.Route {
 	if len(method) == 0 {
 		method = []string{"GET"}
 	}
@@ -83,14 +74,14 @@ func (a *Apps) HandleAPIpath(app App, uri string, api APIHandler, method ...stri
 		id = ""
 	}
 
-	uri = path.Join(a.URLBase, "api", string(app), id, uri)
+	uri = path.Join(a.URLBase, "api", app.Lower(), id, uri)
 
 	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
-func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc { //nolint:cyclop
+func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop
 	return func(w http.ResponseWriter, r *http.Request) {
 		var (
 			msg     interface{}
@@ -98,32 +89,32 @@ func (a *Apps) handleAPI(app App, api APIHandler) http.HandlerFunc { //nolint:cy
 			code    = http.StatusUnprocessableEntity
 			id, _   = strconv.Atoi(mux.Vars(r)["id"])
 			start   = time.Now()
-			post, _ = ioutil.ReadAll(r.Body)
+			post, _ = ioutil.ReadAll(r.Body) // swallowing this error could suck...
 		)
 
-		// Reset the body so it can be re-read.
+		r.Body.Close() // Reset the body so it can be re-read.
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(post))
 
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
 		// Make sure the id is within range of the available service.
-		case app == Radarr && (id >= len(a.Radarr) || id < 0):
+		case app == starr.Radarr && (id >= len(a.Radarr) || id < 0):
 			msg = fmt.Errorf("%v: %w", id, ErrNoRadarr)
-		case app == Lidarr && (id >= len(a.Lidarr) || id < 0):
+		case app == starr.Lidarr && (id >= len(a.Lidarr) || id < 0):
 			msg = fmt.Errorf("%v: %w", id, ErrNoLidarr)
-		case app == Sonarr && (id >= len(a.Sonarr) || id < 0):
+		case app == starr.Sonarr && (id >= len(a.Sonarr) || id < 0):
 			msg = fmt.Errorf("%v: %w", id, ErrNoSonarr)
-		case app == Readarr && (id >= len(a.Readarr) || id < 0):
+		case app == starr.Readarr && (id >= len(a.Readarr) || id < 0):
 			msg = fmt.Errorf("%v: %w", id, ErrNoReadarr)
 		// Store the application configuration (starr) in a context then pass that into the api() method.
 		// Retrieve the return code and output, and send a response via a.Respond().
-		case app == Radarr:
+		case app == starr.Radarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Radarr[id])))
-		case app == Lidarr:
+		case app == starr.Lidarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Lidarr[id])))
-		case app == Sonarr:
+		case app == starr.Sonarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[id])))
-		case app == Readarr:
+		case app == starr.Readarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Readarr[id])))
 		case app == "":
 			// no app, just run the handler.
@@ -164,7 +155,7 @@ func (a *Apps) InitHandlers() {
 
 // Setup creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
-func (a *Apps) Setup(timeout time.Duration) {
+func (a *Apps) Setup(timeout time.Duration) error {
 	for i := range a.Radarr {
 		a.Radarr[i].setup(timeout)
 	}
@@ -180,6 +171,20 @@ func (a *Apps) Setup(timeout time.Duration) {
 	for i := range a.Lidarr {
 		a.Lidarr[i].setup(timeout)
 	}
+
+	for i := range a.Deluge {
+		if err := a.Deluge[i].setup(timeout); err != nil {
+			return err
+		}
+	}
+
+	for i := range a.Qbit {
+		if err := a.Qbit[i].setup(timeout); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs.
@@ -213,17 +218,17 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) {
 /* Every API call runs one of these methods to find the interface for the respective app. */
 
 func getLidarr(r *http.Request) *lidarr.Lidarr {
-	return r.Context().Value(Lidarr).(*LidarrConfig).Lidarr
+	return r.Context().Value(starr.Lidarr).(*LidarrConfig).Lidarr
 }
 
 func getRadarr(r *http.Request) *radarr.Radarr {
-	return r.Context().Value(Radarr).(*RadarrConfig).Radarr
+	return r.Context().Value(starr.Radarr).(*RadarrConfig).Radarr
 }
 
 func getReadarr(r *http.Request) *readarr.Readarr {
-	return r.Context().Value(Readarr).(*ReadarrConfig).Readarr
+	return r.Context().Value(starr.Readarr).(*ReadarrConfig).Readarr
 }
 
 func getSonarr(r *http.Request) *sonarr.Sonarr {
-	return r.Context().Value(Sonarr).(*SonarrConfig).Sonarr
+	return r.Context().Value(starr.Sonarr).(*SonarrConfig).Sonarr
 }

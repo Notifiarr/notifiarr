@@ -137,6 +137,7 @@ log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to save a
 http_log|`DN_HTTP_LOG`|None by default. Provide a file path to save HTTP request logs|
 log_file_mb|`DN_LOG_FILE_MB`|`100` / Max size of log files in megabytes|
 log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation|
+send_dash|`DN_SEND_DASH`|`0` / How often to send dashboard state. `0` disables, `30m` = minimum|
 timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
 
 #### Lidarr

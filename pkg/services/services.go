@@ -288,6 +288,40 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	for _, d := range c.Apps.Deluge {
+		if d.Interval.Duration == 0 {
+			d.Interval.Duration = DefaultCheckInterval
+		}
+
+		if d.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     d.Name,
+				Type:     CheckHTTP,
+				Value:    d.Config.URL,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: d.Timeout.Duration},
+				Interval: d.Interval,
+			})
+		}
+	}
+
+	for _, q := range c.Apps.Qbit {
+		if q.Interval.Duration == 0 {
+			q.Interval.Duration = DefaultCheckInterval
+		}
+
+		if q.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     q.Name,
+				Type:     CheckHTTP,
+				Value:    q.URL,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: q.Timeout.Duration},
+				Interval: q.Interval,
+			})
+		}
+	}
+
 	return svcs
 }
 

@@ -24,10 +24,12 @@ const disabled = "disabled"
 func (c *Client) PrintStartupInfo() {
 	c.Printf("==> %s <==", mnd.HelpLink)
 	c.Print("==> Startup Settings <==")
-	c.printSonarr()
-	c.printRadarr()
 	c.printLidarr()
+	c.printRadarr()
 	c.printReadarr()
+	c.printSonarr()
+	c.printDeluge()
+	c.printQbit()
 	c.printPlex()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
@@ -174,14 +176,14 @@ func (c *Client) printLidarr() {
 
 	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "servers")
 
-	for _, f := range c.Config.Lidarr {
+	for i, f := range c.Config.Lidarr {
 		checkQ := disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
 	}
 }
 
@@ -203,14 +205,14 @@ func (c *Client) printRadarr() {
 
 	c.Print(" => Radarr Config:", len(c.Config.Lidarr), "servers")
 
-	for _, f := range c.Config.Radarr {
+	for i, f := range c.Config.Radarr {
 		checkQ := disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
 	}
 }
 
@@ -232,14 +234,14 @@ func (c *Client) printReadarr() {
 
 	c.Print(" => Readarr Config:", len(c.Config.Lidarr), "servers")
 
-	for _, f := range c.Config.Readarr {
+	for i, f := range c.Config.Readarr {
 		checkQ := disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
 	}
 }
 
@@ -261,13 +263,51 @@ func (c *Client) printSonarr() {
 
 	c.Print(" => Sonarr Config:", len(c.Config.Lidarr), "servers")
 
-	for _, f := range c.Config.Sonarr {
+	for i, f := range c.Config.Sonarr {
 		checkQ := disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+	}
+}
+
+// printDeluge is called on startup to print info about each configured server.
+func (c *Client) printDeluge() {
+	if len(c.Config.Deluge) == 1 {
+		f := c.Config.Deluge[0]
+
+		c.Printf(" => Deluge Config: 1 server: %s, password:%v, timeout:%v, verify ssl:%v",
+			f.Config.URL, f.Password != "", f.Timeout, f.VerifySSL)
+
+		return
+	}
+
+	c.Print(" => Deluge Config:", len(c.Config.Deluge), "servers")
+
+	for i, f := range c.Config.Deluge {
+		c.Printf(" =>    Server %d: %s, password:%v, timeout:%v, verify ssl:%v",
+			i+1, f.Config.URL, f.Password != "", f.Timeout, f.VerifySSL)
+	}
+}
+
+// printQbit is called on startup to print info about each configured server.
+func (c *Client) printQbit() {
+	if len(c.Config.Qbit) == 1 {
+		f := c.Config.Qbit[0]
+
+		c.Printf(" => Qbit Config: 1 server: %s, username: %s, password:%v, timeout:%v, verify ssl:%v",
+			f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
+
+		return
+	}
+
+	c.Print(" => Qbit Config:", len(c.Config.Qbit), "servers")
+
+	for i, f := range c.Config.Qbit {
+		c.Printf(" =>    Server %d: %s, username: %s, password:%v, timeout:%v, verify ssl:%v",
+			i+1, f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
 	}
 }

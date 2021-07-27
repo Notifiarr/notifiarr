@@ -108,6 +108,7 @@ func (c *Client) makeMoreChannels() {
 	c.menu["snap_dev"] = ui.WrapMenu(data.AddSubMenuItem("Dev System Snapshot", "send system snapshot to notifiarr dev endpoint"))
 	c.menu["app_ques"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Items Check", "check app queues for stuck items and send to notifiarr"))
 	c.menu["app_ques_dev"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Items Check (Dev)", "check app queues for stuck items and send to notifiarr dev"))
+	c.menu["send_dash"] = ui.WrapMenu(data.AddSubMenuItem("Send Dashboard States", "collect and send all application states for a dashboard update"))
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	c.menu["debug"] = ui.WrapMenu(debug)
@@ -276,6 +277,9 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 			c.sendPlexSessions(notifiarr.ProdURL)
 		case <-c.menu["snap_prod"].Clicked():
 			c.sendSystemSnapshot(notifiarr.ProdURL)
+		case <-c.menu["send_dash"].Clicked():
+			c.Print("User Requested State Collection for Dashboard")
+			c.notify.GetState()
 		}
 	}
 }

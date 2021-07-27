@@ -5,17 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/gorilla/mux"
+	"golift.io/starr"
 )
-
-// Plex is used a context ID.
-const Plex apps.App = "plex"
 
 // HandleSessions provides a web handlersto the notifiarr client that returns
 // the current Plex sessions. The handler satisfies apps.APIHandler, sorry.
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
-	plexID, _ := r.Context().Value(Plex).(int)
+	plexID, _ := r.Context().Value(starr.Plex).(int)
 
 	sessions, err := s.GetSessionsWithContext(r.Context())
 	if err != nil {
@@ -35,7 +32,7 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
 		ctx       = r.Context()
-		plexID, _ = ctx.Value(Plex).(int)
+		plexID, _ = ctx.Value(starr.Plex).(int)
 		sessionID = mux.Vars(r)["sessionId"]
 		reason    = mux.Vars(r)["reason"]
 	)
