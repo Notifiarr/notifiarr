@@ -38,6 +38,7 @@ type Logger struct {
 var (
 	logFiles  = 1
 	logFileMb = 100
+	fileMode  = uint32(rotatorr.FileMode)
 	customLog = make(map[string]*rotatorr.Logger)
 )
 
@@ -62,6 +63,7 @@ type LogConfig struct {
 	HTTPLog   string `json:"http_log" toml:"http_log" xml:"http_log" yaml:"http_log"`
 	LogFiles  int    `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
 	LogFileMb int    `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
+	FileMode  uint32 `json:"file_mode" toml:"file_mode" xml:"file_mode" yaml:"file_mode"`
 	Debug     bool   `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
 	Quiet     bool   `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
 }
@@ -191,6 +193,7 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 func (l *Logger) SetupLogging(config *LogConfig) {
 	logFiles = config.LogFiles
 	logFileMb = config.LogFileMb
+	fileMode = config.FileMode
 	l.logs = config
 	l.setDefaultLogPaths()
 	l.setLogPaths()
@@ -247,6 +250,7 @@ func (l *Logger) openLogFile() {
 	rotate := &rotatorr.Config{
 		Filepath: l.logs.LogFile,                         // log file name.
 		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: os.FileMode(l.logs.FileMode),
 		Rotatorr: &timerotator.Layout{
 			FileCount:  l.logs.LogFiles, // number of files to keep.
 			PostRotate: l.postLogRotate, // method to run after rotating.
@@ -300,8 +304,9 @@ func (l *Logger) openDebugLog() {
 	}
 
 	rotateDebug := &rotatorr.Config{
-		Filepath: l.logs.DebugLog,                                 // log file name.
-		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
+		Filepath: l.logs.DebugLog,                        // log file name.
+		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: os.FileMode(l.logs.FileMode),
 		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
 	}
 	l.debug = rotatorr.NewMust(rotateDebug)
@@ -315,8 +320,9 @@ func (l *Logger) openDebugLog() {
 
 func (l *Logger) openHTTPLog() {
 	rotateHTTP := &rotatorr.Config{
-		Filepath: l.logs.HTTPLog,                                  // log file name.
-		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
+		Filepath: l.logs.HTTPLog,                         // log file name.
+		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: os.FileMode(l.logs.FileMode),
 		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
 	}
 
@@ -356,8 +362,9 @@ func CustomLog(filePath, logName string) *Logger {
 	}
 
 	customLog[logName] = rotatorr.NewMust(&rotatorr.Config{
-		Filepath: filePath,                                 // log file name.
-		FileSize: int64(logFileMb) * mnd.Megabyte,          // mnd.Megabytes
+		Filepath: filePath,                        // log file name.
+		FileSize: int64(logFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: os.FileMode(fileMode),
 		Rotatorr: &timerotator.Layout{FileCount: logFiles}, // number of files to keep.
 	})
 
