@@ -22,10 +22,15 @@ const (
 	episode = "episode"
 )
 
+// SendPlexSessions sends plex sessions in a go routine through a channel.
+func (c *Config) SendPlexSessions(source string) {
+	c.plexNow <- source
+}
+
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
-func (c *Config) sendPlexSessions() {
-	if body, err := c.SendMeta(PlexCron, c.URL, nil, 0); err != nil {
-		c.Errorf("Sending Plex Session to %s: %v", c.URL, err)
+func (c *Config) sendPlexSessions(source string) {
+	if body, err := c.SendMeta(source, c.URL, nil, 0); err != nil {
+		c.Errorf("Sending Plex Sessions to %s: %v", c.URL, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, fields[3])
 	} else {

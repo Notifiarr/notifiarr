@@ -81,6 +81,10 @@ type States struct {
 }
 
 func (c *Config) GetState() {
+	c.stateNow <- struct{}{}
+}
+
+func (c *Config) getState() {
 	start := time.Now()
 	states := c.getStates()
 	apps := time.Since(start).Round(time.Millisecond)

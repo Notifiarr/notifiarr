@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/gorilla/mux"
 	"golift.io/starr"
 	"golift.io/version"
 )
@@ -25,7 +26,8 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
-	c.Config.HandleAPIpath("", "cfsync", c.handleCFSyncReq, "GET")
+	c.Config.HandleAPIpath("", "cfsync", c.handleCFSyncReq, "GET") // deprecated
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 
 	if c.Config.Plex.Configured() {
 		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
@@ -269,7 +271,37 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
+func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
+	trigger := mux.Vars(r)["trigger"]
+	c.Debugf("Incoming API Trigger: %s", trigger)
+
+	const apiTrigger = "apitrigger"
+
+	switch {
+	case trigger == "cfsync":
+		c.notify.SyncCF(false)
+	case trigger == "services" && c.Config.Services.Disabled:
+		return http.StatusNotImplemented, "services not enabled"
+	case trigger == "services":
+		c.Config.Services.RunAllChecksSendResult(apiTrigger)
+	case trigger == "sessions" && !c.Config.Plex.Configured():
+		return http.StatusNotImplemented, "sessions not enabled"
+	case trigger == "sessions":
+		c.notify.SendPlexSessions(apiTrigger)
+	case trigger == "stuckitems":
+		c.notify.SendFinishedQueueItems(c.notify.BaseURL)
+	case trigger == "dashboard":
+		c.notify.GetState()
+	case trigger == "snapshot":
+		c.notify.SendSnapshot(apiTrigger)
+	default:
+		return http.StatusBadRequest, "unknown trigger '" + trigger + "'"
+	}
+
+	return http.StatusOK, trigger + " initiated"
+}
+
 func (c *Client) handleCFSyncReq(r *http.Request) (int, interface{}) {
 	c.notify.SyncCF(false)
-	return http.StatusOK, "sync initiated"
+	return http.StatusOK, "sync initiated (deprecated)"
 }
