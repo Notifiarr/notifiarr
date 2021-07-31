@@ -1,6 +1,7 @@
 package notifiarr
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/version"
 )
 
@@ -76,6 +78,14 @@ func (c *Config) Info() map[string]interface{} {
 		numPlex = 1
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	hostInfo, _ := host.InfoWithContext(ctx)
+	if hostInfo != nil {
+		hostInfo.Hostname = "" // we do not need this.
+	}
+
 	return map[string]interface{}{
 		"arch":        runtime.GOARCH,
 		"build_date":  version.BuildDate,
@@ -84,6 +94,7 @@ func (c *Config) Info() map[string]interface{} {
 		"docker":      os.Getenv("NOTIFIARR_IN_DOCKER") == "true",
 		"go_version":  version.GoVersion,
 		"gui":         ui.HasGUI(),
+		"host":        hostInfo,
 		"num_deluge":  len(c.Apps.Deluge),
 		"num_lidarr":  len(c.Apps.Lidarr),
 		"num_plex":    numPlex,
