@@ -26,7 +26,6 @@ func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
 	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
-	c.Config.HandleAPIpath("", "cfsync", c.handleCFSyncReq, "GET") // deprecated
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 
 	if c.Config.Plex.Configured() {
@@ -299,9 +298,4 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, trigger + " initiated"
-}
-
-func (c *Client) handleCFSyncReq(r *http.Request) (int, interface{}) {
-	c.notify.SyncCF(false)
-	return http.StatusOK, "sync initiated (deprecated)"
 }
