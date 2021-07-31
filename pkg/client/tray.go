@@ -241,7 +241,7 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 			c.Config.Services.RunChecks(true)
 
 			data, _ := json.MarshalIndent(&services.Results{
-				What:     "user",
+				What:     "log",
 				Svcs:     c.Config.Services.GetResults(),
 				Type:     services.NotifiarrEventType,
 				Interval: c.Config.Services.Interval.Seconds(),

@@ -49,7 +49,8 @@ type Config struct {
 	checks       chan *Service
 	done         chan bool
 	stopChan     chan struct{}
-	mu           sync.Mutex
+	triggerChan  chan string
+	mu           sync.Mutex // XXX: we should be able to remove this by utilizing channels.
 }
 
 // CheckType locks us into a few specific types of checks.
@@ -112,12 +113,13 @@ type Service struct {
 // Start begins the service check routines.
 func (c *Config) Start(services []*Service) error {
 	services = append(services, c.collectApps()...)
-	if c.Disabled || len(services) == 0 {
-		_ = c.setup(services, false)
-		return nil
+	if len(services) == 0 {
+		c.Disabled = true
 	}
 
-	if err := c.setup(services, true); err != nil {
+	if err := c.setup(services, true); c.Disabled {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -176,6 +178,12 @@ func (c *Config) runServiceChecker() {
 				What: "timer",
 				Svcs: c.GetResults(),
 			})
+		case source := <-c.triggerChan:
+			c.RunChecks(false)
+			c.SendResults(notifiarr.ProdURL, &Results{
+				What: source,
+				Svcs: c.GetResults(),
+			})
 		case <-c.stopChan:
 			return
 		}
@@ -189,6 +197,7 @@ func (c *Config) setup(services []*Service, run bool) error {
 		c.checks = make(chan *Service, DefaultBuffer)
 		c.done = make(chan bool)
 		c.stopChan = make(chan struct{})
+		c.triggerChan = make(chan string)
 	}
 
 	for i := range services {
@@ -325,6 +334,12 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 	return svcs
 }
 
+func (c *Config) RunAllChecksSendResult(source string) {
+	if !c.Disabled {
+		c.triggerChan <- source
+	}
+}
+
 // RunChecks runs checks that are due. Passing true, runs them even if they're not due.
 // Returns true if a service state changed.
 func (c *Config) RunChecks(forceAll bool) bool {
@@ -392,6 +407,9 @@ func (c *Config) Stop() {
 	if c.stopChan == nil {
 		return
 	}
+
+	close(c.triggerChan)
+	c.triggerChan = nil
 
 	close(c.stopChan)
 	c.stopChan = nil

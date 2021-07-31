@@ -32,7 +32,11 @@ func (c *Config) logSnapshotStartup() {
 		c.Snap.Interval, c.Snap.Timeout, ex)
 }
 
-func (c *Config) sendSnapshot() {
+func (c *Config) SendSnapshot(source string) {
+	c.snapNow <- source
+}
+
+func (c *Config) sendSnapshot(source string) {
 	snapshot, errs, debug := c.Snap.GetSnapshot()
 	for _, err := range errs {
 		if err != nil {
@@ -47,7 +51,7 @@ func (c *Config) sendSnapshot() {
 		}
 	}
 
-	if _, body, err := c.SendData(c.URL, &Payload{Type: SnapCron, Snap: snapshot}, true); err != nil {
+	if _, body, err := c.SendData(c.URL, &Payload{Type: source, Snap: snapshot}, true); err != nil {
 		c.Errorf("Sending snapshot to %s: %v", c.URL, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("Systems Snapshot sent to %s, sending again in %s, reply: %s", c.URL, c.Snap.Interval, fields[3])

@@ -49,6 +49,10 @@ func (i ItemList) Empty() bool {
 }
 
 func (c *Config) SendFinishedQueueItems(url string) {
+	c.stuckNow <- url
+}
+
+func (c *Config) sendFinishedQueueItems(url string) {
 	start := time.Now()
 	q := c.getQueues()
 	apps := time.Since(start).Round(time.Millisecond)

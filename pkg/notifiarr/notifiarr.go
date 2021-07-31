@@ -87,6 +87,10 @@ type Config struct {
 	radarrCF     map[int]*cfMapIDpayload
 	sonarrRP     map[int]*cfMapIDpayload
 	syncCFnow    chan chan struct{}
+	stuckNow     chan string
+	plexNow      chan string
+	stateNow     chan struct{}
+	snapNow      chan string
 }
 
 // ClientInfo is the reply from the ClienRoute endpoint.
@@ -126,6 +130,10 @@ func (c *Config) Start(mode string) {
 	c.radarrCF = make(map[int]*cfMapIDpayload)
 	c.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.syncCFnow = make(chan chan struct{})
+	c.stuckNow = make(chan string)
+	c.plexNow = make(chan string)
+	c.stateNow = make(chan struct{})
+	c.snapNow = make(chan string)
 
 	c.startTimers()
 }
@@ -134,6 +142,11 @@ func (c *Config) Start(mode string) {
 func (c *Config) Stop() {
 	if c != nil && c.stopTimers != nil {
 		c.stopTimers <- struct{}{}
+		close(c.syncCFnow)
+		close(c.stuckNow)
+		close(c.plexNow)
+		close(c.stateNow)
+		close(c.snapNow)
 	}
 }
 

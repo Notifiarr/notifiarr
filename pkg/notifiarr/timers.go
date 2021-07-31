@@ -109,17 +109,26 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuc
 		case <-syncTimer.C:
 			c.syncRadarr()
 			c.syncSonarr()
+		case source := <-c.snapNow:
+			c.sendSnapshot(source)
 		case <-snapTimer.C:
-			c.sendSnapshot()
+			c.sendSnapshot(SnapCron)
+		case source := <-c.plexNow:
+			c.sendPlexSessions(source)
 		case <-plexTimer1.C:
-			c.sendPlexSessions()
+			c.sendPlexSessions(PlexCron)
+		case url := <-c.stuckNow:
+			c.sendFinishedQueueItems(url)
 		case <-plexTimer2.C:
 			c.checkForFinishedItems(sent)
 		case <-stuckTimer.C:
-			c.SendFinishedQueueItems(c.BaseURL)
+			c.sendFinishedQueueItems(c.BaseURL)
+		case <-c.stateNow:
+			c.Print("API Trigger: Gathering current state for dashboard.")
+			c.getState()
 		case <-dashTimer.C:
 			c.Print("Gathering current state for dashboard.")
-			c.GetState()
+			c.getState()
 		case <-c.stopTimers:
 			return
 		}
