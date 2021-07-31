@@ -21,7 +21,6 @@ func Funcs() template.FuncMap {
 	return map[string]interface{}{
 		"os":    func() string { return runtime.GOOS },
 		"force": func() bool { return ForceAllTmpl },
-		"octal": func(i uint32) string { return fmt.Sprintf("%04o", i) },
 		"version": func() string {
 			return fmt.Sprintf("v%-7s @ %s", version.Version, time.Now().UTC().Format("060201T1504"))
 		},
@@ -95,8 +94,9 @@ log_file_mb = {{.LogFileMb}}
 ## How many files to keep? 0 = all.
 log_files = {{.LogFiles}}
 ##
-## Filemode for written log files. Missing or 0 uses default of 0600. Permissive is 0644.
-file_mode = {{octal .FileMode}}
+## Unix file mode for new log files. Umask also affects this.
+## Missing or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
+file_mode = {{.FileMode.String}}
 
 ## How often to send current application states for the dashboard.
 ##

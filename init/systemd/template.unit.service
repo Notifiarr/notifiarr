@@ -19,6 +19,7 @@ Type=simple
 WorkingDirectory=/tmp
 
 # These should be set correctly for your environment.
+UMask=0002
 User={{BINARY}}
 Group={{BINARY}}
 

@@ -13,6 +13,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	homedir "github.com/mitchellh/go-homedir"
@@ -38,7 +40,7 @@ type Logger struct {
 var (
 	logFiles  = 1
 	logFileMb = 100
-	fileMode  = uint32(rotatorr.FileMode)
+	fileMode  = rotatorr.FileMode
 	customLog = make(map[string]*rotatorr.Logger)
 )
 
@@ -57,15 +59,15 @@ const (
 // LogConfig allows sending logs to rotating files.
 // Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
 type LogConfig struct {
-	AppName   string `json:"-"`
-	LogFile   string `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
-	DebugLog  string `json:"debug_log" toml:"debug_log" xml:"debug_log" yaml:"debug_log"`
-	HTTPLog   string `json:"http_log" toml:"http_log" xml:"http_log" yaml:"http_log"`
-	LogFiles  int    `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
-	LogFileMb int    `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
-	FileMode  uint32 `json:"file_mode" toml:"file_mode" xml:"file_mode" yaml:"file_mode"`
-	Debug     bool   `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
-	Quiet     bool   `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
+	AppName   string   `json:"-"`
+	LogFile   string   `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
+	DebugLog  string   `json:"debug_log" toml:"debug_log" xml:"debug_log" yaml:"debug_log"`
+	HTTPLog   string   `json:"http_log" toml:"http_log" xml:"http_log" yaml:"http_log"`
+	LogFiles  int      `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
+	LogFileMb int      `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
+	FileMode  FileMode `json:"file_mode" toml:"file_mode" xml:"file_mode" yaml:"file_mode"`
+	Debug     bool     `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
+	Quiet     bool     `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
 }
 
 // New returns a new Logger with debug off and sends everything to stdout.
@@ -193,7 +195,7 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 func (l *Logger) SetupLogging(config *LogConfig) {
 	logFiles = config.LogFiles
 	logFileMb = config.LogFileMb
-	fileMode = config.FileMode
+	fileMode = config.FileMode.Mode()
 	l.logs = config
 	l.setDefaultLogPaths()
 	l.setLogPaths()
@@ -250,7 +252,7 @@ func (l *Logger) openLogFile() {
 	rotate := &rotatorr.Config{
 		Filepath: l.logs.LogFile,                         // log file name.
 		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
-		FileMode: os.FileMode(l.logs.FileMode),
+		FileMode: l.logs.FileMode.Mode(),
 		Rotatorr: &timerotator.Layout{
 			FileCount:  l.logs.LogFiles, // number of files to keep.
 			PostRotate: l.postLogRotate, // method to run after rotating.
@@ -306,7 +308,7 @@ func (l *Logger) openDebugLog() {
 	rotateDebug := &rotatorr.Config{
 		Filepath: l.logs.DebugLog,                        // log file name.
 		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
-		FileMode: os.FileMode(l.logs.FileMode),
+		FileMode: l.logs.FileMode.Mode(),
 		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
 	}
 	l.debug = rotatorr.NewMust(rotateDebug)
@@ -322,7 +324,7 @@ func (l *Logger) openHTTPLog() {
 	rotateHTTP := &rotatorr.Config{
 		Filepath: l.logs.HTTPLog,                         // log file name.
 		FileSize: int64(l.logs.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
-		FileMode: os.FileMode(l.logs.FileMode),
+		FileMode: l.logs.FileMode.Mode(),
 		Rotatorr: &timerotator.Layout{FileCount: l.logs.LogFiles}, // number of files to keep.
 	}
 
@@ -364,7 +366,7 @@ func CustomLog(filePath, logName string) *Logger {
 	customLog[logName] = rotatorr.NewMust(&rotatorr.Config{
 		Filepath: filePath,                        // log file name.
 		FileSize: int64(logFileMb) * mnd.Megabyte, // mnd.Megabytes
-		FileMode: os.FileMode(fileMode),
+		FileMode: fileMode,
 		Rotatorr: &timerotator.Layout{FileCount: logFiles}, // number of files to keep.
 	})
 
@@ -375,4 +377,31 @@ func CustomLog(filePath, logName string) *Logger {
 		ErrorLog: log.New(customLog[logName], "[ERROR] ", log.LstdFlags),
 		HTTPLog:  log.New(customLog[logName], "[HTTP] ", log.LstdFlags),
 	}
+}
+
+// FileMode is used to unmarshal a unix file mode from the config file.
+type FileMode os.FileMode
+
+// UnmarshalText turns a unix file mode, wrapped in quotes or not, into a usable os.FileMode.
+func (f *FileMode) UnmarshalText(text []byte) error {
+	str := strings.TrimSpace(strings.Trim(string(text), `"'`))
+
+	fm, err := strconv.ParseUint(str, 8, 32) //nolint:gomnd
+	if err != nil {
+		return fmt.Errorf("file_mode (%s) is invalid: %w", str, err)
+	}
+
+	*f = FileMode(os.FileMode(fm))
+
+	return nil
+}
+
+// String creates a unix-octal version of a file mode.
+func (f FileMode) String() string {
+	return fmt.Sprintf("%04o", f)
+}
+
+// Mode returns the compatable os.FileMode.
+func (f FileMode) Mode() os.FileMode {
+	return os.FileMode(f)
 }

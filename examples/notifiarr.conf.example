@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.1.13  @ 213007T0511 #
+# Created by Notifiarr v0.1.13  @ 213107T0906 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -53,7 +53,8 @@ log_file_mb = 100
 ## How many files to keep? 0 = all.
 log_files = 10
 ##
-## Filemode for written log files. Missing or 0 uses default of 0600. Permissive is 0644.
+## Filemode for written log files. Umask also affects this.
+## Missing or 0 uses default of 0600. Permissive is 0644.
 file_mode = 0600
 
 ## How often to send current application states for the dashboard.
