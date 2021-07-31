@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
-	"runtime"
 	"strings"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
-	"golift.io/version"
 )
 
 // internalHandlers initializes "special" internal API paths.
@@ -116,35 +114,10 @@ type conTest struct {
 	Status   interface{} `json:"systemStatus,omitempty"`
 }
 
-// getVersion returns application run and build time data.
-func (c *Client) getVersion() map[string]interface{} {
-	numPlex := 0 // maybe one day we'll support more than 1 plex.
-	if c.Config.Plex.Configured() {
-		numPlex = 1
-	}
-
-	return map[string]interface{}{
-		"version":        version.Version,
-		"os_arch":        runtime.GOOS + "." + runtime.GOARCH,
-		"uptime":         time.Since(version.Started).Round(time.Second).String(),
-		"uptime_seconds": time.Since(version.Started).Round(time.Second).Seconds(),
-		"build_date":     version.BuildDate,
-		"branch":         version.Branch,
-		"go_version":     version.GoVersion,
-		"revision":       version.Revision,
-		"gui":            ui.HasGUI(),
-		"num_lidarr":     len(c.Config.Apps.Lidarr),
-		"num_sonarr":     len(c.Config.Apps.Sonarr),
-		"num_radarr":     len(c.Config.Apps.Radarr),
-		"num_readarr":    len(c.Config.Apps.Readarr),
-		"num_plex":       numPlex,
-	}
-}
-
 // versionResponse returns application run and build time data and application statuses: /api/version.
 func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
 	var (
-		output = c.getVersion()
+		output = c.notify.Info()
 		rad    = make([]*conTest, len(c.Config.Radarr))
 		read   = make([]*conTest, len(c.Config.Readarr))
 		son    = make([]*conTest, len(c.Config.Sonarr))

@@ -30,26 +30,10 @@ import (
 	"golift.io/version"
 )
 
-// Flags are our CLI input flags.
-type Flags struct {
-	*flag.FlagSet
-	verReq     bool
-	testSnaps  bool
-	sendSnaps  bool
-	restart    bool
-	updated    bool
-	cfsync     bool
-	pslist     bool
-	write      string
-	curl       string
-	ConfigFile string
-	EnvPrefix  string
-}
-
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	Flags  *Flags
+	Flags  *configfile.Flags
 	Config *configfile.Config
 	server *http.Server
 	sigkil chan os.Signal
@@ -93,32 +77,12 @@ func NewDefaults() *Client {
 				LogFileMb: mnd.DefaultLogFileMb,
 			},
 			Timeout: cnfg.Duration{Duration: mnd.DefaultTimeout},
-		}, Flags: &Flags{
+		}, Flags: &configfile.Flags{
 			FlagSet:    flag.NewFlagSet(mnd.DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
 			EnvPrefix:  mnd.DefaultEnvPrefix,
 		},
 	}
-}
-
-// ParseArgs stores the cli flag data into the Flags pointer.
-func (f *Flags) ParseArgs(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File.")
-	f.BoolVar(&f.testSnaps, "snaps", false, f.Name()+"Test Snapshots.")
-	f.BoolVar(&f.sendSnaps, "send", false, f.Name()+"Send Snapshots; must also pass --snaps for this to work.")
-	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix.")
-	f.BoolVarP(&f.verReq, "version", "v", false, "Print the version and exit.")
-	f.BoolVar(&f.cfsync, "cfsync", false, "Trigger Custom Format sync and exit.")
-	f.StringVar(&f.curl, "curl", "", "GET a URL and display headers and payload.")
-	f.BoolVar(&f.pslist, "ps", false, "Print the system process list; useful for 'process' service checks.")
-	f.StringVar(&f.write, "write", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
-
-	if runtime.GOOS == mnd.Windows {
-		f.BoolVar(&f.restart, "restart", false, "This is used by auto-update, do not call it.")
-		f.BoolVar(&f.updated, "updated", false, "This flag causes the app to print an 'updated' message.")
-	}
-
-	f.Parse(args) // nolint: errcheck
 }
 
 // Start runs the app.
@@ -127,15 +91,15 @@ func Start() error {
 	c.Flags.ParseArgs(os.Args[1:])
 
 	switch {
-	case c.Flags.verReq:
+	case c.Flags.VerReq:
 		fmt.Println(version.Print(c.Flags.Name()))
 		return nil // print version and exit.
-	case c.Flags.pslist:
+	case c.Flags.PSlist:
 		return printProcessList()
-	case c.Flags.curl != "":
-		resp, body, err := curl.Get(c.Flags.curl) //nolint:bodyclose // it's already closed.
+	case c.Flags.Curl != "":
+		resp, body, err := curl.Get(c.Flags.Curl) //nolint:bodyclose // it's already closed.
 		if err != nil {
-			return fmt.Errorf("getting URL '%s': %w", c.Flags.curl, err)
+			return fmt.Errorf("getting URL '%s': %w", c.Flags.Curl, err)
 		}
 
 		curl.Print(resp, body)
@@ -146,7 +110,7 @@ func Start() error {
 	if err := c.config(); err != nil {
 		_, _ = ui.Error(mnd.Title, err.Error())
 		return err
-	} else if c.Flags.restart || c.Flags.write != "" {
+	} else if c.Flags.Restart || c.Flags.Write != "" {
 		return nil
 	}
 
@@ -164,10 +128,10 @@ func (c *Client) config() error {
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.
-	write := (!c.Flags.restart && ui.HasGUI()) || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
+	write := (!c.Flags.Restart && ui.HasGUI()) || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
 	c.Flags.ConfigFile, c.newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
 
-	if c.Flags.restart {
+	if c.Flags.Restart {
 		return update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
 			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
@@ -180,8 +144,8 @@ func (c *Client) config() error {
 	}
 
 	// If c.Flags.write is set it will force-write the read-config to the provided file path.
-	if c.Flags.write != "" {
-		return c.forceWriteWithExit(c.Flags.write, msg)
+	if c.Flags.Write != "" {
+		return c.forceWriteWithExit(c.Flags.Write, msg)
 	}
 
 	c.startupMessage([]string{msg})
@@ -232,15 +196,15 @@ func (c *Client) startupMessage(msg []string) {
 }
 
 func (c *Client) start() error {
-	if c.Flags.updated {
+	if c.Flags.Updated {
 		c.printUpdateMessage()
 	}
 
-	if c.Flags.testSnaps {
+	if c.Flags.TestSnaps {
 		c.checkPlex()
 		c.Config.Snapshot.Validate()
 
-		if c.Flags.sendSnaps {
+		if c.Flags.SendSnaps {
 			c.configureNotifiarr()
 			c.notify.Start(c.Config.Mode)
 			c.Printf("[user requested] Snapshot Data:\n%s", c.sendSystemSnapshot(c.notify.URL))
@@ -255,9 +219,9 @@ func (c *Client) start() error {
 		return fmt.Errorf("%w %s_API_KEY", ErrNilAPIKey, c.Flags.EnvPrefix)
 	}
 
-	c.configureServices(!c.Flags.cfsync) // do not collect plex info if cfsync is active.
+	c.configureServices(!c.Flags.CFsync) // do not collect plex info if cfsync is active.
 
-	if c.Flags.cfsync {
+	if c.Flags.CFsync {
 		c.Printf("==> Flag Requested: Syncing Custom Formats and Release Profiles (then exiting)")
 		// c.notify.SendFinishedQueueItems(c.notify.BaseURL)
 		c.notify.SyncCF(true)

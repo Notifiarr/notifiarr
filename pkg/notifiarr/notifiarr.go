@@ -93,18 +93,6 @@ type Config struct {
 	snapNow      chan string
 }
 
-// ClientInfo is the reply from the ClienRoute endpoint.
-type ClientInfo struct {
-	Status  string `json:"status"`
-	Message struct {
-		Text       string `json:"text"`
-		Subscriber bool   `json:"subscriber"`
-		Patron     bool   `json:"patron"`
-		CFSync     int64  `json:"cfSync"`
-		RPSync     int64  `json:"rpSync"`
-	} `json:"message"`
-}
-
 // Start (and log) snapshot and plex cron jobs if they're configured.
 func (c *Config) Start(mode string) {
 	switch strings.ToLower(mode) {
@@ -233,67 +221,6 @@ func (c *Config) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	wg.Wait()
 
 	return snap
-}
-
-// String returns the message text for a client info response.
-func (c *ClientInfo) String() string {
-	if c == nil {
-		return ""
-	}
-
-	return c.Message.Text
-}
-
-// IsSub returns true if the client is a subscriber. False otherwise.
-func (c *ClientInfo) IsSub() bool {
-	return c != nil && c.Message.Subscriber
-}
-
-// IsPatron returns true if the client is a patron. False otherwise.
-func (c *ClientInfo) IsPatron() bool {
-	return c != nil && c.Message.Patron
-}
-
-// GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
-func (c *Config) GetClientInfo() (*ClientInfo, error) {
-	if c.ClientInfo != nil {
-		return c.ClientInfo, nil
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+ClientRoute, nil)
-	if err != nil {
-		return nil, fmt.Errorf("creating http request: %w", err)
-	}
-
-	req.Header.Set("X-API-Key", c.Apps.APIKey)
-
-	resp, err := c.getClient().Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("making http request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("reading response: %w", err)
-	}
-
-	v := ClientInfo{}
-	if err = json.Unmarshal(body, &v); err != nil {
-		return &v, fmt.Errorf("parsing response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return &v, ErrNon200
-	}
-
-	// Only set this if there was no error.
-	c.ClientInfo = &v
-
-	return c.ClientInfo, nil
 }
 
 // SendJSON posts a JSON payload to a URL. Returns the response body or an error.
