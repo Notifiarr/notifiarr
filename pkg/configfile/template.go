@@ -93,6 +93,10 @@ log_file_mb = {{.LogFileMb}}
 ##
 ## How many files to keep? 0 = all.
 log_files = {{.LogFiles}}
+##
+## Unix file mode for new log files. Umask also affects this.
+## Missing or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
+file_mode = {{.FileMode.String}}
 
 ## How often to send current application states for the dashboard.
 ##

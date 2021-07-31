@@ -26,6 +26,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	flag "github.com/spf13/pflag"
 	"golift.io/cnfg"
+	"golift.io/rotatorr"
 	"golift.io/version"
 )
 
@@ -197,6 +198,7 @@ func (c *Client) forceWriteWithExit(f, msg string) error {
 		c.Config.LogFile = ""
 		c.Config.DebugLog = ""
 		c.Config.HTTPLog = ""
+		c.Config.FileMode = logs.FileMode(rotatorr.FileMode)
 		c.Config.Debug = false
 		c.Config.Snapshot.Interval.Duration = mnd.HalfHour
 		configfile.ForceAllTmpl = true
