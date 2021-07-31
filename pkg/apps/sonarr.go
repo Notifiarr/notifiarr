@@ -41,11 +41,11 @@ func (a *Apps) sonarrHandlers() {
 
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
-	Name      string        `toml:"name"`
-	Interval  cnfg.Duration `toml:"interval"`
-	DisableCF bool          `toml:"disable_cf"`
-	StuckItem bool          `toml:"stuck_items"`
-	CheckQ    *uint         `toml:"check_q"`
+	Name      string        `toml:"name" xml:"name"`
+	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
+	DisableCF bool          `toml:"disable_cf" xml:"disable_cf"`
+	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
+	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
 	*starr.Config
 	*sonarr.Sonarr
 }
