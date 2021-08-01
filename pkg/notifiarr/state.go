@@ -373,13 +373,20 @@ func (c *Config) getLidarrHistory(l *apps.LidarrConfig) ([]*Sortable, error) {
 	}
 
 	table := []*Sortable{}
+	albumIDs := make(map[int64]*struct{})
 
+FORLOOP:
 	for _, rec := range history.Records {
-		if len(table) >= showLatest {
-			break
-		} else if rec.EventType != "downloadImported" {
+		switch {
+		case len(table) >= showLatest:
+			break FORLOOP
+		case rec.EventType != "trackFileImported":
+			continue
+		case albumIDs[rec.AlbumID] != nil:
 			continue
 		}
+
+		albumIDs[rec.AlbumID] = &struct{}{}
 
 		// An error here gets swallowed.
 		if album, err := l.GetAlbumByID(rec.AlbumID); err == nil {
