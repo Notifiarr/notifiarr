@@ -18,11 +18,12 @@ import (
 	"gopkg.in/toast.v1"
 )
 
-func (c *Client) checkReloadSignal(sigc os.Signal) {
-	c.reloadConfiguration("caught signal: " + sigc.String())
+func (c *Client) checkReloadSignal(sigc os.Signal) error {
+	return c.reloadConfiguration("Caught Signal: " + sigc.String())
 }
 
-func (c *Client) setReloadSignals() {
+func (c *Client) setSignals() {
+	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 }
 
@@ -76,6 +77,10 @@ func (c *Client) getPNG() string {
 }
 
 func (c *Client) printUpdateMessage() {
+	if !c.Flags.Updated {
+		return
+	}
+
 	err := (&toast.Notification{
 		AppID:   mnd.Title,
 		Title:   mnd.Title + " Upgraded!",
@@ -88,6 +93,8 @@ func (c *Client) printUpdateMessage() {
 }
 
 func (c *Client) AutoWatchUpdate() {
+	defer c.CapturePanic()
+
 	var dur time.Duration
 
 	switch c.Config.AutoUpdate {
@@ -112,10 +119,12 @@ func (c *Client) AutoWatchUpdate() {
 	c.Print("Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
 
 	go func() {
+		defer c.CapturePanic()
+
 		time.Sleep(update.SleepTime)
 		// Check for update on startup.
 		if err := c.checkAndUpdate("startup check"); err != nil {
-			c.Errorf("Auto-Update Failed: %v", err)
+			c.Errorf("Startup-Update Failed: %v", err)
 		}
 	}()
 

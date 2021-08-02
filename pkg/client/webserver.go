@@ -48,6 +48,8 @@ func (c *Client) StartWebServer() {
 
 // runWebServer starts the http or https listener.
 func (c *Client) runWebServer() {
+	defer c.CapturePanic()
+
 	var err error
 
 	if c.menu["stat"] != nil {

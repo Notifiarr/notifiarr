@@ -64,10 +64,10 @@ const success = "success"
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
 type Payload struct {
-	Type string             `json:"eventType"`
-	Plex *plex.Sessions     `json:"plex,omitempty"`
-	Snap *snapshot.Snapshot `json:"snapshot,omitempty"`
-	Load *plex.Webhook      `json:"payload,omitempty"`
+	Type string               `json:"eventType"`
+	Plex *plex.Sessions       `json:"plex,omitempty"`
+	Snap *snapshot.Snapshot   `json:"snapshot,omitempty"`
+	Load *plexIncomingWebhook `json:"payload,omitempty"`
 }
 
 // Config is the input data needed to send payloads to notifiarr.
@@ -86,11 +86,16 @@ type Config struct {
 	client       *httpClient
 	radarrCF     map[int]*cfMapIDpayload
 	sonarrRP     map[int]*cfMapIDpayload
-	syncCFnow    chan chan struct{}
-	stuckNow     chan string
-	plexNow      chan string
-	stateNow     chan struct{}
-	snapNow      chan string
+	Trigger      triggers
+	plexTimer    *logs.Timer
+}
+
+type triggers struct {
+	syncCF chan chan struct{}
+	stuck  chan string
+	plex   chan string
+	state  chan struct{}
+	snap   chan string
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -117,11 +122,12 @@ func (c *Config) Start(mode string) {
 
 	c.radarrCF = make(map[int]*cfMapIDpayload)
 	c.sonarrRP = make(map[int]*cfMapIDpayload)
-	c.syncCFnow = make(chan chan struct{})
-	c.stuckNow = make(chan string)
-	c.plexNow = make(chan string)
-	c.stateNow = make(chan struct{})
-	c.snapNow = make(chan string)
+	c.plexTimer = &logs.Timer{}
+	c.Trigger.syncCF = make(chan chan struct{})
+	c.Trigger.stuck = make(chan string)
+	c.Trigger.plex = make(chan string)
+	c.Trigger.state = make(chan struct{})
+	c.Trigger.snap = make(chan string)
 
 	c.startTimers()
 }
@@ -130,11 +136,11 @@ func (c *Config) Start(mode string) {
 func (c *Config) Stop() {
 	if c != nil && c.stopTimers != nil {
 		c.stopTimers <- struct{}{}
-		close(c.syncCFnow)
-		close(c.stuckNow)
-		close(c.plexNow)
-		close(c.stateNow)
-		close(c.snapNow)
+		close(c.Trigger.syncCF)
+		close(c.Trigger.stuck)
+		close(c.Trigger.plex)
+		close(c.Trigger.state)
+		close(c.Trigger.snap)
 	}
 }
 
@@ -143,7 +149,7 @@ func (c *Config) Stop() {
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) SendMeta(eventType, url string, hook *plex.Webhook, wait time.Duration) ([]byte, error) {
+func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait time.Duration) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), wait+c.Snap.Timeout.Duration)
 	defer cancel()
 

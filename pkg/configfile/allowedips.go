@@ -3,6 +3,7 @@ package configfile
 import (
 	"fmt"
 	"net"
+	"strings"
 )
 
 /* This is a helper method to check if an IP is in a list/cidr. */
@@ -38,4 +39,24 @@ func (n AllowedIPs) Contains(ip string) bool {
 	}
 
 	return false
+}
+
+// MakeIPs turns a list of CIDR strings (or plain IPs) into a list of net.IPNet.
+// This "allowed" list is later used to check incoming IPs from web requests.
+func MakeIPs(upstreams []string) (a AllowedIPs) {
+	for _, ip := range upstreams {
+		if strings.Contains(ip, "/") {
+			if strings.Contains(ip, ":") {
+				ip += "/128"
+			} else {
+				ip += "/32"
+			}
+		}
+
+		if _, i, err := net.ParseCIDR(ip); err == nil {
+			a = append(a, i)
+		}
+	}
+
+	return a
 }

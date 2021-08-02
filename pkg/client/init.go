@@ -6,15 +6,10 @@ package client
 */
 
 import (
-	"context"
-	"errors"
-	"fmt"
 	"path"
 	"strconv"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
 const disabled = "disabled"
@@ -76,71 +71,6 @@ func (c *Client) printLogFileInfo() {
 			c.Printf(" => Service Checks Log: %s (no rotation)", c.Config.Services.LogFile)
 		}
 	}
-}
-
-// Exit stops the web server and logs our exit messages. Start() calls this.
-func (c *Client) Exit() (err error) {
-	defer func() {
-		ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
-		defer cancel()
-
-		if c.server != nil {
-			err = c.server.Shutdown(ctx)
-		}
-	}()
-
-	if c.sigkil == nil || c.sighup == nil {
-		return
-	}
-
-	for {
-		select {
-		case sigc := <-c.sigkil:
-			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
-			return
-		case sigc := <-c.sighup:
-			c.checkReloadSignal(sigc)
-		}
-	}
-}
-
-// reloadConfiguration is called from a menu tray item or when a HUP signal is received.
-// Re-reads the configuration file and stops/starts all the internal routines.
-// Also closes and re-opens all log files. Any errors cause the application to exit.
-func (c *Client) reloadConfiguration(msg string) {
-	c.Print("==> Reloading Configuration: " + msg)
-	c.notify.Stop()
-	c.Config.Services.Stop()
-
-	if err := c.StopWebServer(); err != nil && !errors.Is(err, ErrNoServer) {
-		c.Errorf("Reloading Config (1): %v\nNotifiarr EXITING!", err)
-		panic(err)
-	} else if !errors.Is(err, ErrNoServer) {
-		defer c.StartWebServer()
-	}
-
-	if err := c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix); err != nil {
-		c.Errorf("Reloading Config (2): %v\nNotifiarr EXITING!", err)
-		panic(err)
-	}
-
-	if errs := c.Logger.Close(); len(errs) > 0 {
-		// in a go routine in case logging is blocked
-		go c.Errorf("Reloading Config (3): %v\nNotifiarr EXITING!", errs)
-		time.Sleep(1 * time.Second)
-		panic(errs)
-	}
-
-	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.configureServices(true)
-
-	if err := c.Config.Services.Start(c.Config.Service); err != nil {
-		c.Errorf("Reloading Config (4): %v\nNotifiarr EXITING!", err)
-		panic(fmt.Errorf("service checks: %w", err))
-	}
-
-	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
-	_, _ = ui.Info(mnd.Title, "Configuration Reloaded!") //nolint:wsl
 }
 
 // printPlex is called on startup to print info about configured Plex instance(s).

@@ -27,6 +27,16 @@ func HideConsoleWindow() {
 	}
 }
 
+// ShowConsoleWindow does nothing on OSes besides Windows.
+func ShowConsoleWindow() {
+	if console := w32.GetConsoleWindow(); console != 0 {
+		_, consoleProcID := w32.GetWindowThreadProcessId(console)
+		if w32.GetCurrentProcessId() == consoleProcID {
+			w32.ShowWindowAsync(console, w32.SW_SHOW)
+		}
+	}
+}
+
 // StartCmd starts a command.
 func StartCmd(c string, v ...string) error {
 	cmd := exec.Command(c, v...)

@@ -48,8 +48,8 @@ func (i ItemList) Empty() bool {
 	return i.Len() < 1
 }
 
-func (c *Config) SendFinishedQueueItems(url string) {
-	c.stuckNow <- url
+func (t *triggers) SendFinishedQueueItems(url string) {
+	t.stuck <- url
 }
 
 func (c *Config) sendFinishedQueueItems(url string) {

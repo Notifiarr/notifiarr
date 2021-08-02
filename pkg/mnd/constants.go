@@ -19,6 +19,7 @@ const (
 	Windows  = "windows"
 	HelpLink = "GoLift Discord: https://golift.io/discord"
 	UserRepo = "Notifiarr/notifiarr"
+	BugIssue = "This is a bug please report it on github: https://github.com/" + UserRepo + "/issues/new"
 )
 
 // Application Defaults.

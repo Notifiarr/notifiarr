@@ -3,6 +3,7 @@
 package client
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"runtime"
@@ -11,11 +12,14 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/hako/durafmt"
 	"golift.io/version"
 )
+
+/* This file contains methdos that are triggered from the GUI menu. */
 
 func (c *Client) toggleServer() {
 	if c.server == nil {
@@ -93,6 +97,7 @@ func (c *Client) downloadOther(update *update.Update) {
 	}
 }
 
+// This is always outdated. :( The format on screen sucs anyway. This should probably be removed.
 func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 	s = "Config File: " + c.Flags.ConfigFile
 	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
@@ -161,7 +166,7 @@ func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 func (c *Client) sendPlexSessions(url string) {
 	c.Printf("[user requested] Sending Plex Sessions to %s", url)
 
-	if body, err := c.notify.SendMeta(notifiarr.PlexCron, url, nil, 0); err != nil {
+	if body, err := c.notifiarr.SendMeta(notifiarr.PlexCron, url, nil, 0); err != nil {
 		c.Errorf("[user requested] Sending Plex Sessions to %s: %v", url, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
 		c.Printf("[user requested] Sent Plex Sessions to %s, reply: %s", url, fields[3])
@@ -198,4 +203,67 @@ func (c *Client) menuPanic() {
 
 	defer c.Printf("User Requested Application Panic, good bye.")
 	panic("user requested panic")
+}
+
+// sendSystemSnapshot is triggered from a menu-bar item, and from --send cli arg.
+func (c *Client) sendSystemSnapshot(url string) {
+	c.Printf("[user requested] Sending System Snapshot to %s", url)
+
+	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
+	for _, err := range errs {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	for _, err := range debug {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	payload := &notifiarr.Payload{Type: notifiarr.SnapCron, Snap: snaps}
+	if _, body, err := c.notifiarr.SendData(url, payload, true); err != nil {
+		c.Errorf("[user requested] Sending System Snapshot to %s: %v", url, err)
+	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
+		c.Printf("[user requested] Sent System Snapshot to %s, reply: %s", url, fields[3])
+	} else {
+		c.Printf("[user requested] Sent System Snapshot to %s", url)
+	}
+}
+
+// logSnaps writes a full snapshot payload to the log file.
+func (c *Client) logSnaps() {
+	c.Printf("[user requested] Collecting Snapshot from Plex and the System (for log file).")
+
+	snaps, errs, debug := c.Config.Snapshot.GetSnapshot()
+	for _, err := range errs {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	for _, err := range debug {
+		if err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	var (
+		plex *plex.Sessions
+		err  error
+	)
+
+	if c.Config.Plex.Configured() {
+		if plex, err = c.Config.Plex.GetXMLSessions(); err != nil {
+			c.Errorf("[user requested] %v", err)
+		}
+	}
+
+	b, _ := json.MarshalIndent(&notifiarr.Payload{
+		Type: notifiarr.LogLocal,
+		Snap: snaps,
+		Plex: plex,
+	}, "", "  ")
+	c.Printf("[user requested] Snapshot Data:\n%s", string(b))
 }
