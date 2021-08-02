@@ -38,8 +38,6 @@ type Client struct {
 	menu      map[string]ui.MenuItem
 	info      string
 	notifiarr *notifiarr.Config
-	alert     *logs.Cooler
-	newCon    bool
 }
 
 // Errors returned by this package.
@@ -55,7 +53,6 @@ func NewDefaults() *Client {
 		sigkil: make(chan os.Signal, 1),
 		sighup: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
-		alert:  &logs.Cooler{},
 		Logger: logger,
 		Config: &configfile.Config{
 			Apps: &apps.Apps{
@@ -98,7 +95,9 @@ func Start() error {
 		return curlURL(c.Flags.Curl)
 	}
 
-	switch msg, err := c.loadConfiguration(); {
+	msg, newCon, err := c.loadConfiguration()
+
+	switch {
 	case err != nil:
 		return fmt.Errorf("%s: %w", msg, err)
 	case c.Flags.Restart:
@@ -116,19 +115,19 @@ func Start() error {
 		c.printUpdateMessage()
 	}
 
-	return c.start()
+	return c.start(newCon)
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running confguration.
-func (c *Client) loadConfiguration() (msg string, err error) {
+func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.
 	write := (!c.Flags.Restart && ui.HasGUI()) || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
-	c.Flags.ConfigFile, c.newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
+	c.Flags.ConfigFile, newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
 
 	if c.Flags.Restart {
-		return msg, update.Restart(&update.Command{ //nolint:wrapcheck
+		return msg, newCon, update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
 			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
 		})
@@ -137,14 +136,14 @@ func (c *Client) loadConfiguration() (msg string, err error) {
 	// Parse the config file and environment variables.
 	c.notifiarr, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
 	if err != nil {
-		return msg, fmt.Errorf("getting config: %w", err)
+		return msg, newCon, fmt.Errorf("getting config: %w", err)
 	}
 
-	return msg, nil
+	return msg, newCon, nil
 }
 
 // start runs from Start() after the configuration is loaded.
-func (c *Client) start() error {
+func (c *Client) start(newCon bool) error {
 	if err := c.configureServices(); err != nil {
 		return fmt.Errorf("service checks: %w", err)
 	} else if ci, err := c.notifiarr.GetClientInfo(); err != nil {
@@ -153,7 +152,7 @@ func (c *Client) start() error {
 		c.Printf("==> %s", ci)
 	}
 
-	if c.newCon {
+	if newCon {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
 		_ = ui.OpenFile(c.Flags.ConfigFile)
 		_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+

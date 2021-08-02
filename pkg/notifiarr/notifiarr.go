@@ -1,8 +1,9 @@
 // Package notifiarr provides a standard interface for sending data to notifiarr.com.
 // Several methods are exported to make POSTing data to notifarr easier. This package
-// also handles the "crontab" timers for plex sessions, snapshots, custom format sync
-// for Radarr and release profile sync for Sonarr. This package's cofiguration is
-// provided by the configfile package.
+// also handles the incoming Plex webhook as well as the "crontab" timers for plex
+// sessions, snapshots, dashboard state, custom format sync for Radarr and release
+// profile sync for Sonarr.
+// This package's cofiguration is provided by the configfile  package.
 package notifiarr
 
 import (
@@ -80,26 +81,35 @@ type Config struct {
 	URL          string
 	BaseURL      string
 	Timeout      time.Duration
-	ClientInfo   *ClientInfo
+	Trigger      Triggers
 	*logs.Logger // log file writer
-	stopTimers   chan struct{}
-	client       *httpClient
-	radarrCF     map[int]*cfMapIDpayload
-	sonarrRP     map[int]*cfMapIDpayload
-	Trigger      triggers
-	plexTimer    *logs.Timer
+	extras
 }
 
-type triggers struct {
-	syncCF chan chan struct{}
-	stuck  chan string
-	plex   chan string
-	state  chan struct{}
-	snap   chan string
+type extras struct {
+	clientInfo *ClientInfo
+	client     *httpClient
+	radarrCF   map[int]*cfMapIDpayload
+	sonarrRP   map[int]*cfMapIDpayload
+	plexTimer  *Timer
+}
+
+// Triggers allow trigger actions in the timer routine.
+type Triggers struct {
+	stop   chan struct{}      // Triggered by calling Stop()
+	syncCF chan chan struct{} // Sync Radarr CF and Sonarr RP
+	stuck  chan string        // Stuck Items
+	plex   chan string        // Plex Sessions
+	state  chan struct{}      // Dashboard State
+	snap   chan string        // Snapshot
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
 func (c *Config) Start(mode string) {
+	if c.Trigger.stop != nil {
+		panic("notifiarr timers cannot run twice")
+	}
+
 	switch strings.ToLower(mode) {
 	default:
 		fallthrough
@@ -120,9 +130,14 @@ func (c *Config) Start(mode string) {
 		c.Retries = DefaultRetries
 	}
 
-	c.radarrCF = make(map[int]*cfMapIDpayload)
-	c.sonarrRP = make(map[int]*cfMapIDpayload)
-	c.plexTimer = &logs.Timer{}
+	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
+	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
+	c.extras.plexTimer = &Timer{}
+	c.extras.client = &httpClient{
+		Retries: c.Retries,
+		Logger:  c.ErrorLog,
+		Client:  &http.Client{},
+	}
 	c.Trigger.syncCF = make(chan chan struct{})
 	c.Trigger.stuck = make(chan string)
 	c.Trigger.plex = make(chan string)
@@ -134,8 +149,8 @@ func (c *Config) Start(mode string) {
 
 // Stop snapshot and plex cron jobs.
 func (c *Config) Stop() {
-	if c != nil && c.stopTimers != nil {
-		c.stopTimers <- struct{}{}
+	if c != nil && c.Trigger.stop != nil {
+		c.Trigger.stop <- struct{}{}
 		close(c.Trigger.syncCF)
 		close(c.Trigger.stuck)
 		close(c.Trigger.plex)
@@ -244,7 +259,7 @@ func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, erro
 
 	start := time.Now()
 
-	resp, err := c.getClient().Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (0): %s",
 			url, time.Since(start).Round(time.Microsecond), string(data), err)
@@ -299,19 +314,6 @@ type httpClient struct {
 	Retries int
 	*log.Logger
 	*http.Client
-}
-
-// getClient returns an http client for notifiarr.com. Creates one if it doesn't exist yet.
-func (c *Config) getClient() *httpClient {
-	if c.client == nil {
-		c.client = &httpClient{
-			Retries: c.Retries,
-			Logger:  c.ErrorLog,
-			Client:  &http.Client{},
-		}
-	}
-
-	return c.client
 }
 
 // Do performs an http Request with retries and logging!

@@ -11,11 +11,11 @@ const (
 )
 
 func (c *Config) startTimers() {
-	if c.stopTimers != nil {
+	if c.Trigger.stop != nil {
 		return // Already running.
 	}
 
-	c.stopTimers = make(chan struct{})
+	c.Trigger.stop = make(chan struct{})
 	snapTimer := c.getSnapTimer()
 	syncTimer := c.getSyncTimer()
 	plexTimer1, plexTimer2 := c.getPlexTimers()
@@ -115,7 +115,7 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuc
 		case <-dashTimer.C:
 			c.Print("Gathering current state for dashboard.")
 			c.getState()
-		case <-c.stopTimers:
+		case <-c.Trigger.stop:
 			return
 		}
 	}
@@ -129,6 +129,6 @@ func (c *Config) stopTimerLoop(timers ...*time.Ticker) {
 		timer.Stop()
 	}
 
-	close(c.stopTimers)
-	c.stopTimers = nil
+	close(c.Trigger.stop)
+	c.Trigger.stop = nil
 }

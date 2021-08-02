@@ -80,7 +80,11 @@ type States struct {
 	Deluge  []*State `json:"deluge"`
 }
 
-func (t *triggers) GetState() {
+func (t *Triggers) GetState() {
+	if t.stop == nil {
+		return
+	}
+
 	t.state <- struct{}{}
 }
 

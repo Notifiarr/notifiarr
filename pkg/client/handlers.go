@@ -3,26 +3,19 @@ package client
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
 
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
-	c.Config.HandleAPIpath("", "slow", c.slowResponse, "HEAD") // log testing
-	c.Config.HandleAPIpath("", "status", c.statusResponse, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version", c.notifiarr.VersionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
-	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 
 	if c.Config.Plex.Configured() {
@@ -55,61 +48,9 @@ func (c *Client) internalHandlers() {
 	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
 }
 
-func (c *Client) updateInfoAny(r *http.Request) (int, string, interface{}) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return http.StatusInternalServerError, "", fmt.Errorf("reading PUT body: %w", err)
-	}
-
-	c.Print("New Info from Notifiarr.com:", string(body))
-
-	if _, ok := c.menu["dninfo"]; !ok {
-		return http.StatusAccepted, "", "menu UI is not active"
-	}
-
-	c.info = string(body) // not lockd, prob should be.
-	c.menu["dninfo"].Show()
-
-	return http.StatusOK, string(body), "info updated and menu shown"
-}
-
-func (c *Client) updateInfo(r *http.Request) (int, interface{}) {
-	code, _, err := c.updateInfoAny(r)
-
-	return code, err
-}
-
-// updateInfoAlert is the same as updateInfo except it adds a popup window.
-func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
-	code, body, err := c.updateInfoAny(r)
-	if body == "" {
-		return code, err
-	}
-
-	if c.alert.Active() {
-		return http.StatusLocked, "previous alert not acknowledged"
-	}
-
-	go func() {
-		_, _ = ui.Warning(mnd.Title+" Alert", body)
-		c.alert.Done() //nolint:wsl
-	}()
-
-	return code, err
-}
-
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
 	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.")
-}
-
-func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
-	return http.StatusOK, c.Flags.Name() + " alive!"
-}
-
-func (c *Client) slowResponse(r *http.Request) (int, interface{}) {
-	time.Sleep(100 * time.Millisecond) //nolint:gomnd
-	return http.StatusOK, ""
 }
 
 // slash is the handler for /.
@@ -166,7 +107,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
-func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
+func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop
 	trigger := mux.Vars(r)["trigger"]
 	c.Debugf("Incoming API Trigger: %s", trigger)
 

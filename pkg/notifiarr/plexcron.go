@@ -23,7 +23,11 @@ const (
 )
 
 // SendPlexSessions sends plex sessions in a go routine through a channel.
-func (t *triggers) SendPlexSessions(source string) {
+func (t *Triggers) SendPlexSessions(source string) {
+	if t.stop == nil {
+		return
+	}
+
 	t.plex <- source
 }
 

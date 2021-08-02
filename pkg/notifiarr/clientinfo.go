@@ -47,8 +47,8 @@ func (c *ClientInfo) IsPatron() bool {
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
 func (c *Config) GetClientInfo() (*ClientInfo, error) {
-	if c.ClientInfo != nil {
-		return c.ClientInfo, nil
+	if c.extras.clientInfo != nil {
+		return c.extras.clientInfo, nil
 	}
 
 	resp, body, err := c.SendData(c.BaseURL+ClientRoute, c.Info(), true) //nolint:bodyclose // already closed.
@@ -66,9 +66,9 @@ func (c *Config) GetClientInfo() (*ClientInfo, error) {
 	}
 
 	// Only set this if there was no error.
-	c.ClientInfo = &v
+	c.extras.clientInfo = &v
 
-	return c.ClientInfo, nil
+	return c.extras.clientInfo, nil
 }
 
 // Info is used for JSON input for our outgoing client info.

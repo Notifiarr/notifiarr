@@ -32,7 +32,11 @@ func (c *Config) logSnapshotStartup() {
 		c.Snap.Interval, c.Snap.Timeout, ex)
 }
 
-func (t *triggers) SendSnapshot(source string) {
+func (t *Triggers) SendSnapshot(source string) {
+	if t.stop == nil {
+		return
+	}
+
 	t.snap <- source
 }
 
