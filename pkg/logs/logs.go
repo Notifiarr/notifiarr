@@ -156,9 +156,8 @@ func (l *Logger) Close() (errors []error) {
 
 // CapturePanic can be defered in any go routine to log any panic that occurs.
 func (l *Logger) CapturePanic() {
-	ui.ShowConsoleWindow()
-
 	if r := recover(); r != nil {
+		ui.ShowConsoleWindow()
 		_ = l.ErrorLog.Output(callDepth,
 			fmt.Sprintf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack())))
 	}
