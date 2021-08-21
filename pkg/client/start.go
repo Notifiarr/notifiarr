@@ -189,9 +189,13 @@ func (c *Client) configureServices() error {
 	c.PrintStartupInfo()
 	c.notifiarr.Start(c.Config.Mode)
 
-	if err := CheckPort(c.Config.BindAddr); err != nil {
+	// Make sure the port is not in use before starting the web server.
+	addr, err := CheckPort(c.Config.BindAddr)
+	if err != nil {
 		return err
 	}
+	// Reset this (CheckPort cleans it up too).
+	c.Config.BindAddr = addr
 
 	if err := c.Config.Services.Start(c.Config.Service); err != nil {
 		return fmt.Errorf("service checks: %w", err)
