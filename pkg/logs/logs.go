@@ -158,7 +158,7 @@ func (l *Logger) Close() (errors []error) {
 func (l *Logger) CapturePanic() {
 	if r := recover(); r != nil {
 		ui.ShowConsoleWindow()
-		_ = l.ErrorLog.Output(callDepth,
+		l.ErrorLog.Output(callDepth, //nolint:errcheck
 			fmt.Sprintf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack())))
 	}
 }

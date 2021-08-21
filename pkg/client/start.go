@@ -36,7 +36,6 @@ type Client struct {
 	sigkil    chan os.Signal
 	sighup    chan os.Signal
 	menu      map[string]ui.MenuItem
-	info      string
 	notifiarr *notifiarr.Config
 }
 

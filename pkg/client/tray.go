@@ -219,9 +219,6 @@ func (c *Client) watchLogsChannels() {
 			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
 			c.checkForUpdate()
-		case <-c.menu["dninfo"].Clicked():
-			c.menu["dninfo"].Hide()
-			ui.Info(mnd.Title, "INFO: "+c.info)
 		}
 	}
 }

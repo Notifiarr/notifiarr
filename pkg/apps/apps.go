@@ -10,12 +10,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
 	"strconv"
-	"io"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -28,17 +28,17 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey   string                       `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
-	URLBase  string                       `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	Sonarr   []*SonarrConfig              `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr   []*RadarrConfig              `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr   []*LidarrConfig              `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr  []*ReadarrConfig             `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Deluge   []*DelugeConfig              `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
-	Qbit     []*QbitConfig                `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
-	Router   *mux.Router                  `json:"-" toml:"-" xml:"-" yaml:"-"`
-	ErrorLog *log.Logger                  `json:"-" toml:"-" xml:"-" yaml:"-"`
-	DebugLog *log.Logger  								`json:"-" toml:"-" xml:"-" yaml:"-"`
+	APIKey   string           `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
+	URLBase  string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	Sonarr   []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
+	Radarr   []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
+	Lidarr   []*LidarrConfig  `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
+	Readarr  []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Deluge   []*DelugeConfig  `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
+	Qbit     []*QbitConfig    `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
+	Router   *mux.Router      `json:"-" toml:"-" xml:"-" yaml:"-"`
+	ErrorLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
+	DebugLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
 // Errors sent to client web requests.
