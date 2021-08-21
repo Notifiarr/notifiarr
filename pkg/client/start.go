@@ -56,7 +56,9 @@ func NewDefaults() *Client {
 		Logger: logger,
 		Config: &configfile.Config{
 			Apps: &apps.Apps{
-				URLBase: "/",
+				URLBase:  "/",
+				DebugLog: logger.DebugLog,
+				ErrorLog: logger.ErrorLog,
 			},
 			Services: &services.Config{
 				Interval: cnfg.Duration{Duration: services.DefaultSendInterval},

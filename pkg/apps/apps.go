@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"path"
 	"strconv"
+	"io"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -37,7 +38,7 @@ type Apps struct {
 	Qbit     []*QbitConfig                `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
 	Router   *mux.Router                  `json:"-" toml:"-" xml:"-" yaml:"-"`
 	ErrorLog *log.Logger                  `json:"-" toml:"-" xml:"-" yaml:"-"`
-	Debugf   func(string, ...interface{}) `json:"-" toml:"-" xml:"-" yaml:"-"`
+	DebugLog *log.Logger  								`json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
 // Errors sent to client web requests.
@@ -125,7 +126,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		}
 
 		if len(post) > 0 {
-			a.Debugf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, msg)
+			a.DebugLog.Printf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, msg)
 		}
 
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
@@ -156,29 +157,43 @@ func (a *Apps) InitHandlers() {
 // Setup creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
 func (a *Apps) Setup(timeout time.Duration) error {
+	if a.DebugLog == nil {
+		a.DebugLog = log.New(io.Discard, "", 0)
+	}
+
+	if a.ErrorLog == nil {
+		a.ErrorLog = log.New(io.Discard, "", 0)
+	}
+
 	for i := range a.Radarr {
+		a.Radarr[i].Debugf = a.DebugLog.Printf
 		a.Radarr[i].setup(timeout)
 	}
 
 	for i := range a.Readarr {
+		a.Readarr[i].Debugf = a.DebugLog.Printf
 		a.Readarr[i].setup(timeout)
 	}
 
 	for i := range a.Sonarr {
+		a.Sonarr[i].Debugf = a.DebugLog.Printf
 		a.Sonarr[i].setup(timeout)
 	}
 
 	for i := range a.Lidarr {
+		a.Lidarr[i].Debugf = a.DebugLog.Printf
 		a.Lidarr[i].setup(timeout)
 	}
 
 	for i := range a.Deluge {
+		// a.Deluge[i].Debugf = a.DebugLog.Printf
 		if err := a.Deluge[i].setup(timeout); err != nil {
 			return err
 		}
 	}
 
 	for i := range a.Qbit {
+		// a.Qbit[i].Debugf = a.DebugLog.Printf
 		if err := a.Qbit[i].setup(timeout); err != nil {
 			return err
 		}

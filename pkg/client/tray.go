@@ -117,7 +117,7 @@ func (c *Client) makeMoreChannels() {
 	ui.WrapMenu(debug.AddSubMenuItem("__________", "")).Disable() // fake separator.
 	c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Panic", "cause an application panic (crash)"))
 
-	if c.Config.DebugLog == "" {
+	if c.Config.LogConfig.DebugLog == "" {
 		c.menu["debug_logs"].Hide()
 	}
 
@@ -154,8 +154,8 @@ func (c *Client) watchKillerChannels() {
 		case <-c.menu["debug_panic"].Clicked():
 			c.menuPanic()
 		case <-c.menu["debug_logs"].Clicked():
-			c.Print("User Viewing Debug File:", c.Config.DebugLog)
-			_ = ui.OpenLog(c.Config.DebugLog)
+			c.Print("User Viewing Debug File:", c.Config.LogConfig.DebugLog)
+			_ = ui.OpenLog(c.Config.LogConfig.DebugLog)
 		case <-c.menu["load"].Clicked():
 			if err := c.reloadConfiguration("User Requested"); err != nil {
 				c.Errorf("Need help? %s\n=====> Exiting! Reloading Configuration: %v", mnd.HelpLink, err)

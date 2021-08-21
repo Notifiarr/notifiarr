@@ -56,11 +56,11 @@ func (c *Client) printLogFileInfo() {
 		}
 	}
 
-	if c.Config.Debug && c.Config.DebugLog != "" {
+	if c.Config.Debug && c.Config.LogConfig.DebugLog != "" {
 		if c.Config.LogFiles > 0 {
-			c.Printf(" => Debug Log: %s (%d @ %dMb)", c.Config.DebugLog, c.Config.LogFiles, c.Config.LogFileMb)
+			c.Printf(" => Debug Log: %s (%d @ %dMb)", c.Config.LogConfig.DebugLog, c.Config.LogFiles, c.Config.LogFileMb)
 		} else {
-			c.Printf(" => Debug Log: %s (no rotation)", c.Config.DebugLog)
+			c.Printf(" => Debug Log: %s (no rotation)", c.Config.LogConfig.DebugLog)
 		}
 	}
 

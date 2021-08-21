@@ -27,7 +27,7 @@ func (c *Client) forceWriteWithExit(f string) error {
 		// Bubilding a default template.
 		f = c.Flags.ConfigFile
 		c.Config.LogFile = ""
-		c.Config.DebugLog = ""
+		c.Config.LogConfig.DebugLog = ""
 		c.Config.HTTPLog = ""
 		c.Config.FileMode = logs.FileMode(rotatorr.FileMode)
 		c.Config.Debug = false
