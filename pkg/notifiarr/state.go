@@ -80,8 +80,12 @@ type States struct {
 	Deluge  []*State `json:"deluge"`
 }
 
-func (c *Config) GetState() {
-	c.stateNow <- struct{}{}
+func (t *Triggers) GetState() {
+	if t.stop == nil {
+		return
+	}
+
+	t.state <- struct{}{}
 }
 
 func (c *Config) getState() {
@@ -112,26 +116,32 @@ func (c *Config) getStates() *States {
 	wg.Add(6) //nolint:gomnd // we are polling 6 apps.
 
 	go func() {
+		defer c.CapturePanic()
 		s.Deluge = c.getDelugeStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
+		defer c.CapturePanic()
 		s.Lidarr = c.getLidarrStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
+		defer c.CapturePanic()
 		s.Qbit = c.getQbitStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
+		defer c.CapturePanic()
 		s.Radarr = c.getRadarrStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
+		defer c.CapturePanic()
 		s.Readarr = c.getReadarrStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
+		defer c.CapturePanic()
 		s.Sonarr = c.getSonarrStates()
 		wg.Done() //nolint:wsl
 	}()
@@ -373,13 +383,20 @@ func (c *Config) getLidarrHistory(l *apps.LidarrConfig) ([]*Sortable, error) {
 	}
 
 	table := []*Sortable{}
+	albumIDs := make(map[int64]*struct{})
 
+FORLOOP:
 	for _, rec := range history.Records {
-		if len(table) >= showLatest {
-			break
-		} else if rec.EventType != "downloadImported" {
+		switch {
+		case len(table) >= showLatest:
+			break FORLOOP
+		case rec.EventType != "trackFileImported":
+			continue
+		case albumIDs[rec.AlbumID] != nil:
 			continue
 		}
+
+		albumIDs[rec.AlbumID] = &struct{}{}
 
 		// An error here gets swallowed.
 		if album, err := l.GetAlbumByID(rec.AlbumID); err == nil {

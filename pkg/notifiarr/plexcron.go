@@ -23,8 +23,12 @@ const (
 )
 
 // SendPlexSessions sends plex sessions in a go routine through a channel.
-func (c *Config) SendPlexSessions(source string) {
-	c.plexNow <- source
+func (t *Triggers) SendPlexSessions(source string) {
+	if t.stop == nil {
+		return
+	}
+
+	t.plex <- source
 }
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.

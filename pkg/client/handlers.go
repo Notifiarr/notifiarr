@@ -3,27 +3,19 @@ package client
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
-	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
 
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
-	c.Config.HandleAPIpath("", "slow", c.slowResponse, "HEAD") // log testing
-	c.Config.HandleAPIpath("", "status", c.statusResponse, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version", c.versionResponse, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "info", c.updateInfo, "PUT")
-	c.Config.HandleAPIpath("", "info/alert", c.updateInfoAlert, "PUT")
+	c.Config.HandleAPIpath("", "version", c.notifiarr.VersionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 
 	if c.Config.Plex.Configured() {
@@ -33,13 +25,12 @@ func (c *Client) internalHandlers() {
 
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.Handle("/plex",
-			http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", tokens)
+			http.HandlerFunc(c.notifiarr.PlexHandler)).Methods("POST").Queries("token", tokens)
 
 		if c.Config.URLBase != "/" {
 			// Allow plex to use the base url too.
-			// If this causes a panic, they probably set urlbase to "//" or something.
 			c.Config.Router.Handle(path.Join(c.Config.URLBase, "plex"),
-				http.HandlerFunc(c.plexIncoming)).Methods("POST").Queries("token", tokens)
+				http.HandlerFunc(c.notifiarr.PlexHandler)).Methods("POST").Queries("token", tokens)
 		}
 	}
 
@@ -57,136 +48,9 @@ func (c *Client) internalHandlers() {
 	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
 }
 
-func (c *Client) updateInfoAny(r *http.Request) (int, string, interface{}) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return http.StatusInternalServerError, "", fmt.Errorf("reading PUT body: %w", err)
-	}
-
-	c.Print("New Info from Notifiarr.com:", string(body))
-
-	if _, ok := c.menu["dninfo"]; !ok {
-		return http.StatusAccepted, "", "menu UI is not active"
-	}
-
-	c.info = string(body) // not lockd, prob should be.
-	c.menu["dninfo"].Show()
-
-	return http.StatusOK, string(body), "info updated and menu shown"
-}
-
-func (c *Client) updateInfo(r *http.Request) (int, interface{}) {
-	code, _, err := c.updateInfoAny(r)
-
-	return code, err
-}
-
-// updateInfoAlert is the same as updateInfo except it adds a popup window.
-func (c *Client) updateInfoAlert(r *http.Request) (int, interface{}) {
-	code, body, err := c.updateInfoAny(r)
-	if body == "" {
-		return code, err
-	}
-
-	if c.alert.Active() {
-		return http.StatusLocked, "previous alert not acknowledged"
-	}
-
-	go func() {
-		_, _ = ui.Warning(mnd.Title+" Alert", body)
-		c.alert.Done() //nolint:wsl
-	}()
-
-	return code, err
-}
-
-type appStatus struct {
-	Radarr  []*conTest `json:"radarr"`
-	Readarr []*conTest `json:"readarr"`
-	Sonarr  []*conTest `json:"sonarr"`
-	Lidarr  []*conTest `json:"lidarr"`
-	Plex    []*conTest `json:"plex"`
-}
-
-type conTest struct {
-	Instance int         `json:"instance"`
-	Up       bool        `json:"up"`
-	Status   interface{} `json:"systemStatus,omitempty"`
-}
-
-// versionResponse returns application run and build time data and application statuses: /api/version.
-func (c *Client) versionResponse(r *http.Request) (int, interface{}) {
-	var (
-		output = c.notify.Info()
-		rad    = make([]*conTest, len(c.Config.Radarr))
-		read   = make([]*conTest, len(c.Config.Readarr))
-		son    = make([]*conTest, len(c.Config.Sonarr))
-		lid    = make([]*conTest, len(c.Config.Lidarr))
-		status = &appStatus{Radarr: rad, Readarr: read, Sonarr: son, Lidarr: lid}
-	)
-
-	for i, app := range c.Config.Radarr {
-		stat, err := app.GetSystemStatus()
-		rad[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
-
-	for i, app := range c.Config.Readarr {
-		stat, err := app.GetSystemStatus()
-		read[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
-
-	for i, app := range c.Config.Sonarr {
-		stat, err := app.GetSystemStatus()
-		son[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
-
-	for i, app := range c.Config.Lidarr {
-		stat, err := app.GetSystemStatus()
-		lid[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
-
-	if c.Config.Plex.Configured() {
-		stat, err := c.Config.Plex.GetInfo()
-		if stat == nil {
-			stat = &plex.PMSInfo{}
-		}
-
-		status.Plex = []*conTest{{
-			Instance: 1,
-			Up:       err == nil,
-			Status: map[string]interface{}{
-				"friendlyName":             stat.FriendlyName,
-				"version":                  stat.Version,
-				"updatedAt":                stat.UpdatedAt,
-				"platform":                 stat.Platform,
-				"platformVersion":          stat.PlatformVersion,
-				"size":                     stat.Size,
-				"myPlexSigninState":        stat.MyPlexSigninState,
-				"myPlexSubscription":       stat.MyPlexSubscription,
-				"pushNotifications":        stat.PushNotifications,
-				"streamingBrainVersion":    stat.StreamingBrainVersion,
-				"streamingBrainABRVersion": stat.StreamingBrainABRVersion,
-			},
-		}}
-	}
-
-	output["app_status"] = status
-
-	return http.StatusOK, output
-}
-
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
 	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.")
-}
-
-func (c *Client) statusResponse(r *http.Request) (int, interface{}) {
-	return http.StatusOK, c.Flags.Name() + " alive!"
-}
-
-func (c *Client) slowResponse(r *http.Request) (int, interface{}) {
-	time.Sleep(100 * time.Millisecond) //nolint:gomnd
-	return http.StatusOK, ""
 }
 
 // slash is the handler for /.
@@ -243,7 +107,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
-func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
+func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop
 	trigger := mux.Vars(r)["trigger"]
 	c.Debugf("Incoming API Trigger: %s", trigger)
 
@@ -251,7 +115,7 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
 
 	switch {
 	case trigger == "cfsync":
-		c.notify.SyncCF(false)
+		c.notifiarr.Trigger.SyncCF(false)
 	case trigger == "services" && c.Config.Services.Disabled:
 		return http.StatusNotImplemented, "services not enabled"
 	case trigger == "services":
@@ -259,13 +123,13 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
 	case trigger == "sessions" && !c.Config.Plex.Configured():
 		return http.StatusNotImplemented, "sessions not enabled"
 	case trigger == "sessions":
-		c.notify.SendPlexSessions(apiTrigger)
+		c.notifiarr.Trigger.SendPlexSessions(apiTrigger)
 	case trigger == "stuckitems":
-		c.notify.SendFinishedQueueItems(c.notify.BaseURL)
+		c.notifiarr.Trigger.SendFinishedQueueItems(c.notifiarr.BaseURL)
 	case trigger == "dashboard":
-		c.notify.GetState()
+		c.notifiarr.Trigger.GetState()
 	case trigger == "snapshot":
-		c.notify.SendSnapshot(apiTrigger)
+		c.notifiarr.Trigger.SendSnapshot(apiTrigger)
 	default:
 		return http.StatusBadRequest, "unknown trigger '" + trigger + "'"
 	}

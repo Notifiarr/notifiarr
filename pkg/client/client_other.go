@@ -13,7 +13,7 @@ func (c *Client) printUpdateMessage() {}
 // AutoWatchUpdate is not used on this OS.
 func (c *Client) AutoWatchUpdate() {}
 
-func (c *Client) checkReloadSignal(sigc os.Signal) {
+func (c *Client) checkReloadSignal(sigc os.Signal) error {
 	if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {
 		c.Printf("Writing Config File! Caught Signal: %v", sigc)
 
@@ -21,10 +21,15 @@ func (c *Client) checkReloadSignal(sigc os.Signal) {
 			c.Errorf("Writing Config File: %v", err)
 		}
 	} else {
-		c.reloadConfiguration("caught signal: " + sigc.String())
+		return c.reloadConfiguration("Caught Signal: " + sigc.String())
 	}
+
+	return nil
 }
 
-func (c *Client) setReloadSignals() {
+func (c *Client) setSignals() {
+	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	signal.Notify(c.sighup, syscall.SIGHUP, syscall.SIGUSR1)
 }
+
+func (c *Client) startTray() {}

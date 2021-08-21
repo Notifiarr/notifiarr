@@ -8,19 +8,19 @@ package configfile
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfg/cnfgfile"
@@ -36,11 +36,11 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
-	BindAddr   string              `json:"bind_addr" toml:"bind_addr" xml:"bind_addr" yaml:"bind_addr"`
-	SSLCrtFile string              `json:"ssl_cert_file" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"ssl_cert_file"`
-	SSLKeyFile string              `json:"ssl_key_file" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"ssl_key_file"`
-	AutoUpdate string              `json:"auto_update" toml:"auto_update" xml:"auto_update" yaml:"auto_update"`
-	SendDash   cnfg.Duration       `json:"send_dash" toml:"send_dash" xml:"send_dash" yaml:"send_dash"`
+	BindAddr   string              `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
+	SSLCrtFile string              `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
+	SSLKeyFile string              `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
+	AutoUpdate string              `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
+	SendDash   cnfg.Duration       `json:"sendDash" toml:"send_dash" xml:"send_dash" yaml:"sendDash"`
 	Mode       string              `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
 	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
@@ -55,27 +55,49 @@ type Config struct {
 
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
-func (c *Config) Get(configFile, envPrefix string) error {
+func (c *Config) Get(configFile, envPrefix string, logger *logs.Logger) (*notifiarr.Config, error) {
 	if configFile != "" {
 		if err := cnfgfile.Unmarshal(c, configFile); err != nil {
-			return fmt.Errorf("config file: %w", err)
+			return nil, fmt.Errorf("config file: %w", err)
 		}
 	}
 
 	if _, err := cnfg.UnmarshalENV(c, envPrefix); err != nil {
-		return fmt.Errorf("environment variables: %w", err)
+		return nil, fmt.Errorf("environment variables: %w", err)
 	}
 
-	return c.setup()
+	// This function returns the notifiarr package Config struct too.
+	// This config contains [some of] the same data as the normal Config.
+	notifiarr := &notifiarr.Config{
+		Apps:    c.Apps,
+		Plex:    c.Plex,
+		Snap:    c.Snapshot,
+		Logger:  logger,
+		URL:     notifiarr.ProdURL,
+		Timeout: c.Timeout.Duration,
+		DashDur: c.SendDash.Duration,
+	}
+	c.setup(notifiarr)
+
+	// Make sure each app has a sane timeout.
+	if err := c.Apps.Setup(c.Timeout.Duration); err != nil {
+		return nil, fmt.Errorf("setting up app: %w", err)
+	}
+
+	return notifiarr, nil
 }
 
-func (c *Config) setup() error {
-	if c.Timeout.Duration == 0 {
-		c.Timeout.Duration = mnd.DefaultTimeout
+func (c *Config) setup(notifiarr *notifiarr.Config) {
+	c.URLBase = path.Join("/", c.URLBase)
+	c.Allow = MakeIPs(c.Upstreams)
+
+	if c.Services != nil {
+		c.Services.Notifiarr = notifiarr
+		c.Services.Apps = c.Apps
 	}
 
-	if c.AutoUpdate != "" && runtime.GOOS != "windows" {
-		c.AutoUpdate = ""
+	if c.Timeout.Duration == 0 {
+		c.Timeout.Duration = mnd.DefaultTimeout
 	}
 
 	if c.BindAddr == "" {
@@ -84,28 +106,11 @@ func (c *Config) setup() error {
 		c.BindAddr = "0.0.0.0:" + c.BindAddr
 	}
 
-	c.URLBase = path.Join("/", c.URLBase)
-
-	for _, ip := range c.Upstreams {
-		if !strings.Contains(ip, "/") {
-			if strings.Contains(ip, ":") {
-				ip += "/128"
-			} else {
-				ip += "/32"
-			}
-		}
-
-		if _, i, err := net.ParseCIDR(ip); err == nil {
-			c.Allow = append(c.Allow, i)
-		}
+	if ui.HasGUI() && c.LogConfig != nil {
+		// Setting AppName forces log files (even if not configured).
+		// Used for GUI apps that have no console output.
+		c.LogConfig.AppName = mnd.Title
 	}
-
-	// Make sure each app has a sane timeout.
-	if err := c.Apps.Setup(c.Timeout.Duration); err != nil {
-		return fmt.Errorf("setting up app: %w", err)
-	}
-
-	return nil
 }
 
 // FindAndReturn return a config file. Write one if requested.

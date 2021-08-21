@@ -12,8 +12,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -150,6 +152,15 @@ func (l *Logger) Close() (errors []error) {
 	}
 
 	return errors
+}
+
+// CapturePanic can be defered in any go routine to log any panic that occurs.
+func (l *Logger) CapturePanic() {
+	if r := recover(); r != nil {
+		ui.ShowConsoleWindow()
+		l.ErrorLog.Output(callDepth, //nolint:errcheck
+			fmt.Sprintf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack())))
+	}
 }
 
 // Debug writes log lines... to stdout and/or a file.

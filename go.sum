@@ -433,6 +433,14 @@ golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9 h1:j/WeLF6Ew1lc/m8/bh5qleZ
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9/go.mod h1:EZevRvIGRh8jDMwuYL0/tlPns0KynquPZzb0SerIC1s=
 golift.io/starr v0.10.6 h1:6o7YKzyKkth/nDfLZgYbd8doZrZ+YS+Qwe4dcDzcXsU=
 golift.io/starr v0.10.6/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
+golift.io/starr v0.10.7-0.20210821200026-1dc50368defd h1:DYV2dr7sm4SYoLWbpGxIeRR8SPW6o9d2gpEyKf96tQU=
+golift.io/starr v0.10.7-0.20210821200026-1dc50368defd/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
+golift.io/starr v0.10.7-0.20210821205624-2a622f86675b h1:26xoDCpSQP6SI4+KpcCOGT/ycTdKDqYcEEWDmPhP8Ak=
+golift.io/starr v0.10.7-0.20210821205624-2a622f86675b/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
+golift.io/starr v0.10.7-0.20210821214420-8bf73f976c1f h1:XhwtpAH+ON3dUfq8JNi4c7frqPK9/cW/P0s+a+0GBA0=
+golift.io/starr v0.10.7-0.20210821214420-8bf73f976c1f/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
+golift.io/starr v0.10.7 h1:DwvrOlMmkrEtd6J4wWTm5VgSnconGvFKhOl1FjWxHQw=
+golift.io/starr v0.10.7/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 google.golang.org/api v0.4.0/go.mod h1:8k5glujaEP+g9n7WNsDg8QP6cUVNI86fCNMcbazEtwE=

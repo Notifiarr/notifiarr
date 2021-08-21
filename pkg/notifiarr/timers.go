@@ -11,11 +11,11 @@ const (
 )
 
 func (c *Config) startTimers() {
-	if c.stopTimers != nil {
+	if c.Trigger.stop != nil {
 		return // Already running.
 	}
 
-	c.stopTimers = make(chan struct{})
+	c.Trigger.stop = make(chan struct{})
 	snapTimer := c.getSnapTimer()
 	syncTimer := c.getSyncTimer()
 	plexTimer1, plexTimer2 := c.getPlexTimers()
@@ -83,54 +83,52 @@ func (c *Config) getSnapTimer() *time.Ticker {
 	return time.NewTicker(c.Snap.Interval.Duration)
 }
 
+// runTimerLoop does all of the timer/cron routines for starr apps and plex.
+// Many of the menu items and trigger handlers feed into this routine too.
+// nolint:cyclop
 func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer, dashTimer *time.Ticker) {
-	defer func() {
-		snapTimer.Stop()
-		syncTimer.Stop()
-		plexTimer1.Stop()
-		plexTimer2.Stop()
-		stuckTimer.Stop()
-		dashTimer.Stop()
-		close(c.stopTimers)
-		c.stopTimers = nil
-	}()
+	defer c.stopTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer, dashTimer)
 
-	sent := make(map[string]struct{})
-
-	for {
+	for sent := make(map[string]struct{}); ; {
 		select {
-		case reply := <-c.syncCFnow:
-			c.syncRadarr()
-			c.syncSonarr()
-
-			if reply != nil {
-				reply <- struct{}{}
-			}
+		case reply := <-c.Trigger.syncCF:
+			c.syncCF(reply)
 		case <-syncTimer.C:
-			c.syncRadarr()
-			c.syncSonarr()
-		case source := <-c.snapNow:
+			c.syncCF(nil)
+		case source := <-c.Trigger.snap:
 			c.sendSnapshot(source)
 		case <-snapTimer.C:
 			c.sendSnapshot(SnapCron)
-		case source := <-c.plexNow:
+		case source := <-c.Trigger.plex:
 			c.sendPlexSessions(source)
 		case <-plexTimer1.C:
 			c.sendPlexSessions(PlexCron)
-		case url := <-c.stuckNow:
+		case <-stuckTimer.C:
+			c.sendFinishedQueueItems(c.BaseURL)
+		case url := <-c.Trigger.stuck:
 			c.sendFinishedQueueItems(url)
 		case <-plexTimer2.C:
 			c.checkForFinishedItems(sent)
-		case <-stuckTimer.C:
-			c.sendFinishedQueueItems(c.BaseURL)
-		case <-c.stateNow:
+		case <-c.Trigger.state:
 			c.Print("API Trigger: Gathering current state for dashboard.")
 			c.getState()
 		case <-dashTimer.C:
 			c.Print("Gathering current state for dashboard.")
 			c.getState()
-		case <-c.stopTimers:
+		case <-c.Trigger.stop:
 			return
 		}
 	}
+}
+
+// stopTimerLoop is defered by runTimerLoop.
+func (c *Config) stopTimerLoop(timers ...*time.Ticker) {
+	c.CapturePanic()
+
+	for _, timer := range timers {
+		timer.Stop()
+	}
+
+	close(c.Trigger.stop)
+	c.Trigger.stop = nil
 }

@@ -1,43 +1,29 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
-	"time"
+	"runtime/debug"
 
 	"github.com/Notifiarr/notifiarr/pkg/client"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
 func main() {
-	setup()
-
-	if err := client.Start(); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func setup() {
 	ui.HideConsoleWindow()
-	// setup log package in case we throw an error for main.go before logging is setup.
+	// setup log package in case we throw an error in main.go before logging is setup.
 	log.SetFlags(log.LstdFlags)
 	log.SetPrefix("[ERROR] ")
 
-	// Set time zone based on TZ env variable.
-	if err := setTimeZone(os.Getenv("TZ")); err != nil {
-		log.Print(err)
-	}
-}
+	defer func() {
+		if r := recover(); r != nil {
+			ui.ShowConsoleWindow()
+			log.Printf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack()))
+		}
+	}()
 
-func setTimeZone(tz string) (err error) {
-	if tz == "" {
-		return nil
+	if err := client.Start(); err != nil {
+		_, _ = ui.Error(mnd.Title, err.Error())
+		log.Fatal(err) // nolint:gocritic // defer does not need to run if we have an error.
 	}
-
-	if time.Local, err = time.LoadLocation(tz); err != nil {
-		return fmt.Errorf("loading TZ location '%s': %w", tz, err)
-	}
-
-	return nil
 }

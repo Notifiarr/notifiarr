@@ -36,15 +36,28 @@ type RadarrCustomFormatPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
-func (c *Config) SyncCF(wait bool) {
+func (t *Triggers) SyncCF(wait bool) {
+	if t.stop == nil {
+		return
+	}
+
 	if !wait {
-		c.syncCFnow <- nil
+		t.syncCF <- nil
 		return
 	}
 
 	reply := make(chan struct{})
-	c.syncCFnow <- reply
+	t.syncCF <- reply
 	<-reply
+}
+
+func (c *Config) syncCF(reply chan struct{}) {
+	c.syncRadarr()
+	c.syncSonarr()
+
+	if reply != nil {
+		reply <- struct{}{}
+	}
 }
 
 // syncRadarr triggers a custom format sync for Radarr.

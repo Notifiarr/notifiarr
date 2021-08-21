@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -23,15 +24,10 @@ func (c *Client) StartWebServer() {
 		`"%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	// Create a request router.
 	c.Config.Apps.Router = mux.NewRouter()
-	c.Config.Apps.ErrorLog = c.Logger.ErrorLog
-	c.Config.Apps.Debugf = c.Logger.Debugf
-
-	// Cleanup user input.
-	bindAddr := strings.TrimPrefix(strings.TrimPrefix(strings.TrimRight(c.Config.BindAddr, "/"), "http://"), "https://")
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
 		Handler:           c.stripSecrets(l.Wrap(c.fixForwardedFor(c.Config.Apps.Router), c.Logger.HTTPLog.Writer())),
-		Addr:              bindAddr,
+		Addr:              c.Config.BindAddr,
 		IdleTimeout:       time.Minute,
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,
@@ -48,6 +44,8 @@ func (c *Client) StartWebServer() {
 
 // runWebServer starts the http or https listener.
 func (c *Client) runWebServer() {
+	defer c.CapturePanic()
+
 	var err error
 
 	if c.menu["stat"] != nil {
@@ -88,4 +86,24 @@ func (c *Client) StopWebServer() error {
 	}
 
 	return nil
+}
+
+// CheckPort attempts to bind to a port to check if it's in use or not.
+// We use this to check the port before starting the webserver.
+func CheckPort(addr string) (string, error) {
+	// Cleanup user input.
+	addr = strings.TrimPrefix(strings.TrimPrefix(strings.TrimRight(addr, "/"), "http://"), "https://")
+
+	a, err := net.ResolveTCPAddr("tcp", addr)
+	if err != nil {
+		return addr, fmt.Errorf("provided ip:port combo is invalid: %w", err)
+	}
+
+	l, err := net.ListenTCP("tcp", a)
+	if err != nil {
+		return addr, fmt.Errorf("unable to listen on provided ip:port: %w", err)
+	}
+	defer l.Close()
+
+	return addr, nil
 }
