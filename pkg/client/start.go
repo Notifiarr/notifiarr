@@ -229,6 +229,10 @@ func (c *Client) start() error {
 		return nil
 	}
 
+	if err := CheckPort(c.Config.BindAddr); err != nil {
+		return err
+	}
+
 	if err := c.Config.Services.Start(c.Config.Service); err != nil {
 		return fmt.Errorf("service checks: %w", err)
 	}

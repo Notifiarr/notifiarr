@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -86,6 +87,23 @@ func (c *Client) StopWebServer() error {
 	if err := c.server.Shutdown(ctx); err != nil {
 		return fmt.Errorf("shutting down web server: %w", err)
 	}
+
+	return nil
+}
+
+// CheckPort attempts to bind to a port to check if it's in use or not.
+// We use this to check the port before starting the webserver.
+func CheckPort(addr string) error {
+	a, err := net.ResolveTCPAddr("tcp", addr)
+	if err != nil {
+		return fmt.Errorf("provided ip:port combo is invalid: %w", err)
+	}
+
+	l, err := net.ListenTCP("tcp", a)
+	if err != nil {
+		return fmt.Errorf("unable to listen on provided ip:port: %w", err)
+	}
+	defer l.Close()
 
 	return nil
 }
