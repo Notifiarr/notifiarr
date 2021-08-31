@@ -21,6 +21,7 @@ type Flags struct {
 	Curl       string
 	ConfigFile string
 	EnvPrefix  string
+	Headers    []string
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
@@ -29,8 +30,9 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix.")
 	f.BoolVarP(&f.VerReq, "version", "v", false, "Print the version and exit.")
 	f.StringVar(&f.Curl, "curl", "", "GET a URL and display headers and payload.")
+	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
-	f.StringVar(&f.Write, "write", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
+	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
 
 	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.Restart, "restart", false, "This is used by auto-update, do not call it.")

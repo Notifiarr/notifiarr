@@ -14,7 +14,7 @@ system snapshot and Plex session data to Notifiarr for Discord notifications.
 OPTIONS
 ---
 
-`notifiarr [-c <file>] [--write <file>] [--snaps] [--ps] [--cfsync] [--curl <url>] [-h] [-v]`
+`notifiarr [-c <file>] [-w <file>] [--snaps] [--ps] [--cfsync] [--curl <url>] [-h] [-v]`
 
     -c, --config <config file>
         Provide a configuration file (instead of the default).
@@ -36,13 +36,18 @@ OPTIONS
         This flag makes the application send a Custom Format request to
         Notifiarr.com. Then it exits.
 
-    --write <file>
+    -w, --write <file>
         This flag allows you to read in a config file and re-write it to another file.
         Use - as a shortcut argument to over write the file provided by --config.
 
     --curl <url>
         This flags allows you to make the application GET a URL and print
         the response. Very simple and similar to curl.
+
+    --header <HTTP Request Header>
+        This flag only works with --curl. Use this to pass a request header when
+        making an http request. Example: --header "X-Plex-Token: absdefg123jklm"
+        May be provided more than once to add multiple headers.
 
     -v, --version
         Display version and exit.

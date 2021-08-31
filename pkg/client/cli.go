@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
@@ -18,6 +19,11 @@ import (
 /* This file contains procedures for --write, --curl and --ps CLI flags. */
 
 const curlTimeout = 15 * time.Second
+
+// Errors.
+var (
+	ErrInvalidHeader = fmt.Errorf("invalid header provided; must contain a colon")
+)
 
 // forceWriteWithExit is called only when a user passes --write on the command line.
 func (c *Client) forceWriteWithExit(f string) error {
@@ -71,13 +77,17 @@ func printProcessList() error {
 }
 
 // curlURL is called from the --curl CLI arg.
-func curlURL(url string) error {
+func curlURL(url string, headers []string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), curlTimeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return fmt.Errorf("creating http request: %w", err)
+	}
+
+	if err := addHeaders(req, headers); err != nil {
+		return err
 	}
 
 	resp, err := (&http.Client{}).Do(req)
@@ -92,6 +102,21 @@ func curlURL(url string) error {
 	}
 
 	printCurlReply(resp, body)
+
+	return nil
+}
+
+func addHeaders(req *http.Request, headers []string) error {
+	const headerSize = 2
+
+	for i, h := range headers {
+		if !strings.Contains(h, ":") {
+			return fmt.Errorf("%w: %d: %s", ErrInvalidHeader, i+1, h)
+		}
+
+		header := strings.SplitN(h, ":", headerSize)
+		req.Header.Add(strings.TrimSpace(header[0]), strings.TrimSpace(header[1]))
+	}
 
 	return nil
 }
