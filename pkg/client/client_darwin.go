@@ -12,8 +12,6 @@ func (c *Client) upgradeWindows(_ interface{}) {}
 
 func (c *Client) AutoWatchUpdate() {}
 
-func (c *Client) getPNG() string { return "" }
-
 func (c *Client) checkReloadSignal(sigc os.Signal) error {
 	if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {
 		c.Printf("Writing Config File! Caught Signal: %v", sigc)
