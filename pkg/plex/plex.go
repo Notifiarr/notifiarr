@@ -27,6 +27,7 @@ type Server struct {
 	AccountMap string        `toml:"account_map" xml:"account_map"`
 	Name       string        `toml:"-" xml:"server"`
 	ReturnJSON bool          `toml:"return_json" xml:"return_json"`
+	NoActivity bool          `toml:"no_activity" xml:"no_activity"`
 	Cooldown   cnfg.Duration `toml:"cooldown" xml:"cooldown"`
 	SeriesPC   uint          `toml:"series_percent_complete" xml:"series_percent_complete"`
 	MoviesPC   uint          `toml:"movies_percent_complete" xml:"movies_percent_complete"`
@@ -37,13 +38,14 @@ const (
 	defaultTimeout  = 10 * time.Second
 	minimumTimeout  = 2 * time.Second
 	defaultCooldown = 15 * time.Second
-	minimumCooldown = 10 * time.Second
+	minimumCooldown = 5 * time.Second
 	minimumInterval = 5 * time.Minute
 	minimumComplete = 70
 	maximumComplete = 99
 )
 
 // WaitTime is the recommended wait time to pull plex sessions after a webhook.
+// Only used when NoActivity = false.
 const WaitTime = 10 * time.Second
 
 // ErrNoURLToken is returned when there is no token or URL.
@@ -55,11 +57,7 @@ func (s *Server) Configured() bool {
 }
 
 // Validate checks input values and starts the cron interval if it's configured.
-func (s *Server) Validate() error {
-	if !s.Configured() {
-		return ErrNoURLToken
-	}
-
+func (s *Server) Validate() { //nolint:cyclop
 	if s.SeriesPC > maximumComplete {
 		s.SeriesPC = maximumComplete
 	} else if s.SeriesPC != 0 && s.SeriesPC < minimumComplete {
@@ -72,12 +70,6 @@ func (s *Server) Validate() error {
 		s.MoviesPC = minimumComplete
 	}
 
-	s.setDefaults()
-
-	return nil
-}
-
-func (s *Server) setDefaults() {
 	if s.Interval.Duration < minimumInterval && s.Interval.Duration != 0 {
 		s.Interval.Duration = minimumInterval
 	}
@@ -90,7 +82,7 @@ func (s *Server) setDefaults() {
 
 	if s.Cooldown.Duration == 0 {
 		s.Cooldown.Duration = defaultCooldown
-	} else if s.Cooldown.Duration > minimumCooldown {
+	} else if s.Cooldown.Duration < minimumCooldown {
 		s.Cooldown.Duration = minimumCooldown
 	}
 

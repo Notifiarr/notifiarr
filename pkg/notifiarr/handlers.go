@@ -102,19 +102,20 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) {
 	case err != nil:
 		c.Apps.Respond(w, http.StatusInternalServerError, "payload error")
 		c.Errorf("Unmarshalling Plex payload: %v", err)
-	case v.Event == "media.play":
+	case strings.EqualFold(v.Event, "media.play"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		go c.collectSessions(&v, plex.WaitTime) //nolint:wsl
+		go c.collectSessions(&v) //nolint:wsl
 		c.Apps.Respond(w, http.StatusAccepted, "processing")
-	case (v.Event == "media.resume" || v.Event == "media.pause") && c.plexTimer.Active(c.Plex.Cooldown.Duration):
+	case (strings.EqualFold(v.Event, "media.resume") || strings.EqualFold(v.Event, "media.pause")) &&
+		c.plexTimer.Active(c.Plex.Cooldown.Duration):
 		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		c.Apps.Respond(w, http.StatusAlreadyReported, "ignored, cooldown")
-	case strings.HasPrefix(v.Event, "media"):
+	case strings.EqualFold(v.Event, "media.resume") || strings.EqualFold(v.Event, "media.pause"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		c.collectSessions(&v, 0)
+		go c.collectSessions(&v) //nolint:wsl
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		c.Apps.Respond(w, http.StatusAccepted, "processed")
 	default:
@@ -128,8 +129,8 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) {
 // This reaches back into Plex, asks for sessions and then sends the whole
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
-func (c *Config) collectSessions(v *plexIncomingWebhook, wait time.Duration) {
-	reply, err := c.SendMeta(PlexHook, c.URL, v, wait)
+func (c *Config) collectSessions(v *plexIncomingWebhook) {
+	reply, err := c.SendMeta(PlexHook, c.URL, v, true)
 	if err != nil {
 		c.Errorf("Sending Plex Sessions to Notifiarr: %v", err)
 		return

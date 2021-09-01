@@ -3,13 +3,12 @@ package plex
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
 
-// HandleSessions provides a web handlersto the notifiarr client that returns
+// HandleSessions provides a web handler to the notifiarr client that returns
 // the current Plex sessions. The handler satisfies apps.APIHandler, sorry.
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
@@ -19,11 +18,7 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 		return http.StatusInternalServerError, fmt.Errorf("unable to get sessions (%d): %w", plexID, err)
 	}
 
-	return http.StatusOK, &Sessions{
-		Name:       s.Name,
-		AccountMap: strings.Split(s.AccountMap, "|"),
-		Sessions:   sessions,
-	}
+	return http.StatusOK, sessions
 }
 
 // HandleKillSession provides a web handler to the notifiarr client allows

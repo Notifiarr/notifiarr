@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
@@ -22,6 +23,13 @@ const (
 	episode = "episode"
 )
 
+type holder struct {
+	sessions *plex.Sessions
+	error    error
+}
+
+var ErrNoChannel = fmt.Errorf("no channel to send session request")
+
 // SendPlexSessions sends plex sessions in a go routine through a channel.
 func (t *Triggers) SendPlexSessions(source string) {
 	if t.stop == nil {
@@ -33,12 +41,66 @@ func (t *Triggers) SendPlexSessions(source string) {
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
 func (c *Config) sendPlexSessions(source string) {
-	if body, err := c.SendMeta(source, c.URL, nil, 0); err != nil {
+	if body, err := c.SendMeta(source, c.URL, nil, false); err != nil {
 		c.Errorf("Sending Plex Sessions to %s: %v", c.URL, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("Plex Sessions sent to %s, sending again in %s, reply: %s", c.URL, c.Plex.Interval, fields[3])
+		c.Printf("Plex Sessions sent to %s, reply: %s", c.URL, fields[3])
 	} else {
-		c.Printf("Plex Sessions sent to %s, sending again in %s", c.URL, c.Plex.Interval)
+		c.Printf("Plex Sessions sent to %s.", c.URL)
+	}
+}
+
+// GetSessions returns the plex sessions. This uses a channel so concurrent requests are avoided.
+// Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
+// Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
+func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
+	if c.Trigger.sess == nil {
+		return nil, ErrNoChannel
+	}
+
+	if wait {
+		c.Trigger.sess <- time.Now().Add(plex.WaitTime)
+	} else {
+		c.Trigger.sess <- time.Now().Add(-plex.WaitTime)
+	}
+
+	s := <-c.Trigger.sessr
+
+	return s.sessions, s.error
+}
+
+func (c *Config) runSessionHolder() {
+	defer c.CapturePanic()
+
+	var (
+		sessions *plex.Sessions
+		updated  time.Time
+		err      error
+	)
+
+	if sessions, err = c.Plex.GetXMLSessions(); err == nil {
+		updated = time.Now()
+	}
+
+	c.Trigger.sessr = make(chan *holder)
+	defer close(c.Trigger.sessr)
+
+	for waitUntil := range c.Trigger.sess {
+		if sessions != nil && err == nil && updated.After(waitUntil) {
+			c.Trigger.sessr <- &holder{sessions: sessions}
+			continue
+		}
+
+		if t := time.Until(waitUntil); t > 0 {
+			time.Sleep(t)
+		}
+
+		sessions, err = c.Plex.GetXMLSessions()
+		if err == nil {
+			updated = time.Now()
+		}
+
+		c.Trigger.sessr <- &holder{sessions: sessions, error: err}
 	}
 }
 
@@ -47,16 +109,16 @@ func (c *Config) sendPlexSessions(source string) {
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
 func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
-	sessions, err := c.Plex.GetSessions()
+	sessions, err := c.GetSessions(false)
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
 		return
-	} else if len(sessions) == 0 {
-		// c.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.URL)
+	} else if len(sessions.Sessions) == 0 {
+		c.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.URL)
 		return
 	}
 
-	for _, s := range sessions {
+	for _, s := range sessions.Sessions {
 		var (
 			_, ok = sent[s.Session.ID+s.SessionKey]
 			pct   = s.ViewOffset / s.Duration * 100

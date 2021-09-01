@@ -82,11 +82,11 @@ urlbase = "{{.URLBase}}"
 ## If you set these, logs will be written to these files.
 ## If blank on windows or macOS, log file paths are chosen for you.
 {{if .LogFile}}log_file = '{{.LogFile}}'{{else}}#log_file = '~/.notifiarr/notifiarr.log'{{end}}
-{{if .HTTPLog}}http_log = '{{.HTTPLog}}'{{else}}#http_log = '~/.notifiarr/notifiarr.http.log'{{end}}{{if or .DebugLog .Debug}}
+{{if .HTTPLog}}http_log = '{{.HTTPLog}}'{{else}}#http_log = '~/.notifiarr/notifiarr.http.log'{{end}}{{if or .LogConfig.DebugLog .Debug}}
 ##
 ## Debug Log is optional. By default, debug logs write to the app log (above).
 ## Change that by setting a debug log file path here.
-{{if .DebugLog}}debug_log = '{{.DebugLog}}'{{else}}#debug_log = '~/.notifiarr/debug.log'{{end}}{{end}}
+{{if .LogConfig.DebugLog}}debug_log = '{{.LogConfig.DebugLog}}'{{else}}#debug_log = '~/.notifiarr/debug.log'{{end}}{{end}}
 ##
 ## Set this to the number of megabytes to rotate files.
 log_file_mb = {{.LogFileMb}}
@@ -221,10 +221,12 @@ timeout = "{{.Timeout}}"
   url         = "{{.Plex.URL}}"  # Your plex URL
   token       = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
   interval    = "{{.Plex.Interval}}"  # how often to send session data, 0 = off
-  cooldown    = "{{.Plex.Cooldown}}"  # how often plex webhooks may trigger session hooks
+  timeout     = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
+  cooldown    = "{{.Plex.Cooldown}}"    # how often plex webhooks may trigger session hooks
   account_map = "{{.Plex.AccountMap}}"  # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
   movies_percent_complete = {{.Plex.MoviesPC}}  # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = {{.Plex.SeriesPC}}  # 0, 70-99, send notifications when an episode session is this % complete.
+  no_activity = {{.Plex.NoActivity}}          # Disable getting sessions from Plex after a webhook, hides "Activity"
 {{- else}}
   url         = "http://localhost:32400" # Your plex URL
   token       = ""            # your plex token; get this from a web inspector

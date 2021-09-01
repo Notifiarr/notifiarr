@@ -93,7 +93,7 @@ func Start() error {
 	case c.Flags.PSlist: // print process list and exit.
 		return printProcessList()
 	case c.Flags.Curl != "": // curl a URL and exit.
-		return curlURL(c.Flags.Curl)
+		return curlURL(c.Flags.Curl, c.Flags.Headers)
 	}
 
 	msg, newCon, err := c.loadConfiguration()
@@ -146,7 +146,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 // start runs from Start() after the configuration is loaded.
 func (c *Client) start(newCon bool) error {
 	if err := c.configureServices(); err != nil {
-		return fmt.Errorf("service checks: %w", err)
+		return err
 	} else if ci, err := c.notifiarr.GetClientInfo(); err != nil {
 		c.Printf("==> [WARNING] API Key may be invalid: %v: %s", err, ci)
 	} else if ci != nil {
@@ -174,8 +174,6 @@ func (c *Client) start(newCon bool) error {
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices() error {
 	if c.Config.Plex.Configured() {
-		_ = c.Config.Plex.Validate()
-
 		if info, err := c.Config.Plex.GetInfo(); err != nil {
 			c.Config.Plex.Name = ""
 			c.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)

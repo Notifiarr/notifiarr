@@ -99,9 +99,11 @@ type Triggers struct {
 	stop   chan struct{}      // Triggered by calling Stop()
 	syncCF chan chan struct{} // Sync Radarr CF and Sonarr RP
 	stuck  chan string        // Stuck Items
-	plex   chan string        // Plex Sessions
+	plex   chan string        // Send Plex Sessions
 	state  chan struct{}      // Dashboard State
 	snap   chan string        // Snapshot
+	sess   chan time.Time     // Return Plex Sessions
+	sessr  chan *holder       // Session Return Channel
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -143,7 +145,9 @@ func (c *Config) Start(mode string) {
 	c.Trigger.plex = make(chan string)
 	c.Trigger.state = make(chan struct{})
 	c.Trigger.snap = make(chan string)
+	c.Trigger.sess = make(chan time.Time)
 
+	go c.runSessionHolder()
 	c.startTimers()
 }
 
@@ -156,6 +160,9 @@ func (c *Config) Stop() {
 		close(c.Trigger.plex)
 		close(c.Trigger.state)
 		close(c.Trigger.snap)
+
+		defer close(c.Trigger.sess)
+		c.Trigger.sess = nil
 	}
 }
 
@@ -164,13 +171,25 @@ func (c *Config) Stop() {
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait time.Duration) ([]byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), wait+c.Snap.Timeout.Duration)
+func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait bool) ([]byte, error) {
+	extra := time.Second
+	if wait {
+		extra = plex.WaitTime
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), extra+c.Snap.Timeout.Duration)
 	defer cancel()
 
 	var (
-		payload = &Payload{Type: eventType, Load: hook}
-		wg      sync.WaitGroup
+		payload = &Payload{
+			Type: eventType,
+			Load: hook,
+			Plex: &plex.Sessions{
+				Name:       c.Plex.Name,
+				AccountMap: strings.Split(c.Plex.AccountMap, "|"),
+			},
+		}
+		wg sync.WaitGroup
 	)
 
 	rep := make(chan error)
@@ -191,11 +210,11 @@ func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait
 		wg.Done() // nolint:wsl
 	}()
 
-	time.Sleep(wait)
-
-	var err error
-	if payload.Plex, err = c.Plex.GetXMLSessions(); err != nil {
-		rep <- fmt.Errorf("getting sessions: %w", err)
+	if !wait || !c.Plex.NoActivity {
+		var err error
+		if payload.Plex, err = c.GetSessions(wait); err != nil {
+			rep <- fmt.Errorf("getting sessions: %w", err)
+		}
 	}
 
 	wg.Wait()
@@ -323,7 +342,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		deadline = time.Now().Add(h.Timeout)
 	}
 
-	timeout := time.Until(deadline)
+	timeout := time.Until(deadline).Round(time.Millisecond)
 
 	for i := 0; ; i++ {
 		resp, err := h.Client.Do(req)

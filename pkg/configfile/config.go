@@ -111,6 +111,10 @@ func (c *Config) setup(notifiarr *notifiarr.Config) {
 		// Used for GUI apps that have no console output.
 		c.LogConfig.AppName = mnd.Title
 	}
+
+	if c.Plex.Configured() {
+		c.Plex.Validate()
+	}
 }
 
 // FindAndReturn return a config file. Write one if requested.

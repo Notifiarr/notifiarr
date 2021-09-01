@@ -129,6 +129,6 @@ func (c *Config) stopTimerLoop(timers ...*time.Ticker) {
 		timer.Stop()
 	}
 
-	close(c.Trigger.stop)
+	defer close(c.Trigger.stop)
 	c.Trigger.stop = nil
 }
