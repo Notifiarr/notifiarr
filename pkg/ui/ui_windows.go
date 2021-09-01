@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -24,7 +25,12 @@ func HasGUI() bool {
 }
 
 func Notify(msg string) error {
-	return beeep.Notify(mnd.Title, msg, getPNG())
+	err := beeep.Notify(mnd.Title, msg, getPNG())
+	if err != nil {
+		return fmt.Errorf("ui element failed: %w", err)
+	}
+
+	return nil
 }
 
 // getPNG purposely returns an empty string when there is no verified file.

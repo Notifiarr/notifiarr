@@ -11,8 +11,6 @@ import (
 
 func (c *Client) printUpdateMessage() {}
 
-func (c *Client) getPNG() string { return "" }
-
 // AutoWatchUpdate is not used on this OS.
 func (c *Client) AutoWatchUpdate() {}
 

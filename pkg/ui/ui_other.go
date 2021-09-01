@@ -18,7 +18,7 @@ func HasGUI() bool {
 	return false
 }
 
-func Notify(_, _ string) error {
+func Notify(_ string) error {
 	return nil
 }
 

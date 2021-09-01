@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -26,7 +27,16 @@ func HideConsoleWindow() {}
 func ShowConsoleWindow() {}
 
 func Notify(msg string) error {
-	return beeep.Notify(mnd.Title, msg, "")
+	if !hasGUI {
+		return nil
+	}
+
+	err := beeep.Notify(mnd.Title, msg, "")
+	if err != nil {
+		return fmt.Errorf("ui element failed: %w", err)
+	}
+
+	return nil
 }
 
 // StartCmd starts a command.
