@@ -10,7 +10,7 @@ jobs:
     dist: bionic
     services: docker
     language: go
-    go: 1.16.x
+    go: 1.17.x
 git:
   depth: false
 addons:
