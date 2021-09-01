@@ -1,3 +1,4 @@
+//go:build !windows && !darwin
 // +build !windows,!darwin
 
 package ui
@@ -15,6 +16,10 @@ const SystrayIcon = "files/favicon.png"
 // HasGUI returns false on Linux, true on Windows and optional on macOS.
 func HasGUI() bool {
 	return false
+}
+
+func Notify(_, _ string) error {
+	return nil
 }
 
 // HideConsoleWindow doesn't work on most OSes.

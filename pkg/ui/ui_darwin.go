@@ -4,6 +4,9 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/gen2brain/beeep"
 )
 
 // SystrayIcon is the icon in the menu bar.
@@ -21,6 +24,10 @@ func HideConsoleWindow() {}
 
 // ShowConsoleWindow does nothing on OSes besides Windows.
 func ShowConsoleWindow() {}
+
+func Notify(msg string) error {
+	return beeep.Notify(mnd.Title, msg, "")
+}
 
 // StartCmd starts a command.
 func StartCmd(c string, v ...string) error {

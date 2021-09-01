@@ -1,9 +1,9 @@
+//go:build darwin || windows
 // +build darwin windows
 
 package client
 
 import (
-	"encoding/json"
 	"os"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
@@ -154,8 +154,8 @@ func (c *Client) watchKillerChannels() {
 		case <-c.menu["debug_panic"].Clicked():
 			c.menuPanic()
 		case <-c.menu["debug_logs"].Clicked():
+			go ui.OpenLog(c.Config.LogConfig.DebugLog) // nolint:errcheck
 			c.Print("User Viewing Debug File:", c.Config.LogConfig.DebugLog)
-			_ = ui.OpenLog(c.Config.LogConfig.DebugLog)
 		case <-c.menu["load"].Clicked():
 			if err := c.reloadConfiguration("User Requested"); err != nil {
 				c.Errorf("Need help? %s\n=====> Exiting! Reloading Configuration: %v", mnd.HelpLink, err)
@@ -172,15 +172,15 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["stat"].Clicked():
 			c.toggleServer()
 		case <-c.menu["gh"].Clicked():
-			ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
+			go ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
 		case <-c.menu["hp"].Clicked():
-			ui.OpenURL("https://notifiarr.com/")
+			go ui.OpenURL("https://notifiarr.com/")
 		case <-c.menu["wiki"].Clicked():
-			ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/")
+			go ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/")
 		case <-c.menu["disc1"].Clicked():
-			ui.OpenURL("https://notifiarr.com/discord")
+			go ui.OpenURL("https://notifiarr.com/discord")
 		case <-c.menu["disc2"].Clicked():
-			ui.OpenURL("https://golift.io/discord")
+			go ui.OpenURL("https://golift.io/discord")
 		}
 	}
 }
@@ -190,10 +190,10 @@ func (c *Client) watchConfigChannels() {
 	for {
 		select {
 		case <-c.menu["view"].Clicked():
-			ui.Info(mnd.Title+": Configuration", c.displayConfig())
+			go ui.Info(mnd.Title+": Configuration", c.displayConfig())
 		case <-c.menu["edit"].Clicked():
+			go ui.OpenFile(c.Flags.ConfigFile)
 			c.Print("User Editing Config File:", c.Flags.ConfigFile)
-			ui.OpenFile(c.Flags.ConfigFile)
 		case <-c.menu["write"].Clicked():
 			c.writeConfigFile()
 		case <-c.menu["key"].Clicked():
@@ -207,14 +207,14 @@ func (c *Client) watchLogsChannels() {
 	for {
 		select {
 		case <-c.menu["logs_view"].Clicked():
+			go ui.OpenLog(c.Config.LogFile)
 			c.Print("User Viewing Log File:", c.Config.LogFile)
-			ui.OpenLog(c.Config.LogFile)
 		case <-c.menu["logs_http"].Clicked():
+			go ui.OpenLog(c.Config.HTTPLog)
 			c.Print("User Viewing Log File:", c.Config.HTTPLog)
-			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_svcs"].Clicked():
+			go ui.OpenLog(c.Config.Services.LogFile)
 			c.Print("User Viewing Log File:", c.Config.Services.LogFile)
-			ui.OpenLog(c.Config.Services.LogFile)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
@@ -233,29 +233,13 @@ func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
 			c.logSnaps()
 		case <-c.menu["svcs_log"].Clicked():
 			c.Printf("[user requested] Checking services and logging results.")
-			c.Config.Services.RunChecks(true)
-
-			data, _ := json.MarshalIndent(&services.Results{
-				What:     "log",
-				Svcs:     c.Config.Services.GetResults(),
-				Type:     services.NotifiarrEventType,
-				Interval: c.Config.Services.Interval.Seconds(),
-			}, "", " ")
-			c.Print("Payload (log only):", string(data))
+			c.Config.Services.RunChecks(&services.Source{Name: "log", URL: ""})
 		case <-c.menu["svcs_prod"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr.")
-			c.Config.Services.RunChecks(true)
-			c.Config.Services.SendResults(notifiarr.ProdURL, &services.Results{
-				What: "user",
-				Svcs: c.Config.Services.GetResults(),
-			})
+			c.Config.Services.RunChecks(&services.Source{Name: "user", URL: notifiarr.ProdURL})
 		case <-c.menu["svcs_test"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr Test.")
-			c.Config.Services.RunChecks(true)
-			c.Config.Services.SendResults(notifiarr.TestURL, &services.Results{
-				What: "user",
-				Svcs: c.Config.Services.GetResults(),
-			})
+			c.Config.Services.RunChecks(&services.Source{Name: "user", URL: notifiarr.TestURL})
 		case <-c.menu["plex_test"].Clicked():
 			c.sendPlexSessions(notifiarr.TestURL)
 		case <-c.menu["snap_test"].Clicked():

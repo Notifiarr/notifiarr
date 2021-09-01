@@ -14,16 +14,28 @@ import (
 	"golift.io/version"
 )
 
-// ClientInfo is the reply from the ClienRoute endpoint.
+// ClientInfo is the reply from the ClientRoute endpoint.
 type ClientInfo struct {
-	Status  string `json:"status"`
+	Status  string  `json:"status"`
+	Timers  []timer `json:"timers"`
 	Message struct {
 		Text       string `json:"text"`
 		Subscriber bool   `json:"subscriber"`
 		Patron     bool   `json:"patron"`
+		Gaps       gaps   `json:"gaps"`
 		CFSync     int64  `json:"cfSync"`
 		RPSync     int64  `json:"rpSync"`
 	} `json:"message"`
+}
+
+type timer struct {
+	URI      string
+	Interval int
+	last     time.Time
+}
+
+func (t *timer) Ready() bool {
+	return t.last.After(time.Now().Add(time.Duration(t.Interval) * time.Minute))
 }
 
 // String returns the message text for a client info response.

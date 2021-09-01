@@ -4,18 +4,15 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/hako/durafmt"
 	"github.com/kardianos/osext"
 	"golift.io/version"
-	"gopkg.in/toast.v1"
 )
 
 func (c *Client) checkReloadSignal(sigc os.Signal) error {
@@ -42,51 +39,12 @@ func (c *Client) upgradeWindows(update *update.Update) {
 	}
 }
 
-// getPNG purposely returns an empty string when there is no verified file.
-// This is used to give the toast notification an icon.
-// Do not throw errors if the icon is missing, it'd nbd, just return empty "".
-func (c *Client) getPNG() string {
-	folder, err := osext.ExecutableFolder()
-	if err != nil {
-		c.Debug("Error Finding app folder:", err) // purposely debug and not error
-		return ""
-	}
-
-	const minimumFileSize = 100 // arbitrary
-
-	pngPath := filepath.Join(folder, "notifiarr.png")
-	if f, err := os.Stat(pngPath); err == nil && f.Size() > minimumFileSize {
-		return pngPath // most code paths land here.
-	} else if !os.IsNotExist(err) || (f != nil && f.Size() < minimumFileSize) {
-		c.Debug("Error Stating file:", err) // purposely debug and not error
-		return ""
-	}
-
-	data, err := bindata.Asset("files/favicon.png")
-	if err != nil {
-		c.Debug("Error Finding asset:", err) // purposely debug and not error
-		return ""
-	}
-
-	if err := os.WriteFile(pngPath, data, mnd.Mode0600); err != nil {
-		c.Debug("Error Writing file:", err) // purposely debug and not error
-		return ""
-	}
-
-	return pngPath
-}
-
 func (c *Client) printUpdateMessage() {
 	if !c.Flags.Updated {
 		return
 	}
 
-	err := (&toast.Notification{
-		AppID:   mnd.Title,
-		Title:   mnd.Title + " Upgraded!",
-		Message: mnd.Title + " updated to version " + version.Version,
-		Icon:    c.getPNG(),
-	}).Push()
+	err := ui.Notify(mnd.Title + " updated to version " + version.Version)
 	if err != nil {
 		c.Error("Creating Toast Notification:", err)
 	}

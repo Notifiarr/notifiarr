@@ -82,7 +82,7 @@ type plexIncomingWebhook struct {
 }
 
 // PlexHandler handles an incoming webhook from Plex.
-func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) {
+func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:cyclop
 	start := time.Now()
 
 	if err := r.ParseMultipartForm(mnd.KB100); err != nil {
@@ -102,25 +102,31 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) {
 	case err != nil:
 		c.Apps.Respond(w, http.StatusInternalServerError, "payload error")
 		c.Errorf("Unmarshalling Plex payload: %v", err)
-	case strings.EqualFold(v.Event, "media.play"):
-		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
+	case strings.EqualFold(v.Event, "admin.database.backup"):
+		fallthrough
+	case strings.EqualFold(v.Event, "device.new"):
+		fallthrough
+	case strings.EqualFold(v.Event, "admin.database.corrupt"):
+		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (relaying to Notifiarr)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		go c.collectSessions(&v) //nolint:wsl
+		c.sendPlexWebhook(&v)
+		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		c.Apps.Respond(w, http.StatusAccepted, "processing")
-	case (strings.EqualFold(v.Event, "media.resume") || strings.EqualFold(v.Event, "media.pause")) &&
-		c.plexTimer.Active(c.Plex.Cooldown.Duration):
-		c.Printf("Plex Incoming Webhook IGNORED (cooldown): %s, %s '%s' => %s",
+	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(c.Plex.Cooldown.Duration):
+		c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		c.Apps.Respond(w, http.StatusAlreadyReported, "ignored, cooldown")
-	case strings.EqualFold(v.Event, "media.resume") || strings.EqualFold(v.Event, "media.pause"):
+	case strings.EqualFold(v.Event, "media.play"):
+		fallthrough
+	case strings.EqualFold(v.Event, "media.resume"):
+		go c.collectSessions(&v)
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		go c.collectSessions(&v) //nolint:wsl
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
-		c.Apps.Respond(w, http.StatusAccepted, "processed")
+		c.Apps.Respond(w, http.StatusAccepted, "processing")
 	default:
-		c.Apps.Respond(w, http.StatusAlreadyReported, "ignored, non-media")
-		c.Printf("Plex Incoming Webhook IGNORED (non-media): %s, %s '%s' => %s",
+		c.Apps.Respond(w, http.StatusAlreadyReported, "ignored, unsupported")
+		c.Printf("Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' => %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 	}
 }
@@ -136,9 +142,33 @@ func (c *Config) collectSessions(v *plexIncomingWebhook) {
 		return
 	}
 
-	// This is probably going to break at some point.
-	if fields := strings.Split(string(reply), `"`); len(fields) > 3 { // nolint:gomnd
-		c.Printf("Plex => Notifiarr: %s '%s' => %s (%s)", v.Account.Title, v.Event, v.Metadata.Title, fields[3])
+	c.plexNotifiarrReplyParserLog(reply, v)
+}
+
+// sendPlexWebhook simply relays an incoming "admin" plex webhook to Notifiarr.com.
+func (c *Config) sendPlexWebhook(v *plexIncomingWebhook) {
+	_, reply, err := c.SendData(c.URL, &Payload{ //nolint:bodyclose // already closed
+		Type: PlexHook,
+		Load: v,
+		Plex: &plex.Sessions{
+			Name:       c.Plex.Name,
+			AccountMap: strings.Split(c.Plex.AccountMap, "|"),
+		},
+	}, true)
+	if err != nil {
+		c.Errorf("Sending Plex Webhook to Notifiarr: %v", err)
+		return
+	}
+
+	c.plexNotifiarrReplyParserLog(reply, v)
+}
+
+// This is probably going to break at some point.
+func (c *Config) plexNotifiarrReplyParserLog(reply []byte, v *plexIncomingWebhook) {
+	const fieldPos = 3
+
+	if fields := strings.Split(string(reply), `"`); len(fields) > fieldPos {
+		c.Printf("Plex => Notifiarr: %s '%s' => %s (%s)", v.Account.Title, v.Event, v.Metadata.Title, fields[fieldPos])
 	} else {
 		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
 	}

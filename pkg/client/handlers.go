@@ -9,6 +9,9 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/services"
+	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
@@ -113,23 +116,31 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 
 	const apiTrigger = "apitrigger"
 
-	switch {
-	case trigger == "cfsync":
+	switch trigger {
+	case "cfsync":
 		c.notifiarr.Trigger.SyncCF(false)
-	case trigger == "services" && c.Config.Services.Disabled:
-		return http.StatusNotImplemented, "services not enabled"
-	case trigger == "services":
-		c.Config.Services.RunAllChecksSendResult(apiTrigger)
-	case trigger == "sessions" && !c.Config.Plex.Configured():
-		return http.StatusNotImplemented, "sessions not enabled"
-	case trigger == "sessions":
+	case "services":
+		if c.Config.Services.Disabled {
+			return http.StatusNotImplemented, "services not enabled"
+		}
+
+		c.Config.Services.RunChecks(&services.Source{Name: apiTrigger, URL: notifiarr.ProdURL})
+	case "sessions":
+		if !c.Config.Plex.Configured() {
+			return http.StatusNotImplemented, "sessions not enabled"
+		}
+
 		c.notifiarr.Trigger.SendPlexSessions(apiTrigger)
-	case trigger == "stuckitems":
+	case "stuckitems":
 		c.notifiarr.Trigger.SendFinishedQueueItems(c.notifiarr.BaseURL)
-	case trigger == "dashboard":
+	case "dashboard":
 		c.notifiarr.Trigger.GetState()
-	case trigger == "snapshot":
+	case "snapshot":
 		c.notifiarr.Trigger.SendSnapshot(apiTrigger)
+	case "gaps":
+		c.notifiarr.Trigger.SendGaps(apiTrigger)
+	case "reload":
+		c.sighup <- &update.Signal{Text: "reload http triggered"}
 	default:
 		return http.StatusBadRequest, "unknown trigger '" + trigger + "'"
 	}

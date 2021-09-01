@@ -268,7 +268,11 @@ func (c *Client) reloadConfiguration(source string) error {
 	}
 
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
-	_, _ = ui.Info(mnd.Title, "Configuration Reloaded!") //nolint:wsl
+
+	err = ui.Notify("Configuration Reloaded!")
+	if err != nil {
+		c.Error("Creating Toast Notification:", err)
+	}
 
 	return nil
 }

@@ -5,20 +5,20 @@ import (
 	"time"
 )
 
-func (c *Config) RunAllChecksSendResult(source string) {
+// runChecks runs checks from an external package.
+func (c *Config) RunChecks(source *Source) {
 	if !c.Disabled {
 		c.triggerChan <- source
 	}
 }
 
-// RunChecks runs checks that are due. Passing true, runs them even if they're not due.
-// Returns true if a service state changed.
-func (c *Config) RunChecks(forceAll bool) bool {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+// runChecks runs checks that are due. Passing true, runs them even if they're not due.
+func (c *Config) runChecks(forceAll bool) {
+	if c.checks == nil || c.done == nil {
+		return
+	}
 
 	count := 0
-	stateChange := false
 
 	for s := range c.services {
 		if forceAll || c.services[s].lastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
@@ -28,19 +28,12 @@ func (c *Config) RunChecks(forceAll bool) bool {
 	}
 
 	for ; count > 0; count-- {
-		if sc := <-c.done; sc {
-			stateChange = true
-		}
+		<-c.done
 	}
-
-	return stateChange
 }
 
-// GetResults creates a copy of all the results and returns them.
-func (c *Config) GetResults() []*CheckResult {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
+// getResults creates a copy of all the results and returns them.
+func (c *Config) getResults() []*CheckResult {
 	svcs := make([]*CheckResult, len(c.services))
 	count := 0
 

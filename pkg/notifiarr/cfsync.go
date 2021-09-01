@@ -63,7 +63,7 @@ func (c *Config) syncCF(reply chan struct{}) {
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *Config) syncRadarr() {
 	if ci, err := c.GetClientInfo(); err != nil {
-		c.Debugf("Cannot sync Radarr Custom Formats. Error: %v", err)
+		c.Errorf("Cannot sync Radarr Custom Formats. Error: %v", err)
 		return
 	} else if ci.Message.CFSync < 1 {
 		return

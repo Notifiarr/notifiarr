@@ -4,12 +4,14 @@ go 1.16
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
+	github.com/gen2brain/beeep v0.0.0-20210529141713-5586760f0cc1
 	github.com/gen2brain/dlgs v0.0.0-20210609125024-bf6c92aaa984
 	github.com/getlantern/golog v0.0.0-20210606115803-bce9f9fe5a5f // indirect
 	github.com/getlantern/hidden v0.0.0-20201229170000-e66e7f878730 // indirect
 	github.com/getlantern/ops v0.0.0-20200403153110-8476b16edcd6 // indirect
 	github.com/getlantern/systray v1.1.0
 	github.com/go-stack/stack v1.8.1 // indirect
+	github.com/godbus/dbus/v5 v5.0.4 // indirect
 	github.com/gonutz/w32 v1.0.0
 	github.com/google/glazier v0.0.0-20210831085901-f44389497a84 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210825203111-a709d8e111b3 // indirect

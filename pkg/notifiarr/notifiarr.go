@@ -42,6 +42,7 @@ const (
 	// CFSyncRoute is the webserver route to send sync requests to.
 	CFSyncRoute = "/api/v1/user/trash"
 	DashRoute   = "/api/v1/user/dashboard"
+	GapsRoute   = "/api/v1/user/gaps"
 )
 
 // These are used as 'source' values in json payloads sent to the webserver.
@@ -98,6 +99,7 @@ type extras struct {
 type Triggers struct {
 	stop   chan struct{}      // Triggered by calling Stop()
 	syncCF chan chan struct{} // Sync Radarr CF and Sonarr RP
+	gaps   chan string        // Send Radarr Collection Gaps
 	stuck  chan string        // Stuck Items
 	plex   chan string        // Send Plex Sessions
 	state  chan struct{}      // Dashboard State
@@ -146,6 +148,7 @@ func (c *Config) Start(mode string) {
 	c.Trigger.state = make(chan struct{})
 	c.Trigger.snap = make(chan string)
 	c.Trigger.sess = make(chan time.Time)
+	c.Trigger.gaps = make(chan string)
 
 	go c.runSessionHolder()
 	c.startTimers()
@@ -160,6 +163,7 @@ func (c *Config) Stop() {
 		close(c.Trigger.plex)
 		close(c.Trigger.state)
 		close(c.Trigger.snap)
+		close(c.Trigger.gaps)
 
 		defer close(c.Trigger.sess)
 		c.Trigger.sess = nil
@@ -299,6 +303,47 @@ func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, erro
 
 		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
 			url, time.Since(start).Round(time.Microsecond), string(data), resp.Status, headers, string(body))
+	}()
+
+	if err != nil {
+		return resp, body, fmt.Errorf("reading http response body: %w", err)
+	}
+
+	return resp, body, nil
+}
+
+func (c *Config) GetData(url string) (*http.Response, []byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating http request: %w", err)
+	}
+
+	req.Header.Set("X-API-Key", c.Apps.APIKey)
+
+	start := time.Now()
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, nil, fmt.Errorf("making http request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	defer func() {
+		headers := ""
+
+		for k, vs := range resp.Header {
+			for _, v := range vs {
+				headers += k + ": " + v + "\n"
+			}
+		}
+
+		c.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
+			url, time.Since(start).Round(time.Microsecond), resp.Status, headers, string(body))
 	}()
 
 	if err != nil {
