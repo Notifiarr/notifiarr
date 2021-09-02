@@ -96,8 +96,8 @@ func (c *Config) getState() {
 	//nolint:bodyclose // already closed
 	switch resp, body, err := c.SendData(c.BaseURL+DashRoute, states, true); {
 	case err != nil:
-		c.Errorf("Sending Dashboard State Data (apps:%s total:%s): %v",
-			apps, time.Since(start).Round(time.Millisecond), err)
+		c.Errorf("Sending Dashboard State Data (apps:%s total:%s): %v: %v",
+			apps, time.Since(start).Round(time.Millisecond), err, states)
 	case resp.StatusCode != http.StatusOK:
 		c.Errorf("Sending Dashboard State Data (apps:%s total:%s): %v: %s",
 			apps, time.Since(start).Round(time.Millisecond), ErrNon200, string(body))

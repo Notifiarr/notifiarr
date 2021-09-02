@@ -38,7 +38,7 @@ const (
 	TestURL     = BaseURL + "/notifierTest.php"
 	DevBaseURL  = "http://dev.notifiarr.com"
 	DevURL      = DevBaseURL + "/notifier.php"
-	ClientRoute = "/api/v1/user/client"
+	ClientRoute = "/api/v2/user/client"
 	// CFSyncRoute is the webserver route to send sync requests to.
 	CFSyncRoute = "/api/v1/user/trash"
 	DashRoute   = "/api/v1/user/dashboard"

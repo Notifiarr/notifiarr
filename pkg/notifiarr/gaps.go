@@ -10,8 +10,8 @@ import (
 /* Gaps allows filling gaps in Radarr collections. */
 
 type gaps struct {
-	Instances []int
-	Interval  int
+	Instances []int `json:"instances"`
+	Minutes   int   `json:"timer"`
 }
 
 func (t *Triggers) SendGaps(source string) {
@@ -29,12 +29,12 @@ func (c *Config) sendGaps(source string) {
 	if err != nil {
 		c.Errorf("Cannot send Radarr Collection Gaps: %v", err)
 		return
-	} else if len(ci.Message.Gaps.Instances) == 0 {
+	} else if len(ci.Actions.Gaps.Instances) == 0 {
 		return
 	}
 
 	for i, r := range c.Apps.Radarr {
-		if r.DisableCF || r.URL == "" || r.APIKey == "" || !ci.Message.Gaps.Has(i+1) {
+		if r.DisableCF || r.URL == "" || r.APIKey == "" || !ci.Actions.Gaps.Has(i+1) {
 			continue
 		}
 

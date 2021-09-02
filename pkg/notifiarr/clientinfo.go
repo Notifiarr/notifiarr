@@ -16,26 +16,32 @@ import (
 
 // ClientInfo is the reply from the ClientRoute endpoint.
 type ClientInfo struct {
-	Status  string  `json:"status"`
-	Timers  []timer `json:"timers"`
-	Message struct {
-		Text       string `json:"text"`
+	User struct {
+		WelcomeMSG string `json:"welcome"`
 		Subscriber bool   `json:"subscriber"`
 		Patron     bool   `json:"patron"`
-		Gaps       gaps   `json:"gaps"`
-		CFSync     int64  `json:"cfSync"`
-		RPSync     int64  `json:"rpSync"`
-	} `json:"message"`
+	} `json:"user"`
+	Actions struct {
+		Sync struct {
+			Minutes int    `json:"timer"`    // how often to fire in minutes.
+			URI     string `json:"endpoint"` // "api/v1/user/sync"
+			Radarr  int64  `json:"radarr"`   // items in sync
+			Sonarr  int64  `json:"sonarr"`   // items in sync
+		}
+		Gaps   gaps `json:"gaps"`
+		Custom []*timer
+	}
 }
 
 type timer struct {
-	URI      string
-	Interval int
-	last     time.Time
+	Name    string `json:"name"`     // name of action.
+	Minutes int    `json:"timer"`    // how often to GET this URI.
+	URI     string `json:"endpoint"` // endpoint for the URI.
+	last    time.Time
 }
 
 func (t *timer) Ready() bool {
-	return t.last.After(time.Now().Add(time.Duration(t.Interval) * time.Minute))
+	return t.last.After(time.Now().Add(time.Duration(t.Minutes) * time.Minute))
 }
 
 // String returns the message text for a client info response.
@@ -44,17 +50,17 @@ func (c *ClientInfo) String() string {
 		return ""
 	}
 
-	return c.Message.Text
+	return c.User.WelcomeMSG
 }
 
 // IsSub returns true if the client is a subscriber. False otherwise.
 func (c *ClientInfo) IsSub() bool {
-	return c != nil && c.Message.Subscriber
+	return c != nil && c.User.Subscriber
 }
 
 // IsPatron returns true if the client is a patron. False otherwise.
 func (c *ClientInfo) IsPatron() bool {
-	return c != nil && c.Message.Patron
+	return c != nil && c.User.Patron
 }
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
@@ -101,7 +107,6 @@ func (c *Config) Info() map[string]interface{} {
 	return map[string]interface{}{
 		"arch":        runtime.GOARCH,
 		"build_date":  version.BuildDate,
-		"cfsync_dur":  cfSyncTimer.Seconds(),
 		"dash_dur":    c.DashDur.Seconds(),
 		"docker":      os.Getenv("NOTIFIARR_IN_DOCKER") == "true",
 		"go_version":  version.GoVersion,

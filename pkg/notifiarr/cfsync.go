@@ -65,7 +65,7 @@ func (c *Config) syncRadarr() {
 	if ci, err := c.GetClientInfo(); err != nil {
 		c.Errorf("Cannot sync Radarr Custom Formats. Error: %v", err)
 		return
-	} else if ci.Message.CFSync < 1 {
+	} else if ci.Actions.Sync.Radarr < 1 {
 		return
 	}
 
@@ -221,7 +221,7 @@ func (c *Config) syncSonarr() {
 	if ci, err := c.GetClientInfo(); err != nil {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Error: %v", err)
 		return
-	} else if ci.Message.RPSync < 1 {
+	} else if ci.Actions.Sync.Sonarr < 1 {
 		return
 	}
 

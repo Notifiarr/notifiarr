@@ -5,7 +5,6 @@ import (
 )
 
 const (
-	cfSyncTimer  = 30 * time.Minute
 	minDashTimer = 30 * time.Minute
 	stuckTimer   = 5*time.Minute + 327*time.Millisecond
 )
@@ -43,26 +42,33 @@ func (c *Config) getDashTimer() *time.Ticker {
 func (c *Config) getSyncGapsAndCronTimers() (*time.Ticker, *time.Ticker, *time.Ticker) {
 	cronTimer := &time.Ticker{C: make(<-chan time.Time)}
 	gapsTimer := &time.Ticker{C: make(<-chan time.Time)}
+	syncTimer := &time.Ticker{C: make(<-chan time.Time)}
 
 	ci, err := c.GetClientInfo()
-	if err != nil || (ci.Message.CFSync < 1 && ci.Message.RPSync < 1) {
-		return cronTimer, cronTimer, gapsTimer
+	if err != nil {
+		return syncTimer, cronTimer, gapsTimer
 	}
 
-	if len(ci.Timers) > 0 {
-		c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Timers))
-		cronTimer = time.NewTicker(time.Minute) //nolint:wsl
+	if len(ci.Actions.Custom) > 0 {
+		c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Actions.Custom))
+
+		cronTimer = time.NewTicker(time.Minute)
 	}
 
-	if ci.Message.Gaps.Interval > 0 {
-		c.Printf("==> Collection Gaps Timer Enabled, interval: %dm", ci.Message.Gaps.Interval)
-		gapsTimer = time.NewTicker(time.Minute * time.Duration(ci.Message.Gaps.Interval))
+	if ci.Actions.Gaps.Minutes > 0 {
+		c.Printf("==> Collection Gaps Timer Enabled, interval: %dm", ci.Actions.Gaps.Minutes)
+
+		gapsTimer = time.NewTicker(time.Minute * time.Duration(ci.Actions.Gaps.Minutes))
 	}
 
-	c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced",
-		ci.Message.CFSync, ci.Message.RPSync)
+	if ci.Actions.Sync.Minutes > 0 {
+		c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced, interval: %dm",
+			ci.Actions.Sync.Radarr, ci.Actions.Sync.Sonarr, ci.Actions.Sync.Minutes)
 
-	return time.NewTicker(cfSyncTimer), cronTimer, gapsTimer
+		syncTimer = time.NewTicker(time.Minute * time.Duration(ci.Actions.Sync.Minutes))
+	}
+
+	return syncTimer, cronTimer, gapsTimer
 }
 
 func (c *Config) getPlexTimers() (*time.Ticker, *time.Ticker) {
@@ -106,7 +112,7 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2,
 	for sent := make(map[string]struct{}); ; {
 		select {
 		case <-cronTimer.C:
-			for _, timer := range c.extras.clientInfo.Timers {
+			for _, timer := range c.extras.clientInfo.Actions.Custom {
 				if timer.Ready() {
 					if _, _, err := c.GetData(timer.URI); err != nil {
 						c.Errorf("Custom Timer Request for %s failed: %v", timer.URI, err)
