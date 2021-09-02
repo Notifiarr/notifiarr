@@ -133,7 +133,6 @@ timeout = "{{.Timeout}}"
   name        = "{{.Name}}"
   url         = "{{.URL}}"
   api_key     = "{{.APIKey}}"
-  disable_cf  = {{.DisableCF}} # Disable custom format sync.
   interval    = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout     = "{{.Timeout}}"{{if .CheckQ}}
   check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
@@ -142,7 +141,6 @@ timeout = "{{.Timeout}}"
 #name        = "" # Set a name to enable checks of your service.
 #url         = "http://127.0.0.1:7878/radarr"
 #api_key     = ""
-#disable_cf  = true  # Disable custom format sync.
 #check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 {{if .Readarr}}{{range .Readarr}}
@@ -165,7 +163,6 @@ timeout = "{{.Timeout}}"
   name        = "{{.Name}}"
   url         = "{{.URL}}"
   api_key     = "{{.APIKey}}"
-  disable_cf  = {{.DisableCF}}  # Disable release profile sync.
   interval    = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout     = "{{.Timeout}}"{{if .CheckQ}}
   check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
@@ -174,7 +171,6 @@ timeout = "{{.Timeout}}"
 #name        = ""  # Set a name to enable checks of your service.
 #url         = "http://sonarr:8989/"
 #api_key     = ""
-#disable_cf  = true # Disable release profile sync.
 #check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 

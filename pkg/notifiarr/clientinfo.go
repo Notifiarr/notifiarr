@@ -53,7 +53,7 @@ type intList []int
 
 func (l intList) Has(instance int) bool {
 	for _, i := range l {
-		if instance-1 == i {
+		if instance == i {
 			return true
 		}
 	}

@@ -95,6 +95,7 @@ func (c *Client) makeChannels() {
 func (c *Client) makeMoreChannels() {
 	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, service checks")
 	c.menu["data"] = ui.WrapMenu(data)
+	c.menu["gaps"] = ui.WrapMenu(data.AddSubMenuItem("Send Radarr Gaps", "[premium feature] trigger radarr collections gaps"))
 	c.menu["sync_cf"] = ui.WrapMenu(data.AddSubMenuItem("Sync Custom Formats", "[premium feature] trigger custom format sync"))
 	c.menu["snap_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Full Snapshot", "write snapshot data to log file"))
 	c.menu["svcs_log"] = ui.WrapMenu(data.AddSubMenuItem("Log Service Checks", "check all services and log results"))
@@ -222,6 +223,9 @@ func (c *Client) watchLogsChannels() {
 func (c *Client) watchNotifiarrMenu() {
 	for {
 		select {
+		case <-c.menu["gaps"].Clicked():
+			ui.Notify("Sending Radarr Collection Gaps")
+			c.notifiarr.Trigger.SendGaps("user")
 		case <-c.menu["sync_cf"].Clicked():
 			ui.Notify("Starting custom format and quality profiles sync")
 			c.Printf("[user requested] Triggering Custom Formats and Quality Profiles Sync for Radarr and Sonarr.")

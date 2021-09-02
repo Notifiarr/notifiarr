@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"golift.io/starr/radarr"
 )
 
@@ -24,37 +25,40 @@ func (t *Triggers) SendGaps(source string) {
 }
 
 func (c *Config) sendGaps(source string) {
-	c.Printf("Sending Radarr Collections Gaps to Notifiarr: %s", source)
-
 	ci, err := c.GetClientInfo()
 	if err != nil {
 		c.Errorf("Cannot send Radarr Collection Gaps: %v", err)
 		return
-	} else if len(ci.Actions.Gaps.Instances) == 0 {
+	} else if len(ci.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
+		c.Errorf("Cannot send Radarr Collection Gaps: instances (%d) or radarrs (%d) are zero.",
+			len(ci.Actions.Gaps.Instances), len(c.Apps.Radarr))
 		return
 	}
 
+	c.Printf("Sending Radarr Collections Gaps to Notifiarr: triggered by %s", source)
+
 	for i, r := range c.Apps.Radarr {
-		if r.DisableCF || r.URL == "" || r.APIKey == "" || !ci.Actions.Gaps.Instances.Has(i) {
+		instance := i + 1
+		if r.URL == "" || r.APIKey == "" || !ci.Actions.Gaps.Instances.Has(instance) {
 			continue
 		}
 
-		if err := c.sendInstanceGaps(i); err != nil {
-			c.Errorf("Radarr Collection Gaps request for '%d:%s' failed: %v", i+1, r.URL, err)
+		if err := c.sendInstanceGaps(instance, r); err != nil {
+			c.Errorf("Radarr Collection Gaps request for '%d:%s' failed: %v", instance, r.URL, err)
 		} else {
-			c.Printf("Sent Collection Gaps to Notifiarr for Radarr: %d:%s", i+1, r.URL)
+			c.Printf("Sent Collection Gaps to Notifiarr for Radarr: %d:%s", instance, r.URL)
 		}
 	}
 }
 
-func (c *Config) sendInstanceGaps(i int) error {
+func (c *Config) sendInstanceGaps(instance int, app *apps.RadarrConfig) error {
 	type radarrGapsPayload struct {
 		Instance int             `json:"instance"`
 		Name     string          `json:"name"`
 		Movies   []*radarr.Movie `json:"movies"`
 	}
 
-	movies, err := c.Apps.Radarr[i].GetMovie(0)
+	movies, err := app.GetMovie(0)
 	if err != nil {
 		return fmt.Errorf("getting movies: %w", err)
 	}
@@ -62,8 +66,8 @@ func (c *Config) sendInstanceGaps(i int) error {
 	//nolint:bodyclose // already closed
 	resp, _, err := c.SendData(c.BaseURL+GapsRoute+"?app=radarr", &radarrGapsPayload{
 		Movies:   movies,
-		Name:     c.Apps.Radarr[i].Name,
-		Instance: i,
+		Name:     app.Name,
+		Instance: instance,
 	}, false)
 	if err != nil {
 		return fmt.Errorf("sending collection gaps: %w", err)
