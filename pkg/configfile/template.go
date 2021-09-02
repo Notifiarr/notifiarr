@@ -98,10 +98,6 @@ log_files = {{.LogFiles}}
 ## Missing, blank or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
 file_mode = "{{.FileMode.String}}"
 
-## How often to send current application states for the dashboard.
-##
-send_dash = "{{.SendDash}}"
-
 ## Web server and application timeouts.
 ##
 timeout = "{{.Timeout}}"
@@ -236,39 +232,6 @@ timeout = "{{.Timeout}}"
   movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
   series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
 {{- end }}
-
-
-#####################
-# Snapshot Settings #
-#####################
-
-## Install package(s)
-##  - Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
-##  - Linux:    apt install smartmontools || yum install smartmontools
-##  - Docker:   Already Included. Run in --privileged mode.
-##  - Synology: opkg install smartmontools
-##  - Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-##
-[snapshot]
-  interval          = "{{.Snapshot.Interval}}" # how often to send a snapshot, 0 = off, 30m - 2h recommended
-  timeout           = "{{.Snapshot.Timeout}}" # how long a snapshot may take
-  monitor_raid      = {{.Snapshot.Raid}} # mdadm / megacli
-  monitor_drives    = {{.Snapshot.DriveData}} # smartctl: age, temp, health
-  monitor_space     = {{.Snapshot.DiskUsage}} # disk usage for all partitions
-  monitor_uptime    = {{.Snapshot.Uptime}} # system data, users, hostname, uptime, os, build
-  monitor_cpuMemory = {{.Snapshot.CPUMem}} # literally cpu usage, load averages, and memory
-  monitor_cpuTemp   = {{.Snapshot.CPUTemp}} # cpu temperatures, not available on all platforms
-{{- if .Snapshot.ZFSPools}}
-  zfs_pools         = [
-   {{- range $s := .Snapshot.ZFSPools}}"{{$s}}",{{end -}}
-   ]    # list of zfs pools, ex: zfs_pools=["data", "data2"]{{else}}
-  zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]{{end}}
-  use_sudo          = {{.Snapshot.UseSudo}} # sudo is needed on unix when monitor_drives=true or for megacli.
-## Example sudoers entries follow; these go in /etc/sudoers.d. Fix the paths to smartctl and MegaCli.
-## notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
-## notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
-
 
 ##################
 # Service Checks #

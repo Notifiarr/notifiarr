@@ -40,7 +40,6 @@ type Config struct {
 	SSLCrtFile string              `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
 	SSLKeyFile string              `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
 	AutoUpdate string              `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
-	SendDash   cnfg.Duration       `json:"sendDash" toml:"send_dash" xml:"send_dash" yaml:"sendDash"`
 	Mode       string              `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
 	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
@@ -75,7 +74,6 @@ func (c *Config) Get(configFile, envPrefix string, logger *logs.Logger) (*notifi
 		Logger:  logger,
 		URL:     notifiarr.ProdURL,
 		Timeout: c.Timeout.Duration,
-		DashDur: c.SendDash.Duration,
 	}
 	c.setup(notifiarr)
 

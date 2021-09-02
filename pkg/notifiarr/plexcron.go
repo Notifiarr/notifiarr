@@ -23,6 +23,15 @@ const (
 	episode = "episode"
 )
 
+// plexConfig is the configuration returned from the notifiarr website.
+type plexConfig struct {
+	Minutes    int  `json:"timer"`       // how often to send session data in minutes.
+	Cooldown   int  `json:"cooldown"`    // how often to allow a "resume" payload in seconds.
+	MoviesPC   uint `json:"moviesPc"`    // movies percent complete for notification
+	SeriesPC   uint `json:"seriesPc"`    // series percent complete for notification
+	NoActivity bool `json:"no_activity"` // disable activity gether on webhook.
+}
+
 type holder struct {
 	sessions *plex.Sessions
 	error    error

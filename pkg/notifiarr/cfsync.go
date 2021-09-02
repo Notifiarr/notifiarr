@@ -10,6 +10,15 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+// syncConfig is the configuration returned from the notifiarr website.
+type syncConfig struct {
+	Instances intList `json:"instances"` // which instance IDs we sync
+	Minutes   int     `json:"timer"`     // how often to fire in minutes.
+	URI       string  `json:"endpoint"`  // "api/v1/user/sync"
+	Radarr    int64   `json:"radarr"`    // items in sync
+	Sonarr    int64   `json:"sonarr"`    // items in sync
+}
+
 // cfMapIDpayload is used to post-back ID changes for profiles and formats.
 type cfMapIDpayload struct {
 	Instance int     `json:"instance"`

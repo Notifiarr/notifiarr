@@ -5,8 +5,7 @@ import (
 )
 
 const (
-	minDashTimer = 30 * time.Minute
-	stuckTimer   = 5*time.Minute + 327*time.Millisecond
+	stuckTimer = 5*time.Minute + 1327*time.Millisecond
 )
 
 func (c *Config) startTimers() {
@@ -16,38 +15,26 @@ func (c *Config) startTimers() {
 
 	c.Trigger.stop = make(chan struct{})
 	snapTimer := c.getSnapTimer()
-	syncTimer, cronTimer, gapsTimer := c.getSyncGapsAndCronTimers()
 	plexTimer1, plexTimer2 := c.getPlexTimers()
 	stuckItemTimer := time.NewTicker(stuckTimer)
-	dashTimer := c.getDashTimer()
+
+	syncTimer := &time.Ticker{C: make(<-chan time.Time)}
+	cronTimer := &time.Ticker{C: make(<-chan time.Time)}
+	gapsTimer := &time.Ticker{C: make(<-chan time.Time)}
+	dashTimer := &time.Ticker{C: make(<-chan time.Time)}
+
+	if ci, err := c.GetClientInfo(); err == nil {
+		syncTimer, cronTimer, gapsTimer, dashTimer = c.getClientInfoTimers(ci)
+	}
 
 	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckItemTimer, dashTimer, cronTimer, gapsTimer)
 }
 
-func (c *Config) getDashTimer() *time.Ticker {
-	dashTimer := &time.Ticker{}
-
-	if c.DashDur > 0 && c.DashDur < minDashTimer {
-		c.DashDur = minDashTimer
-	}
-
-	if c.DashDur > 0 {
-		c.Printf("==> Sending Current State Data for Dashboard every %v", c.DashDur)
-		dashTimer = time.NewTicker(c.DashDur)
-	}
-
-	return dashTimer
-}
-
-func (c *Config) getSyncGapsAndCronTimers() (*time.Ticker, *time.Ticker, *time.Ticker) {
+func (c *Config) getClientInfoTimers(ci *ClientInfo) (*time.Ticker, *time.Ticker, *time.Ticker, *time.Ticker) {
 	cronTimer := &time.Ticker{C: make(<-chan time.Time)}
 	gapsTimer := &time.Ticker{C: make(<-chan time.Time)}
 	syncTimer := &time.Ticker{C: make(<-chan time.Time)}
-
-	ci, err := c.GetClientInfo()
-	if err != nil {
-		return syncTimer, cronTimer, gapsTimer
-	}
+	dashTimer := &time.Ticker{C: make(<-chan time.Time)}
 
 	if len(ci.Actions.Custom) > 0 {
 		c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Actions.Custom))
@@ -68,7 +55,12 @@ func (c *Config) getSyncGapsAndCronTimers() (*time.Ticker, *time.Ticker, *time.T
 		syncTimer = time.NewTicker(time.Minute * time.Duration(ci.Actions.Sync.Minutes))
 	}
 
-	return syncTimer, cronTimer, gapsTimer
+	if ci.Actions.Dashboard.Minutes > 0 {
+		c.Printf("==> Sending Current State Data for Dashboard every %dm", ci.Actions.Dashboard.Minutes)
+		dashTimer = time.NewTicker(time.Minute * time.Duration(ci.Actions.Dashboard.Minutes))
+	}
+
+	return syncTimer, cronTimer, gapsTimer, dashTimer
 }
 
 func (c *Config) getPlexTimers() (*time.Ticker, *time.Ticker) {
@@ -114,7 +106,7 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2,
 		case <-cronTimer.C:
 			for _, timer := range c.extras.clientInfo.Actions.Custom {
 				if timer.Ready() {
-					if _, _, err := c.GetData(timer.URI); err != nil {
+					if _, _, err := c.GetData(c.BaseURL + "/" + timer.URI); err != nil {
 						c.Errorf("Custom Timer Request for %s failed: %v", timer.URI, err)
 					}
 					break //nolint:wsl

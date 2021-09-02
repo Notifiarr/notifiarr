@@ -9,9 +9,10 @@ import (
 
 /* Gaps allows filling gaps in Radarr collections. */
 
-type gaps struct {
-	Instances []int `json:"instances"`
-	Minutes   int   `json:"timer"`
+// gapsConfig is the configuration returned from the notifiarr website.
+type gapsConfig struct {
+	Instances intList `json:"instances"`
+	Minutes   int     `json:"timer"`
 }
 
 func (t *Triggers) SendGaps(source string) {
@@ -34,11 +35,11 @@ func (c *Config) sendGaps(source string) {
 	}
 
 	for i, r := range c.Apps.Radarr {
-		if r.DisableCF || r.URL == "" || r.APIKey == "" || !ci.Actions.Gaps.Has(i+1) {
+		if r.DisableCF || r.URL == "" || r.APIKey == "" || !ci.Actions.Gaps.Instances.Has(i) {
 			continue
 		}
 
-		if err := c.sendInstanceGaps(i + 1); err != nil {
+		if err := c.sendInstanceGaps(i); err != nil {
 			c.Errorf("Radarr Collection Gaps request for '%d:%s' failed: %v", i+1, r.URL, err)
 		} else {
 			c.Printf("Sent Collection Gaps to Notifiarr for Radarr: %d:%s", i+1, r.URL)
@@ -71,14 +72,4 @@ func (c *Config) sendInstanceGaps(i int) error {
 	}
 
 	return nil
-}
-
-func (g gaps) Has(instance int) bool {
-	for _, i := range g.Instances {
-		if instance == i {
-			return true
-		}
-	}
-
-	return false
 }

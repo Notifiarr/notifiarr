@@ -17,14 +17,19 @@ const (
 	completed = "completed"
 )
 
-type custom struct {
+// stuckConfig is the configuration returned from the notifiarr website.
+type stuckConfig struct {
+	Instances intList `json:"instances"`
+}
+
+type ListItem struct {
 	Elapsed time.Duration `json:"elapsed"`
 	Repeat  uint          `json:"repeat"`
 	Name    string        `json:"name"`
 	Queue   []interface{} `json:"queue"`
 }
 
-type ItemList map[int]custom
+type ItemList map[int]ListItem
 
 type QueuePayload struct {
 	Type    string   `json:"type"`

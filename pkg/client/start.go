@@ -147,10 +147,6 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 func (c *Client) start(newCon bool) error {
 	if err := c.configureServices(); err != nil {
 		return err
-	} else if ci, err := c.notifiarr.GetClientInfo(); err != nil {
-		c.Printf("==> [WARNING] API Key may be invalid: %v: %s", err, ci)
-	} else if ci != nil {
-		c.Printf("==> %s", ci)
 	}
 
 	if newCon {
@@ -171,8 +167,34 @@ func (c *Client) start(newCon bool) error {
 	return c.Exit()
 }
 
+// Load configuration from the website.
+func (c *Client) loadSiteConfig() {
+	ci, err := c.notifiarr.GetClientInfo()
+	if err != nil || ci == nil {
+		c.Printf("==> [WARNING] API Key may be invalid: %v, info: %s", err, ci)
+		return
+	}
+
+	c.Printf("==> %s", ci)
+
+	if ci.Actions.Snapshot != nil {
+		c.notifiarr.Snap, c.Config.Snapshot = ci.Actions.Snapshot, ci.Actions.Snapshot
+	}
+
+	if ci.Actions.Plex != nil {
+		c.Config.Plex.Interval.Duration = time.Duration(ci.Actions.Plex.Minutes) * time.Minute
+		c.Config.Plex.Cooldown.Duration = time.Duration(ci.Actions.Plex.Cooldown) * time.Second
+		c.Config.Plex.MoviesPC = ci.Actions.Plex.MoviesPC
+		c.Config.Plex.SeriesPC = ci.Actions.Plex.SeriesPC
+		c.Config.Plex.NoActivity = ci.Actions.Plex.NoActivity
+	}
+}
+
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices() error {
+	c.notifiarr.Setup(c.Config.Mode)
+	c.loadSiteConfig()
+
 	if c.Config.Plex.Configured() {
 		if info, err := c.Config.Plex.GetInfo(); err != nil {
 			c.Config.Plex.Name = ""
@@ -184,7 +206,7 @@ func (c *Client) configureServices() error {
 
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo()
-	c.notifiarr.Start(c.Config.Mode)
+	c.notifiarr.Start()
 
 	// Make sure the port is not in use before starting the web server.
 	addr, err := CheckPort(c.Config.BindAddr)

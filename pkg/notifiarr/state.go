@@ -21,6 +21,11 @@ const (
 	showLatest = 5
 )
 
+// dashConfig is the configuration returned from the notifiarr website.
+type dashConfig struct {
+	Minutes int `json:"timer"` // how often to fire in minutes.
+}
+
 // Sortable holds data about any Starr item. Kind of a generic data store.
 type Sortable struct {
 	id      int64

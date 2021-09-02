@@ -9,12 +9,18 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/version"
 )
 
-// ClientInfo is the reply from the ClientRoute endpoint.
+// clientInfoResponse is the reply from the ClientRoute endpoint.
+type clientInfoResponse struct {
+	Response   string     `json:"response"` // success
+	ClientInfo ClientInfo `json:"message"`
+}
+
 type ClientInfo struct {
 	User struct {
 		WelcomeMSG string `json:"welcome"`
@@ -22,15 +28,14 @@ type ClientInfo struct {
 		Patron     bool   `json:"patron"`
 	} `json:"user"`
 	Actions struct {
-		Sync struct {
-			Minutes int    `json:"timer"`    // how often to fire in minutes.
-			URI     string `json:"endpoint"` // "api/v1/user/sync"
-			Radarr  int64  `json:"radarr"`   // items in sync
-			Sonarr  int64  `json:"sonarr"`   // items in sync
-		}
-		Gaps   gaps `json:"gaps"`
-		Custom []*timer
-	}
+		Plex       *plexConfig      `json:"plex"`      // unused yet
+		StuckItems stuckConfig      `json:"stuck"`     // unused yet!
+		Dashboard  dashConfig       `json:"dashboard"` // now in use.
+		Sync       syncConfig       `json:"sync"`      // in use (cfsync)
+		Gaps       gapsConfig       `json:"gaps"`      // radarr collection gaps
+		Custom     []*timer         `json:"custom"`    // custom GET timers
+		Snapshot   *snapshot.Config `json:"snapshot"`  // unused
+	} `json:"actions"`
 }
 
 type timer struct {
@@ -44,10 +49,22 @@ func (t *timer) Ready() bool {
 	return t.last.After(time.Now().Add(time.Duration(t.Minutes) * time.Minute))
 }
 
+type intList []int
+
+func (l intList) Has(instance int) bool {
+	for _, i := range l {
+		if instance-1 == i {
+			return true
+		}
+	}
+
+	return false
+}
+
 // String returns the message text for a client info response.
 func (c *ClientInfo) String() string {
 	if c == nil {
-		return ""
+		return "<nil>"
 	}
 
 	return c.User.WelcomeMSG
@@ -65,6 +82,9 @@ func (c *ClientInfo) IsPatron() bool {
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
 func (c *Config) GetClientInfo() (*ClientInfo, error) {
+	c.extras.ciMutex.Lock()
+	defer c.extras.ciMutex.Unlock()
+
 	if c.extras.clientInfo != nil {
 		return c.extras.clientInfo, nil
 	}
@@ -74,17 +94,17 @@ func (c *Config) GetClientInfo() (*ClientInfo, error) {
 		return nil, fmt.Errorf("POSTing client info: %w", err)
 	}
 
-	v := ClientInfo{}
+	v := clientInfoResponse{}
 	if err = json.Unmarshal(body, &v); err != nil {
-		return &v, fmt.Errorf("parsing response: %w", err)
+		return &v.ClientInfo, fmt.Errorf("parsing response: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return &v, ErrNon200
+		return &v.ClientInfo, ErrNon200
 	}
 
 	// Only set this if there was no error.
-	c.extras.clientInfo = &v
+	c.extras.clientInfo = &v.ClientInfo
 
 	return c.extras.clientInfo, nil
 }
@@ -107,7 +127,6 @@ func (c *Config) Info() map[string]interface{} {
 	return map[string]interface{}{
 		"arch":        runtime.GOARCH,
 		"build_date":  version.BuildDate,
-		"dash_dur":    c.DashDur.Seconds(),
 		"docker":      os.Getenv("NOTIFIARR_IN_DOCKER") == "true",
 		"go_version":  version.GoVersion,
 		"gui":         ui.HasGUI(),
@@ -122,8 +141,7 @@ func (c *Config) Info() map[string]interface{} {
 		"os":          runtime.GOOS,
 		"retries":     c.Retries,
 		"revision":    version.Revision,
-		"snap_dur":    c.Snap.Interval.Seconds(),
-		"snap_tout":   c.Snap.Timeout.Seconds(),
+		"snapshots":   c.Snap,
 		"stuck_dur":   stuckTimer.Seconds(),
 		"timeout":     c.Timeout.Seconds(),
 		"uptime_dur":  time.Since(version.Started).Round(time.Second).Seconds(),
