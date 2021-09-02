@@ -131,26 +131,14 @@ func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, erro
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (0): %s",
-			url, time.Since(start).Round(time.Microsecond), string(data), err)
+		c.debughttplog(nil, url, start, data, nil)
 		return nil, nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	defer func() {
-		headers := ""
-
-		for k, vs := range resp.Header {
-			for _, v := range vs {
-				headers += k + ": " + v + "\n"
-			}
-		}
-
-		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), string(data), resp.Status, headers, string(body))
-	}()
+	defer c.debughttplog(resp, url, start, data, body)
 
 	if err != nil {
 		return resp, body, fmt.Errorf("reading http response body: %w", err)
@@ -180,18 +168,7 @@ func (c *Config) GetData(url string) (*http.Response, []byte, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	defer func() {
-		headers := ""
-
-		for k, vs := range resp.Header {
-			for _, v := range vs {
-				headers += k + ": " + v + "\n"
-			}
-		}
-
-		c.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), resp.Status, headers, string(body))
-	}()
+	defer c.debughttplog(resp, url, start, nil, body)
 
 	if err != nil {
 		return resp, body, fmt.Errorf("reading http response body: %w", err)
@@ -261,5 +238,38 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 			h.Printf("[%d/%d] Request to Notifiarr.com failed, retrying in %s, error: %v", i+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
+	}
+}
+
+func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, data, body []byte) {
+	headers := ""
+	status := "0"
+
+	if resp != nil {
+		status = resp.Status
+	}
+
+	for k, vs := range resp.Header {
+		for _, v := range vs {
+			headers += k + ": " + v + "\n"
+		}
+	}
+
+	b := string(body)
+	if c.MaxBody > 0 && len(b) > c.MaxBody {
+		b = b[:c.MaxBody] + " <body truncated>"
+	}
+
+	d := string(data)
+	if c.MaxBody > 0 && len(d) > c.MaxBody {
+		d = d[:c.MaxBody] + " <data truncated>"
+	}
+
+	if len(data) == 0 {
+		c.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
+			url, time.Since(start).Round(time.Microsecond), status, headers, b)
+	} else {
+		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
+			url, time.Since(start).Round(time.Microsecond), d, status, headers, b)
 	}
 }

@@ -19,7 +19,7 @@ import (
 
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
-	c.Config.HandleAPIpath("", "version", c.notifiarr.VersionHandler, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version", c.website.VersionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
 
@@ -30,12 +30,12 @@ func (c *Client) internalHandlers() {
 
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.Handle("/plex",
-			http.HandlerFunc(c.notifiarr.PlexHandler)).Methods("POST").Queries("token", tokens)
+			http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
 
 		if c.Config.URLBase != "/" {
 			// Allow plex to use the base url too.
 			c.Config.Router.Handle(path.Join(c.Config.URLBase, "plex"),
-				http.HandlerFunc(c.notifiarr.PlexHandler)).Methods("POST").Queries("token", tokens)
+				http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
 		}
 	}
 
@@ -120,7 +120,7 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 
 	switch trigger {
 	case "cfsync":
-		c.notifiarr.Trigger.SyncCF(false)
+		c.website.Trigger.SyncCF(false)
 	case "services":
 		if c.Config.Services.Disabled {
 			return http.StatusNotImplemented, "services not enabled"
@@ -132,15 +132,15 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 			return http.StatusNotImplemented, "sessions not enabled"
 		}
 
-		c.notifiarr.Trigger.SendPlexSessions(apiTrigger)
+		c.website.Trigger.SendPlexSessions(apiTrigger)
 	case "stuckitems":
-		c.notifiarr.Trigger.SendFinishedQueueItems(c.notifiarr.BaseURL)
+		c.website.Trigger.SendFinishedQueueItems(c.website.BaseURL)
 	case "dashboard":
-		c.notifiarr.Trigger.GetState()
+		c.website.Trigger.GetState()
 	case "snapshot":
-		c.notifiarr.Trigger.SendSnapshot(apiTrigger)
+		c.website.Trigger.SendSnapshot(apiTrigger)
 	case "gaps":
-		c.notifiarr.Trigger.SendGaps(apiTrigger)
+		c.website.Trigger.SendGaps(apiTrigger)
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}
 	case "notification":

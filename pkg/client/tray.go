@@ -225,11 +225,11 @@ func (c *Client) watchNotifiarrMenu() {
 		select {
 		case <-c.menu["gaps"].Clicked():
 			ui.Notify("Sending Radarr Collection Gaps")
-			c.notifiarr.Trigger.SendGaps("user")
+			c.website.Trigger.SendGaps("user")
 		case <-c.menu["sync_cf"].Clicked():
 			ui.Notify("Starting custom format and quality profiles sync")
 			c.Printf("[user requested] Triggering Custom Formats and Quality Profiles Sync for Radarr and Sonarr.")
-			c.notifiarr.Trigger.SyncCF(false)
+			c.website.Trigger.SyncCF(false)
 		case <-c.menu["snap_log"].Clicked():
 			ui.Notify("Logging local system snapshot")
 			c.logSnaps()
@@ -259,10 +259,10 @@ func (c *Client) watchNotifiarrMenu() {
 			c.sendSystemSnapshot(notifiarr.DevURL)
 		case <-c.menu["app_ques"].Clicked():
 			ui.Notify("Sending finished, possibly stuck, queue items")
-			c.notifiarr.Trigger.SendFinishedQueueItems(notifiarr.BaseURL)
+			c.website.Trigger.SendFinishedQueueItems(notifiarr.BaseURL)
 		case <-c.menu["app_ques_dev"].Clicked():
 			ui.Notify("Sending finished, possibly stuck, queue items (dev)")
-			c.notifiarr.Trigger.SendFinishedQueueItems(notifiarr.DevBaseURL)
+			c.website.Trigger.SendFinishedQueueItems(notifiarr.DevBaseURL)
 		case <-c.menu["plex_prod"].Clicked():
 			ui.Notify("Gathering and sending Plex sessions")
 			c.sendPlexSessions(notifiarr.ProdURL)
@@ -272,7 +272,7 @@ func (c *Client) watchNotifiarrMenu() {
 		case <-c.menu["send_dash"].Clicked():
 			ui.Notify("Gathering and sending app states for dashboard")
 			c.Print("User Requested State Collection for Dashboard")
-			c.notifiarr.Trigger.GetState()
+			c.website.Trigger.GetState()
 		}
 	}
 }

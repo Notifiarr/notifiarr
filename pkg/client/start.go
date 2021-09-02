@@ -30,13 +30,13 @@ import (
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	Flags     *configfile.Flags
-	Config    *configfile.Config
-	server    *http.Server
-	sigkil    chan os.Signal
-	sighup    chan os.Signal
-	menu      map[string]ui.MenuItem
-	notifiarr *notifiarr.Config
+	Flags   *configfile.Flags
+	Config  *configfile.Config
+	server  *http.Server
+	sigkil  chan os.Signal
+	sighup  chan os.Signal
+	menu    map[string]ui.MenuItem
+	website *notifiarr.Config
 }
 
 // Errors returned by this package.
@@ -135,7 +135,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	}
 
 	// Parse the config file and environment variables.
-	c.notifiarr, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
+	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
 	if err != nil {
 		return msg, newCon, fmt.Errorf("getting config: %w", err)
 	}
@@ -169,7 +169,7 @@ func (c *Client) start(newCon bool) error {
 
 // Load configuration from the website.
 func (c *Client) loadSiteConfig() {
-	ci, err := c.notifiarr.GetClientInfo()
+	ci, err := c.website.GetClientInfo()
 	if err != nil || ci == nil {
 		c.Printf("==> [WARNING] API Key may be invalid: %v, info: %s", err, ci)
 		return
@@ -178,7 +178,7 @@ func (c *Client) loadSiteConfig() {
 	c.Printf("==> %s", ci)
 
 	if ci.Actions.Snapshot != nil {
-		c.notifiarr.Snap, c.Config.Snapshot = ci.Actions.Snapshot, ci.Actions.Snapshot
+		c.website.Snap, c.Config.Snapshot = ci.Actions.Snapshot, ci.Actions.Snapshot
 	}
 
 	if ci.Actions.Plex != nil {
@@ -192,7 +192,7 @@ func (c *Client) loadSiteConfig() {
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices() error {
-	c.notifiarr.Setup(c.Config.Mode)
+	c.website.Setup(c.Config.Mode)
 	c.loadSiteConfig()
 
 	if c.Config.Plex.Configured() {
@@ -206,7 +206,7 @@ func (c *Client) configureServices() error {
 
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo()
-	c.notifiarr.Start()
+	c.website.Start()
 
 	// Make sure the port is not in use before starting the web server.
 	addr, err := CheckPort(c.Config.BindAddr)
@@ -264,7 +264,7 @@ func (c *Client) exit() error {
 // Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(source string) error {
 	c.Print("==> Reloading Configuration: " + source)
-	c.notifiarr.Stop()
+	c.website.Stop()
 	c.Config.Services.Stop()
 
 	err := c.StopWebServer()
@@ -274,7 +274,7 @@ func (c *Client) reloadConfiguration(source string) error {
 		defer c.StartWebServer()
 	}
 
-	c.notifiarr, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
+	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
 	if err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}

@@ -8,6 +8,19 @@ const (
 	stuckTimer = 5*time.Minute + 1327*time.Millisecond
 )
 
+// timerConfig defines a custom GET timer from the website.
+// Used to offload crons to clients.
+type timerConfig struct {
+	Name    string `json:"name"`     // name of action.
+	Minutes int    `json:"timer"`    // how often to GET this URI.
+	URI     string `json:"endpoint"` // endpoint for the URI.
+	last    time.Time
+}
+
+func (t *timerConfig) Ready() bool {
+	return t.last.After(time.Now().Add(time.Duration(t.Minutes) * time.Minute))
+}
+
 func (c *Config) startTimers() {
 	if c.Trigger.stop != nil {
 		return // Already running.

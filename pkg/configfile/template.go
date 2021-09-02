@@ -56,7 +56,8 @@ bind_addr = "{{.BindAddr}}"
 quiet = {{.Quiet}}{{if .Debug}}
 
 ## Debug prints more data and json payloads. Recommend setting debug_log if enabled.
-debug = true{{end}}{{if .Mode}}
+debug = true
+max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .Mode}}
 
 ## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
 mode  = "{{.Mode}}"{{end}}
@@ -115,63 +116,67 @@ timeout = "{{.Timeout}}"
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
 {{if .Lidarr}}{{range .Lidarr}}
 [[lidarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
+  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
   #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[lidarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://lidarr:8989/"
-#api_key     = ""
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name     = "" # Set a name to enable checks of your service.
+#url      = "http://lidarr:8989/"
+#api_key  = ""
+#check_q  = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 {{if .Radarr}}{{range .Radarr}}
 [[radarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{ if .MaxBody }}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
+  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
   #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[radarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://127.0.0.1:7878/radarr"
-#api_key     = ""
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name      = "" # Set a name to enable checks of your service.
+#url       = "http://127.0.0.1:7878/radarr"
+#api_key   = ""
+#check_q   = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 {{if .Readarr}}{{range .Readarr}}
 [[readarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
+  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
   #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[readarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://127.0.0.1:8787/readarr"
-#api_key     = ""
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name      = "" # Set a name to enable checks of your service.
+#url       = "http://127.0.0.1:8787/readarr"
+#api_key   = ""
+#check_q   = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 {{if .Sonarr}}{{range .Sonarr}}
 [[sonarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
+  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
   #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
 {{else}}#[[sonarr]]
-#name        = ""  # Set a name to enable checks of your service.
-#url         = "http://sonarr:8989/"
-#api_key     = ""
-#check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name      = ""  # Set a name to enable checks of your service.
+#url       = "http://sonarr:8989/"
+#api_key   = ""
+#check_q   = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
 
 
 # Download Client Configs (below) are used for dashboard state and service checks.

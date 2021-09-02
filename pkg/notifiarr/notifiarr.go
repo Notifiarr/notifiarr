@@ -76,6 +76,7 @@ type Config struct {
 	BaseURL      string
 	Timeout      time.Duration
 	Trigger      Triggers
+	MaxBody      int
 	*logs.Logger // log file writer
 	extras
 }

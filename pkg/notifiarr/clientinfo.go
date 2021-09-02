@@ -33,20 +33,9 @@ type ClientInfo struct {
 		Dashboard  dashConfig       `json:"dashboard"` // now in use.
 		Sync       syncConfig       `json:"sync"`      // in use (cfsync)
 		Gaps       gapsConfig       `json:"gaps"`      // radarr collection gaps
-		Custom     []*timer         `json:"custom"`    // custom GET timers
+		Custom     []*timerConfig   `json:"custom"`    // custom GET timers
 		Snapshot   *snapshot.Config `json:"snapshot"`  // unused
 	} `json:"actions"`
-}
-
-type timer struct {
-	Name    string `json:"name"`     // name of action.
-	Minutes int    `json:"timer"`    // how often to GET this URI.
-	URI     string `json:"endpoint"` // endpoint for the URI.
-	last    time.Time
-}
-
-func (t *timer) Ready() bool {
-	return t.last.After(time.Now().Add(time.Duration(t.Minutes) * time.Minute))
 }
 
 type intList []int
