@@ -4,6 +4,7 @@
 package services
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs"
@@ -41,50 +42,73 @@ func (c *Config) start() {
 			defer c.CapturePanic()
 
 			for check := range c.checks {
+				if c.done == nil {
+					return
+				} else if check == nil {
+					c.done <- false
+					return
+				}
+
 				c.done <- check.check()
 			}
-
-			c.done <- false
 		}()
 	}
 
 	go c.runServiceChecker()
-	c.Printf("==> Service Checker Started! %d services, interval: %s", len(c.services), c.Interval)
+	c.Printf("==> Service Checker Started! %d services, interval: %s, parallel: %d",
+		len(c.services), c.Interval, c.Parallel)
 }
 
 func (c *Config) runServiceChecker() {
 	ticker := time.NewTicker(c.Interval.Duration)
-	second := time.NewTicker(time.Millisecond * 4159) //nolint:gomnd
+	second := time.NewTicker(10 * time.Second) //nolint:gomnd
 
 	defer func() {
 		c.CapturePanic()
 		second.Stop()
 		ticker.Stop()
-		c.done <- false
 	}()
 
-	c.RunChecks(true)
+	c.runChecks(true)
 	c.SendResults(notifiarr.ProdURL, &Results{
 		What: "start",
-		Svcs: c.GetResults(),
+		Svcs: c.getResults(),
 	})
 
 	for {
 		select {
 		case <-second.C:
-			c.RunChecks(false)
+			c.runChecks(false)
 		case <-ticker.C:
 			c.SendResults(notifiarr.ProdURL, &Results{
 				What: "timer",
-				Svcs: c.GetResults(),
+				Svcs: c.getResults(),
 			})
 		case source := <-c.triggerChan:
-			c.RunChecks(false)
-			c.SendResults(notifiarr.ProdURL, &Results{
-				What: source,
-				Svcs: c.GetResults(),
-			})
+			c.runChecks(true)
+
+			if source.URL == "" {
+				data, _ := json.MarshalIndent(&Results{
+					What:     "log",
+					Svcs:     c.getResults(),
+					Type:     NotifiarrEventType,
+					Interval: c.Interval.Seconds(),
+				}, "", " ")
+				c.Print("Payload (log only):", string(data))
+			} else {
+				c.SendResults(source.URL, &Results{
+					What: source.Name,
+					Svcs: c.getResults(),
+				})
+			}
 		case <-c.stopChan:
+			for i := uint(0); i < c.Parallel; i++ {
+				c.checks <- nil
+				<-c.done
+			}
+
+			c.stopChan <- struct{}{}
+
 			return
 		}
 	}
@@ -95,7 +119,7 @@ func (c *Config) setup(services []*Service) error {
 	c.checks = make(chan *Service, DefaultBuffer)
 	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
-	c.triggerChan = make(chan string)
+	c.triggerChan = make(chan *Source)
 
 	for i := range services {
 		services[i].log = c.Logger
@@ -128,20 +152,15 @@ func (c *Config) Stop() {
 		return
 	}
 
-	close(c.triggerChan)
+	defer close(c.triggerChan)
+	defer close(c.stopChan)
+	defer close(c.checks)
+	defer close(c.done)
+
 	c.triggerChan = nil
-
-	close(c.stopChan)
-	c.stopChan = nil
-	<-c.done
-
-	close(c.checks)
+	c.stopChan <- struct{}{}
+	<-c.stopChan
 	c.checks = nil
-
-	for i := uint(0); i < c.Parallel; i++ {
-		<-c.done
-	}
-
-	close(c.done)
 	c.done = nil
+	c.stopChan = nil
 }

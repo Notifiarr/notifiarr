@@ -133,7 +133,7 @@ func (c *Client) printRadarr() {
 		return
 	}
 
-	c.Print(" => Radarr Config:", len(c.Config.Lidarr), "servers")
+	c.Print(" => Radarr Config:", len(c.Config.Radarr), "servers")
 
 	for i, f := range c.Config.Radarr {
 		checkQ := disabled
@@ -162,7 +162,7 @@ func (c *Client) printReadarr() {
 		return
 	}
 
-	c.Print(" => Readarr Config:", len(c.Config.Lidarr), "servers")
+	c.Print(" => Readarr Config:", len(c.Config.Readarr), "servers")
 
 	for i, f := range c.Config.Readarr {
 		checkQ := disabled
@@ -191,7 +191,7 @@ func (c *Client) printSonarr() {
 		return
 	}
 
-	c.Print(" => Sonarr Config:", len(c.Config.Lidarr), "servers")
+	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "servers")
 
 	for i, f := range c.Config.Sonarr {
 		checkQ := disabled

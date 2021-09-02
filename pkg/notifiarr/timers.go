@@ -17,12 +17,12 @@ func (c *Config) startTimers() {
 
 	c.Trigger.stop = make(chan struct{})
 	snapTimer := c.getSnapTimer()
-	syncTimer := c.getSyncTimer()
+	syncTimer, cronTimer, gapsTimer := c.getSyncGapsAndCronTimers()
 	plexTimer1, plexTimer2 := c.getPlexTimers()
 	stuckItemTimer := time.NewTicker(stuckTimer)
 	dashTimer := c.getDashTimer()
 
-	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckItemTimer, dashTimer)
+	go c.runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckItemTimer, dashTimer, cronTimer, gapsTimer)
 }
 
 func (c *Config) getDashTimer() *time.Ticker {
@@ -40,16 +40,29 @@ func (c *Config) getDashTimer() *time.Ticker {
 	return dashTimer
 }
 
-func (c *Config) getSyncTimer() *time.Ticker {
+func (c *Config) getSyncGapsAndCronTimers() (*time.Ticker, *time.Ticker, *time.Ticker) {
+	cronTimer := &time.Ticker{C: make(<-chan time.Time)}
+	gapsTimer := &time.Ticker{C: make(<-chan time.Time)}
+
 	ci, err := c.GetClientInfo()
 	if err != nil || (ci.Message.CFSync < 1 && ci.Message.RPSync < 1) {
-		return &time.Ticker{C: make(<-chan time.Time)}
+		return cronTimer, cronTimer, gapsTimer
+	}
+
+	if len(ci.Timers) > 0 {
+		c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Timers))
+		cronTimer = time.NewTicker(time.Minute) //nolint:wsl
+	}
+
+	if ci.Message.Gaps.Interval > 0 {
+		c.Printf("==> Collection Gaps Timer Enabled, interval: %dm", ci.Message.Gaps.Interval)
+		gapsTimer = time.NewTicker(time.Minute * time.Duration(ci.Message.Gaps.Interval))
 	}
 
 	c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced",
 		ci.Message.CFSync, ci.Message.RPSync)
 
-	return time.NewTicker(cfSyncTimer)
+	return time.NewTicker(cfSyncTimer), cronTimer, gapsTimer
 }
 
 func (c *Config) getPlexTimers() (*time.Ticker, *time.Ticker) {
@@ -86,11 +99,25 @@ func (c *Config) getSnapTimer() *time.Ticker {
 // runTimerLoop does all of the timer/cron routines for starr apps and plex.
 // Many of the menu items and trigger handlers feed into this routine too.
 // nolint:cyclop
-func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer, dashTimer *time.Ticker) {
-	defer c.stopTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer, dashTimer)
+func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2,
+	stuckTimer, dashTimer, cronTimer, gapsTimer *time.Ticker) {
+	defer c.stopTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuckTimer, dashTimer, cronTimer, gapsTimer)
 
 	for sent := make(map[string]struct{}); ; {
 		select {
+		case <-cronTimer.C:
+			for _, timer := range c.extras.clientInfo.Timers {
+				if timer.Ready() {
+					if _, _, err := c.GetData(timer.URI); err != nil {
+						c.Errorf("Custom Timer Request for %s failed: %v", timer.URI, err)
+					}
+					break //nolint:wsl
+				}
+			}
+		case <-gapsTimer.C:
+			c.sendGaps("timer")
+		case source := <-c.Trigger.gaps:
+			c.sendGaps(source)
 		case reply := <-c.Trigger.syncCF:
 			c.syncCF(reply)
 		case <-syncTimer.C:
@@ -123,12 +150,12 @@ func (c *Config) runTimerLoop(snapTimer, syncTimer, plexTimer1, plexTimer2, stuc
 
 // stopTimerLoop is defered by runTimerLoop.
 func (c *Config) stopTimerLoop(timers ...*time.Ticker) {
+	defer close(c.Trigger.stop)
+	c.Trigger.stop = nil
+
 	c.CapturePanic()
 
 	for _, timer := range timers {
 		timer.Stop()
 	}
-
-	defer close(c.Trigger.stop)
-	c.Trigger.stop = nil
 }

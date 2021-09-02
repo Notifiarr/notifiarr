@@ -1,9 +1,9 @@
+//go:build darwin || windows
 // +build darwin windows
 
 package client
 
 import (
-	"encoding/json"
 	"os"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
@@ -132,11 +132,6 @@ func (c *Client) makeMoreChannels() {
 	}
 
 	c.menu["update"] = ui.WrapMenu(systray.AddMenuItem("Update", "Check GitHub for Update"))
-	c.menu["dninfo"] = ui.WrapMenu(systray.AddMenuItem("Info!", "info from Notifiarr.com"))
-	c.menu["dninfo"].Hide()
-	c.menu["alert"] = ui.WrapMenu(systray.AddMenuItem("Alert!", "alert from Notifiarr.com"))
-	c.menu["alert"].Hide() // currently unused.
-
 	c.menu["exit"] = ui.WrapMenu(systray.AddMenuItem("Quit", "Exit "+c.Flags.Name()))
 }
 
@@ -154,8 +149,8 @@ func (c *Client) watchKillerChannels() {
 		case <-c.menu["debug_panic"].Clicked():
 			c.menuPanic()
 		case <-c.menu["debug_logs"].Clicked():
+			go ui.OpenLog(c.Config.LogConfig.DebugLog) // nolint:errcheck
 			c.Print("User Viewing Debug File:", c.Config.LogConfig.DebugLog)
-			_ = ui.OpenLog(c.Config.LogConfig.DebugLog)
 		case <-c.menu["load"].Clicked():
 			if err := c.reloadConfiguration("User Requested"); err != nil {
 				c.Errorf("Need help? %s\n=====> Exiting! Reloading Configuration: %v", mnd.HelpLink, err)
@@ -172,15 +167,15 @@ func (c *Client) watchGuiChannels() {
 		case <-c.menu["stat"].Clicked():
 			c.toggleServer()
 		case <-c.menu["gh"].Clicked():
-			ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
+			go ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
 		case <-c.menu["hp"].Clicked():
-			ui.OpenURL("https://notifiarr.com/")
+			go ui.OpenURL("https://notifiarr.com/")
 		case <-c.menu["wiki"].Clicked():
-			ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/")
+			go ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/")
 		case <-c.menu["disc1"].Clicked():
-			ui.OpenURL("https://notifiarr.com/discord")
+			go ui.OpenURL("https://notifiarr.com/discord")
 		case <-c.menu["disc2"].Clicked():
-			ui.OpenURL("https://golift.io/discord")
+			go ui.OpenURL("https://golift.io/discord")
 		}
 	}
 }
@@ -190,12 +185,12 @@ func (c *Client) watchConfigChannels() {
 	for {
 		select {
 		case <-c.menu["view"].Clicked():
-			ui.Info(mnd.Title+": Configuration", c.displayConfig())
+			go ui.Info(mnd.Title+": Configuration", c.displayConfig())
 		case <-c.menu["edit"].Clicked():
+			go ui.OpenFile(c.Flags.ConfigFile)
 			c.Print("User Editing Config File:", c.Flags.ConfigFile)
-			ui.OpenFile(c.Flags.ConfigFile)
 		case <-c.menu["write"].Clicked():
-			c.writeConfigFile()
+			go c.writeConfigFile()
 		case <-c.menu["key"].Clicked():
 			c.changeKey()
 		}
@@ -207,14 +202,14 @@ func (c *Client) watchLogsChannels() {
 	for {
 		select {
 		case <-c.menu["logs_view"].Clicked():
+			go ui.OpenLog(c.Config.LogFile)
 			c.Print("User Viewing Log File:", c.Config.LogFile)
-			ui.OpenLog(c.Config.LogFile)
 		case <-c.menu["logs_http"].Clicked():
+			go ui.OpenLog(c.Config.HTTPLog)
 			c.Print("User Viewing Log File:", c.Config.HTTPLog)
-			ui.OpenLog(c.Config.HTTPLog)
 		case <-c.menu["logs_svcs"].Clicked():
+			go ui.OpenLog(c.Config.Services.LogFile)
 			c.Print("User Viewing Log File:", c.Config.Services.LogFile)
-			ui.OpenLog(c.Config.Services.LogFile)
 		case <-c.menu["logs_rotate"].Clicked():
 			c.rotateLogs()
 		case <-c.menu["update"].Clicked():
@@ -223,56 +218,55 @@ func (c *Client) watchLogsChannels() {
 	}
 }
 
-func (c *Client) watchNotifiarrMenu() { //nolint:cyclop
+//nolint:errcheck,cyclop
+func (c *Client) watchNotifiarrMenu() {
 	for {
 		select {
 		case <-c.menu["sync_cf"].Clicked():
+			ui.Notify("Starting custom format and quality profiles sync")
 			c.Printf("[user requested] Triggering Custom Formats and Quality Profiles Sync for Radarr and Sonarr.")
 			c.notifiarr.Trigger.SyncCF(false)
 		case <-c.menu["snap_log"].Clicked():
+			ui.Notify("Logging local system snapshot")
 			c.logSnaps()
 		case <-c.menu["svcs_log"].Clicked():
 			c.Printf("[user requested] Checking services and logging results.")
-			c.Config.Services.RunChecks(true)
-
-			data, _ := json.MarshalIndent(&services.Results{
-				What:     "log",
-				Svcs:     c.Config.Services.GetResults(),
-				Type:     services.NotifiarrEventType,
-				Interval: c.Config.Services.Interval.Seconds(),
-			}, "", " ")
-			c.Print("Payload (log only):", string(data))
+			ui.Notify("Running and logging %d Service Checks", len(c.Config.Service))
+			c.Config.Services.RunChecks(&services.Source{Name: "log", URL: ""})
 		case <-c.menu["svcs_prod"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr.")
-			c.Config.Services.RunChecks(true)
-			c.Config.Services.SendResults(notifiarr.ProdURL, &services.Results{
-				What: "user",
-				Svcs: c.Config.Services.GetResults(),
-			})
+			ui.Notify("Running and sending %d Service Checks", len(c.Config.Service))
+			c.Config.Services.RunChecks(&services.Source{Name: "user", URL: notifiarr.ProdURL})
 		case <-c.menu["svcs_test"].Clicked():
 			c.Printf("[user requested] Checking services and sending results to Notifiarr Test.")
-			c.Config.Services.RunChecks(true)
-			c.Config.Services.SendResults(notifiarr.TestURL, &services.Results{
-				What: "user",
-				Svcs: c.Config.Services.GetResults(),
-			})
+			ui.Notify("Running and sending %d Service Checks (test)", len(c.Config.Service))
+			c.Config.Services.RunChecks(&services.Source{Name: "user", URL: notifiarr.TestURL})
 		case <-c.menu["plex_test"].Clicked():
+			ui.Notify("Gathering and sending Plex sessions (test)")
 			c.sendPlexSessions(notifiarr.TestURL)
 		case <-c.menu["snap_test"].Clicked():
+			ui.Notify("Gathering and sending system snapshot (test)")
 			c.sendSystemSnapshot(notifiarr.TestURL)
 		case <-c.menu["plex_dev"].Clicked():
+			ui.Notify("Gathering and sending Plex sessions (dev)")
 			c.sendPlexSessions(notifiarr.DevURL)
 		case <-c.menu["snap_dev"].Clicked():
+			ui.Notify("Gathering and sending system snapshot (dev)")
 			c.sendSystemSnapshot(notifiarr.DevURL)
 		case <-c.menu["app_ques"].Clicked():
+			ui.Notify("Sending finished, possibly stuck, queue items")
 			c.notifiarr.Trigger.SendFinishedQueueItems(notifiarr.BaseURL)
 		case <-c.menu["app_ques_dev"].Clicked():
+			ui.Notify("Sending finished, possibly stuck, queue items (dev)")
 			c.notifiarr.Trigger.SendFinishedQueueItems(notifiarr.DevBaseURL)
 		case <-c.menu["plex_prod"].Clicked():
+			ui.Notify("Gathering and sending Plex sessions")
 			c.sendPlexSessions(notifiarr.ProdURL)
 		case <-c.menu["snap_prod"].Clicked():
+			ui.Notify("Gathering and sending system snapshot")
 			c.sendSystemSnapshot(notifiarr.ProdURL)
 		case <-c.menu["send_dash"].Clicked():
+			ui.Notify("Gathering and sending app states for dashboard")
 			c.Print("User Requested State Collection for Dashboard")
 			c.notifiarr.Trigger.GetState()
 		}

@@ -1,3 +1,4 @@
+//go:build darwin || windows
 // +build darwin windows
 
 package client
@@ -23,12 +24,14 @@ import (
 
 func (c *Client) toggleServer() {
 	if c.server == nil {
+		ui.Notify("Started web server") //nolint:errcheck
 		c.Print("[user requested] Starting Web Server")
 		c.StartWebServer()
 
 		return
 	}
 
+	ui.Notify("Paused web server") //nolint:errcheck
 	c.Print("[user requested] Pausing Web Server")
 
 	if err := c.StopWebServer(); err != nil {
@@ -38,9 +41,11 @@ func (c *Client) toggleServer() {
 
 func (c *Client) rotateLogs() {
 	c.Print("[user requested] Rotating Log Files!")
+	ui.Notify("Rotating log files") //nolint:errcheck
 
 	for _, err := range c.Logger.Rotate() {
 		if err != nil {
+			ui.Notify("Error rotateing log files: %v", err) //nolint:errcheck
 			c.Errorf("Rotating Log Files: %v", err)
 		}
 	}

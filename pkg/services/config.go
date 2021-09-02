@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -45,8 +44,7 @@ type Config struct {
 	checks       chan *Service
 	done         chan bool
 	stopChan     chan struct{}
-	triggerChan  chan string
-	mu           sync.Mutex // XXX: we should be able to remove this by utilizing channels.
+	triggerChan  chan *Source
 }
 
 // CheckType locks us into a few specific types of checks.
@@ -104,4 +102,10 @@ type Service struct {
 	since     time.Time
 	lastCheck time.Time
 	proc      *procExpect // only used for process checks.
+}
+
+// Source is used to pass a source and destination for service checks (from a trigger).
+type Source struct {
+	Name string
+	URL  string
 }
