@@ -27,7 +27,7 @@ func HideConsoleWindow() {}
 // ShowConsoleWindow does nothing on OSes besides Windows.
 func ShowConsoleWindow() {}
 
-func Notify(msg string) error {
+func Notify(msg string, v ...interface{}) error {
 	if !hasGUI {
 		return nil
 	}
@@ -43,7 +43,7 @@ func Notify(msg string) error {
 		return fmt.Errorf("cannot find terminal-notifier: %w", err)
 	}
 
-	err = StartCmd(app, "-title", mnd.Title, "-message", msg, "-sender", "com.notifiarr.client")
+	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, v...), "-sender", "com.notifiarr.client")
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}

@@ -24,8 +24,8 @@ func HasGUI() bool {
 	return true
 }
 
-func Notify(msg string) error {
-	err := beeep.Notify(mnd.Title, msg, getPNG())
+func Notify(msg string, v ...interface{}) error {
+	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), getPNG())
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}

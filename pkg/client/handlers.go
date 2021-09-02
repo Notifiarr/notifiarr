@@ -11,6 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -20,6 +21,7 @@ import (
 func (c *Client) internalHandlers() {
 	c.Config.HandleAPIpath("", "version", c.notifiarr.VersionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
 
 	if c.Config.Plex.Configured() {
 		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
@@ -141,6 +143,13 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 		c.notifiarr.Trigger.SendGaps(apiTrigger)
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}
+	case "notification":
+		if content := mux.Vars(r)["content"]; content != "" {
+			ui.Notify("Notification: %s", content) //nolint:errcheck
+			c.Printf("NOTIFICATION: %s", content)
+		} else {
+			return http.StatusBadRequest, "missing notification content"
+		}
 	default:
 		return http.StatusBadRequest, "unknown trigger '" + trigger + "'"
 	}
