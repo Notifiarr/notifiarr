@@ -22,10 +22,6 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 		return nil, err
 	}
 
-	if c.LogFile != "" {
-		c.Logger = logs.CustomLog(c.LogFile, "Services")
-	}
-
 	checks := make([]*notifiarr.ServiceCheck, len(services))
 	for i, check := range services {
 		checks[i] = &notifiarr.ServiceCheck{
@@ -34,10 +30,6 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 			Expect:   check.Expect,
 			Timeout:  check.Timeout,
 			Interval: check.Interval,
-		}
-
-		if c.LogFile != "" && c.services[check.Name] != nil {
-			c.services[check.Name].log = c.Logger
 		}
 	}
 
@@ -53,7 +45,10 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 // Runs Parallel checkers and the check reporter.
 func (c *Config) Start() {
 	if c.LogFile != "" {
-		c.Printf("==> Service Checks Log File: %s", c.LogFile)
+		c.Logger = logs.CustomLog(c.LogFile, "Services")
+		for i := range c.services {
+			c.services[i].log = c.Logger
+		}
 	}
 
 	c.checks = make(chan *Service, DefaultBuffer)
@@ -130,7 +125,6 @@ func (c *Config) setup(services []*Service) error {
 	c.services = make(map[string]*Service)
 
 	for i := range services {
-		services[i].log = c.Logger
 		if err := services[i].validate(); err != nil {
 			return err
 		}

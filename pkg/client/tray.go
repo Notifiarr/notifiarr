@@ -150,14 +150,8 @@ func (c *Client) makeMoreChannels() {
 	c.menu["app_ques"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Queue Items Check", "check app queues for stuck items and send to notifiarr"))
 	c.menu["send_dash"] = ui.WrapMenu(data.AddSubMenuItem("Send Dashboard States", "collect and send all application states for a dashboard update"))
 
-	debug := systray.AddMenuItem("Debug", "Debug Menu")
-	c.menu["debug"] = ui.WrapMenu(debug)
-	c.menu["mode"] = ui.WrapMenu(debug.AddSubMenuItem("Mode: "+strings.Title(c.Config.Mode), "toggle application mode"))
-	c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Debug Log", "view the Debug log"))
-	c.menu["svcs_log"] = ui.WrapMenu(debug.AddSubMenuItem("Log Service Checks", "check all services and log results"))
-
 	if ci, err := c.website.GetClientInfo(notifiarr.EventStart); err == nil {
-		ui.WrapMenu(debug.AddSubMenuItem("- Custom Timers -", "")).Disable()
+		ui.WrapMenu(data.AddSubMenuItem("- Custom Timers -", "")).Disable()
 
 		for _, t := range ci.Actions.Custom {
 			desc := "this is a dynamic custom timer"
@@ -165,10 +159,16 @@ func (c *Client) makeMoreChannels() {
 				desc = t.Desc
 			}
 
-			c.menu["timer"+t.Name] = ui.WrapMenu(debug.AddSubMenuItem(t.Name,
+			c.menu["timer"+t.Name] = ui.WrapMenu(data.AddSubMenuItem(t.Name,
 				fmt.Sprintf("%s; config: interval: %s, path: %s", desc, t.Interval, t.URI)))
 		}
 	}
+
+	debug := systray.AddMenuItem("Debug", "Debug Menu")
+	c.menu["debug"] = ui.WrapMenu(debug)
+	c.menu["mode"] = ui.WrapMenu(debug.AddSubMenuItem("Mode: "+strings.Title(c.Config.Mode), "toggle application mode"))
+	c.menu["debug_logs"] = ui.WrapMenu(debug.AddSubMenuItem("View Debug Log", "view the Debug log"))
+	c.menu["svcs_log"] = ui.WrapMenu(debug.AddSubMenuItem("Log Service Checks", "check all services and log results"))
 
 	ui.WrapMenu(debug.AddSubMenuItem("- Danger Zone -", "")).Disable()
 	c.menu["debug_panic"] = ui.WrapMenu(debug.AddSubMenuItem("Application Panic", "cause an application panic (crash)"))

@@ -262,6 +262,8 @@ func (c *Config) Setup(mode string) string {
 
 // Start runs the timers.
 func (c *Config) Start() {
+	c.Print("==> Starting Notifiarr Timers.")
+
 	if c.Trigger.stop != nil {
 		panic("notifiarr timers cannot run twice")
 	}
@@ -274,25 +276,34 @@ func (c *Config) Start() {
 	c.Trigger.plex = make(chan EventType, 1)
 	c.Trigger.state = make(chan EventType, 1)
 	c.Trigger.snap = make(chan EventType, 1)
-	c.Trigger.sess = make(chan time.Time, 1)
 	c.Trigger.gaps = make(chan EventType, 1)
+	c.Trigger.sess = make(chan time.Time, 1)
 
 	go c.runSessionHolder()
 	c.startTimers()
 }
 
-// Stop snapshot and plex cron jobs.
+// Stop all internal cron timers and Triggers.
 func (c *Config) Stop() {
-	if c != nil && c.Trigger.stop != nil {
-		c.Trigger.stop <- struct{}{}
-		close(c.Trigger.syncCF)
-		close(c.Trigger.stuck)
-		close(c.Trigger.plex)
-		close(c.Trigger.state)
-		close(c.Trigger.snap)
-		close(c.Trigger.gaps)
-
-		defer close(c.Trigger.sess)
-		c.Trigger.sess = nil
+	if c == nil {
+		return
 	}
+
+	c.Print("==> Stopping Notifiarr Timers.")
+
+	if c.Trigger.stop == nil {
+		c.Print("==> Notifiarr Timers cannot be stopped: not running!")
+		return
+	}
+
+	c.Trigger.stop <- struct{}{}
+	close(c.Trigger.syncCF)
+	close(c.Trigger.stuck)
+	close(c.Trigger.plex)
+	close(c.Trigger.state)
+	close(c.Trigger.snap)
+	close(c.Trigger.gaps)
+
+	defer close(c.Trigger.sess)
+	c.Trigger.sess = nil
 }
