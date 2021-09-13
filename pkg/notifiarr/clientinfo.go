@@ -4,14 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"runtime"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/update"
+	"github.com/denisbrodbeck/machineid"
 	"github.com/shirou/gopsutil/v3/host"
+	"golift.io/cnfg"
 	"golift.io/version"
 )
 
@@ -28,14 +31,32 @@ type ClientInfo struct {
 		Patron     bool   `json:"patron"`
 	} `json:"user"`
 	Actions struct {
-		Plex       *plexConfig      `json:"plex"`      // unused yet
-		StuckItems stuckConfig      `json:"stuck"`     // unused yet!
-		Dashboard  dashConfig       `json:"dashboard"` // now in use.
-		Sync       syncConfig       `json:"sync"`      // in use (cfsync)
-		Gaps       gapsConfig       `json:"gaps"`      // radarr collection gaps
-		Custom     []*timerConfig   `json:"custom"`    // custom GET timers
-		Snapshot   *snapshot.Config `json:"snapshot"`  // unused
+		Poll      bool             `json:"poll"`
+		Plex      *plex.Server     `json:"plex"`      // optional
+		Apps      appConfigs       `json:"apps"`      // unused yet!
+		Dashboard dashConfig       `json:"dashboard"` // now in use.
+		Sync      syncConfig       `json:"sync"`      // in use (cfsync)
+		Gaps      gapsConfig       `json:"gaps"`      // radarr collection gaps
+		Custom    []*timerConfig   `json:"custom"`    // custom GET timers
+		Snapshot  *snapshot.Config `json:"snapshot"`  // optional
 	} `json:"actions"`
+}
+
+// ServiceConfig comes from the services package. It's only used for display on the website.
+type ServiceConfig struct {
+	Interval cnfg.Duration
+	Parallel int
+	Disabled bool
+	Checks   []*ServiceCheck
+}
+
+// ServiceCheck comes from the services package. It's only used for display on the website.
+type ServiceCheck struct {
+	Name     string        `json:"name"`
+	Type     string        `json:"type"`
+	Expect   string        `json:"expect"`
+	Timeout  cnfg.Duration `json:"timeout"`
+	Interval cnfg.Duration `json:"interval"`
 }
 
 type intList []int
@@ -70,17 +91,22 @@ func (c *ClientInfo) IsPatron() bool {
 }
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
-func (c *Config) GetClientInfo() (*ClientInfo, error) {
+func (c *Config) GetClientInfo(source EventType) (*ClientInfo, error) {
 	c.extras.ciMutex.Lock()
 	defer c.extras.ciMutex.Unlock()
 
-	if c.extras.clientInfo != nil {
-		return c.extras.clientInfo, nil
+	if c.extras.ClientInfo != nil {
+		return c.extras.ClientInfo, nil
 	}
 
-	resp, body, err := c.SendData(c.BaseURL+ClientRoute, c.Info(), true) //nolint:bodyclose // already closed.
+	info, err := c.Info()
 	if err != nil {
-		return nil, fmt.Errorf("POSTing client info: %w", err)
+		return nil, fmt.Errorf("getting system info: %w", err)
+	}
+
+	body, err := c.SendData(ClientRoute.Path(source), info, true)
+	if err != nil {
+		return nil, fmt.Errorf("sending client info: %w", err)
 	}
 
 	v := clientInfoResponse{}
@@ -88,52 +114,175 @@ func (c *Config) GetClientInfo() (*ClientInfo, error) {
 		return &v.ClientInfo, fmt.Errorf("parsing response: %w", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return &v.ClientInfo, ErrNon200
-	}
-
 	// Only set this if there was no error.
-	c.extras.clientInfo = &v.ClientInfo
+	c.extras.ClientInfo = &v.ClientInfo
 
-	return c.extras.clientInfo, nil
+	return c.extras.ClientInfo, nil
 }
 
 // Info is used for JSON input for our outgoing client info.
-func (c *Config) Info() map[string]interface{} {
-	numPlex := 0 // maybe one day we'll support more than 1 plex.
+func (c *Config) Info() (map[string]interface{}, error) {
+	var (
+		plexConfig interface{}
+		numPlex    = 0 // maybe one day we'll support more than 1 plex.
+	)
+
 	if c.Plex.Configured() {
 		numPlex = 1
+		plexConfig = map[string]interface{}{
+			"seriesPc":   c.Plex.SeriesPC,
+			"moviesPc":   c.Plex.MoviesPC,
+			"cooldown":   c.Plex.Cooldown,
+			"accountMap": c.Plex.AccountMap,
+			"interval":   c.Plex.Interval,
+			"noActivity": c.Plex.NoActivity,
+		}
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-
-	hostInfo, _ := host.InfoWithContext(ctx)
-	if hostInfo != nil {
-		hostInfo.Hostname = "" // we do not need this.
-	}
+	hostInfo, err := c.GetHostInfoUID()
 
 	return map[string]interface{}{
-		"arch":        runtime.GOARCH,
-		"build_date":  version.BuildDate,
-		"docker":      os.Getenv("NOTIFIARR_IN_DOCKER") == "true",
-		"go_version":  version.GoVersion,
-		"gui":         ui.HasGUI(),
-		"host":        hostInfo,
-		"num_deluge":  len(c.Apps.Deluge),
-		"num_lidarr":  len(c.Apps.Lidarr),
-		"num_plex":    numPlex,
-		"num_qbit":    len(c.Apps.Qbit),
-		"num_radarr":  len(c.Apps.Radarr),
-		"num_readarr": len(c.Apps.Readarr),
-		"num_sonarr":  len(c.Apps.Sonarr),
-		"os":          runtime.GOOS,
-		"retries":     c.Retries,
-		"revision":    version.Revision,
-		"snapshots":   c.Snap,
-		"stuck_dur":   stuckTimer.Seconds(),
-		"timeout":     c.Timeout.Seconds(),
-		"uptime_dur":  time.Since(version.Started).Round(time.Second).Seconds(),
-		"version":     version.Version,
+		"client": map[string]interface{}{
+			"arch":      runtime.GOARCH,
+			"buildDate": version.BuildDate,
+			"goVersion": version.GoVersion,
+			"os":        runtime.GOOS,
+			"revision":  version.Revision,
+			"version":   version.Version,
+			"uptimeSec": time.Since(version.Started).Round(time.Second).Seconds(),
+			"started":   version.Started,
+			"docker":    os.Getenv("NOTIFIARR_IN_DOCKER") == "true",
+			"gui":       ui.HasGUI(),
+		},
+		"host": hostInfo,
+		"num": map[string]interface{}{
+			"deluge":  len(c.Apps.Deluge),
+			"lidarr":  len(c.Apps.Lidarr),
+			"plex":    numPlex,
+			"qbit":    len(c.Apps.Qbit),
+			"radarr":  len(c.Apps.Radarr),
+			"readarr": len(c.Apps.Readarr),
+			"sonarr":  len(c.Apps.Sonarr),
+		},
+		"config": map[string]interface{}{
+			"globalTimeout": c.Timeout.String(),
+			"retries":       c.Retries,
+			"plex":          plexConfig,
+			"snapshots":     c.Snap,
+			"apps":          c.getAppConfigs(),
+		},
+		"internal": map[string]interface{}{
+			"stuckDur": stuckDur.String(),
+			"pollDur":  pollDur.String(),
+		},
+		"services": c.Services,
+	}, err
+}
+
+// GetHostInfoUID attempts to make a unique machine identifier...
+func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
+	c.extras.hiMutex.Lock()
+	defer c.extras.hiMutex.Unlock()
+
+	if c.extras.hostInfo != nil {
+		return c.extras.hostInfo, nil
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) //nolint:gomnd
+	defer cancel()
+
+	hostInfo, err := host.InfoWithContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("getting host info: %w", err)
+	}
+
+	uid, err := machineid.ProtectedID(hostInfo.Hostname)
+	if err != nil {
+		return nil, fmt.Errorf("getting machine ID: %w", err)
+	}
+
+	hostInfo.HostID = uid // this is where we put the unique ID.
+
+	return hostInfo, nil
+}
+
+func (c *Config) pollForReload() {
+	if c.ClientInfo != nil && !c.ClientInfo.Actions.Poll {
+		return
+	}
+
+	info, err := c.Info()
+	if err != nil {
+		c.Errorf("Getting System Info: %v", err)
+		return
+	}
+
+	body, err := c.SendData(ClientRoute.Path(EventPoll), info, true)
+	if err != nil {
+		c.Errorf("Polling Notifiarr: %v", err)
+		return
+	}
+
+	var v struct {
+		Reload bool `json:"reload"`
+	}
+
+	if err = json.Unmarshal(body, &v); err != nil {
+		c.Errorf("Polling Notifiarr: %v", err)
+		return
+	}
+
+	if v.Reload {
+		c.Printf("Website indicated new configurations; reloading to pick them up!")
+		c.Sighup <- &update.Signal{Text: "poll triggered reload"}
+	} else if c.ClientInfo == nil {
+		c.Printf("API Key checked out, reloading to pick up configuration from website!")
+		c.Sighup <- &update.Signal{Text: "client info reload"}
+	}
+}
+
+func (c *Config) getAppConfigs() interface{} {
+	apps := make(map[string][]map[string]interface{})
+
+	for i, app := range c.Apps.Lidarr {
+		apps["lidarr"] = append(apps["lidarr"], map[string]interface{}{
+			"name":     app.Name,
+			"instance": i + 1,
+			"checkQ":   app.CheckQ,
+			"stuckOn":  app.StuckItem,
+			"interval": app.Interval,
+		})
+	}
+
+	for i, app := range c.Apps.Radarr {
+		apps["radarr"] = append(apps["radarr"], map[string]interface{}{
+			"name":     app.Name,
+			"instance": i + 1,
+			"checkQ":   app.CheckQ,
+			"stuckOn":  app.StuckItem,
+			"interval": app.Interval,
+		})
+	}
+
+	for i, app := range c.Apps.Readarr {
+		apps["readarr"] = append(apps["readarr"], map[string]interface{}{
+			"name":     app.Name,
+			"instance": i + 1,
+			"checkQ":   app.CheckQ,
+			"stuckOn":  app.StuckItem,
+			"interval": app.Interval,
+		})
+	}
+
+	for i, app := range c.Apps.Sonarr {
+		apps["sonarr"] = append(apps["sonarr"], map[string]interface{}{
+			"name":     app.Name,
+			"instance": i + 1,
+			"checkQ":   app.CheckQ,
+			"stuckOn":  app.StuckItem,
+			"interval": app.Interval,
+		})
+	}
+
+	return apps
 }

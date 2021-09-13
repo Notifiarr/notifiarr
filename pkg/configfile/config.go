@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
@@ -66,44 +65,48 @@ func (c *Config) Get(configFile, envPrefix string, logger *logs.Logger) (*notifi
 		return nil, fmt.Errorf("environment variables: %w", err)
 	}
 
-	// This function returns the notifiarr package Config struct too.
-	// This config contains [some of] the same data as the normal Config.
-	notifiarr := &notifiarr.Config{
-		Apps:    c.Apps,
-		Plex:    c.Plex,
-		Snap:    c.Snapshot,
-		Logger:  logger,
-		URL:     notifiarr.ProdURL,
-		Timeout: c.Timeout.Duration,
-		MaxBody: c.MaxBody,
-	}
-	c.setup(notifiarr)
-
 	// Make sure each app has a sane timeout.
-	if err := c.Apps.Setup(c.Timeout.Duration); err != nil {
+	err := c.Apps.Setup(c.Timeout.Duration)
+	if err != nil {
 		return nil, fmt.Errorf("setting up app: %w", err)
 	}
 
-	return notifiarr, nil
+	// Make sure the port is not in use before starting the web server.
+	if c.BindAddr, err = CheckPort(c.BindAddr); err != nil {
+		return nil, err
+	}
+
+	c.Services.Apps = c.Apps
+
+	svcs, err := c.Services.Setup(c.Service)
+	if err != nil {
+		return nil, fmt.Errorf("service checks: %w", err)
+	}
+
+	// This function returns the notifiarr package Config struct too.
+	// This config contains [some of] the same data as the normal Config.
+	c.Services.Notifiarr = &notifiarr.Config{
+		Apps:     c.Apps,
+		Plex:     c.Plex,
+		Snap:     c.Snapshot,
+		Logger:   logger,
+		BaseURL:  notifiarr.BaseURL,
+		Timeout:  c.Timeout.Duration,
+		MaxBody:  c.MaxBody,
+		Services: svcs,
+	}
+	c.setup()
+
+	return c.Services.Notifiarr, nil
 }
 
-func (c *Config) setup(notifiarr *notifiarr.Config) {
+func (c *Config) setup() {
+	c.Mode = c.Services.Notifiarr.Setup(c.Mode)
 	c.URLBase = path.Join("/", c.URLBase)
 	c.Allow = MakeIPs(c.Upstreams)
 
-	if c.Services != nil {
-		c.Services.Notifiarr = notifiarr
-		c.Services.Apps = c.Apps
-	}
-
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = mnd.DefaultTimeout
-	}
-
-	if c.BindAddr == "" {
-		c.BindAddr = mnd.DefaultBindAddr
-	} else if !strings.Contains(c.BindAddr, ":") {
-		c.BindAddr = "0.0.0.0:" + c.BindAddr
 	}
 
 	if ui.HasGUI() && c.LogConfig != nil {

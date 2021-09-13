@@ -3,20 +3,20 @@ package notifiarr
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"golift.io/cnfg"
 	"golift.io/starr/radarr"
 	"golift.io/starr/sonarr"
 )
 
 // syncConfig is the configuration returned from the notifiarr website.
 type syncConfig struct {
-	Instances intList `json:"instances"` // which instance IDs we sync
-	Minutes   int     `json:"timer"`     // how often to fire in minutes.
-	URI       string  `json:"endpoint"`  // "api/v1/user/sync"
-	Radarr    int64   `json:"radarr"`    // items in sync
-	Sonarr    int64   `json:"sonarr"`    // items in sync
+	Interval        cnfg.Duration `json:"interval"`        // how often to fire in minutes.
+	Radarr          int64         `json:"radarr"`          // items in sync
+	RadarrInstances intList       `json:"radarrInstances"` // which instance IDs we sync
+	Sonarr          int64         `json:"sonarr"`          // items in sync
+	SonarrInstances intList       `json:"sonarrInstances"` // which instance IDs we sync
 }
 
 // cfMapIDpayload is used to post-back ID changes for profiles and formats.
@@ -45,44 +45,34 @@ type RadarrCustomFormatPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
-func (t *Triggers) SyncCF(wait bool) {
+func (t *Triggers) SyncCF(event EventType) {
 	if t.stop == nil {
 		return
 	}
 
-	if !wait {
-		t.syncCF <- nil
-		return
-	}
-
-	reply := make(chan struct{})
-	t.syncCF <- reply
-	<-reply
+	t.syncCF <- event
 }
 
-func (c *Config) syncCF(reply chan struct{}) {
+func (c *Config) syncCF(event EventType) {
+	c.Debugf("Running CF Sync via event: %s", event)
 	c.syncRadarr()
 	c.syncSonarr()
-
-	if reply != nil {
-		reply <- struct{}{}
-	}
 }
 
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *Config) syncRadarr() {
-	ci, err := c.GetClientInfo()
-	if err != nil {
-		c.Errorf("Cannot sync Radarr Custom Formats. Error: %v", err)
-		return
-	} else if ci.Actions.Sync.Radarr < 1 {
+	if c.ClientInfo == nil || len(c.Actions.Sync.RadarrInstances) < 1 {
 		c.Debugf("Cannot sync Radarr Custom Formats. Website provided 0 instances.")
+		return
+	} else if len(c.Apps.Radarr) < 1 {
+		c.Debugf("Cannot sync Radarr Custom Formats. No Radarr instances configured.")
 		return
 	}
 
 	for i, app := range c.Apps.Radarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || !ci.Actions.Sync.Instances.Has(instance) {
+		if app.URL == "" || app.APIKey == "" || !c.Actions.Sync.RadarrInstances.Has(instance) {
+			c.Debugf("CF Sync Skipping Radarr instance %d. Not in sync list: %v", instance, c.Actions.Sync.RadarrInstances)
 			continue
 		}
 
@@ -97,7 +87,7 @@ func (c *Config) syncRadarr() {
 	}
 }
 
-func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) (bool, error) {
+func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) (bool, error) { //nolint:dupl
 	var (
 		err     error
 		payload = RadarrCustomFormatPayload{Instance: instance, Name: app.Name, NewMaps: c.radarrCF[instance]}
@@ -113,12 +103,9 @@ func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) (bool, error
 		return false, fmt.Errorf("getting custom formats: %w", err)
 	}
 
-	//nolint:bodyclose // already closed
-	resp, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=radarr", payload, false)
+	body, err := c.SendData(CFSyncRoute.Path("", "app=radarr"), payload, false)
 	if err != nil {
 		return false, fmt.Errorf("sending current formats: %w", err)
-	} else if resp.StatusCode != http.StatusOK {
-		return false, fmt.Errorf("%w: %s", ErrNon200, resp.Status)
 	}
 
 	delete(c.radarrCF, instance)
@@ -136,14 +123,16 @@ func (c *Config) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byt
 	payload := struct {
 		Response string `json:"response"`
 		Message  struct {
-			RadarrCustomFormatPayload
+			Response struct {
+				RadarrCustomFormatPayload
+			} `json:"response"`
 		} `json:"message"`
 	}{}
 	if err := json.Unmarshal(data, &payload); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
 
-	reply := payload.Message
+	reply := payload.Message.Response.RadarrCustomFormatPayload
 	c.Debugf("Received %d quality profiles and %d custom formats for Radarr: %d:%s",
 		len(reply.QualityProfiles), len(reply.CustomFormats), instance, app.URL)
 
@@ -198,17 +187,13 @@ func (c *Config) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 		return nil
 	}
 
-	//nolint:bodyclose // already closed.
-	resp, _, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=radarr&updateIDs=true", &RadarrCustomFormatPayload{
+	_, err := c.SendData(CFSyncRoute.Path("", "app=radarr", "updateIDs=true"), &RadarrCustomFormatPayload{
 		Instance: instance,
 		NewMaps:  maps,
 	}, false)
 	if err != nil {
 		c.radarrCF[instance] = maps
 		return fmt.Errorf("updating custom format ID map: %w", err)
-	} else if resp.StatusCode != http.StatusOK {
-		c.radarrCF[instance] = maps
-		return fmt.Errorf("updating custom format ID map: %w: %s", ErrNon200, resp.Status)
 	}
 
 	delete(c.radarrCF, instance)
@@ -230,18 +215,18 @@ type SonarrCustomFormatPayload struct {
 
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *Config) syncSonarr() {
-	ci, err := c.GetClientInfo()
-	if err != nil {
-		c.Debugf("Cannot sync Sonarr Release Profiles. Error: %v", err)
-		return
-	} else if ci.Actions.Sync.Sonarr < 1 {
+	if c.ClientInfo == nil || len(c.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Website provided 0 instances.")
+		return
+	} else if len(c.Apps.Sonarr) < 1 {
+		c.Debugf("Cannot sync Sonarr Release Profiles. No Sonarr instances configured.")
 		return
 	}
 
 	for i, app := range c.Apps.Sonarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || !ci.Actions.Sync.Instances.Has(instance) {
+		if app.URL == "" || app.APIKey == "" || !c.Actions.Sync.SonarrInstances.Has(instance) {
+			c.Debugf("CF Sync Skipping Sonarr instance %d. Not in sync list: %v", instance, c.Actions.Sync.SonarrInstances)
 			continue
 		}
 
@@ -272,12 +257,9 @@ func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) (bool, error
 		return false, fmt.Errorf("getting release profiles: %w", err)
 	}
 
-	//nolint:bodyclose // already closed
-	resp, body, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=sonarr", payload, false)
+	body, err := c.SendData(CFSyncRoute.Path("", "app=sonarr"), payload, false)
 	if err != nil {
 		return false, fmt.Errorf("sending current profiles: %w", err)
-	} else if resp.StatusCode != http.StatusOK {
-		return false, fmt.Errorf("%w: %s", ErrNon200, resp.Status)
 	}
 
 	delete(c.sonarrRP, instance)
@@ -295,14 +277,16 @@ func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byt
 	payload := struct {
 		Response string `json:"response"`
 		Message  struct {
-			SonarrCustomFormatPayload
+			Response struct {
+				SonarrCustomFormatPayload
+			} `json:"response"`
 		} `json:"message"`
 	}{}
 	if err := json.Unmarshal(data, &payload); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
 
-	reply := payload.Message
+	reply := payload.Message.Response.SonarrCustomFormatPayload
 	c.Debugf("Received %d quality profiles and %d release profiles for Sonarr: %d:%s",
 		len(reply.QualityProfiles), len(reply.ReleaseProfiles), instance, app.URL)
 
@@ -357,17 +341,13 @@ func (c *Config) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
 		return nil
 	}
 
-	//nolint:bodyclose // already closed
-	resp, _, err := c.SendData(c.BaseURL+CFSyncRoute+"?app=sonarr&updateIDs=true", &SonarrCustomFormatPayload{
+	_, err := c.SendData(CFSyncRoute.Path("", "app=sonarr", "updateIDs=true"), &SonarrCustomFormatPayload{
 		Instance: instance,
 		NewMaps:  maps,
 	}, false)
 	if err != nil {
 		c.sonarrRP[instance] = maps
 		return fmt.Errorf("updating quality release ID map: %w", err)
-	} else if resp.StatusCode != http.StatusOK {
-		c.sonarrRP[instance] = maps
-		return fmt.Errorf("updating quality release ID map: %w: %s", ErrNon200, resp.Status)
 	}
 
 	delete(c.sonarrRP, instance)

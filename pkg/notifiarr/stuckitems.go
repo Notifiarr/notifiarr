@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"golift.io/cnfg"
 	"golift.io/starr/sonarr"
 )
 
@@ -17,9 +18,19 @@ const (
 	completed = "completed"
 )
 
-// stuckConfig is the configuration returned from the notifiarr website.
-type stuckConfig struct {
-	Instances intList `json:"instances"`
+type appConfig struct {
+	Instance int           `json:"instance"`
+	Name     string        `json:"name"`
+	Stuck    bool          `json:"stuck"`
+	Interval cnfg.Duration `json:"interval"`
+}
+
+// appConfigs is the configuration returned from the notifiarr website.
+type appConfigs struct {
+	Lidarr  []*appConfig `json:"lidarr"`
+	Radarr  []*appConfig `json:"radarr"`
+	Readarr []*appConfig `json:"readarr"`
+	Sonarr  []*appConfig `json:"sonarr"`
 }
 
 type ListItem struct {
@@ -53,15 +64,15 @@ func (i ItemList) Empty() bool {
 	return i.Len() < 1
 }
 
-func (t *Triggers) SendFinishedQueueItems(url string) {
+func (t *Triggers) SendFinishedQueueItems(event EventType) {
 	if t.stop == nil {
 		return
 	}
 
-	t.stuck <- url
+	t.stuck <- event
 }
 
-func (c *Config) sendFinishedQueueItems(url string) {
+func (c *Config) sendFinishedQueueItems(event EventType) {
 	start := time.Now()
 	q := c.getQueues()
 	apps := time.Since(start).Round(time.Millisecond)
@@ -70,14 +81,14 @@ func (c *Config) sendFinishedQueueItems(url string) {
 		return
 	}
 
-	_, _, err := c.SendData(url+ClientRoute, q, true)
+	_, err := c.SendData(StuckRoute.Path(event), q, true)
 	elapsed := time.Since(start).Round(time.Millisecond)
 
 	if err != nil {
 		c.Errorf("Sending Stuck Queue Items (apps:%s total:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d): %v",
 			apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), err)
 	} else {
-		c.Printf("Sent Stuck Items (apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
+		c.Printf("Sent Stuck Items to Notifiarr (apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len())
 	}
 }

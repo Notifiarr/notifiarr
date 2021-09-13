@@ -45,7 +45,7 @@ require (
 	golang.org/x/mod v0.5.0
 	golang.org/x/net v0.0.0-20210825183410-e898025ed96a // indirect
 	golang.org/x/sys v0.0.0-20210831042530-f4d43177bf5e
-	golift.io/cnfg v0.0.8-0.20201101095209-9c9085f1bf93
+	golift.io/cnfg v0.0.8
 	golift.io/deluge v0.9.2
 	golift.io/qbit v0.0.0-20210717220751-d545c7a8f721
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
@@ -55,3 +55,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	howett.net/plist v0.0.0-20201203080718-1454fab16a06 // indirect
 )
+
+require github.com/denisbrodbeck/machineid v1.0.1 // indirect

@@ -8,6 +8,7 @@ package client
 import (
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
@@ -17,8 +18,13 @@ const disabled = "disabled"
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
 func (c *Client) PrintStartupInfo() {
+	hi, _ := c.website.GetHostInfoUID()
+	if hi != nil {
+		c.Printf("==> Unique ID: %s (%s)", hi.HostID, hi.Hostname)
+	}
+
 	c.Printf("==> %s <==", mnd.HelpLink)
-	c.Print("==> Startup Settings <==")
+	c.Printf("==> %s Startup Settings <==", strings.Title(strings.ToLower(c.Config.Mode)))
 	c.printLidarr()
 	c.printRadarr()
 	c.printReadarr()

@@ -18,20 +18,6 @@ const (
 	statusSent     = "sent"
 )
 
-const (
-	movie   = "movie"
-	episode = "episode"
-)
-
-// plexConfig is the configuration returned from the notifiarr website.
-type plexConfig struct {
-	Minutes    int  `json:"timer"`       // how often to send session data in minutes.
-	Cooldown   int  `json:"cooldown"`    // how often to allow a "resume" payload in seconds.
-	MoviesPC   uint `json:"moviesPc"`    // movies percent complete for notification
-	SeriesPC   uint `json:"seriesPc"`    // series percent complete for notification
-	NoActivity bool `json:"no_activity"` // disable activity gether on webhook.
-}
-
 type holder struct {
 	sessions *plex.Sessions
 	error    error
@@ -40,22 +26,22 @@ type holder struct {
 var ErrNoChannel = fmt.Errorf("no channel to send session request")
 
 // SendPlexSessions sends plex sessions in a go routine through a channel.
-func (t *Triggers) SendPlexSessions(source string) {
+func (t *Triggers) SendPlexSessions(event EventType) {
 	if t.stop == nil {
 		return
 	}
 
-	t.plex <- source
+	t.plex <- event
 }
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
-func (c *Config) sendPlexSessions(source string) {
-	if body, err := c.SendMeta(source, c.URL, nil, false); err != nil {
-		c.Errorf("Sending Plex Sessions to %s: %v", c.URL, err)
+func (c *Config) sendPlexSessions(event EventType) {
+	if body, err := c.sendPlexMeta(event, nil, false); err != nil {
+		c.Errorf("Sending Plex Sessions to Notifiarr, event: %s: %v", event, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("Plex Sessions sent to %s, reply: %s", c.URL, fields[3])
+		c.Printf("Plex Sessions sent to Notifiarr, event: %s, reply: %s", event, fields[3])
 	} else {
-		c.Printf("Plex Sessions sent to %s.", c.URL)
+		c.Printf("Plex Sessions sent to Notifiar, event: %s", event)
 	}
 }
 
@@ -87,7 +73,7 @@ func (c *Config) runSessionHolder() {
 		err      error
 	)
 
-	if sessions, err = c.Plex.GetXMLSessions(); err == nil {
+	if sessions, err = c.Plex.GetSessions(); err == nil {
 		updated = time.Now()
 	}
 
@@ -104,7 +90,7 @@ func (c *Config) runSessionHolder() {
 			time.Sleep(t)
 		}
 
-		sessions, err = c.Plex.GetXMLSessions()
+		sessions, err = c.Plex.GetSessions()
 		if err == nil {
 			updated = time.Now()
 		}
@@ -158,13 +144,13 @@ func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
 
 func (c *Config) checkSessionDone(s *plex.Session, pct float64) string {
 	switch {
-	case c.Plex.MoviesPC > 0 && strings.EqualFold(s.Type, movie):
+	case c.Plex.MoviesPC > 0 && EventType(s.Type) == EventMovie:
 		if pct < float64(c.Plex.MoviesPC) {
 			return statusWatching
 		}
 
 		return c.sendSessionDone(s)
-	case c.Plex.SeriesPC > 0 && strings.EqualFold(s.Type, episode):
+	case c.Plex.SeriesPC > 0 && EventType(s.Type) == EventEpisode:
 		if pct < float64(c.Plex.SeriesPC) {
 			return statusWatching
 		}
@@ -181,11 +167,12 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), c.Snap.Timeout.Duration)
-	snap := c.GetMetaSnap(ctx)
+	snap := c.getMetaSnap(ctx)
 	cancel() //nolint:wsl
 
-	_, body, err := c.SendData(c.URL, &Payload{
-		Type: "plex_session_complete_" + s.Type,
+	route := PlexRoute.Path(EventType(s.Type))
+
+	body, err := c.SendData(route, &Payload{
 		Snap: snap,
 		Plex: &plex.Sessions{
 			Name:       c.Plex.Name,
@@ -194,10 +181,10 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 		},
 	}, true)
 	if err != nil {
-		return statusError + ": sending to " + c.URL + ": " + err.Error() + ": " + string(body)
+		return statusError + ": sending to " + route + ": " + err.Error() + ": " + string(body)
 	}
 
-	return statusSending + " to " + c.URL
+	return statusSending
 }
 
 func (c *Config) checkPlexAgent(s *plex.Session) error {

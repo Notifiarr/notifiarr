@@ -23,47 +23,6 @@ type Sessions struct {
 // ErrBadStatus is returned when plex returns an invalid status code.
 var ErrBadStatus = fmt.Errorf("status code not 200")
 
-// GetXMLSessions returns the Plex sessions in XML format.
-func (s *Server) GetXMLSessions() (*Sessions, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
-	defer cancel()
-
-	var (
-		v struct {
-			MediaContainer struct {
-				Sessions []*Session `json:"Metadata"`
-			} `json:"MediaContainer"`
-		}
-
-		sessions = &Sessions{
-			Name:       s.Name,
-			AccountMap: strings.Split(s.AccountMap, "|"),
-		}
-	)
-
-	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", map[string]string{"Accept": "application/xml"})
-	if err != nil {
-		return sessions, fmt.Errorf("%w: %s", err, string(body))
-	}
-
-	if s.ReturnJSON {
-		body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
-		if err != nil {
-			return sessions, fmt.Errorf("%w: %s", err, string(body))
-		}
-
-		// log.Print("DEBUG PLEX PAYLOAD:\n", string(data))
-		if err = json.Unmarshal(body, &v); err != nil {
-			return sessions, fmt.Errorf("parsing plex sessions: %w", err)
-		}
-	}
-
-	sessions.Sessions = v.MediaContainer.Sessions
-	sessions.XML = string(body)
-
-	return sessions, nil
-}
-
 // GetSessions returns the Plex sessions in JSON format, no timeout.
 func (s *Server) GetSessions() (*Sessions, error) {
 	return s.GetSessionsWithContext(context.Background())

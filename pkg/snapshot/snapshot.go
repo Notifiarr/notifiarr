@@ -26,23 +26,25 @@ const DefaultTimeout = 30 * time.Second
 
 const (
 	minimumTimeout  = 5 * time.Second
+	maximumTimeout  = time.Minute
 	minimumInterval = 10 * time.Minute
 )
 
 // Config determines which checks to run, etc.
-//nolint:lll,tagliatelle
+//nolint:lll
 type Config struct {
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                               // total run time allowed.
-	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                            // how often to send snaps (cron).
-	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfs_pool"`                           // zfs pools to monitor.
-	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"use_sudo"`                            // use sudo for smartctl commands.
-	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitor_raid"`                // include mdstat and/or megaraid.
-	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitor_drives"`          // smartctl commands.
-	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitor_space"`             // get disk usage.
-	Uptime    bool          `toml:"monitor_uptime" xml:"monitor_uptime" json:"monitor_uptime"`          // all system stats.
-	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitor_cpuMemory"` // cpu perct and memory used/free.
-	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitor_cpuTemp"`       // not everything supports temps.
-	synology  bool
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                           // total run time allowed.
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                        // how often to send snaps (cron).
+	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfsPools"`                       // zfs pools to monitor.
+	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"useSudo"`                         // use sudo for smartctl commands.
+	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`             // include mdstat and/or megaraid.
+	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"`       // smartctl commands.
+	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`          // get disk usage.
+	Uptime    bool          `toml:"monitor_uptime" xml:"monitor_uptime" json:"monitorUptime"`       // all system stats.
+	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitorCpuMem"` // cpu perct and memory used/free.
+	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
+	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
+	synology bool
 }
 
 // Errors this package generates.
@@ -91,10 +93,13 @@ type Partition struct {
 
 // Validate makes sure the snapshot configuration is valid.
 func (c *Config) Validate() {
-	if c.Timeout.Duration == 0 {
+	switch {
+	case c.Timeout.Duration == 0:
 		c.Timeout.Duration = DefaultTimeout
-	} else if c.Timeout.Duration < minimumTimeout {
+	case c.Timeout.Duration < minimumTimeout:
 		c.Timeout.Duration = minimumTimeout
+	case c.Timeout.Duration > maximumTimeout:
+		c.Timeout.Duration = maximumTimeout
 	}
 
 	if c.Interval.Duration == 0 {
@@ -114,12 +119,6 @@ func (c *Config) Validate() {
 
 // GetSnapshot returns a system snapshot based on requested data in the config.
 func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
-	if c.Timeout.Duration == 0 {
-		c.Timeout.Duration = DefaultTimeout
-	} else if c.Timeout.Duration < minimumTimeout {
-		c.Timeout.Duration = minimumTimeout
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 

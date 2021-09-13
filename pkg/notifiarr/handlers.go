@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
@@ -136,9 +137,9 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
 func (c *Config) collectSessions(v *plexIncomingWebhook) {
-	reply, err := c.SendMeta(PlexHook, c.URL, v, true)
+	reply, err := c.sendPlexMeta(EventHook, v, true)
 	if err != nil {
-		c.Errorf("Sending Plex Sessions to Notifiarr: %v", err)
+		c.Errorf("Sending Plex Sessions (and webhook) to Notifiarr: %v", err)
 		return
 	}
 
@@ -147,8 +148,7 @@ func (c *Config) collectSessions(v *plexIncomingWebhook) {
 
 // sendPlexWebhook simply relays an incoming "admin" plex webhook to Notifiarr.com.
 func (c *Config) sendPlexWebhook(v *plexIncomingWebhook) {
-	_, reply, err := c.SendData(c.URL, &Payload{ //nolint:bodyclose // already closed
-		Type: PlexHook,
+	reply, err := c.SendData(PlexRoute.Path(EventHook), &Payload{
 		Load: v,
 		Plex: &plex.Sessions{
 			Name:       c.Plex.Name,
@@ -175,10 +175,10 @@ func (c *Config) plexNotifiarrReplyParserLog(reply []byte, v *plexIncomingWebhoo
 }
 
 type appStatus struct {
+	Lidarr  []*conTest `json:"lidarr"`
 	Radarr  []*conTest `json:"radarr"`
 	Readarr []*conTest `json:"readarr"`
 	Sonarr  []*conTest `json:"sonarr"`
-	Lidarr  []*conTest `json:"lidarr"`
 	Plex    []*conTest `json:"plex"`
 }
 
@@ -191,33 +191,9 @@ type conTest struct {
 // VersionHandler returns application run and build time data and application statuses: /api/version.
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 	var (
-		output = c.Info()
-		rad    = make([]*conTest, len(c.Apps.Radarr))
-		read   = make([]*conTest, len(c.Apps.Readarr))
-		son    = make([]*conTest, len(c.Apps.Sonarr))
-		lid    = make([]*conTest, len(c.Apps.Lidarr))
-		status = &appStatus{Radarr: rad, Readarr: read, Sonarr: son, Lidarr: lid}
+		output, err = c.Info()
+		status      = appStatsForVersion(c.Apps)
 	)
-
-	for i, app := range c.Apps.Radarr {
-		stat, err := app.GetSystemStatus()
-		rad[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
-
-	for i, app := range c.Apps.Readarr {
-		stat, err := app.GetSystemStatus()
-		read[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
-
-	for i, app := range c.Apps.Sonarr {
-		stat, err := app.GetSystemStatus()
-		son[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
-
-	for i, app := range c.Apps.Lidarr {
-		stat, err := app.GetSystemStatus()
-		lid[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
 
 	if c.Plex.Configured() {
 		stat, err := c.Plex.GetInfo()
@@ -244,7 +220,43 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 		}}
 	}
 
-	output["app_status"] = status
+	if err != nil {
+		output = make(map[string]interface{})
+		output["systemError"] = err.Error()
+	}
+
+	output["appsStatus"] = status
 
 	return http.StatusOK, output
+}
+
+func appStatsForVersion(apps *apps.Apps) *appStatus {
+	var (
+		lid  = make([]*conTest, len(apps.Lidarr))
+		rad  = make([]*conTest, len(apps.Radarr))
+		read = make([]*conTest, len(apps.Readarr))
+		son  = make([]*conTest, len(apps.Sonarr))
+	)
+
+	for i, app := range apps.Lidarr {
+		stat, err := app.GetSystemStatus()
+		lid[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	for i, app := range apps.Radarr {
+		stat, err := app.GetSystemStatus()
+		rad[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	for i, app := range apps.Readarr {
+		stat, err := app.GetSystemStatus()
+		read[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	for i, app := range apps.Sonarr {
+		stat, err := app.GetSystemStatus()
+		son[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	return &appStatus{Radarr: rad, Readarr: read, Sonarr: son, Lidarr: lid}
 }

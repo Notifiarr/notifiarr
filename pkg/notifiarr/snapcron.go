@@ -32,15 +32,15 @@ func (c *Config) logSnapshotStartup() {
 		c.Snap.Interval, c.Snap.Timeout, ex)
 }
 
-func (t *Triggers) SendSnapshot(source string) {
+func (t *Triggers) SendSnapshot(event EventType) {
 	if t.stop == nil {
 		return
 	}
 
-	t.snap <- source
+	t.snap <- event
 }
 
-func (c *Config) sendSnapshot(source string) {
+func (c *Config) sendSnapshot(event EventType) {
 	snapshot, errs, debug := c.Snap.GetSnapshot()
 	for _, err := range errs {
 		if err != nil {
@@ -55,11 +55,13 @@ func (c *Config) sendSnapshot(source string) {
 		}
 	}
 
-	if _, body, err := c.SendData(c.URL, &Payload{Type: source, Snap: snapshot}, true); err != nil {
-		c.Errorf("Sending snapshot to %s: %v", c.URL, err)
+	body, err := c.SendData(SnapRoute.Path(event), &Payload{Snap: snapshot}, true)
+	if err != nil {
+		c.Errorf("Sending snapshot to Notifiarr, event: %s: %v", event, err)
 	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("Systems Snapshot sent to %s, sending again in %s, reply: %s", c.URL, c.Snap.Interval, fields[3])
+		c.Printf("Systems Snapshot sent to Notifiarr, event: %s, cron interval: %s, reply: %s",
+			event, c.Snap.Interval, fields[3])
 	} else {
-		c.Printf("Systems Snapshot sent to %s, sending again in %s", c.URL, c.Snap.Interval)
+		c.Printf("Systems Snapshot sent to Notifiarr, event: %s, cron interval: %s", event, c.Snap.Interval)
 	}
 }

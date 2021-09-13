@@ -17,12 +17,12 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
 
-// SendMeta is kicked off by the webserver in go routine.
+// sendPlexMeta is kicked off by the webserver in go routine.
 // It's also called by the plex cron (with webhook set to nil).
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait bool) ([]byte, error) {
+func (c *Config) sendPlexMeta(event EventType, hook *plexIncomingWebhook, wait bool) ([]byte, error) {
 	extra := time.Second
 	if wait {
 		extra = plex.WaitTime
@@ -33,7 +33,6 @@ func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait
 
 	var (
 		payload = &Payload{
-			Type: eventType,
 			Load: hook,
 			Plex: &plex.Sessions{
 				Name:       c.Plex.Name,
@@ -57,7 +56,7 @@ func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait
 	wg.Add(1)
 
 	go func() {
-		payload.Snap = c.GetMetaSnap(ctx)
+		payload.Snap = c.getMetaSnap(ctx)
 		wg.Done() // nolint:wsl
 	}()
 
@@ -70,13 +69,13 @@ func (c *Config) SendMeta(eventType, url string, hook *plexIncomingWebhook, wait
 
 	wg.Wait()
 
-	_, e, err := c.SendData(url, payload, true) //nolint:bodyclose // already closed
+	body, err := c.SendData(PlexRoute.Path(event), payload, true)
 
-	return e, err
+	return body, err
 }
 
-// GetMetaSnap grabs some basic system info: cpu, memory, username.
-func (c *Config) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
+// getMetaSnap grabs some basic system info: cpu, memory, username.
+func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	var (
 		snap = &snapshot.Snapshot{}
 		wg   sync.WaitGroup
@@ -114,14 +113,89 @@ func (c *Config) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	return snap
 }
 
-// SendJSON posts a JSON payload to a URL. Returns the response body or an error.
-func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, error) {
+func (c *Config) GetData(url string) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating http request: %w", err)
+	}
+
+	req.Header.Set("X-API-Key", c.Apps.APIKey)
+
+	start := time.Now()
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("making http request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	defer c.debughttplog(resp, url, start, nil, body)
+
+	if err != nil {
+		return body, fmt.Errorf("reading http response body: %w", err)
+	}
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusIMUsed {
+		b := string(body)
+		if len(b) > c.MaxBody {
+			b = b[:c.MaxBody]
+		}
+
+		return nil, fmt.Errorf("%w: %s: %s, %s",
+			ErrNon200, url, resp.Status, strings.Join(strings.Fields(b), " "))
+	}
+
+	return body, nil
+}
+
+// SendData sends raw data to a notifiarr URL as JSON.
+func (c *Config) SendData(uri string, payload interface{}, log bool) ([]byte, error) {
+	var (
+		post []byte
+		err  error
+	)
+
+	if log {
+		post, err = json.MarshalIndent(payload, "", " ")
+	} else {
+		post, err = json.Marshal(payload)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
+	}
+
+	code, body, err := c.sendJSON(c.BaseURL+uri, post, log)
+	if err != nil {
+		return nil, err
+	}
+
+	if code < http.StatusOK || code > http.StatusIMUsed {
+		b := string(body)
+		if len(b) > c.MaxBody {
+			b = b[:c.MaxBody]
+		}
+
+		return nil, fmt.Errorf("%w: %s: %s, %s",
+			ErrNon200, c.BaseURL+uri, http.StatusText(code), strings.Join(strings.Fields(b), " "))
+	}
+
+	return body, nil
+}
+
+// sendJSON posts a JSON payload to a URL. Returns the response body or an error.
+func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
-		return nil, nil, fmt.Errorf("creating http request: %w", err)
+		return 0, nil, fmt.Errorf("creating http request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -132,69 +206,23 @@ func (c *Config) SendJSON(url string, data []byte) (*http.Response, []byte, erro
 	resp, err := c.client.Do(req)
 	if err != nil {
 		c.debughttplog(nil, url, start, data, nil)
-		return nil, nil, fmt.Errorf("making http request: %w", err)
+		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	defer c.debughttplog(resp, url, start, data, body)
-
-	if err != nil {
-		return resp, body, fmt.Errorf("reading http response body: %w", err)
-	}
-
-	return resp, body, nil
-}
-
-func (c *Config) GetData(url string) (*http.Response, []byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("creating http request: %w", err)
-	}
-
-	req.Header.Set("X-API-Key", c.Apps.APIKey)
-
-	start := time.Now()
-
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("making http request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-
-	defer c.debughttplog(resp, url, start, nil, body)
-
-	if err != nil {
-		return resp, body, fmt.Errorf("reading http response body: %w", err)
-	}
-
-	return resp, body, nil
-}
-
-// SendData sends raw data to a notifiarr URL as JSON.
-func (c *Config) SendData(url string, payload interface{}, pretty bool) (*http.Response, []byte, error) {
-	var (
-		post []byte
-		err  error
-	)
-
-	if pretty {
-		post, err = json.MarshalIndent(payload, "", " ")
+	if log {
+		defer c.debughttplog(resp, url, start, data, body)
 	} else {
-		post, err = json.Marshal(payload)
+		defer c.debughttplog(resp, url, start, []byte("<data not logged>"), body)
 	}
 
 	if err != nil {
-		return nil, nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
+		return resp.StatusCode, body, fmt.Errorf("reading http response body: %w", err)
 	}
 
-	return c.SendJSON(url, post)
+	return resp.StatusCode, body, nil
 }
 
 // httpClient is our custom http client to wrap Do and provide retries.
@@ -221,21 +249,21 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 			body, _ := ioutil.ReadAll(resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                    // do not defer, because we're in a loop.
 			// shoehorn a non-200 error into the empty http error.
-			err = fmt.Errorf("%w: %s: %s", ErrNon200, resp.Status, string(body))
+			err = fmt.Errorf("%w: %s: %s: %s", ErrNon200, req.URL, resp.Status, string(body))
 		}
 
 		switch {
 		case errors.Is(err, context.DeadlineExceeded):
 			if i == 0 {
-				return nil, fmt.Errorf("notifiarr.com req timed out after %s: %w", timeout, err)
+				return nil, fmt.Errorf("notifiarr req timed out after %s: %s: %w", timeout, req.URL, err)
 			}
 
-			return nil, fmt.Errorf("[%d/%d] notifiarr.com reqs timed out after %s, giving up: %w",
+			return nil, fmt.Errorf("[%d/%d] Notifiarr req timed out after %s, giving up: %w",
 				i+1, h.Retries+1, timeout, err)
 		case i == h.Retries:
-			return nil, fmt.Errorf("[%d/%d] notifiarr.com req failed: %w", i+1, h.Retries+1, err)
+			return nil, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", i+1, h.Retries+1, err)
 		default:
-			h.Printf("[%d/%d] Request to Notifiarr.com failed, retrying in %s, error: %v", i+1, h.Retries+1, RetryDelay, err)
+			h.Printf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", i+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
@@ -247,11 +275,11 @@ func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, 
 
 	if resp != nil {
 		status = resp.Status
-	}
 
-	for k, vs := range resp.Header {
-		for _, v := range vs {
-			headers += k + ": " + v + "\n"
+		for k, vs := range resp.Header {
+			for _, v := range vs {
+				headers += k + ": " + v + "\n"
+			}
 		}
 	}
 
