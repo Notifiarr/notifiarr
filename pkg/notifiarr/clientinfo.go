@@ -45,7 +45,7 @@ type ClientInfo struct {
 // ServiceConfig comes from the services package. It's only used for display on the website.
 type ServiceConfig struct {
 	Interval cnfg.Duration
-	Parallel int
+	Parallel uint
 	Disabled bool
 	Checks   []*ServiceCheck
 }
@@ -168,7 +168,7 @@ func (c *Config) Info() (map[string]interface{}, error) {
 			"globalTimeout": c.Timeout.String(),
 			"retries":       c.Retries,
 			"plex":          plexConfig,
-			"snapshots":     c.Snap,
+			"snapshot":      c.Snap,
 			"apps":          c.getAppConfigs(),
 		},
 		"internal": map[string]interface{}{

@@ -18,13 +18,37 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 		return &notifiarr.ServiceConfig{Disabled: true}, nil
 	}
 
-	if err := c.setup(services); err != nil {
-		return nil, err
+	if c.Parallel > MaximumParallel {
+		c.Parallel = MaximumParallel
+	} else if c.Parallel == 0 {
+		c.Parallel = 1
 	}
 
-	checks := make([]*notifiarr.ServiceCheck, len(services))
+	if c.Interval.Duration == 0 {
+		c.Interval.Duration = DefaultSendInterval
+	} else if c.Interval.Duration < MinimumSendInterval {
+		c.Interval.Duration = MinimumSendInterval
+	}
+
+	return c.setup(services)
+}
+
+func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
+	c.services = make(map[string]*Service)
+	scnfg := &notifiarr.ServiceConfig{
+		Interval: c.Interval,
+		Parallel: c.Parallel,
+		Checks:   make([]*notifiarr.ServiceCheck, len(services)),
+	}
+
 	for i, check := range services {
-		checks[i] = &notifiarr.ServiceCheck{
+		if err := services[i].validate(); err != nil {
+			return nil, err
+		}
+
+		// Add this validated service to our service map.
+		c.services[services[i].Name] = services[i]
+		scnfg.Checks[i] = &notifiarr.ServiceCheck{
 			Name:     check.Name,
 			Type:     string(check.Type),
 			Expect:   check.Expect,
@@ -33,12 +57,7 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 		}
 	}
 
-	return &notifiarr.ServiceConfig{
-		Disabled: false,
-		Interval: c.Interval,
-		Parallel: int(c.Parallel),
-		Checks:   checks,
-	}, nil
+	return scnfg, nil
 }
 
 // Start begins the service check routines.
@@ -119,33 +138,6 @@ func (c *Config) runServiceChecker() {
 			c.runChecks(false)
 		}
 	}
-}
-
-func (c *Config) setup(services []*Service) error {
-	c.services = make(map[string]*Service)
-
-	for i := range services {
-		if err := services[i].validate(); err != nil {
-			return err
-		}
-
-		// Add this validated service to our service map.
-		c.services[services[i].Name] = services[i]
-	}
-
-	if c.Parallel > MaximumParallel {
-		c.Parallel = MaximumParallel
-	} else if c.Parallel == 0 {
-		c.Parallel = 1
-	}
-
-	if c.Interval.Duration == 0 {
-		c.Interval.Duration = DefaultSendInterval
-	} else if c.Interval.Duration < MinimumSendInterval {
-		c.Interval.Duration = MinimumSendInterval
-	}
-
-	return nil
 }
 
 // Stop ends all service checker routines.
