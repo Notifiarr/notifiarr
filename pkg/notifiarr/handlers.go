@@ -137,41 +137,26 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
 func (c *Config) collectSessions(v *plexIncomingWebhook) {
-	reply, err := c.sendPlexMeta(EventHook, v, true)
+	resp, err := c.sendPlexMeta(EventHook, v, true)
 	if err != nil {
 		c.Errorf("Sending Plex Sessions (and webhook) to Notifiarr: %v", err)
 		return
 	}
 
-	c.plexNotifiarrReplyParserLog(reply, v)
+	c.Printf("Plex => Notifiarr: %s '%s' => %s. Website took %s and replied with: %s, %s",
+		v.Account.Title, v.Event, v.Metadata.Title, resp.Message.Elapsed, resp.Status, resp.Message.Response)
 }
 
 // sendPlexWebhook simply relays an incoming "admin" plex webhook to Notifiarr.com.
 func (c *Config) sendPlexWebhook(v *plexIncomingWebhook) {
-	reply, err := c.SendData(PlexRoute.Path(EventHook), &Payload{
-		Load: v,
-		Plex: &plex.Sessions{
-			Name:       c.Plex.Name,
-			AccountMap: strings.Split(c.Plex.AccountMap, "|"),
-		},
-	}, true)
+	resp, err := c.SendData(PlexRoute.Path(EventHook), &Payload{Load: v, Plex: &plex.Sessions{Name: c.Plex.Name}}, true)
 	if err != nil {
 		c.Errorf("Sending Plex Webhook to Notifiarr: %v", err)
 		return
 	}
 
-	c.plexNotifiarrReplyParserLog(reply, v)
-}
-
-// This is probably going to break at some point.
-func (c *Config) plexNotifiarrReplyParserLog(reply []byte, v *plexIncomingWebhook) {
-	const fieldPos = 3
-
-	if fields := strings.Split(string(reply), `"`); len(fields) > fieldPos {
-		c.Printf("Plex => Notifiarr: %s '%s' => %s (%s)", v.Account.Title, v.Event, v.Metadata.Title, fields[fieldPos])
-	} else {
-		c.Printf("Plex => Notifiarr: %s '%s' => %s", v.Account.Title, v.Event, v.Metadata.Title)
-	}
+	c.Printf("Plex => Notifiarr: %s '%s' => %s. Website took %s and replied with: %s, %s",
+		v.Account.Title, v.Event, v.Metadata.Title, resp.Message.Elapsed, resp.Status, resp.Message.Response)
 }
 
 type appStatus struct {
@@ -191,8 +176,8 @@ type conTest struct {
 // VersionHandler returns application run and build time data and application statuses: /api/version.
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 	var (
-		output, err = c.Info()
-		status      = appStatsForVersion(c.Apps)
+		output = c.Info()
+		status = appStatsForVersion(c.Apps)
 	)
 
 	if c.Plex.Configured() {
@@ -220,12 +205,13 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 		}}
 	}
 
-	if err != nil {
-		output = make(map[string]interface{})
-		output["systemError"] = err.Error()
-	}
-
 	output["appsStatus"] = status
+
+	if host, err := c.GetHostInfoUID(); err != nil {
+		output["hostError"] = err.Error()
+	} else {
+		output["host"] = host
+	}
 
 	return http.StatusOK, output
 }

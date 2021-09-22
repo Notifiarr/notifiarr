@@ -204,14 +204,7 @@ func (c *Client) watchTimerChannels() {
 
 	for {
 		index, _, _ := reflect.Select(cases)
-		timer := ci.Actions.Custom[index] // and we have our custom dynamic timer data.
-		url := c.website.BaseURL + "/" + timer.URI
-		_ = ui.Notify("Sending Custom Timer '%s' GET %s", timer.Name, url)
-		c.Printf("User triggered custom timer '%s' GET %s", timer.Name, url)
-
-		if _, err := c.website.GetData(url); err != nil {
-			c.Errorf("Custom Timer Request for %s failed: %v", url, err)
-		}
+		ci.Actions.Custom[index].Run(notifiarr.EventUser)
 	}
 }
 
@@ -239,7 +232,7 @@ func (c *Client) watchGuiChannels() {
 	for {
 		select {
 		case <-c.menu["stat"].Clicked():
-			go c.toggleServer()
+			c.toggleServer()
 		case <-c.menu["gh"].Clicked():
 			go ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
 		case <-c.menu["hp"].Clicked():
@@ -325,12 +318,8 @@ func (c *Client) watchNotifiarrMenu() {
 	for {
 		select {
 		case <-c.menu["gaps"].Clicked():
-			c.Print("[user requested] Sending Radarr Collection Gaps.")
-			ui.Notify("Sending Radarr Collection Gaps.")
 			c.website.Trigger.SendGaps(notifiarr.EventUser)
 		case <-c.menu["sync_cf"].Clicked():
-			c.Print("[user requested] Triggering Custom Formats and Quality Profiles Sync for Radarr and Sonarr.")
-			ui.Notify("Starting custom format and quality profiles sync.")
 			c.website.Trigger.SyncCF(notifiarr.EventUser)
 		case <-c.menu["svcs_log"].Clicked():
 			c.Print("[user requested] Checking services and logging results.")
@@ -341,20 +330,12 @@ func (c *Client) watchNotifiarrMenu() {
 			ui.Notify("Running and sending %d Service Checks.", len(c.Config.Service))
 			c.Config.Services.RunChecks(notifiarr.EventUser)
 		case <-c.menu["app_ques"].Clicked():
-			c.Print("[user requested] Check app queues and sending stuck items.")
-			ui.Notify("Sending finished, possibly stuck, queue items.")
-			c.website.Trigger.SendFinishedQueueItems(notifiarr.EventUser)
+			c.website.Trigger.SendStuckQueueItems(notifiarr.EventUser)
 		case <-c.menu["plex_prod"].Clicked():
-			c.Print("[user requested] Gathering and sending Plex Sessions.")
-			ui.Notify("Gathering and sending Plex sessions.")
 			c.website.Trigger.SendPlexSessions(notifiarr.EventUser)
 		case <-c.menu["snap_prod"].Clicked():
-			c.Print("[user requested] Gathering and sending System Snapshot.")
-			ui.Notify("Gathering and sending system snapshot.")
 			c.website.Trigger.SendSnapshot(notifiarr.EventUser)
 		case <-c.menu["send_dash"].Clicked():
-			c.Print("[user requested] Initiating State Collection for Dashboard.")
-			ui.Notify("Gathering and sending app states for dashboard.")
 			c.website.Trigger.SendDashboardState(notifiarr.EventUser)
 		}
 	}

@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"sync"
 	"time"
 
@@ -108,7 +109,7 @@ func (c *Config) Validate() {
 		c.Interval.Duration = minimumInterval
 	}
 
-	if os.Getenv("NOTIFIARR_IN_DOCKER") == "true" {
+	if os.Getenv("NOTIFIARR_IN_DOCKER") == "true" || runtime.GOOS == "windows" {
 		c.UseSudo = false
 	}
 

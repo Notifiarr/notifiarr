@@ -14,15 +14,10 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/denisbrodbeck/machineid"
 	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/process"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
-
-// clientInfoResponse is the reply from the ClientRoute endpoint.
-type clientInfoResponse struct {
-	Response   string     `json:"response"` // success
-	ClientInfo ClientInfo `json:"message"`
-}
 
 type ClientInfo struct {
 	User struct {
@@ -44,10 +39,10 @@ type ClientInfo struct {
 
 // ServiceConfig comes from the services package. It's only used for display on the website.
 type ServiceConfig struct {
-	Interval cnfg.Duration
-	Parallel uint
-	Disabled bool
-	Checks   []*ServiceCheck
+	Interval cnfg.Duration   `json:"interval"`
+	Parallel uint            `json:"parallel"`
+	Disabled bool            `json:"disabled"`
+	Checks   []*ServiceCheck `json:"checks"`
 }
 
 // ServiceCheck comes from the services package. It's only used for display on the website.
@@ -57,6 +52,13 @@ type ServiceCheck struct {
 	Expect   string        `json:"expect"`
 	Timeout  cnfg.Duration `json:"timeout"`
 	Interval cnfg.Duration `json:"interval"`
+}
+
+// InfoStat contains information about the running host.
+type InfoStat struct {
+	*host.InfoStat
+	Age     int64     `json:"age"`
+	updated time.Time `json:"-"`
 }
 
 type intList []int
@@ -91,7 +93,7 @@ func (c *ClientInfo) IsPatron() bool {
 }
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
-func (c *Config) GetClientInfo(source EventType) (*ClientInfo, error) {
+func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
 	c.extras.ciMutex.Lock()
 	defer c.extras.ciMutex.Unlock()
 
@@ -99,29 +101,24 @@ func (c *Config) GetClientInfo(source EventType) (*ClientInfo, error) {
 		return c.extras.ClientInfo, nil
 	}
 
-	info, err := c.Info()
-	if err != nil {
-		return nil, fmt.Errorf("getting system info: %w", err)
-	}
-
-	body, err := c.SendData(ClientRoute.Path(source), info, true)
+	body, err := c.SendData(ClientRoute.Path(event), c.Info(), true)
 	if err != nil {
 		return nil, fmt.Errorf("sending client info: %w", err)
 	}
 
-	v := clientInfoResponse{}
-	if err = json.Unmarshal(body, &v); err != nil {
-		return &v.ClientInfo, fmt.Errorf("parsing response: %w", err)
+	v := ClientInfo{}
+	if err = json.Unmarshal(body.Message.Response, &v); err != nil {
+		return &v, fmt.Errorf("parsing response: %w, %s", err, string(body.Message.Response))
 	}
 
 	// Only set this if there was no error.
-	c.extras.ClientInfo = &v.ClientInfo
+	c.extras.ClientInfo = &v
 
 	return c.extras.ClientInfo, nil
 }
 
 // Info is used for JSON input for our outgoing client info.
-func (c *Config) Info() (map[string]interface{}, error) {
+func (c *Config) Info() map[string]interface{} {
 	var (
 		plexConfig interface{}
 		numPlex    = 0 // maybe one day we'll support more than 1 plex.
@@ -139,8 +136,6 @@ func (c *Config) Info() (map[string]interface{}, error) {
 		}
 	}
 
-	hostInfo, err := c.GetHostInfoUID()
-
 	return map[string]interface{}{
 		"client": map[string]interface{}{
 			"arch":      runtime.GOARCH,
@@ -154,7 +149,6 @@ func (c *Config) Info() (map[string]interface{}, error) {
 			"docker":    os.Getenv("NOTIFIARR_IN_DOCKER") == "true",
 			"gui":       ui.HasGUI(),
 		},
-		"host": hostInfo,
 		"num": map[string]interface{}{
 			"deluge":  len(c.Apps.Deluge),
 			"lidarr":  len(c.Apps.Lidarr),
@@ -176,19 +170,44 @@ func (c *Config) Info() (map[string]interface{}, error) {
 			"pollDur":  pollDur.String(),
 		},
 		"services": c.Services,
-	}, err
+	}
+}
+
+// HostInfoNoError will return nil if there is an error, otherwise a copy of the host info.
+func (c *Config) HostInfoNoError() *host.InfoStat {
+	if c.extras.hostInfo == nil {
+		return nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	procs, _ := process.ProcessesWithContext(ctx)
+
+	return &host.InfoStat{
+		Hostname:             c.extras.hostInfo.Hostname,
+		Uptime:               uint64(time.Now().Unix()) - c.extras.hostInfo.BootTime,
+		BootTime:             c.extras.hostInfo.BootTime,
+		Procs:                uint64(len(procs)),
+		OS:                   c.extras.hostInfo.OS,
+		Platform:             c.extras.hostInfo.Platform,
+		PlatformFamily:       c.extras.hostInfo.PlatformFamily,
+		PlatformVersion:      c.extras.hostInfo.PlatformVersion,
+		KernelVersion:        c.extras.hostInfo.KernelVersion,
+		KernelArch:           c.extras.hostInfo.KernelArch,
+		VirtualizationSystem: c.extras.hostInfo.VirtualizationSystem,
+		VirtualizationRole:   c.extras.hostInfo.VirtualizationRole,
+		HostID:               c.extras.hostInfo.HostID,
+	}
 }
 
 // GetHostInfoUID attempts to make a unique machine identifier...
 func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
-	c.extras.hiMutex.Lock()
-	defer c.extras.hiMutex.Unlock()
-
 	if c.extras.hostInfo != nil {
-		return c.extras.hostInfo, nil
+		return c.HostInfoNoError(), nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) //nolint:gomnd
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) //nolint:gomnd
 	defer cancel()
 
 	hostInfo, err := host.InfoWithContext(ctx)
@@ -202,41 +221,30 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 	}
 
 	hostInfo.HostID = uid // this is where we put the unique ID.
+	c.extras.hostInfo = hostInfo
 
-	return hostInfo, nil
+	return c.HostInfoNoError(), nil // return a copy.
 }
 
-func (c *Config) pollForReload() {
-	if c.ClientInfo != nil && !c.ClientInfo.Actions.Poll {
-		return
-	}
-
-	info, err := c.Info()
+func (c *Config) pollForReload(event EventType) {
+	body, err := c.SendData(ClientRoute.Path(EventPoll), c.Info(), true)
 	if err != nil {
-		c.Errorf("Getting System Info: %v", err)
+		c.Errorf("[%s requested] Polling Notifiarr: %v", event, err)
 		return
 	}
 
-	body, err := c.SendData(ClientRoute.Path(EventPoll), info, true)
-	if err != nil {
-		c.Errorf("Polling Notifiarr: %v", err)
+	var v bool
+
+	if err = json.Unmarshal(body.Message.Response, &v); err != nil {
+		c.Errorf("[%s requested] Polling Notifiarr: %v", event, err)
 		return
 	}
 
-	var v struct {
-		Reload bool `json:"reload"`
-	}
-
-	if err = json.Unmarshal(body, &v); err != nil {
-		c.Errorf("Polling Notifiarr: %v", err)
-		return
-	}
-
-	if v.Reload {
-		c.Printf("Website indicated new configurations; reloading to pick them up!")
+	if v {
+		c.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!", event)
 		c.Sighup <- &update.Signal{Text: "poll triggered reload"}
 	} else if c.ClientInfo == nil {
-		c.Printf("API Key checked out, reloading to pick up configuration from website!")
+		c.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", event)
 		c.Sighup <- &update.Signal{Text: "client info reload"}
 	}
 }

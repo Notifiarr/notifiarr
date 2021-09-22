@@ -12,12 +12,6 @@ import (
 )
 
 func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
-	services = append(services, c.collectApps()...)
-	if c.Disabled || len(services) == 0 {
-		c.Disabled = true
-		return &notifiarr.ServiceConfig{Disabled: true}, nil
-	}
-
 	if c.Parallel > MaximumParallel {
 		c.Parallel = MaximumParallel
 	} else if c.Parallel == 0 {
@@ -30,6 +24,11 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 		c.Interval.Duration = MinimumSendInterval
 	}
 
+	services = append(services, c.collectApps()...)
+	if len(services) == 0 {
+		c.Disabled = true
+	}
+
 	return c.setup(services)
 }
 
@@ -38,6 +37,7 @@ func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 	scnfg := &notifiarr.ServiceConfig{
 		Interval: c.Interval,
 		Parallel: c.Parallel,
+		Disabled: c.Disabled,
 		Checks:   make([]*notifiarr.ServiceCheck, len(services)),
 	}
 
@@ -93,22 +93,32 @@ func (c *Config) Start() {
 	}
 
 	go c.runServiceChecker()
-	c.Printf("==> Service Checker Started! %d services, interval: %s, parallel: %d",
-		len(c.services), c.Interval, c.Parallel)
+
+	word := "Started"
+	if c.Disabled {
+		word = "Disabled"
+	}
+
+	c.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
+		word, len(c.services), c.Interval, c.Parallel)
 }
 
 func (c *Config) runServiceChecker() {
-	ticker := time.NewTicker(c.Interval.Duration)
-	second := time.NewTicker(10 * time.Second) //nolint:gomnd
+	defer c.CapturePanic()
 
-	defer func() {
-		c.CapturePanic()
-		second.Stop()
-		ticker.Stop()
-	}()
+	ticker := &time.Ticker{C: make(<-chan time.Time)}
+	second := &time.Ticker{C: make(<-chan time.Time)}
 
-	c.runChecks(true)
-	c.SendResults(&Results{What: notifiarr.EventStart, Svcs: c.getResults()})
+	if !c.Disabled {
+		ticker = time.NewTicker(c.Interval.Duration)
+		defer ticker.Stop()
+
+		second = time.NewTicker(10 * time.Second) //nolint:gomnd
+		defer second.Stop()
+
+		c.runChecks(true)
+		c.SendResults(&Results{What: notifiarr.EventStart, Svcs: c.getResults()})
+	}
 
 	for {
 		select {

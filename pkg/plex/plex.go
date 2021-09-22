@@ -91,10 +91,6 @@ func (s *Server) Validate() { //nolint:cyclop
 }
 
 func (s *Server) getPlexURL(ctx context.Context, url string, headers map[string]string) ([]byte, error) {
-	if s == nil || s.URL == "" || s.Token == "" {
-		return nil, ErrNoURLToken
-	}
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("creating http request: %w", err)

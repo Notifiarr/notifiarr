@@ -119,10 +119,6 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 	case "cfsync":
 		c.website.Trigger.SyncCF(notifiarr.EventAPI)
 	case "services":
-		if c.Config.Services.Disabled {
-			return http.StatusNotImplemented, "services not enabled"
-		}
-
 		c.Config.Services.RunChecks(notifiarr.EventAPI)
 	case "sessions":
 		if !c.Config.Plex.Configured() {
@@ -131,7 +127,7 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 
 		c.website.Trigger.SendPlexSessions(notifiarr.EventAPI)
 	case "stuckitems":
-		c.website.Trigger.SendFinishedQueueItems(notifiarr.EventAPI)
+		c.website.Trigger.SendStuckQueueItems(notifiarr.EventAPI)
 	case "dashboard":
 		c.website.Trigger.SendDashboardState(notifiarr.EventAPI)
 	case "snapshot":

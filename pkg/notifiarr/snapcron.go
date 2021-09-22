@@ -1,9 +1,5 @@
 package notifiarr
 
-import (
-	"strings"
-)
-
 func (c *Config) logSnapshotStartup() {
 	var ex string
 
@@ -37,14 +33,14 @@ func (t *Triggers) SendSnapshot(event EventType) {
 		return
 	}
 
-	t.snap <- event
+	t.snap.C <- event
 }
 
 func (c *Config) sendSnapshot(event EventType) {
 	snapshot, errs, debug := c.Snap.GetSnapshot()
 	for _, err := range errs {
 		if err != nil {
-			c.Errorf("Snapshot: %v", err)
+			c.Errorf("[%s requested] Snapshot: %v", event, err)
 		}
 	}
 
@@ -55,13 +51,12 @@ func (c *Config) sendSnapshot(event EventType) {
 		}
 	}
 
-	body, err := c.SendData(SnapRoute.Path(event), &Payload{Snap: snapshot}, true)
+	resp, err := c.SendData(SnapRoute.Path(event), &Payload{Snap: snapshot}, true)
 	if err != nil {
-		c.Errorf("Sending snapshot to Notifiarr, event: %s: %v", event, err)
-	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("Systems Snapshot sent to Notifiarr, event: %s, cron interval: %s, reply: %s",
-			event, c.Snap.Interval, fields[3])
+		c.Errorf("[%s requested] Sending snapshot to Notifiarr: %v", event, err)
 	} else {
-		c.Printf("Systems Snapshot sent to Notifiarr, event: %s, cron interval: %s", event, c.Snap.Interval)
+		c.Printf("[%s requested] System Snapshot sent to Notifiarr, cron interval: %s. "+
+			"Website took %s and replied with: %s, %s",
+			event, c.Snap.Interval, resp.Message.Elapsed, resp.Status, resp.Message.Response)
 	}
 }

@@ -35,7 +35,6 @@ type appConfigs struct {
 
 type ListItem struct {
 	Elapsed time.Duration `json:"elapsed"`
-	Repeat  uint          `json:"repeat"`
 	Name    string        `json:"name"`
 	Queue   []interface{} `json:"queue"`
 }
@@ -43,7 +42,6 @@ type ListItem struct {
 type ItemList map[int]ListItem
 
 type QueuePayload struct {
-	Type    string   `json:"type"`
 	Lidarr  ItemList `json:"lidarr,omitempty"`
 	Radarr  ItemList `json:"radarr,omitempty"`
 	Readarr ItemList `json:"readarr,omitempty"`
@@ -64,38 +62,43 @@ func (i ItemList) Empty() bool {
 	return i.Len() < 1
 }
 
-func (t *Triggers) SendFinishedQueueItems(event EventType) {
+func (t *Triggers) SendStuckQueueItems(event EventType) {
 	if t.stop == nil {
 		return
 	}
 
-	t.stuck <- event
+	t.stuck.C <- event
 }
 
-func (c *Config) sendFinishedQueueItems(event EventType) {
+func (c *Config) sendStuckQueueItems(event EventType) {
 	start := time.Now()
 	q := c.getQueues()
 	apps := time.Since(start).Round(time.Millisecond)
 
-	if q.Lidarr.Empty() && q.Radarr.Empty() && q.Readarr.Empty() && q.Sonarr.Empty() {
+	if q == nil || (q.Lidarr.Empty() && q.Radarr.Empty() && q.Readarr.Empty() && q.Sonarr.Empty()) {
+		c.Printf("[%s requested] No stuck items found to send to Notifiarr.", event)
 		return
 	}
 
-	_, err := c.SendData(StuckRoute.Path(event), q, true)
+	resp, err := c.SendData(StuckRoute.Path(event), q, true)
 	elapsed := time.Since(start).Round(time.Millisecond)
 
 	if err != nil {
-		c.Errorf("Sending Stuck Queue Items (apps:%s total:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d): %v",
-			apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), err)
+		c.Errorf("[%s requested] Sending Stuck Queue Items "+
+			"(apps:%s total:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d): %v",
+			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), err)
 	} else {
-		c.Printf("Sent Stuck Items to Notifiarr (apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-			apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len())
+		c.Printf("[%s requested] Sent Stuck Items to Notifiarr "+
+			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d."+
+			"Website took %s and replied with: %s, %s",
+			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(),
+			resp.Message.Elapsed, resp.Status, resp.Message.Response)
 	}
 }
 
 // getQueues fires a routine for each app type and tries to get a lot of data fast!
 func (c *Config) getQueues() *QueuePayload {
-	q := &QueuePayload{Type: "queue"}
+	q := &QueuePayload{}
 
 	var wg sync.WaitGroup
 
@@ -128,7 +131,7 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 	for i, l := range c.Apps.Lidarr {
 		instance := i + 1
 
-		if l.CheckQ == nil {
+		if !l.StuckItem {
 			continue
 		}
 
@@ -153,7 +156,6 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 		}
 
 		app.Name = l.Name
-		app.Repeat = *l.CheckQ
 		app.Elapsed = time.Since(start)
 		stuck[instance] = app
 
@@ -170,7 +172,7 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 	for i, l := range c.Apps.Radarr {
 		instance := i + 1
 
-		if l.CheckQ == nil {
+		if !l.StuckItem {
 			continue
 		}
 
@@ -197,7 +199,6 @@ func (c *Config) getFinishedItemsRadarr() ItemList {
 		}
 
 		app.Name = l.Name
-		app.Repeat = *l.CheckQ
 		app.Elapsed = time.Since(start)
 		stuck[instance] = app
 
@@ -214,7 +215,7 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 	for i, l := range c.Apps.Readarr {
 		instance := i + 1
 
-		if l.CheckQ == nil {
+		if !l.StuckItem {
 			continue
 		}
 
@@ -239,7 +240,6 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 		}
 
 		app.Name = l.Name
-		app.Repeat = *l.CheckQ
 		app.Elapsed = time.Since(start)
 		stuck[instance] = app
 
@@ -256,7 +256,7 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 	for i, l := range c.Apps.Sonarr {
 		instance := i + 1
 
-		if l.CheckQ == nil {
+		if !l.StuckItem {
 			continue
 		}
 
@@ -287,7 +287,6 @@ func (c *Config) getFinishedItemsSonarr() ItemList {
 		}
 
 		app.Name = l.Name
-		app.Repeat = *l.CheckQ
 		app.Elapsed = time.Since(start)
 		stuck[instance] = app
 

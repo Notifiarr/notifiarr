@@ -31,17 +31,16 @@ func (t *Triggers) SendPlexSessions(event EventType) {
 		return
 	}
 
-	t.plex <- event
+	t.plex.C <- event
 }
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
 func (c *Config) sendPlexSessions(event EventType) {
-	if body, err := c.sendPlexMeta(event, nil, false); err != nil {
-		c.Errorf("Sending Plex Sessions to Notifiarr, event: %s: %v", event, err)
-	} else if fields := strings.Split(string(body), `"`); len(fields) > 3 { //nolint:gomnd
-		c.Printf("Plex Sessions sent to Notifiarr, event: %s, reply: %s", event, fields[3])
+	if resp, err := c.sendPlexMeta(event, nil, false); err != nil {
+		c.Errorf("[%s requested] Sending Plex Sessions to Notifiarr: %v", event, err)
 	} else {
-		c.Printf("Plex Sessions sent to Notifiar, event: %s", event)
+		c.Printf("[%s requested] Plex Sessions sent to Notifiar. Website took %s and replied with: %s, %s",
+			event, resp.Message.Elapsed, resp.Status, resp.Message.Response)
 	}
 }
 
@@ -103,7 +102,7 @@ func (c *Config) runSessionHolder() {
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
-func (c *Config) checkForFinishedItems(sent map[string]struct{}) {
+func (c *Config) checkPlexFinishedItems(sent map[string]struct{}) {
 	sessions, err := c.GetSessions(false)
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
@@ -172,16 +171,12 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 
 	route := PlexRoute.Path(EventType(s.Type))
 
-	body, err := c.SendData(route, &Payload{
+	_, err := c.SendData(route, &Payload{
 		Snap: snap,
-		Plex: &plex.Sessions{
-			Name:       c.Plex.Name,
-			Sessions:   []*plex.Session{s},
-			AccountMap: strings.Split(c.Plex.AccountMap, "|"),
-		},
+		Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{s}},
 	}, true)
 	if err != nil {
-		return statusError + ": sending to " + route + ": " + err.Error() + ": " + string(body)
+		return statusError + ": sending to " + route + ": " + err.Error()
 	}
 
 	return statusSending

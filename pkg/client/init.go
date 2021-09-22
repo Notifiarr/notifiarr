@@ -18,8 +18,10 @@ const disabled = "disabled"
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
 func (c *Client) PrintStartupInfo() {
-	hi, _ := c.website.GetHostInfoUID()
-	if hi != nil {
+	hi, err := c.website.GetHostInfoUID()
+	if err != nil {
+		c.Errorf("Unknown Host Info (this is bad): %v", err)
+	} else {
 		c.Printf("==> Unique ID: %s (%s)", hi.HostID, hi.Hostname)
 	}
 

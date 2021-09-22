@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -54,7 +55,7 @@ func NewDefaults() *Client {
 		menu:   make(map[string]ui.MenuItem),
 		Logger: logger,
 		Config: &configfile.Config{
-			Mode: "production",
+			Mode: notifiarr.ModeProd,
 			Apps: &apps.Apps{
 				URLBase:  "/",
 				DebugLog: logger.DebugLog,
@@ -62,7 +63,6 @@ func NewDefaults() *Client {
 			},
 			Services: &services.Config{
 				Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
-				Parallel: 1,
 				Logger:   logger,
 			},
 			BindAddr: mnd.DefaultBindAddr,
@@ -104,13 +104,13 @@ func (c *Client) start() error {
 	msg, newCon, err := c.loadConfiguration()
 
 	switch {
+	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
+		c.Printf("==> %s", msg)
+		return c.forceWriteWithExit(c.Flags.Write)
 	case err != nil:
 		return fmt.Errorf("%s: %w", msg, err)
 	case c.Flags.Restart:
 		return nil
-	case c.Flags.Write != "":
-		c.Printf("==> %s", msg)
-		return c.forceWriteWithExit(c.Flags.Write)
 	case c.Config.APIKey == "":
 		return fmt.Errorf("%s: %w %s_API_KEY", msg, ErrNilAPIKey, c.Flags.EnvPrefix)
 	}
@@ -135,6 +135,7 @@ func (c *Client) start() error {
 	if ui.HasGUI() {
 		// This starts the web server and calls os.Exit() when done.
 		c.startTray()
+		return nil
 	}
 
 	return c.Exit()
@@ -262,6 +263,7 @@ func (c *Client) Exit() error {
 	}
 }
 
+// This is called from at least two different exit points.
 func (c *Client) exit() error {
 	if c.server == nil {
 		return nil
@@ -284,7 +286,7 @@ func (c *Client) exit() error {
 // Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(source string) error {
 	c.Print("==> Reloading Configuration: " + source)
-	c.website.Stop()
+	c.website.Stop(notifiarr.EventReload)
 	c.Config.Services.Stop()
 
 	err := c.StopWebServer()
@@ -308,7 +310,7 @@ func (c *Client) reloadConfiguration(source string) error {
 	c.setupMenus()
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
-	if err = ui.Notify("Configuration Reloaded!"); err != nil {
+	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Error("Creating Toast Notification:", err)
 	}
 

@@ -6,18 +6,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 )
 
 // Sessions is the config input data.
 type Sessions struct {
-	Name       string        `json:"server"`
-	AccountMap []string      `json:"account_map"`
-	Sessions   []*Session    `json:"sessions"`
-	XML        string        `json:"sessions_xml,omitempty"`
-	Updated    time.Time     `json:"update_time,omitempty"`
-	Age        time.Duration `json:"update_age,omitempty"`
+	Name     string        `json:"server"`
+	HostID   string        `json:"hostId"`
+	Sessions []*Session    `json:"sessions"`
+	Updated  time.Time     `json:"update_time,omitempty"`
+	Age      time.Duration `json:"update_age,omitempty"`
 }
 
 // ErrBadStatus is returned when plex returns an invalid status code.
@@ -30,16 +28,17 @@ func (s *Server) GetSessions() (*Sessions, error) {
 
 // GetSessionsWithContext returns the Plex sessions in JSON format.
 func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) {
+	if !s.Configured() {
+		return nil, ErrNoURLToken
+	}
+
 	var (
 		v struct {
 			MediaContainer struct {
 				Sessions []*Session `json:"Metadata"`
 			} `json:"MediaContainer"`
 		}
-		sessions = &Sessions{
-			Name:       s.Name,
-			AccountMap: strings.Split(s.AccountMap, "|"),
-		}
+		sessions = &Sessions{Name: s.Name}
 	)
 
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
@@ -62,7 +61,7 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 
 // KillSessionWithContext kills a Plex session.
 func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) error {
-	if s == nil || s.URL == "" || s.Token == "" {
+	if !s.Configured() {
 		return ErrNoURLToken
 	}
 

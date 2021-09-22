@@ -8,7 +8,7 @@ import (
 
 // runChecks runs checks from an external package.
 func (c *Config) RunChecks(source notifiarr.EventType) {
-	if c.Disabled || c.triggerChan == nil || c.stopChan == nil {
+	if c.triggerChan == nil || c.stopChan == nil {
 		c.Errorf("Cannot run service checks. Go routine is not running.")
 		return
 	}

@@ -15,14 +15,71 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"golift.io/cnfg"
 )
+
+// Response is what notifiarr replies to our requests with.
+/* try this
+{
+    "response": "success",
+    "message": {
+        "response": {
+            "instance": 1,
+            "debug": null
+        },
+        "started": "23:57:03",
+        "finished": "23:57:03",
+        "elapsed": "0s"
+    }
+}
+
+{
+    "response": "success",
+    "message": {
+        "response": "Service status cron processed.",
+        "started": "00:04:15",
+        "finished": "00:04:15",
+        "elapsed": "0s"
+    }
+}
+
+{
+    "response": "success",
+    "message": {
+        "response": "Channel stats cron processed.",
+        "started": "00:04:31",
+        "finished": "00:04:36",
+        "elapsed": "5s"
+    }
+}
+
+{
+    "response": "success",
+    "message": {
+        "response": "Dashboard payload processed.",
+        "started": "00:02:04",
+        "finished": "00:02:11",
+        "elapsed": "7s"
+    }
+}
+*/
+// nitsua: all responses should be that way.. but response might not always be an object.
+type Response struct {
+	Status  string `json:"response"`
+	Message struct {
+		Response json.RawMessage `json:"response"` // can be anything. type it out later.
+		Started  time.Time       `json:"started"`
+		Finished time.Time       `json:"finished"`
+		Elapsed  cnfg.Duration   `json:"elapsed"`
+	} `json:"message"`
+}
 
 // sendPlexMeta is kicked off by the webserver in go routine.
 // It's also called by the plex cron (with webhook set to nil).
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) sendPlexMeta(event EventType, hook *plexIncomingWebhook, wait bool) ([]byte, error) {
+func (c *Config) sendPlexMeta(event EventType, hook *plexIncomingWebhook, wait bool) (*Response, error) {
 	extra := time.Second
 	if wait {
 		extra = plex.WaitTime
@@ -32,14 +89,8 @@ func (c *Config) sendPlexMeta(event EventType, hook *plexIncomingWebhook, wait b
 	defer cancel()
 
 	var (
-		payload = &Payload{
-			Load: hook,
-			Plex: &plex.Sessions{
-				Name:       c.Plex.Name,
-				AccountMap: strings.Split(c.Plex.AccountMap, "|"),
-			},
-		}
-		wg sync.WaitGroup
+		payload = &Payload{Load: hook, Plex: &plex.Sessions{Name: c.Plex.Name}}
+		wg      sync.WaitGroup
 	)
 
 	rep := make(chan error)
@@ -69,9 +120,7 @@ func (c *Config) sendPlexMeta(event EventType, hook *plexIncomingWebhook, wait b
 
 	wg.Wait()
 
-	body, err := c.SendData(PlexRoute.Path(event), payload, true)
-
-	return body, err
+	return c.SendData(PlexRoute.Path(event), payload, true)
 }
 
 // getMetaSnap grabs some basic system info: cpu, memory, username.
@@ -113,7 +162,7 @@ func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	return snap
 }
 
-func (c *Config) GetData(url string) ([]byte, error) {
+func (c *Config) GetData(url string) (*Response, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
@@ -137,7 +186,7 @@ func (c *Config) GetData(url string) ([]byte, error) {
 	defer c.debughttplog(resp, url, start, nil, body)
 
 	if err != nil {
-		return body, fmt.Errorf("reading http response body: %w", err)
+		return nil, fmt.Errorf("reading http response body: %w", err)
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusIMUsed {
@@ -150,15 +199,31 @@ func (c *Config) GetData(url string) ([]byte, error) {
 			ErrNon200, url, resp.Status, strings.Join(strings.Fields(b), " "))
 	}
 
-	return body, nil
+	var r Response
+	if err := json.Unmarshal(body, &r); err != nil {
+		return nil, fmt.Errorf("converting json response: %w", err)
+	}
+
+	return &r, nil
 }
 
 // SendData sends raw data to a notifiarr URL as JSON.
-func (c *Config) SendData(uri string, payload interface{}, log bool) ([]byte, error) {
+func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response, error) {
 	var (
 		post []byte
 		err  error
 	)
+
+	if data, err := json.Marshal(payload); err == nil {
+		var torn map[string]interface{}
+		if err := json.Unmarshal(data, &torn); err == nil {
+			torn["host"], err = c.GetHostInfoUID()
+			payload = torn
+			if err != nil {
+				c.Errorf("Host Info Unknown: %v", err)
+			}
+		}
+	}
 
 	if log {
 		post, err = json.MarshalIndent(payload, "", " ")
@@ -185,7 +250,12 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) ([]byte, er
 			ErrNon200, c.BaseURL+uri, http.StatusText(code), strings.Join(strings.Fields(b), " "))
 	}
 
-	return body, nil
+	var r Response
+	if err := json.Unmarshal(body, &r); err != nil {
+		return nil, fmt.Errorf("converting json response: %w", err)
+	}
+
+	return &r, nil
 }
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
@@ -285,12 +355,12 @@ func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, 
 
 	b := string(body)
 	if c.MaxBody > 0 && len(b) > c.MaxBody {
-		b = b[:c.MaxBody] + " <body truncated>"
+		b = b[:c.MaxBody] + fmt.Sprintf(" <body truncated, max: %d>", c.MaxBody)
 	}
 
 	d := string(data)
 	if c.MaxBody > 0 && len(d) > c.MaxBody {
-		d = d[:c.MaxBody] + " <data truncated>"
+		d = d[:c.MaxBody] + fmt.Sprintf(" <data truncated, max: %d>", c.MaxBody)
 	}
 
 	if len(data) == 0 {

@@ -94,22 +94,27 @@ func (t *Triggers) SendDashboardState(event EventType) {
 		return
 	}
 
-	t.state <- event
+	t.dash.C <- event
 }
 
 func (c *Config) sendDashboardState(event EventType) {
-	start := time.Now()
-	states := c.getStates() //nolint:ifshort // stupid broken linter.
-	apps := time.Since(start).Round(time.Millisecond)
+	var (
+		start  = time.Now()
+		states = c.getStates()
+		apps   = time.Since(start).Round(time.Millisecond)
+	)
 
-	if _, err := c.SendData(DashRoute.Path(event), states, true); err != nil {
-		c.Errorf("Sending Dashboard State Data to Notifiarr (apps:%s total:%s): %v: %v",
-			apps, time.Since(start).Round(time.Millisecond), err, states)
+	resp, err := c.SendData(DashRoute.Path(event), states, true)
+	if err != nil {
+		c.Errorf("[%s requested] Sending Dashboard State Data to Notifiarr (apps:%s total:%s): %v: %v",
+			event, apps, time.Since(start).Round(time.Millisecond), err, states)
 		return
 	}
 
-	c.Printf("Sent Dashboard State Data to Notifiarr! Elapsed: apps:%s total:%s",
-		apps, time.Since(start).Round(time.Millisecond))
+	c.Printf("[%s requested] Sent Dashboard State Data to Notifiarr! Elapsed: apps:%s total:%s."+
+		" Website took %s and replied with: %s, %s",
+		event, apps, time.Since(start).Round(time.Millisecond),
+		resp.Message.Elapsed, resp.Status, resp.Message.Response)
 }
 
 // getStates fires a routine for each app type and tries to get a lot of data fast!

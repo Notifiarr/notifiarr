@@ -21,53 +21,6 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 )
 
-/* try this
-nitsua: all responses should be that way.. but response might not always be an object
-
-{
-    "response": "success",
-    "message": {
-        "response": {
-            "instance": 1,
-            "debug": null
-        },
-        "started": "23:57:03",
-        "finished": "23:57:03",
-        "elapsed": "0s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Service status cron processed.",
-        "started": "00:04:15",
-        "finished": "00:04:15",
-        "elapsed": "0s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Channel stats cron processed.",
-        "started": "00:04:31",
-        "finished": "00:04:36",
-        "elapsed": "5s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Dashboard payload processed.",
-        "started": "00:02:04",
-        "finished": "00:02:11",
-        "elapsed": "7s"
-    }
-}
-*/
-
 // Errors returned by this library.
 var (
 	ErrNon200          = fmt.Errorf("return code was not 200")
@@ -122,7 +75,7 @@ api/v1/user/trash?app=...
 */
 const (
 	BaseURL           = "https://notifiarr.com"
-	DevBaseURL        = "http://dev.notifiarr.com"
+	DevBaseURL        = "https://dev.notifiarr.com"
 	userRoute1  Route = "/api/v1/user"
 	userRoute2  Route = "/api/v2/user"
 	ClientRoute Route = userRoute2 + "/client"
@@ -208,7 +161,6 @@ type Config struct {
 
 type extras struct {
 	ciMutex sync.Mutex
-	hiMutex sync.Mutex
 	*ClientInfo
 	client    *httpClient
 	radarrCF  map[int]*cfMapIDpayload
@@ -219,15 +171,15 @@ type extras struct {
 
 // Triggers allow trigger actions in the timer routine.
 type Triggers struct {
-	stop   chan struct{}  // Triggered by calling Stop()
-	syncCF chan EventType // Sync Radarr CF and Sonarr RP
-	gaps   chan EventType // Send Radarr Collection Gaps
-	stuck  chan EventType // Stuck Items
-	plex   chan EventType // Send Plex Sessions
-	state  chan EventType // Dashboard State
-	snap   chan EventType // Snapshot
-	sess   chan time.Time // Return Plex Sessions
-	sessr  chan *holder   // Session Return Channel
+	stop  *action        // Triggered by calling Stop()
+	sync  *action        // Sync Radarr CF and Sonarr RP
+	gaps  *action        // Send Radarr Collection Gaps
+	stuck *action        // Stuck Items
+	plex  *action        // Send Plex Sessions
+	dash  *action        // Dashboard State
+	snap  *action        // Snapshot
+	sess  chan time.Time // Return Plex Sessions
+	sessr chan *holder   // Session Return Channel
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -262,29 +214,56 @@ func (c *Config) Setup(mode string) string {
 
 // Start runs the timers.
 func (c *Config) Start() {
-	c.Print("==> Starting Notifiarr Timers.")
-
 	if c.Trigger.stop != nil {
 		panic("notifiarr timers cannot run twice")
 	}
 
+	c.Trigger.stuck = &action{
+		Fn:  c.sendStuckQueueItems,
+		Msg: "Checking app queues and sending stuck items.",
+		C:   make(chan EventType, 1),
+		T:   time.NewTicker(stuckDur),
+	}
+	c.Trigger.plex = &action{
+		Fn:  c.sendPlexSessions,
+		Msg: "Gathering and sending Plex Sessions.",
+		C:   make(chan EventType, 1),
+	}
+	c.Trigger.gaps = &action{
+		Fn:  c.sendGaps,
+		Msg: "Sending Radarr Collection Gaps.",
+		C:   make(chan EventType, 1),
+	}
+	c.Trigger.sync = &action{
+		Fn:  c.syncCF,
+		Msg: "Starting Custom Formats and Quality Profiles Sync for Radarr and Sonarr.",
+		C:   make(chan EventType, 1),
+	}
+	c.Trigger.dash = &action{
+		Fn:  c.sendDashboardState,
+		Msg: "Initiating State Collection for Dashboard.",
+		C:   make(chan EventType, 1),
+	}
+	c.Trigger.snap = &action{
+		Fn:  c.sendSnapshot,
+		Msg: "Gathering and sending System Snapshot.",
+		C:   make(chan EventType, 1),
+	}
+	c.Trigger.stop = &action{
+		Msg: "Stop Channel is used for reloads and must not have a function.",
+		C:   make(chan EventType),
+	}
+	c.Trigger.sess = make(chan time.Time, 1)
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
-	c.Trigger.syncCF = make(chan EventType, 1)
-	c.Trigger.stuck = make(chan EventType, 1)
-	c.Trigger.plex = make(chan EventType, 1)
-	c.Trigger.state = make(chan EventType, 1)
-	c.Trigger.snap = make(chan EventType, 1)
-	c.Trigger.gaps = make(chan EventType, 1)
-	c.Trigger.sess = make(chan time.Time, 1)
 
 	go c.runSessionHolder()
 	c.startTimers()
 }
 
 // Stop all internal cron timers and Triggers.
-func (c *Config) Stop() {
+func (c *Config) Stop(event EventType) {
 	if c == nil {
 		return
 	}
@@ -292,18 +271,11 @@ func (c *Config) Stop() {
 	c.Print("==> Stopping Notifiarr Timers.")
 
 	if c.Trigger.stop == nil {
-		c.Print("==> Notifiarr Timers cannot be stopped: not running!")
+		c.Error("==> Notifiarr Timers cannot be stopped: not running!")
 		return
 	}
 
-	c.Trigger.stop <- struct{}{}
-	close(c.Trigger.syncCF)
-	close(c.Trigger.stuck)
-	close(c.Trigger.plex)
-	close(c.Trigger.state)
-	close(c.Trigger.snap)
-	close(c.Trigger.gaps)
-
+	c.Trigger.stop.C <- event
 	defer close(c.Trigger.sess)
 	c.Trigger.sess = nil
 }

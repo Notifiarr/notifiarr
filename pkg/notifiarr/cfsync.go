@@ -50,17 +50,17 @@ func (t *Triggers) SyncCF(event EventType) {
 		return
 	}
 
-	t.syncCF <- event
+	t.sync.C <- event
 }
 
 func (c *Config) syncCF(event EventType) {
 	c.Debugf("Running CF Sync via event: %s", event)
-	c.syncRadarr()
-	c.syncSonarr()
+	c.syncRadarr(event)
+	c.syncSonarr(event)
 }
 
 // syncRadarr triggers a custom format sync for Radarr.
-func (c *Config) syncRadarr() {
+func (c *Config) syncRadarr(event EventType) {
 	if c.ClientInfo == nil || len(c.Actions.Sync.RadarrInstances) < 1 {
 		c.Debugf("Cannot sync Radarr Custom Formats. Website provided 0 instances.")
 		return
@@ -76,18 +76,16 @@ func (c *Config) syncRadarr() {
 			continue
 		}
 
-		switch synced, err := c.syncRadarrCF(instance, app); {
-		case err != nil:
-			c.Errorf("Radarr Custom Formats sync request for '%d:%s' failed: %v", instance, app.URL, err)
-		case synced:
-			c.Printf("Synced Custom Formats from Notifiarr for Radarr: %d:%s", instance, app.URL)
-		default:
-			c.Printf("Sent Custom Formats sync request to Notifiarr for Radarr: %d:%s", instance, app.URL)
+		if err := c.syncRadarrCF(instance, app); err != nil {
+			c.Errorf("[%s requested] Radarr Custom Formats sync request for '%d:%s' failed: %v", event, instance, app.URL, err)
+			return
 		}
+
+		c.Printf("[%s requested] Synced Custom Formats from Notifiarr for Radarr: %d:%s", event, instance, app.URL)
 	}
 }
 
-func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) (bool, error) { //nolint:dupl
+func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) error { //nolint:dupl
 	var (
 		err     error
 		payload = RadarrCustomFormatPayload{Instance: instance, Name: app.Name, NewMaps: c.radarrCF[instance]}
@@ -95,50 +93,40 @@ func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) (bool, error
 
 	payload.QualityProfiles, err = app.GetQualityProfiles()
 	if err != nil {
-		return false, fmt.Errorf("getting quality profiles: %w", err)
+		return fmt.Errorf("getting quality profiles: %w", err)
 	}
 
 	payload.CustomFormats, err = app.GetCustomFormats()
 	if err != nil {
-		return false, fmt.Errorf("getting custom formats: %w", err)
+		return fmt.Errorf("getting custom formats: %w", err)
 	}
 
 	body, err := c.SendData(CFSyncRoute.Path("", "app=radarr"), payload, false)
 	if err != nil {
-		return false, fmt.Errorf("sending current formats: %w", err)
+		return fmt.Errorf("sending current formats: %w", err)
 	}
 
 	delete(c.radarrCF, instance)
 
-	if len(body) < 1 {
-		return false, nil
-	} else if err := c.updateRadarrCF(instance, app, body); err != nil {
-		return false, fmt.Errorf("updating application: %w", err)
+	if body.Status != success {
+		return fmt.Errorf("%w: %s", ErrInvalidResponse, body.Status)
 	}
 
-	return true, nil
+	if err := c.updateRadarrCF(instance, app, body.Message.Response); err != nil {
+		return fmt.Errorf("updating application: %w", err)
+	}
+
+	return nil
 }
 
 func (c *Config) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) error {
-	payload := struct {
-		Response string `json:"response"`
-		Message  struct {
-			Response struct {
-				RadarrCustomFormatPayload
-			} `json:"response"`
-		} `json:"message"`
-	}{}
-	if err := json.Unmarshal(data, &payload); err != nil {
+	reply := &RadarrCustomFormatPayload{}
+	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
 
-	reply := payload.Message.Response.RadarrCustomFormatPayload
 	c.Debugf("Received %d quality profiles and %d custom formats for Radarr: %d:%s",
 		len(reply.QualityProfiles), len(reply.CustomFormats), instance, app.URL)
-
-	if payload.Response != success {
-		return fmt.Errorf("%w: %s", ErrInvalidResponse, payload.Response)
-	}
 
 	maps := &cfMapIDpayload{QP: []idMap{}, CF: []idMap{}, Instance: instance}
 
@@ -214,7 +202,7 @@ type SonarrCustomFormatPayload struct {
 }
 
 // syncSonarr triggers a custom format sync for Sonarr.
-func (c *Config) syncSonarr() {
+func (c *Config) syncSonarr(event EventType) {
 	if c.ClientInfo == nil || len(c.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Website provided 0 instances.")
 		return
@@ -230,18 +218,16 @@ func (c *Config) syncSonarr() {
 			continue
 		}
 
-		switch synced, err := c.syncSonarrRP(instance, app); {
-		case err != nil:
-			c.Errorf("Sonarr Release Profiles sync for '%d:%s' failed: %v", instance, app.URL, err)
-		case synced:
-			c.Printf("Synced Release Profiles from Notifiarr for Sonarr: %d:%s", instance, app.URL)
-		default:
-			c.Printf("Sent Release Profiles sync request to Notifiarr for Sonarr: %d:%s", instance, app.URL)
+		if err := c.syncSonarrRP(instance, app); err != nil {
+			c.Errorf("[%s requested] Sonarr Release Profiles sync for '%d:%s' failed: %v", event, instance, app.URL, err)
+			return
 		}
+
+		c.Printf("[%s requested] Synced Sonarr Release Profiles from Notifiarr: %d:%s", event, instance, app.URL)
 	}
 }
 
-func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) (bool, error) {
+func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error { //nolint:dupl
 	var (
 		err     error
 		payload = SonarrCustomFormatPayload{Instance: instance, Name: app.Name, NewMaps: c.sonarrRP[instance]}
@@ -249,50 +235,40 @@ func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) (bool, error
 
 	payload.QualityProfiles, err = app.GetQualityProfiles()
 	if err != nil {
-		return false, fmt.Errorf("getting quality profiles: %w", err)
+		return fmt.Errorf("getting quality profiles: %w", err)
 	}
 
 	payload.ReleaseProfiles, err = app.GetReleaseProfiles()
 	if err != nil {
-		return false, fmt.Errorf("getting release profiles: %w", err)
+		return fmt.Errorf("getting release profiles: %w", err)
 	}
 
 	body, err := c.SendData(CFSyncRoute.Path("", "app=sonarr"), payload, false)
 	if err != nil {
-		return false, fmt.Errorf("sending current profiles: %w", err)
+		return fmt.Errorf("sending current profiles: %w", err)
 	}
 
 	delete(c.sonarrRP, instance)
 
-	if len(body) < 1 {
-		return false, nil
-	} else if err := c.updateSonarrRP(instance, app, body); err != nil {
-		return false, fmt.Errorf("updating application: %w", err)
+	if body.Status != success {
+		return fmt.Errorf("%w: %s", ErrInvalidResponse, body.Status)
 	}
 
-	return true, nil
+	if err := c.updateSonarrRP(instance, app, body.Message.Response); err != nil {
+		return fmt.Errorf("updating application: %w", err)
+	}
+
+	return nil
 }
 
 func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) error {
-	payload := struct {
-		Response string `json:"response"`
-		Message  struct {
-			Response struct {
-				SonarrCustomFormatPayload
-			} `json:"response"`
-		} `json:"message"`
-	}{}
-	if err := json.Unmarshal(data, &payload); err != nil {
+	reply := &SonarrCustomFormatPayload{}
+	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
 
-	reply := payload.Message.Response.SonarrCustomFormatPayload
 	c.Debugf("Received %d quality profiles and %d release profiles for Sonarr: %d:%s",
 		len(reply.QualityProfiles), len(reply.ReleaseProfiles), instance, app.URL)
-
-	if payload.Response != success {
-		return fmt.Errorf("%w: %s", ErrInvalidResponse, payload.Response)
-	}
 
 	maps := &cfMapIDpayload{RP: []idMap{}, QP: []idMap{}, Instance: instance}
 
