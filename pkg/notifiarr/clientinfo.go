@@ -212,6 +212,11 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 		syn.SetInfo(hostInfo)
 	}
 
+	if hostInfo.Platform == "" && hostInfo.VirtualizationSystem == "docker" {
+		hostInfo.Platform = "Docker " + hostInfo.KernelVersion
+		hostInfo.PlatformFamily = "Docker"
+	}
+
 	c.extras.hostInfo = hostInfo
 
 	return c.HostInfoNoError(), nil // return a copy.

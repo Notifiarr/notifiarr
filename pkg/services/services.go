@@ -65,9 +65,10 @@ func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 func (c *Config) Start() {
 	if c.LogFile != "" {
 		c.Logger = logs.CustomLog(c.LogFile, "Services")
-		for i := range c.services {
-			c.services[i].log = c.Logger
-		}
+	}
+
+	for i := range c.services {
+		c.services[i].log = c.Logger
 	}
 
 	c.checks = make(chan *Service, DefaultBuffer)
