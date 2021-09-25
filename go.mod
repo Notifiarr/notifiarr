@@ -34,7 +34,6 @@ require (
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
-	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/cabbie v1.0.2 // indirect
