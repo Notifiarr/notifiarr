@@ -12,7 +12,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
-	"github.com/denisbrodbeck/machineid"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/process"
 	"golift.io/cnfg"
@@ -52,13 +51,6 @@ type ServiceCheck struct {
 	Expect   string        `json:"expect"`
 	Timeout  cnfg.Duration `json:"timeout"`
 	Interval cnfg.Duration `json:"interval"`
-}
-
-// InfoStat contains information about the running host.
-type InfoStat struct {
-	*host.InfoStat
-	Age     int64     `json:"age"`
-	updated time.Time `json:"-"`
 }
 
 type intList []int
@@ -215,12 +207,11 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 		return nil, fmt.Errorf("getting host info: %w", err)
 	}
 
-	uid, err := machineid.ProtectedID(hostInfo.Hostname)
-	if err != nil {
-		return nil, fmt.Errorf("getting machine ID: %w", err)
+	syn, err := snapshot.GetSynology(true)
+	if syn != nil && err == nil {
+		syn.SetInfo(hostInfo)
 	}
 
-	hostInfo.HostID = uid // this is where we put the unique ID.
 	c.extras.hostInfo = hostInfo
 
 	return c.HostInfoNoError(), nil // return a copy.

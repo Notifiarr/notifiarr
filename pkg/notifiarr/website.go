@@ -217,11 +217,11 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 	if data, err := json.Marshal(payload); err == nil {
 		var torn map[string]interface{}
 		if err := json.Unmarshal(data, &torn); err == nil {
-			torn["host"], err = c.GetHostInfoUID()
-			payload = torn
-			if err != nil {
+			if torn["host"], err = c.GetHostInfoUID(); err != nil {
 				c.Errorf("Host Info Unknown: %v", err)
 			}
+
+			payload = torn
 		}
 	}
 

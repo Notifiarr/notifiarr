@@ -140,8 +140,10 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		errs = append(errs, err...)
 	}
 
-	if err := s.GetSynology(c.Uptime); err != nil {
+	if syn, err := GetSynology(c.Uptime && s.synology); err != nil {
 		errs = append(errs, err)
+	} else if syn != nil {
+		syn.SetInfo(s.System.InfoStat)
 	}
 
 	if err := s.getDisksUsage(ctx, c.DiskUsage); len(err) != 0 {
