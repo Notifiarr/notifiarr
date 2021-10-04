@@ -49,6 +49,7 @@ type LidarrConfig struct {
 	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
 	*starr.Config
 	*lidarr.Lidarr
+	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
 }
 
 func (r *LidarrConfig) setup(timeout time.Duration) {
@@ -61,6 +62,15 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	if r.StuckItem && r.CheckQ == nil {
 		i := uint(0)
 		r.CheckQ = &i
+	} else if r.CheckQ != nil {
+		r.StuckItem = true
+	}
+
+	if u, err := r.GetURL(); err != nil {
+		r.Errorf("Checking Lidarr Path: %v", err)
+	} else if u := strings.TrimRight(u, "/"); u != r.URL {
+		r.Errorf("Lidarr URL fixed: %s -> %s", r.URL, u)
+		r.URL = u
 	}
 }
 

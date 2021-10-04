@@ -48,6 +48,7 @@ type SonarrConfig struct {
 	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
 	*starr.Config
 	*sonarr.Sonarr
+	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
 }
 
 func (r *SonarrConfig) setup(timeout time.Duration) {
@@ -62,6 +63,13 @@ func (r *SonarrConfig) setup(timeout time.Duration) {
 		r.CheckQ = &i
 	} else if r.CheckQ != nil {
 		r.StuckItem = true
+	}
+
+	if u, err := r.GetURL(); err != nil {
+		r.Errorf("Checking Sonarr Path: %v", err)
+	} else if u = strings.TrimRight(u, "/"); u != r.URL {
+		r.Errorf("Sonarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.URL = u
 	}
 }
 
