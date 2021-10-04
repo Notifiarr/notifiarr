@@ -81,9 +81,6 @@ func New() *Logger {
 
 // SetupLogging splits log writers into a file and/or stdout.
 func (l *Logger) SetupLogging(config *LogConfig) {
-	logFiles = config.LogFiles
-	logFileMb = config.LogFileMb
-	fileMode = config.FileMode.Mode()
 	l.logs = config
 	l.setDefaultLogPaths()
 	l.setLogPaths()
@@ -160,6 +157,7 @@ func (l *Logger) CapturePanic() {
 		ui.ShowConsoleWindow()
 		l.ErrorLog.Output(callDepth, //nolint:errcheck
 			fmt.Sprintf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack())))
+		panic(r)
 	}
 }
 

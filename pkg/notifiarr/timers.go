@@ -11,7 +11,7 @@ import (
 
 const (
 	stuckDur = 5*time.Minute + 1327*time.Millisecond
-	pollDur  = 4*time.Minute + 47*time.Second + 977*time.Millisecond
+	pollDur  = 4*time.Minute + 977*time.Millisecond
 )
 
 // timerConfig defines a custom GET timer from the website.
@@ -51,7 +51,7 @@ func (t *timerConfig) run(event EventType) {
 
 func (t *timerConfig) setup(c *Config) {
 	t.URI, t.errorf, t.getdata = c.BaseURL+"/"+t.URI, c.Errorf, c.GetData
-	t.ch = make(chan EventType)
+	t.ch = make(chan EventType, 1)
 }
 
 func (c *Config) startTimers() {
@@ -71,7 +71,8 @@ func (c *Config) startTimers() {
 	}
 
 	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
-		c.Printf("==> Started Notifiarr Poller, (nil=%v) interval: %v, timeout: %v", c.ClientInfo == nil, pollDur, c.Timeout)
+		c.Printf("==> Started Notifiarr Poller, (have_clientinfo=%v) interval: %v, timeout: %v",
+			c.ClientInfo != nil, pollDur, c.Timeout)
 		actions = append(actions, //nolint:wsl
 			&action{Msg: "Polling Notifiarr for new settings.", Fn: c.pollForReload, T: time.NewTicker(pollDur)})
 	}

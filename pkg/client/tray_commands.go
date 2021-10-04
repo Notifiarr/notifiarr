@@ -162,6 +162,8 @@ func (c *Client) writeConfigFile() {
 }
 
 func (c *Client) menuPanic() {
+	defer c.CapturePanic()
+
 	yes, err := ui.Question(mnd.Title, "You really want to panic?", true)
 	if !yes || err != nil {
 		return

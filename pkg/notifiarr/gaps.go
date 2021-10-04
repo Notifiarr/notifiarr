@@ -42,7 +42,7 @@ func (c *Config) sendGaps(event EventType) {
 		} else {
 			c.Printf("[%s requested] Sent Collection Gaps to Notifiarr for Radarr: %d:%s. "+
 				"Website took %s and replied with: %s, %s",
-				event, instance, r.URL, resp.Message.Elapsed, resp.Status, resp.Message.Response)
+				event, instance, r.URL, resp.Details.Elapsed, resp.Result, resp.Details.Response)
 		}
 	}
 }

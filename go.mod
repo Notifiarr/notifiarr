@@ -2,6 +2,8 @@ module github.com/Notifiarr/notifiarr
 
 go 1.17
 
+replace golift.io/starr => ../../../golift.io/starr
+
 // home grown goodness.
 require (
 	golift.io/cnfg v0.0.8

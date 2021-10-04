@@ -10,7 +10,7 @@ func (c *Config) logSnapshotStartup() {
 		"uptime":  c.Snap.Uptime,
 		"cpumem":  c.Snap.CPUMem,
 		"cputemp": c.Snap.CPUTemp,
-		"zfs":     c.Snap.ZFSPools != nil,
+		"zfs":     len(c.Snap.ZFSPools) > 0,
 		"sudo":    c.Snap.UseSudo && c.Snap.DriveData,
 	} {
 		if !v {
@@ -57,6 +57,6 @@ func (c *Config) sendSnapshot(event EventType) {
 	} else {
 		c.Printf("[%s requested] System Snapshot sent to Notifiarr, cron interval: %s. "+
 			"Website took %s and replied with: %s, %s",
-			event, c.Snap.Interval, resp.Message.Elapsed, resp.Status, resp.Message.Response)
+			event, c.Snap.Interval, resp.Details.Elapsed, resp.Result, resp.Details.Response)
 	}
 }

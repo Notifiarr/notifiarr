@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
@@ -65,13 +65,13 @@ import (
 */
 // nitsua: all responses should be that way.. but response might not always be an object.
 type Response struct {
-	Status  string `json:"response"`
-	Message struct {
+	Result  string `json:"result"`
+	Details struct {
 		Response json.RawMessage `json:"response"` // can be anything. type it out later.
 		Started  time.Time       `json:"started"`
 		Finished time.Time       `json:"finished"`
 		Elapsed  cnfg.Duration   `json:"elapsed"`
-	} `json:"message"`
+	} `json:"details"`
 }
 
 // sendPlexMeta is kicked off by the webserver in go routine.
@@ -183,28 +183,13 @@ func (c *Config) GetData(url string) (*Response, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	defer c.debughttplog(resp, url, start, nil, body)
+	defer c.debughttplog(resp, url, start, "", string(body))
 
 	if err != nil {
 		return nil, fmt.Errorf("reading http response body: %w", err)
 	}
 
-	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusIMUsed {
-		b := string(body)
-		if len(b) > c.MaxBody {
-			b = b[:c.MaxBody]
-		}
-
-		return nil, fmt.Errorf("%w: %s: %s, %s",
-			ErrNon200, url, resp.Status, strings.Join(strings.Fields(b), " "))
-	}
-
-	var r Response
-	if err := json.Unmarshal(body, &r); err != nil {
-		return nil, fmt.Errorf("converting json response: %w", err)
-	}
-
-	return &r, nil
+	return unmarshalResponse(url, resp.StatusCode, body)
 }
 
 // SendData sends raw data to a notifiarr URL as JSON.
@@ -240,18 +225,25 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 		return nil, err
 	}
 
+	return unmarshalResponse(c.BaseURL+uri, code, body)
+}
+
+// unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
+func unmarshalResponse(url string, code int, body []byte) (*Response, error) {
+	var r Response
+	err := json.Unmarshal(body, &r)
+
 	if code < http.StatusOK || code > http.StatusIMUsed {
-		b := string(body)
-		if len(b) > c.MaxBody {
-			b = b[:c.MaxBody]
+		if err != nil {
+			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v)",
+				ErrNon200, url, code, http.StatusText(code), err)
 		}
 
-		return nil, fmt.Errorf("%w: %s: %s, %s",
-			ErrNon200, c.BaseURL+uri, http.StatusText(code), strings.Join(strings.Fields(b), " "))
+		return nil, fmt.Errorf("%w: %s: %d %s, %s: %s",
+			ErrNon200, url, code, http.StatusText(code), r.Result, r.Details.Response)
 	}
 
-	var r Response
-	if err := json.Unmarshal(body, &r); err != nil {
+	if err != nil {
 		return nil, fmt.Errorf("converting json response: %w", err)
 	}
 
@@ -275,7 +267,7 @@ func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		c.debughttplog(nil, url, start, data, nil)
+		c.debughttplog(nil, url, start, string(data), "")
 		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
@@ -283,9 +275,9 @@ func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if log {
-		defer c.debughttplog(resp, url, start, data, body)
+		defer c.debughttplog(resp, url, start, string(data), string(body))
 	} else {
-		defer c.debughttplog(resp, url, start, []byte("<data not logged>"), body)
+		defer c.debughttplog(resp, url, start, "<data not logged>", string(body))
 	}
 
 	if err != nil {
@@ -313,25 +305,28 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 
 	for i := 0; ; i++ {
 		resp, err := h.Client.Do(req)
-		if err == nil && resp.StatusCode < http.StatusInternalServerError {
-			return resp, nil
-		} else if err == nil { // resp.StatusCode is 500 or higher, make that en error.
-			body, _ := ioutil.ReadAll(resp.Body) // must read the entire body when err == nil
-			resp.Body.Close()                    // do not defer, because we're in a loop.
+		if err == nil {
+			if resp.StatusCode < http.StatusInternalServerError {
+				return resp, nil
+			}
+
+			// resp.StatusCode is 500 or higher, make that en error.
+			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
+			resp.Body.Close()                         // do not defer, because we're in a loop.
 			// shoehorn a non-200 error into the empty http error.
-			err = fmt.Errorf("%w: %s: %s: %s", ErrNon200, req.URL, resp.Status, string(body))
+			err = fmt.Errorf("%w: %s: %d bytes, %s", ErrNon200, req.URL, size, resp.Status)
 		}
 
 		switch {
-		case errors.Is(err, context.DeadlineExceeded):
+		case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
 			if i == 0 {
-				return nil, fmt.Errorf("notifiarr req timed out after %s: %s: %w", timeout, req.URL, err)
+				return resp, fmt.Errorf("notifiarr req timed out after %s: %s: %w", timeout, req.URL, err)
 			}
 
-			return nil, fmt.Errorf("[%d/%d] Notifiarr req timed out after %s, giving up: %w",
+			return resp, fmt.Errorf("[%d/%d] Notifiarr req timed out after %s, giving up: %w",
 				i+1, h.Retries+1, timeout, err)
 		case i == h.Retries:
-			return nil, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", i+1, h.Retries+1, err)
+			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", i+1, h.Retries+1, err)
 		default:
 			h.Printf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", i+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
@@ -339,7 +334,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 	}
 }
 
-func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, data, body []byte) {
+func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, data, body string) {
 	headers := ""
 	status := "0"
 
@@ -353,21 +348,19 @@ func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, 
 		}
 	}
 
-	b := string(body)
-	if c.MaxBody > 0 && len(b) > c.MaxBody {
-		b = b[:c.MaxBody] + fmt.Sprintf(" <body truncated, max: %d>", c.MaxBody)
+	if c.MaxBody > 0 && len(body) > c.MaxBody {
+		body = fmt.Sprintf("%s <body truncated, max: %d>", body[:c.MaxBody], c.MaxBody)
 	}
 
-	d := string(data)
-	if c.MaxBody > 0 && len(d) > c.MaxBody {
-		d = d[:c.MaxBody] + fmt.Sprintf(" <data truncated, max: %d>", c.MaxBody)
+	if c.MaxBody > 0 && len(data) > c.MaxBody {
+		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:c.MaxBody], c.MaxBody)
 	}
 
-	if len(data) == 0 {
+	if data == "" {
 		c.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), status, headers, b)
+			url, time.Since(start).Round(time.Microsecond), status, headers, body)
 	} else {
 		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), d, status, headers, b)
+			url, time.Since(start).Round(time.Microsecond), data, status, headers, body)
 	}
 }

@@ -99,8 +99,8 @@ func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
 	}
 
 	v := ClientInfo{}
-	if err = json.Unmarshal(body.Message.Response, &v); err != nil {
-		return &v, fmt.Errorf("parsing response: %w, %s", err, string(body.Message.Response))
+	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
+		return &v, fmt.Errorf("parsing response: %w, %s", err, string(body.Details.Response))
 	}
 
 	// Only set this if there was no error.
@@ -229,15 +229,20 @@ func (c *Config) pollForReload(event EventType) {
 		return
 	}
 
-	var v bool
+	var v struct {
+		Reload     bool      `json:"reload"`
+		LastSync   time.Time `json:"lastSync"`
+		LastChange time.Time `json:"lastChange"`
+	}
 
-	if err = json.Unmarshal(body.Message.Response, &v); err != nil {
+	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
 		c.Errorf("[%s requested] Polling Notifiarr: %v", event, err)
 		return
 	}
 
-	if v {
-		c.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!", event)
+	if v.Reload {
+		c.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!"+
+			" Last Sync: %v, Last Change: %v, Diff: %v", event, v.LastSync, v.LastChange, v.LastSync.Sub(v.LastChange))
 		c.Sighup <- &update.Signal{Text: "poll triggered reload"}
 	} else if c.ClientInfo == nil {
 		c.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", event)

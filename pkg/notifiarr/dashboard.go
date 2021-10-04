@@ -106,15 +106,15 @@ func (c *Config) sendDashboardState(event EventType) {
 
 	resp, err := c.SendData(DashRoute.Path(event), states, true)
 	if err != nil {
-		c.Errorf("[%s requested] Sending Dashboard State Data to Notifiarr (apps:%s total:%s): %v: %v",
-			event, apps, time.Since(start).Round(time.Millisecond), err, states)
+		c.Errorf("[%s requested] Sending Dashboard State Data to Notifiarr (apps:%s total:%s): %v",
+			event, apps, time.Since(start).Round(time.Millisecond), err)
 		return
 	}
 
 	c.Printf("[%s requested] Sent Dashboard State Data to Notifiarr! Elapsed: apps:%s total:%s."+
 		" Website took %s and replied with: %s, %s",
 		event, apps, time.Since(start).Round(time.Millisecond),
-		resp.Message.Elapsed, resp.Status, resp.Message.Response)
+		resp.Details.Elapsed, resp.Result, resp.Details.Response)
 }
 
 // getStates fires a routine for each app type and tries to get a lot of data fast!

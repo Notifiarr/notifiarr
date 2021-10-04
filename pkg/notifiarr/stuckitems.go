@@ -89,10 +89,10 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), err)
 	} else {
 		c.Printf("[%s requested] Sent Stuck Items to Notifiarr "+
-			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d."+
+			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d. "+
 			"Website took %s and replied with: %s, %s",
 			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(),
-			resp.Message.Elapsed, resp.Status, resp.Message.Response)
+			resp.Details.Elapsed, resp.Result, resp.Details.Response)
 	}
 }
 

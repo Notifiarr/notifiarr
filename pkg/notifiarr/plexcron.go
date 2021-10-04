@@ -36,11 +36,27 @@ func (t *Triggers) SendPlexSessions(event EventType) {
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
 func (c *Config) sendPlexSessions(event EventType) {
-	if resp, err := c.sendPlexMeta(event, nil, false); err != nil {
-		c.Errorf("[%s requested] Sending Plex Sessions to Notifiarr: %v", event, err)
+	c.collectSessions(event, nil)
+}
+
+// collectSessions is called in a go routine after a plex media.play webhook.
+// This reaches back into Plex, asks for sessions and then sends the whole
+// payloads (incoming webhook and sessions) over to notifiarr.com.
+// SendMeta also collects system snapshot info, so a lot happens here.
+func (c *Config) collectSessions(event EventType, v *plexIncomingWebhook) {
+	wait := false
+	msg := ""
+
+	if v != nil {
+		wait = true
+		msg = " (and webhook)"
+	}
+
+	if resp, err := c.sendPlexMeta(event, v, wait); err != nil {
+		c.Errorf("[%s requested] Sending Plex Sessions%s to Notifiarr: %v", event, msg, err)
 	} else {
-		c.Printf("[%s requested] Plex Sessions sent to Notifiar. Website took %s and replied with: %s, %s",
-			event, resp.Message.Elapsed, resp.Status, resp.Message.Response)
+		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar. Website took %s and replied with: %s, %s",
+			event, msg, resp.Details.Elapsed, resp.Result, resp.Details.Response)
 	}
 }
 

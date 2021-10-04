@@ -120,7 +120,7 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "media.play"):
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
-		go c.collectSessions(&v)
+		go c.collectSessions(EventHook, &v)
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
@@ -132,21 +132,6 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	}
 }
 
-// collectSessions is called in a go routine after a plex media.play webhook.
-// This reaches back into Plex, asks for sessions and then sends the whole
-// payloads (incoming webhook and sessions) over to notifiarr.com.
-// SendMeta also collects system snapshot info, so a lot happens here.
-func (c *Config) collectSessions(v *plexIncomingWebhook) {
-	resp, err := c.sendPlexMeta(EventHook, v, true)
-	if err != nil {
-		c.Errorf("Sending Plex Sessions (and webhook) to Notifiarr: %v", err)
-		return
-	}
-
-	c.Printf("Plex => Notifiarr: %s '%s' => %s. Website took %s and replied with: %s, %s",
-		v.Account.Title, v.Event, v.Metadata.Title, resp.Message.Elapsed, resp.Status, resp.Message.Response)
-}
-
 // sendPlexWebhook simply relays an incoming "admin" plex webhook to Notifiarr.com.
 func (c *Config) sendPlexWebhook(v *plexIncomingWebhook) {
 	resp, err := c.SendData(PlexRoute.Path(EventHook), &Payload{Load: v, Plex: &plex.Sessions{Name: c.Plex.Name}}, true)
@@ -156,7 +141,7 @@ func (c *Config) sendPlexWebhook(v *plexIncomingWebhook) {
 	}
 
 	c.Printf("Plex => Notifiarr: %s '%s' => %s. Website took %s and replied with: %s, %s",
-		v.Account.Title, v.Event, v.Metadata.Title, resp.Message.Elapsed, resp.Status, resp.Message.Response)
+		v.Account.Title, v.Event, v.Metadata.Title, resp.Details.Elapsed, resp.Result, resp.Details.Response)
 }
 
 type appStatus struct {

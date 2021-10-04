@@ -1,4 +1,4 @@
-//+build !linux,!windows
+//go:build !linux && !windows
 
 package logs
 
@@ -15,5 +15,4 @@ var stderr = os.Stderr.Fd()
 func redirectStderr(file *os.File) {
 	// This works on darwin and freebsd, maybe others.
 	_ = syscall.Dup2(int(file.Fd()), int(stderr))
-	os.Stderr = file
 }

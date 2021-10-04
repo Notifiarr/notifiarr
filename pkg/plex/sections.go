@@ -17,38 +17,38 @@ type LibrarySection struct {
 	MediaTagPrefix      string `json:"mediaTagPrefix"`
 	MediaTagVersion     int    `json:"mediaTagVersion"`
 	Metadata            []struct {
-		RatingKey             string `json:"ratingKey"`
-		Key                   string `json:"key"`
-		ParentRatingKey       string `json:"parentRatingKey,omitempty"`
-		GrandparentRatingKey  string `json:"grandparentRatingKey,omitempty"`
-		GUID                  string `json:"guid"`
-		ParentGUID            string `json:"parentGuid,omitempty"`
-		GrandparentGUID       string `json:"grandparentGuid,omitempty"`
-		Type                  string `json:"type"`
-		Title                 string `json:"title"`
-		GrandparentKey        string `json:"grandparentKey,omitempty"`
-		ParentKey             string `json:"parentKey,omitempty"`
-		LibrarySectionTitle   string `json:"librarySectionTitle"`
-		LibrarySectionID      int    `json:"librarySectionID"`
-		LibrarySectionKey     string `json:"librarySectionKey"`
-		GrandparentTitle      string `json:"grandparentTitle,omitempty"`
-		ParentTitle           string `json:"parentTitle,omitempty"`
-		ContentRating         string `json:"contentRating"`
-		Summary               string `json:"summary"`
-		Index                 int    `json:"index,omitempty"`
-		ParentIndex           int    `json:"parentIndex,omitempty"`
-		Rating                int    `json:"rating,omitempty"`
-		Year                  int    `json:"year,omitempty"`
-		Thumb                 string `json:"thumb"`
-		Art                   string `json:"art"`
-		ParentThumb           string `json:"parentThumb,omitempty"`
-		GrandparentThumb      string `json:"grandparentThumb,omitempty"`
-		GrandparentArt        string `json:"grandparentArt,omitempty"`
-		GrandparentTheme      string `json:"grandparentTheme,omitempty"`
-		Duration              int    `json:"duration"`
-		OriginallyAvailableAt string `json:"originallyAvailableAt"`
-		AddedAt               int    `json:"addedAt"`
-		UpdatedAt             int    `json:"updatedAt"`
+		RatingKey             string  `json:"ratingKey"`
+		Key                   string  `json:"key"`
+		ParentRatingKey       string  `json:"parentRatingKey,omitempty"`
+		GrandparentRatingKey  string  `json:"grandparentRatingKey,omitempty"`
+		GUID                  string  `json:"guid"`
+		ParentGUID            string  `json:"parentGuid,omitempty"`
+		GrandparentGUID       string  `json:"grandparentGuid,omitempty"`
+		Type                  string  `json:"type"`
+		Title                 string  `json:"title"`
+		GrandparentKey        string  `json:"grandparentKey,omitempty"`
+		ParentKey             string  `json:"parentKey,omitempty"`
+		LibrarySectionTitle   string  `json:"librarySectionTitle"`
+		LibrarySectionID      int     `json:"librarySectionID"`
+		LibrarySectionKey     string  `json:"librarySectionKey"`
+		GrandparentTitle      string  `json:"grandparentTitle,omitempty"`
+		ParentTitle           string  `json:"parentTitle,omitempty"`
+		ContentRating         string  `json:"contentRating"`
+		Summary               string  `json:"summary"`
+		Index                 int     `json:"index,omitempty"`
+		ParentIndex           int     `json:"parentIndex,omitempty"`
+		Rating                float64 `json:"rating,omitempty"`
+		Year                  int     `json:"year,omitempty"`
+		Thumb                 string  `json:"thumb"`
+		Art                   string  `json:"art"`
+		ParentThumb           string  `json:"parentThumb,omitempty"`
+		GrandparentThumb      string  `json:"grandparentThumb,omitempty"`
+		GrandparentArt        string  `json:"grandparentArt,omitempty"`
+		GrandparentTheme      string  `json:"grandparentTheme,omitempty"`
+		Duration              int     `json:"duration"`
+		OriginallyAvailableAt string  `json:"originallyAvailableAt"`
+		AddedAt               int     `json:"addedAt"`
+		UpdatedAt             int     `json:"updatedAt"`
 		Media                 []struct {
 			ID                    int     `json:"id"`
 			Duration              int     `json:"duration"`

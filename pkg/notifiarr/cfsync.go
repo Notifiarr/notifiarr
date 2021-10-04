@@ -108,11 +108,11 @@ func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) error { //no
 
 	delete(c.radarrCF, instance)
 
-	if body.Status != success {
-		return fmt.Errorf("%w: %s", ErrInvalidResponse, body.Status)
+	if body.Result != success {
+		return fmt.Errorf("%w: %s", ErrInvalidResponse, body.Result)
 	}
 
-	if err := c.updateRadarrCF(instance, app, body.Message.Response); err != nil {
+	if err := c.updateRadarrCF(instance, app, body.Details.Response); err != nil {
 		return fmt.Errorf("updating application: %w", err)
 	}
 
@@ -250,11 +250,11 @@ func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error { //no
 
 	delete(c.sonarrRP, instance)
 
-	if body.Status != success {
-		return fmt.Errorf("%w: %s", ErrInvalidResponse, body.Status)
+	if body.Result != success {
+		return fmt.Errorf("%w: %s", ErrInvalidResponse, body.Result)
 	}
 
-	if err := c.updateSonarrRP(instance, app, body.Message.Response); err != nil {
+	if err := c.updateSonarrRP(instance, app, body.Details.Response); err != nil {
 		return fmt.Errorf("updating application: %w", err)
 	}
 

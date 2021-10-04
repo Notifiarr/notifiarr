@@ -52,6 +52,10 @@ func (c *Client) startTray() {
 }
 
 func (c *Client) setupMenus() {
+	if !ui.HasGUI() {
+		return
+	}
+
 	if c.Config.LogConfig.DebugLog == "" {
 		c.menu["debug_logs"].Hide()
 		c.menu["debug_logs2"].Hide()
@@ -203,7 +207,17 @@ func (c *Client) watchTimerChannels() {
 	}
 
 	for {
-		index, _, _ := reflect.Select(cases)
+		index, _, ok := reflect.Select(cases)
+		if !ok {
+			// Channel cases[index] has been closed, remove it.
+			cases = append(cases[:index], cases[index+1:]...)
+			if len(cases) < 1 {
+				return
+			}
+
+			continue
+		}
+
 		ci.Actions.Custom[index].Run(notifiarr.EventUser)
 	}
 }
