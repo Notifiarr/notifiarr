@@ -2,15 +2,13 @@ module github.com/Notifiarr/notifiarr
 
 go 1.17
 
-replace golift.io/starr => ../../../golift.io/starr
-
 // home grown goodness.
 require (
 	golift.io/cnfg v0.0.8
 	golift.io/deluge v0.9.2
 	golift.io/qbit v0.0.0-20210717220751-d545c7a8f721
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.10.9-0.20210902222804-eda94a310924
+	golift.io/starr v0.10.10
 	golift.io/version v0.0.2
 )
 
@@ -39,7 +37,7 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/cabbie v1.0.2 // indirect
-	github.com/google/glazier v0.0.0-20210921133349-9c434c8b2d2c // indirect
+	github.com/google/glazier v0.0.0-20211004192146-897b4e78b5fb // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210825203111-a709d8e111b3 // indirect
 	github.com/gopherjs/gopherwasm v1.1.0 // indirect
 	github.com/gorilla/mux v1.8.0
@@ -54,7 +52,7 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/scjalliance/comshim v0.0.0-20190308082608-cf06d2532c4e // indirect
-	github.com/shirou/gopsutil/v3 v3.21.8
+	github.com/shirou/gopsutil/v3 v3.21.9
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
