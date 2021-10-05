@@ -69,7 +69,7 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	if u, err := r.GetURL(); err != nil {
 		r.Errorf("Checking Lidarr Path: %v", err)
 	} else if u := strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Lidarr URL fixed: %s -> %s", r.URL, u)
+		r.Errorf("Lidarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }
