@@ -49,6 +49,7 @@ type RadarrConfig struct {
 	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
 	*starr.Config
 	*radarr.Radarr
+	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
 }
 
 func (r *RadarrConfig) setup(timeout time.Duration) {
@@ -63,6 +64,13 @@ func (r *RadarrConfig) setup(timeout time.Duration) {
 		r.CheckQ = &i
 	} else if r.CheckQ != nil {
 		r.StuckItem = true
+	}
+
+	if u, err := r.GetURL(); err != nil {
+		r.Errorf("Checking Radarr Path: %v", err)
+	} else if u = strings.TrimRight(u, "/"); u != r.URL {
+		r.Errorf("Radarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.URL = u
 	}
 }
 

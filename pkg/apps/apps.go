@@ -167,21 +167,25 @@ func (a *Apps) Setup(timeout time.Duration) error {
 
 	for i := range a.Radarr {
 		a.Radarr[i].Debugf = a.DebugLog.Printf
+		a.Radarr[i].Errorf = a.ErrorLog.Printf
 		a.Radarr[i].setup(timeout)
 	}
 
 	for i := range a.Readarr {
 		a.Readarr[i].Debugf = a.DebugLog.Printf
+		a.Readarr[i].Errorf = a.ErrorLog.Printf
 		a.Readarr[i].setup(timeout)
 	}
 
 	for i := range a.Sonarr {
 		a.Sonarr[i].Debugf = a.DebugLog.Printf
+		a.Sonarr[i].Errorf = a.ErrorLog.Printf
 		a.Sonarr[i].setup(timeout)
 	}
 
 	for i := range a.Lidarr {
 		a.Lidarr[i].Debugf = a.DebugLog.Printf
+		a.Lidarr[i].Errorf = a.ErrorLog.Printf
 		a.Lidarr[i].setup(timeout)
 	}
 
