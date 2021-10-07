@@ -55,7 +55,7 @@ log_files = 0
 ##
 ## Unix file mode for new log files. Umask also affects this.
 ## Missing or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
-file_mode = 0600
+file_mode = "0600"
 
 ## How often to send current application states for the dashboard.
 ##
