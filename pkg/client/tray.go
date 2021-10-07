@@ -228,7 +228,7 @@ func (c *Client) watchKillerChannels() {
 	for {
 		select {
 		case <-c.menu["exit"].Clicked():
-			c.Errorf("Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
+			c.Printf("Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
 			return
 		case <-c.menu["debug_panic"].Clicked():
 			c.menuPanic()

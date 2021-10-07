@@ -179,7 +179,7 @@ func (c *Client) loadSiteConfig(source notifiarr.EventType) {
 		c.website.Snap, c.Config.Snapshot = ci.Actions.Snapshot, ci.Actions.Snapshot
 	}
 
-	if ci.Actions.Plex != nil {
+	if ci.Actions.Plex != nil && c.Config.Plex != nil {
 		c.Config.Plex.Interval = ci.Actions.Plex.Interval
 		c.Config.Plex.Cooldown = ci.Actions.Plex.Cooldown
 		c.Config.Plex.MoviesPC = ci.Actions.Plex.MoviesPC

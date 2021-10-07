@@ -107,12 +107,12 @@ func (c *Config) getClientInfoTimers(haveInfo bool) []*action {
 		return nil
 	}
 
-	if c.Actions.Gaps.Interval.Duration > 0 {
+	if c.Actions.Gaps.Interval.Duration > 0 && len(c.Apps.Radarr) > 0 {
 		c.Trigger.gaps.T = time.NewTicker(c.Actions.Gaps.Interval.Duration)
 		c.Printf("==> Collection Gaps Timer Enabled, interval: %s", c.Actions.Gaps.Interval)
 	}
 
-	if c.Actions.Sync.Interval.Duration > 0 {
+	if c.Actions.Sync.Interval.Duration > 0 && (len(c.Apps.Radarr) > 0 || len(c.Apps.Sonarr) > 0) {
 		c.Trigger.sync.T = time.NewTicker(c.Actions.Sync.Interval.Duration)
 		c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced, interval: %s",
 			c.Actions.Sync.Radarr, c.Actions.Sync.Sonarr, c.Actions.Sync.Interval)
@@ -123,7 +123,7 @@ func (c *Config) getClientInfoTimers(haveInfo bool) []*action {
 		c.Printf("==> Sending Current State Data for Dashboard every %s", c.Actions.Dashboard.Interval)
 	}
 
-	if len(c.Actions.Custom) > 0 { // This is not directly triggable.
+	if len(c.Actions.Custom) > 0 { // This is not directly triggerable.
 		c.Printf("==> Custom Timers Enabled: %d timers provided", len(c.Actions.Custom))
 	}
 
