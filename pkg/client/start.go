@@ -187,6 +187,10 @@ func (c *Client) loadSiteConfig(source notifiarr.EventType) {
 		c.Config.Plex.NoActivity = ci.Actions.Plex.NoActivity
 	}
 
+	c.loadSiteAppsConfig(ci)
+}
+
+func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 	for _, app := range ci.Actions.Apps.Lidarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Lidarr) {
 			c.Errorf("Website provided configuration for missing Lidarr app: %d:%s", app.Instance, app.Name)
