@@ -1,6 +1,9 @@
 package plex
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 /* This file contains all the types for Plex Sessions API response. */
 
@@ -103,7 +106,7 @@ type structDur struct {
 }
 
 func (s *structDur) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + time.Since(s.Time).Round(time.Second).String() + `"`), nil
+	return []byte(fmt.Sprintf(`"%.0f"`, time.Since(s.Time).Seconds())), nil
 }
 
 // Country is part of a Plex Session.
