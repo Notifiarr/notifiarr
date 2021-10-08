@@ -84,19 +84,19 @@ func (c *Config) runSessionHolder() {
 
 	var (
 		sessions *plex.Sessions
-		updated  time.Time
 		err      error
 	)
 
 	if sessions, err = c.Plex.GetSessions(); err == nil {
-		updated = time.Now()
+		c.plexSessionTracker(sessions.Sessions, nil)
+		sessions.Updated.Time = time.Now()
 	}
 
 	c.Trigger.sessr = make(chan *holder)
 	defer close(c.Trigger.sessr)
 
 	for waitUntil := range c.Trigger.sess {
-		if sessions != nil && err == nil && updated.After(waitUntil) {
+		if sessions != nil && err == nil && sessions.Updated.After(waitUntil) {
 			c.Trigger.sessr <- &holder{sessions: sessions}
 			continue
 		}
@@ -105,12 +105,36 @@ func (c *Config) runSessionHolder() {
 			time.Sleep(t)
 		}
 
-		sessions, err = c.Plex.GetSessions()
+		currSessions, err := c.Plex.GetSessions()
 		if err == nil {
-			updated = time.Now()
+			c.plexSessionTracker(currSessions.Sessions, sessions.Sessions)
+			sessions = currSessions
+			currSessions.Updated.Time = time.Now()
 		}
 
 		c.Trigger.sessr <- &holder{sessions: sessions, error: err}
+	}
+}
+
+// plexSessionTracker checks for state changes between the previous session pull
+// and the current session pull. if changes are present, a timestmp is added.
+func (c *Config) plexSessionTracker(curr, prev []*plex.Session) {
+CURRENT:
+	for _, currSess := range curr {
+		currSess.Player.StateTime.Time = time.Now()
+
+		for _, prevSess := range prev {
+			if currSess.Session.ID == prevSess.Session.ID {
+				// we have a match, check for state change.
+				if currSess.Player.State == prevSess.Player.State {
+					currSess.Player.StateTime.Time = prevSess.Player.StateTime.Time
+				}
+
+				continue CURRENT
+			}
+		}
+
+		// new session, set a start time.
 	}
 }
 

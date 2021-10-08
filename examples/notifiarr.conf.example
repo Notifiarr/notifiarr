@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.1.15  @ 213108T0935 #
+# Created by Notifiarr v0.2.0   @ 210810T0109 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -54,12 +54,8 @@ log_file_mb = 100
 log_files = 0
 ##
 ## Unix file mode for new log files. Umask also affects this.
-## Missing or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
-file_mode = 0600
-
-## How often to send current application states for the dashboard.
-##
-send_dash = "0s"
+## Missing, blank or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
+file_mode = "0600"
 
 ## Web server and application timeouts.
 ##
@@ -77,30 +73,24 @@ timeout = "1m0s"
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
 #[[lidarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://lidarr:8989/"
-#api_key     = ""
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
+#name     = "" # Set a name to enable checks of your service.
+#url      = "http://lidarr:8989/"
+#api_key  = "".
 
 #[[radarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://127.0.0.1:7878/radarr"
-#api_key     = ""
-#disable_cf  = true  # Disable custom format sync.
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
+#name      = "" # Set a name to enable checks of your service.
+#url       = "http://127.0.0.1:7878/radarr"
+#api_key   = ""
 
 #[[readarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://127.0.0.1:8787/readarr"
-#api_key     = ""
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
+#name      = "" # Set a name to enable checks of your service.
+#url       = "http://127.0.0.1:8787/readarr"
+#api_key   = ""
 
 #[[sonarr]]
-#name        = ""  # Set a name to enable checks of your service.
-#url         = "http://sonarr:8989/"
-#api_key     = ""
-#disable_cf  = true # Disable release profile sync.
-#check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.
+#name      = ""  # Set a name to enable checks of your service.
+#url       = "http://sonarr:8989/"
+#api_key   = ""
 
 
 # Download Client Configs (below) are used for dashboard state and service checks.
@@ -126,41 +116,7 @@ timeout = "1m0s"
 ##
 [plex]
   url         = "http://localhost:32400" # Your plex URL
-  token       = ""            # your plex token; get this from a web inspector
-  interval    = "30m0s"       # how often to send session data, 0 = off
-  cooldown    = "15s"         # how often plex webhooks may trigger session hooks
-  account_map = ""            # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
-  series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
-
-
-#####################
-# Snapshot Settings #
-#####################
-
-## Install package(s)
-##  - Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
-##  - Linux:    apt install smartmontools || yum install smartmontools
-##  - Docker:   Already Included. Run in --privileged mode.
-##  - Synology: opkg install smartmontools
-##  - Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-##
-[snapshot]
-  interval          = "30m0s" # how often to send a snapshot, 0 = off, 30m - 2h recommended
-  timeout           = "30s" # how long a snapshot may take
-  monitor_raid      = false # mdadm / megacli
-  monitor_drives    = false # smartctl: age, temp, health
-  monitor_space     = false # disk usage for all partitions
-  monitor_uptime    = false # system data, users, hostname, uptime, os, build
-  monitor_cpuMemory = false # literally cpu usage, load averages, and memory
-  monitor_cpuTemp   = false # cpu temperatures, not available on all platforms
-  zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]
-  use_sudo          = false # sudo is needed on unix when monitor_drives=true or for megacli.
-## Example sudoers entries follow; these go in /etc/sudoers.d. Fix the paths to smartctl and MegaCli.
-## notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
-## notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
-
+  token       = "" # your plex token; get this from a web inspector
 
 ##################
 # Service Checks #

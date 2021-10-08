@@ -6,16 +6,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 // Sessions is the config input data.
 type Sessions struct {
-	Name     string        `json:"server"`
-	HostID   string        `json:"hostId"`
-	Sessions []*Session    `json:"sessions"`
-	Updated  time.Time     `json:"update_time,omitempty"`
-	Age      time.Duration `json:"update_age,omitempty"`
+	Name     string     `json:"server"`
+	HostID   string     `json:"hostId"`
+	Sessions []*Session `json:"sessions"`
+	Updated  structDur  `json:"updateTime,omitempty"`
 }
 
 // ErrBadStatus is returned when plex returns an invalid status code.
@@ -60,9 +58,9 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 }
 
 // KillSessionWithContext kills a Plex session.
-func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) error {
+func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) ([]byte, error) {
 	if !s.Configured() {
-		return ErrNoURLToken
+		return nil, ErrNoURLToken
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
@@ -70,7 +68,7 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+"/status/sessions/terminate", nil)
 	if err != nil {
-		return fmt.Errorf("creating http request: %w", err)
+		return nil, fmt.Errorf("creating http request: %w", err)
 	}
 
 	req.Header.Set("X-Plex-Token", s.Token)
@@ -82,24 +80,24 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 
 	resp, err := s.getClient().Do(req)
 	if err != nil {
-		return fmt.Errorf("making http request: %w", err)
+		return nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("reading http response: %w", err)
+		return body, fmt.Errorf("reading http response: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("%w: %s", ErrBadStatus, string(body))
+		return body, ErrBadStatus
 	}
 
-	return nil
+	return body, nil
 }
 
 // KillSession kills a Plex session.
-func (s *Server) KillSession(sessionID, reason string) error {
+func (s *Server) KillSession(sessionID, reason string) ([]byte, error) {
 	return s.KillSessionWithContext(context.Background(), sessionID, reason)
 }
 

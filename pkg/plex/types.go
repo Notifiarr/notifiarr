@@ -1,5 +1,7 @@
 package plex
 
+import "time"
+
 /* This file contains all the types for Plex Sessions API response. */
 
 // Session is a Plex json struct.
@@ -76,23 +78,32 @@ type User struct {
 
 // Player is part of a Plex Session.
 type Player struct {
-	Address     string `json:"address"`
-	Device      string `json:"device"`
-	MachineID   string `json:"machineIdentifier"`
-	Model       string `json:"model"`
-	Platform    string `json:"platform"`
-	PlatformVer string `json:"platformVersion"`
-	Product     string `json:"product"`
-	Profile     string `json:"profile"`
-	PublicAddr  string `json:"remotePublicAddress"`
-	State       string `json:"state"`
-	Title       string `json:"title"`
-	UserID      int64  `json:"userID"`
-	Vendor      string `json:"vendor"`
-	Version     string `json:"version"`
-	Relayed     bool   `json:"relayed"`
-	Local       bool   `json:"local"`
-	Secure      bool   `json:"secure"`
+	Address     string    `json:"address"`
+	Device      string    `json:"device"`
+	MachineID   string    `json:"machineIdentifier"`
+	Model       string    `json:"model"`
+	Platform    string    `json:"platform"`
+	PlatformVer string    `json:"platformVersion"`
+	Product     string    `json:"product"`
+	Profile     string    `json:"profile"`
+	PublicAddr  string    `json:"remotePublicAddress"`
+	State       string    `json:"state"`
+	StateTime   structDur `json:"stateTime"` // this is not a plex item. We calculate this.
+	Title       string    `json:"title"`
+	UserID      int64     `json:"userID"`
+	Vendor      string    `json:"vendor"`
+	Version     string    `json:"version"`
+	Relayed     bool      `json:"relayed"`
+	Local       bool      `json:"local"`
+	Secure      bool      `json:"secure"`
+}
+
+type structDur struct {
+	time.Time
+}
+
+func (s *structDur) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + time.Since(s.Time).Round(time.Second).String() + `"`), nil
 }
 
 // Country is part of a Plex Session.

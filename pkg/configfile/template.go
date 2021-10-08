@@ -57,7 +57,7 @@ quiet = {{.Quiet}}{{if .Debug}}
 
 ## Debug prints more data and json payloads. Recommend setting debug_log if enabled.
 debug = true
-max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .Mode}}
+max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if and .Mode (ne .Mode "production")}}
 
 ## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
 mode  = "{{.Mode}}"{{end}}
@@ -121,14 +121,11 @@ timeout = "{{.Timeout}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
-  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[lidarr]]
 #name     = "" # Set a name to enable checks of your service.
 #url      = "http://lidarr:8989/"
-#api_key  = ""
-#check_q  = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#api_key  = "".{{end}}
 
 {{if .Radarr}}{{range .Radarr}}
 [[radarr]]
@@ -137,14 +134,11 @@ timeout = "{{.Timeout}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{ if .MaxBody }}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
-  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
 #url       = "http://127.0.0.1:7878/radarr"
-#api_key   = ""
-#check_q   = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#api_key   = ""{{end}}
 
 {{if .Readarr}}{{range .Readarr}}
 [[readarr]]
@@ -153,14 +147,11 @@ timeout = "{{.Timeout}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
-  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
 #url       = "http://127.0.0.1:8787/readarr"
-#api_key   = ""
-#check_q   = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#api_key   = ""{{end}}
 
 {{if .Sonarr}}{{range .Sonarr}}
 [[sonarr]]
@@ -169,14 +160,11 @@ timeout = "{{.Timeout}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if .CheckQ}}
-  check_q  = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[sonarr]]
 #name      = ""  # Set a name to enable checks of your service.
 #url       = "http://sonarr:8989/"
-#api_key   = ""
-#check_q   = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#api_key   = ""{{end}}
 
 
 # Download Client Configs (below) are used for dashboard state and service checks.
@@ -217,21 +205,10 @@ timeout = "{{.Timeout}}"
 [plex]{{if and .Plex (not force)}}
   url         = "{{.Plex.URL}}"  # Your plex URL
   token       = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
-  interval    = "{{.Plex.Interval}}"  # how often to send session data, 0 = off
   timeout     = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
-  cooldown    = "{{.Plex.Cooldown}}"    # how often plex webhooks may trigger session hooks
-  account_map = "{{.Plex.AccountMap}}"  # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  movies_percent_complete = {{.Plex.MoviesPC}}  # 0, 70-99, send notifications when a movie session is this % complete.
-  series_percent_complete = {{.Plex.SeriesPC}}  # 0, 70-99, send notifications when an episode session is this % complete.
-  no_activity = {{.Plex.NoActivity}}          # Disable getting sessions from Plex after a webhook, hides "Activity"
 {{- else}}
   url         = "http://localhost:32400" # Your plex URL
-  token       = ""            # your plex token; get this from a web inspector
-  interval    = "30m0s"       # how often to send session data, 0 = off
-  cooldown    = "15s"         # how often plex webhooks may trigger session hooks
-  account_map = ""            # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
-  series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
+  token       = "" # your plex token; get this from a web inspector
 {{- end }}
 
 ##################
