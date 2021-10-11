@@ -69,9 +69,9 @@ func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
 	}
 
 	if wait {
-		c.Trigger.sess <- time.Now().Add(plex.WaitTime)
+		c.Trigger.sess <- time.Now().Add(c.Plex.Delay.Duration)
 	} else {
-		c.Trigger.sess <- time.Now().Add(-plex.WaitTime)
+		c.Trigger.sess <- time.Now().Add(-c.Plex.Delay.Duration)
 	}
 
 	s := <-c.Trigger.sessr
@@ -82,14 +82,12 @@ func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
 func (c *Config) runSessionHolder() {
 	defer c.CapturePanic()
 
-	var (
-		sessions *plex.Sessions
-		err      error
-	)
-
-	if sessions, err = c.Plex.GetSessions(); err == nil {
-		c.plexSessionTracker(sessions.Sessions, nil)
+	sessions, err := c.Plex.GetSessions() // err not used until for loop.
+	if sessions != nil {
 		sessions.Updated.Time = time.Now()
+		if len(sessions.Sessions) > 0 {
+			c.plexSessionTracker(sessions.Sessions, nil)
+		}
 	}
 
 	c.Trigger.sessr = make(chan *holder)
@@ -105,11 +103,16 @@ func (c *Config) runSessionHolder() {
 			time.Sleep(t)
 		}
 
-		currSessions, err := c.Plex.GetSessions()
-		if err == nil {
-			c.plexSessionTracker(currSessions.Sessions, sessions.Sessions)
-			sessions = currSessions
+		var currSessions *plex.Sessions // so we can update the error.
+		if currSessions, err = c.Plex.GetSessions(); currSessions != nil {
+			if sessions == nil || len(sessions.Sessions) < 1 {
+				c.plexSessionTracker(currSessions.Sessions, nil)
+			} else {
+				c.plexSessionTracker(currSessions.Sessions, sessions.Sessions)
+			}
+
 			currSessions.Updated.Time = time.Now()
+			sessions = currSessions
 		}
 
 		c.Trigger.sessr <- &holder{sessions: sessions, error: err}
@@ -121,20 +124,20 @@ func (c *Config) runSessionHolder() {
 func (c *Config) plexSessionTracker(curr, prev []*plex.Session) {
 CURRENT:
 	for _, currSess := range curr {
+		// make sure every current session has a start time.
 		currSess.Player.StateTime.Time = time.Now()
-
+		// now check if a current session matches a previous session
 		for _, prevSess := range prev {
 			if currSess.Session.ID == prevSess.Session.ID {
 				// we have a match, check for state change.
 				if currSess.Player.State == prevSess.Player.State {
+					// since the state is the same, copy the previous start time.
 					currSess.Player.StateTime.Time = prevSess.Player.StateTime.Time
 				}
-
+				// we found this current session in previous session list, so go to the next one.
 				continue CURRENT
 			}
 		}
-
-		// new session, set a start time.
 	}
 }
 

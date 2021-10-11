@@ -106,7 +106,7 @@ type structDur struct {
 }
 
 func (s *structDur) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%.0f"`, time.Since(s.Time).Seconds())), nil
+	return []byte(fmt.Sprintf(`%.0f`, time.Since(s.Time).Seconds())), nil
 }
 
 // Country is part of a Plex Session.

@@ -27,6 +27,7 @@ type Server struct {
 	AccountMap string        `toml:"account_map" xml:"account_map" json:"accountMap"`
 	Name       string        `toml:"-" xml:"-" json:"-"`
 	NoActivity bool          `toml:"no_activity" xml:"no_activity" json:"noActivity"`
+	Delay      cnfg.Duration `toml:"activity_delay" xml:"activity_delay" json:"activityDelay"`
 	Cooldown   cnfg.Duration `toml:"cooldown" xml:"cooldown" json:"cooldown"`
 	SeriesPC   uint          `toml:"series_percent_complete" xml:"series_percent_complete" json:"seriesPc"`
 	MoviesPC   uint          `toml:"movies_percent_complete" xml:"movies_percent_complete" json:"moviesPc"`
@@ -43,9 +44,9 @@ const (
 	maximumComplete = 99
 )
 
-// WaitTime is the recommended wait time to pull plex sessions after a webhook.
-// Only used when NoActivity = false.
-const WaitTime = 10 * time.Second
+// defaultWaitTime is the recommended wait time to pull plex sessions after a webhook.
+// Only used when NoActivity = false, and used as default if Delay=0.
+const defaultWaitTime = 10 * time.Second
 
 // ErrNoURLToken is returned when there is no token or URL.
 var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
@@ -87,6 +88,10 @@ func (s *Server) Validate() { //nolint:cyclop
 
 	if s.Cooldown.Duration < s.Timeout.Duration {
 		s.Cooldown.Duration = s.Timeout.Duration
+	}
+
+	if s.Delay.Duration == 0 {
+		s.Delay.Duration = defaultWaitTime
 	}
 }
 

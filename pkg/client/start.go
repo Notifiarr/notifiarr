@@ -185,6 +185,7 @@ func (c *Client) loadSiteConfig(source notifiarr.EventType) {
 		c.Config.Plex.MoviesPC = ci.Actions.Plex.MoviesPC
 		c.Config.Plex.SeriesPC = ci.Actions.Plex.SeriesPC
 		c.Config.Plex.NoActivity = ci.Actions.Plex.NoActivity
+		c.Config.Plex.Delay = ci.Actions.Plex.Delay
 	}
 
 	c.loadSiteAppsConfig(ci)

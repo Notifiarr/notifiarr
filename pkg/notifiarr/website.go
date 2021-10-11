@@ -82,7 +82,7 @@ type Response struct {
 func (c *Config) sendPlexMeta(event EventType, hook *plexIncomingWebhook, wait bool) (*Response, error) {
 	extra := time.Second
 	if wait {
-		extra = plex.WaitTime
+		extra = c.Plex.Delay.Duration
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), extra+c.Snap.Timeout.Duration)

@@ -159,8 +159,8 @@ func (c *Config) getPlexTimers() *action {
 
 	if c.Plex.Interval.Duration > 0 {
 		// Add a little splay to the timers to not hit plex at the same time too often.
-		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval: %v, timeout: %v, webhook cooldown: %v",
-			c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown)
+		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval: %v, timeout: %v, webhook cooldown: %v, delay: %v",
+			c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown, c.Plex.Delay)
 		c.Trigger.plex.T = time.NewTicker(c.Plex.Interval.Duration + 139*time.Millisecond) // nolint:wsl
 	}
 
