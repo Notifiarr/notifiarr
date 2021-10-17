@@ -7,7 +7,6 @@ import (
 // collectApps turns app configs into service checks if they have a name.
 func (c *Config) collectApps() []*Service {
 	svcs := []*Service{}
-
 	svcs = c.collectLidarrApps(svcs)
 	svcs = c.collectRadarrApps(svcs)
 	svcs = c.collectReadarrApps(svcs)

@@ -99,7 +99,7 @@ docker logs <container id from docker run>
 #### Docker Environment Variables
 
 See below for more information about which environment variables are available.
-You must set `--privileged` when `monitor_drives=true`.
+You must set `--privileged` when `monitor drives` is enabled on the website.
 
 ```shell
 docker pull golift/notifiarr
@@ -108,7 +108,6 @@ docker run -d --privileged \
   -e "DN_API_KEY=abcdef-12345-bcfead-43312-bbbaaa-123" \
   -e "DN_SONARR_0_URL=http://localhost:8989" \
   -e "DN_SONARR_0_API_KEY=kjsdkasjdaksdj" \
-  -e "DN_SNAPSHOT_MONITOR_DRIVES=true" \
   golift/notifiarr
 docker logs <container id from docker run>
 ```
@@ -126,28 +125,49 @@ docker logs <container id from docker run>
 
 |Config Name|Variable Name|Default / Note|
 |---|---|---|
-api_key|`DN_API_KEY`|**Required** / API Key from Notifiarr.com|
-bind_addr|`DN_BIND_ADDR`|`0.0.0.0:5454` / The IP and port to listen on|
-quiet|`DN_QUIET`|`false` / Turns off output. Set a log_file if this is true|
-urlbase|`DN_URLBASE`|default: `/` Change the web root with this setting|
-upstreams|`DN_UPSTREAMS_0`|List of upstream networks that can set X-Forwarded-For|
-ssl_key_file|`DN_SSL_KEY_FILE`|Providing SSL files turns on the SSL listener|
-ssl_cert_file|`DN_SSL_CERT_FILE`|Providing SSL files turns on the SSL listener|
-log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to save app logs|
-http_log|`DN_HTTP_LOG`|None by default. Provide a file path to save HTTP request logs|
-log_file_mb|`DN_LOG_FILE_MB`|`100` / Max size of log files in megabytes|
-log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation|
-timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
+|api_key|`DN_API_KEY`|**Required** / API Key from Notifiarr.com|
+|auto_update|`DN_AUTO_UPDATE`|`off` / Set to `daily` to turn on automatic updates (windows only)|
+|bind_addr|`DN_BIND_ADDR`|`0.0.0.0:5454` / The IP and port to listen on|
+|quiet|`DN_QUIET`|`false` / Turns off output. Set a log_file if this is true|
+|urlbase|`DN_URLBASE`|default: `/` Change the web root with this setting|
+|upstreams|`DN_UPSTREAMS_0`|List of upstream networks that can set X-Forwarded-For|
+|ssl_key_file|`DN_SSL_KEY_FILE`|Providing SSL files turns on the SSL listener|
+|ssl_cert_file|`DN_SSL_CERT_FILE`|Providing SSL files turns on the SSL listener|
+|log_file|`DN_LOG_FILE`|None by default. Optionally provide a file path to save app logs|
+|http_log|`DN_HTTP_LOG`|None by default. Provide a file path to save HTTP request logs|
+|log_file_mb|`DN_LOG_FILE_MB`|`100` / Max size of log files in megabytes|
+|log_files|`DN_LOG_FILES`|`10` / Log files to keep after rotating. `0` disables rotation|
+|file_mode|`DN_FILE_MODE`|`"0600"` / Unix octal filemode for new log files|
+|timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
 
-#### Lidarr
+All applications below (starr, downloaders, tautulli, plex) have a `timeout` setting.
+If the configuration for an application is missing the timeout, the global timeout (above) is used.
+
+### Secret Settings
+
+Recommend not messing with these unless instructed to do so.
+
+|Config Name|Variable Name|Default / Note|
+|---|---|---|
+|mode|`DN_MODE`|`production` / Change application mode: `development` or `production`|
+|debug|`DN_DEBUG`|`false` / Adds payloads and other stuff to the log output; very verbose/noisy|
+|debug_log|`DN_DEBUG_LOG`|`""` / Set a file system path to write debug logs to a dedicated file|
+|max_body|`DN_MAX_BODY`|Unlimited, `0` / Maximum debug-log body size (integer) for payloads to and from notifiarr.com|
+
+All Starr apps (below) also allow a `max_body` parameter. This parameter only controls debug output.
+Debug-log payload sizes from each app can be controlled individually.
+
+_Note: You may disable the GUI (menu item) on Windows by setting the env variable `USEGUI` to `false`._
+
+### Lidarr
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enables service checks.|
+lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enables service checks|
 lidarr.url|`DN_LIDARR_0_URL`|No Default. Something like: `http://lidarr:8686`|
 lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
-#### Radarr
+### Radarr
 
 |Config Name|Variable Name|Note|
 |---|---|---|
@@ -155,23 +175,23 @@ radarr.name|`DN_RADARR_0_NAME`|No Default. Setting a name enables service checks
 radarr.url|`DN_RADARR_0_URL`|No Default. Something like: `http://localhost:7878`|
 radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you use Radarr|
 
-#### Readarr
+### Readarr
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-readarr.name|`DN_READARR_0_NAME`|No Default. Setting a name enables service checks.|
+readarr.name|`DN_READARR_0_NAME`|No Default. Setting a name enables service checks|
 readarr.url|`DN_READARR_0_URL`|No Default. Something like: `http://localhost:8787`|
 readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
-#### Sonarr
+### Sonarr
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enables service checks.|
+sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enables service checks|
 sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
 sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
 
-#### Plex
+### Plex
 
 This application can also send Plex sessions to Notfiarr so you can receive
 notifications when users interact with your server. This has three different features:
@@ -181,9 +201,7 @@ notifications when users interact with your server. This has three different fea
 - Notify on session change (Plex Webhook) ie. pause/resume.
 
 You [must provide Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
-for this to work. Setting `movies_percent_complete` or `series_percent_complete` to a number above 0 will cause this
-application to poll Plex once per minute looking for sessions nearing completion. If Plex goes down
-this will cause a lot of log spam. You may also need to add a webhook to Plex so it sends notices to this application.
+for this to work. You may also need to add a webhook to Plex so it sends notices to this application.
 
 - In Plex Media Server, add this URL to webhooks:
   - `http://localhost:5454/plex?token=plex-token-here`
@@ -195,25 +213,19 @@ this will cause a lot of log spam. You may also need to add a webhook to Plex so
 |---|---|---|
 plex.url|`DN_PLEX_URL`|`http://localhost:32400` / local URL to your plex server|
 plex.token|`DN_PLEX_TOKEN`|Required. [Must provide Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) for this to work.|
-plex.interval|`DN_PLEX_INTERVAL`|`30m`, How often to notify on all session data (cron)|
-plex.cooldown|`DN_PLEX_COOLDOWN`|`10s`, Maximum rate of notifications is 1 every cooldown interval|
-plex.account_map|`DN_PLEX_ACCOUNT_MAP`|map an email to a name, ex: `"som@ema.il,Name|some@ther.mail,name"`|
-plex.movies_percent_complete|`DN_PLEX_MOVIES_PERCENT_COMPLETE`|Send complete notice when a movie reaches this percent.|
-plex.series_percent_complete|`DN_PLEX_SERIES_PERCENT_COMPLETE`|Send complete notice when a show reaches this percent.|
 
-#### Tautulli
+### Tautulli
 
 Only 1 Tautulli instance may be configured per client. Providing Tautulli allows Notifiarr
 to use the "Friendly Name" for your Plex users and it allows you to easily enable a service check.
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-tautulli.name|`DN_TAUTULLI_NAME`|No Default. Setting a name enables service checks of Tautulli.|
+tautulli.name|`DN_TAUTULLI_NAME`|No Default. Setting a name enables service checks of Tautulli|
 tautulli.url|`DN_TAUTULLI_URL`|No Default. Something like: `http://localhost:8181`|
-tautulli.api_key|`DN_TAUTULLI_API_KEY`|No Default. Provide URL and API key if you want name maps from Tautulli.|
+tautulli.api_key|`DN_TAUTULLI_API_KEY`|No Default. Provide URL and API key if you want name maps from Tautulli|
 
-
-#### System Snapshot
+### System Snapshot
 
 This application can also take a snapshot of your system at an interval and send
 you a notification. Snapshot means system health like cpu, memory, disk, raid, users, etc.
@@ -228,7 +240,7 @@ notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
 notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 ```
 
-###### Snapshot Packages
+#### Snapshot Packages
 
   - **Windows**:  `smartmontools` - get it here https://sourceforge.net/projects/smartmontools/
   - **Linux**:    Debian/Ubuntu: `apt install smartmontools`, RedHat/CentOS: `yum install smartmontools`
@@ -237,11 +249,11 @@ notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
     - Entware (synology):  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
     - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
 
-###### Snapshot Configuration
+#### Snapshot Configuration
 
 Snapshot configuration is now found on the [website](https://notifiarr.com). - 9/14/2021
 
-#### Service Checks
+### Service Checks
 
 The Notifiarr client can also check URLs for health. If you set names on your
 Starr apps they will be automatically checked and reports sent to Notifiarr.
@@ -251,7 +263,7 @@ to the app log nor to console stdout.
 |Config Name|Variable Name|Note|
 |---|---|---|
 services.log_file|`DN_SERVICES_LOG_FILE`|If a file path is provided, service check logs write there|
-services.interval|`DN_SERVICES_INTERVAL`|`10m`, How often to check service health; minimum: `5m`|
+services.interval|`DN_SERVICES_INTERVAL`|`10m`, How often to send service states to Notifiarr; minimum: `5m`|
 services.parallel|`DN_SERVICES_PARALLE`|`1`, How many services can be checked at once; 1 is plenty|
 
 You can also create ad-hoc service checks for things like Bazarr.
@@ -263,6 +275,7 @@ service.type|`DN_SERVICE_0_TYPE`|Type must be one of `http`, `tcp`|
 service.check|`DN_SERVICE_0_CHECK`|The `URL`, or `host/ip:port` to check|
 service.expect|`DN_SERVICE_0_EXPECT`|`200`, For HTTP, the return code to expect|
 service.timeout|`DN_SERVICE_0_TIMEOUT`|`15s`, How long to wait for service response|
+service.interval|`DN_SERVICE_0_INTERVAL`|`5m`, How often to check the service|
 
 ## Reverse Proxy
 
