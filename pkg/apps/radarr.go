@@ -37,6 +37,9 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrGetCustomFormats, "GET")
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrAddCustomFormat, "POST")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrUpdateCustomFormat, "PUT")
+	a.HandleAPIpath(starr.Radarr, "/importlist", radarrGetImportLists, "GET")
+	a.HandleAPIpath(starr.Radarr, "/importlist", radarrAddImportList, "POST")
+	a.HandleAPIpath(starr.Radarr, "/importlist/{ilid:[0-9]+}", radarrUpdateImportList, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/command/search/{movieid:[0-9]+}", radarrTriggerSearchMovie, "GET")
 }
 
@@ -422,6 +425,45 @@ func radarrUpdateCustomFormat(r *http.Request) (int, interface{}) {
 	output, err := getRadarr(r).UpdateCustomFormat(&cf, cfID)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
+	}
+
+	return http.StatusOK, output
+}
+
+func radarrGetImportLists(r *http.Request) (int, interface{}) {
+	il, err := getRadarr(r).GetImportLists()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting import lists: %w", err)
+	}
+
+	return http.StatusOK, il
+}
+
+func radarrUpdateImportList(r *http.Request) (int, interface{}) {
+	var il radarr.ImportList
+	if err := json.NewDecoder(r.Body).Decode(&il); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	il.ID, _ = strconv.ParseInt(mux.Vars(r)["ilid"], mnd.Base10, mnd.Bits64)
+
+	output, err := getRadarr(r).UpdateImportList(&il)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating import list: %w", err)
+	}
+
+	return http.StatusOK, output
+}
+
+func radarrAddImportList(r *http.Request) (int, interface{}) {
+	var il radarr.ImportList
+	if err := json.NewDecoder(r.Body).Decode(&il); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	output, err := getRadarr(r).CreateImportList(&il)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("creating import list: %w", err)
 	}
 
 	return http.StatusOK, output
