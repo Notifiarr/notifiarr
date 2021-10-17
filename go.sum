@@ -79,8 +79,9 @@ github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2
 github.com/go-logfmt/logfmt v0.3.0/go.mod h1:Qt1PoO58o5twSAckw1HlFXLmHsOX5/0LbT9GBnD5lWE=
 github.com/go-logfmt/logfmt v0.4.0/go.mod h1:3RMwSq7FuexP4Kalkev3ejPJsZTpXXBr9+V4qmtdjCk=
 github.com/go-ole/go-ole v1.2.4/go.mod h1:XCwSNxSkXRo4vlyPy93sltvi/qJq0jqQhjqQNIwKuxM=
-github.com/go-ole/go-ole v1.2.5 h1:t4MGB5xEDZvXI+0rMjjsfBsD7yAgp/s9ZDkL1JndXwY=
 github.com/go-ole/go-ole v1.2.5/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
+github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=
+github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/go-stack/stack v1.8.1 h1:ntEHSVwIt7PNXNpgPmVfMrNhLtgjlmnZha2kOpuRiDw=
 github.com/go-stack/stack v1.8.1/go.mod h1:dcoOX6HbPZSZptuspn9bctJ+N/CnF5gGygcUP3XYfe4=
@@ -119,8 +120,8 @@ github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ
 github.com/google/cabbie v1.0.2 h1:UtB+Nn6fPB43wGg5xs4tgU+P3hTZ6KsulgtaHtqZZfs=
 github.com/google/cabbie v1.0.2/go.mod h1:6MmHaUrgfabehCHAIaxdrbmvHSxUVXj3Abs08FMABSo=
 github.com/google/glazier v0.0.0-20210617205946-bf91b619f5d4/go.mod h1:g7oyIhindbeebnBh0hbFua5rv6XUt/nweDwIWdvxirg=
-github.com/google/glazier v0.0.0-20211004192146-897b4e78b5fb h1:aKKoI+bBzHIMMCoSayaS6BCNqU58Q+owVauyjsEqlwQ=
-github.com/google/glazier v0.0.0-20211004192146-897b4e78b5fb/go.mod h1:h2R3DLUecGbLSyi6CcxBs5bdgtJhgK+lIffglvAcGKg=
+github.com/google/glazier v0.0.0-20211007155120-e60a0495f2ea h1:BMyoCnGfkRNgcnoFUI0Qj996HN8kqWIv9eyytljlAyc=
+github.com/google/glazier v0.0.0-20211007155120-e60a0495f2ea/go.mod h1:h2R3DLUecGbLSyi6CcxBs5bdgtJhgK+lIffglvAcGKg=
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
@@ -450,8 +451,8 @@ golift.io/qbit v0.0.0-20210717220751-d545c7a8f721 h1:hVHvpJ9X9fP3U7XBy1ohCeVLIf/
 golift.io/qbit v0.0.0-20210717220751-d545c7a8f721/go.mod h1:dUZrJv4PE34QTxUSFXPSWw6P8kd0LFLR9CBOxD3HxYw=
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9 h1:j/WeLF6Ew1lc/m8/bh5qleZ66aSeJ72B1fUWigF69OE=
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9/go.mod h1:EZevRvIGRh8jDMwuYL0/tlPns0KynquPZzb0SerIC1s=
-golift.io/starr v0.10.10 h1:c+CmsF8dr8bq5YKh1x8WtesZZlH+l6w2TiR6ZpLwboM=
-golift.io/starr v0.10.10/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
+golift.io/starr v0.11.11 h1:jw50mPlMuTDKUu9JnZSutzdsQ4r4Ga0BPUPBF78vLcA=
+golift.io/starr v0.11.11/go.mod h1:2ZSbBMYCBGkgA18ihFRL6R4DelptIkAJrtW8wyxU9ew=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 google.golang.org/api v0.4.0/go.mod h1:8k5glujaEP+g9n7WNsDg8QP6cUVNI86fCNMcbazEtwE=

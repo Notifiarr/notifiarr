@@ -8,7 +8,7 @@ require (
 	golift.io/deluge v0.9.2
 	golift.io/qbit v0.0.0-20210717220751-d545c7a8f721
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.10.10
+	golift.io/starr v0.11.11
 	golift.io/version v0.0.2
 )
 
@@ -24,7 +24,7 @@ require (
 	github.com/getlantern/hidden v0.0.0-20201229170000-e66e7f878730 // indirect
 	github.com/getlantern/ops v0.0.0-20200403153110-8476b16edcd6 // indirect
 	github.com/getlantern/systray v1.1.0
-	github.com/go-ole/go-ole v1.2.5 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.0.5 // indirect
 	github.com/gonutz/w32 v1.0.0
@@ -37,7 +37,7 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/cabbie v1.0.2 // indirect
-	github.com/google/glazier v0.0.0-20211004192146-897b4e78b5fb // indirect
+	github.com/google/glazier v0.0.0-20211007155120-e60a0495f2ea // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210825203111-a709d8e111b3 // indirect
 	github.com/gopherjs/gopherwasm v1.1.0 // indirect
 	github.com/gorilla/mux v1.8.0
