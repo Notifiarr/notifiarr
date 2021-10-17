@@ -9,51 +9,51 @@ import (
 
 // Session is a Plex json struct.
 type Session struct {
-	User                 User        `json:"User"`
-	Player               Player      `json:"Player"`
-	TranscodeSession     Transcode   `json:"TranscodeSession"`
-	Added                interface{} `json:"addedAt"`
-	Art                  string      `json:"art"`
-	AudienceRating       string      `json:"audienceRating"`
-	AudienceRatingImg    string      `json:"audienceRatingImage"`
-	ContentRating        string      `json:"contentRating"`
-	Duration             float64     `json:"duration,string"`
-	GUID                 string      `json:"guid"`
-	GrandparentArt       string      `json:"grandparentArt"`
-	GrandparentGUID      string      `json:"grandparentGuid"`
-	GrandparentKey       string      `json:"grandparentKey"`
-	GrandparentRatingKey string      `json:"grandparentRatingKey"`
-	GrandparentTheme     string      `json:"grandparentTheme"`
-	GrandparentThumb     string      `json:"grandparentThumb"`
-	GrandparentTitle     string      `json:"grandparentTitle"`
-	Index                string      `json:"index"`
-	Key                  string      `json:"key"`
-	LastViewed           int64       `json:"lastViewedAt,string"`
-	LibrarySectionID     string      `json:"librarySectionID"`
-	LibrarySectionKey    string      `json:"librarySectionKey"`
-	LibrarySectionTitle  string      `json:"librarySectionTitle"`
-	OriginallyAvailable  string      `json:"originallyAvailableAt"`
-	ParentGUID           string      `json:"parentGuid"`
-	ParentIndex          string      `json:"parentIndex"`
-	ParentKey            string      `json:"parentKey"`
-	ParentRatingKey      string      `json:"parentRatingKey"`
-	ParentThumb          string      `json:"parentThumb"`
-	ParentTitle          string      `json:"parentTitle"`
-	PrimaryExtraKey      string      `json:"primaryExtraKey"`
-	Rating               string      `json:"rating"`
-	RatingImage          string      `json:"ratingImage"`
-	RatingKey            string      `json:"ratingKey"`
-	SessionKey           string      `json:"sessionKey"`
-	Studio               string      `json:"studio"`
-	Summary              string      `json:"summary"`
-	Thumb                string      `json:"thumb"`
-	Title                string      `json:"title"`
-	TitleSort            string      `json:"titleSort"`
-	Type                 string      `json:"type"`
-	Updated              int64       `json:"updatedAt,string"`
-	ViewCount            string      `json:"viewCount"`
-	ViewOffset           float64     `json:"viewOffset,string"`
-	Year                 string      `json:"year"`
+	User                 User      `json:"User"`
+	Player               Player    `json:"Player"`
+	TranscodeSession     Transcode `json:"TranscodeSession"`
+	Added                int64     `json:"addedAt"`
+	Art                  string    `json:"art"`
+	AudienceRating       float64   `json:"audienceRating"`
+	AudienceRatingImg    string    `json:"audienceRatingImage"`
+	ContentRating        string    `json:"contentRating"`
+	Duration             float64   `json:"duration"`
+	GUID                 string    `json:"guid"`
+	GrandparentArt       string    `json:"grandparentArt"`
+	GrandparentGUID      string    `json:"grandparentGuid"`
+	GrandparentKey       string    `json:"grandparentKey"`
+	GrandparentRatingKey string    `json:"grandparentRatingKey"`
+	GrandparentTheme     string    `json:"grandparentTheme"`
+	GrandparentThumb     string    `json:"grandparentThumb"`
+	GrandparentTitle     string    `json:"grandparentTitle"`
+	Index                int       `json:"index"`
+	Key                  string    `json:"key"`
+	LastViewed           int64     `json:"lastViewedAt"`
+	LibrarySectionID     string    `json:"librarySectionID"`
+	LibrarySectionKey    string    `json:"librarySectionKey"`
+	LibrarySectionTitle  string    `json:"librarySectionTitle"`
+	OriginallyAvailable  string    `json:"originallyAvailableAt"`
+	ParentGUID           string    `json:"parentGuid"`
+	ParentIndex          int       `json:"parentIndex"`
+	ParentKey            string    `json:"parentKey"`
+	ParentRatingKey      string    `json:"parentRatingKey"`
+	ParentThumb          string    `json:"parentThumb"`
+	ParentTitle          string    `json:"parentTitle"`
+	PrimaryExtraKey      string    `json:"primaryExtraKey"`
+	Rating               float64   `json:"rating"`
+	RatingImage          string    `json:"ratingImage"`
+	RatingKey            string    `json:"ratingKey"`
+	SessionKey           string    `json:"sessionKey"`
+	Studio               string    `json:"studio"`
+	Summary              string    `json:"summary"`
+	Thumb                string    `json:"thumb"`
+	Title                string    `json:"title"`
+	TitleSort            string    `json:"titleSort"`
+	Type                 string    `json:"type"`
+	Updated              int64     `json:"updatedAt"`
+	ViewCount            string    `json:"viewCount"`
+	ViewOffset           float64   `json:"viewOffset"`
+	Year                 int64     `json:"year"`
 	Session              struct {
 		Bandwidth int64  `json:"bandwidth"`
 		ID        string `json:"id"`
@@ -111,10 +111,10 @@ func (s *structDur) MarshalJSON() ([]byte, error) {
 
 // Country is part of a Plex Session.
 type Country struct {
-	Count  string      `json:"count"`
-	Filter string      `json:"filter"`
-	ID     interface{} `json:"id"`
-	Tag    string      `json:"tag"`
+	Count  string `json:"count"`
+	Filter string `json:"filter"`
+	ID     string `json:"id"`
+	Tag    string `json:"tag"`
 }
 
 // Director is part of a Plex Session.
@@ -135,70 +135,71 @@ type Genre struct {
 // MediaStream is part of a Plex Session.
 type MediaStream struct {
 	AudioChannelLayout string  `json:"audioChannelLayout,omitempty"`
-	BitDepth           string  `json:"bitDepth,omitempty"`
-	Bitrate            float64 `json:"bitrate,string"`
+	BitDepth           int     `json:"bitDepth,omitempty"`
+	Bitrate            float64 `json:"bitrate"`
 	BitrateMode        string  `json:"bitrateMode,omitempty"`
-	Channels           string  `json:"channels,omitempty"`
+	Channels           int     `json:"channels,omitempty"`
 	ChromaLocation     string  `json:"chromaLocation,omitempty"`
 	ChromaSubsampling  string  `json:"chromaSubsampling,omitempty"`
 	Codec              string  `json:"codec"`
-	CodedHeight        string  `json:"codedHeight,omitempty"`
-	CodedWidth         string  `json:"codedWidth,omitempty"`
+	CodedHeight        int64   `json:"codedHeight,omitempty"`
+	CodedWidth         int64   `json:"codedWidth,omitempty"`
 	ColorPrimaries     string  `json:"colorPrimaries,omitempty"`
 	ColorTrc           string  `json:"colorTrc,omitempty"`
 	Decision           string  `json:"decision"`
-	Default            string  `json:"default,omitempty"`
+	Default            bool    `json:"default,omitempty"`
 	DisplayTitle       string  `json:"displayTitle"`
 	ExtDisplayTitle    string  `json:"extendedDisplayTitle"`
-	FrameRate          float64 `json:"frameRate,omitempty,string"`
-	HasScalingMatrix   string  `json:"hasScalingMatrix,omitempty"`
-	Height             int64   `json:"height,omitempty,string"`
+	FrameRate          float64 `json:"frameRate,omitempty"`
+	HasScalingMatrix   bool    `json:"hasScalingMatrix,omitempty"`
+	Height             int64   `json:"height,omitempty"`
 	ID                 string  `json:"id"`
-	Index              string  `json:"index"`
+	Index              int     `json:"index"`
 	Language           string  `json:"language,omitempty"`
 	LanguageCode       string  `json:"languageCode,omitempty"`
-	Level              string  `json:"level,omitempty"`
+	Level              int     `json:"level,omitempty"`
 	Location           string  `json:"location"`
 	Profile            string  `json:"profile"`
-	RefFrames          string  `json:"refFrames,omitempty"`
-	SamplingRate       string  `json:"samplingRate,omitempty"`
+	RefFrames          int     `json:"refFrames,omitempty"`
+	SamplingRate       int     `json:"samplingRate,omitempty"`
 	ScanType           string  `json:"scanType,omitempty"`
-	Selected           string  `json:"selected,omitempty"`
-	StreamType         string  `json:"streamType"`
-	Width              int64   `json:"width,omitempty,string"`
+	Selected           bool    `json:"selected,omitempty"`
+	StreamType         int     `json:"streamType"`
+	Width              int64   `json:"width,omitempty"`
+	LanguageTag        string  `json:"languageTag,omitempty"`
 }
 
 // MediaPart is part of a Plex Session.
 type MediaPart struct {
 	AudioProfile    string         `json:"audioProfile"`
-	Bitrate         int64          `json:"bitrate,string"`
+	Bitrate         float64        `json:"bitrate"`
 	Container       string         `json:"container"`
 	Decision        string         `json:"decision"`
-	Duration        float64        `json:"duration,string"`
+	Duration        float64        `json:"duration"`
 	File            string         `json:"file"`
-	Height          int64          `json:"height,string"`
+	Height          int64          `json:"height"`
 	ID              string         `json:"id"`
 	Indexes         string         `json:"indexes"`
 	Key             string         `json:"key"`
 	Protocol        string         `json:"protocol"`
 	Selected        bool           `json:"selected"`
-	Size            string         `json:"size"`
+	Size            int64          `json:"size"`
 	StreamingOptmzd string         `json:"optimizedForStreaming"`
 	VideoProfile    string         `json:"videoProfile"`
-	Width           int64          `json:"width,string"`
+	Width           int64          `json:"width"`
 	Stream          []*MediaStream `json:"Stream"`
 }
 
 // Media is part of a Plex Session.
 type Media struct {
 	AspectRatio     string       `json:"aspectRatio"`
-	AudioChannels   int          `json:"audioChannels,string"`
+	AudioChannels   int          `json:"audioChannels"`
 	AudioCodec      string       `json:"audioCodec"`
 	AudioProfile    string       `json:"audioProfile"`
-	Bitrate         int64        `json:"bitrate,string"`
+	Bitrate         float64      `json:"bitrate"`
 	Container       string       `json:"container"`
-	Duration        float64      `json:"duration,string"`
-	Height          int64        `json:"height,string"`
+	Duration        float64      `json:"duration"`
+	Height          int64        `json:"height"`
 	ID              string       `json:"id"`
 	Protocol        string       `json:"protocol"`
 	StreamingOptmzd string       `json:"optimizedForStreaming"`
@@ -206,13 +207,14 @@ type Media struct {
 	VideoFrameRate  string       `json:"videoFrameRate"`
 	VideoProfile    string       `json:"videoProfile"`
 	VideoResolution string       `json:"videoResolution"`
-	Width           int64        `json:"width,string"`
+	Width           int64        `json:"width"`
 	Selected        bool         `json:"selected"`
 	Part            []*MediaPart `json:"Part"`
 }
 
 // Producer is part of a Plex Session.
 type Producer struct {
+	Count  string `json:"count"`
 	Filter string `json:"filter"`
 	ID     string `json:"id"`
 	Tag    string `json:"tag"`

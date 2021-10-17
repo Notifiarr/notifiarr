@@ -47,7 +47,8 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 		return sessions, fmt.Errorf("%w: %s", err, string(body))
 	}
 
-	// log.Print("DEBUG PLEX PAYLOAD:\n", string(data))
+	// fmt.Println("DEBUG PLEX PAYLOAD:", string(body))
+
 	if err = json.Unmarshal(body, &v); err != nil {
 		return sessions, fmt.Errorf("parsing plex sessions: %w", err)
 	}
