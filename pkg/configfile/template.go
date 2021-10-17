@@ -203,12 +203,31 @@ timeout = "{{.Timeout}}"
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
 [plex]{{if and .Plex (not force)}}
-  url         = "{{.Plex.URL}}"  # Your plex URL
-  token       = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
-  timeout     = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
+  url     = "{{.Plex.URL}}"  # Your plex URL
+  token   = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
+  timeout = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
 {{- else}}
-  url         = "http://localhost:32400" # Your plex URL
-  token       = "" # your plex token; get this from a web inspector
+  url     = "http://localhost:32400" # Your plex URL
+  token   = "" # your plex token; get this from a web inspector
+{{- end }}
+
+#####################
+# Tautulli Settings #
+#####################
+
+# Enables email=>username map. Set a name to enable service checks.
+# Must uncomment api_key and url at a minimum.
+
+[tautulli]{{if and .Tautulli (not force)}}
+  name     = "{{.Tautulli.Name}}" # only set a name if you want to enable service checks.
+  url      = "{{.Tautulli.URL}}" # Your Tautulli URL
+  api_key  = "{{.Tautulli.APIKey}}" # your plex token; get this from a web inspector
+  timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
+  interval = "{{.Tautulli.Interval}}" # how often to send service checks
+{{- else}}
+#  name    = "" # only set a name if you want to enable service checks.
+#  url     = "http://localhost:8181" # Your Tautulli URL
+#  api_key = "" # your tautulli api key; get this from settings
 {{- end }}
 
 ##################

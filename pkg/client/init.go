@@ -33,6 +33,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printDeluge()
 	c.printQbit()
 	c.printPlex()
+	c.printTautulli()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
 
@@ -246,5 +247,18 @@ func (c *Client) printQbit() {
 	for i, f := range c.Config.Qbit {
 		c.Printf(" =>    Server %d: %s, username: %s, password:%v, timeout:%v, verify ssl:%v",
 			i+1, f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
+	}
+}
+
+// printTautulli is called on startup to print info about configured Tautulli instance(s).
+func (c *Client) printTautulli() {
+	switch t := c.Config.Apps.Tautulli; {
+	case t == nil, t.URL == "":
+		c.Printf(" => Tautulli Config (enables name map): 0 servers")
+	case t.Name != "":
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s, timeout: %v, check interval: %v, name: %s",
+			t.URL, t.Timeout, t.Interval, t.Name)
+	default:
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s, timeout: %v", t.URL, t.Timeout)
 	}
 }

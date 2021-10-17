@@ -165,6 +165,16 @@ func (c *Config) Info() map[string]interface{} {
 	}
 }
 
+func (c *Config) getTautulliData(add map[string]interface{}) {
+	u, err := c.Apps.Tautulli.GetUsers()
+	if err != nil {
+		c.Error("Getting Tautulli Users:", err)
+		return
+	}
+
+	add["tautulli"] = map[string]interface{}{"users": u.MapEmailName()}
+}
+
 // HostInfoNoError will return nil if there is an error, otherwise a copy of the host info.
 func (c *Config) HostInfoNoError() *host.InfoStat {
 	if c.extras.hostInfo == nil {
@@ -250,7 +260,7 @@ func (c *Config) pollForReload(event EventType) {
 	}
 }
 
-func (c *Config) getAppConfigs() interface{} {
+func (c *Config) getAppConfigs() map[string]interface{} {
 	apps := make(map[string][]map[string]interface{})
 
 	for i, app := range c.Apps.Lidarr {
@@ -293,5 +303,13 @@ func (c *Config) getAppConfigs() interface{} {
 		})
 	}
 
-	return apps
+	// We do this so more apps can be added later.
+	r := make(map[string]interface{})
+	for k, v := range apps {
+		r[k] = v
+	}
+
+	c.getTautulliData(r)
+
+	return r
 }

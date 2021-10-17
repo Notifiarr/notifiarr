@@ -25,6 +25,14 @@ type QbitConfig struct {
 	*qbit.Qbit
 }
 
+type TautulliConfig struct {
+	Name     string        `toml:"name"`
+	Interval cnfg.Duration `toml:"interval"`
+	Timeout  cnfg.Duration `toml:"timeout"`
+	URL      string        `toml:"url"`
+	APIKey   string        `toml:"api_key"`
+}
+
 func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
 	d.Deluge, err = deluge.New(*d.Config)
 	if err != nil {

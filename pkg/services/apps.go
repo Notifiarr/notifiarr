@@ -110,5 +110,20 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	if t := c.Apps.Tautulli; t != nil && t.URL != "" && t.Name != "" {
+		if t.Interval.Duration == 0 {
+			t.Interval.Duration = DefaultCheckInterval
+		}
+
+		svcs = append(svcs, &Service{
+			Name:     t.Name,
+			Type:     CheckHTTP,
+			Value:    t.URL + "/api/v2?cmd=status&apikey=" + t.APIKey,
+			Expect:   "200",
+			Timeout:  t.Timeout,
+			Interval: t.Interval,
+		})
+	}
+
 	return svcs
 }

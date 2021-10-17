@@ -143,7 +143,7 @@ timeout|`DN_TIMEOUT`|`60s` / Global API Timeouts (all apps default)|
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enabled service checks.|
+lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enables service checks.|
 lidarr.url|`DN_LIDARR_0_URL`|No Default. Something like: `http://lidarr:8686`|
 lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
@@ -151,7 +151,7 @@ lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you 
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-radarr.name|`DN_RADARR_0_NAME`|No Default. Setting a name enabled service checks.|
+radarr.name|`DN_RADARR_0_NAME`|No Default. Setting a name enables service checks.|
 radarr.url|`DN_RADARR_0_URL`|No Default. Something like: `http://localhost:7878`|
 radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you use Radarr|
 
@@ -159,7 +159,7 @@ radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you 
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-readarr.name|`DN_READARR_0_NAME`|No Default. Setting a name enabled service checks.|
+readarr.name|`DN_READARR_0_NAME`|No Default. Setting a name enables service checks.|
 readarr.url|`DN_READARR_0_URL`|No Default. Something like: `http://localhost:8787`|
 readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
 
@@ -167,7 +167,7 @@ readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if yo
 
 |Config Name|Variable Name|Note|
 |---|---|---|
-sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enabled service checks.|
+sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enables service checks.|
 sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
 sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
 
@@ -200,6 +200,18 @@ plex.cooldown|`DN_PLEX_COOLDOWN`|`10s`, Maximum rate of notifications is 1 every
 plex.account_map|`DN_PLEX_ACCOUNT_MAP`|map an email to a name, ex: `"som@ema.il,Name|some@ther.mail,name"`|
 plex.movies_percent_complete|`DN_PLEX_MOVIES_PERCENT_COMPLETE`|Send complete notice when a movie reaches this percent.|
 plex.series_percent_complete|`DN_PLEX_SERIES_PERCENT_COMPLETE`|Send complete notice when a show reaches this percent.|
+
+#### Tautulli
+
+Only 1 Tautulli instance may be configured per client. Providing Tautulli allows Notifiarr
+to use the "Friendly Name" for your Plex users and it allows you to easily enable a service check.
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+tautulli.name|`DN_TAUTULLI_NAME`|No Default. Setting a name enables service checks of Tautulli.|
+tautulli.url|`DN_TAUTULLI_URL`|No Default. Something like: `http://localhost:8181`|
+tautulli.api_key|`DN_TAUTULLI_API_KEY`|No Default. Provide URL and API key if you want name maps from Tautulli.|
+
 
 #### System Snapshot
 
