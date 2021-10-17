@@ -5,9 +5,20 @@ import (
 )
 
 // collectApps turns app configs into service checks if they have a name.
-func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
+func (c *Config) collectApps() []*Service {
 	svcs := []*Service{}
 
+	svcs = c.collectLidarrApps(svcs)
+	svcs = c.collectRadarrApps(svcs)
+	svcs = c.collectReadarrApps(svcs)
+	svcs = c.collectSonarrApps(svcs)
+	svcs = c.collectDownloadApps(svcs)
+	svcs = c.collectTautulliApp(svcs)
+
+	return svcs
+}
+
+func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 	for _, a := range c.Apps.Lidarr {
 		if a.Interval.Duration == 0 {
 			a.Interval.Duration = DefaultCheckInterval
@@ -25,6 +36,10 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	return svcs
+}
+
+func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 	for _, a := range c.Apps.Radarr {
 		if a.Interval.Duration == 0 {
 			a.Interval.Duration = DefaultCheckInterval
@@ -42,6 +57,10 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	return svcs
+}
+
+func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 	for _, a := range c.Apps.Readarr {
 		if a.Interval.Duration == 0 {
 			a.Interval.Duration = DefaultCheckInterval
@@ -59,6 +78,10 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	return svcs
+}
+
+func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	for _, a := range c.Apps.Sonarr {
 		if a.Interval.Duration == 0 {
 			a.Interval.Duration = DefaultCheckInterval
@@ -76,6 +99,11 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	return svcs
+}
+
+func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
+	// Deluge instances.
 	for _, d := range c.Apps.Deluge {
 		if d.Interval.Duration == 0 {
 			d.Interval.Duration = DefaultCheckInterval
@@ -93,6 +121,7 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	// Qbittorrent instances.
 	for _, q := range c.Apps.Qbit {
 		if q.Interval.Duration == 0 {
 			q.Interval.Duration = DefaultCheckInterval
@@ -110,6 +139,11 @@ func (c *Config) collectApps() []*Service { //nolint:funlen,cyclop
 		}
 	}
 
+	return svcs
+}
+
+func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
+	// Tautulli instance (1).
 	if t := c.Apps.Tautulli; t != nil && t.URL != "" && t.Name != "" {
 		if t.Interval.Duration == 0 {
 			t.Interval.Duration = DefaultCheckInterval
