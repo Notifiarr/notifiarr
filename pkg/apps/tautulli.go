@@ -1,10 +1,6 @@
 package apps
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -28,28 +24,15 @@ func (t *TautulliConfig) GetUsers() (*TautulliUsers, error) {
 		return nil, nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), t.Timeout.Duration)
-	defer cancel()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, t.URL+"/api/v2", nil)
-	if err != nil {
-		return nil, fmt.Errorf("creating request: %w", err)
-	}
-
 	params := url.Values{}
 	params.Add("cmd", "get_users")
 	params.Add("apikey", t.APIKey)
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := (&http.Client{}).Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("making request: %w", err)
-	}
-	defer resp.Body.Close()
 
 	var users TautulliUsers
-	if err := json.NewDecoder(resp.Body).Decode(&users); err != nil {
-		return nil, fmt.Errorf("parsing json: %w", err)
+
+	err := GetURLInto(t.Timeout.Duration, t.URL+"/api/v2", params, &users)
+	if err != nil {
+		return nil, err
 	}
 
 	return &users, nil

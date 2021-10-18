@@ -47,10 +47,8 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 		return sessions, fmt.Errorf("%w: %s", err, string(body))
 	}
 
-	// fmt.Println("DEBUG PLEX PAYLOAD:", string(body))
-
 	if err = json.Unmarshal(body, &v); err != nil {
-		return sessions, fmt.Errorf("parsing plex sessions (TRY UPGRADING PLEX): %w", err)
+		return sessions, fmt.Errorf("parsing plex sessions (TRY UPGRADING PLEX): %w: %s", err, string(body))
 	}
 
 	sessions.Sessions = v.MediaContainer.Sessions

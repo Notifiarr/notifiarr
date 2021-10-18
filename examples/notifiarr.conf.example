@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.2.0   @ 210810T0109 #
+# Created by Notifiarr v0.2.0   @ 211810T0106 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -108,6 +108,12 @@ timeout = "1m0s"
 #pass     = ""
 
 
+#[[sabnzbd]]
+#name     = ""  # Set a name to enable checks of this application.
+#url      = "http://sabnzbd:8080/"
+#api_key  = ""
+
+
 #################
 # Plex Settings #
 #################
@@ -115,8 +121,20 @@ timeout = "1m0s"
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
 [plex]
-  url         = "http://localhost:32400" # Your plex URL
-  token       = "" # your plex token; get this from a web inspector
+  url     = "http://localhost:32400" # Your plex URL
+  token   = "" # your plex token; get this from a web inspector
+
+#####################
+# Tautulli Settings #
+#####################
+
+# Enables email=>username map. Set a name to enable service checks.
+# Must uncomment [tautulli], 'api_key' and 'url' at a minimum.
+
+#[tautulli]
+#  name    = "" # only set a name if you want to enable service checks.
+#  url     = "http://localhost:8181" # Your Tautulli URL
+#  api_key = "" # your tautulli api key; get this from settings
 
 ##################
 # Service Checks #

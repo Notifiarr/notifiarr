@@ -191,6 +191,37 @@ sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enables service checks
 sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
 sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
 
+### Downloaders
+
+You can add supported downloaders so they show up on the dashboard integration.
+You may easily add service checks to these downloaders by adding a name.
+Any number of downloaders of any type may be configured.
+
+#### QbitTorrent
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+qbit.name|`DN_QBIT_0_NAME`|No Default. Setting a name enables service checks|
+qbit.url|`DN_QBIT_0_URL`|No Default. Something like: `http://localhost:8080`|
+qbit.user|`DN_QBIT_0_USER`|No Default. Provide URL, user and pass if you use Qbit|
+qbit.pass|`DN_QBIT_0_PASS`|No Default. Provide URL, user and pass if you use Qbit|
+
+#### SABnzbd
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+sabnzbd.name|`DN_SABNZBD_0_NAME`|No Default. Setting a name enables service checks|
+sabnzbd.url|`DN_SABNZBD_0_URL`|No Default. Something like: `http://localhost:8080/sabnzbd`|
+sabnzbd.api_key|`DN_SABNZBD_0_API_KEY`|No Default. Provide URL and API key if you use SABnzbd|
+
+#### Deluge
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+deluge.name|`DN_DELUGE_0_NAME`|No Default. Setting a name enables service checks|
+deluge.url|`DN_DELUGE_0_URL`|No Default. Something like: `http://localhost:8080`|
+deluge.password|`DN_DELUGE_0_PASSWORD`|No Default. Provide URL and password key if you use Deluge|
+
 ### Plex
 
 This application can also send Plex sessions to Notfiarr so you can receive

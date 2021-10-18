@@ -232,29 +232,29 @@ type Role struct {
 
 // Transcode is part of a Plex Session.
 type Transcode struct {
-	AudioChannels       int    `json:"audioChannels"`
-	AudioCodec          string `json:"audioCodec"`
-	AudioDecision       string `json:"audioDecision"`
-	Container           string `json:"container"`
-	Context             string `json:"context"`
-	Duration            int64  `json:"duration"`
-	Key                 string `json:"key"`
-	MaxOffsetAvailable  string `json:"maxOffsetAvailable"`
-	MinOffsetAvailable  string `json:"minOffsetAvailable"`
-	Progress            string `json:"progress"`
-	Protocol            string `json:"protocol"`
-	Remaining           int64  `json:"remaining"`
-	Size                int64  `json:"size"`
-	SourceAudioCodec    string `json:"sourceAudioCodec"`
-	SourceVideoCodec    string `json:"sourceVideoCodec"`
-	Speed               string `json:"speed"`
-	TimeStamp           string `json:"timeStamp"`
-	VideoCodec          string `json:"videoCodec"`
-	VideoDecision       string `json:"videoDecision"`
-	Throttled           bool   `json:"throttled"`
-	Complete            bool   `json:"complete"`
-	XcodeHwFullPipeline bool   `json:"transcodeHwFullPipeline"`
-	XcodeHwRequested    bool   `json:"transcodeHwRequested"`
+	AudioChannels       int     `json:"audioChannels"`
+	AudioCodec          string  `json:"audioCodec"`
+	AudioDecision       string  `json:"audioDecision"`
+	Container           string  `json:"container"`
+	Context             string  `json:"context"`
+	Duration            int64   `json:"duration"`
+	Key                 string  `json:"key"`
+	MaxOffsetAvailable  float64 `json:"maxOffsetAvailable"`
+	MinOffsetAvailable  float64 `json:"minOffsetAvailable"`
+	Progress            float64 `json:"progress"`
+	Protocol            string  `json:"protocol"`
+	Remaining           int64   `json:"remaining"`
+	Size                int64   `json:"size"`
+	SourceAudioCodec    string  `json:"sourceAudioCodec"`
+	SourceVideoCodec    string  `json:"sourceVideoCodec"`
+	Speed               float64 `json:"speed"`
+	TimeStamp           float64 `json:"timeStamp"`
+	VideoCodec          string  `json:"videoCodec"`
+	VideoDecision       string  `json:"videoDecision"`
+	Throttled           bool    `json:"throttled"`
+	Complete            bool    `json:"complete"`
+	XcodeHwFullPipeline bool    `json:"transcodeHwFullPipeline"`
+	XcodeHwRequested    bool    `json:"transcodeHwRequested"`
 }
 
 // Writer is part of a Plex Session.

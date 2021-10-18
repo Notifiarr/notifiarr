@@ -51,7 +51,7 @@ type State struct {
 	Next     SortableList  `json:"next,omitempty"`
 	Latest   SortableList  `json:"latest,omitempty"`
 	OnDisk   int64         `json:"onDisk,omitempty"`
-	Elapsed  time.Duration `json:"elapsed"` // How long it took.
+	Elapsed  cnfg.Duration `json:"elapsed"` // How long it took.
 	Name     string        `json:"name"`
 	// Radarr
 	Movies int64 `json:"movies,omitempty"`
@@ -86,6 +86,7 @@ type States struct {
 	Sonarr  []*State `json:"sonarr"`
 	Qbit    []*State `json:"qbit"`
 	Deluge  []*State `json:"deluge"`
+	SabNZB  []*State `json:"sabnzbd"`
 }
 
 // SendDashboardState sends the current states for the dashboard.
@@ -123,7 +124,7 @@ func (c *Config) getStates() *States {
 
 	var wg sync.WaitGroup
 
-	wg.Add(6) //nolint:gomnd // we are polling 6 apps.
+	wg.Add(7) //nolint:gomnd // we are polling 7 apps.
 
 	go func() {
 		defer c.CapturePanic()
@@ -153,6 +154,11 @@ func (c *Config) getStates() *States {
 	go func() {
 		defer c.CapturePanic()
 		s.Sonarr = c.getSonarrStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		defer c.CapturePanic()
+		s.SabNZB = c.getSabNZBStates()
 		wg.Done() //nolint:wsl
 	}()
 	wg.Wait()
@@ -297,7 +303,7 @@ func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, err
 	start := time.Now()
 
 	xfers, err := d.GetXfersCompat()
-	state.Elapsed = time.Since(start)
+	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
@@ -342,7 +348,7 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 	start := time.Now()
 
 	albums, err := l.GetAlbum("") // all albums
-	state.Elapsed = time.Since(start)
+	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
 		return state, fmt.Errorf("getting albums from instance %d: %w", instance, err)
@@ -432,7 +438,7 @@ func (c *Config) getQbitState(instance int, q *apps.QbitConfig) (*State, error) 
 	start := time.Now()
 
 	xfers, err := q.GetXfers()
-	state.Elapsed = time.Since(start)
+	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
@@ -470,7 +476,7 @@ func (c *Config) getRadarrState(instance int, r *apps.RadarrConfig) (*State, err
 	start := time.Now()
 
 	movies, err := r.GetMovie(0)
-	state.Elapsed = time.Since(start)
+	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
 		return state, fmt.Errorf("getting movies from instance %d: %w", instance, err)
@@ -519,7 +525,7 @@ func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, e
 	start := time.Now()
 
 	books, err := r.GetBook("") // all books
-	state.Elapsed = time.Since(start)
+	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
 		return state, fmt.Errorf("getting books from instance %d: %w", instance, err)
@@ -602,7 +608,7 @@ func (c *Config) getSonarrState(instance int, s *apps.SonarrConfig) (*State, err
 	start := time.Now()
 
 	allshows, err := s.GetAllSeries()
-	state.Elapsed = time.Since(start)
+	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
 		return state, fmt.Errorf("getting series from instance %d: %w", instance, err)
@@ -715,6 +721,84 @@ func (c *Config) getSonarrStateUpcoming(s *apps.SonarrConfig, next []*Sortable) 
 	}
 
 	return redo, nil
+}
+
+func (c *Config) getSabNZBStates() []*State {
+	states := []*State{}
+
+	for instance, s := range c.Apps.SabNZB {
+		if s.URL == "" {
+			continue
+		}
+
+		c.Debugf("Getting SabNZB State: %d:%s", instance+1, s.URL)
+
+		state, err := c.getSabNZBState(instance+1, s)
+		if err != nil {
+			state.Error = err.Error()
+			c.Errorf("Getting SabNZB Data from %d:%s: %v", instance+1, s.URL, err)
+		}
+
+		states = append(states, state)
+	}
+
+	return states
+}
+
+func (c *Config) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, error) {
+	state := &State{Instance: instance, Name: s.Name}
+	start := time.Now()
+	queue, err := s.GetQueue()
+	hist, err2 := s.GetHistory()
+	state.Elapsed.Duration = time.Since(start)
+
+	if err != nil {
+		return state, fmt.Errorf("getting queue from instance %d: %w", instance, err)
+	} else if err2 != nil {
+		return state, fmt.Errorf("getting history from instance %d: %w", instance, err2)
+	}
+
+	state.Size = hist.TotalSize.Bytes
+	state.Downloads = len(queue.Slots) + hist.Noofslots
+	state.Next = []*Sortable{}
+	state.Latest = []*Sortable{}
+
+	for _, xfer := range queue.Slots {
+		if strings.EqualFold(xfer.Status, "Downloading") {
+			state.Downloading++
+		} else if strings.EqualFold(xfer.Status, "Paused") {
+			state.Paused++
+		}
+
+		if xfer.Mbleft > 0 {
+			state.Incomplete++
+		}
+
+		state.Next = append(state.Next, &Sortable{
+			Date: xfer.Eta.Round(time.Second).UTC(),
+			Name: xfer.Filename,
+		})
+	}
+
+	for _, xfer := range hist.Slots {
+		state.Latest = append(state.Latest, &Sortable{
+			Name: xfer.Name,
+			Date: time.Unix(xfer.Completed, 0).Round(time.Second).UTC(),
+		})
+
+		if xfer.FailMessage != "" {
+			state.Errors++
+		} else {
+			state.Downloaded++
+		}
+	}
+
+	sort.Sort(dateSorter(state.Next))
+	sort.Sort(dateSorter(state.Latest))
+	state.Next.Shrink(showNext)
+	state.Latest.Shrink(showLatest)
+
+	return state, nil
 }
 
 type dateSorter []*Sortable

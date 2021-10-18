@@ -193,7 +193,20 @@ timeout = "{{.Timeout}}"
 #name     = ""  # Set a name to enable checks of your service.
 #url      = "http://qbit:8080/"
 #user     = ""
-#pass     = ""
+#pass     = ""{{end}}
+
+{{if .SabNZB}}{{range .SabNZB}}
+[[sabnzbd]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{end}}
+{{else}}
+#[[sabnzbd]]
+#name     = ""  # Set a name to enable checks of this application.
+#url      = "http://sabnzbd:8080/"
+#api_key  = ""
 {{end}}
 
 #################
@@ -216,15 +229,16 @@ timeout = "{{.Timeout}}"
 #####################
 
 # Enables email=>username map. Set a name to enable service checks.
-# Must uncomment api_key and url at a minimum.
-
-[tautulli]{{if and .Tautulli (not force)}}
+# Must uncomment [tautulli], 'api_key' and 'url' at a minimum.
+{{if and .Tautulli (not force)}}
+[tautulli]
   name     = "{{.Tautulli.Name}}" # only set a name if you want to enable service checks.
   url      = "{{.Tautulli.URL}}" # Your Tautulli URL
   api_key  = "{{.Tautulli.APIKey}}" # your plex token; get this from a web inspector
   timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
   interval = "{{.Tautulli.Interval}}" # how often to send service checks
 {{- else}}
+#[tautulli]
 #  name    = "" # only set a name if you want to enable service checks.
 #  url     = "http://localhost:8181" # Your Tautulli URL
 #  api_key = "" # your tautulli api key; get this from settings

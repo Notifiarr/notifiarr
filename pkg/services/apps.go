@@ -138,6 +138,24 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 		}
 	}
 
+	// SabNBZd instances.
+	for _, s := range c.Apps.SabNZB {
+		if s.Interval.Duration == 0 {
+			s.Interval.Duration = DefaultCheckInterval
+		}
+
+		if s.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     s.Name,
+				Type:     CheckHTTP,
+				Value:    s.URL + "/api?mode=version&apikey=" + s.APIKey,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: s.Timeout.Duration},
+				Interval: s.Interval,
+			})
+		}
+	}
+
 	return svcs
 }
 
