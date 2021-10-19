@@ -51,7 +51,7 @@ type Session struct {
 	TitleSort            string    `json:"titleSort"`
 	Type                 string    `json:"type"`
 	Updated              int64     `json:"updatedAt"`
-	ViewCount            string    `json:"viewCount"`
+	ViewCount            int64     `json:"viewCount"`
 	ViewOffset           float64   `json:"viewOffset"`
 	Year                 int64     `json:"year"`
 	Session              struct {
@@ -184,7 +184,7 @@ type MediaPart struct {
 	Protocol        string         `json:"protocol"`
 	Selected        bool           `json:"selected"`
 	Size            int64          `json:"size"`
-	StreamingOptmzd string         `json:"optimizedForStreaming"`
+	StreamingOptmzd bool           `json:"optimizedForStreaming"`
 	VideoProfile    string         `json:"videoProfile"`
 	Width           int64          `json:"width"`
 	Stream          []*MediaStream `json:"Stream"`
@@ -202,7 +202,7 @@ type Media struct {
 	Height          int64        `json:"height"`
 	ID              string       `json:"id"`
 	Protocol        string       `json:"protocol"`
-	StreamingOptmzd string       `json:"optimizedForStreaming"`
+	StreamingOptmzd bool         `json:"optimizedForStreaming"`
 	VideoCodec      string       `json:"videoCodec"`
 	VideoFrameRate  string       `json:"videoFrameRate"`
 	VideoProfile    string       `json:"videoProfile"`

@@ -14,17 +14,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
-	"github.com/Notifiarr/notifiarr/pkg/services"
-	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	flag "github.com/spf13/pflag"
-	"golift.io/cnfg"
 	"golift.io/version"
 )
 
@@ -54,27 +50,8 @@ func NewDefaults() *Client {
 		sighup: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
 		Logger: logger,
-		Config: &configfile.Config{
-			Mode: notifiarr.ModeProd,
-			Apps: &apps.Apps{
-				URLBase:  "/",
-				DebugLog: logger.DebugLog,
-				ErrorLog: logger.ErrorLog,
-			},
-			Services: &services.Config{
-				Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
-				Logger:   logger,
-			},
-			BindAddr: mnd.DefaultBindAddr,
-			Snapshot: &snapshot.Config{
-				Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
-			},
-			LogConfig: &logs.LogConfig{
-				LogFiles:  mnd.DefaultLogFiles,
-				LogFileMb: mnd.DefaultLogFileMb,
-			},
-			Timeout: cnfg.Duration{Duration: mnd.DefaultTimeout},
-		}, Flags: &configfile.Flags{
+		Config: configfile.NewConfig(logger),
+		Flags: &configfile.Flags{
 			FlagSet:    flag.NewFlagSet(mnd.DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
 			EnvPrefix:  mnd.DefaultEnvPrefix,
@@ -157,7 +134,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	}
 
 	// Parse the config file and environment variables.
-	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
+	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
 	if err != nil {
 		return msg, newCon, fmt.Errorf("getting config: %w", err)
 	}
@@ -301,7 +278,10 @@ func (c *Client) reloadConfiguration(source string) error {
 		defer c.StartWebServer()
 	}
 
-	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
+	// start over.
+	c.Config = configfile.NewConfig(c.Logger)
+
+	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
 	if err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}

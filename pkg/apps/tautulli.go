@@ -81,12 +81,18 @@ func (t *TautulliUsers) MapEmailName() map[string]string {
 	m := map[string]string{}
 
 	for _, user := range t.Response.Data {
-		if user.Email != "" && user.FriendlyName != "" {
-			if user.Email == user.FriendlyName && user.Username != "" {
-				m[user.Email] = user.Username
-			} else {
-				m[user.Email] = user.FriendlyName
-			}
+		if user.FriendlyName == "" && user.Email != "" && user.Username != "" {
+			m[user.Email] = user.Username
+			return m
+		} else if user.FriendlyName == "" {
+			// This user has no mapability.
+			return m
+		}
+
+		if user.Username != "" {
+			m[user.Username] = user.FriendlyName
+		} else if user.Email != "" {
+			m[user.Email] = user.FriendlyName
 		}
 	}
 

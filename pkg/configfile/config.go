@@ -52,9 +52,35 @@ type Config struct {
 	Allow AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
+// NewConfig returns a fresh config with only defaults and a logger ready to go.
+func NewConfig(logger *logs.Logger) *Config {
+	return &Config{
+		Mode: notifiarr.ModeProd,
+		Apps: &apps.Apps{
+			URLBase:  "/",
+			DebugLog: logger.DebugLog,
+			ErrorLog: logger.ErrorLog,
+		},
+		Services: &services.Config{
+			Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
+			Logger:   logger,
+		},
+		BindAddr: mnd.DefaultBindAddr,
+		Snapshot: &snapshot.Config{
+			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
+		},
+		LogConfig: &logs.LogConfig{
+			LogFiles:  mnd.DefaultLogFiles,
+			LogFileMb: mnd.DefaultLogFileMb,
+		},
+		Timeout: cnfg.Duration{Duration: mnd.DefaultTimeout},
+	}
+}
+
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
-func (c *Config) Get(configFile, envPrefix string, logger *logs.Logger) (*notifiarr.Config, error) {
+// You should only run this after getting a config with NewConfig().
+func (c *Config) Get(configFile, envPrefix string) (*notifiarr.Config, error) {
 	if configFile != "" {
 		if err := cnfgfile.Unmarshal(c, configFile); err != nil {
 			return nil, fmt.Errorf("config file: %w", err)
@@ -86,7 +112,7 @@ func (c *Config) Get(configFile, envPrefix string, logger *logs.Logger) (*notifi
 		Apps:     c.Apps,
 		Plex:     c.Plex,
 		Snap:     c.Snapshot,
-		Logger:   logger,
+		Logger:   c.Services.Logger,
 		BaseURL:  notifiarr.BaseURL,
 		Timeout:  c.Timeout.Duration,
 		MaxBody:  c.MaxBody,
