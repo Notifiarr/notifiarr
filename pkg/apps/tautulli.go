@@ -81,14 +81,16 @@ func (t *TautulliUsers) MapEmailName() map[string]string {
 	m := map[string]string{}
 
 	for _, user := range t.Response.Data {
+		// user.FriendlyName always seems to be set, so this first if-block is safety only.
 		if user.FriendlyName == "" && user.Email != "" && user.Username != "" {
 			m[user.Email] = user.Username
-			return m
+			continue
 		} else if user.FriendlyName == "" {
 			// This user has no mapability.
-			return m
+			continue
 		}
 
+		// We only need username or email, not both, but in the order username then email.
 		if user.Username != "" {
 			m[user.Username] = user.FriendlyName
 		} else if user.Email != "" {
