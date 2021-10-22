@@ -222,7 +222,8 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 		syn.SetInfo(hostInfo)
 	}
 
-	if hostInfo.Platform == "" && hostInfo.VirtualizationSystem == "docker" {
+	if hostInfo.Platform == "" &&
+		(hostInfo.VirtualizationSystem == "docker" || os.Getenv("NOTIFIARR_IN_DOCKER") == "true") {
 		hostInfo.Platform = "Docker " + hostInfo.KernelVersion
 		hostInfo.PlatformFamily = "Docker"
 	}

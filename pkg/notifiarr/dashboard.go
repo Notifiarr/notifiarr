@@ -76,6 +76,8 @@ type State struct {
 	Seeding     int64 `json:"seeding,omitempty"`
 	Paused      int64 `json:"paused,omitempty"`
 	Errors      int64 `json:"errors,omitempty"`
+	Month       int64 `json:"month,omitempty"`
+	Week        int64 `json:"week,omitempty"`
 }
 
 // States is our compiled states for the dashboard.
@@ -759,6 +761,9 @@ func (c *Config) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, err
 	}
 
 	state.Size = hist.TotalSize.Bytes
+	state.Month = hist.MonthSize.Bytes
+	state.Week = hist.WeekSize.Bytes
+
 	state.Downloads = len(queue.Slots) + hist.Noofslots
 	state.Next = []*Sortable{}
 	state.Latest = []*Sortable{}
