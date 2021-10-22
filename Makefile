@@ -377,6 +377,7 @@ generate: mockgen bindata
 
 docker:
 	docker build -f init/docker/Dockerfile \
+		--no-cache --pull \
 		--build-arg "BUILD_DATE=$(DATE)" \
 		--build-arg "COMMIT=$(COMMIT)" \
 		--build-arg "VERSION=$(VERSION)-$(ITERATION)" \
