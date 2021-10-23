@@ -16,7 +16,7 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool) []error {
 		return nil
 	}
 
-	partitions, err := disk.PartitionsWithContext(ctx, false)
+	partitions, err := disk.PartitionsWithContext(ctx, true)
 	if err != nil {
 		return []error{fmt.Errorf("unable to get partitions: %w", err)}
 	}

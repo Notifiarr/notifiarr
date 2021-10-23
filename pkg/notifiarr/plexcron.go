@@ -12,6 +12,7 @@ import (
 // Statuses for an item being played on Plex.
 const (
 	statusIgnoring = "ignoring"
+	statusPaused   = "ignoring, paused"
 	statusWatching = "watching"
 	statusSending  = "sending"
 	statusError    = "error"
@@ -186,6 +187,8 @@ func (c *Config) checkPlexFinishedItems(sent map[string]struct{}) {
 
 func (c *Config) checkSessionDone(s *plex.Session, pct float64) string {
 	switch {
+	case s.Player.State != "playing":
+		return statusPaused
 	case c.Plex.MoviesPC > 0 && EventType(s.Type) == EventMovie:
 		if pct < float64(c.Plex.MoviesPC) {
 			return statusWatching

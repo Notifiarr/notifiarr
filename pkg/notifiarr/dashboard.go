@@ -301,17 +301,35 @@ func (c *Config) getSonarrStates() []*State {
 }
 
 func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, error) {
-	state := &State{Instance: instance, Name: d.Name}
 	start := time.Now()
-
 	xfers, err := d.GetXfersCompat()
-	state.Elapsed.Duration = time.Since(start)
+	state := &State{
+		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
+		Instance: instance,
+		Name:     d.Name,
+		Next:     []*Sortable{},
+		Latest:   []*Sortable{},
+	}
 
 	if err != nil {
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
 
 	for _, xfer := range xfers {
+		if eta, _ := xfer.Eta.Int64(); eta != 0 && xfer.FinishedTime == 0 {
+			//			c.Error(xfer.FinishedTime, eta, xfer.Name)
+			state.Next = append(state.Next, &Sortable{
+				Name: xfer.Name,
+				Date: time.Now().Add(time.Second * time.Duration(eta)),
+			})
+		} else if xfer.FinishedTime > 0 {
+			seconds := time.Duration(xfer.FinishedTime) * time.Second
+			state.Latest = append(state.Latest, &Sortable{
+				Name: xfer.Name,
+				Date: time.Now().Add(-seconds).Round(time.Second),
+			})
+		}
+
 		state.Size += int64(xfer.TotalSize)
 		state.Uploaded += int64(xfer.TotalUploaded)
 		state.Downloaded += int64(xfer.AllTimeDownload)
@@ -341,6 +359,11 @@ func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, err
 			state.Errors++
 		}
 	}
+
+	sort.Sort(dateSorter(state.Next))
+	sort.Sort(sort.Reverse(dateSorter(state.Latest)))
+	state.Next.Shrink(showNext)
+	state.Latest.Shrink(showLatest)
 
 	return state, nil
 }
@@ -436,17 +459,33 @@ FORLOOP:
 }
 
 func (c *Config) getQbitState(instance int, q *apps.QbitConfig) (*State, error) {
-	state := &State{Instance: instance, Name: q.Name}
 	start := time.Now()
-
 	xfers, err := q.GetXfers()
-	state.Elapsed.Duration = time.Since(start)
+	state := &State{
+		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
+		Instance: instance,
+		Name:     q.Name,
+		Next:     []*Sortable{},
+		Latest:   []*Sortable{},
+	}
 
 	if err != nil {
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
 
 	for _, xfer := range xfers {
+		if xfer.Eta != 8640000 && xfer.Eta != 0 && xfer.AmountLeft > 0 {
+			state.Next = append(state.Next, &Sortable{
+				Name: xfer.Name,
+				Date: time.Now().Add(time.Second * time.Duration(xfer.Eta)),
+			})
+		} else if xfer.AmountLeft == 0 {
+			state.Latest = append(state.Latest, &Sortable{
+				Name: xfer.Name,
+				Date: time.Unix(int64(xfer.CompletionOn), 0).Round(time.Second),
+			})
+		}
+
 		state.Size += xfer.Size
 		state.Uploaded += xfer.Uploaded
 		state.Downloaded += int64(xfer.Downloaded)
@@ -469,6 +508,11 @@ func (c *Config) getQbitState(instance int, q *apps.QbitConfig) (*State, error) 
 			state.Errors++
 		}
 	}
+
+	sort.Sort(dateSorter(state.Next))
+	sort.Sort(sort.Reverse(dateSorter(state.Latest)))
+	state.Next.Shrink(showNext)
+	state.Latest.Shrink(showLatest)
 
 	return state, nil
 }
@@ -799,7 +843,7 @@ func (c *Config) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, err
 	}
 
 	sort.Sort(dateSorter(state.Next))
-	sort.Sort(dateSorter(state.Latest))
+	sort.Sort(sort.Reverse(dateSorter(state.Latest)))
 	state.Next.Shrink(showNext)
 	state.Latest.Shrink(showLatest)
 
