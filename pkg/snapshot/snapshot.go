@@ -41,6 +41,7 @@ type Config struct {
 	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`             // include mdstat and/or megaraid.
 	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"`       // smartctl commands.
 	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`          // get disk usage.
+	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`                   // usage for all drives?
 	Uptime    bool          `toml:"monitor_uptime" xml:"monitor_uptime" json:"monitorUptime"`       // all system stats.
 	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitorCpuMem"` // cpu perct and memory used/free.
 	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
@@ -146,7 +147,7 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		syn.SetInfo(s.System.InfoStat)
 	}
 
-	if err := s.getDisksUsage(ctx, c.DiskUsage); len(err) != 0 {
+	if err := s.getDisksUsage(ctx, c.DiskUsage, c.AllDrives); len(err) != 0 {
 		errs = append(errs, err...)
 	}
 
