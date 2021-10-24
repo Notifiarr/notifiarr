@@ -32,6 +32,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printSonarr()
 	c.printDeluge()
 	c.printQbit()
+	c.printSABnzbd()
 	c.printPlex()
 	c.printTautulli()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
@@ -247,6 +248,23 @@ func (c *Client) printQbit() {
 	for i, f := range c.Config.Qbit {
 		c.Printf(" =>    Server %d: %s, username: %s, password:%v, timeout:%v, verify ssl:%v",
 			i+1, f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
+	}
+}
+
+// printSABnzbd is called on startup to print info about each configured SAB downloader.
+func (c *Client) printSABnzbd() {
+	if len(c.Config.SabNZB) == 1 {
+		f := c.Config.SabNZB[0]
+
+		c.Printf(" => SABnzbd Config: 1 server: %s, api_key: %v, timeout:%v", f.URL, f.APIKey != "", f.Timeout)
+
+		return
+	}
+
+	c.Print(" => SABnzbd Config:", len(c.Config.SabNZB), "servers")
+
+	for i, f := range c.Config.SabNZB {
+		c.Printf(" =>    Server %d: %s, api_key: %v, timeout:%v", i+1, f.URL, f.APIKey != "", f.Timeout)
 	}
 }
 
