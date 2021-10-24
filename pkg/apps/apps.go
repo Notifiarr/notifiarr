@@ -36,6 +36,8 @@ type Apps struct {
 	Readarr  []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
 	Deluge   []*DelugeConfig  `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
 	Qbit     []*QbitConfig    `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
+	SabNZB   []*SabNZBConfig  `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
+	Tautulli *TautulliConfig  `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
 	Router   *mux.Router      `json:"-" toml:"-" xml:"-" yaml:"-"`
 	ErrorLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
 	DebugLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
@@ -189,6 +191,10 @@ func (a *Apps) Setup(timeout time.Duration) error {
 		a.Lidarr[i].setup(timeout)
 	}
 
+	for i := range a.SabNZB {
+		a.SabNZB[i].setup(timeout)
+	}
+
 	for i := range a.Deluge {
 		// a.Deluge[i].Debugf = a.DebugLog.Printf
 		if err := a.Deluge[i].setup(timeout); err != nil {
@@ -202,6 +208,8 @@ func (a *Apps) Setup(timeout time.Duration) error {
 			return err
 		}
 	}
+
+	a.Tautulli.setup(timeout)
 
 	return nil
 }

@@ -8,6 +8,7 @@ package client
 import (
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
@@ -17,8 +18,14 @@ const disabled = "disabled"
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
 func (c *Client) PrintStartupInfo() {
+	if hi, err := c.website.GetHostInfoUID(); err != nil {
+		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
+	} else {
+		c.Printf("==> Unique ID: %s (%s)", hi.HostID, hi.Hostname)
+	}
+
 	c.Printf("==> %s <==", mnd.HelpLink)
-	c.Print("==> Startup Settings <==")
+	c.Printf("==> %s Startup Settings <==", strings.Title(strings.ToLower(c.Config.Mode)))
 	c.printLidarr()
 	c.printRadarr()
 	c.printReadarr()
@@ -26,6 +33,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printDeluge()
 	c.printQbit()
 	c.printPlex()
+	c.printTautulli()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
 
@@ -239,5 +247,18 @@ func (c *Client) printQbit() {
 	for i, f := range c.Config.Qbit {
 		c.Printf(" =>    Server %d: %s, username: %s, password:%v, timeout:%v, verify ssl:%v",
 			i+1, f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
+	}
+}
+
+// printTautulli is called on startup to print info about configured Tautulli instance(s).
+func (c *Client) printTautulli() {
+	switch t := c.Config.Apps.Tautulli; {
+	case t == nil, t.URL == "":
+		c.Printf(" => Tautulli Config (enables name map): 0 servers")
+	case t.Name != "":
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s, timeout: %v, check interval: %v, name: %s",
+			t.URL, t.Timeout, t.Interval, t.Name)
+	default:
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s, timeout: %v", t.URL, t.Timeout)
 	}
 }

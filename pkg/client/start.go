@@ -11,32 +11,29 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
-	"github.com/Notifiarr/notifiarr/pkg/services"
-	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	flag "github.com/spf13/pflag"
-	"golift.io/cnfg"
 	"golift.io/version"
 )
 
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	Flags     *configfile.Flags
-	Config    *configfile.Config
-	server    *http.Server
-	sigkil    chan os.Signal
-	sighup    chan os.Signal
-	menu      map[string]ui.MenuItem
-	notifiarr *notifiarr.Config
+	Flags   *configfile.Flags
+	Config  *configfile.Config
+	server  *http.Server
+	sigkil  chan os.Signal
+	sighup  chan os.Signal
+	menu    map[string]ui.MenuItem
+	website *notifiarr.Config
 }
 
 // Errors returned by this package.
@@ -53,27 +50,8 @@ func NewDefaults() *Client {
 		sighup: make(chan os.Signal, 1),
 		menu:   make(map[string]ui.MenuItem),
 		Logger: logger,
-		Config: &configfile.Config{
-			Apps: &apps.Apps{
-				URLBase:  "/",
-				DebugLog: logger.DebugLog,
-				ErrorLog: logger.ErrorLog,
-			},
-			Services: &services.Config{
-				Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
-				Parallel: 1,
-				Logger:   logger,
-			},
-			BindAddr: mnd.DefaultBindAddr,
-			Snapshot: &snapshot.Config{
-				Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
-			},
-			LogConfig: &logs.LogConfig{
-				LogFiles:  mnd.DefaultLogFiles,
-				LogFileMb: mnd.DefaultLogFileMb,
-			},
-			Timeout: cnfg.Duration{Duration: mnd.DefaultTimeout},
-		}, Flags: &configfile.Flags{
+		Config: configfile.NewConfig(logger),
+		Flags: &configfile.Flags{
 			FlagSet:    flag.NewFlagSet(mnd.DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
 			EnvPrefix:  mnd.DefaultEnvPrefix,
@@ -94,29 +72,50 @@ func Start() error {
 		return printProcessList()
 	case c.Flags.Curl != "": // curl a URL and exit.
 		return curlURL(c.Flags.Curl, c.Flags.Headers)
+	default:
+		return c.start()
 	}
+}
 
+func (c *Client) start() error {
 	msg, newCon, err := c.loadConfiguration()
 
 	switch {
+	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
+		c.Printf("==> %s", msg)
+		return c.forceWriteWithExit(c.Flags.Write)
 	case err != nil:
 		return fmt.Errorf("%s: %w", msg, err)
 	case c.Flags.Restart:
 		return nil
-	case c.Flags.Write != "":
-		c.Printf("==> %s", msg)
-		return c.forceWriteWithExit(c.Flags.Write)
 	case c.Config.APIKey == "":
 		return fmt.Errorf("%s: %w %s_API_KEY", msg, ErrNilAPIKey, c.Flags.EnvPrefix)
-	default:
-		c.Logger.SetupLogging(c.Config.LogConfig)
-		c.Printf("%s v%s-%s Starting! [PID: %v] %v",
-			c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
-		c.Printf("==> %s", msg)
-		c.printUpdateMessage()
 	}
 
-	return c.start(newCon)
+	c.Logger.SetupLogging(c.Config.LogConfig)
+	c.Printf("%s v%s-%s Starting! [PID: %v] %v",
+		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
+	c.Printf("==> %s", msg)
+	c.printUpdateMessage()
+	c.configureServices(notifiarr.EventStart)
+
+	if newCon {
+		_, _ = c.Config.Write(c.Flags.ConfigFile)
+		_ = ui.OpenFile(c.Flags.ConfigFile)
+		_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
+			c.Flags.ConfigFile+" - it should open in a text editor. "+
+			"Please edit the file and reload this application using the tray menu.")
+	} else if c.Config.AutoUpdate != "" {
+		go c.AutoWatchUpdate() // do not run updater if there's a brand new config file.
+	}
+
+	if ui.HasGUI() {
+		// This starts the web server and calls os.Exit() when done.
+		c.startTray()
+		return nil
+	}
+
+	return c.Exit()
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running confguration.
@@ -135,7 +134,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	}
 
 	// Parse the config file and environment variables.
-	c.notifiarr, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
+	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
 	if err != nil {
 		return msg, newCon, fmt.Errorf("getting config: %w", err)
 	}
@@ -143,36 +142,74 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	return msg, newCon, nil
 }
 
-// start runs from Start() after the configuration is loaded.
-func (c *Client) start(newCon bool) error {
-	if err := c.configureServices(); err != nil {
-		return err
-	} else if ci, err := c.notifiarr.GetClientInfo(); err != nil {
-		c.Printf("==> [WARNING] API Key may be invalid: %v: %s", err, ci)
-	} else if ci != nil {
-		c.Printf("==> %s", ci)
+// Load configuration from the website.
+func (c *Client) loadSiteConfig(source notifiarr.EventType) {
+	ci, err := c.website.GetClientInfo(source)
+	if err != nil || ci == nil {
+		c.Printf("==> [WARNING] API Key may be invalid: %v, info: %s", err, ci)
+		return
 	}
 
-	if newCon {
-		_, _ = c.Config.Write(c.Flags.ConfigFile)
-		_ = ui.OpenFile(c.Flags.ConfigFile)
-		_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
-			c.Flags.ConfigFile+" - it should open in a text editor. "+
-			"Please edit the file and reload this application using the tray menu.")
-	} else if c.Config.AutoUpdate != "" {
-		go c.AutoWatchUpdate() // do not run updater if there's a brand new config file.
+	c.Printf("==> %s", ci)
+
+	if ci.Actions.Snapshot != nil {
+		c.website.Snap, c.Config.Snapshot = ci.Actions.Snapshot, ci.Actions.Snapshot
 	}
 
-	if ui.HasGUI() {
-		// This starts the web server and calls os.Exit() when done.
-		c.startTray()
+	if ci.Actions.Plex != nil && c.Config.Plex != nil {
+		c.Config.Plex.Interval = ci.Actions.Plex.Interval
+		c.Config.Plex.Cooldown = ci.Actions.Plex.Cooldown
+		c.Config.Plex.MoviesPC = ci.Actions.Plex.MoviesPC
+		c.Config.Plex.SeriesPC = ci.Actions.Plex.SeriesPC
+		c.Config.Plex.NoActivity = ci.Actions.Plex.NoActivity
+		c.Config.Plex.Delay = ci.Actions.Plex.Delay
 	}
 
-	return c.Exit()
+	c.loadSiteAppsConfig(ci)
+}
+
+func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
+	for _, app := range ci.Actions.Apps.Lidarr {
+		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Lidarr) {
+			c.Errorf("Website provided configuration for missing Lidarr app: %d:%s", app.Instance, app.Name)
+			continue
+		}
+
+		c.Config.Apps.Lidarr[app.Instance-1].StuckItem = app.Stuck
+	}
+
+	for _, app := range ci.Actions.Apps.Radarr {
+		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Radarr) {
+			c.Errorf("Website provided configuration for missing Radarr app: %d:%s", app.Instance, app.Name)
+			continue
+		}
+
+		c.Config.Apps.Radarr[app.Instance-1].StuckItem = app.Stuck
+	}
+
+	for _, app := range ci.Actions.Apps.Readarr {
+		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Readarr) {
+			c.Errorf("Website provided configuration for missing Readarr app: %d:%s", app.Instance, app.Name)
+			continue
+		}
+
+		c.Config.Apps.Readarr[app.Instance-1].StuckItem = app.Stuck
+	}
+
+	for _, app := range ci.Actions.Apps.Sonarr {
+		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Sonarr) {
+			c.Errorf("Website provided configuration for missing Sonarr app: %d:%s", app.Instance, app.Name)
+			continue
+		}
+
+		c.Config.Apps.Sonarr[app.Instance-1].StuckItem = app.Stuck
+	}
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices() error {
+func (c *Client) configureServices(source notifiarr.EventType) {
+	c.loadSiteConfig(source)
+
 	if c.Config.Plex.Configured() {
 		if info, err := c.Config.Plex.GetInfo(); err != nil {
 			c.Config.Plex.Name = ""
@@ -182,23 +219,11 @@ func (c *Client) configureServices() error {
 		}
 	}
 
+	c.website.Sighup = c.sighup
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo()
-	c.notifiarr.Start(c.Config.Mode)
-
-	// Make sure the port is not in use before starting the web server.
-	addr, err := CheckPort(c.Config.BindAddr)
-	if err != nil {
-		return err
-	}
-	// Reset this (CheckPort cleans it up too).
-	c.Config.BindAddr = addr
-
-	if err := c.Config.Services.Start(c.Config.Service); err != nil {
-		return fmt.Errorf("service checks: %w", err)
-	}
-
-	return nil
+	c.website.Start()
+	c.Config.Services.Start()
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
@@ -220,6 +245,7 @@ func (c *Client) Exit() error {
 	}
 }
 
+// This is called from at least two different exit points.
 func (c *Client) exit() error {
 	if c.server == nil {
 		return nil
@@ -242,7 +268,7 @@ func (c *Client) exit() error {
 // Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(source string) error {
 	c.Print("==> Reloading Configuration: " + source)
-	c.notifiarr.Stop()
+	c.website.Stop(notifiarr.EventReload)
 	c.Config.Services.Stop()
 
 	err := c.StopWebServer()
@@ -252,7 +278,10 @@ func (c *Client) reloadConfiguration(source string) error {
 		defer c.StartWebServer()
 	}
 
-	c.notifiarr, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix, c.Logger)
+	// start over.
+	c.Config = configfile.NewConfig(c.Logger)
+
+	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
 	if err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}
@@ -262,15 +291,11 @@ func (c *Client) reloadConfiguration(source string) error {
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-
-	if err := c.configureServices(); err != nil {
-		return err
-	}
-
+	c.configureServices(notifiarr.EventReload)
+	c.setupMenus()
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
-	err = ui.Notify("Configuration Reloaded!")
-	if err != nil {
+	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Error("Creating Toast Notification:", err)
 	}
 

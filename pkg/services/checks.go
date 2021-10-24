@@ -132,12 +132,13 @@ func (s *Service) checkHTTP() *result {
 		return r
 	}
 
-	if len(body) > maxBody {
-		body = body[:maxBody]
+	b := string(body)
+	if len(b) > maxBody {
+		b = b[:maxBody]
 	}
 
 	r.state = StateCritical
-	r.output = resp.Status + ": " + strings.TrimSpace(string(body))
+	r.output = resp.Status + ": " + strings.TrimSpace(b)
 
 	return r
 }

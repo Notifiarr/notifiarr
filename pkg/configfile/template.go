@@ -56,7 +56,8 @@ bind_addr = "{{.BindAddr}}"
 quiet = {{.Quiet}}{{if .Debug}}
 
 ## Debug prints more data and json payloads. Recommend setting debug_log if enabled.
-debug = true{{end}}{{if .Mode}}
+debug = true
+max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if and .Mode (ne .Mode "production")}}
 
 ## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
 mode  = "{{.Mode}}"{{end}}
@@ -95,12 +96,8 @@ log_file_mb = {{.LogFileMb}}
 log_files = {{.LogFiles}}
 ##
 ## Unix file mode for new log files. Umask also affects this.
-## Missing or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
-file_mode = {{.FileMode.String}}
-
-## How often to send current application states for the dashboard.
-##
-send_dash = "{{.SendDash}}"
+## Missing, blank or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
+file_mode = "{{.FileMode.String}}"
 
 ## Web server and application timeouts.
 ##
@@ -119,67 +116,55 @@ timeout = "{{.Timeout}}"
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
 {{if .Lidarr}}{{range .Lidarr}}
 [[lidarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[lidarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://lidarr:8989/"
-#api_key     = ""
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name     = "" # Set a name to enable checks of your service.
+#url      = "http://lidarr:8989/"
+#api_key  = "".{{end}}
 
 {{if .Radarr}}{{range .Radarr}}
 [[radarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  disable_cf  = {{.DisableCF}} # Disable custom format sync.
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{ if .MaxBody }}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[radarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://127.0.0.1:7878/radarr"
-#api_key     = ""
-#disable_cf  = true  # Disable custom format sync.
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name      = "" # Set a name to enable checks of your service.
+#url       = "http://127.0.0.1:7878/radarr"
+#api_key   = ""{{end}}
 
 {{if .Readarr}}{{range .Readarr}}
 [[readarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[readarr]]
-#name        = "" # Set a name to enable checks of your service.
-#url         = "http://127.0.0.1:8787/readarr"
-#api_key     = ""
-#check_q     = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name      = "" # Set a name to enable checks of your service.
+#url       = "http://127.0.0.1:8787/readarr"
+#api_key   = ""{{end}}
 
 {{if .Sonarr}}{{range .Sonarr}}
 [[sonarr]]
-  name        = "{{.Name}}"
-  url         = "{{.URL}}"
-  api_key     = "{{.APIKey}}"
-  disable_cf  = {{.DisableCF}}  # Disable release profile sync.
-  interval    = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout     = "{{.Timeout}}"{{if .CheckQ}}
-  check_q = {{.CheckQ}} # 0 = no repeat, 1 = every hour, 2 = every 2 hours, etc.{{else}}
-  #check_q = 0 # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}{{end -}}
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
 {{else}}#[[sonarr]]
-#name        = ""  # Set a name to enable checks of your service.
-#url         = "http://sonarr:8989/"
-#api_key     = ""
-#disable_cf  = true # Disable release profile sync.
-#check_q     = 0    # Check for items stuck in queue. 0 = no repeat, 1 to repeat every hour, 2 for every 2 hours, etc.{{end}}
+#name      = ""  # Set a name to enable checks of your service.
+#url       = "http://sonarr:8989/"
+#api_key   = ""{{end}}
 
 
 # Download Client Configs (below) are used for dashboard state and service checks.
@@ -208,7 +193,20 @@ timeout = "{{.Timeout}}"
 #name     = ""  # Set a name to enable checks of your service.
 #url      = "http://qbit:8080/"
 #user     = ""
-#pass     = ""
+#pass     = ""{{end}}
+
+{{if .SabNZB}}{{range .SabNZB}}
+[[sabnzbd]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{end}}
+{{else}}
+#[[sabnzbd]]
+#name     = ""  # Set a name to enable checks of this application.
+#url      = "http://sabnzbd:8080/"
+#api_key  = ""
 {{end}}
 
 #################
@@ -218,57 +216,33 @@ timeout = "{{.Timeout}}"
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
 [plex]{{if and .Plex (not force)}}
-  url         = "{{.Plex.URL}}"  # Your plex URL
-  token       = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
-  interval    = "{{.Plex.Interval}}"  # how often to send session data, 0 = off
-  timeout     = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
-  cooldown    = "{{.Plex.Cooldown}}"    # how often plex webhooks may trigger session hooks
-  account_map = "{{.Plex.AccountMap}}"  # map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  movies_percent_complete = {{.Plex.MoviesPC}}  # 0, 70-99, send notifications when a movie session is this % complete.
-  series_percent_complete = {{.Plex.SeriesPC}}  # 0, 70-99, send notifications when an episode session is this % complete.
-  no_activity = {{.Plex.NoActivity}}          # Disable getting sessions from Plex after a webhook, hides "Activity"
+  url     = "{{.Plex.URL}}"  # Your plex URL
+  token   = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
+  timeout = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
 {{- else}}
-  url         = "http://localhost:32400" # Your plex URL
-  token       = ""            # your plex token; get this from a web inspector
-  interval    = "30m0s"       # how often to send session data, 0 = off
-  cooldown    = "15s"         # how often plex webhooks may trigger session hooks
-  account_map = ""            # shared plex servers: map an email to a name, ex: "som@ema.il,Name|some@ther.mail,name"
-  movies_percent_complete = 0 # 0, 70-99, send notifications when a movie session is this % complete.
-  series_percent_complete = 0 # 0, 70-99, send notifications when an episode session is this % complete.
+  url     = "http://localhost:32400" # Your plex URL
+  token   = "" # your plex token; get this from a web inspector
 {{- end }}
 
-
 #####################
-# Snapshot Settings #
+# Tautulli Settings #
 #####################
 
-## Install package(s)
-##  - Windows:  smartmontools - https://sourceforge.net/projects/smartmontools/
-##  - Linux:    apt install smartmontools || yum install smartmontools
-##  - Docker:   Already Included. Run in --privileged mode.
-##  - Synology: opkg install smartmontools
-##  - Entware:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-##  - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-##
-[snapshot]
-  interval          = "{{.Snapshot.Interval}}" # how often to send a snapshot, 0 = off, 30m - 2h recommended
-  timeout           = "{{.Snapshot.Timeout}}" # how long a snapshot may take
-  monitor_raid      = {{.Snapshot.Raid}} # mdadm / megacli
-  monitor_drives    = {{.Snapshot.DriveData}} # smartctl: age, temp, health
-  monitor_space     = {{.Snapshot.DiskUsage}} # disk usage for all partitions
-  monitor_uptime    = {{.Snapshot.Uptime}} # system data, users, hostname, uptime, os, build
-  monitor_cpuMemory = {{.Snapshot.CPUMem}} # literally cpu usage, load averages, and memory
-  monitor_cpuTemp   = {{.Snapshot.CPUTemp}} # cpu temperatures, not available on all platforms
-{{- if .Snapshot.ZFSPools}}
-  zfs_pools         = [
-   {{- range $s := .Snapshot.ZFSPools}}"{{$s}}",{{end -}}
-   ]    # list of zfs pools, ex: zfs_pools=["data", "data2"]{{else}}
-  zfs_pools         = []    # list of zfs pools, ex: zfs_pools=["data", "data2"]{{end}}
-  use_sudo          = {{.Snapshot.UseSudo}} # sudo is needed on unix when monitor_drives=true or for megacli.
-## Example sudoers entries follow; these go in /etc/sudoers.d. Fix the paths to smartctl and MegaCli.
-## notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
-## notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
-
+# Enables email=>username map. Set a name to enable service checks.
+# Must uncomment [tautulli], 'api_key' and 'url' at a minimum.
+{{if and .Tautulli (not force)}}
+[tautulli]
+  name     = "{{.Tautulli.Name}}" # only set a name if you want to enable service checks.
+  url      = "{{.Tautulli.URL}}" # Your Tautulli URL
+  api_key  = "{{.Tautulli.APIKey}}" # your plex token; get this from a web inspector
+  timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
+  interval = "{{.Tautulli.Interval}}" # how often to send service checks
+{{- else}}
+#[tautulli]
+#  name    = "" # only set a name if you want to enable service checks.
+#  url     = "http://localhost:8181" # Your Tautulli URL
+#  api_key = "" # your tautulli api key; get this from settings
+{{- end }}
 
 ##################
 # Service Checks #

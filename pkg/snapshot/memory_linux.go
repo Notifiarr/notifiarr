@@ -20,7 +20,6 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
 	if err != nil {
 		return s.getMemoryUsageShared(ctx, run)
 	}
-	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
@@ -35,6 +34,9 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
 			s.System.MemFree, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)
 		}
 	}
+
+	// Not defered because we want it closed before calling s.getMemoryUsageShared().
+	_ = file.Close()
 
 	s.System.MemTotal *= 1024
 	s.System.MemFree *= 1024

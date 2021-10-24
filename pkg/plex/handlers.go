@@ -32,10 +32,10 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 		reason    = mux.Vars(r)["reason"]
 	)
 
-	err := s.KillSessionWithContext(ctx, sessionID, reason)
+	_, err := s.KillSessionWithContext(ctx, sessionID, reason)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("unable to kill session (%s@%d): %w", sessionID, plexID, err)
 	}
 
-	return http.StatusOK, "kilt"
+	return http.StatusOK, fmt.Sprintf("kilt session '%s' with reason: %s", sessionID, reason)
 }

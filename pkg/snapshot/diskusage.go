@@ -3,6 +3,7 @@ package snapshot
 import (
 	"context"
 	"fmt"
+	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -11,12 +12,14 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
-func (s *Snapshot) getDisksUsage(ctx context.Context, run bool) []error {
+func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error {
 	if !run {
 		return nil
 	}
 
-	partitions, err := disk.PartitionsWithContext(ctx, false)
+	getAllDisks := allDrives || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
+
+	partitions, err := disk.PartitionsWithContext(ctx, getAllDisks)
 	if err != nil {
 		return []error{fmt.Errorf("unable to get partitions: %w", err)}
 	}
@@ -28,7 +31,7 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool) []error {
 	for i := range partitions {
 		u, err := disk.UsageWithContext(ctx, partitions[i].Mountpoint)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("unable to get partition usage: %w", err))
+			errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[i].Mountpoint, err))
 			continue
 		}
 

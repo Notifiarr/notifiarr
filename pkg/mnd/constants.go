@@ -8,8 +8,9 @@ const (
 	Mode0755 = 0o755
 	Mode0750 = 0o750
 	Mode0600 = 0o600
-	Megabyte = 1024 * 1024
-	KB100    = 1024 * 100
+	Kilobyte = 1024
+	Megabyte = Kilobyte * Kilobyte
+	KB100    = Kilobyte * 100
 	OneDay   = 24 * time.Hour
 	HalfHour = 30 * time.Minute
 	Base10   = 10
