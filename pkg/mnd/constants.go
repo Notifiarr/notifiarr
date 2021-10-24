@@ -1,7 +1,10 @@
 // Package mnd provides re-usable constants for the Notifiarr application packages.
 package mnd
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
 // Application Constants.
 const (
@@ -21,7 +24,12 @@ const (
 	HelpLink = "GoLift Discord: https://golift.io/discord"
 	UserRepo = "Notifiarr/notifiarr"
 	BugIssue = "This is a bug please report it on github: https://github.com/" + UserRepo + "/issues/new"
+	DockerV  = "NOTIFIARR_IN_DOCKER"
 )
+
+// IsDocker tells us if this is our Docker container.
+//nolint:gochecknoglobals
+var IsDocker = os.Getenv(DockerV) == "true"
 
 // Application Defaults.
 const (

@@ -4,6 +4,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
 
@@ -12,7 +13,7 @@ import (
 func defaultLocactions() (string, []string) {
 	defaultConf := ""
 
-	if os.Getenv("NOTIFIARR_IN_DOCKER") == "true" {
+	if mnd.IsDocker {
 		// Provide a default config on Docker if /config dir exists.
 		if f, err := os.Stat("/config"); err == nil && f.IsDir() {
 			defaultConf = "/config/notifiarr.conf"
@@ -23,7 +24,7 @@ func defaultLocactions() (string, []string) {
 	}
 
 	switch runtime.GOOS {
-	case "windows":
+	case mnd.Windows:
 		return `C:\ProgramData\notifiarr\notifiarr.conf`, []string{
 			`~\.dnclient\dnclient.conf`,
 			`~\.notifiarr\notifiarr.conf`,

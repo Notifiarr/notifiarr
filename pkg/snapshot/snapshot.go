@@ -16,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"golift.io/cnfg"
@@ -110,7 +111,7 @@ func (c *Config) Validate() {
 		c.Interval.Duration = minimumInterval
 	}
 
-	if os.Getenv("NOTIFIARR_IN_DOCKER") == "true" || runtime.GOOS == "windows" {
+	if mnd.IsDocker || runtime.GOOS == mnd.Windows {
 		c.UseSudo = false
 	}
 

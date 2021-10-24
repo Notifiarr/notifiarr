@@ -3,7 +3,6 @@ package snapshot
 import (
 	"context"
 	"fmt"
-	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -17,7 +16,7 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 		return nil
 	}
 
-	getAllDisks := allDrives || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
+	getAllDisks := allDrives || mnd.IsDocker
 
 	partitions, err := disk.PartitionsWithContext(ctx, getAllDisks)
 	if err != nil {

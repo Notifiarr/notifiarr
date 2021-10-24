@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/jaypipes/ghw"
 	"github.com/shirou/gopsutil/v3/disk"
 )
@@ -88,7 +89,7 @@ func getBlocks(disks map[string]string) error {
 	}
 
 	for _, dev := range block.Disks {
-		if runtime.GOOS != "windows" {
+		if runtime.GOOS != mnd.Windows {
 			disks[path.Join("/dev", dev.Name)] = ""
 		} else {
 			disks[dev.Name] = ""
