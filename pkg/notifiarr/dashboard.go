@@ -300,6 +300,7 @@ func (c *Config) getSonarrStates() []*State {
 	return states
 }
 
+//nolint:funlen
 func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, error) {
 	start := time.Now()
 	xfers, err := d.GetXfersCompat()
