@@ -5,7 +5,6 @@ import (
 	"runtime"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
 
 // First string is default config file.
@@ -18,7 +17,7 @@ func defaultLocactions() (string, []string) {
 		if f, err := os.Stat("/config"); err == nil && f.IsDir() {
 			defaultConf = "/config/notifiarr.conf"
 		}
-	} else if _, err := os.Stat(snapshot.SynologyConf); err == nil {
+	} else if mnd.IsSynology {
 		// Provide a default config on Synology.
 		defaultConf = "/etc/notifiarr/notifiarr.conf"
 	}
