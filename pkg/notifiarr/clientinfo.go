@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"runtime"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -138,7 +138,7 @@ func (c *Config) Info() map[string]interface{} {
 			"version":   version.Version,
 			"uptimeSec": time.Since(version.Started).Round(time.Second).Seconds(),
 			"started":   version.Started,
-			"docker":    os.Getenv("NOTIFIARR_IN_DOCKER") == "true",
+			"docker":    mnd.IsDocker,
 			"gui":       ui.HasGUI(),
 		},
 		"num": map[string]interface{}{
@@ -223,7 +223,7 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 	}
 
 	if hostInfo.Platform == "" &&
-		(hostInfo.VirtualizationSystem == "docker" || os.Getenv("NOTIFIARR_IN_DOCKER") == "true") {
+		(hostInfo.VirtualizationSystem == "docker" || mnd.IsDocker) {
 		hostInfo.Platform = "Docker " + hostInfo.KernelVersion
 		hostInfo.PlatformFamily = "Docker"
 	}

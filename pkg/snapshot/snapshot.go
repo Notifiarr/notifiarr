@@ -10,12 +10,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"runtime"
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"golift.io/cnfg"
@@ -46,7 +46,6 @@ type Config struct {
 	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitorCpuMem"` // cpu perct and memory used/free.
 	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
-	synology bool
 }
 
 // Errors this package generates.
@@ -77,7 +76,6 @@ type Snapshot struct {
 	DiskUsage  map[string]*Partition `json:"diskUsage,omitempty"`
 	DiskHealth map[string]string     `json:"driveHealth,omitempty"`
 	ZFSPool    map[string]*Partition `json:"zfsPools,omitempty"`
-	synology   bool
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -110,12 +108,8 @@ func (c *Config) Validate() {
 		c.Interval.Duration = minimumInterval
 	}
 
-	if os.Getenv("NOTIFIARR_IN_DOCKER") == "true" || runtime.GOOS == "windows" {
+	if mnd.IsDocker || runtime.GOOS == mnd.Windows {
 		c.UseSudo = false
-	}
-
-	if _, err := os.Stat(SynologyConf); err == nil {
-		c.synology = true
 	}
 }
 
@@ -125,9 +119,8 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	defer cancel()
 
 	s := &Snapshot{
-		Version:  version.Version + "-" + version.Revision,
-		Uptime:   time.Since(version.Started),
-		synology: c.synology,
+		Version: version.Version + "-" + version.Revision,
+		Uptime:  time.Since(version.Started),
 	}
 	errs, debug := c.getSnapshot(ctx, s)
 
@@ -141,7 +134,7 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		errs = append(errs, err...)
 	}
 
-	if syn, err := GetSynology(c.Uptime && s.synology); err != nil {
+	if syn, err := GetSynology(c.Uptime); err != nil {
 		errs = append(errs, err)
 	} else if syn != nil {
 		syn.SetInfo(s.System.InfoStat)

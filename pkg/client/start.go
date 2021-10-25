@@ -123,7 +123,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.
-	write := (!c.Flags.Restart && ui.HasGUI()) || os.Getenv("NOTIFIARR_IN_DOCKER") == "true"
+	write := (!c.Flags.Restart && ui.HasGUI()) || mnd.IsDocker
 	c.Flags.ConfigFile, newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
 
 	if c.Flags.Restart {

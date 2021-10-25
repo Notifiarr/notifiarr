@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -108,20 +109,20 @@ func (s *Service) checkHTTP() *result {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.Value, nil)
 	if err != nil {
-		r.output = "creating request: " + err.Error()
+		r.output = "creating request: " + removeAPIKey(s.Value, err.Error())
 		return r
 	}
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		r.output = "making request: " + err.Error()
+		r.output = "making request: " + removeAPIKey(s.Value, err.Error())
 		return r
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		r.output = "reading body: " + err.Error()
+		r.output = "reading body: " + removeAPIKey(s.Value, err.Error())
 		return r
 	}
 
@@ -141,6 +142,20 @@ func (s *Service) checkHTTP() *result {
 	r.output = resp.Status + ": " + strings.TrimSpace(b)
 
 	return r
+}
+
+func removeAPIKey(appURL, message string) string {
+	u, err := url.Parse(appURL)
+	if err != nil {
+		return message
+	}
+
+	key := u.Query().Get("apikey")
+	if key == "" {
+		return message
+	}
+
+	return strings.ReplaceAll(message, key, "**********")
 }
 
 func (s *Service) checkTCP() *result {

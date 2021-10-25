@@ -21,6 +21,8 @@ const (
 	HelpLink = "GoLift Discord: https://golift.io/discord"
 	UserRepo = "Notifiarr/notifiarr"
 	BugIssue = "This is a bug please report it on github: https://github.com/" + UserRepo + "/issues/new"
+	DockerV  = "NOTIFIARR_IN_DOCKER"
+	Synology = "/etc/synoinfo.conf" // Synology is the path to the syno config file.
 )
 
 // Application Defaults.

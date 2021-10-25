@@ -61,13 +61,17 @@ func (c *Config) getResults() []*CheckResult {
 func (c *Config) SendResults(results *Results) {
 	results.Interval = c.Interval.Seconds()
 
-	if _, err := c.Notifiarr.SendData(notifiarr.SvcRoute.Path(results.What), results, true); err != nil {
+	resp, err := c.Notifiarr.SendData(notifiarr.SvcRoute.Path(results.What), results, true)
+	if err != nil {
 		c.Errorf("Sending service check update to Notifiarr, event: %s, buffer: %d/%d, error: %v",
 			results.What, len(c.checks), cap(c.checks), err)
-	} else {
-		c.Printf("Sent %d service check states to Notifiarr, event: %s, buffer: %d/%d",
-			len(results.Svcs), results.What, len(c.checks), cap(c.checks))
+		return
 	}
+
+	c.Printf("Sent %d service check states to Notifiarr, event: %s, buffer: %d/%d. "+
+		"Website took %s and replied with: %s, %s",
+		len(results.Svcs), results.What, len(c.checks), cap(c.checks),
+		resp.Details.Elapsed, resp.Result, resp.Details.Response)
 }
 
 // String turns a check status into a human string.

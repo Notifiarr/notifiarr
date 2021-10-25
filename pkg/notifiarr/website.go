@@ -306,6 +306,10 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 	for i := 0; ; i++ {
 		resp, err := h.Client.Do(req)
 		if err == nil {
+			for i, c := range resp.Cookies() {
+				h.Printf("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
+			}
+
 			if resp.StatusCode < http.StatusInternalServerError {
 				return resp, nil
 			}
