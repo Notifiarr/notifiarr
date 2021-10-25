@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -164,7 +163,7 @@ func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup, procs in
 }
 
 func (s *Snapshot) getIoStat(ctx context.Context, run bool) error {
-	if !run || mnd.IsDocker || runtime.GOOS != "linux" {
+	if !run || mnd.IsDocker || mnd.IsLinux {
 		return nil
 	}
 

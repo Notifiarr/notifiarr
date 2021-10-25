@@ -95,7 +95,7 @@ func FillUpdate(release *GitHubReleasesLatest, version string) (*Update, error) 
 	}
 
 	suffix := OSsuffixMap[runtime.GOOS]
-	if runtime.GOOS == "freebsd" || runtime.GOOS == "linux" {
+	if mnd.IsFreeBSD || mnd.IsLinux {
 		suffix = arch + suffix
 	}
 

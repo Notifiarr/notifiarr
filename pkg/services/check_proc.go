@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"runtime"
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/hako/durafmt"
 	"github.com/shirou/gopsutil/v3/process"
 )
@@ -192,7 +192,7 @@ func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, []error) {
 	}
 
 	// FreeBSD doesn't have create time.
-	if runtime.GOOS != "freebsd" {
+	if !mnd.IsFreeBSD {
 		created, err := p.CreateTimeWithContext(ctx)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("CreateTimeWithContext: %w", err))

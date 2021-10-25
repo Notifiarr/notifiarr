@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
-	"runtime"
 	"sync"
 	"time"
 
@@ -115,11 +114,11 @@ func (c *Config) Validate() {
 		c.Interval.Duration = minimumInterval
 	}
 
-	if mnd.IsDocker || runtime.GOOS == mnd.Windows {
+	if mnd.IsDocker || mnd.IsWindows {
 		c.UseSudo = false
 	}
 
-	if mnd.IsDocker || runtime.GOOS != "linux" {
+	if mnd.IsDocker || mnd.IsLinux {
 		c.IOTop = 0
 	}
 }
@@ -139,7 +138,7 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 }
 
 func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error) {
-	errs := s.GetProcesses(ctx, 10)
+	errs := s.GetProcesses(ctx, c.PSTop)
 	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
 
 	if err := s.GetLocalData(ctx, c.Uptime); len(err) != 0 {
