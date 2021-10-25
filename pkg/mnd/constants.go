@@ -1,10 +1,7 @@
 // Package mnd provides re-usable constants for the Notifiarr application packages.
 package mnd
 
-import (
-	"os"
-	"time"
-)
+import "time"
 
 // Application Constants.
 const (
@@ -25,11 +22,8 @@ const (
 	UserRepo = "Notifiarr/notifiarr"
 	BugIssue = "This is a bug please report it on github: https://github.com/" + UserRepo + "/issues/new"
 	DockerV  = "NOTIFIARR_IN_DOCKER"
+	Synology = "/etc/synoinfo.conf" // SynologyConf is the path to the syno config file.
 )
-
-// IsDocker tells us if this is our Docker container.
-//nolint:gochecknoglobals
-var IsDocker = os.Getenv(DockerV) == "true"
 
 // Application Defaults.
 const (

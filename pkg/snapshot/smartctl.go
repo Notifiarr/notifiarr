@@ -113,6 +113,7 @@ func getParts(ctx context.Context, disks map[string]string) error {
 	return nil
 }
 
+//nolint:cyclop
 func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bool) error {
 	args := []string{"-AH", name}
 
@@ -121,7 +122,7 @@ func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bo
 		strings.HasPrefix(name, "/dev/zram") || strings.HasPrefix(name, "/dev/synoboot") ||
 		strings.HasPrefix(name, "/dev/nbd") || strings.HasPrefix(name, "/dev/vda"):
 		return nil
-	case s.synology:
+	case mnd.IsSynology:
 		args = []string{"-d", "sat", "-AH", name}
 	case dev != "" && strings.Contains(name, ","):
 		args = []string{"-d", name, "-AH", dev}
