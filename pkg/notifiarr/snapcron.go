@@ -10,6 +10,7 @@ func (c *Config) logSnapshotStartup() {
 		"uptime":  c.Snap.Uptime,
 		"cpumem":  c.Snap.CPUMem,
 		"cputemp": c.Snap.CPUTemp,
+		"iotop":   c.Snap.IOTop > 0,
 		"zfs":     len(c.Snap.ZFSPools) > 0,
 		"sudo":    c.Snap.UseSudo && c.Snap.DriveData,
 	} {

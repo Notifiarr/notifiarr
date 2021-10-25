@@ -12,10 +12,20 @@ import (
 	"github.com/shirou/gopsutil/v3/mem"
 )
 
-// GetCPUSample gets a CPU percentage sample.
+// GetCPUSample gets a CPU percentage sample, CPU Times and Load Average.
 func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
 	if !run {
 		return nil
+	}
+
+	times, err := cpu.TimesWithContext(ctx, false) // percpu, true/false
+	if err != nil {
+		return fmt.Errorf("unable to get cpu times: %w", err)
+	}
+
+	s.System.AvgStat, err = load.AvgWithContext(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to get load avg: %w", err)
 	}
 
 	cpus, err := cpu.PercentWithContext(ctx, time.Second, false) // percpu, true/false
@@ -23,12 +33,8 @@ func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
 		return fmt.Errorf("unable to get cpu usage: %w", err)
 	}
 
+	s.System.CPUTime = times[0]
 	s.System.CPU = cpus[0]
-
-	s.System.AvgStat, err = load.AvgWithContext(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to get load avg: %w", err)
-	}
 
 	return nil
 }

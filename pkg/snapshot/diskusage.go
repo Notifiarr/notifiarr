@@ -25,7 +25,10 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 
 	s.DiskUsage = make(map[string]*Partition)
 
-	var errs []error
+	var (
+		errs  []error
+		names = []string{}
+	)
 
 	for i := range partitions {
 		u, err := disk.UsageWithContext(ctx, partitions[i].Mountpoint)
@@ -33,6 +36,8 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 			errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[i].Mountpoint, err))
 			continue
 		}
+
+		names = append(names, partitions[i].Device, partitions[i].Mountpoint)
 
 		if u.Total == 0 ||
 			((runtime.GOOS == "darwin" || strings.HasSuffix(runtime.GOOS, "bsd")) &&

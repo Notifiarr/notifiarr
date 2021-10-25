@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"golift.io/cnfg"
@@ -28,20 +29,21 @@ const DefaultTimeout = 30 * time.Second
 const (
 	minimumTimeout  = 5 * time.Second
 	maximumTimeout  = time.Minute
-	minimumInterval = 10 * time.Minute
+	minimumInterval = time.Minute
 )
 
 // Config determines which checks to run, etc.
 //nolint:lll
 type Config struct {
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                           // total run time allowed.
-	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                        // how often to send snaps (cron).
-	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfsPools"`                       // zfs pools to monitor.
-	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"useSudo"`                         // use sudo for smartctl commands.
-	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`             // include mdstat and/or megaraid.
-	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"`       // smartctl commands.
-	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`          // get disk usage.
-	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`                   // usage for all drives?
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                     // total run time allowed.
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                  // how often to send snaps (cron).
+	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfsPools"`                 // zfs pools to monitor.
+	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"useSudo"`                   // use sudo for smartctl commands.
+	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`       // include mdstat and/or megaraid.
+	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"` // smartctl commands.
+	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`    // get disk usage.
+	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`             // usage for all drives?
+	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`
 	Uptime    bool          `toml:"monitor_uptime" xml:"monitor_uptime" json:"monitorUptime"`       // all system stats.
 	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitorCpuMem"` // cpu perct and memory used/free.
 	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
@@ -69,12 +71,15 @@ type Snapshot struct {
 		Temps    map[string]float64 `json:"temperatures,omitempty"`
 		Users    int                `json:"users"`
 		*load.AvgStat
+		CPUTime cpu.TimesStat `json:"cpuTime"`
 	} `json:"system"`
 	Raid       *RaidData             `json:"raid,omitempty"`
 	DriveAges  map[string]int        `json:"driveAges,omitempty"`
 	DriveTemps map[string]int        `json:"driveTemps,omitempty"`
 	DiskUsage  map[string]*Partition `json:"diskUsage,omitempty"`
 	DiskHealth map[string]string     `json:"driveHealth,omitempty"`
+	IOTop      *IOTopData            `json:"ioTop,omitempty"`
+	IOStat     *IoStatDisks          `json:"ioStat,omitempty"`
 	ZFSPool    map[string]*Partition `json:"zfsPools,omitempty"`
 }
 
@@ -110,6 +115,10 @@ func (c *Config) Validate() {
 
 	if mnd.IsDocker || runtime.GOOS == mnd.Windows {
 		c.UseSudo = false
+	}
+
+	if mnd.IsDocker || runtime.GOOS != "linux" {
+		c.IOTop = 0
 	}
 }
 
@@ -153,6 +162,8 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 	errs = append(errs, s.getZFSPoolData(ctx, c.ZFSPools))
 	errs = append(errs, s.getRaidData(ctx, c.UseSudo, c.Raid))
 	errs = append(errs, s.getSystemTemps(ctx, c.CPUTemp))
+	errs = append(errs, s.getIOTop(ctx, c.UseSudo, c.IOTop))
+	errs = append(errs, s.getIoStat(ctx, c.DiskUsage))
 
 	return errs, debug
 }
