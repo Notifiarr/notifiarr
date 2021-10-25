@@ -35,18 +35,19 @@ const (
 // Config determines which checks to run, etc.
 //nolint:lll
 type Config struct {
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                     // total run time allowed.
-	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                  // how often to send snaps (cron).
-	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfsPools"`                 // zfs pools to monitor.
-	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"useSudo"`                   // use sudo for smartctl commands.
-	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`       // include mdstat and/or megaraid.
-	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"` // smartctl commands.
-	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`    // get disk usage.
-	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`             // usage for all drives?
-	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                           // total run time allowed.
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                        // how often to send snaps (cron).
+	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfsPools"`                       // zfs pools to monitor.
+	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"useSudo"`                         // use sudo for smartctl commands.
+	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`             // include mdstat and/or megaraid.
+	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"`       // smartctl commands.
+	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`          // get disk usage.
+	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`                   // usage for all drives?
 	Uptime    bool          `toml:"monitor_uptime" xml:"monitor_uptime" json:"monitorUptime"`       // all system stats.
 	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitorCpuMem"` // cpu perct and memory used/free.
 	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
+	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`                                 // number of processes to include from ioTop
+	PSTop     int           `toml:"pstop" xml:"pstop" json:"psTop"`                                 // number of processes to include from top (cpu usage)
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
 }
 
@@ -80,6 +81,7 @@ type Snapshot struct {
 	DiskHealth map[string]string     `json:"driveHealth,omitempty"`
 	IOTop      *IOTopData            `json:"ioTop,omitempty"`
 	IOStat     *IoStatDisks          `json:"ioStat,omitempty"`
+	Processes  Processes             `json:"processes,omitempty"`
 	ZFSPool    map[string]*Partition `json:"zfsPools,omitempty"`
 }
 
@@ -137,7 +139,8 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 }
 
 func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error) {
-	var errs, debug []error
+	errs := s.GetProcesses(ctx, 10)
+	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
 
 	if err := s.GetLocalData(ctx, c.Uptime); len(err) != 0 {
 		errs = append(errs, err...)
@@ -153,11 +156,12 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		errs = append(errs, err...)
 	}
 
+	var debug []error
+
 	if err := s.getDriveData(ctx, c.DriveData, c.UseSudo); len(err) != 0 {
 		debug = append(debug, err...) // these can be noisy, so debug/hide them.
 	}
 
-	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
 	errs = append(errs, s.GetMemoryUsage(ctx, c.CPUMem))
 	errs = append(errs, s.getZFSPoolData(ctx, c.ZFSPools))
 	errs = append(errs, s.getRaidData(ctx, c.UseSudo, c.Raid))
