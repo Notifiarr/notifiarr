@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.2.0   @ 212410T2154 #
+# Created by Notifiarr v0.2.1   @ 212610T0855 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -132,9 +132,24 @@ timeout = "1m0s"
 # Must uncomment [tautulli], 'api_key' and 'url' at a minimum.
 
 #[tautulli]
-#  name    = "" # only set a name if you want to enable service checks.
+#  name    = "" # only set a name to enable service checks.
 #  url     = "http://localhost:8181" # Your Tautulli URL
 #  api_key = "" # your tautulli api key; get this from settings
+
+##################
+# MySQL Snapshot #
+##################
+
+# Enables MySQL process list in snapshot output.
+# Adding a name to a server enables TCP service checks.
+# Example Grant:
+# GRANT SELECT,PROCESS ON *.* to 'notifiarr'@'localhost'
+
+#[[snapshot.mysql]]
+#name = "" # only set a name to enable service checks.
+#host = "localhost:3306"
+#user = "notifiarr"
+#pass = "password"
 
 ##################
 # Service Checks #

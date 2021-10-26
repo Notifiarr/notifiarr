@@ -68,6 +68,7 @@ func NewConfig(logger *logs.Logger) *Config {
 		BindAddr: mnd.DefaultBindAddr,
 		Snapshot: &snapshot.Config{
 			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
+			Plugins: &snapshot.Plugins{},
 		},
 		LogConfig: &logs.LogConfig{
 			LogFiles:  mnd.DefaultLogFiles,
@@ -98,6 +99,7 @@ func (c *Config) Get(configFile, envPrefix string) (*notifiarr.Config, error) {
 	}
 
 	c.Services.Apps = c.Apps
+	c.Services.Plugins = c.Snapshot.Plugins
 
 	svcs, err := c.Services.Setup(c.Service)
 	if err != nil {

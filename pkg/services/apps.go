@@ -1,6 +1,8 @@
 package services
 
 import (
+	"strings"
+
 	"golift.io/cnfg"
 )
 
@@ -13,6 +15,7 @@ func (c *Config) collectApps() []*Service {
 	svcs = c.collectSonarrApps(svcs)
 	svcs = c.collectDownloadApps(svcs)
 	svcs = c.collectTautulliApp(svcs)
+	svcs = c.collectMySQLApps(svcs)
 
 	return svcs
 }
@@ -174,6 +177,35 @@ func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 			Timeout:  t.Timeout,
 			Interval: t.Interval,
 		})
+	}
+
+	return svcs
+}
+
+func (c *Config) collectMySQLApps(svcs []*Service) []*Service {
+	if c.Plugins == nil {
+		return svcs
+	}
+
+	for _, m := range c.Plugins.MySQL {
+		if m.Interval.Duration == 0 {
+			m.Interval.Duration = DefaultCheckInterval
+		}
+
+		host := strings.TrimLeft(strings.TrimRight(m.Host, ")"), "@tcp(")
+		if !strings.Contains(host, ":") {
+			host += ":3306"
+		}
+
+		if m.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     m.Name,
+				Type:     CheckTCP,
+				Value:    host,
+				Timeout:  m.Timeout,
+				Interval: m.Interval,
+			})
+		}
 	}
 
 	return svcs

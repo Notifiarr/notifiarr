@@ -2,7 +2,9 @@ package snapshot
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 	"os/user"
 	"sort"
 	"time"
@@ -121,11 +123,11 @@ func (s *Snapshot) GetProcesses(ctx context.Context, count int) (errs []error) {
 	time.Sleep(4 * time.Second) // nolint:gomnd
 
 	for i, p := range procs {
-		if s.Processes[i].CPUPercent, err = p.PercentWithContext(ctx, 0); err != nil {
+		if s.Processes[i].CPUPercent, err = p.PercentWithContext(ctx, 0); err != nil && !errors.Is(err, os.ErrNotExist) {
 			errs = append(errs, fmt.Errorf("pid %d, cpu percent: %w", p.Pid, err))
 		}
 
-		if s.Processes[i].MemPercent, err = p.MemoryPercentWithContext(ctx); err != nil {
+		if s.Processes[i].MemPercent, err = p.MemoryPercentWithContext(ctx); err != nil && !errors.Is(err, os.ErrNotExist) {
 			errs = append(errs, fmt.Errorf("pid %d, mem percent: %w", p.Pid, err))
 		}
 	}

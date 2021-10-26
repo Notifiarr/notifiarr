@@ -7,12 +7,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 /* This files has procedures to structure data from iotop and iostat. */
@@ -94,7 +96,7 @@ func (s *Snapshot) getIOTop(ctx context.Context, useSudo bool, procs int) error 
 		return nil
 	}
 
-	args := []string{"--batch", "--only", "--iter=1", "--quiet", "--quiet", "--kilobytes", "--processes"}
+	args := []string{"--batch", "--only", "--iter=2", "--kilobytes"}
 
 	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "iotop", args...)
 	if err != nil {
@@ -103,14 +105,22 @@ func (s *Snapshot) getIOTop(ctx context.Context, useSudo bool, procs int) error 
 
 	s.IOTop = &IOTopData{}
 
-	go s.scanIOTop(stdout, wg, procs)
+	go s.scanIOTop(stdout, wg)
+
+	defer func() {
+		sort.Sort(s.IOTop.Processes)
+		s.IOTop.Processes.Shrink(procs)
+	}()
 
 	return runCommand(cmd, wg)
 }
 
 // scanIOTop turns the iotop output into structured data using a Scanner.
-func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup, procs int) {
+func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup) {
 	defer wg.Done()
+
+	re := regexp.MustCompile(`[0-9]+\.[0-9]+`)
+	captured := map[string]*IOTopProc{} // used to de-dup by pid.
 
 	for stdout.Scan() {
 		text := stdout.Text()
@@ -120,23 +130,26 @@ func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup, procs in
 			return
 			// it's a bad command wrong OS.
 		case len(fields) < 10, fields[0] == "PID": //nolint:gomnd
-		// PID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN      IO    COMMAND
-		// not enough fields, or header row.
+			// PID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN      IO    COMMAND
+			// not enough fields, or header row.
+			continue
 		case fields[0] == "Total":
 			//	Total DISK READ:         0.00 K/s | Total DISK WRITE:         0.00 K/s
-			s.IOTop.TotalRead, _ = strconv.ParseFloat(fields[3], mnd.Bits64)
-			s.IOTop.TotalWrite, _ = strconv.ParseFloat(fields[9], mnd.Bits64)
-			s.IOTop.TotalRead *= mnd.Kilobyte  // convert to bytes.
-			s.IOTop.TotalWrite *= mnd.Kilobyte // convert to bytes.
-		case fields[0] == "Current":
+			if nums := re.FindAllString(text, 2); len(nums) == 2 { //nolint:gomnd
+				s.IOTop.TotalRead, _ = strconv.ParseFloat(nums[0], mnd.Bits64)
+				s.IOTop.TotalWrite, _ = strconv.ParseFloat(nums[1], mnd.Bits64)
+				s.IOTop.TotalRead *= mnd.Kilobyte  // convert to bytes.
+				s.IOTop.TotalWrite *= mnd.Kilobyte // convert to bytes.
+			}
+		case fields[0] == "Current", fields[0] == "Actual":
 			//	Current DISK READ:       0.00 K/s | Current DISK WRITE:       0.00 K/s
-			s.IOTop.CurrRead, _ = strconv.ParseFloat(fields[3], mnd.Bits64)
-			s.IOTop.CurrWrite, _ = strconv.ParseFloat(fields[9], mnd.Bits64)
-			s.IOTop.CurrRead *= mnd.Kilobyte  // convert to bytes.
-			s.IOTop.CurrWrite *= mnd.Kilobyte // convert to bytes.
-		case len(fields) < 12: //nolint:gomnd
-			// not enough fields to do anything else.
-		default:
+			if nums := re.FindAllString(text, 2); len(nums) == 2 { //nolint:gomnd
+				s.IOTop.CurrRead, _ = strconv.ParseFloat(nums[0], mnd.Bits64)
+				s.IOTop.CurrWrite, _ = strconv.ParseFloat(nums[1], mnd.Bits64)
+				s.IOTop.CurrRead *= mnd.Kilobyte  // convert to bytes.
+				s.IOTop.CurrWrite *= mnd.Kilobyte // convert to bytes.
+			}
+		case len(fields) >= 12: //nolint:gomnd
 			// 780711 be/4 david       0.00 K/s    0.00 K/s  0.00 %  0.00 % pulseaudio --daemonize=no --log-target=journal
 			proc := &IOTopProc{
 				// Pid:   fields[0]
@@ -155,15 +168,18 @@ func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup, procs in
 			proc.IO, _ = strconv.ParseFloat(fields[9], mnd.Bits64)
 			proc.DiskRead *= mnd.Kilobyte
 			proc.DiskWrite *= mnd.Kilobyte
-			s.IOTop.Processes = append(s.IOTop.Processes, proc)
+			captured[fields[0]] = proc
 		}
 	}
-	sort.Sort(s.IOTop.Processes)
-	s.IOTop.Processes.Shrink(procs)
+
+	for _, proc := range captured {
+		s.IOTop.Processes = append(s.IOTop.Processes, proc)
+	}
 }
 
+// getIoStat only works with newer versions of sysstat on linux.
 func (s *Snapshot) getIoStat(ctx context.Context, run bool) error {
-	if !run || mnd.IsDocker || mnd.IsLinux {
+	if !run {
 		return nil
 	}
 
@@ -183,7 +199,12 @@ func (s *Snapshot) getIoStat(ctx context.Context, run bool) error {
 	cmd.Stderr = stderr
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%v: %w: %s", cmd.Args, err, stderr)
+		e := stderr.String()
+		if strings.Contains(e, "illegal option") {
+			return nil
+		}
+
+		return fmt.Errorf("%v: %w: %s", cmd.Args, err, e)
 	}
 
 	var v IoStatData
@@ -193,6 +214,20 @@ func (s *Snapshot) getIoStat(ctx context.Context, run bool) error {
 
 	if len(v.Sysstat.Hosts) > 0 && len(v.Sysstat.Hosts[0].Statistics) > 0 {
 		s.IOStat = &v.Sysstat.Hosts[0].Statistics[0].Disk
+	}
+
+	return nil
+}
+
+// getIoStat2 works on most platforms, but returns unusual data.
+func (s *Snapshot) getIoStat2(ctx context.Context, run bool) (err error) {
+	if !run {
+		return nil
+	}
+
+	s.IOStat2, err = disk.IOCountersWithContext(ctx)
+	if err != nil {
+		return fmt.Errorf("disk IO counters: %w", err)
 	}
 
 	return nil

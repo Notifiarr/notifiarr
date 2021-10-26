@@ -16,6 +16,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"golift.io/cnfg"
@@ -29,6 +30,7 @@ const (
 	minimumTimeout  = 5 * time.Second
 	maximumTimeout  = time.Minute
 	minimumInterval = time.Minute
+	defaultMyLimit  = 10
 )
 
 // Config determines which checks to run, etc.
@@ -47,7 +49,14 @@ type Config struct {
 	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
 	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`                                 // number of processes to include from ioTop
 	PSTop     int           `toml:"pstop" xml:"pstop" json:"psTop"`                                 // number of processes to include from top (cpu usage)
+	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                                 // number of processes to include from mysql servers.
+	*Plugins
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
+}
+
+// Plugins is optional configuration for "plugins".
+type Plugins struct {
+	MySQL []*MySQLConfig `toml:"mysql" xml:"mysql" json:"mysql"`
 }
 
 // Errors this package generates.
@@ -73,15 +82,17 @@ type Snapshot struct {
 		*load.AvgStat
 		CPUTime cpu.TimesStat `json:"cpuTime"`
 	} `json:"system"`
-	Raid       *RaidData             `json:"raid,omitempty"`
-	DriveAges  map[string]int        `json:"driveAges,omitempty"`
-	DriveTemps map[string]int        `json:"driveTemps,omitempty"`
-	DiskUsage  map[string]*Partition `json:"diskUsage,omitempty"`
-	DiskHealth map[string]string     `json:"driveHealth,omitempty"`
-	IOTop      *IOTopData            `json:"ioTop,omitempty"`
-	IOStat     *IoStatDisks          `json:"ioStat,omitempty"`
-	Processes  Processes             `json:"processes,omitempty"`
-	ZFSPool    map[string]*Partition `json:"zfsPools,omitempty"`
+	Raid       *RaidData                      `json:"raid,omitempty"`
+	DriveAges  map[string]int                 `json:"driveAges,omitempty"`
+	DriveTemps map[string]int                 `json:"driveTemps,omitempty"`
+	DiskUsage  map[string]*Partition          `json:"diskUsage,omitempty"`
+	DiskHealth map[string]string              `json:"driveHealth,omitempty"`
+	IOTop      *IOTopData                     `json:"ioTop,omitempty"`
+	IOStat     *IoStatDisks                   `json:"ioStat,omitempty"`
+	IOStat2    map[string]disk.IOCountersStat `json:"ioStat2,omitempty"`
+	Processes  Processes                      `json:"processes,omitempty"`
+	ZFSPool    map[string]*Partition          `json:"zfsPools,omitempty"`
+	MySQL      map[string]MySQLProcesses      `json:"mysql,omitempty"`
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -98,7 +109,7 @@ type Partition struct {
 }
 
 // Validate makes sure the snapshot configuration is valid.
-func (c *Config) Validate() {
+func (c *Config) Validate() { //nolint:cyclop
 	switch {
 	case c.Timeout.Duration == 0:
 		c.Timeout.Duration = DefaultTimeout
@@ -118,8 +129,16 @@ func (c *Config) Validate() {
 		c.UseSudo = false
 	}
 
-	if mnd.IsDocker || mnd.IsLinux {
+	if mnd.IsDocker || !mnd.IsLinux {
 		c.IOTop = 0
+	}
+
+	if c.Plugins != nil {
+		for _, mysql := range c.Plugins.MySQL {
+			if mysql.Timeout.Duration == 0 {
+				mysql.Timeout.Duration = DefaultTimeout
+			}
+		}
 	}
 }
 
@@ -161,12 +180,17 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		debug = append(debug, err...) // these can be noisy, so debug/hide them.
 	}
 
+	if err := s.GetMySQL(ctx, c.Plugins.MySQL, c.MyTop); len(err) != 0 {
+		errs = append(errs, err...)
+	}
+
 	errs = append(errs, s.GetMemoryUsage(ctx, c.CPUMem))
 	errs = append(errs, s.getZFSPoolData(ctx, c.ZFSPools))
 	errs = append(errs, s.getRaidData(ctx, c.UseSudo, c.Raid))
 	errs = append(errs, s.getSystemTemps(ctx, c.CPUTemp))
 	errs = append(errs, s.getIOTop(ctx, c.UseSudo, c.IOTop))
-	errs = append(errs, s.getIoStat(ctx, c.DiskUsage))
+	errs = append(errs, s.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
+	errs = append(errs, s.getIoStat2(ctx, c.DiskUsage))
 
 	return errs, debug
 }

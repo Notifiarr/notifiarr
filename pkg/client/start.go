@@ -153,6 +153,7 @@ func (c *Client) loadSiteConfig(source notifiarr.EventType) {
 	c.Printf("==> %s", ci)
 
 	if ci.Actions.Snapshot != nil {
+		ci.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins // use local data for plugins.
 		c.website.Snap, c.Config.Snapshot = ci.Actions.Snapshot, ci.Actions.Snapshot
 	}
 
@@ -223,6 +224,12 @@ func (c *Client) configureServices(source notifiarr.EventType) {
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo()
 	c.website.Start()
+	/* // debug stuff.
+	snap, err, _ := c.Config.Snapshot.GetSnapshot()
+	b, _ := json.MarshalIndent(snap, "", "   ")
+	c.Print(string(b), err)
+	os.Exit(1)
+	/**/
 	c.Config.Services.Start()
 }
 
