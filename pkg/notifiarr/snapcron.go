@@ -12,6 +12,7 @@ func (c *Config) logSnapshotStartup() {
 		"cputemp": c.Snap.CPUTemp,
 		"iotop":   c.Snap.IOTop > 0,
 		"pstop":   c.Snap.PSTop > 0,
+		"mysql":   c.Snap.Plugins != nil && len(c.Snap.MySQL) > 0,
 		"zfs":     len(c.Snap.ZFSPools) > 0,
 		"sudo":    c.Snap.UseSudo && c.Snap.DriveData,
 	} {

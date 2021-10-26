@@ -18,8 +18,8 @@ type MySQLConfig struct {
 	Host     string        `toml:"host"`
 	User     string        `toml:"user"`
 	Pass     string        `toml:"pass"`
-	Timeout  cnfg.Duration `toml:"timeout"`
-	Interval cnfg.Duration `toml:"interval"` // only used by service checks.
+	Timeout  cnfg.Duration `toml:"timeout"`  // only used by service checks, snapshot timeout is used for mysql.
+	Interval cnfg.Duration `toml:"interval"` // only used by service checks, snapshot interval is used for mysql.
 }
 
 // MySQLProcesses allows us to manipulate our list with methods.

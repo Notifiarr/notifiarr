@@ -258,8 +258,8 @@ timeout = "{{.Timeout}}"
   host     = "{{.Host}}"
 	user     = "{{.User}}"
 	pass     = "{{.Pass}}"
-  interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{end}}
+{{if .Name}}interval = "{{.Interval}}" # Service check duration.
+  timeout  = "{{.Timeout}}" # Service check timeout.{{end}}{{end}}
 {{else}}
 #[[snapshot.mysql]]
 #name = "" # only set a name to enable service checks.
