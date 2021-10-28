@@ -92,7 +92,7 @@ type Snapshot struct {
 	IOStat2    map[string]disk.IOCountersStat `json:"ioStat2,omitempty"`
 	Processes  Processes                      `json:"processes,omitempty"`
 	ZFSPool    map[string]*Partition          `json:"zfsPools,omitempty"`
-	MySQL      map[string]MySQLProcesses      `json:"mysql,omitempty"`
+	MySQL      map[string]*MySQLServerData    `json:"mysql,omitempty"`
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -131,14 +131,6 @@ func (c *Config) Validate() { //nolint:cyclop
 
 	if mnd.IsDocker || !mnd.IsLinux {
 		c.IOTop = 0
-	}
-
-	if c.Plugins != nil {
-		for _, mysql := range c.Plugins.MySQL {
-			if mysql.Timeout.Duration == 0 {
-				mysql.Timeout.Duration = DefaultTimeout
-			}
-		}
 	}
 }
 

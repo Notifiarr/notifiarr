@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
-	// We use mysql driver, this is how it's loaded.
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	_ "github.com/go-sql-driver/mysql" //nolint:gci // We use mysql driver, this is how it's loaded.
 	"golift.io/cnfg"
 )
 
@@ -41,6 +42,14 @@ type NullString struct {
 	sql.NullString
 }
 
+type MySQLStatus map[string]interface{}
+
+type MySQLServerData struct {
+	Name      string         `json:"name"`
+	Processes MySQLProcesses `json:"processes"`
+	GSTatus   MySQLStatus    `json:"globalstatus"`
+}
+
 // MarshalJSON makes the output from sql.NullString not suck.
 func (n NullString) MarshalJSON() ([]byte, error) {
 	if !n.Valid {
@@ -52,34 +61,34 @@ func (n NullString) MarshalJSON() ([]byte, error) {
 
 // GetMySQL grabs the process list from a bunch of servers.
 func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit int) (errs []error) {
-	s.MySQL = make(map[string]MySQLProcesses)
+	s.MySQL = make(map[string]*MySQLServerData)
 
 	for _, server := range servers {
 		if server.Host == "" {
 			continue
 		}
 
-		data, err := getMySQL(ctx, server)
+		procs, status, err := getMySQL(ctx, server)
 		if err != nil {
 			errs = append(errs, err)
 		}
 
-		if server.Name != "" {
-			s.MySQL[server.Name] = data
-		} else {
-			s.MySQL[server.Host] = data
+		s.MySQL[server.Host] = &MySQLServerData{
+			Name:      server.Name,
+			Processes: procs,
+			GSTatus:   status,
 		}
 	}
 
 	for _, v := range s.MySQL {
-		sort.Sort(v)
-		v.Shrink(limit)
+		sort.Sort(v.Processes)
+		v.Processes.Shrink(limit)
 	}
 
 	return errs
 }
 
-func getMySQL(ctx context.Context, s *MySQLConfig) (MySQLProcesses, error) {
+func getMySQL(ctx context.Context, s *MySQLConfig) (MySQLProcesses, MySQLStatus, error) {
 	id := s.Host
 	if s.Name != "" {
 		id = s.Name
@@ -92,16 +101,21 @@ func getMySQL(ctx context.Context, s *MySQLConfig) (MySQLProcesses, error) {
 
 	db, err := sql.Open("mysql", s.User+":"+s.Pass+host+"/")
 	if err != nil {
-		return nil, fmt.Errorf("mysql server %s: connecting: %w", id, err)
+		return nil, nil, fmt.Errorf("mysql server %s: connecting: %w", id, err)
 	}
 	defer db.Close()
 
 	list, err := scanMySQLProcessList(ctx, db)
 	if err != nil {
-		return list, fmt.Errorf("mysql server %s: %w", id, err)
+		return list, nil, fmt.Errorf("mysql server %s: %w", id, err)
 	}
 
-	return list, nil
+	status, err := scanMySQLStatus(ctx, db)
+	if err != nil {
+		return list, nil, fmt.Errorf("mysql server %s: %w", id, err)
+	}
+
+	return list, status, nil
 }
 
 func scanMySQLProcessList(ctx context.Context, db *sql.DB) (MySQLProcesses, error) {
@@ -121,10 +135,60 @@ func scanMySQLProcessList(ctx context.Context, db *sql.DB) (MySQLProcesses, erro
 		// for each row, scan the result into our tag composite object
 		err := rows.Scan(&p.ID, &p.User, &p.Host, &p.DB, &p.Cmd, &p.Time, &p.State, &p.Info)
 		if err != nil {
-			return nil, fmt.Errorf("scanning rows: %w", err)
+			return nil, fmt.Errorf("scanning process rows: %w", err)
 		}
 
 		list = append(list, &p)
+	}
+
+	return list, nil
+}
+
+func scanMySQLStatus(ctx context.Context, db *sql.DB) (MySQLStatus, error) {
+	var (
+		list  = make(MySQLStatus)
+		likes = []string{
+			"Aborted",
+			"Bytes",
+			"Connection",
+			"Created",
+			"Handler",
+			"Innodb",
+			"Key",
+			"Open",
+			"Q",
+			"Slow",
+			"Sort",
+			"Uptime",
+			"Table",
+			"Threads",
+		}
+	)
+
+	for _, name := range likes {
+		rows, err := db.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'")
+		if err != nil {
+			return nil, fmt.Errorf("getting global status: %w", err)
+		} else if err = rows.Err(); err != nil {
+			return nil, fmt.Errorf("getting global status rows: %w", err)
+		}
+
+		for rows.Next() {
+			var vname, value string
+
+			if err := rows.Scan(&vname, &value); err != nil {
+				return nil, fmt.Errorf("scanning global status rows: %w", err)
+			}
+
+			v, err := strconv.ParseFloat(value, mnd.Bits64)
+			if err != nil || v == 0 {
+				continue
+			}
+
+			list[vname] = v
+		}
+
+		rows.Close() //nolint:sqlclosecheck // not defered because we're in a loop.
 	}
 
 	return list, nil
