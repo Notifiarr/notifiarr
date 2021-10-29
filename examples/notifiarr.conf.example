@@ -1,6 +1,6 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.2.1   @ 212610T0855 #
+# Created by Notifiarr v0.2.1   @ 212910T0624 #
 ###############################################
 
 # This API key must be copied from your notifiarr.com account.
@@ -143,7 +143,7 @@ timeout = "1m0s"
 # Enables MySQL process list in snapshot output.
 # Adding a name to a server enables TCP service checks.
 # Example Grant:
-# GRANT SELECT,PROCESS ON *.* to 'notifiarr'@'localhost'
+# GRANT PROCESS ON *.* to 'notifiarr'@'localhost'
 
 #[[snapshot.mysql]]
 #name = "" # only set a name to enable service checks.

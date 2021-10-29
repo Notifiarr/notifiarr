@@ -251,7 +251,7 @@ timeout = "{{.Timeout}}"
 # Enables MySQL process list in snapshot output.
 # Adding a name to a server enables TCP service checks.
 # Example Grant:
-# GRANT SELECT,PROCESS ON *.* to 'notifiarr'@'localhost'
+# GRANT PROCESS ON *.* to 'notifiarr'@'localhost'
 {{if .Snapshot.MySQL}} {{range .Snapshot.MySQL}}
 [[snapshot.mysql]]
   name     = "{{.Name}}"
