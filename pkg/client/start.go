@@ -7,7 +7,6 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -225,7 +224,7 @@ func (c *Client) configureServices(source notifiarr.EventType) {
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo()
 	c.website.Start()
-	/**/ // debug stuff.
+	/* // debug stuff.
 	snap, err, _ := c.Config.Snapshot.GetSnapshot()
 	b, _ := json.MarshalIndent(snap, "", "   ")
 	c.Print(string(b), err)
