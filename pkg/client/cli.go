@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"runtime"
 	"strings"
 	"time"
 
@@ -61,7 +60,7 @@ func printProcessList() error {
 	}
 
 	for _, p := range pslist {
-		if runtime.GOOS == "freebsd" {
+		if mnd.IsFreeBSD {
 			fmt.Printf("[%-5d] %s\n", p.PID, p.CmdLine)
 			continue
 		}

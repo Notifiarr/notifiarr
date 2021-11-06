@@ -109,20 +109,20 @@ func (s *Service) checkHTTP() *result {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.Value, nil)
 	if err != nil {
-		r.output = "creating request: " + removeAPIKey(s.Value, err.Error())
+		r.output = "creating request: " + RemoveSecrets(s.Value, err.Error())
 		return r
 	}
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		r.output = "making request: " + removeAPIKey(s.Value, err.Error())
+		r.output = "making request: " + RemoveSecrets(s.Value, err.Error())
 		return r
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		r.output = "reading body: " + removeAPIKey(s.Value, err.Error())
+		r.output = "reading body: " + RemoveSecrets(s.Value, err.Error())
 		return r
 	}
 
@@ -139,23 +139,25 @@ func (s *Service) checkHTTP() *result {
 	}
 
 	r.state = StateCritical
-	r.output = resp.Status + ": " + strings.TrimSpace(b)
+	r.output = resp.Status + ": " + strings.TrimSpace(RemoveSecrets(s.Value, b))
 
 	return r
 }
 
-func removeAPIKey(appURL, message string) string {
+// RemoveSecrets removes secret token values in a message parsed from a url.
+func RemoveSecrets(appURL, message string) string {
 	u, err := url.Parse(appURL)
 	if err != nil {
 		return message
 	}
 
-	key := u.Query().Get("apikey")
-	if key == "" {
-		return message
+	for _, keyName := range []string{"apikey", "token", "pass", "password", "secret"} {
+		if secret := u.Query().Get(keyName); secret != "" {
+			message = strings.ReplaceAll(message, secret, "********")
+		}
 	}
 
-	return strings.ReplaceAll(message, key, "**********")
+	return message
 }
 
 func (s *Service) checkTCP() *result {

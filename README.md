@@ -260,14 +260,20 @@ tautulli.api_key|`DN_TAUTULLI_API_KEY`|No Default. Provide URL and API key if yo
 
 This application can also take a snapshot of your system at an interval and send
 you a notification. Snapshot means system health like cpu, memory, disk, raid, users, etc.
+Other data available in the snapshot: mysql health, `iotop`, `iostat` and `top` data.
+Some of this may only be available on Linux, but other platforms have similar abilities.
 
 If you monitor drive health you must have smartmontools (`smartctl`) installed.
 If you use smartctl on Linux, you must enable sudo. Add this sudoers entry to
 `/etc/sudoers` and fix the path to `smartctl` if yours differs. If you monitor
 raid and use MegaCli (LSI card), add the appropriate sudoers entry for that too.
 
+To monitor application disk I/O you may install `iotop` and add the sudoers entry
+for it, shown below. This feature is enabled on the website.
+
 ```
 notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
+notifiarr ALL=(root) NOPASSWD:/usr/sbin/iotop *
 notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 ```
 
@@ -283,6 +289,27 @@ notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 #### Snapshot Configuration
 
 Snapshot configuration is now found on the [website](https://notifiarr.com). - 9/14/2021
+
+#### MySQL Snapshots
+
+You may add mysql credentials to your notifiarr configuration to snapshot mysql
+service health. This feature snapshots `SHOW PROCESSLIST` and `SHOW STATUS` data.
+
+Example Grant:
+
+```
+GRANT PROCESS ON *.* to 'notifiarr'@'localhost'
+```
+
+Access to a database is not required. `SELECT` may not be required.
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+snapshot.mysql.name|`DN_SNAPSHOT_MYSQL_NAME`|Setting a name enables service checks of MySQL|
+snapshot.mysql.host|`DN_SNAPSHOT_MYSQL_HOST`|Something like: `localhost:3306`|
+snapshot.mysql.user|`DN_SNAPSHOT_MYSQL_USER`|Username in the GRANT statement|
+snapshot.mysql.pass|`DN_SNAPSHOT_MYSQL_PASS`|Password for the user in the GRANT statement|
+
 
 ### Service Checks
 

@@ -35,6 +35,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printSABnzbd()
 	c.printPlex()
 	c.printTautulli()
+	c.printMySQL()
 	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
 
@@ -278,5 +279,34 @@ func (c *Client) printTautulli() {
 			t.URL, t.Timeout, t.Interval, t.Name)
 	default:
 		c.Printf(" => Tautulli Config (enables name map): 1 server: %s, timeout: %v", t.URL, t.Timeout)
+	}
+}
+
+// printMySQL is called on startup to print info about each configured SQL server.
+func (c *Client) printMySQL() {
+	if c.Config.Snapshot.Plugins == nil { // unlikely.
+		return
+	}
+
+	if len(c.Config.Snapshot.MySQL) == 1 {
+		if m := c.Config.Snapshot.MySQL[0]; m.Name != "" {
+			c.Printf(" => MySQL Config: 1 server: %s, user: %v, timeout:%v, check interval: %v, name: %s",
+				m.Host, m.User, m.Timeout, m.Interval, m.Name)
+		} else {
+			c.Printf(" => MySQL Config: 1 server: %s, user: %v, timeout:%v", m.Host, m.User, m.Timeout)
+		}
+
+		return
+	}
+
+	c.Print(" => MySQL Config:", len(c.Config.Snapshot.MySQL), "servers")
+
+	for i, m := range c.Config.Snapshot.MySQL {
+		if m.Name != "" {
+			c.Printf(" =>    Server %d: %s, user: %v, timeout:%v, check interval: %v, name: %s",
+				i+1, m.Host, m.User, m.Timeout, m.Interval, m.Name)
+		} else {
+			c.Printf(" =>    Server %d: %s, user: %v, timeout:%v", i+1, m.Host, m.User, m.Timeout)
+		}
 	}
 }

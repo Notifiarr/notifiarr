@@ -2,20 +2,45 @@ package snapshot
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 	"os/user"
+	"sort"
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
-// GetCPUSample gets a CPU percentage sample.
+// Processes allows us to sort a process list.
+type Processes []*Process
+
+// Process is a PID's basic info.
+type Process struct {
+	Name       string  `json:"name"`
+	Pid        int32   `json:"pid"`
+	MemPercent float32 `json:"memPercent"`
+	CPUPercent float64 `json:"cpuPercent"`
+}
+
+// GetCPUSample gets a CPU percentage sample, CPU Times and Load Average.
 func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
 	if !run {
 		return nil
+	}
+
+	times, err := cpu.TimesWithContext(ctx, false) // percpu, true/false
+	if err != nil {
+		return fmt.Errorf("unable to get cpu times: %w", err)
+	}
+
+	s.System.AvgStat, err = load.AvgWithContext(ctx)
+	if err != nil {
+		return fmt.Errorf("unable to get load avg: %w", err)
 	}
 
 	cpus, err := cpu.PercentWithContext(ctx, time.Second, false) // percpu, true/false
@@ -23,12 +48,8 @@ func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
 		return fmt.Errorf("unable to get cpu usage: %w", err)
 	}
 
+	s.System.CPUTime = times[0]
 	s.System.CPU = cpus[0]
-
-	s.System.AvgStat, err = load.AvgWithContext(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to get load avg: %w", err)
-	}
 
 	return nil
 }
@@ -72,4 +93,73 @@ func (s *Snapshot) GetLocalData(ctx context.Context, run bool) (errs []error) {
 	}
 
 	return errs
+}
+
+// GetProcesses collects 'count' processes by CPU usage.
+func (s *Snapshot) GetProcesses(ctx context.Context, count int) (errs []error) {
+	if count < 1 {
+		return nil
+	}
+
+	procs, err := process.ProcessesWithContext(ctx)
+	if err != nil {
+		return []error{fmt.Errorf("process list: %w", err)}
+	}
+
+	s.Processes = make(Processes, len(procs))
+
+	for i, p := range procs {
+		s.Processes[i] = &Process{Pid: p.Pid}
+
+		if s.Processes[i].Name, err = p.NameWithContext(ctx); err != nil {
+			errs = append(errs, fmt.Errorf("pid %d, no name: %w", p.Pid, err))
+		}
+
+		// This for loop primes the second run of PercentWithContext.
+		// Then sleep a moment, and gather the cpu samples for all PIDs across that moment.
+		_, _ = p.PercentWithContext(ctx, 0)
+	}
+
+	time.Sleep(4 * time.Second) // nolint:gomnd
+
+	for i, p := range procs {
+		if s.Processes[i].CPUPercent, err = p.PercentWithContext(ctx, 0); err != nil && !errors.Is(err, os.ErrNotExist) {
+			errs = append(errs, fmt.Errorf("pid %d, cpu percent: %w", p.Pid, err))
+		}
+
+		if s.Processes[i].MemPercent, err = p.MemoryPercentWithContext(ctx); err != nil && !errors.Is(err, os.ErrNotExist) {
+			errs = append(errs, fmt.Errorf("pid %d, mem percent: %w", p.Pid, err))
+		}
+	}
+
+	sort.Sort(s.Processes)
+	s.Processes.Shrink(count)
+
+	return errs
+}
+
+// Len allows us to sort Processes.
+func (s Processes) Len() int {
+	return len(s)
+}
+
+// Swap allows us to sort Processes.
+func (s Processes) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+// Less allows us to sort Processes.
+func (s Processes) Less(i, j int) bool {
+	return s[i].CPUPercent > s[j].CPUPercent
+}
+
+// Shrink a process list.
+func (s *Processes) Shrink(size int) {
+	if s == nil {
+		return
+	}
+
+	if len(*s) > size {
+		*s = (*s)[:size]
+	}
 }

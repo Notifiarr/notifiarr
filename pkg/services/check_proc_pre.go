@@ -3,9 +3,10 @@ package services
 import (
 	"fmt"
 	"regexp"
-	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // Custom errors.
@@ -45,7 +46,7 @@ func (s *Service) fillExpect() (err error) {
 		case strings.EqualFold(str, "restart"):
 			s.proc.restarts = true
 
-			if runtime.GOOS == "freebsd" {
+			if mnd.IsFreeBSD {
 				return ErrBSDRestart
 			}
 		case strings.EqualFold(str, "running"):

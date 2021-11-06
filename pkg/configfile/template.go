@@ -232,17 +232,41 @@ timeout = "{{.Timeout}}"
 # Must uncomment [tautulli], 'api_key' and 'url' at a minimum.
 {{if and .Tautulli (not force)}}
 [tautulli]
-  name     = "{{.Tautulli.Name}}" # only set a name if you want to enable service checks.
+  name     = "{{.Tautulli.Name}}" # only set a name to enable service checks.
   url      = "{{.Tautulli.URL}}" # Your Tautulli URL
   api_key  = "{{.Tautulli.APIKey}}" # your plex token; get this from a web inspector
   timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
   interval = "{{.Tautulli.Interval}}" # how often to send service checks
 {{- else}}
 #[tautulli]
-#  name    = "" # only set a name if you want to enable service checks.
+#  name    = "" # only set a name to enable service checks.
 #  url     = "http://localhost:8181" # Your Tautulli URL
 #  api_key = "" # your tautulli api key; get this from settings
 {{- end }}
+
+##################
+# MySQL Snapshot #
+##################
+
+# Enables MySQL process list in snapshot output.
+# Adding a name to a server enables TCP service checks.
+# Example Grant:
+# GRANT PROCESS ON *.* to 'notifiarr'@'localhost'
+{{if .Snapshot.MySQL}} {{range .Snapshot.MySQL}}
+[[snapshot.mysql]]
+  name     = "{{.Name}}"
+  host     = "{{.Host}}"
+	user     = "{{.User}}"
+	pass     = "{{.Pass}}"
+{{if .Name}}interval = "{{.Interval}}" # Service check duration.
+  timeout  = "{{.Timeout}}" # Service check timeout.{{end}}{{end}}
+{{else}}
+#[[snapshot.mysql]]
+#name = "" # only set a name to enable service checks.
+#host = "localhost:3306"
+#user = "notifiarr"
+#pass = "password"
+{{- end}}
 
 ##################
 # Service Checks #

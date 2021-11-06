@@ -82,6 +82,8 @@ github.com/go-ole/go-ole v1.2.4/go.mod h1:XCwSNxSkXRo4vlyPy93sltvi/qJq0jqQhjqQNI
 github.com/go-ole/go-ole v1.2.5/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
 github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=
 github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
+github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
+github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/go-stack/stack v1.8.1 h1:ntEHSVwIt7PNXNpgPmVfMrNhLtgjlmnZha2kOpuRiDw=
 github.com/go-stack/stack v1.8.1/go.mod h1:dcoOX6HbPZSZptuspn9bctJ+N/CnF5gGygcUP3XYfe4=
@@ -120,8 +122,8 @@ github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ
 github.com/google/cabbie v1.0.2 h1:UtB+Nn6fPB43wGg5xs4tgU+P3hTZ6KsulgtaHtqZZfs=
 github.com/google/cabbie v1.0.2/go.mod h1:6MmHaUrgfabehCHAIaxdrbmvHSxUVXj3Abs08FMABSo=
 github.com/google/glazier v0.0.0-20210617205946-bf91b619f5d4/go.mod h1:g7oyIhindbeebnBh0hbFua5rv6XUt/nweDwIWdvxirg=
-github.com/google/glazier v0.0.0-20211007155120-e60a0495f2ea h1:BMyoCnGfkRNgcnoFUI0Qj996HN8kqWIv9eyytljlAyc=
-github.com/google/glazier v0.0.0-20211007155120-e60a0495f2ea/go.mod h1:h2R3DLUecGbLSyi6CcxBs5bdgtJhgK+lIffglvAcGKg=
+github.com/google/glazier v0.0.0-20211020141234-79a2756d295f h1:wgupLmMh1RfLc/M7pQfZf+2hdV9in66rDgl7MGq3a0M=
+github.com/google/glazier v0.0.0-20211020141234-79a2756d295f/go.mod h1:h2R3DLUecGbLSyi6CcxBs5bdgtJhgK+lIffglvAcGKg=
 github.com/google/go-cmp v0.2.0/go.mod h1:oXzfMopK8JAjlY9xF4vHSVASa0yLyX7SntLO5aqRK0M=
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/go-cmp v0.3.1/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=

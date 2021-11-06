@@ -7,6 +7,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"golift.io/cnfg"
 )
 
@@ -38,6 +39,7 @@ type Config struct {
 	LogFile      string            `toml:"log_file" xml:"log_file"`
 	Apps         *apps.Apps        `toml:"-"`
 	Notifiarr    *notifiarr.Config `toml:"-"`
+	Plugins      *snapshot.Plugins `toml:"-"`
 	*logs.Logger `json:"-"`        // log file writer
 	services     map[string]*Service
 	checks       chan *Service

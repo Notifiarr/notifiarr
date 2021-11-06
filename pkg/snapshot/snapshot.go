@@ -11,11 +11,12 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
-	"runtime"
 	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
 	"github.com/shirou/gopsutil/v3/load"
 	"golift.io/cnfg"
@@ -28,7 +29,8 @@ const DefaultTimeout = 30 * time.Second
 const (
 	minimumTimeout  = 5 * time.Second
 	maximumTimeout  = time.Minute
-	minimumInterval = 10 * time.Minute
+	minimumInterval = time.Minute
+	defaultMyLimit  = 10
 )
 
 // Config determines which checks to run, etc.
@@ -45,7 +47,16 @@ type Config struct {
 	Uptime    bool          `toml:"monitor_uptime" xml:"monitor_uptime" json:"monitorUptime"`       // all system stats.
 	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitorCpuMem"` // cpu perct and memory used/free.
 	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
+	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`                                 // number of processes to include from ioTop
+	PSTop     int           `toml:"pstop" xml:"pstop" json:"psTop"`                                 // number of processes to include from top (cpu usage)
+	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                                 // number of processes to include from mysql servers.
+	*Plugins
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
+}
+
+// Plugins is optional configuration for "plugins".
+type Plugins struct {
+	MySQL []*MySQLConfig `toml:"mysql" xml:"mysql" json:"mysql"`
 }
 
 // Errors this package generates.
@@ -69,13 +80,19 @@ type Snapshot struct {
 		Temps    map[string]float64 `json:"temperatures,omitempty"`
 		Users    int                `json:"users"`
 		*load.AvgStat
+		CPUTime cpu.TimesStat `json:"cpuTime"`
 	} `json:"system"`
-	Raid       *RaidData             `json:"raid,omitempty"`
-	DriveAges  map[string]int        `json:"driveAges,omitempty"`
-	DriveTemps map[string]int        `json:"driveTemps,omitempty"`
-	DiskUsage  map[string]*Partition `json:"diskUsage,omitempty"`
-	DiskHealth map[string]string     `json:"driveHealth,omitempty"`
-	ZFSPool    map[string]*Partition `json:"zfsPools,omitempty"`
+	Raid       *RaidData                      `json:"raid,omitempty"`
+	DriveAges  map[string]int                 `json:"driveAges,omitempty"`
+	DriveTemps map[string]int                 `json:"driveTemps,omitempty"`
+	DiskUsage  map[string]*Partition          `json:"diskUsage,omitempty"`
+	DiskHealth map[string]string              `json:"driveHealth,omitempty"`
+	IOTop      *IOTopData                     `json:"ioTop,omitempty"`
+	IOStat     *IoStatDisks                   `json:"ioStat,omitempty"`
+	IOStat2    map[string]disk.IOCountersStat `json:"ioStat2,omitempty"`
+	Processes  Processes                      `json:"processes,omitempty"`
+	ZFSPool    map[string]*Partition          `json:"zfsPools,omitempty"`
+	MySQL      map[string]*MySQLServerData    `json:"mysql,omitempty"`
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -92,7 +109,7 @@ type Partition struct {
 }
 
 // Validate makes sure the snapshot configuration is valid.
-func (c *Config) Validate() {
+func (c *Config) Validate() { //nolint:cyclop
 	switch {
 	case c.Timeout.Duration == 0:
 		c.Timeout.Duration = DefaultTimeout
@@ -108,8 +125,12 @@ func (c *Config) Validate() {
 		c.Interval.Duration = minimumInterval
 	}
 
-	if mnd.IsDocker || runtime.GOOS == mnd.Windows {
+	if mnd.IsDocker || mnd.IsWindows {
 		c.UseSudo = false
+	}
+
+	if mnd.IsDocker || !mnd.IsLinux {
+		c.IOTop = 0
 	}
 }
 
@@ -128,7 +149,8 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 }
 
 func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error) {
-	var errs, debug []error
+	errs := s.GetProcesses(ctx, c.PSTop)
+	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
 
 	if err := s.GetLocalData(ctx, c.Uptime); len(err) != 0 {
 		errs = append(errs, err...)
@@ -144,15 +166,23 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		errs = append(errs, err...)
 	}
 
+	var debug []error
+
 	if err := s.getDriveData(ctx, c.DriveData, c.UseSudo); len(err) != 0 {
 		debug = append(debug, err...) // these can be noisy, so debug/hide them.
 	}
 
-	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
+	if err := s.GetMySQL(ctx, c.Plugins.MySQL, c.MyTop); len(err) != 0 {
+		errs = append(errs, err...)
+	}
+
 	errs = append(errs, s.GetMemoryUsage(ctx, c.CPUMem))
 	errs = append(errs, s.getZFSPoolData(ctx, c.ZFSPools))
 	errs = append(errs, s.getRaidData(ctx, c.UseSudo, c.Raid))
 	errs = append(errs, s.getSystemTemps(ctx, c.CPUTemp))
+	errs = append(errs, s.getIOTop(ctx, c.UseSudo, c.IOTop))
+	errs = append(errs, s.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
+	errs = append(errs, s.getIoStat2(ctx, c.DiskUsage))
 
 	return errs, debug
 }
