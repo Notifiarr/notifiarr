@@ -21,7 +21,7 @@ After install, edit the config and start the service:
 
 ```
 sudo nano /etc/notifiarr/notifiarr.conf
-sudo service systemctl restart notifiarr
+sudo systemctl restart notifiarr
 ```
 
 ### FreeBSD
