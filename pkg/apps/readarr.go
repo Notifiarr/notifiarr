@@ -61,6 +61,8 @@ func (r *ReadarrConfig) setup(timeout time.Duration) {
 		r.StuckItem = true
 	}
 
+	r.URL = strings.TrimRight(r.URL, "/")
+
 	if u, err := r.GetURL(); err != nil {
 		r.Errorf("Checking Readarr Path: %v", err)
 	} else if u = strings.TrimRight(u, "/"); u != r.URL {
