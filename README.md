@@ -159,6 +159,70 @@ Debug-log payload sizes from each app can be controlled individually.
 
 _Note: You may disable the GUI (menu item) on Windows by setting the env variable `USEGUI` to `false`._
 
+### System Snapshot
+
+This application can take a snapshot of your system at an interval and send
+you a notification. Snapshot means system health like cpu, memory, disk, raid, users, etc.
+Other data available in the snapshot: mysql health, `iotop`, `iostat` and `top` data.
+Some of this may only be available on Linux, but other platforms have similar abilities.
+
+If you monitor drive health you must have smartmontools (`smartctl`) installed.
+If you use smartctl on Linux, you must enable sudo. Add the sudoers entry below to
+`/etc/sudoers` and fix the path to `smartctl` if yours differs. If you monitor
+raid and use MegaCli (LSI card), add the appropriate sudoers entry for that too.
+
+To monitor application disk I/O you may install `iotop` and add the sudoers entry
+for it, shown below. This feature is enabled on the website.
+
+#### Snapshot Sudoers
+
+The following sudoers entries are used by various snapshot features. Add them if you use the respective feature.
+You can usually just put the following content into `/etc/sudoers` or `/etc/sudoers.d/00-notifiarr`.
+
+```
+# Allows drive health monitoring on macOS, Linux/Docker and FreeBSD.
+notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
+
+# Allows disk utilization monitoring on Linux (non-Docker).
+notifiarr ALL=(root) NOPASSWD:/usr/sbin/iotop *
+
+# Allows monitoring megaraid volumes on macOS, Linux/Docker and FreeBSD.
+# Rarely needed, and you'll know if you need this.
+notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
+```
+
+#### Snapshot Packages
+
+  - **Windows**:  `smartmontools` - get it here https://sourceforge.net/projects/smartmontools/
+  - **Linux**:    Debian/Ubuntu: `apt install smartmontools`, RedHat/CentOS: `yum install smartmontools`
+  - **Docker**:    It's already in the container. Lucky you! Just run it in `--privileged` mode.
+  - **Synology**: `opkg install smartmontools`, but first get Entware:
+    - Entware (synology):  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
+    - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
+
+#### Snapshot Configuration
+
+There is no client configuration for snapshots (except MySQL, below).
+Snapshot configuration is found on the [website](https://notifiarr.com).
+
+#### MySQL Snapshots
+
+You may add mysql credentials to your notifiarr configuration to snapshot mysql
+service health. This feature snapshots `SHOW PROCESSLIST` and `SHOW STATUS` data.
+
+Access to a database is not required. Example Grant:
+
+```
+GRANT PROCESS ON *.* to 'notifiarr'@'localhost'
+```
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+snapshot.mysql.name|`DN_SNAPSHOT_MYSQL_NAME`|Setting a name enables service checks of MySQL|
+snapshot.mysql.host|`DN_SNAPSHOT_MYSQL_HOST`|Something like: `localhost:3306`|
+snapshot.mysql.user|`DN_SNAPSHOT_MYSQL_USER`|Username in the GRANT statement|
+snapshot.mysql.pass|`DN_SNAPSHOT_MYSQL_PASS`|Password for the user in the GRANT statement|
+
 ### Lidarr
 
 |Config Name|Variable Name|Note|
@@ -256,61 +320,6 @@ tautulli.name|`DN_TAUTULLI_NAME`|No Default. Setting a name enables service chec
 tautulli.url|`DN_TAUTULLI_URL`|No Default. Something like: `http://localhost:8181`|
 tautulli.api_key|`DN_TAUTULLI_API_KEY`|No Default. Provide URL and API key if you want name maps from Tautulli|
 
-### System Snapshot
-
-This application can also take a snapshot of your system at an interval and send
-you a notification. Snapshot means system health like cpu, memory, disk, raid, users, etc.
-Other data available in the snapshot: mysql health, `iotop`, `iostat` and `top` data.
-Some of this may only be available on Linux, but other platforms have similar abilities.
-
-If you monitor drive health you must have smartmontools (`smartctl`) installed.
-If you use smartctl on Linux, you must enable sudo. Add this sudoers entry to
-`/etc/sudoers` and fix the path to `smartctl` if yours differs. If you monitor
-raid and use MegaCli (LSI card), add the appropriate sudoers entry for that too.
-
-To monitor application disk I/O you may install `iotop` and add the sudoers entry
-for it, shown below. This feature is enabled on the website.
-
-```
-notifiarr ALL=(root) NOPASSWD:/usr/sbin/smartctl *
-notifiarr ALL=(root) NOPASSWD:/usr/sbin/iotop *
-notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
-```
-
-#### Snapshot Packages
-
-  - **Windows**:  `smartmontools` - get it here https://sourceforge.net/projects/smartmontools/
-  - **Linux**:    Debian/Ubuntu: `apt install smartmontools`, RedHat/CentOS: `yum install smartmontools`
-  - **Docker**:    It's already in the container. Lucky you! Just run it in `--privileged` mode.
-  - **Synology**: `opkg install smartmontools`, but first get Entware:
-    - Entware (synology):  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-    - Entware Package List:  https://github.com/Entware/Entware-ng/wiki/Install-on-Synology-NAS
-
-#### Snapshot Configuration
-
-Snapshot configuration is now found on the [website](https://notifiarr.com). - 9/14/2021
-
-#### MySQL Snapshots
-
-You may add mysql credentials to your notifiarr configuration to snapshot mysql
-service health. This feature snapshots `SHOW PROCESSLIST` and `SHOW STATUS` data.
-
-Example Grant:
-
-```
-GRANT PROCESS ON *.* to 'notifiarr'@'localhost'
-```
-
-Access to a database is not required. `SELECT` may not be required.
-
-|Config Name|Variable Name|Note|
-|---|---|---|
-snapshot.mysql.name|`DN_SNAPSHOT_MYSQL_NAME`|Setting a name enables service checks of MySQL|
-snapshot.mysql.host|`DN_SNAPSHOT_MYSQL_HOST`|Something like: `localhost:3306`|
-snapshot.mysql.user|`DN_SNAPSHOT_MYSQL_USER`|Username in the GRANT statement|
-snapshot.mysql.pass|`DN_SNAPSHOT_MYSQL_PASS`|Password for the user in the GRANT statement|
-
-
 ### Service Checks
 
 The Notifiarr client can also check URLs for health. If you set names on your
@@ -404,4 +413,4 @@ Yes, please.
 
 ## License
 
-[MIT](https://github.com/Notifiarr/notifiarr/blob/main/LICENSE) - Copyright (c) 2020-2021 Go Lift
+[MIT](https://github.com/Notifiarr/notifiarr/blob/main/LICENSE) - Copyright (c) 2020-2022 Go Lift

@@ -14,7 +14,7 @@ system snapshot and Plex session data to Notifiarr for Discord notifications.
 OPTIONS
 ---
 
-`notifiarr [-c <file>] [-w <file>] [--snaps] [--ps] [--cfsync] [--curl <url>] [-h] [-v]`
+`notifiarr [-c <file>] [-w <file>] [--ps] [--curl <url> [--header <header>]] [-h] [-v]`
 
     -c, --config <config file>
         Provide a configuration file (instead of the default).
@@ -24,17 +24,9 @@ OPTIONS
         The default environment variable configuration prefix is `DN`.
         Use this tunable to change it.
 
-    --snaps
-        This flag makes the application output a system snapshot and exit.
-        Useful for debugging and testing.
-
     --ps
         This flags makes the application output the system process list and exit.
         Useful for debugging and testing 'process' service checks.
-
-    --cfsync
-        This flag makes the application send a Custom Format request to
-        Notifiarr.com. Then it exits.
 
     -w, --write <file>
         This flag allows you to read in a config file and re-write it to another file.
