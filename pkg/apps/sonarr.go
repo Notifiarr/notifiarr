@@ -36,7 +36,8 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/tag/{tid:[0-9]+}/{label}", sonarrUpdateTag, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/tag/{label}", sonarrSetTag, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/update", sonarrUpdateSeries, "PUT")
-	a.HandleAPIpath(starr.Sonarr, "/command/{command:[a-z]+}/{seriesid:[0-9]+}", sonarrTriggerCommand, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/command/{commandid:[0-9]+}", sonarrStatusCommand, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/command", sonarrTriggerCommand, "POST")
 }
 
 // SonarrConfig represents the input data for a Sonarr server.
@@ -161,19 +162,33 @@ func sonarrUnmonitorEpisode(r *http.Request) (int, interface{}) {
 }
 
 func sonarrTriggerCommand(r *http.Request) (int, interface{}) {
-	command := "Series" + strings.Title(mux.Vars(r)["seriesid"])
-	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], mnd.Base10, mnd.Bits64)
+	var command sonarr.CommandRequest
 
-	output, err := getSonarr(r).SendCommand(&sonarr.CommandRequest{
-		Name:     command,
-		SeriesID: seriesID,
-	})
+	// Extract payload and check for TMDB ID.
+	err := json.NewDecoder(r.Body).Decode(&command)
 	if err != nil {
-		return http.StatusServiceUnavailable,
-			fmt.Errorf("triggering command '%s' on series %d: %w", command, seriesID, err)
+		return http.StatusBadRequest, fmt.Errorf("decoding command payload: %w", err)
 	}
 
-	return http.StatusOK, output.Status
+	output, err := getSonarr(r).SendCommand(&command)
+	if err != nil {
+		return http.StatusServiceUnavailable,
+			fmt.Errorf("triggering command '%s' on series %d: %w", command.Name, command.SeriesID, err)
+	}
+
+	return http.StatusOK, output
+}
+
+func sonarrStatusCommand(r *http.Request) (int, interface{}) {
+	commandID, _ := strconv.ParseInt(mux.Vars(r)["commandid"], mnd.Base10, mnd.Bits64)
+
+	output, err := getSonarr(r).GetCommandStatus(commandID)
+	if err != nil {
+		return http.StatusServiceUnavailable,
+			fmt.Errorf("getting command status for ID %d: %w", commandID, err)
+	}
+
+	return http.StatusOK, output
 }
 
 func sonarrLangProfiles(r *http.Request) (int, interface{}) {
