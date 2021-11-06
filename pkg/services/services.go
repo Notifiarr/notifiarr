@@ -25,9 +25,6 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 	}
 
 	services = append(services, c.collectApps()...)
-	if len(services) == 0 {
-		c.Disabled = true
-	}
 
 	return c.setup(services)
 }

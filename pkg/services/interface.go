@@ -63,8 +63,8 @@ func (c *Config) SendResults(results *Results) {
 
 	resp, err := c.Notifiarr.SendData(notifiarr.SvcRoute.Path(results.What), results, true)
 	if err != nil {
-		c.Errorf("Sending service check update to Notifiarr, event: %s, buffer: %d/%d, error: %v",
-			results.What, len(c.checks), cap(c.checks), err)
+		c.Errorf("Sending %d service updates to Notifiarr, event: %s, buffer: %d/%d, error: %v",
+			len(results.Svcs), results.What, len(c.checks), cap(c.checks), err)
 		return
 	}
 
