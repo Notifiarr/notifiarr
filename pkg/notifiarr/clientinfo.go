@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -226,6 +227,10 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 		(hostInfo.VirtualizationSystem == "docker" || mnd.IsDocker) {
 		hostInfo.Platform = "Docker " + hostInfo.KernelVersion
 		hostInfo.PlatformFamily = "Docker"
+	}
+
+	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > 17 {
+		hostInfo.Hostname = hostInfo.Hostname[:len(hostInfo.Hostname)-17]
 	}
 
 	c.extras.hostInfo = hostInfo
