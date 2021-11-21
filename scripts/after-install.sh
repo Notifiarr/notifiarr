@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This file is used by deb, rpm and BSD packages.
+# This file is used by aur, deb, rpm and BSD packages.
 # FPM adds this as the after-install script.
 # Edit this file as needed for your application.
 # This file is only installed if FORMULA is set to service.

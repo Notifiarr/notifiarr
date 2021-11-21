@@ -30,8 +30,8 @@ SOURCE_URL="https://github.com/${REPO}"
 # Name the Version-containing library the same as the github repo, without dashes.
 VERSION_PATH="golift.io/version"
 
-# Used by homebrew downloads.
-SOURCE_PATH=https://codeload.github.com/${REPO}/tar.gz/v${VERSION}
+# Used by homebrew and arch linux downloads.
+SOURCE_PATH=https://codeload.github.com/${REPO}/tar.gz/refs/tags/v${VERSION}
 
 export BINARY HBREPO MAINT VENDOR DESC GOLANGCI_LINT_ARGS CONFIG_FILE
 export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH

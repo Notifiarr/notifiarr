@@ -14,6 +14,11 @@ RSRC_BIN=github.com/akavel/rsrc
 # If upx is available, use it to compress the binaries.
 UPXPATH=$(shell which upx)
 
+# Skip upx in Mac ARM environments: https://github.com/upx/upx/issues/446
+ifeq ($(shell uname -ps),Darwin arm)
+  UPXPATH=
+endif
+
 # Travis CI passes the version in. Local builds get it from the current git tag.
 ifeq ($(VERSION),)
 	include .metadata.make
@@ -91,7 +96,8 @@ clean:
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
-	rm -rf package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
+	rm -f $(BINARY).aur.install PKGBUILD
+	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
 
 ####################
 ##### Sidecars #####
@@ -198,6 +204,22 @@ $(MACAPP).app: macos
 	[ -z "$(MACAPP)" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 
+aur: PKGBUILD $(BINARY).aur.install
+	mkdir -p $@
+	mv PKGBUILD $(BINARY).aur.install $@/
+
+PKGBUILD: v$(VERSION).tar.gz.sha256
+	@echo "Creating 'aur' PKGBUILD file for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
+	sed -e "s/{{VERSION}}/$(VERSION)/g" \
+		-e "s/{{Iter}}/$(ITERATION)/g" \
+		-e "s/{{SHA256}}/$(shell head -c64 $<)/g" \
+		-e "s/{{Desc}}/$(DESC)/g" \
+		-e "s%{{BINARY}}%$(BINARY)%g" \
+		-e "s%{{SOURCE_URL}}%$(SOURCE_URL)%g" \
+		-e "s%{{SOURCE_PATH}}%$(SOURCE_PATH)%g" \
+		-e "s%{{CONFIG_FILE}}%$(CONFIG_FILE)%g" \
+		init/archlinux/PKGBUILD.template | tee PKGBUILD
+
 rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux check_fpm
 	@echo "Building 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
@@ -262,7 +284,7 @@ $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
 	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
 
 # Build an environment that can be packaged for linux.
-package_build_linux: readme man plugins_linux_amd64 after-install-rendered.sh before-remove-rendered.sh linux
+package_build_linux: readme man plugins_linux_amd64 after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY)
 	# Copying the binary, config file, unit file, and man page into the env.
@@ -274,15 +296,32 @@ package_build_linux: readme man plugins_linux_amd64 after-install-rendered.sh be
 	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/$(CONFIG_FILE)
 	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/$(BINARY)/
 	[ "$(FORMULA)" != "service" ] || mkdir -p $@/lib/systemd/system
+	[ "$(FORMULA)" != "service" ] || mv $(BINARY).service $@/lib/systemd/system/
+
+$(BINARY).service:
 	[ "$(FORMULA)" != "service" ] || \
 		sed -e "s/{{BINARY}}/$(BINARY)/g" -e "s/{{DESC}}/$(DESC)/g" \
-		init/systemd/template.unit.service > $@/lib/systemd/system/$(BINARY).service
+		init/systemd/template.unit.service > $(BINARY).service
 
 after-install-rendered.sh:
 	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/after-install.sh > after-install-rendered.sh
 
 before-remove-rendered.sh:
 	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/before-remove.sh > before-remove-rendered.sh
+
+# This is used for arch linux
+$(BINARY).aur.install:
+	echo "post_install() {" > $@
+	sed -e "s/^/ /g" -e "s/{{BINARY}}/$(BINARY)/g" scripts/after-install.sh >> $@
+	echo "}" >> $@
+	echo "" >> $@
+	echo "post_upgrade() {" >> $@
+	echo '  post_install $$1' >> $@
+	echo "}" >> $@
+	echo "" >> $@
+	echo "pre_remove() {" >> $@
+	sed -e "s/^/ /g" -e "s/{{BINARY}}/$(BINARY)/g" scripts/before-remove.sh >> $@
+	echo "}" >> $@
 
 package_build_linux_386: package_build_linux linux386
 	mkdir -p $@

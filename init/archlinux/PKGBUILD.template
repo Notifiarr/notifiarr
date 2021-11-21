@@ -1,0 +1,39 @@
+pkgname={{BINARY}}
+pkgver={{VERSION}}
+pkgrel={{Iter}}
+pkgdesc='{{Desc}}'
+arch=('x86_64', 'arm', 'armv6h', 'armv7h', 'aarch64', 'i686', 'pentium4')
+url='{{SOURCE_URL}}'
+license=('MIT')
+makedepends=('go', 'upx', 'make')
+source=('{{SOURCE_PATH}}')
+sha256sums=('{{SHA256}}')
+configfile='{{CONFIG_FILE}}'
+install="${pkgname}.aur.install"
+
+build() {
+  cd "$pkgname-$pkgver"
+  make man
+  export EXTRA_LDFLAGS=-linkmode=external
+  export VERSION="${pkgver}"
+  export ITERATION="${pkgrel}"
+  make linux
+  make "${pkgname}.service"
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  make test
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 "${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+  install -Dm644 "${pkgname}.1.gz" "${pkgdir}/share/man/man1/${pkgname}.1.gz"
+  install -Dm644 "examples/${configfile}.example" "${pkgdir}/etc/$pkgname/${configfile}.example"
+  [ -f "$pkgdir/etc/$pkgname/$configfile" ] || \
+    install -Dm644 "examples/${configfile}.example" "${pkgdir}/etc/${pkgname}/${configfile}"
+  install -Dm644 *.html examples/* "$pkgdir"/share/doc/$pkgname/
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 "${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
+}
