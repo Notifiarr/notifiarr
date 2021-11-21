@@ -21,7 +21,7 @@ BUILDS="linux:armhf:arm linux:arm64:arm64 linux:amd64:amd64 linux:i386:386"
 
 export VENDOR VVERSION VERSION ITERATION DATE BRANCH COMMIT BUILDS
 
-export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+[ "$GOFLAGS" != "" ] || export GOFLAGS="-trimpath -mod=readonly -modcacherw"
 export CGO_CPPFLAGS="${CPPFLAGS}"
 export CGO_CFLAGS="${CFLAGS}"
 export CGO_CXXFLAGS="${CXXFLAGS}"

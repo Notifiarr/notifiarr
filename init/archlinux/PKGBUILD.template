@@ -17,6 +17,7 @@ build() {
   export EXTRA_LDFLAGS=-linkmode=external
   export VERSION="${pkgver}"
   export ITERATION="${pkgrel}"
+  export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
   make linux
   make "${pkgname}.service"
 }
