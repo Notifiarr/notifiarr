@@ -77,7 +77,7 @@ func (a *Apps) setupQbit(timeout time.Duration) error {
 }
 
 func (q *QbitConfig) setup(timeout time.Duration) (err error) {
-	q.Qbit, err = qbit.New(q.Config)
+	q.Qbit, err = qbit.NewNoAuth(q.Config)
 	if err != nil {
 		return fmt.Errorf("qbit setup failed: %w", err)
 	}
