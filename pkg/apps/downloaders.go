@@ -49,7 +49,7 @@ func (a *Apps) setupDeluge(timeout time.Duration) error {
 }
 
 func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
-	d.Deluge, err = deluge.New(*d.Config)
+	d.Deluge, err = deluge.NewNoAuth(d.Config)
 	if err != nil {
 		return fmt.Errorf("deluge setup failed: %w", err)
 	}
@@ -77,7 +77,7 @@ func (a *Apps) setupQbit(timeout time.Duration) error {
 }
 
 func (q *QbitConfig) setup(timeout time.Duration) (err error) {
-	q.Qbit, err = qbit.New(q.Config)
+	q.Qbit, err = qbit.NewNoAuth(q.Config)
 	if err != nil {
 		return fmt.Errorf("qbit setup failed: %w", err)
 	}
