@@ -62,13 +62,20 @@ after_success:
   # This is an ssh key added to your homebrew forumla repo.
   - |
     mkdir -p $HOME/.ssh
-    declare -r SSH_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
-    echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> $HOME/.ssh/config
-    [ ! -f github_deploy_key ] || (mv github_deploy_key $SSH_FILE \
-      && chmod 600 "$SSH_FILE" \
+    declare -r HB_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
+    [ ! -f github_deploy_key ] || (mv github_deploy_key "${HB_FILE}" \
+      && chmod 600 "$HB_FILE" \
       && printf "%s\n" \
         "Host github.com" \
-        "  IdentityFile $SSH_FILE" \
+        "  IdentityFile ${HB_FILE}" \
+        "  StrictHostKeyChecking no" \
+        "  LogLevel ERROR" >> $HOME/.ssh/config)
+    declare -r AU_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
+    [ ! -f aur_deploy_key ] || (mv aur_deploy_key "${AU_FILE}" \
+      && chmod 600 "${AU_FILE}" \
+      && printf "%s\n" \
+        "Host github.com-aurepo" \
+        "  IdentityFile ${AU_FILE}" \
         "  StrictHostKeyChecking no" \
         "  LogLevel ERROR" >> $HOME/.ssh/config)
 deploy:
@@ -143,3 +150,9 @@ deploy:
     on:
       tags: true
       condition: "$TRAVIS_OS_NAME = osx"
+  # Upload aur PKGBUILD file to a special repo.
+  - provider: script
+    script: bash scripts/aur-deploy.sh
+    on:
+      tags: true
+      condition: "$TRAVIS_OS_NAME = linux"

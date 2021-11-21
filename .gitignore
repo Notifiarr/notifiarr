@@ -35,6 +35,7 @@ README.html
 /homebrew-mugs
 .secret*files.tar
 github_deploy_key*
+aur_deploy_key*
 .metadata.make
 /after-install-rendered.sh
 /before-remove-rendered.sh
