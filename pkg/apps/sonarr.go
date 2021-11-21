@@ -51,6 +51,20 @@ type SonarrConfig struct {
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
 }
 
+func (a *Apps) setupSonarr(timeout time.Duration) error {
+	for i := range a.Sonarr {
+		if a.Sonarr[i].Config == nil || a.Sonarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Sonarr config %d", ErrInvalidApp, i+1)
+		}
+
+		a.Sonarr[i].Debugf = a.DebugLog.Printf
+		a.Sonarr[i].Errorf = a.ErrorLog.Printf
+		a.Sonarr[i].setup(timeout)
+	}
+
+	return nil
+}
+
 func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.Sonarr = sonarr.New(r.Config)
 	if r.Timeout.Duration == 0 {

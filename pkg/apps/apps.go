@@ -57,6 +57,7 @@ var (
 	ErrNonZeroID = fmt.Errorf("provided ID must be non-zero")
 	// ErrWrongCount is returned when an app returns the wrong item count.
 	ErrWrongCount = fmt.Errorf("wrong item count returned")
+	ErrInvalidApp = fmt.Errorf("invalid application configuration provided")
 )
 
 // APIHandler is our custom handler function for APIs.
@@ -167,46 +168,32 @@ func (a *Apps) Setup(timeout time.Duration) error {
 		a.ErrorLog = log.New(io.Discard, "", 0)
 	}
 
-	for i := range a.Radarr {
-		a.Radarr[i].Debugf = a.DebugLog.Printf
-		a.Radarr[i].Errorf = a.ErrorLog.Printf
-		a.Radarr[i].setup(timeout)
+	if err := a.setupLidarr(timeout); err != nil {
+		return err
 	}
 
-	for i := range a.Readarr {
-		a.Readarr[i].Debugf = a.DebugLog.Printf
-		a.Readarr[i].Errorf = a.ErrorLog.Printf
-		a.Readarr[i].setup(timeout)
+	if err := a.setupRadarr(timeout); err != nil {
+		return err
 	}
 
-	for i := range a.Sonarr {
-		a.Sonarr[i].Debugf = a.DebugLog.Printf
-		a.Sonarr[i].Errorf = a.ErrorLog.Printf
-		a.Sonarr[i].setup(timeout)
+	if err := a.setupReadarr(timeout); err != nil {
+		return err
 	}
 
-	for i := range a.Lidarr {
-		a.Lidarr[i].Debugf = a.DebugLog.Printf
-		a.Lidarr[i].Errorf = a.ErrorLog.Printf
-		a.Lidarr[i].setup(timeout)
+	if err := a.setupSonarr(timeout); err != nil {
+		return err
+	}
+
+	if err := a.setupDeluge(timeout); err != nil {
+		return err
+	}
+
+	if err := a.setupQbit(timeout); err != nil {
+		return err
 	}
 
 	for i := range a.SabNZB {
 		a.SabNZB[i].setup(timeout)
-	}
-
-	for i := range a.Deluge {
-		// a.Deluge[i].Debugf = a.DebugLog.Printf
-		if err := a.Deluge[i].setup(timeout); err != nil {
-			return err
-		}
-	}
-
-	for i := range a.Qbit {
-		// a.Qbit[i].Debugf = a.DebugLog.Printf
-		if err := a.Qbit[i].setup(timeout); err != nil {
-			return err
-		}
 	}
 
 	a.Tautulli.setup(timeout)

@@ -47,6 +47,20 @@ type ReadarrConfig struct {
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
 }
 
+func (a *Apps) setupReadarr(timeout time.Duration) error {
+	for i := range a.Readarr {
+		if a.Readarr[i].Config == nil || a.Readarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, i+1)
+		}
+
+		a.Readarr[i].Debugf = a.DebugLog.Printf
+		a.Readarr[i].Errorf = a.ErrorLog.Printf
+		a.Readarr[i].setup(timeout)
+	}
+
+	return nil
+}
+
 func (r *ReadarrConfig) setup(timeout time.Duration) {
 	r.Readarr = readarr.New(r.Config)
 	if r.Timeout.Duration == 0 {

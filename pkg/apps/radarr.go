@@ -54,6 +54,20 @@ type RadarrConfig struct {
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
 }
 
+func (a *Apps) setupRadarr(timeout time.Duration) error {
+	for i := range a.Radarr {
+		if a.Radarr[i].Config == nil || a.Radarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Radarr config %d", ErrInvalidApp, i+1)
+		}
+
+		a.Radarr[i].Debugf = a.DebugLog.Printf
+		a.Radarr[i].Errorf = a.ErrorLog.Printf
+		a.Radarr[i].setup(timeout)
+	}
+
+	return nil
+}
+
 func (r *RadarrConfig) setup(timeout time.Duration) {
 	r.Radarr = radarr.New(r.Config)
 	if r.Timeout.Duration == 0 {

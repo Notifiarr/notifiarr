@@ -33,6 +33,21 @@ type TautulliConfig struct {
 	APIKey   string        `toml:"api_key"`
 }
 
+func (a *Apps) setupDeluge(timeout time.Duration) error {
+	for i := range a.Deluge {
+		if a.Deluge[i] == nil || a.Deluge[i].Config == nil || a.Deluge[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, i+1)
+		}
+
+		// a.Deluge[i].Debugf = a.DebugLog.Printf
+		if err := a.Deluge[i].setup(timeout); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
 	d.Deluge, err = deluge.New(*d.Config)
 	if err != nil {
@@ -41,6 +56,21 @@ func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
 
 	if d.Timeout.Duration == 0 {
 		d.Timeout.Duration = timeout
+	}
+
+	return nil
+}
+
+func (a *Apps) setupQbit(timeout time.Duration) error {
+	for i := range a.Qbit {
+		if a.Qbit[i].Config == nil || a.Qbit[i].URL == "" {
+			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, i+1)
+		}
+
+		// a.Qbit[i].Debugf = a.DebugLog.Printf
+		if err := a.Qbit[i].setup(timeout); err != nil {
+			return err
+		}
 	}
 
 	return nil
