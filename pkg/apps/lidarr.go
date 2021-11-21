@@ -52,6 +52,20 @@ type LidarrConfig struct {
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
 }
 
+func (a *Apps) setupLidarr(timeout time.Duration) error {
+	for i := range a.Lidarr {
+		if a.Lidarr[i].Config == nil || a.Lidarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, i+1)
+		}
+
+		a.Lidarr[i].Debugf = a.DebugLog.Printf
+		a.Lidarr[i].Errorf = a.ErrorLog.Printf
+		a.Lidarr[i].setup(timeout)
+	}
+
+	return nil
+}
+
 func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.Lidarr = lidarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
