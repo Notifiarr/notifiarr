@@ -57,6 +57,7 @@ var (
 	ErrNonZeroID = fmt.Errorf("provided ID must be non-zero")
 	// ErrWrongCount is returned when an app returns the wrong item count.
 	ErrWrongCount = fmt.Errorf("wrong item count returned")
+	ErrInvalidApp = fmt.Errorf("invalid application configuration provided")
 )
 
 // APIHandler is our custom handler function for APIs.
@@ -158,7 +159,7 @@ func (a *Apps) InitHandlers() {
 
 // Setup creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
-func (a *Apps) Setup(timeout time.Duration) error {
+func (a *Apps) Setup(timeout time.Duration) error { //nolint:funlen,gocognit
 	if a.DebugLog == nil {
 		a.DebugLog = log.New(io.Discard, "", 0)
 	}
@@ -167,28 +168,44 @@ func (a *Apps) Setup(timeout time.Duration) error {
 		a.ErrorLog = log.New(io.Discard, "", 0)
 	}
 
+	for i := range a.Lidarr {
+		if a.Lidarr[i].Config == nil || a.Lidarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, i+1)
+		}
+
+		a.Lidarr[i].Debugf = a.DebugLog.Printf
+		a.Lidarr[i].Errorf = a.ErrorLog.Printf
+		a.Lidarr[i].setup(timeout)
+	}
+
 	for i := range a.Radarr {
+		if a.Radarr[i].Config == nil || a.Radarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Radarr config %d", ErrInvalidApp, i+1)
+		}
+
 		a.Radarr[i].Debugf = a.DebugLog.Printf
 		a.Radarr[i].Errorf = a.ErrorLog.Printf
 		a.Radarr[i].setup(timeout)
 	}
 
 	for i := range a.Readarr {
+		if a.Readarr[i].Config == nil || a.Readarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, i+1)
+		}
+
 		a.Readarr[i].Debugf = a.DebugLog.Printf
 		a.Readarr[i].Errorf = a.ErrorLog.Printf
 		a.Readarr[i].setup(timeout)
 	}
 
 	for i := range a.Sonarr {
+		if a.Sonarr[i].Config == nil || a.Sonarr[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Sonarr config %d", ErrInvalidApp, i+1)
+		}
+
 		a.Sonarr[i].Debugf = a.DebugLog.Printf
 		a.Sonarr[i].Errorf = a.ErrorLog.Printf
 		a.Sonarr[i].setup(timeout)
-	}
-
-	for i := range a.Lidarr {
-		a.Lidarr[i].Debugf = a.DebugLog.Printf
-		a.Lidarr[i].Errorf = a.ErrorLog.Printf
-		a.Lidarr[i].setup(timeout)
 	}
 
 	for i := range a.SabNZB {
@@ -196,6 +213,10 @@ func (a *Apps) Setup(timeout time.Duration) error {
 	}
 
 	for i := range a.Deluge {
+		if a.Deluge[i] == nil || a.Deluge[i].Config == nil || a.Deluge[i].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, i+1)
+		}
+
 		// a.Deluge[i].Debugf = a.DebugLog.Printf
 		if err := a.Deluge[i].setup(timeout); err != nil {
 			return err
@@ -203,6 +224,10 @@ func (a *Apps) Setup(timeout time.Duration) error {
 	}
 
 	for i := range a.Qbit {
+		if a.Qbit[i].Config == nil || a.Qbit[i].URL == "" {
+			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, i+1)
+		}
+
 		// a.Qbit[i].Debugf = a.DebugLog.Printf
 		if err := a.Qbit[i].setup(timeout); err != nil {
 			return err
