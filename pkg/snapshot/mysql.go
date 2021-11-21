@@ -3,6 +3,7 @@ package snapshot
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strconv"
@@ -47,7 +48,7 @@ type MySQLStatus map[string]interface{}
 type MySQLServerData struct {
 	Name      string         `json:"name"`
 	Processes MySQLProcesses `json:"processes"`
-	GSTatus   MySQLStatus    `json:"globalstatus"`
+	GStatus   MySQLStatus    `json:"globalstatus"`
 }
 
 // MarshalJSON makes the output from sql.NullString not suck.
@@ -56,7 +57,7 @@ func (n NullString) MarshalJSON() ([]byte, error) {
 		return []byte(`"NULL"`), nil
 	}
 
-	return []byte(`"` + n.String + `"`), nil
+	return json.Marshal(strings.TrimSpace(n.String)) //nolint:wrapcheck
 }
 
 // GetMySQL grabs the process list from a bunch of servers.
@@ -76,7 +77,7 @@ func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit i
 		s.MySQL[server.Host] = &MySQLServerData{
 			Name:      server.Name,
 			Processes: procs,
-			GSTatus:   status,
+			GStatus:   status,
 		}
 	}
 
@@ -119,7 +120,7 @@ func getMySQL(ctx context.Context, s *MySQLConfig) (MySQLProcesses, MySQLStatus,
 }
 
 func scanMySQLProcessList(ctx context.Context, db *sql.DB) (MySQLProcesses, error) {
-	rows, err := db.QueryContext(ctx, "SHOW PROCESSLIST")
+	rows, err := db.QueryContext(ctx, "SHOW FULL PROCESSLIST")
 	if err != nil {
 		return nil, fmt.Errorf("getting processes: %w", err)
 	} else if err = rows.Err(); err != nil {
@@ -136,6 +137,10 @@ func scanMySQLProcessList(ctx context.Context, db *sql.DB) (MySQLProcesses, erro
 		err := rows.Scan(&p.ID, &p.User, &p.Host, &p.DB, &p.Cmd, &p.Time, &p.State, &p.Info)
 		if err != nil {
 			return nil, fmt.Errorf("scanning process rows: %w", err)
+		}
+
+		if p.Info.Valid {
+			p.Info.String = strings.Join(strings.Fields(p.Info.String), " ")
 		}
 
 		list = append(list, &p)

@@ -8,7 +8,7 @@ require (
 	golift.io/deluge v0.9.2
 	golift.io/qbit v0.0.0-20210717220751-d545c7a8f721
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.11.11
+	golift.io/starr v0.11.12
 	golift.io/version v0.0.2
 )
 
@@ -26,7 +26,7 @@ require (
 	github.com/getlantern/systray v1.1.0
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
-	github.com/godbus/dbus/v5 v5.0.5 // indirect
+	github.com/godbus/dbus/v5 v5.0.6 // indirect
 	github.com/gonutz/w32 v1.0.0
 	github.com/iamacarpet/go-win64api v0.0.0-20210719094426-0fa5b6bd91f5
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
@@ -38,7 +38,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/cabbie v1.0.2 // indirect
-	github.com/google/glazier v0.0.0-20211020141234-79a2756d295f // indirect
+	github.com/google/glazier v0.0.0-20211029225403-9f766cca891d // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210825203111-a709d8e111b3 // indirect
 	github.com/gopherjs/gopherwasm v1.1.0 // indirect
 	github.com/gorilla/mux v1.8.0
@@ -53,14 +53,16 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/scjalliance/comshim v0.0.0-20190308082608-cf06d2532c4e // indirect
-	github.com/shirou/gopsutil/v3 v3.21.9
+	github.com/shirou/gopsutil/v3 v3.21.10
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
 	golang.org/x/mod v0.5.0
 	golang.org/x/net v0.0.0-20210825183410-e898025ed96a // indirect
-	golang.org/x/sys v0.0.0-20210831042530-f4d43177bf5e
+	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	howett.net/plist v0.0.0-20201203080718-1454fab16a06 // indirect
 )
+
+require github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
