@@ -187,6 +187,8 @@ func (c *Config) checkPlexFinishedItems(sent map[string]struct{}) {
 
 func (c *Config) checkSessionDone(s *plex.Session, pct float64) string {
 	switch {
+	case s.Duration == 0:
+		return statusIgnoring
 	case s.Player.State != "playing":
 		return statusPaused
 	case c.Plex.MoviesPC > 0 && EventType(s.Type) == EventMovie:
