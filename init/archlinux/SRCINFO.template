@@ -1,0 +1,21 @@
+pkgbase = {{BINARY}}
+	pkgdesc = {{Desc}}
+	pkgver = {{VERSION}}
+	pkgrel = {{Iter}}
+	url = {{SOURCE_URL}}
+	install = {{BINARY}}.aur.install
+	arch = x86_64
+	arch = arm
+	arch = armv6h
+	arch = armv7h
+	arch = aarch64
+	arch = i686
+	arch = pentium4
+	license = MIT
+	makedepends = go
+	makedepends = make
+	backup = etc/{{BINARY}}/{{CONFIG_FILE}}
+	source = {{BINARY}}-{{VERSION}}.tar.gz::{{SOURCE_PATH}}
+	sha256sums = {{SHA256}}
+
+pkgname = {{BINARY}}
