@@ -8,7 +8,7 @@ DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 # Defines docker manifest/build types.
 BUILDS="linux:armhf:arm linux:arm64:arm64 linux:amd64:amd64 linux:i386:386"
 
-if [ -x "$(which git)"]; then
+if [ -x "$(which git)" ] && git status > /dev/null 2>&1; then
   # Dynamic. Recommend not changing.
   VVERSION=$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
   VERSION="$(echo $VVERSION | tr -d v | grep -E '^\S+$' || echo development)"
