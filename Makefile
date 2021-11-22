@@ -208,9 +208,10 @@ $(MACAPP).app: macos
 	[ -z "$(MACAPP)" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 
-aur: PKGBUILD $(BINARY).aur.install
+aur: PKGBUILD SRCINFO $(BINARY).aur.install
 	mkdir -p $@
 	mv PKGBUILD $(BINARY).aur.install $@/
+	mv SRCINFO $@/.SRCINFO
 
 PKGBUILD: v$(VERSION).tar.gz.sha256
 	@echo "Creating 'aur' PKGBUILD file for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
@@ -223,6 +224,17 @@ PKGBUILD: v$(VERSION).tar.gz.sha256
 		-e "s%{{SOURCE_PATH}}%$(SOURCE_PATH)%g" \
 		-e "s%{{CONFIG_FILE}}%$(CONFIG_FILE)%g" \
 		init/archlinux/PKGBUILD.template | tee PKGBUILD
+
+SRCINFO: v$(VERSION).tar.gz.sha256
+	sed -e "s/{{VERSION}}/$(VERSION)/g" \
+		-e "s/{{Iter}}/$(ITERATION)/g" \
+		-e "s/{{SHA256}}/$(shell head -c64 $<)/g" \
+		-e "s/{{Desc}}/$(DESC)/g" \
+		-e "s%{{BINARY}}%$(BINARY)%g" \
+		-e "s%{{SOURCE_URL}}%$(SOURCE_URL)%g" \
+		-e "s%{{SOURCE_PATH}}%$(SOURCE_PATH)%g" \
+		-e "s%{{CONFIG_FILE}}%$(CONFIG_FILE)%g" \
+		init/archlinux/SRCINFO.template | tee SRCINFO
 
 rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux check_fpm
