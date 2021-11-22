@@ -8,7 +8,15 @@ DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 # Defines docker manifest/build types.
 BUILDS="linux:armhf:arm linux:arm64:arm64 linux:amd64:amd64 linux:i386:386"
 
-if [ -x "$(which git)" ] && git status > /dev/null 2>&1; then
+export VENDOR DATE BUILDS
+
+[ "$GOFLAGS" != "" ] || export GOFLAGS="-trimpath -mod=readonly -modcacherw"
+export CGO_CPPFLAGS="${CPPFLAGS}"
+export CGO_CFLAGS="${CFLAGS}"
+export CGO_CXXFLAGS="${CXXFLAGS}"
+export CGO_LDFLAGS="${LDFLAGS}"
+
+if git status > /dev/null 2>&1; then
   # Dynamic. Recommend not changing.
   VVERSION=$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
   VERSION="$(echo $VVERSION | tr -d v | grep -E '^\S+$' || echo development)"
@@ -20,10 +28,4 @@ if [ -x "$(which git)" ] && git status > /dev/null 2>&1; then
   BRANCH="${TRAVIS_BRANCH:-${GIT_BRANCH}}"
 fi
 
-export VENDOR VVERSION VERSION ITERATION DATE BRANCH COMMIT BUILDS
-
-[ "$GOFLAGS" != "" ] || export GOFLAGS="-trimpath -mod=readonly -modcacherw"
-export CGO_CPPFLAGS="${CPPFLAGS}"
-export CGO_CFLAGS="${CFLAGS}"
-export CGO_CXXFLAGS="${CXXFLAGS}"
-export CGO_LDFLAGS="${LDFLAGS}"
+export VVERSION VERSION ITERATION BRANCH COMMIT

@@ -19,6 +19,10 @@ ifeq ($(shell uname -ps),Darwin arm)
   UPXPATH=
 endif
 
+ifeq ($(shell grep -o 'Arch Linux' /etc/issue 2>/dev/null),Arch Linux)
+  UPXPATH=
+endif
+
 # Travis CI passes the version in. Local builds get it from the current git tag.
 ifeq ($(VERSION),)
 	include .metadata.make
@@ -96,7 +100,7 @@ clean:
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
-	rm -f $(BINARY).aur.install PKGBUILD
+	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service
 	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
 
 ####################
@@ -311,16 +315,13 @@ before-remove-rendered.sh:
 
 # This is used for arch linux
 $(BINARY).aur.install:
-	echo "post_install() {" > $@
-	sed -e "s/^/ /g" -e "s/{{BINARY}}/$(BINARY)/g" scripts/after-install.sh >> $@
-	echo "}" >> $@
-	echo "" >> $@
 	echo "post_upgrade() {" >> $@
-	echo '  post_install $$1' >> $@
+	echo "  /bin/systemctl restart $(BINARY)" >> $@
 	echo "}" >> $@
 	echo "" >> $@
 	echo "pre_remove() {" >> $@
-	sed -e "s/^/ /g" -e "s/{{BINARY}}/$(BINARY)/g" scripts/before-remove.sh >> $@
+	echo "  /bin/systemctl stop $(BINARY)" >> $@
+	echo "  /bin/systemctl disable $(BINARY)" >> $@
 	echo "}" >> $@
 
 package_build_linux_386: package_build_linux linux386
