@@ -107,6 +107,8 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		fallthrough
 	case strings.EqualFold(v.Event, "device.new"):
 		fallthrough
+	case strings.EqualFold(v.Event, "media.rate"):
+		fallthrough
 	case strings.EqualFold(v.Event, "admin.database.corrupt"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (relaying to Notifiarr)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
