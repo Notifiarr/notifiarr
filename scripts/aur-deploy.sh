@@ -13,10 +13,10 @@ git config --global user.email "${BINARY}@auto.releaser"
 git config --global user.name "${BINARY}-auto-releaser"
 
 rm -rf aur_release_repo
-git clone git@github.com-aurepo:${AUREPO}.git aur_release_repo
+git clone git@github.com-aurepo:golift/aur.git aur_release_repo
 
 mkdir -p "aur_release_repo/${BINARY}"
-cp aur/* "aur_release_repo/${BINARY}/"
+cp aur/{*,.??*} "aur_release_repo/${BINARY}/"
 pushd aur_release_repo
 git add ${BINARY}
 git commit -m "Update ${BINARY} on Release: v${VERSION}-${ITERATION}"

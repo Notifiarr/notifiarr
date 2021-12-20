@@ -106,6 +106,7 @@ type Partition struct {
 	Device string `json:"name"`
 	Total  uint64 `json:"total"`
 	Free   uint64 `json:"free"`
+	Used   uint64 `json:"used"`
 }
 
 // Validate makes sure the snapshot configuration is valid.

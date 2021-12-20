@@ -44,6 +44,7 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 			Device: partitions[i].Mountpoint,
 			Total:  u.Total,
 			Free:   u.Free,
+			Used:   u.Used,
 		}
 	}
 
