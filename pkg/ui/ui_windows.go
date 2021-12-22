@@ -42,24 +42,29 @@ func getPNG() string {
 		return ""
 	}
 
-	const minimumFileSize = 100 // arbitrary
-
-	pngPath := filepath.Join(folder, "notifiarr.png")
-	if f, err := os.Stat(pngPath); err == nil && f.Size() > minimumFileSize {
-		return pngPath // most code paths land here.
-	} else if !os.IsNotExist(err) || (f != nil && f.Size() < minimumFileSize) {
-		return ""
-	}
-
 	data, err := bindata.Asset("files/favicon.png")
 	if err != nil {
 		return ""
 	}
 
-	if err := os.WriteFile(pngPath, data, mnd.Mode0600); err != nil {
-		return ""
+	const (
+		percent99  = 0.99
+		percent101 = 1.01
+	)
+
+	minimumFileSize := int64(float64(len(data)) * percent99)
+	maximumFileSize := int64(float64(len(data)) * percent101)
+	pngPath := filepath.Join(folder, "notifiarr.png")
+
+	f, err := os.Stat(pngPath)
+	if err != nil || f.Size() < minimumFileSize || f.Size() > maximumFileSize {
+		// File does not exist, or not within 1% of correct size. Overwrite it.
+		if err := os.WriteFile(pngPath, data, mnd.Mode0600); err != nil {
+			return ""
+		}
 	}
 
+	// go log.Println("minmaxsize", minimumFileSize, maximumFileSize, f.Size(), len(data))
 	return pngPath
 }
 

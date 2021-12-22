@@ -21,7 +21,7 @@ func (t *TautulliConfig) setup(timeout time.Duration) {
 // GetUsers returns the Tautulli users.
 func (t *TautulliConfig) GetUsers() (*TautulliUsers, error) {
 	if t == nil || t.URL == "" {
-		return nil, nil
+		return &TautulliUsers{}, nil
 	}
 
 	params := url.Values{}

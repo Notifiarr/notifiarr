@@ -25,23 +25,21 @@ var (
 )
 
 // forceWriteWithExit is called only when a user passes --write on the command line.
-func (c *Client) forceWriteWithExit(f string) error {
-	if f == "-" {
-		f = c.Flags.ConfigFile
-	} else if f == "example" || f == "---" {
+func (c *Client) forceWriteWithExit(fileName string) error {
+	if fileName == "-" {
+		fileName = c.Flags.ConfigFile
+	} else if fileName == "example" || fileName == "---" {
 		// Bubilding a default template.
-		f = c.Flags.ConfigFile
+		fileName = c.Flags.ConfigFile
 		c.Config.LogFile = ""
 		c.Config.LogConfig.DebugLog = ""
 		c.Config.HTTPLog = ""
 		c.Config.FileMode = logs.FileMode(rotatorr.FileMode)
 		c.Config.Debug = false
-		c.Config.Snapshot.Interval.Duration = mnd.HalfHour
-		c.Config.Services.Disabled = false
 		configfile.ForceAllTmpl = true
 	}
 
-	f, err := c.Config.Write(f)
+	f, err := c.Config.Write(fileName)
 	if err != nil { // f purposely shadowed.
 		return fmt.Errorf("writing config: %s: %w", f, err)
 	}
@@ -59,18 +57,18 @@ func printProcessList() error {
 		return fmt.Errorf("unable to get processes: %w", err)
 	}
 
-	for _, p := range pslist {
+	for _, proc := range pslist {
 		if mnd.IsFreeBSD {
-			fmt.Printf("[%-5d] %s\n", p.PID, p.CmdLine)
+			fmt.Printf("[%-5d] %s\n", proc.PID, proc.CmdLine)
 			continue
 		}
 
 		t := "unknown"
-		if !p.Created.IsZero() {
-			t = time.Since(p.Created).Round(time.Second).String()
+		if !proc.Created.IsZero() {
+			t = time.Since(proc.Created).Round(time.Second).String()
 		}
 
-		fmt.Printf("[%-5d] %-11s: %s\n", p.PID, t, p.CmdLine)
+		fmt.Printf("[%-5d] %-11s: %s\n", proc.PID, t, proc.CmdLine)
 	}
 
 	return nil
