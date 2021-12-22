@@ -12,6 +12,8 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 )
 
+var ErrNotSynology = fmt.Errorf("the running host is not a Synology")
+
 // Synology is the data we care about from the config file.
 type Synology struct {
 	Build   string `json:"last_admin_login_build"` // 254263
@@ -30,7 +32,7 @@ type Synology struct {
 // GetSynology checks if the app is running on a Synology, and gets system info.
 func GetSynology(run bool) (*Synology, error) { //nolint:cyclop
 	if !run || !mnd.IsSynology {
-		return &Synology{}, nil
+		return nil, ErrNotSynology
 	}
 
 	file, err := os.Open(mnd.Synology)
