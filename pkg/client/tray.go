@@ -1,5 +1,4 @@
 //go:build darwin || windows
-// +build darwin windows
 
 package client
 
@@ -56,22 +55,18 @@ func (c *Client) setupMenus() {
 		return
 	}
 
-	if c.Config.LogConfig.DebugLog == "" {
-		c.menu["debug_logs"].Hide()
-		c.menu["debug_logs2"].Hide()
-	} else {
-		c.menu["debug_logs"].Show()
-		c.menu["debug_logs2"].Show()
-	}
-
 	if !c.Config.Debug {
 		c.menu["debug"].Hide()
-		c.menu["debug_logs"].Hide()
-		c.menu["debug_logs2"].Hide()
 	} else {
 		c.menu["debug"].Show()
-		c.menu["debug_logs"].Show()
-		c.menu["debug_logs2"].Show()
+
+		if c.Config.LogConfig.DebugLog == "" {
+			c.menu["debug_logs"].Hide()
+			c.menu["debug_logs2"].Hide()
+		} else {
+			c.menu["debug_logs"].Show()
+			c.menu["debug_logs2"].Show()
+		}
 	}
 
 	if c.Config.Services.LogFile == "" {
