@@ -114,58 +114,58 @@ type HistorySlots struct {
 }
 
 type History struct {
-	TotalSize         SabNZBSize      `json:"total_size"`
-	MonthSize         SabNZBSize      `json:"month_size"`
-	WeekSize          SabNZBSize      `json:"week_size"`
-	DaySize           SabNZBSize      `json:"day_size"`
-	Slots             []*HistorySlots `json:"slots"`
-	Noofslots         int             `json:"noofslots"`
-	LastHistoryUpdate int64           `json:"last_history_update"`
-	Version           string          `json:"version"`
+	TotalSize         SabNZBSize     `json:"total_size"`
+	MonthSize         SabNZBSize     `json:"month_size"`
+	WeekSize          SabNZBSize     `json:"week_size"`
+	DaySize           SabNZBSize     `json:"day_size"`
+	Slots             []HistorySlots `json:"slots"`
+	Noofslots         int            `json:"noofslots"`
+	LastHistoryUpdate int64          `json:"last_history_update"`
+	Version           string         `json:"version"`
 }
 
 type Queue struct {
-	Version           string        `json:"version"`
-	Paused            bool          `json:"paused"`
-	PauseInt          string        `json:"pause_int"`
-	PausedAll         bool          `json:"paused_all"`
-	Diskspace1        float64       `json:"diskspace1,string"`
-	Diskspace2        float64       `json:"diskspace2,string"`
-	Diskspace1Norm    SabNZBSize    `json:"diskspace1_norm"`
-	Diskspace2Norm    SabNZBSize    `json:"diskspace2_norm"`
-	Diskspacetotal1   float64       `json:"diskspacetotal1,string"`
-	Diskspacetotal2   float64       `json:"diskspacetotal2,string"`
-	Loadavg           string        `json:"loadavg"`
-	Speedlimit        int           `json:"speedlimit,string"`
-	SpeedlimitAbs     string        `json:"speedlimit_abs"`
-	HaveWarnings      string        `json:"have_warnings"`
-	Finishaction      interface{}   `json:"finishaction"`
-	Quota             string        `json:"quota"`
-	HaveQuota         bool          `json:"have_quota"`
-	LeftQuota         string        `json:"left_quota"`
-	CacheArt          string        `json:"cache_art"`
-	CacheSize         SabNZBSize    `json:"cache_size"`
-	CacheMax          int64         `json:"cache_max,string"`
-	Kbpersec          float64       `json:"kbpersec,string"`
-	Speed             SabNZBSize    `json:"speed"`
-	Mbleft            float64       `json:"mbleft,string"`
-	Mb                float64       `json:"mb,string"`
-	Sizeleft          SabNZBSize    `json:"sizeleft"`
-	Size              SabNZBSize    `json:"size"`
-	NoofslotsTotal    int           `json:"noofslots_total"`
-	Status            string        `json:"status"`
-	Timeleft          string        `json:"timeleft"`
-	Eta               string        `json:"eta"`
-	RefreshRate       string        `json:"refresh_rate"`
-	InterfaceSettings string        `json:"interface_settings"`
-	Scripts           []string      `json:"scripts"`
-	Categories        []string      `json:"categories"`
-	RatingEnable      bool          `json:"rating_enable"`
-	Noofslots         int           `json:"noofslots"`
-	Start             int64         `json:"start"`
-	Limit             int64         `json:"limit"`
-	Finish            int64         `json:"finish"`
-	Slots             []*QueueSlots `json:"slots"`
+	Version           string       `json:"version"`
+	Paused            bool         `json:"paused"`
+	PauseInt          string       `json:"pause_int"`
+	PausedAll         bool         `json:"paused_all"`
+	Diskspace1        float64      `json:"diskspace1,string"`
+	Diskspace2        float64      `json:"diskspace2,string"`
+	Diskspace1Norm    SabNZBSize   `json:"diskspace1_norm"`
+	Diskspace2Norm    SabNZBSize   `json:"diskspace2_norm"`
+	Diskspacetotal1   float64      `json:"diskspacetotal1,string"`
+	Diskspacetotal2   float64      `json:"diskspacetotal2,string"`
+	Loadavg           string       `json:"loadavg"`
+	Speedlimit        int          `json:"speedlimit,string"`
+	SpeedlimitAbs     string       `json:"speedlimit_abs"`
+	HaveWarnings      string       `json:"have_warnings"`
+	Finishaction      interface{}  `json:"finishaction"`
+	Quota             string       `json:"quota"`
+	HaveQuota         bool         `json:"have_quota"`
+	LeftQuota         string       `json:"left_quota"`
+	CacheArt          string       `json:"cache_art"`
+	CacheSize         SabNZBSize   `json:"cache_size"`
+	CacheMax          int64        `json:"cache_max,string"`
+	Kbpersec          float64      `json:"kbpersec,string"`
+	Speed             SabNZBSize   `json:"speed"`
+	Mbleft            float64      `json:"mbleft,string"`
+	Mb                float64      `json:"mb,string"`
+	Sizeleft          SabNZBSize   `json:"sizeleft"`
+	Size              SabNZBSize   `json:"size"`
+	NoofslotsTotal    int          `json:"noofslots_total"`
+	Status            string       `json:"status"`
+	Timeleft          string       `json:"timeleft"`
+	Eta               string       `json:"eta"`
+	RefreshRate       string       `json:"refresh_rate"`
+	InterfaceSettings string       `json:"interface_settings"`
+	Scripts           []string     `json:"scripts"`
+	Categories        []string     `json:"categories"`
+	RatingEnable      bool         `json:"rating_enable"`
+	Noofslots         int          `json:"noofslots"`
+	Start             int64        `json:"start"`
+	Limit             int64        `json:"limit"`
+	Finish            int64        `json:"finish"`
+	Slots             []QueueSlots `json:"slots"`
 }
 
 func (s *SabNZBConfig) setup(timeout time.Duration) {
@@ -182,7 +182,7 @@ func (s *SabNZBConfig) setup(timeout time.Duration) {
 
 func (s *SabNZBConfig) GetHistory() (*History, error) {
 	if s == nil || s.URL == "" {
-		return nil, nil
+		return &History{}, nil
 	}
 
 	params := url.Values{}
@@ -204,7 +204,7 @@ func (s *SabNZBConfig) GetHistory() (*History, error) {
 
 func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 	if s == nil || s.URL == "" {
-		return nil, nil
+		return &Queue{}, nil
 	}
 
 	params := url.Values{}

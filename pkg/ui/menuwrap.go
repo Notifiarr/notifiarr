@@ -1,4 +1,4 @@
-// +build windows darwin
+//go:build windows || darwin
 
 package ui
 
@@ -9,7 +9,7 @@ type menuItem struct {
 }
 
 // WrapMenu is just gross.
-func WrapMenu(m *systray.MenuItem) MenuItem {
+func WrapMenu(m *systray.MenuItem) MenuItem { //nolint:ireturn
 	return MenuItem(&menuItem{MenuItem: m})
 }
 
