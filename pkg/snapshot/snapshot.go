@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"sync"
@@ -157,7 +158,7 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		errs = append(errs, err...)
 	}
 
-	if syn, err := GetSynology(c.Uptime); err != nil {
+	if syn, err := GetSynology(c.Uptime); err != nil && !errors.Is(err, ErrNotSynology) {
 		errs = append(errs, err)
 	} else if syn != nil {
 		syn.SetInfo(s.System.InfoStat)
