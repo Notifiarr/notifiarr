@@ -67,6 +67,7 @@ after_success:
       && chmod 600 "$HB_FILE" \
       && printf "%s\n" \
         "Host github.com" \
+        "  HostName github.com" \
         "  IdentityFile ${HB_FILE}" \
         "  StrictHostKeyChecking no" \
         "  LogLevel ERROR" >> $HOME/.ssh/config)
@@ -75,6 +76,7 @@ after_success:
       && chmod 600 "${AU_FILE}" \
       && printf "%s\n" \
         "Host github.com-aurepo" \
+        "  HostName github.com" \
         "  IdentityFile ${AU_FILE}" \
         "  StrictHostKeyChecking no" \
         "  LogLevel ERROR" >> $HOME/.ssh/config)

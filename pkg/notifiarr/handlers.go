@@ -14,9 +14,10 @@ import (
 
 // plexIncomingWebhook is the incoming webhook from a Plex Media Server.
 type plexIncomingWebhook struct {
-	Event   string `json:"event"`
-	User    bool   `json:"user"`
-	Owner   bool   `json:"owner"`
+	Event   string  `json:"event"`
+	User    bool    `json:"user"`
+	Owner   bool    `json:"owner"`
+	Rating  float64 `json:"rating"`
 	Account struct {
 		ID    int    `json:"id"`
 		Thumb string `json:"thumb"`
@@ -106,6 +107,8 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "admin.database.backup"):
 		fallthrough
 	case strings.EqualFold(v.Event, "device.new"):
+		fallthrough
+	case strings.EqualFold(v.Event, "media.rate"):
 		fallthrough
 	case strings.EqualFold(v.Event, "admin.database.corrupt"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (relaying to Notifiarr)",
