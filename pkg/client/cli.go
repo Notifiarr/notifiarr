@@ -36,8 +36,6 @@ func (c *Client) forceWriteWithExit(fileName string) error {
 		c.Config.HTTPLog = ""
 		c.Config.FileMode = logs.FileMode(rotatorr.FileMode)
 		c.Config.Debug = false
-		c.Config.Snapshot.Interval.Duration = time.Hour
-		c.Config.Services.Disabled = false
 		configfile.ForceAllTmpl = true
 	}
 
