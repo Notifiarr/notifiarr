@@ -15,7 +15,6 @@ const (
 	Megabyte  = Kilobyte * Kilobyte
 	KB100     = Kilobyte * 100
 	OneDay    = 24 * time.Hour
-	HalfHour  = 30 * time.Minute
 	Base10    = 10
 	Base8     = 8
 	Bits64    = 64

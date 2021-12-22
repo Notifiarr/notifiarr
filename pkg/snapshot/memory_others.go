@@ -1,4 +1,4 @@
-// +build !linux,!freebsd,!windows
+//go:build !linux && !freebsd && !windows
 
 package snapshot
 
