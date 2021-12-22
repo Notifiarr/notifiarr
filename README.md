@@ -24,6 +24,12 @@ sudo nano /etc/notifiarr/notifiarr.conf
 sudo systemctl restart notifiarr
 ```
 
+#### Arch Linux
+
+This one is special; hope you know what you're doing.
+Build a package with `makepkg` using the `aur` source.
+Here: https://github.com/golift/aur
+
 ### FreeBSD
 
 -   Download a package from the [Releases](https://github.com/Notifiarr/notifiarr/releases) page.
