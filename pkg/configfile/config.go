@@ -33,8 +33,6 @@ const (
 	MsgConfigFound  = "Using Config File: "
 )
 
-var ErrFileExists = fmt.Errorf("file exists, refusing to overwrite")
-
 // Config represents the data in our config file.
 type Config struct {
 	BindAddr   string              `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
