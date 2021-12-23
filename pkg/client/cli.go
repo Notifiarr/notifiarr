@@ -26,11 +26,9 @@ var (
 
 // forceWriteWithExit is called only when a user passes --write on the command line.
 func (c *Client) forceWriteWithExit(fileName string) error {
-	if fileName == "-" {
-		fileName = c.Flags.ConfigFile
-	} else if fileName == "example" || fileName == "---" {
+	if fileName == "example" || fileName == "---" {
 		// Bubilding a default template.
-		fileName = c.Flags.ConfigFile
+		fileName = c.Flags.ConfigFile + ".new"
 		c.Config.LogFile = ""
 		c.Config.LogConfig.DebugLog = ""
 		c.Config.HTTPLog = ""
@@ -40,8 +38,8 @@ func (c *Client) forceWriteWithExit(fileName string) error {
 	}
 
 	f, err := c.Config.Write(fileName)
-	if err != nil { // f purposely shadowed.
-		return fmt.Errorf("writing config: %s: %w", f, err)
+	if err != nil {
+		return fmt.Errorf("writing config: %w", err)
 	}
 
 	c.Print("Wrote Config File:", f)
