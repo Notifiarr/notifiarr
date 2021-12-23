@@ -115,7 +115,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 			svcs = append(svcs, &Service{
 				Name:     d.Name,
 				Type:     CheckHTTP,
-				Value:    d.Config.URL,
+				Value:    strings.TrimSuffix(d.Config.URL, "/json"),
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: d.Timeout.Duration},
 				Interval: d.Interval,

@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"golift.io/cnfg"
@@ -58,6 +59,8 @@ func (s *Server) Configured() bool {
 
 // Validate checks input values and starts the cron interval if it's configured.
 func (s *Server) Validate() { //nolint:cyclop
+	s.URL = strings.TrimRight(s.URL, "/")
+
 	if s.SeriesPC > maximumComplete {
 		s.SeriesPC = maximumComplete
 	} else if s.SeriesPC != 0 && s.SeriesPC < minimumComplete {

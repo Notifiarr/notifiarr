@@ -204,13 +204,17 @@ func (c *Config) Write(file string) (string, error) {
 		return "", fmt.Errorf("making config dir: %w", err)
 	}
 
-	f, err := os.Create(file)
+	if _, err = os.Stat(file); err == nil {
+		return "", fmt.Errorf("%w: %s", os.ErrExist, file)
+	}
+
+	newFile, err := os.Create(file)
 	if err != nil {
 		return "", fmt.Errorf("creating config file: %w", err)
 	}
-	defer f.Close()
+	defer newFile.Close()
 
-	if err := Template.Execute(f, c); err != nil {
+	if err := Template.Execute(newFile, c); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)
 	}
 
