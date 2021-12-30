@@ -260,6 +260,8 @@ golift.io/starr v0.11.13-0.20211230073621-05c1f7d03616 h1:YYpJSQ2BW7SIvyJ/eiXs58
 golift.io/starr v0.11.13-0.20211230073621-05c1f7d03616/go.mod h1:4iD2P+XcRFYNppJPvM/oP4WoizSBmFt207XdEbWmwRY=
 golift.io/starr v0.12.0 h1:qOdyl8Dk/uUcyUaBh1VgzFbxcFY8AWnXnY55B9U9aFw=
 golift.io/starr v0.12.0/go.mod h1:4iD2P+XcRFYNppJPvM/oP4WoizSBmFt207XdEbWmwRY=
+golift.io/starr v0.12.1-0.20211230211547-d2a25a103e6d h1:WPRln71yF+RXLujBXngPRX9gtIA7O8LG3BqpTdVkbOg=
+golift.io/starr v0.12.1-0.20211230211547-d2a25a103e6d/go.mod h1:4iD2P+XcRFYNppJPvM/oP4WoizSBmFt207XdEbWmwRY=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 golift.io/xtractr v0.0.11 h1:6SVjqX7aCT7Zl4y1rVunBnzwAqK56m90IMywbgeh3r8=
