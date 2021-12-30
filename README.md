@@ -159,9 +159,7 @@ Recommend not messing with these unless instructed to do so.
 |debug|`DN_DEBUG`|`false` / Adds payloads and other stuff to the log output; very verbose/noisy|
 |debug_log|`DN_DEBUG_LOG`|`""` / Set a file system path to write debug logs to a dedicated file|
 |max_body|`DN_MAX_BODY`|Unlimited, `0` / Maximum debug-log body size (integer) for payloads to and from notifiarr.com|
-
-All Starr apps (below) also allow a `max_body` parameter. This parameter only controls debug output.
-Debug-log payload sizes from each app can be controlled individually.
+||`TMPDIR`|`%TMP%` on Windows. Varies depending on system; must be writable if using Backup Corruption Check|
 
 _Note: You may disable the GUI (menu item) on Windows by setting the env variable `USEGUI` to `false`._
 
@@ -240,6 +238,7 @@ lidarr.username|`DN_LIDARR_0_USERNAME`|Provide username if using backup corrupti
 lidarr.password|`DN_LIDARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
 lidarr.http_user|`DN_LIDARR_0_HTTP_USER`|Provide username if Lidarr uses basic auth (uncommon) and BCC enabled|
 lidarr.http_pass|`DN_LIDARR_0_HTTP_PASS`|Provide password if Lidarr uses basic auth (uncommon) and BCC enabled|
+lidarr.max_body|`DN_LIDARR_0_MAX_BODY`|`0` (off) / How much of the response body is logged when debug is on|
 
 * __BCC = Backup Corruption Check__
 
@@ -254,6 +253,7 @@ radarr.username|`DN_RADARR_0_USERNAME`|Provide username if using backup corrupti
 radarr.password|`DN_RADARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
 radarr.http_user|`DN_RADARR_0_HTTP_USER`|Provide username if Radarr uses basic auth (uncommon) and BCC enabled|
 radarr.http_pass|`DN_RADARR_0_HTTP_PASS`|Provide password if Radarr uses basic auth (uncommon) and BCC enabled|
+radarr.max_body|`DN_RADARR_0_MAX_BODY`|`0` (off) / How much of the response body is logged when debug is on.|
 
 ### Readarr
 
@@ -266,6 +266,7 @@ readarr.username|`DN_READARR_0_USERNAME`|Provide username if using backup corrup
 readarr.password|`DN_READARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
 readarr.http_user|`DN_READARR_0_HTTP_USER`|Provide username if Readarr uses basic auth (uncommon) and BCC enabled|
 readarr.http_pass|`DN_READARR_0_HTTP_PASS`|Provide password if Readarr uses basic auth (uncommon) and BCC enabled|
+readarr.max_body|`DN_READARR_0_MAX_BODY`|`0` (off) / How much of the response body is logged when debug is on.|
 
 ### Sonarr
 
@@ -278,6 +279,7 @@ sonarr.username|`DN_SONARR_0_USERNAME`|Provide username if using backup corrupti
 sonarr.password|`DN_SONARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
 sonarr.http_user|`DN_SONARR_0_HTTP_USER`|Provide username if Sonarr uses basic auth (uncommon) and BCC enabled|
 sonarr.http_pass|`DN_SONARR_0_HTTP_PASS`|Provide password if Sonarr uses basic auth (uncommon) and BCC enabled|
+sonarr.max_body|`DN_SONARR_0_MAX_BODY`|`0` (off) / How much of the response body is logged when debug is on.|
 
 ### Downloaders
 
@@ -366,11 +368,25 @@ You can also create ad-hoc service checks for things like Bazarr.
 |Config Name|Variable Name|Note|
 |---|---|---|
 service.name|`DN_SERVICE_0_NAME`|Services must have a unique name|
-service.type|`DN_SERVICE_0_TYPE`|Type must be one of `http`, `tcp`|
+service.type|`DN_SERVICE_0_TYPE`|Type must be one of `http`, `tcp`, `process`|
 service.check|`DN_SERVICE_0_CHECK`|The `URL`, or `host/ip:port` to check|
 service.expect|`DN_SERVICE_0_EXPECT`|`200`, For HTTP, the return code to expect|
 service.timeout|`DN_SERVICE_0_TIMEOUT`|`15s`, How long to wait for service response|
 service.interval|`DN_SERVICE_0_INTERVAL`|`5m`, How often to check the service|
+
+#### Process Service Checks
+
+When `type` is set to `process`, the `expect` parameter becomes a special variable.
+You may set it to `restart` to send a notification when the process restarts.
+You may set it to `running` to alert if the process is found running (negative check).
+You may set it to `count:min:max`. ie `count:1:2` means alert if process count is below 1 or above 2.
+You may combine these with commas. ie `restart,count:1:3`.
+
+By default `check` is the value to find in the process list. It uses a simple string match.
+Unless you wrap the value in slashes, then it becomes a regex.
+ie. use this `expect = "/^/usr/bin/smtpd$/"` to match an exact string.
+
+Run `notifiarr --ps` to view the process list from Notifiarr's point of view.
 
 ## Reverse Proxy
 
@@ -433,6 +449,7 @@ documentation support. This project succeeds because of them. Thank you!
 <a title="Travis-CI" alt="Travis-CI" href="https://Travis-CI.com"><img src="https://docs.golift.io/integrations/travis-ci.png"/></a>
 <a title="Homebrew" alt="Homebrew" href="https://brew.sh"><img src="https://docs.golift.io/integrations/homebrew.png"/></a>
 <a title="Go Lift" alt="Go Lift" href="https://golift.io"><img src="https://docs.golift.io/integrations/golift.png"/></a>
+<a title="Better Uptime" alt="Go Lift" href="http://betteruptime.com"><img src="https://docs.golift.io/integrations/betteruptime.png"/></a>
 </p>
 
 ## Contributing
