@@ -177,6 +177,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Lidarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Lidarr[app.Instance-1].Corrupt = app.Corrupt
 	}
 
 	for _, app := range ci.Actions.Apps.Radarr {
@@ -186,6 +187,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Radarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Radarr[app.Instance-1].Corrupt = app.Corrupt
 	}
 
 	for _, app := range ci.Actions.Apps.Readarr {
@@ -195,6 +197,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Readarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Readarr[app.Instance-1].Corrupt = app.Corrupt
 	}
 
 	for _, app := range ci.Actions.Apps.Sonarr {
@@ -204,6 +207,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Sonarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Sonarr[app.Instance-1].Corrupt = app.Corrupt
 	}
 }
 

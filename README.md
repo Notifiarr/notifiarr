@@ -236,6 +236,12 @@ snapshot.mysql.pass|`DN_SNAPSHOT_MYSQL_PASS`|Password for the user in the GRANT 
 lidarr.name|`DN_LIDARR_0_NAME`|No Default. Setting a name enables service checks|
 lidarr.url|`DN_LIDARR_0_URL`|No Default. Something like: `http://lidarr:8686`|
 lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
+lidarr.username|`DN_LIDARR_0_USERNAME`|Provide username if using backup corruption check and auth is enabled|
+lidarr.password|`DN_LIDARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
+lidarr.http_user|`DN_LIDARR_0_HTTP_USER`|Provide username if Lidarr uses basic auth (uncommon) and BCC enabled|
+lidarr.http_pass|`DN_LIDARR_0_HTTP_PASS`|Provide password if Lidarr uses basic auth (uncommon) and BCC enabled|
+
+* __BCC = Backup Corruption Check__
 
 ### Radarr
 
@@ -244,6 +250,10 @@ lidarr.api_key|`DN_LIDARR_0_API_KEY`|No Default. Provide URL and API key if you 
 radarr.name|`DN_RADARR_0_NAME`|No Default. Setting a name enables service checks.|
 radarr.url|`DN_RADARR_0_URL`|No Default. Something like: `http://localhost:7878`|
 radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you use Radarr|
+radarr.username|`DN_RADARR_0_USERNAME`|Provide username if using backup corruption check and auth is enabled|
+radarr.password|`DN_RADARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
+radarr.http_user|`DN_RADARR_0_HTTP_USER`|Provide username if Radarr uses basic auth (uncommon) and BCC enabled|
+radarr.http_pass|`DN_RADARR_0_HTTP_PASS`|Provide password if Radarr uses basic auth (uncommon) and BCC enabled|
 
 ### Readarr
 
@@ -252,6 +262,10 @@ radarr.api_key|`DN_RADARR_0_API_KEY`|No Default. Provide URL and API key if you 
 readarr.name|`DN_READARR_0_NAME`|No Default. Setting a name enables service checks|
 readarr.url|`DN_READARR_0_URL`|No Default. Something like: `http://localhost:8787`|
 readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
+readarr.username|`DN_READARR_0_USERNAME`|Provide username if using backup corruption check and auth is enabled|
+readarr.password|`DN_READARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
+readarr.http_user|`DN_READARR_0_HTTP_USER`|Provide username if Readarr uses basic auth (uncommon) and BCC enabled|
+readarr.http_pass|`DN_READARR_0_HTTP_PASS`|Provide password if Readarr uses basic auth (uncommon) and BCC enabled|
 
 ### Sonarr
 
@@ -260,6 +274,10 @@ readarr.api_key|`DN_READARR_0_API_KEY`|No Default. Provide URL and API key if yo
 sonarr.name|`DN_SONARR_0_NAME`|No Default. Setting a name enables service checks|
 sonarr.url|`DN_SONARR_0_URL`|No Default. Something like: `http://localhost:8989`|
 sonarr.api_key|`DN_SONARR_0_API_KEY`|No Default. Provide URL and API key if you use Sonarr|
+sonarr.username|`DN_SONARR_0_USERNAME`|Provide username if using backup corruption check and auth is enabled|
+sonarr.password|`DN_SONARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
+sonarr.http_user|`DN_SONARR_0_HTTP_USER`|Provide username if Sonarr uses basic auth (uncommon) and BCC enabled|
+sonarr.http_pass|`DN_SONARR_0_HTTP_PASS`|Provide password if Sonarr uses basic auth (uncommon) and BCC enabled|
 
 ### Downloaders
 
@@ -275,6 +293,8 @@ qbit.name|`DN_QBIT_0_NAME`|No Default. Setting a name enables service checks|
 qbit.url|`DN_QBIT_0_URL`|No Default. Something like: `http://localhost:8080`|
 qbit.user|`DN_QBIT_0_USER`|No Default. Provide URL, user and pass if you use Qbit|
 qbit.pass|`DN_QBIT_0_PASS`|No Default. Provide URL, user and pass if you use Qbit|
+qbit.http_user|`DN_QBIT_0_HTTP_USER`|Provide this username if Qbit is behind basic auth (uncommon)|
+qbit.http_pass|`DN_QBIT_0_HTTP_PASS`|Provide this password if Qbit is behind basic auth (uncommon)|
 
 #### SABnzbd
 
@@ -291,6 +311,8 @@ sabnzbd.api_key|`DN_SABNZBD_0_API_KEY`|No Default. Provide URL and API key if yo
 deluge.name|`DN_DELUGE_0_NAME`|No Default. Setting a name enables service checks|
 deluge.url|`DN_DELUGE_0_URL`|No Default. Something like: `http://localhost:8080`|
 deluge.password|`DN_DELUGE_0_PASSWORD`|No Default. Provide URL and password key if you use Deluge|
+deluge.http_user|`DN_DELUGE_0_HTTP_USER`|Provide this username if Deluge is behind basic auth (uncommon)|
+deluge.http_pass|`DN_DELUGE_0_HTTP_PASS`|Provide this password if Deluge is behind basic auth (uncommon)|
 
 ### Plex
 

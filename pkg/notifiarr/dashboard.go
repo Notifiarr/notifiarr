@@ -425,7 +425,7 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 
 // getLidarrHistory is not done.
 func (c *Config) getLidarrHistory(l *apps.LidarrConfig) ([]*Sortable, error) {
-	history, err := l.GetHistory(showLatest * 40) //nolint:gomnd
+	history, err := l.GetHistory(showLatest*40, 100) //nolint:gomnd
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
@@ -623,7 +623,7 @@ func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, e
 
 // getReadarrHistory is not done.
 func (c *Config) getReadarrHistory(r *apps.ReadarrConfig) ([]*Sortable, error) {
-	history, err := r.GetHistory(showLatest * 20) //nolint:gomnd
+	history, err := r.GetHistory(showLatest*20, 100) //nolint:gomnd
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
@@ -698,7 +698,7 @@ func (c *Config) getSonarrState(instance int, s *apps.SonarrConfig) (*State, err
 }
 
 func (c *Config) getSonarrHistory(s *apps.SonarrConfig) ([]*Sortable, error) {
-	history, err := s.GetHistory(showLatest * 20) //nolint:gomnd
+	history, err := s.GetHistory(showLatest*20, 100) //nolint:gomnd
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}

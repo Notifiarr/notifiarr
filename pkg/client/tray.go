@@ -148,6 +148,10 @@ func (c *Client) makeMoreChannels() {
 	c.menu["snap_prod"] = ui.WrapMenu(data.AddSubMenuItem("Send System Snapshot", "send system snapshot to notifiarr"))
 	c.menu["app_ques"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Queue Items Check", "check app queues for stuck items and send to notifiarr"))
 	c.menu["send_dash"] = ui.WrapMenu(data.AddSubMenuItem("Send Dashboard States", "collect and send all application states for a dashboard update"))
+	c.menu["corrLidarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Lidarr Backups", "check latest backup database in each instance for corruption"))
+	c.menu["corrRadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Radarr Backups", "check latest backup database in each instance for corruption"))
+	c.menu["corrReadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Readarr Backups", "check latest backup database in each instance for corruption"))
+	c.menu["corrSonarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Sonar Backups", "check latest backup database in each instance for corruption"))
 
 	if ci, err := c.website.GetClientInfo(notifiarr.EventStart); err == nil {
 		ui.WrapMenu(data.AddSubMenuItem("- Custom Timers -", "")).Disable()
@@ -346,6 +350,14 @@ func (c *Client) watchNotifiarrMenu() {
 			c.website.Trigger.SendSnapshot(notifiarr.EventUser)
 		case <-c.menu["send_dash"].Clicked():
 			c.website.Trigger.SendDashboardState(notifiarr.EventUser)
+		case <-c.menu["corrLidarr"].Clicked():
+			c.website.Trigger.SendLidarrCorruption(notifiarr.EventUser)
+		case <-c.menu["corrRadarr"].Clicked():
+			c.website.Trigger.SendRadarrCorruption(notifiarr.EventUser)
+		case <-c.menu["corrReadarr"].Clicked():
+			c.website.Trigger.SendReadarrCorruption(notifiarr.EventUser)
+		case <-c.menu["corrSonarr"].Clicked():
+			c.website.Trigger.SendSonarrCorruption(notifiarr.EventUser)
 		}
 	}
 }

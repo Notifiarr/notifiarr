@@ -22,6 +22,7 @@ type appConfig struct {
 	Instance int           `json:"instance"`
 	Name     string        `json:"name"`
 	Stuck    bool          `json:"stuck"`
+	Corrupt  string        `json:"corrupt"`
 	Interval cnfg.Duration `json:"interval"`
 }
 
@@ -137,7 +138,7 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 
 		start := time.Now()
 
-		queue, err := l.GetQueue(getItemsMax)
+		queue, err := l.GetQueue(getItemsMax, getItemsMax)
 		if err != nil {
 			c.Errorf("Getting Lidarr Queue (%d): %v", instance, err)
 			continue
@@ -221,7 +222,7 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 
 		start := time.Now()
 
-		queue, err := l.GetQueue(getItemsMax)
+		queue, err := l.GetQueue(getItemsMax, getItemsMax)
 		if err != nil {
 			c.Errorf("Getting Readarr Queue (%d): %v", instance, err)
 			continue

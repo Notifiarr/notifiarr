@@ -8,8 +8,9 @@ require (
 	golift.io/deluge v0.9.3
 	golift.io/qbit v0.0.0-20211121074815-1558e8969b98
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.11.12
+	golift.io/starr v0.11.13-0.20211230073621-05c1f7d03616
 	golift.io/version v0.0.2
+	golift.io/xtractr v0.0.11
 )
 
 // ui
@@ -62,9 +63,38 @@ require (
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
 	golang.org/x/mod v0.5.1
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	howett.net/plist v1.0.0 // indirect
+)
+
+// zip extraction for databsae corruption checks.
+require (
+	github.com/nwaples/rardecode v1.1.2 // indirect
+	github.com/saracen/go7z v0.0.0-20191010121135-9c09b6bd7fda // indirect
+	github.com/saracen/go7z-fixtures v0.0.0-20190623165746-aa6b8fba1d2f // indirect
+	github.com/saracen/solidblock v0.0.0-20190426153529-45df20abab6f // indirect
+	github.com/ulikunitz/xz v0.5.10 // indirect
+)
+
+// sqlite3 abstraction for databsae corruption checks.
+require (
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
+	golang.org/x/tools v0.1.5 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	lukechampine.com/uint128 v1.1.1 // indirect
+	modernc.org/cc/v3 v3.35.18 // indirect
+	modernc.org/ccgo/v3 v3.12.95 // indirect
+	modernc.org/libc v1.11.104 // indirect
+	modernc.org/mathutil v1.4.1 // indirect
+	modernc.org/memory v1.0.5 // indirect
+	modernc.org/opt v0.1.1 // indirect
+	modernc.org/sqlite v1.14.3
+	modernc.org/strutil v1.1.1 // indirect
+	modernc.org/token v1.0.0 // indirect
 )

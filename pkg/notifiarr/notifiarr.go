@@ -74,19 +74,20 @@ api/v1/user/trash?app=...
   sonarr
 */
 const (
-	BaseURL           = "https://notifiarr.com"
-	DevBaseURL        = "https://dev.notifiarr.com"
-	userRoute1  Route = "/api/v1/user"
-	userRoute2  Route = "/api/v2/user"
-	ClientRoute Route = userRoute2 + "/client"
-	CFSyncRoute Route = userRoute1 + "/trash"
-	GapsRoute   Route = userRoute1 + "/gaps"
-	notifiRoute Route = "/api/v1/notification"
-	DashRoute   Route = notifiRoute + "/dashboard"
-	StuckRoute  Route = notifiRoute + "/stuck"
-	PlexRoute   Route = notifiRoute + "/plex"
-	SnapRoute   Route = notifiRoute + "/snapshot"
-	SvcRoute    Route = notifiRoute + "/services"
+	BaseURL            = "https://notifiarr.com"
+	DevBaseURL         = "https://dev.notifiarr.com"
+	userRoute1   Route = "/api/v1/user"
+	userRoute2   Route = "/api/v2/user"
+	ClientRoute  Route = userRoute2 + "/client"
+	CFSyncRoute  Route = userRoute1 + "/trash"
+	GapsRoute    Route = userRoute1 + "/gaps"
+	notifiRoute  Route = "/api/v1/notification"
+	DashRoute    Route = notifiRoute + "/dashboard"
+	StuckRoute   Route = notifiRoute + "/stuck"
+	PlexRoute    Route = notifiRoute + "/plex"
+	SnapRoute    Route = notifiRoute + "/snapshot"
+	SvcRoute     Route = notifiRoute + "/services"
+	CorruptRoute Route = notifiRoute + "/corruption"
 )
 
 const (
@@ -171,15 +172,19 @@ type extras struct {
 
 // Triggers allow trigger actions in the timer routine.
 type Triggers struct {
-	stop  *action        // Triggered by calling Stop()
-	sync  *action        // Sync Radarr CF and Sonarr RP
-	gaps  *action        // Send Radarr Collection Gaps
-	stuck *action        // Stuck Items
-	plex  *action        // Send Plex Sessions
-	dash  *action        // Dashboard State
-	snap  *action        // Snapshot
-	sess  chan time.Time // Return Plex Sessions
-	sessr chan *holder   // Session Return Channel
+	stop           *action // Triggered by calling Stop()
+	sync           *action // Sync Radarr CF and Sonarr RP
+	gaps           *action // Send Radarr Collection Gaps
+	stuck          *action // Stuck Items
+	plex           *action // Send Plex Sessions
+	dash           *action // Dashboard State
+	snap           *action // Snapshot
+	corruptLidarr  *action
+	corruptRadarr  *action
+	corruptReadarr *action
+	corruptSonarr  *action
+	sess           chan time.Time // Return Plex Sessions
+	sessr          chan *holder   // Session Return Channel
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -253,12 +258,14 @@ func (c *Config) Start() {
 		Msg: "Stop Channel is used for reloads and must not have a function.",
 		C:   make(chan EventType),
 	}
+
 	c.Trigger.sess = make(chan time.Time, 1)
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
 
 	go c.runSessionHolder()
+	c.makeCorruptionTriggers()
 	c.startTimers()
 }
 

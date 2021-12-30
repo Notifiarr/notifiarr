@@ -77,23 +77,24 @@ func (c *Config) startTimers() {
 			&action{Msg: "Polling Notifiarr for new settings.", Fn: c.pollForReload, T: time.NewTicker(pollDur)})
 	}
 
-	for _, t := range append(actions,
+	for _, action := range append(actions,
 		plex, c.Trigger.snap, c.Trigger.gaps, c.Trigger.plex,
-		c.Trigger.dash, c.Trigger.stop, c.Trigger.sync, c.Trigger.stuck) {
-		if t == nil {
+		c.Trigger.dash, c.Trigger.stop, c.Trigger.sync, c.Trigger.stuck,
+		c.Trigger.corruptLidarr, c.Trigger.corruptRadarr, c.Trigger.corruptReadarr, c.Trigger.corruptSonarr) {
+		if action == nil {
 			continue
 		}
 
 		// Since we may add up to 2 actions per list item, duplicate the pointer in a new combined list.
-		if t.C != nil {
-			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(t.C)})
-			combine = append(combine, t)
+		if action.C != nil {
+			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.C)})
+			combine = append(combine, action)
 			trigger++
 		}
 
-		if t.T != nil {
-			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(t.T.C)})
-			combine = append(combine, t)
+		if action.T != nil {
+			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.T.C)})
+			combine = append(combine, action)
 			timer++
 		}
 	}

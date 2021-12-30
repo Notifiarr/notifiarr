@@ -111,7 +111,8 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
-func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop
+func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop,funlen
+	content := mux.Vars(r)["content"]
 	trigger := mux.Vars(r)["trigger"]
 	c.Debugf("Incoming API Trigger: %s", trigger)
 
@@ -134,10 +135,25 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 		c.website.Trigger.SendSnapshot(notifiarr.EventAPI)
 	case "gaps":
 		c.website.Trigger.SendGaps(notifiarr.EventAPI)
+	case "corrupt":
+		switch strings.ToLower(content) {
+		default:
+			return http.StatusBadRequest, "invalid application value: " + content
+		case "":
+			return http.StatusBadRequest, "missing application value"
+		case "lidarr":
+			c.website.Trigger.SendLidarrCorruption(notifiarr.EventAPI)
+		case "radarr":
+			c.website.Trigger.SendRadarrCorruption(notifiarr.EventAPI)
+		case "readarr":
+			c.website.Trigger.SendReadarrCorruption(notifiarr.EventAPI)
+		case "sonarr":
+			c.website.Trigger.SendSonarrCorruption(notifiarr.EventAPI)
+		}
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}
 	case "notification":
-		if content := mux.Vars(r)["content"]; content != "" {
+		if content != "" {
 			ui.Notify("Notification: %s", content) //nolint:errcheck
 			c.Printf("NOTIFICATION: %s", content)
 		} else {
@@ -145,6 +161,10 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 		}
 	default:
 		return http.StatusBadRequest, "unknown trigger '" + trigger + "'"
+	}
+
+	if content != "" {
+		return http.StatusOK, trigger + " (" + content + ") initiated"
 	}
 
 	return http.StatusOK, trigger + " initiated"

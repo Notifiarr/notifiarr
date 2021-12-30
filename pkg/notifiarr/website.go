@@ -74,6 +74,15 @@ type Response struct {
 	} `json:"details"`
 }
 
+func (r *Response) String() string {
+	if r == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("Website took %s and replied with: %s, %s",
+		r.Details.Elapsed, r.Result, r.Details.Response)
+}
+
 // sendPlexMeta is kicked off by the webserver in go routine.
 // It's also called by the plex cron (with webhook set to nil).
 // This runs after Plex drops off a webhook telling us someone did something.

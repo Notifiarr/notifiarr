@@ -41,6 +41,7 @@ type ReadarrConfig struct {
 	Name      string        `toml:"name" xml:"name"`
 	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
 	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
+	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
 	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
 	*starr.Config
 	*readarr.Readarr

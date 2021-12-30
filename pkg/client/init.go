@@ -13,8 +13,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-const disabled = "disabled"
-
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
 func (c *Client) PrintStartupInfo() {
@@ -85,17 +83,17 @@ func (c *Client) printLogFileInfo() {
 
 // printPlex is called on startup to print info about configured Plex instance(s).
 func (c *Client) printPlex() {
-	p := c.Config.Plex
-	if !p.Configured() {
+	plex := c.Config.Plex
+	if !plex.Configured() {
 		return
 	}
 
-	name := p.Name
+	name := plex.Name
 	if name == "" {
 		name = "<possible connection error>"
 	}
 
-	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming APIs and webhook)", name, p.URL)
+	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming APIs and webhook)", name, plex.URL)
 }
 
 // printLidarr is called on startup to print info about each configured server.
@@ -103,13 +101,13 @@ func (c *Client) printLidarr() {
 	if len(c.Config.Lidarr) == 1 {
 		f := c.Config.Lidarr[0]
 
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" => Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" => Lidarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 
 		return
 	}
@@ -117,13 +115,13 @@ func (c *Client) printLidarr() {
 	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "servers")
 
 	for i, f := range c.Config.Lidarr {
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 	}
 }
 
@@ -132,13 +130,13 @@ func (c *Client) printRadarr() {
 	if len(c.Config.Radarr) == 1 {
 		f := c.Config.Radarr[0]
 
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" => Radarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 
 		return
 	}
@@ -146,13 +144,13 @@ func (c *Client) printRadarr() {
 	c.Print(" => Radarr Config:", len(c.Config.Radarr), "servers")
 
 	for i, f := range c.Config.Radarr {
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 	}
 }
 
@@ -161,13 +159,13 @@ func (c *Client) printReadarr() {
 	if len(c.Config.Readarr) == 1 {
 		f := c.Config.Readarr[0]
 
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" => Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" => Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 
 		return
 	}
@@ -175,13 +173,13 @@ func (c *Client) printReadarr() {
 	c.Print(" => Readarr Config:", len(c.Config.Readarr), "servers")
 
 	for i, f := range c.Config.Readarr {
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 	}
 }
 
@@ -190,13 +188,13 @@ func (c *Client) printSonarr() {
 	if len(c.Config.Sonarr) == 1 {
 		f := c.Config.Sonarr[0]
 
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" => Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" => Sonarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 
 		return
 	}
@@ -204,13 +202,13 @@ func (c *Client) printSonarr() {
 	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "servers")
 
 	for i, f := range c.Config.Sonarr {
-		checkQ := disabled
+		checkQ := mnd.Disabled
 		if f.CheckQ != nil {
 			checkQ = strconv.Itoa(int(*f.CheckQ))
 		}
 
-		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ)
+		c.Printf(" =>    Server %d: %s, apikey:%v, timeout:%v, verify ssl:%v, check_q: %s, corrupt:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 	}
 }
 
