@@ -449,7 +449,7 @@ documentation support. This project succeeds because of them. Thank you!
 <a title="Travis-CI" alt="Travis-CI" href="https://Travis-CI.com"><img src="https://docs.golift.io/integrations/travis-ci.png"/></a>
 <a title="Homebrew" alt="Homebrew" href="https://brew.sh"><img src="https://docs.golift.io/integrations/homebrew.png"/></a>
 <a title="Go Lift" alt="Go Lift" href="https://golift.io"><img src="https://docs.golift.io/integrations/golift.png"/></a>
-<a title="Better Uptime" alt="Go Lift" href="http://betteruptime.com"><img src="https://docs.golift.io/integrations/betteruptime.png"/></a>
+<a title="Better Uptime" alt="Go Lift" href="https://betteruptime.com"><img src="https://docs.golift.io/integrations/betteruptime.png"/></a>
 </p>
 
 ## Contributing

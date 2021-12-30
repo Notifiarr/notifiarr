@@ -1,4 +1,4 @@
-//go:build (darwin && (amd64 || arm64)) || (freebsd && amd64) || (netbsd && amd64) || windows || linux
+//go:build (darwin && (amd64 || arm64)) || (freebsd && amd64) || windows || linux
 
 package notifiarr
 
