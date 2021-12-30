@@ -200,7 +200,7 @@ $(BINARY).amd64.exe: rsrc.syso main.go
 
 linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
-freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
+freebsd_packages: freebsd_pkg #freebsd386_pkg freebsdarm_pkg
 
 macapp: $(MACAPP).app
 $(MACAPP).app: macos

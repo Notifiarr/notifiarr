@@ -151,7 +151,7 @@ func (c *Client) makeMoreChannels() {
 	c.menu["corrLidarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Lidarr Backups", "check latest backup database in each instance for corruption"))
 	c.menu["corrRadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Radarr Backups", "check latest backup database in each instance for corruption"))
 	c.menu["corrReadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Readarr Backups", "check latest backup database in each instance for corruption"))
-	c.menu["corrSonarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Sonar Backups", "check latest backup database in each instance for corruption"))
+	c.menu["corrSonarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Sonarr Backups", "check latest backup database in each instance for corruption"))
 
 	if ci, err := c.website.GetClientInfo(notifiarr.EventStart); err == nil {
 		ui.WrapMenu(data.AddSubMenuItem("- Custom Timers -", "")).Disable()
