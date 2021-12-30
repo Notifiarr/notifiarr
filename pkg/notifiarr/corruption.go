@@ -14,7 +14,6 @@ import (
 	"golang.org/x/net/context"
 	"golift.io/starr"
 	"golift.io/xtractr"
-	_ "modernc.org/sqlite" //nolint:gci // database driver for sqlite3.
 )
 
 // Intervals at which these apps database backups are checked for corruption.
