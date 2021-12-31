@@ -25,6 +25,7 @@ func (c *Client) PrintStartupInfo() {
 	c.Printf("==> %s <==", mnd.HelpLink)
 	c.Printf("==> %s Startup Settings <==", strings.Title(strings.ToLower(c.Config.Mode)))
 	c.printLidarr()
+	c.printProwlarr()
 	c.printRadarr()
 	c.printReadarr()
 	c.printSonarr()
@@ -122,6 +123,25 @@ func (c *Client) printLidarr() {
 
 		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
 			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+	}
+}
+
+// printProwlarr is called on startup to print info about each configured server.
+func (c *Client) printProwlarr() {
+	if len(c.Config.Prowlarr) == 1 {
+		f := c.Config.Prowlarr[0]
+
+		c.Printf(" => Prowlarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+
+		return
+	}
+
+	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), "servers")
+
+	for i, f := range c.Config.Prowlarr {
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
 	}
 }
 

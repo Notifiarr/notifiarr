@@ -114,123 +114,151 @@ timeout = "{{.Timeout}}"
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
-{{if .Lidarr}}{{range .Lidarr}}
-[[lidarr]]
+
+{{if .Lidarr}}{{range .Lidarr}}[[lidarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"{{if .Username}}
-	username = "{{.Username}}"
-	password = "{{.Password}}"{{end}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[lidarr]]
 #name     = "" # Set a name to enable checks of your service.
 #url      = "http://lidarr:8989/"
-#api_key  = "".{{end}}
+#api_key  = ""
 
-{{if .Prowlarr}}{{range .Prowlarr}}
-[[prowlarr]]
+
+{{end}}{{if .Prowlarr}}{{range .Prowlarr}}[[prowlarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"{{if .Username}}
-	username = "{{.Username}}"
-	password = "{{.Password}}"{{end}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[prowlarr]]
 #name     = "" # Set a name to enable checks of your service.
 #url      = "http://prowlarr:9696/"
-#api_key  = "".{{end}}
+#api_key  = ""
 
-{{if .Radarr}}{{range .Radarr}}
-[[radarr]]
+
+{{end}}{{if .Radarr}}{{range .Radarr}}[[radarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"{{if .Username}}
-	username = "{{.Username}}"
-	password = "{{.Password}}"{{end}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{ if .MaxBody }}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
 #url       = "http://127.0.0.1:7878/radarr"
-#api_key   = ""{{end}}
+#api_key   = ""
 
-{{if .Readarr}}{{range .Readarr}}
-[[readarr]]
+
+{{end}}{{if .Readarr}}{{range .Readarr}}[[readarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"{{if .Username}}
-	username = "{{.Username}}"
-	password = "{{.Password}}"{{end}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
 #url       = "http://127.0.0.1:8787/readarr"
-#api_key   = ""{{end}}
+#api_key   = ""
 
-{{if .Sonarr}}{{range .Sonarr}}
-[[sonarr]]
+
+{{end}}{{if .Sonarr}}{{range .Sonarr}}[[sonarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"{{if .Username}}
-	username = "{{.Username}}"
-	password = "{{.Password}}"{{end}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[sonarr]]
 #name      = ""  # Set a name to enable checks of your service.
 #url       = "http://sonarr:8989/"
-#api_key   = ""{{end}}
+#api_key   = ""
 
+
+{{end -}}
 
 # Download Client Configs (below) are used for dashboard state and service checks.
 
-{{if .Deluge}}{{range .Deluge -}}
-[[deluge]]
+{{if .Deluge}}{{range .Deluge }}[[deluge]]
   name     = "{{.Name}}"
   url      = "{{.Config.URL}}"
   password = "{{.Password}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{end}}{{else}}#[[deluge]]
+  timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[deluge]]
 #name     = ""  # Set a name to enable checks of your service.
 #url      = "http://deluge:8112/"
-#password = ""{{end}}
+#password = ""
 
-{{if .Qbit}}{{range .Qbit}}
-[[qbit]]
+
+{{end}}{{if .Qbit}}{{range .Qbit}}[[qbit]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   user     = "{{.User}}"
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{end}}
-{{else}}
-#[[qbit]]
+  timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[qbit]]
 #name     = ""  # Set a name to enable checks of your service.
 #url      = "http://qbit:8080/"
 #user     = ""
-#pass     = ""{{end}}
+#pass     = ""
 
-{{if .SabNZB}}{{range .SabNZB}}
-[[sabnzbd]]
+
+{{end}}{{if .SabNZB}}{{range .SabNZB}}[[sabnzbd]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{end}}
-{{else}}
-#[[sabnzbd]]
+  timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[sabnzbd]]
 #name     = ""  # Set a name to enable checks of this application.
 #url      = "http://sabnzbd:8080/"
 #api_key  = ""
-{{end}}
+
+
+{{end -}}
 
 #################
 # Plex Settings #

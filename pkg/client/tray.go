@@ -149,6 +149,7 @@ func (c *Client) makeMoreChannels() {
 	c.menu["app_ques"] = ui.WrapMenu(data.AddSubMenuItem("Stuck Queue Items Check", "check app queues for stuck items and send to notifiarr"))
 	c.menu["send_dash"] = ui.WrapMenu(data.AddSubMenuItem("Send Dashboard States", "collect and send all application states for a dashboard update"))
 	c.menu["corrLidarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Lidarr Backups", "check latest backup database in each instance for corruption"))
+	c.menu["corrProwlarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Prowlarr Backups", "check latest backup database in each instance for corruption"))
 	c.menu["corrRadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Radarr Backups", "check latest backup database in each instance for corruption"))
 	c.menu["corrReadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Readarr Backups", "check latest backup database in each instance for corruption"))
 	c.menu["corrSonarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Sonarr Backups", "check latest backup database in each instance for corruption"))
@@ -352,6 +353,8 @@ func (c *Client) watchNotifiarrMenu() {
 			c.website.Trigger.SendDashboardState(notifiarr.EventUser)
 		case <-c.menu["corrLidarr"].Clicked():
 			c.website.Trigger.SendLidarrCorruption(notifiarr.EventUser)
+		case <-c.menu["corrProwlarr"].Clicked():
+			c.website.Trigger.SendProwlarrCorruption(notifiarr.EventUser)
 		case <-c.menu["corrRadarr"].Clicked():
 			c.website.Trigger.SendRadarrCorruption(notifiarr.EventUser)
 		case <-c.menu["corrReadarr"].Clicked():

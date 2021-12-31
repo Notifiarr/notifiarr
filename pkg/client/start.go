@@ -180,6 +180,15 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		c.Config.Apps.Lidarr[app.Instance-1].Corrupt = app.Corrupt
 	}
 
+	for _, app := range ci.Actions.Apps.Prowlarr {
+		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Prowlarr) {
+			c.Errorf("Website provided configuration for missing Prowlarr app: %d:%s", app.Instance, app.Name)
+			continue
+		}
+
+		c.Config.Apps.Prowlarr[app.Instance-1].Corrupt = app.Corrupt
+	}
+
 	for _, app := range ci.Actions.Apps.Radarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Radarr) {
 			c.Errorf("Website provided configuration for missing Radarr app: %d:%s", app.Instance, app.Name)

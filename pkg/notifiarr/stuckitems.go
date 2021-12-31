@@ -28,10 +28,11 @@ type appConfig struct {
 
 // appConfigs is the configuration returned from the notifiarr website.
 type appConfigs struct {
-	Lidarr  []*appConfig `json:"lidarr"`
-	Radarr  []*appConfig `json:"radarr"`
-	Readarr []*appConfig `json:"readarr"`
-	Sonarr  []*appConfig `json:"sonarr"`
+	Lidarr   []*appConfig `json:"lidarr"`
+	Prowlarr []*appConfig `json:"prowlarr"`
+	Radarr   []*appConfig `json:"radarr"`
+	Readarr  []*appConfig `json:"readarr"`
+	Sonarr   []*appConfig `json:"sonarr"`
 }
 
 type ListItem struct {
