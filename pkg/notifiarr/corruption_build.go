@@ -1,4 +1,5 @@
-//go:build (darwin && (amd64 || arm64)) || (freebsd && amd64) || windows || linux
+// https://pkg.go.dev/modernc.org/sqlite#hdr-Supported_platforms_and_architectures
+//go:build (darwin && (amd64 || arm64)) || (freebsd && amd64) || (windows && and64) || linux
 
 package notifiarr
 

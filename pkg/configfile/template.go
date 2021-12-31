@@ -118,7 +118,9 @@ timeout = "{{.Timeout}}"
 [[lidarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+	username = "{{.Username}}"
+	password = "{{.Password}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
 	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
@@ -127,11 +129,28 @@ timeout = "{{.Timeout}}"
 #url      = "http://lidarr:8989/"
 #api_key  = "".{{end}}
 
+{{if .Prowlarr}}{{range .Prowlarr}}
+[[prowlarr]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+	username = "{{.Username}}"
+	password = "{{.Password}}"{{end}}
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+{{else}}#[[prowlarr]]
+#name     = "" # Set a name to enable checks of your service.
+#url      = "http://prowlarr:9696/"
+#api_key  = "".{{end}}
+
 {{if .Radarr}}{{range .Radarr}}
 [[radarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+	username = "{{.Username}}"
+	password = "{{.Password}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{ if .MaxBody }}
   max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
@@ -144,7 +163,9 @@ timeout = "{{.Timeout}}"
 [[readarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+	username = "{{.Username}}"
+	password = "{{.Password}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
 	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
@@ -157,7 +178,9 @@ timeout = "{{.Timeout}}"
 [[sonarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+	username = "{{.Username}}"
+	password = "{{.Password}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
 	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
@@ -285,7 +308,7 @@ timeout = "{{.Timeout}}"
 
 ## Uncomment the following section to create a service check on a URL or IP:port.
 ## You may include as many [[service]] sections as you have services to check.
-## Do not add Radarr, Sonarr, Readarr or Lidarr here! Add a name to enable their checks.
+## Do not add Radarr, Sonarr, Readarr, Prowlarr, or Lidarr here! Add a name to enable their checks.
 ##
 ## Example with comments follows.
 #[[service]]

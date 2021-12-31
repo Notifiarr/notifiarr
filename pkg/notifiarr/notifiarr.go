@@ -172,19 +172,16 @@ type extras struct {
 
 // Triggers allow trigger actions in the timer routine.
 type Triggers struct {
-	stop           *action // Triggered by calling Stop()
-	sync           *action // Sync Radarr CF and Sonarr RP
-	gaps           *action // Send Radarr Collection Gaps
-	stuck          *action // Stuck Items
-	plex           *action // Send Plex Sessions
-	dash           *action // Dashboard State
-	snap           *action // Snapshot
-	corruptLidarr  *action
-	corruptRadarr  *action
-	corruptReadarr *action
-	corruptSonarr  *action
-	sess           chan time.Time // Return Plex Sessions
-	sessr          chan *holder   // Session Return Channel
+	stop            *action        // Triggered by calling Stop()
+	sync            *action        // Sync Radarr CF and Sonarr RP
+	gaps            *action        // Send Radarr Collection Gaps
+	stuck           *action        // Stuck Items
+	plex            *action        // Send Plex Sessions
+	dash            *action        // Dashboard State
+	snap            *action        // Snapshot
+	corruptTriggers                // off-loaded to another file
+	sess            chan time.Time // Return Plex Sessions
+	sessr           chan *holder   // Session Return Channel
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.

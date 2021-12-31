@@ -18,16 +18,25 @@ import (
 
 // Intervals at which these apps database backups are checked for corruption.
 const (
-	lidarrCorruptCheckDur  = 6*time.Hour + 10*time.Minute
-	radarrCorruptCheckDur  = 5*time.Hour + 40*time.Minute
-	readarrCorruptCheckDur = 6*time.Hour + 45*time.Minute
-	sonarrCorruptCheckDur  = 5*time.Hour + 15*time.Minute
+	lidarrCorruptCheckDur   = 5*time.Hour + 10*time.Minute
+	prowlarrCorruptCheckDur = 5*time.Hour + 20*time.Minute
+	radarrCorruptCheckDur   = 5*time.Hour + 30*time.Minute
+	readarrCorruptCheckDur  = 5*time.Hour + 40*time.Minute
+	sonarrCorruptCheckDur   = 5*time.Hour + 50*time.Minute
 )
 
 // Errors returned by this package.
 var (
 	ErrNoDBInBackup = fmt.Errorf("no database file found in backup")
 )
+
+type corruptTriggers struct {
+	corruptLidarr   *action
+	corruptProwlarr *action
+	corruptRadarr   *action
+	corruptReadarr  *action
+	corruptSonarr   *action
+}
 
 // BackupInfo contains a pile of information about a Starr database (backup).
 // This is the data sent to notifiarr.com.
@@ -46,25 +55,31 @@ type BackupInfo struct {
 }
 
 func (c *Config) makeCorruptionTriggers() {
-	c.Trigger.corruptLidarr = &action{
+	c.Trigger.corruptTriggers.corruptLidarr = &action{
 		Fn:  c.sendLidarrCorruption,
 		Msg: "Checking Lidarr instances for database backup corruption.",
 		C:   make(chan EventType, 1),
 		T:   time.NewTicker(lidarrCorruptCheckDur),
 	}
-	c.Trigger.corruptRadarr = &action{
+	c.Trigger.corruptTriggers.corruptProwlarr = &action{
+		Fn:  c.sendProwlarrCorruption,
+		Msg: "Checking Prowlarr instances for database backup corruption.",
+		C:   make(chan EventType, 1),
+		T:   time.NewTicker(prowlarrCorruptCheckDur),
+	}
+	c.Trigger.corruptTriggers.corruptRadarr = &action{
 		Fn:  c.sendRadarrCorruption,
 		Msg: "Checking Radarr instances for database backup corruption.",
 		C:   make(chan EventType, 1),
 		T:   time.NewTicker(radarrCorruptCheckDur),
 	}
-	c.Trigger.corruptReadarr = &action{
+	c.Trigger.corruptTriggers.corruptReadarr = &action{
 		Fn:  c.sendReadarrCorruption,
 		Msg: "Checking Readarr instances for database backup corruption.",
 		C:   make(chan EventType, 1),
 		T:   time.NewTicker(readarrCorruptCheckDur),
 	}
-	c.Trigger.corruptSonarr = &action{
+	c.Trigger.corruptTriggers.corruptSonarr = &action{
 		Fn:  c.sendSonarrCorruption,
 		Msg: "Checking Sonarr instances for database backup corruption.",
 		C:   make(chan EventType, 1),
@@ -78,6 +93,14 @@ func (t *Triggers) SendLidarrCorruption(event EventType) {
 	}
 
 	t.corruptLidarr.C <- event
+}
+
+func (t *Triggers) SendProwlarrCorruption(event EventType) {
+	if t.stop == nil {
+		return
+	}
+
+	t.corruptProwlarr.C <- event
 }
 
 func (t *Triggers) SendRadarrCorruption(event EventType) {
@@ -109,7 +132,20 @@ func (c *Config) sendLidarrCorruption(event EventType) {
 		app.Corrupt = c.sendAndLogAppCorruption(&checkInstanceCorruption{
 			event: event,
 			last:  app.Corrupt,
-			name:  "Lidarr",
+			name:  string(starr.Lidarr),
+			int:   i + 1,
+			app:   app,
+			cName: app.Name,
+		})
+	}
+}
+
+func (c *Config) sendProwlarrCorruption(event EventType) {
+	for i, app := range c.Apps.Prowlarr {
+		app.Corrupt = c.sendAndLogAppCorruption(&checkInstanceCorruption{
+			event: event,
+			last:  app.Corrupt,
+			name:  string(starr.Prowlarr),
 			int:   i + 1,
 			app:   app,
 			cName: app.Name,
@@ -122,7 +158,7 @@ func (c *Config) sendRadarrCorruption(event EventType) {
 		app.Corrupt = c.sendAndLogAppCorruption(&checkInstanceCorruption{
 			event: event,
 			last:  app.Corrupt,
-			name:  "Radarr",
+			name:  string(starr.Radarr),
 			int:   i + 1,
 			app:   app,
 			cName: app.Name,
@@ -135,7 +171,7 @@ func (c *Config) sendReadarrCorruption(event EventType) {
 		app.Corrupt = c.sendAndLogAppCorruption(&checkInstanceCorruption{
 			event: event,
 			last:  app.Corrupt,
-			name:  "Readarr",
+			name:  string(starr.Readarr),
 			int:   i + 1,
 			app:   app,
 			cName: app.Name,
@@ -148,7 +184,7 @@ func (c *Config) sendSonarrCorruption(event EventType) {
 		app.Corrupt = c.sendAndLogAppCorruption(&checkInstanceCorruption{
 			event: event,
 			last:  app.Corrupt,
-			name:  "Sonarr",
+			name:  string(starr.Sonarr),
 			int:   i + 1,
 			app:   app,
 			cName: app.Name,

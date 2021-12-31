@@ -242,6 +242,19 @@ lidarr.max_body|`DN_LIDARR_0_MAX_BODY`|`0` (off) / How much of the response body
 
 * __BCC = Backup Corruption Check__
 
+### Prowlarr
+
+|Config Name|Variable Name|Note|
+|---|---|---|
+prowlarr.name|`DN_PROWLARR_0_NAME`|No Default. Setting a name enables service checks|
+prowlarr.url|`DN_PROWLARR_0_URL`|No Default. Something like: `http://prowlarr:9696`|
+prowlarr.api_key|`DN_PROWLARR_0_API_KEY`|No Default. Provide URL and API key if you use Readarr|
+prowlarr.username|`DN_PROWLARR_0_USERNAME`|Provide username if using backup corruption check and auth is enabled|
+prowlarr.password|`DN_PROWLARR_0_PASSWORD`|Provide password if using backup corruption check and auth is enabled|
+prowlarr.http_user|`DN_PROWLARR_0_HTTP_USER`|Provide username if Prowlarr uses basic auth (uncommon) and BCC enabled|
+prowlarr.http_pass|`DN_PROWLARR_0_HTTP_PASS`|Provide password if Prowlarr uses basic auth (uncommon) and BCC enabled|
+prowlarr.max_body|`DN_PROWLARR_0_MAX_BODY`|`0` (off) / How much of the response body is logged when debug is on|
+
 ### Radarr
 
 |Config Name|Variable Name|Note|
