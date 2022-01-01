@@ -97,7 +97,9 @@ func (t *Triggers) SendDashboardState(event EventType) {
 		return
 	}
 
-	t.dash.C <- event
+	if trigger := t.get(TrigDashboard); trigger != nil {
+		trigger.C <- event
+	}
 }
 
 func (c *Config) sendDashboardState(event EventType) {
@@ -114,10 +116,8 @@ func (c *Config) sendDashboardState(event EventType) {
 		return
 	}
 
-	c.Printf("[%s requested] Sent Dashboard State Data to Notifiarr! Elapsed: apps:%s total:%s."+
-		" Website took %s and replied with: %s, %s",
-		event, apps, time.Since(start).Round(time.Millisecond),
-		resp.Details.Elapsed, resp.Result, resp.Details.Response)
+	c.Printf("[%s requested] Sent Dashboard State Data to Notifiarr! Elapsed: apps:%s total:%s. %s",
+		event, apps, time.Since(start).Round(time.Millisecond), resp)
 }
 
 // getStates fires a routine for each app type and tries to get a lot of data fast!

@@ -15,72 +15,13 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
-	"golift.io/cnfg"
 )
 
-// Response is what notifiarr replies to our requests with.
-/* try this
-{
-    "response": "success",
-    "message": {
-        "response": {
-            "instance": 1,
-            "debug": null
-        },
-        "started": "23:57:03",
-        "finished": "23:57:03",
-        "elapsed": "0s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Service status cron processed.",
-        "started": "00:04:15",
-        "finished": "00:04:15",
-        "elapsed": "0s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Channel stats cron processed.",
-        "started": "00:04:31",
-        "finished": "00:04:36",
-        "elapsed": "5s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Dashboard payload processed.",
-        "started": "00:02:04",
-        "finished": "00:02:11",
-        "elapsed": "7s"
-    }
-}
-*/
-// nitsua: all responses should be that way.. but response might not always be an object.
-type Response struct {
-	Result  string `json:"result"`
-	Details struct {
-		Response json.RawMessage `json:"response"` // can be anything. type it out later.
-		Started  time.Time       `json:"started"`
-		Finished time.Time       `json:"finished"`
-		Elapsed  cnfg.Duration   `json:"elapsed"`
-	} `json:"details"`
-}
-
-func (r *Response) String() string {
-	if r == nil {
-		return ""
-	}
-
-	return fmt.Sprintf("Website took %s and replied with: %s, %s",
-		r.Details.Elapsed, r.Result, r.Details.Response)
+// httpClient is our custom http client to wrap Do and provide retries.
+type httpClient struct {
+	Retries int
+	*log.Logger
+	*http.Client
 }
 
 // sendPlexMeta is kicked off by the webserver in go routine.
@@ -294,13 +235,6 @@ func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error
 	}
 
 	return resp.StatusCode, body, nil
-}
-
-// httpClient is our custom http client to wrap Do and provide retries.
-type httpClient struct {
-	Retries int
-	*log.Logger
-	*http.Client
 }
 
 // Do performs an http Request with retries and logging!

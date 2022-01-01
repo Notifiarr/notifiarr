@@ -1,6 +1,10 @@
 package notifiarr
 
 func (c *Config) logSnapshotStartup() {
+	if c.Snap.Interval.Duration < 1 {
+		return
+	}
+
 	var ex string
 
 	for k, v := range map[string]bool{
@@ -36,7 +40,9 @@ func (t *Triggers) SendSnapshot(event EventType) {
 		return
 	}
 
-	t.snap.C <- event
+	if t := t.get(TrigSnapshot); t != nil {
+		t.C <- event
+	}
 }
 
 func (c *Config) sendSnapshot(event EventType) {
@@ -58,8 +64,6 @@ func (c *Config) sendSnapshot(event EventType) {
 	if err != nil {
 		c.Errorf("[%s requested] Sending snapshot to Notifiarr: %v", event, err)
 	} else {
-		c.Printf("[%s requested] System Snapshot sent to Notifiarr, cron interval: %s. "+
-			"Website took %s and replied with: %s, %s",
-			event, c.Snap.Interval, resp.Details.Elapsed, resp.Result, resp.Details.Response)
+		c.Printf("[%s requested] System Snapshot sent to Notifiarr, cron interval: %s. %s", event, c.Snap.Interval, resp)
 	}
 }

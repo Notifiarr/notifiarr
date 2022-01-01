@@ -25,18 +25,19 @@ const (
 	sonarrCorruptCheckDur   = 5*time.Hour + 50*time.Minute
 )
 
+// Trigger Types.
+const (
+	TrigLidarrCorrupt   TriggerName = "Checking Lidarr instances for database backup corruption."
+	TrigProwlarrCorrupt TriggerName = "Checking Prowlarr instances for database backup corruption."
+	TrigRadarrCorrupt   TriggerName = "Checking Radarr instances for database backup corruption."
+	TrigReadarrCorrupt  TriggerName = "Checking Readarr instances for database backup corruption."
+	TrigSonarrCorrupt   TriggerName = "Checking Sonarr instances for database backup corruption."
+)
+
 // Errors returned by this package.
 var (
 	ErrNoDBInBackup = fmt.Errorf("no database file found in backup")
 )
-
-type corruptTriggers struct {
-	corruptLidarr   *action
-	corruptProwlarr *action
-	corruptRadarr   *action
-	corruptReadarr  *action
-	corruptSonarr   *action
-}
 
 // BackupInfo contains a pile of information about a Starr database (backup).
 // This is the data sent to notifiarr.com.
@@ -55,36 +56,32 @@ type BackupInfo struct {
 }
 
 func (c *Config) makeCorruptionTriggers() {
-	c.Trigger.corruptTriggers.corruptLidarr = &action{
-		Fn:  c.sendLidarrCorruption,
-		Msg: "Checking Lidarr instances for database backup corruption.",
-		C:   make(chan EventType, 1),
-		T:   time.NewTicker(lidarrCorruptCheckDur),
-	}
-	c.Trigger.corruptTriggers.corruptProwlarr = &action{
-		Fn:  c.sendProwlarrCorruption,
-		Msg: "Checking Prowlarr instances for database backup corruption.",
-		C:   make(chan EventType, 1),
-		T:   time.NewTicker(prowlarrCorruptCheckDur),
-	}
-	c.Trigger.corruptTriggers.corruptRadarr = &action{
-		Fn:  c.sendRadarrCorruption,
-		Msg: "Checking Radarr instances for database backup corruption.",
-		C:   make(chan EventType, 1),
-		T:   time.NewTicker(radarrCorruptCheckDur),
-	}
-	c.Trigger.corruptTriggers.corruptReadarr = &action{
-		Fn:  c.sendReadarrCorruption,
-		Msg: "Checking Readarr instances for database backup corruption.",
-		C:   make(chan EventType, 1),
-		T:   time.NewTicker(readarrCorruptCheckDur),
-	}
-	c.Trigger.corruptTriggers.corruptSonarr = &action{
-		Fn:  c.sendSonarrCorruption,
-		Msg: "Checking Sonarr instances for database backup corruption.",
-		C:   make(chan EventType, 1),
-		T:   time.NewTicker(sonarrCorruptCheckDur),
-	}
+	c.Trigger.add(&action{
+		Name: TrigLidarrCorrupt,
+		Fn:   c.sendLidarrCorruption,
+		C:    make(chan EventType, 1),
+		T:    time.NewTicker(lidarrCorruptCheckDur),
+	}, &action{
+		Name: TrigProwlarrCorrupt,
+		Fn:   c.sendProwlarrCorruption,
+		C:    make(chan EventType, 1),
+		T:    time.NewTicker(prowlarrCorruptCheckDur),
+	}, &action{
+		Name: TrigRadarrCorrupt,
+		Fn:   c.sendRadarrCorruption,
+		C:    make(chan EventType, 1),
+		T:    time.NewTicker(radarrCorruptCheckDur),
+	}, &action{
+		Name: TrigReadarrCorrupt,
+		Fn:   c.sendReadarrCorruption,
+		C:    make(chan EventType, 1),
+		T:    time.NewTicker(readarrCorruptCheckDur),
+	}, &action{
+		Name: TrigSonarrCorrupt,
+		Fn:   c.sendSonarrCorruption,
+		C:    make(chan EventType, 1),
+		T:    time.NewTicker(sonarrCorruptCheckDur),
+	})
 }
 
 func (t *Triggers) SendLidarrCorruption(event EventType) {
@@ -92,7 +89,9 @@ func (t *Triggers) SendLidarrCorruption(event EventType) {
 		return
 	}
 
-	t.corruptLidarr.C <- event
+	if t := t.get(TrigLidarrCorrupt); t != nil {
+		t.C <- event
+	}
 }
 
 func (t *Triggers) SendProwlarrCorruption(event EventType) {
@@ -100,7 +99,9 @@ func (t *Triggers) SendProwlarrCorruption(event EventType) {
 		return
 	}
 
-	t.corruptProwlarr.C <- event
+	if t := t.get(TrigProwlarrCorrupt); t != nil {
+		t.C <- event
+	}
 }
 
 func (t *Triggers) SendRadarrCorruption(event EventType) {
@@ -108,7 +109,9 @@ func (t *Triggers) SendRadarrCorruption(event EventType) {
 		return
 	}
 
-	t.corruptRadarr.C <- event
+	if t := t.get(TrigRadarrCorrupt); t != nil {
+		t.C <- event
+	}
 }
 
 func (t *Triggers) SendReadarrCorruption(event EventType) {
@@ -116,7 +119,9 @@ func (t *Triggers) SendReadarrCorruption(event EventType) {
 		return
 	}
 
-	t.corruptReadarr.C <- event
+	if t := t.get(TrigReadarrCorrupt); t != nil {
+		t.C <- event
+	}
 }
 
 func (t *Triggers) SendSonarrCorruption(event EventType) {
@@ -124,7 +129,9 @@ func (t *Triggers) SendSonarrCorruption(event EventType) {
 		return
 	}
 
-	t.corruptSonarr.C <- event
+	if t := t.get(TrigSonarrCorrupt); t != nil {
+		t.C <- event
+	}
 }
 
 func (c *Config) sendLidarrCorruption(event EventType) {
@@ -207,7 +214,7 @@ type checkInstanceCorruption struct {
 
 func (c *Config) sendAndLogAppCorruption(input *checkInstanceCorruption) string {
 	if input.last == mnd.Disabled || input.last == "" {
-		c.Debugf("[%s requested] Disabled: %s Backup File Corruption Check (%d)", input.event, input.name, input.int)
+		c.Printf("[%s requested] Disabled: %s Backup File Corruption Check (%d)", input.event, input.name, input.int)
 		return input.last
 	}
 

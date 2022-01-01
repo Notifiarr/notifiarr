@@ -69,7 +69,9 @@ func (t *Triggers) SendStuckQueueItems(event EventType) {
 		return
 	}
 
-	t.stuck.C <- event
+	if t := t.get(TrigStuckItems); t != nil {
+		t.C <- event
+	}
 }
 
 func (c *Config) sendStuckQueueItems(event EventType) {
@@ -91,10 +93,8 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), err)
 	} else {
 		c.Printf("[%s requested] Sent Stuck Items to Notifiarr "+
-			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d. "+
-			"Website took %s and replied with: %s, %s",
-			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(),
-			resp.Details.Elapsed, resp.Result, resp.Details.Response)
+			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d. %s",
+			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), resp)
 	}
 }
 
