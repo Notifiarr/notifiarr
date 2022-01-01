@@ -23,11 +23,7 @@ type memoryStatusEx struct {
 var kernel = syscall.NewLazyDLL("Kernel32.dll")
 
 // GetMemoryUsage returns current host memory consumption.
-func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
-	if !run {
-		return nil
-	}
-
+func (s *Snapshot) GetMemoryUsage(ctx context.Context) error {
 	memInfo := memoryStatusEx{}
 	memInfo.cbSize = uint32(unsafe.Sizeof(memInfo))
 	globalmemory := kernel.NewProc("GlobalMemoryStatusEx")

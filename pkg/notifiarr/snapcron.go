@@ -11,8 +11,6 @@ func (c *Config) logSnapshotStartup() {
 		"raid":    c.Snap.Raid,
 		"disks":   c.Snap.DiskUsage,
 		"drives":  c.Snap.DriveData,
-		"uptime":  c.Snap.Uptime,
-		"cpumem":  c.Snap.CPUMem,
 		"cputemp": c.Snap.CPUTemp,
 		"iotop":   c.Snap.IOTop > 0,
 		"pstop":   c.Snap.PSTop > 0,

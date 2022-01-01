@@ -30,8 +30,8 @@ type Synology struct {
 */
 
 // GetSynology checks if the app is running on a Synology, and gets system info.
-func GetSynology(run bool) (*Synology, error) { //nolint:cyclop
-	if !run || !mnd.IsSynology {
+func GetSynology() (*Synology, error) { //nolint:cyclop
+	if !mnd.IsSynology {
 		return nil, ErrNotSynology
 	}
 

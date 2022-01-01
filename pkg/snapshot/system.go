@@ -28,11 +28,7 @@ type Process struct {
 }
 
 // GetCPUSample gets a CPU percentage sample, CPU Times and Load Average.
-func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
-	if !run {
-		return nil
-	}
-
+func (s *Snapshot) GetCPUSample(ctx context.Context) error {
 	times, err := cpu.TimesWithContext(ctx, false) // percpu, true/false
 	if err != nil {
 		return fmt.Errorf("unable to get cpu times: %w", err)
@@ -54,11 +50,7 @@ func (s *Snapshot) GetCPUSample(ctx context.Context, run bool) error {
 	return nil
 }
 
-func (s *Snapshot) getMemoryUsageShared(ctx context.Context, run bool) error {
-	if !run {
-		return nil
-	}
-
+func (s *Snapshot) getMemoryUsageShared(ctx context.Context) error {
 	memory, err := mem.SwapMemoryWithContext(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to get memory usage: %w", err)
@@ -72,16 +64,12 @@ func (s *Snapshot) getMemoryUsageShared(ctx context.Context, run bool) error {
 }
 
 // GetLocalData collects current username, logged in user and host info.
-func (s *Snapshot) GetLocalData(ctx context.Context, run bool) (errs []error) {
+func (s *Snapshot) GetLocalData(ctx context.Context) (errs []error) {
 	u, err := user.Current()
 	if err != nil {
 		errs = append(errs, fmt.Errorf("getting username: %w", err))
 	} else {
 		s.System.Username = u.Username
-	}
-
-	if !run {
-		return errs
 	}
 
 	if err := s.GetUsers(ctx); err != nil {
