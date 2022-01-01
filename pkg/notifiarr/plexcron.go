@@ -28,12 +28,8 @@ var ErrNoChannel = fmt.Errorf("no channel to send session request")
 
 // SendPlexSessions sends plex sessions in a go routine through a channel.
 func (t *Triggers) SendPlexSessions(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	if t := t.get(TrigPlexSessions); t != nil {
-		t.C <- event
+	if trig := t.get(TrigPlexSessions); trig != nil && t.stop != nil {
+		trig.C <- event
 	}
 }
 

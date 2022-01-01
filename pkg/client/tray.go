@@ -153,6 +153,11 @@ func (c *Client) makeMoreChannels() {
 	c.menu["corrRadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Radarr Backups", "check latest backup database in each instance for corruption"))
 	c.menu["corrReadarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Readarr Backups", "check latest backup database in each instance for corruption"))
 	c.menu["corrSonarr"] = ui.WrapMenu(data.AddSubMenuItem("Check Sonarr Backups", "check latest backup database in each instance for corruption"))
+	c.menu["backLidarr"] = ui.WrapMenu(data.AddSubMenuItem("Send Lidarr Backups", "send backup file list for each instance to Notifiarr"))
+	c.menu["backProwlarr"] = ui.WrapMenu(data.AddSubMenuItem("Send Prowlarr Backups", "send backup file list for each instance to Notifiarr"))
+	c.menu["backRadarr"] = ui.WrapMenu(data.AddSubMenuItem("Send Radarr Backups", "send backup file list for each instance to Notifiarr"))
+	c.menu["backReadarr"] = ui.WrapMenu(data.AddSubMenuItem("Send Readarr Backups", "send backup file list for each instance to Notifiarr"))
+	c.menu["backSonarr"] = ui.WrapMenu(data.AddSubMenuItem("Send Sonarr Backups", "send backup file list for each instance to Notifiarr"))
 
 	if ci, err := c.website.GetClientInfo(notifiarr.EventStart); err == nil {
 		ui.WrapMenu(data.AddSubMenuItem("- Custom Timers -", "")).Disable()
@@ -361,6 +366,16 @@ func (c *Client) watchNotifiarrMenu() {
 			c.website.Trigger.SendReadarrCorruption(notifiarr.EventUser)
 		case <-c.menu["corrSonarr"].Clicked():
 			c.website.Trigger.SendSonarrCorruption(notifiarr.EventUser)
+		case <-c.menu["backLidarr"].Clicked():
+			c.website.Trigger.SendLidarrBackups(notifiarr.EventUser)
+		case <-c.menu["backProwlarr"].Clicked():
+			c.website.Trigger.SendProwlarrBackups(notifiarr.EventUser)
+		case <-c.menu["backRadarr"].Clicked():
+			c.website.Trigger.SendRadarrBackups(notifiarr.EventUser)
+		case <-c.menu["backReadarr"].Clicked():
+			c.website.Trigger.SendReadarrBackups(notifiarr.EventUser)
+		case <-c.menu["backSonarr"].Clicked():
+			c.website.Trigger.SendSonarrBackups(notifiarr.EventUser)
 		}
 	}
 }

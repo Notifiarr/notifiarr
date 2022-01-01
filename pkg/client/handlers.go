@@ -141,14 +141,37 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 			return http.StatusBadRequest, "invalid application value: " + content
 		case "":
 			return http.StatusBadRequest, "missing application value"
+		case "all":
+			c.website.Trigger.SendAllStarrCorruption(notifiarr.EventAPI)
 		case "lidarr":
 			c.website.Trigger.SendLidarrCorruption(notifiarr.EventAPI)
+		case "prowlarr":
+			c.website.Trigger.SendProwlarrCorruption(notifiarr.EventAPI)
 		case "radarr":
 			c.website.Trigger.SendRadarrCorruption(notifiarr.EventAPI)
 		case "readarr":
 			c.website.Trigger.SendReadarrCorruption(notifiarr.EventAPI)
 		case "sonarr":
 			c.website.Trigger.SendSonarrCorruption(notifiarr.EventAPI)
+		}
+	case "backup":
+		switch strings.ToLower(content) {
+		default:
+			return http.StatusBadRequest, "invalid application value: " + content
+		case "":
+			return http.StatusBadRequest, "missing application value"
+		case "all":
+			c.website.Trigger.SendAllStarrBackups(notifiarr.EventAPI)
+		case "lidarr":
+			c.website.Trigger.SendLidarrBackups(notifiarr.EventAPI)
+		case "prowlarr":
+			c.website.Trigger.SendProwlarrBackups(notifiarr.EventAPI)
+		case "radarr":
+			c.website.Trigger.SendRadarrBackups(notifiarr.EventAPI)
+		case "readarr":
+			c.website.Trigger.SendReadarrBackups(notifiarr.EventAPI)
+		case "sonarr":
+			c.website.Trigger.SendSonarrBackups(notifiarr.EventAPI)
 		}
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}

@@ -34,7 +34,7 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context) error {
 	s.System.MemTotal = memInfo.ullTotalPhys
 
 	if mem == 0 {
-		return s.getMemoryUsageShared(ctx, run)
+		return s.getMemoryUsageShared(ctx)
 	}
 
 	return nil

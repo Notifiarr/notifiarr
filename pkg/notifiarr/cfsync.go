@@ -49,12 +49,8 @@ type RadarrCustomFormatPayload struct {
 }
 
 func (t *Triggers) SyncCF(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	if t := t.get(TrigCFSync); t != nil {
-		t.C <- event
+	if trig := t.get(TrigCFSync); trig != nil && t.stop != nil {
+		trig.C <- event
 	}
 }
 

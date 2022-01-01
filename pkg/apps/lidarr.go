@@ -47,7 +47,7 @@ type LidarrConfig struct {
 	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
 	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
 	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
+	Backup    string        `toml:"backup" xml:"backup"`
 	*starr.Config
 	*lidarr.Lidarr
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
@@ -71,14 +71,6 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.Lidarr = lidarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
-	}
-
-	// These things are not used in this package but this package configures them.
-	if r.StuckItem && r.CheckQ == nil {
-		i := uint(0)
-		r.CheckQ = &i
-	} else if r.CheckQ != nil {
-		r.StuckItem = true
 	}
 
 	r.URL = strings.TrimRight(r.URL, "/")

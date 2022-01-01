@@ -7,7 +7,6 @@ package client
 
 import (
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -102,13 +101,9 @@ func (c *Client) printLidarr() {
 	if len(c.Config.Lidarr) == 1 {
 		f := c.Config.Lidarr[0]
 
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" => Lidarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" => Lidarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
 		return
 	}
@@ -116,13 +111,9 @@ func (c *Client) printLidarr() {
 	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "servers")
 
 	for i, f := range c.Config.Lidarr {
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem,
+			f.Corrupt != "" && f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
 }
 
@@ -131,8 +122,9 @@ func (c *Client) printProwlarr() {
 	if len(c.Config.Prowlarr) == 1 {
 		f := c.Config.Prowlarr[0]
 
-		c.Printf(" => Prowlarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" => Prowlarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v backup:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
 		return
 	}
@@ -140,8 +132,9 @@ func (c *Client) printProwlarr() {
 	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), "servers")
 
 	for i, f := range c.Config.Prowlarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v backup:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
 }
 
@@ -150,13 +143,9 @@ func (c *Client) printRadarr() {
 	if len(c.Config.Radarr) == 1 {
 		f := c.Config.Radarr[0]
 
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" => Radarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" => Radarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
 		return
 	}
@@ -164,13 +153,9 @@ func (c *Client) printRadarr() {
 	c.Print(" => Radarr Config:", len(c.Config.Radarr), "servers")
 
 	for i, f := range c.Config.Radarr {
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
 }
 
@@ -179,13 +164,9 @@ func (c *Client) printReadarr() {
 	if len(c.Config.Readarr) == 1 {
 		f := c.Config.Readarr[0]
 
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" => Readarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" => Readarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
 		return
 	}
@@ -193,13 +174,9 @@ func (c *Client) printReadarr() {
 	c.Print(" => Readarr Config:", len(c.Config.Readarr), "servers")
 
 	for i, f := range c.Config.Readarr {
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
 }
 
@@ -208,13 +185,9 @@ func (c *Client) printSonarr() {
 	if len(c.Config.Sonarr) == 1 {
 		f := c.Config.Sonarr[0]
 
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" => Sonarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" => Sonarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
 		return
 	}
@@ -222,13 +195,9 @@ func (c *Client) printSonarr() {
 	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "servers")
 
 	for i, f := range c.Config.Sonarr {
-		checkQ := mnd.Disabled
-		if f.CheckQ != nil {
-			checkQ = strconv.Itoa(int(*f.CheckQ))
-		}
-
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v check_q:%s corrupt:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, checkQ, f.Corrupt != "" && f.Corrupt != mnd.Disabled)
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
 }
 

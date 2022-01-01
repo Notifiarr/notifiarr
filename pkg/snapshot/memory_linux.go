@@ -14,7 +14,7 @@ import (
 func (s *Snapshot) GetMemoryUsage(ctx context.Context) error {
 	file, err := os.Open("/proc/meminfo")
 	if err != nil {
-		return s.getMemoryUsageShared(ctx, run)
+		return s.getMemoryUsageShared(ctx)
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -40,7 +40,7 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context) error {
 	if s.System.MemTotal > 0 && s.System.MemFree > 0 {
 		s.System.MemUsed = s.System.MemTotal - s.System.MemFree
 	} else {
-		return s.getMemoryUsageShared(ctx, run)
+		return s.getMemoryUsageShared(ctx)
 	}
 
 	return nil

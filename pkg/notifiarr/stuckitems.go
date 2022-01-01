@@ -23,6 +23,7 @@ type appConfig struct {
 	Name     string        `json:"name"`
 	Stuck    bool          `json:"stuck"`
 	Corrupt  string        `json:"corrupt"`
+	Backup   string        `json:"backup"`
 	Interval cnfg.Duration `json:"interval"`
 }
 
@@ -65,12 +66,8 @@ func (i ItemList) Empty() bool {
 }
 
 func (t *Triggers) SendStuckQueueItems(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	if t := t.get(TrigStuckItems); t != nil {
-		t.C <- event
+	if trig := t.get(TrigStuckItems); trig != nil && t.stop != nil {
+		trig.C <- event
 	}
 }
 

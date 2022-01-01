@@ -19,6 +19,7 @@ type ProwlarrConfig struct {
 	Name     string        `toml:"name" xml:"name"`         // if set, turn on service checks.
 	Interval cnfg.Duration `toml:"interval" xml:"interval"` // service check interval.
 	Corrupt  string        `toml:"corrupt" xml:"corrupt"`
+	Backup   string        `toml:"backup" xml:"backup"`
 	*starr.Config
 	*prowlarr.Prowlarr
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`

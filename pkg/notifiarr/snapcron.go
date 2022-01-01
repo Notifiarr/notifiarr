@@ -8,15 +8,15 @@ func (c *Config) logSnapshotStartup() {
 	var ex string
 
 	for k, v := range map[string]bool{
-		"raid":    c.Snap.Raid,
-		"disks":   c.Snap.DiskUsage,
-		"drives":  c.Snap.DriveData,
-		"cputemp": c.Snap.CPUTemp,
-		"iotop":   c.Snap.IOTop > 0,
-		"pstop":   c.Snap.PSTop > 0,
-		"mysql":   c.Snap.Plugins != nil && len(c.Snap.MySQL) > 0,
-		"zfs":     len(c.Snap.ZFSPools) > 0,
-		"sudo":    c.Snap.UseSudo && c.Snap.DriveData,
+		"cpu, load, memory, uptime, users, temps": true,
+		"raid":   c.Snap.Raid,
+		"disks":  c.Snap.DiskUsage,
+		"drives": c.Snap.DriveData,
+		"iotop":  c.Snap.IOTop > 0,
+		"pstop":  c.Snap.PSTop > 0,
+		"mysql":  c.Snap.Plugins != nil && len(c.Snap.MySQL) > 0,
+		"zfs":    len(c.Snap.ZFSPools) > 0,
+		"sudo":   c.Snap.UseSudo && c.Snap.DriveData,
 	} {
 		if !v {
 			continue
@@ -34,12 +34,8 @@ func (c *Config) logSnapshotStartup() {
 }
 
 func (t *Triggers) SendSnapshot(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	if t := t.get(TrigSnapshot); t != nil {
-		t.C <- event
+	if trig := t.get(TrigSnapshot); trig != nil && t.stop != nil {
+		trig.C <- event
 	}
 }
 

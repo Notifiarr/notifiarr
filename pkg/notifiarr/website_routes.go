@@ -95,9 +95,10 @@ const (
 	SnapRoute    Route = notifiRoute + "/snapshot"
 	SvcRoute     Route = notifiRoute + "/services"
 	CorruptRoute Route = notifiRoute + "/corruption"
+	BackupRoute  Route = notifiRoute + "/backup"
 )
 
-// Path adds parameter to a route path and turns it into a string.
+// Path adds parameters to a route path and turns it into a string.
 func (r Route) Path(event EventType, params ...string) string {
 	switch {
 	case len(params) == 0 && event == "":

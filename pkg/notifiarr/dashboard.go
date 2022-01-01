@@ -93,12 +93,8 @@ type States struct {
 
 // SendDashboardState sends the current states for the dashboard.
 func (t *Triggers) SendDashboardState(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	if trigger := t.get(TrigDashboard); trigger != nil {
-		trigger.C <- event
+	if trig := t.get(TrigDashboard); trig != nil && t.stop != nil {
+		trig.C <- event
 	}
 }
 

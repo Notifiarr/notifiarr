@@ -17,12 +17,8 @@ type gapsConfig struct {
 }
 
 func (t *Triggers) SendGaps(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	if t := t.get(TrigCollectionGaps); t != nil {
-		t.C <- event
+	if trig := t.get(TrigCollectionGaps); trig != nil && t.stop != nil {
+		trig.C <- event
 	}
 }
 
