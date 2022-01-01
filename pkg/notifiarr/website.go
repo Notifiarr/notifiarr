@@ -93,15 +93,15 @@ func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 
 	wg.Add(3) //nolint: gomnd,wsl
 	go func() {
-		rep <- snap.GetCPUSample(ctx, true)
+		rep <- snap.GetCPUSample(ctx)
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
-		rep <- snap.GetMemoryUsage(ctx, true)
+		rep <- snap.GetMemoryUsage(ctx)
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
-		for _, err := range snap.GetLocalData(ctx, false) {
+		for _, err := range snap.GetLocalData(ctx) {
 			rep <- err
 		}
 		wg.Done() //nolint:wsl

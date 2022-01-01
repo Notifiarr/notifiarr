@@ -19,6 +19,7 @@ import (
 	"golift.io/version"
 )
 
+// ClientInfo is the client's startup data received from the website.
 type ClientInfo struct {
 	User struct {
 		WelcomeMSG string `json:"welcome"`
@@ -112,21 +113,9 @@ func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
 
 // Info is used for JSON input for our outgoing client info.
 func (c *Config) Info() map[string]interface{} {
-	var (
-		plexConfig interface{}
-		numPlex    = 0 // maybe one day we'll support more than 1 plex.
-	)
-
+	numPlex := 0 // maybe one day we'll support more than 1 plex.
 	if c.Plex.Configured() {
 		numPlex = 1
-		plexConfig = map[string]interface{}{
-			"seriesPc":   c.Plex.SeriesPC,
-			"moviesPc":   c.Plex.MoviesPC,
-			"cooldown":   c.Plex.Cooldown,
-			"accountMap": c.Plex.AccountMap,
-			"interval":   c.Plex.Interval,
-			"noActivity": c.Plex.NoActivity,
-		}
 	}
 
 	return map[string]interface{}{
@@ -143,19 +132,19 @@ func (c *Config) Info() map[string]interface{} {
 			"gui":       ui.HasGUI(),
 		},
 		"num": map[string]interface{}{
-			"deluge":  len(c.Apps.Deluge),
-			"lidarr":  len(c.Apps.Lidarr),
-			"plex":    numPlex,
-			"qbit":    len(c.Apps.Qbit),
-			"radarr":  len(c.Apps.Radarr),
-			"readarr": len(c.Apps.Readarr),
-			"sonarr":  len(c.Apps.Sonarr),
+			"deluge":   len(c.Apps.Deluge),
+			"lidarr":   len(c.Apps.Lidarr),
+			"plex":     numPlex,
+			"prowlarr": len(c.Apps.Prowlarr),
+			"qbit":     len(c.Apps.Qbit),
+			"radarr":   len(c.Apps.Radarr),
+			"readarr":  len(c.Apps.Readarr),
+			"sabnzbd":  len(c.Apps.SabNZB),
+			"sonarr":   len(c.Apps.Sonarr),
 		},
 		"config": map[string]interface{}{
 			"globalTimeout": c.Timeout.String(),
 			"retries":       c.Retries,
-			"plex":          plexConfig,
-			"snapshot":      c.Snap,
 			"apps":          c.getAppConfigs(),
 		},
 		"internal": map[string]interface{}{
@@ -164,16 +153,6 @@ func (c *Config) Info() map[string]interface{} {
 		},
 		"services": c.Services,
 	}
-}
-
-func (c *Config) getTautulliData(add map[string]interface{}) {
-	u, err := c.Apps.Tautulli.GetUsers()
-	if err != nil {
-		c.Error("Getting Tautulli Users:", err)
-		return
-	}
-
-	add["tautulli"] = map[string]interface{}{"users": u.MapEmailName()}
 }
 
 // HostInfoNoError will return nil if there is an error, otherwise a copy of the host info.
@@ -218,8 +197,9 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 		return nil, fmt.Errorf("getting host info: %w", err)
 	}
 
-	syn, err := snapshot.GetSynology(true)
-	if syn != nil && err == nil {
+	syn, err := snapshot.GetSynology()
+	if err == nil {
+		// This method writes synology data into hostInfo.
 		syn.SetInfo(hostInfo)
 	}
 
@@ -229,6 +209,7 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 		hostInfo.PlatformFamily = "Docker"
 	}
 
+	// TrueNAS adds junk to the hostname.
 	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > 17 {
 		hostInfo.Hostname = hostInfo.Hostname[:len(hostInfo.Hostname)-17]
 	}
@@ -268,54 +249,44 @@ func (c *Config) pollForReload(event EventType) {
 
 func (c *Config) getAppConfigs() map[string]interface{} {
 	apps := make(map[string][]map[string]interface{})
+	add := func(i int, name string) map[string]interface{} {
+		return map[string]interface{}{
+			"name":     name,
+			"instance": i + 1,
+		}
+	}
 
 	for i, app := range c.Apps.Lidarr {
-		apps["lidarr"] = append(apps["lidarr"], map[string]interface{}{
-			"name":     app.Name,
-			"instance": i + 1,
-			"checkQ":   app.CheckQ,
-			"stuckOn":  app.StuckItem,
-			"interval": app.Interval,
-		})
+		apps["lidarr"] = append(apps["lidarr"], add(i, app.Name))
+	}
+
+	for i, app := range c.Apps.Prowlarr {
+		apps["prowlarr"] = append(apps["prowlarr"], add(i, app.Name))
 	}
 
 	for i, app := range c.Apps.Radarr {
-		apps["radarr"] = append(apps["radarr"], map[string]interface{}{
-			"name":     app.Name,
-			"instance": i + 1,
-			"checkQ":   app.CheckQ,
-			"stuckOn":  app.StuckItem,
-			"interval": app.Interval,
-		})
+		apps["radarr"] = append(apps["radarr"], add(i, app.Name))
 	}
 
 	for i, app := range c.Apps.Readarr {
-		apps["readarr"] = append(apps["readarr"], map[string]interface{}{
-			"name":     app.Name,
-			"instance": i + 1,
-			"checkQ":   app.CheckQ,
-			"stuckOn":  app.StuckItem,
-			"interval": app.Interval,
-		})
+		apps["readarr"] = append(apps["readarr"], add(i, app.Name))
 	}
 
 	for i, app := range c.Apps.Sonarr {
-		apps["sonarr"] = append(apps["sonarr"], map[string]interface{}{
-			"name":     app.Name,
-			"instance": i + 1,
-			"checkQ":   app.CheckQ,
-			"stuckOn":  app.StuckItem,
-			"interval": app.Interval,
-		})
+		apps["sonarr"] = append(apps["sonarr"], add(i, app.Name))
 	}
 
 	// We do this so more apps can be added later.
-	r := make(map[string]interface{})
+	reApps := make(map[string]interface{})
 	for k, v := range apps {
-		r[k] = v
+		reApps[k] = v
 	}
 
-	c.getTautulliData(r)
+	if u, err := c.Apps.Tautulli.GetUsers(); err != nil {
+		c.Error("Getting Tautulli Users:", err)
+	} else {
+		reApps["tautulli"] = map[string]interface{}{"users": u.MapEmailName()}
+	}
 
-	return r
+	return reApps
 }

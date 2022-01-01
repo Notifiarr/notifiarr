@@ -77,6 +77,7 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 	return syn, nil
 }
 
+// SetInfo writes synology data INTO the provided InfoStat.
 func (s *Synology) SetInfo(hi *host.InfoStat) {
 	if hi.Platform == "" && s.Vendor != "" {
 		hi.Platform = s.Vendor
