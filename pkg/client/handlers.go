@@ -114,7 +114,12 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop,funlen
 	content := mux.Vars(r)["content"]
 	trigger := mux.Vars(r)["trigger"]
-	c.Debugf("Incoming API Trigger: %s", trigger)
+
+	if content != "" {
+		c.Debugf("Incoming API Trigger: %s (%s)", trigger, content)
+	} else {
+		c.Debugf("Incoming API Trigger: %s", trigger)
+	}
 
 	switch trigger {
 	case "cfsync":

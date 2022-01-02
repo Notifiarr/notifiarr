@@ -23,11 +23,6 @@ const (
 	radarrCorruptCheckDur   = 5*time.Hour + 30*time.Minute
 	readarrCorruptCheckDur  = 5*time.Hour + 40*time.Minute
 	sonarrCorruptCheckDur   = 5*time.Hour + 50*time.Minute
-	lidarrBackupCheckDur    = 6*time.Hour + 10*time.Minute
-	prowlarrBackupCheckDur  = 6*time.Hour + 20*time.Minute
-	radarrBackupCheckDur    = 6*time.Hour + 30*time.Minute
-	readarrBackupCheckDur   = 6*time.Hour + 40*time.Minute
-	sonarrBackupCheckDur    = 6*time.Hour + 50*time.Minute
 )
 
 // Trigger Types.
@@ -37,11 +32,6 @@ const (
 	TrigRadarrCorrupt   TriggerName = "Checking Radarr instances for database backup corruption."
 	TrigReadarrCorrupt  TriggerName = "Checking Readarr instances for database backup corruption."
 	TrigSonarrCorrupt   TriggerName = "Checking Sonarr instances for database backup corruption."
-	TrigLidarrBackup    TriggerName = "Sending Lidarr Backup File List to Notifiarr."
-	TrigProwlarrBackup  TriggerName = "Sending Prowlarr Backup File List to Notifiarr."
-	TrigRadarrBackup    TriggerName = "Sending Radarr Backup File List to Notifiarr."
-	TrigReadarrBackup   TriggerName = "Sending Readarr Backup File List to Notifiarr."
-	TrigSonarrBackup    TriggerName = "Sending Sonarr Backup File List to Notifiarr."
 )
 
 // Errors returned by this package.
@@ -52,18 +42,17 @@ var (
 // BackupInfo contains a pile of information about a Starr database (backup).
 // This is the data sent to notifiarr.com.
 type BackupInfo struct {
-	App    string              `json:"app"`
-	Int    int                 `json:"instance"`
-	Name   string              `json:"name"`
-	File   string              `json:"file,omitempty"`
-	Ver    string              `json:"version,omitempty"`
-	Integ  string              `json:"integrity,omitempty"`
-	Quick  string              `json:"quick,omitempty"`
-	Rows   int                 `json:"rows,omitempty"`
-	Size   int64               `json:"bytes,omitempty"`
-	Tables int64               `json:"tables,omitempty"`
-	Date   time.Time           `json:"date,omitempty"`
-	Files  []*starr.BackupFile `json:"backups,omitempty"`
+	App    string    `json:"app"`
+	Int    int       `json:"instance"`
+	Name   string    `json:"name"`
+	File   string    `json:"file,omitempty"`
+	Ver    string    `json:"version,omitempty"`
+	Integ  string    `json:"integrity,omitempty"`
+	Quick  string    `json:"quick,omitempty"`
+	Rows   int       `json:"rows,omitempty"`
+	Size   int64     `json:"bytes,omitempty"`
+	Tables int64     `json:"tables,omitempty"`
+	Date   time.Time `json:"date,omitempty"`
 }
 
 func (c *Config) makeCorruptionTriggers() {
@@ -92,31 +81,6 @@ func (c *Config) makeCorruptionTriggers() {
 		Fn:   c.sendSonarrCorruption,
 		C:    make(chan EventType, 1),
 		T:    time.NewTicker(sonarrCorruptCheckDur),
-	}, &action{
-		Name: TrigLidarrBackup,
-		Fn:   c.sendLidarrBackups,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(lidarrBackupCheckDur),
-	}, &action{
-		Name: TrigProwlarrBackup,
-		Fn:   c.sendProwlarrBackups,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(prowlarrBackupCheckDur),
-	}, &action{
-		Name: TrigRadarrBackup,
-		Fn:   c.sendRadarrBackups,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(radarrBackupCheckDur),
-	}, &action{
-		Name: TrigReadarrBackup,
-		Fn:   c.sendReadarrBackups,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(readarrBackupCheckDur),
-	}, &action{
-		Name: TrigSonarrBackup,
-		Fn:   c.sendSonarrBackups,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(sonarrBackupCheckDur),
 	})
 }
 
@@ -154,44 +118,6 @@ func (t *Triggers) SendReadarrCorruption(event EventType) {
 
 func (t *Triggers) SendSonarrCorruption(event EventType) {
 	if trig := t.get(TrigSonarrCorrupt); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendAllStarrBackups(event EventType) {
-	t.SendSonarrBackups(event)
-	t.SendProwlarrBackups(event)
-	t.SendRadarrBackups(event)
-	t.SendReadarrBackups(event)
-	t.SendSonarrBackups(event)
-}
-
-func (t *Triggers) SendLidarrBackups(event EventType) {
-	if trig := t.get(TrigLidarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendProwlarrBackups(event EventType) {
-	if trig := t.get(TrigProwlarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendRadarrBackups(event EventType) {
-	if trig := t.get(TrigRadarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendReadarrBackups(event EventType) {
-	if trig := t.get(TrigReadarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendSonarrBackups(event EventType) {
-	if trig := t.get(TrigSonarrBackup); trig != nil && t.stop != nil {
 		trig.C <- event
 	}
 }
@@ -261,71 +187,6 @@ func (c *Config) sendSonarrCorruption(event EventType) {
 	}
 }
 
-func (c *Config) sendLidarrBackups(event EventType) {
-	for i, app := range c.Apps.Lidarr {
-		if app.Backup != mnd.Disabled {
-			c.sendBackups(&checkInstanceCorruption{
-				event: event,
-				name:  string(starr.Lidarr),
-				int:   i + 1,
-				app:   app,
-			})
-		}
-	}
-}
-
-func (c *Config) sendProwlarrBackups(event EventType) {
-	for i, app := range c.Apps.Prowlarr {
-		if app.Backup != mnd.Disabled {
-			c.sendBackups(&checkInstanceCorruption{
-				event: event,
-				name:  string(starr.Prowlarr),
-				int:   i + 1,
-				app:   app,
-			})
-		}
-	}
-}
-
-func (c *Config) sendRadarrBackups(event EventType) {
-	for i, app := range c.Apps.Radarr {
-		if app.Backup != mnd.Disabled {
-			c.sendBackups(&checkInstanceCorruption{
-				event: event,
-				name:  string(starr.Radarr),
-				int:   i + 1,
-				app:   app,
-			})
-		}
-	}
-}
-
-func (c *Config) sendReadarrBackups(event EventType) {
-	for i, app := range c.Apps.Readarr {
-		if app.Backup != mnd.Disabled {
-			c.sendBackups(&checkInstanceCorruption{
-				event: event,
-				name:  string(starr.Readarr),
-				int:   i + 1,
-				app:   app,
-			})
-		}
-	}
-}
-
-func (c *Config) sendSonarrBackups(event EventType) {
-	for i, app := range c.Apps.Sonarr {
-		if app.Backup != mnd.Disabled {
-			c.sendBackups(&checkInstanceCorruption{
-				event: event,
-				name:  string(starr.Sonarr),
-				int:   i + 1,
-				app:   app,
-			})
-		}
-	}
-}
-
 // checkInstanceCorruption is used to abstract all starr apps to reusable methods.
 type checkInstanceCorruption struct {
 	event EventType
@@ -341,7 +202,7 @@ type checkInstanceCorruption struct {
 
 func (c *Config) sendAndLogAppCorruption(input *checkInstanceCorruption) string {
 	if input.last == mnd.Disabled || input.last == "" {
-		c.Printf("[%s requested] Disabled: %s Backup File Corruption Check (%d)", input.event, input.name, input.int)
+		c.Printf("[%s requested] Disabled: %s Backup File Corruption Check (%d), '%s'", input.event, input.name, input.int, input.last)
 		return input.last
 	}
 
@@ -388,33 +249,6 @@ func (c *Config) sendAndLogAppCorruption(input *checkInstanceCorruption) string 
 	}
 
 	return backup.Name
-}
-
-func (c *Config) sendBackups(input *checkInstanceCorruption) {
-	fileList, err := input.app.GetBackupFiles()
-	if err != nil {
-		c.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
-		return
-	} else if len(fileList) == 0 {
-		c.Printf("[%s requested] %s has no backup files (%d)", input.event, input.name, input.int)
-		return
-	}
-
-	send := &BackupInfo{
-		App:   input.name,
-		Int:   input.int,
-		Name:  input.cName,
-		Files: fileList,
-	}
-
-	resp, err := c.SendData(BackupRoute.Path(input.event), send, true)
-	if err != nil {
-		c.Errorf("[%s requested] Sending %s Backup File List to Notifiarr (%d): %v: %s",
-			input.event, input.name, input.int, err, resp)
-	} else {
-		c.Printf("[%s requested] Sent %s Backup File List to Notifiarr (%d): %s",
-			input.event, input.name, input.int, resp)
-	}
 }
 
 func (c *checkInstanceCorruption) checkFileCorruption(remotePath string) (*BackupInfo, error) {

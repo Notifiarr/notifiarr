@@ -210,7 +210,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 
 		c.Config.Apps.Readarr[app.Instance-1].StuckItem = app.Stuck
 		c.Config.Apps.Readarr[app.Instance-1].Corrupt = app.Corrupt
-		c.Config.Apps.Readarr[app.Instance-1].Corrupt = app.Backup
+		c.Config.Apps.Readarr[app.Instance-1].Backup = app.Backup
 	}
 
 	for _, app := range ci.Actions.Apps.Sonarr {
@@ -221,7 +221,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 
 		c.Config.Apps.Sonarr[app.Instance-1].StuckItem = app.Stuck
 		c.Config.Apps.Sonarr[app.Instance-1].Corrupt = app.Corrupt
-		c.Config.Apps.Sonarr[app.Instance-1].Corrupt = app.Backup
+		c.Config.Apps.Sonarr[app.Instance-1].Backup = app.Backup
 	}
 }
 

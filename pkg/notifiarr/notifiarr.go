@@ -121,6 +121,7 @@ func (c *Config) Start() {
 	c.logSnapshotStartup()
 	c.makeBaseTriggers()
 	c.makeCorruptionTriggers()
+	c.makeBackupTriggers()
 	c.setPlexTimers()
 
 	if _, err := c.GetClientInfo(EventStart); err == nil { // only run this if we have clientinfo
@@ -213,6 +214,10 @@ func (c *Config) makeCustomClientInfoTimerTriggers() {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%v timeout:%v",
 			c.ClientInfo != nil, pollDur, c.Timeout)
 		c.Trigger.add(&action{Name: TrigPollSite, Fn: c.pollForReload, T: time.NewTicker(pollDur)})
+	}
+
+	if c.ClientInfo == nil {
+		return
 	}
 
 	for _, custom := range c.Actions.Custom {
