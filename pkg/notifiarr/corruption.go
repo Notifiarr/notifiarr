@@ -202,7 +202,8 @@ type checkInstanceCorruption struct {
 
 func (c *Config) sendAndLogAppCorruption(input *checkInstanceCorruption) string {
 	if input.last == mnd.Disabled || input.last == "" {
-		c.Printf("[%s requested] Disabled: %s Backup File Corruption Check (%d), '%s'", input.event, input.name, input.int, input.last)
+		c.Printf("[%s requested] Disabled: %s Backup File Corruption Check (%d), Last File: '%s'",
+			input.event, input.name, input.int, input.last)
 		return input.last
 	}
 
