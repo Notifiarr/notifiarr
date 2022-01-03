@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"golift.io/cnfg"
 )
 
 // PrintStartupInfo prints info about our startup config.
@@ -207,7 +208,7 @@ func (c *Client) printDeluge() {
 		f := c.Config.Deluge[0]
 
 		c.Printf(" => Deluge Config: 1 server: %s password:%v timeout:%s verify_ssl:%v",
-			f.Config.URL, f.Password != "", f.Timeout, f.VerifySSL)
+			f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
 
 		return
 	}
@@ -216,7 +217,7 @@ func (c *Client) printDeluge() {
 
 	for i, f := range c.Config.Deluge {
 		c.Printf(" =>    Server %d: %s password:%v timeout:%s verify_ssl:%v",
-			i+1, f.Config.URL, f.Password != "", f.Timeout, f.VerifySSL)
+			i+1, f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
 	}
 }
 
@@ -226,7 +227,7 @@ func (c *Client) printQbit() {
 		f := c.Config.Qbit[0]
 
 		c.Printf(" => Qbit Config: 1 server: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
+			f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
 
 		return
 	}
@@ -235,7 +236,7 @@ func (c *Client) printQbit() {
 
 	for i, f := range c.Config.Qbit {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			i+1, f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
+			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
 	}
 }
 

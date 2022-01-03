@@ -266,13 +266,13 @@ timeout = "{{.Timeout}}"
 
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
-[plex]{{if and .Plex (not force)}}
-  url     = "{{.Plex.URL}}"  # Your plex URL
-  token   = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
-  timeout = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
-{{- else}}
-  url     = "http://localhost:32400" # Your plex URL
-  token   = "" # your plex token; get this from a web inspector
+{{if and .Plex (not force)}}[plex]
+  url     = "{{.Plex.URL}}"   # Your plex URL
+  token   = "{{.Plex.Token}}"   # your plex token; get this from a web inspector
+  timeout = "{{.Plex.Timeout}}"  # how long to wait for HTTP responses
+{{- else}}#[plex]
+#url     = "http://localhost:32400" # Your plex URL
+#token   = "" # your plex token; get this from a web inspector
 {{- end }}
 
 #####################
@@ -329,10 +329,10 @@ timeout = "{{.Timeout}}"
 ## Use the [[service]] directive to add more service checks. Example below.
 
 [services]
-  disabled = {{.Services.Disabled}}   # Setting this to true disables all service checking routines.
-  parallel = {{.Services.Parallel}}       # How many services to check concurrently. 1 should be enough.
+  disabled = {{.Services.Disabled}} # Setting this to true disables all service checking routines.
+  parallel = {{.Services.Parallel}}     # How many services to check concurrently. 1 should be enough.
   interval = "{{.Services.Interval}}" # How often to send service states to Notifiarr.com. Minimum = 5m.
-  log_file = '{{.Services.LogFile}}'      # Service Check logs go to the app log by default. Change that by setting a services.log file here.
+  log_file = '{{.Services.LogFile}}'    # Service Check logs go to the app log by default. Change that by setting a services.log file here.
 
 ## Uncomment the following section to create a service check on a URL or IP:port.
 ## You may include as many [[service]] sections as you have services to check.

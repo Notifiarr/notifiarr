@@ -3,6 +3,7 @@ package configfile
 import (
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	flag "github.com/spf13/pflag"
@@ -27,8 +28,10 @@ type Flags struct {
 
 // ParseArgs stores the cli flag data into the Flags pointer.
 func (f *Flags) ParseArgs(args []string) {
-	f.StringVarP(&f.ConfigFile, "config", "c", os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), f.Name()+" Config File.")
-	f.StringSliceVarP(&f.ExtraConf, "extraconfig", "e", nil, "This app supports multiple config files.")
+	f.StringVarP(&f.ConfigFile, "config", "c",
+		os.Getenv(mnd.DefaultEnvPrefix+"_CONFIG_FILE"), strings.Title(f.Name())+" Config File.")
+	f.StringSliceVarP(&f.ExtraConf, "extraconfig", "e", nil, "This app supports multiple config files. "+
+		"Separate with commas, or pass -e more than once.")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix.")
 	f.BoolVarP(&f.VerReq, "version", "v", false, "Print the version and exit.")
 	f.StringVar(&f.Curl, "curl", "", "GET a URL and display headers and payload.")
