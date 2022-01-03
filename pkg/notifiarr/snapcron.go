@@ -34,9 +34,7 @@ func (c *Config) logSnapshotStartup() {
 }
 
 func (t *Triggers) SendSnapshot(event EventType) {
-	if trig := t.get(TrigSnapshot); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
+	t.exec(event, TrigSnapshot)
 }
 
 func (c *Config) sendSnapshot(event EventType) {

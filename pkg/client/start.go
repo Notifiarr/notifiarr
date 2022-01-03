@@ -134,7 +134,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	}
 
 	// Parse the config file and environment variables.
-	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
+	c.website, err = c.Config.Get(c.Flags)
 	if err != nil {
 		return msg, newCon, fmt.Errorf("getting config: %w", err)
 	}
@@ -306,7 +306,7 @@ func (c *Client) reloadConfiguration(source string) error {
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
 
-	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
+	c.website, err = c.Config.Get(c.Flags)
 	if err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}

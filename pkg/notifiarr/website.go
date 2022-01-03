@@ -113,7 +113,7 @@ func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 }
 
 func (c *Config) GetData(url string) (*Response, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -202,7 +202,7 @@ func unmarshalResponse(url string, code int, body []byte) (*Response, error) {
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
 func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))

@@ -111,7 +111,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
-func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop,funlen
+func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop
 	content := mux.Vars(r)["content"]
 	trigger := mux.Vars(r)["trigger"]
 
@@ -141,42 +141,14 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 	case "gaps":
 		c.website.Trigger.SendGaps(notifiarr.EventAPI)
 	case "corrupt":
-		switch strings.ToLower(content) {
-		default:
-			return http.StatusBadRequest, "invalid application value: " + content
-		case "":
-			return http.StatusBadRequest, "missing application value"
-		case "all":
-			c.website.Trigger.SendAllStarrCorruption(notifiarr.EventAPI)
-		case "lidarr":
-			c.website.Trigger.SendLidarrCorruption(notifiarr.EventAPI)
-		case "prowlarr":
-			c.website.Trigger.SendProwlarrCorruption(notifiarr.EventAPI)
-		case "radarr":
-			c.website.Trigger.SendRadarrCorruption(notifiarr.EventAPI)
-		case "readarr":
-			c.website.Trigger.SendReadarrCorruption(notifiarr.EventAPI)
-		case "sonarr":
-			c.website.Trigger.SendSonarrCorruption(notifiarr.EventAPI)
+		err := c.website.Trigger.Corruption(notifiarr.EventAPI, starr.App(strings.Title(content)))
+		if err != nil {
+			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err)
 		}
 	case "backup":
-		switch strings.ToLower(content) {
-		default:
-			return http.StatusBadRequest, "invalid application value: " + content
-		case "":
-			return http.StatusBadRequest, "missing application value"
-		case "all":
-			c.website.Trigger.SendAllStarrBackups(notifiarr.EventAPI)
-		case "lidarr":
-			c.website.Trigger.SendLidarrBackups(notifiarr.EventAPI)
-		case "prowlarr":
-			c.website.Trigger.SendProwlarrBackups(notifiarr.EventAPI)
-		case "radarr":
-			c.website.Trigger.SendRadarrBackups(notifiarr.EventAPI)
-		case "readarr":
-			c.website.Trigger.SendReadarrBackups(notifiarr.EventAPI)
-		case "sonarr":
-			c.website.Trigger.SendSonarrBackups(notifiarr.EventAPI)
+		err := c.website.Trigger.Backup(notifiarr.EventAPI, starr.App(strings.Title(content)))
+		if err != nil {
+			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err)
 		}
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}

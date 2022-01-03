@@ -158,6 +158,16 @@ func (c *Config) stopTimerLoop(actions []*action) {
 
 /* Helpers. */
 
+// exec runs a trigger.
+func (t *Triggers) exec(event EventType, name TriggerName) {
+	trig := t.get(name)
+	if t.stop == nil || trig == nil || trig.C == nil {
+		return
+	}
+
+	trig.C <- event
+}
+
 // get a trigger by unique name. May return nil, and that could cause a panic.
 func (t *Triggers) get(name TriggerName) *action {
 	for _, trigger := range t.List {

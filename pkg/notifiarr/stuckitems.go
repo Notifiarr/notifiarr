@@ -66,9 +66,7 @@ func (i ItemList) Empty() bool {
 }
 
 func (t *Triggers) SendStuckQueueItems(event EventType) {
-	if trig := t.get(TrigStuckItems); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
+	t.exec(event, TrigStuckItems)
 }
 
 func (c *Config) sendStuckQueueItems(event EventType) {

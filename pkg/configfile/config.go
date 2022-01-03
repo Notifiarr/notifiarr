@@ -81,14 +81,19 @@ func NewConfig(logger *logs.Logger) *Config {
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 // You should only run this after getting a config with NewConfig().
-func (c *Config) Get(configFile, envPrefix string) (*notifiarr.Config, error) {
-	if configFile != "" {
-		if err := cnfgfile.Unmarshal(c, configFile); err != nil {
+func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
+	if flag.ConfigFile != "" {
+		files := append([]string{flag.ConfigFile}, flag.ExtraConf...)
+		if err := cnfgfile.Unmarshal(c, files...); err != nil {
 			return nil, fmt.Errorf("config file: %w", err)
+		}
+	} else if len(flag.ExtraConf) != 0 {
+		if err := cnfgfile.Unmarshal(c, flag.ExtraConf...); err != nil {
+			return nil, fmt.Errorf("extra config file: %w", err)
 		}
 	}
 
-	if _, err := cnfg.UnmarshalENV(c, envPrefix); err != nil {
+	if _, err := cnfg.UnmarshalENV(c, flag.EnvPrefix); err != nil {
 		return nil, fmt.Errorf("environment variables: %w", err)
 	}
 

@@ -19,12 +19,14 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/shirou/gopsutil/v3/host"
+	"golift.io/cnfg"
 )
 
 // Errors returned by this library.
 var (
 	ErrNon200          = fmt.Errorf("return code was not 200")
 	ErrInvalidResponse = fmt.Errorf("invalid response")
+	ErrInvalidApp      = fmt.Errorf("invalid application provided")
 )
 
 const (
@@ -48,7 +50,7 @@ type Config struct {
 	Services *ServiceConfig
 	Retries  int
 	BaseURL  string
-	Timeout  time.Duration
+	Timeout  cnfg.Duration
 	Trigger  Triggers
 	MaxBody  int
 	Sighup   chan os.Signal
@@ -173,13 +175,13 @@ func (c *Config) setPlexTimers() {
 
 	if c.Plex.Interval.Duration > 0 {
 		// Add a little splay to the timers to not hit plex at the same time too often.
-		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%v timeout:%v webhook_cooldown:%v delay:%v",
+		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
 			c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown, c.Plex.Delay)
 		c.Trigger.get(TrigPlexSessions).T = time.NewTicker(c.Plex.Interval.Duration + 139*time.Millisecond) // nolint:wsl
 	}
 
 	if c.Plex.MoviesPC != 0 || c.Plex.SeriesPC != 0 {
-		c.Printf("==> Plex Completed Items Started, URL: %s, interval:1m timeout:%v movies:%d%% series:%d%%",
+		c.Printf("==> Plex Completed Items Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%%",
 			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
 		c.Trigger.add( // this has no name, which keeps it from logging _every minute_
 			&action{SFn: c.checkPlexFinishedItems, T: time.NewTicker(time.Minute + 179*time.Millisecond)})
@@ -211,8 +213,8 @@ func (c *Config) setClientInfoTimerTriggers() {
 func (c *Config) makeCustomClientInfoTimerTriggers() {
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
 	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
-		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%v timeout:%v",
-			c.ClientInfo != nil, pollDur, c.Timeout)
+		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s timeout:%s",
+			c.ClientInfo != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)}, c.Timeout)
 		c.Trigger.add(&action{Name: TrigPollSite, Fn: c.pollForReload, T: time.NewTicker(pollDur)})
 	}
 

@@ -1,6 +1,7 @@
 package notifiarr
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -9,7 +10,7 @@ import (
 
 // BackupPayload is the data we send to notifiarr.
 type BackupPayload struct {
-	App   string              `json:"app"`
+	App   starr.App           `json:"app"`
 	Int   int                 `json:"instance"`
 	Name  string              `json:"name"`
 	Files []*starr.BackupFile `json:"backups"`
@@ -24,16 +25,16 @@ const (
 	TrigSonarrBackup   TriggerName = "Sending Sonarr Backup File List to Notifiarr."
 )
 
-// Built-in backup check timers. Non-adjustable.
-const (
-	lidarrBackupCheckDur   = 6*time.Hour + 10*time.Minute
-	prowlarrBackupCheckDur = 6*time.Hour + 20*time.Minute
-	radarrBackupCheckDur   = 6*time.Hour + 30*time.Minute
-	readarrBackupCheckDur  = 6*time.Hour + 40*time.Minute
-	sonarrBackupCheckDur   = 6*time.Hour + 50*time.Minute
-)
-
 func (c *Config) makeBackupTriggers() {
+	// Built-in backup check timers. Non-adjustable.
+	const (
+		lidarrBackupCheckDur   = 6*time.Hour + 10*time.Minute
+		prowlarrBackupCheckDur = 6*time.Hour + 20*time.Minute
+		radarrBackupCheckDur   = 6*time.Hour + 30*time.Minute
+		readarrBackupCheckDur  = 6*time.Hour + 40*time.Minute
+		sonarrBackupCheckDur   = 6*time.Hour + 50*time.Minute
+	)
+
 	c.Trigger.add(&action{
 		Name: TrigLidarrBackup,
 		Fn:   c.sendLidarrBackups,
@@ -62,51 +63,39 @@ func (c *Config) makeBackupTriggers() {
 	})
 }
 
-// SendAllStarrBackups sends backups from all apps.
-func (t *Triggers) SendAllStarrBackups(event EventType) {
-	t.SendSonarrBackups(event)
-	t.SendProwlarrBackups(event)
-	t.SendRadarrBackups(event)
-	t.SendReadarrBackups(event)
-	t.SendSonarrBackups(event)
-}
-
-func (t *Triggers) SendLidarrBackups(event EventType) {
-	if trig := t.get(TrigLidarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
+func (t *Triggers) Backup(event EventType, app starr.App) error {
+	switch app { //nolint:exhaustive // we do not need them all here.
+	default:
+		return fmt.Errorf("%w: %s", ErrInvalidApp, app)
+	case "":
+		return fmt.Errorf("%w: <no app provided>", ErrInvalidApp)
+	case "All":
+		t.exec(event, TrigLidarrBackup)
+		t.exec(event, TrigProwlarrBackup)
+		t.exec(event, TrigRadarrBackup)
+		t.exec(event, TrigReadarrBackup)
+		t.exec(event, TrigSonarrBackup)
+	case starr.Lidarr:
+		t.exec(event, TrigLidarrBackup)
+	case starr.Prowlarr:
+		t.exec(event, TrigProwlarrBackup)
+	case starr.Radarr:
+		t.exec(event, TrigRadarrBackup)
+	case starr.Readarr:
+		t.exec(event, TrigReadarrBackup)
+	case starr.Sonarr:
+		t.exec(event, TrigSonarrBackup)
 	}
-}
 
-func (t *Triggers) SendProwlarrBackups(event EventType) {
-	if trig := t.get(TrigProwlarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendRadarrBackups(event EventType) {
-	if trig := t.get(TrigRadarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendReadarrBackups(event EventType) {
-	if trig := t.get(TrigReadarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
-}
-
-func (t *Triggers) SendSonarrBackups(event EventType) {
-	if trig := t.get(TrigSonarrBackup); trig != nil && t.stop != nil {
-		trig.C <- event
-	}
+	return nil
 }
 
 func (c *Config) sendLidarrBackups(event EventType) {
 	for i, app := range c.Apps.Lidarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
-			c.sendBackups(&checkInstanceCorruption{
+			c.sendBackups(&genericInstance{
 				event: event,
-				name:  string(starr.Lidarr),
+				name:  starr.Lidarr,
 				int:   i + 1,
 				app:   app,
 			})
@@ -117,9 +106,9 @@ func (c *Config) sendLidarrBackups(event EventType) {
 func (c *Config) sendProwlarrBackups(event EventType) {
 	for i, app := range c.Apps.Prowlarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
-			c.sendBackups(&checkInstanceCorruption{
+			c.sendBackups(&genericInstance{
 				event: event,
-				name:  string(starr.Prowlarr),
+				name:  starr.Prowlarr,
 				int:   i + 1,
 				app:   app,
 			})
@@ -130,9 +119,9 @@ func (c *Config) sendProwlarrBackups(event EventType) {
 func (c *Config) sendRadarrBackups(event EventType) {
 	for i, app := range c.Apps.Radarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
-			c.sendBackups(&checkInstanceCorruption{
+			c.sendBackups(&genericInstance{
 				event: event,
-				name:  string(starr.Radarr),
+				name:  starr.Radarr,
 				int:   i + 1,
 				app:   app,
 			})
@@ -143,9 +132,9 @@ func (c *Config) sendRadarrBackups(event EventType) {
 func (c *Config) sendReadarrBackups(event EventType) {
 	for i, app := range c.Apps.Readarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
-			c.sendBackups(&checkInstanceCorruption{
+			c.sendBackups(&genericInstance{
 				event: event,
-				name:  string(starr.Readarr),
+				name:  starr.Readarr,
 				int:   i + 1,
 				app:   app,
 			})
@@ -156,9 +145,9 @@ func (c *Config) sendReadarrBackups(event EventType) {
 func (c *Config) sendSonarrBackups(event EventType) {
 	for i, app := range c.Apps.Sonarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
-			c.sendBackups(&checkInstanceCorruption{
+			c.sendBackups(&genericInstance{
 				event: event,
-				name:  string(starr.Sonarr),
+				name:  starr.Sonarr,
 				cName: app.Name,
 				int:   i + 1,
 				app:   app,
@@ -167,7 +156,7 @@ func (c *Config) sendSonarrBackups(event EventType) {
 	}
 }
 
-func (c *Config) sendBackups(input *checkInstanceCorruption) {
+func (c *Config) sendBackups(input *genericInstance) {
 	fileList, err := input.app.GetBackupFiles()
 	if err != nil {
 		c.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)

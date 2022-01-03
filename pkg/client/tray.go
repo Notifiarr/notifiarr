@@ -13,6 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/getlantern/systray"
+	"golift.io/starr"
 	"golift.io/version"
 )
 
@@ -357,25 +358,25 @@ func (c *Client) watchNotifiarrMenu() {
 		case <-c.menu["send_dash"].Clicked():
 			c.website.Trigger.SendDashboardState(notifiarr.EventUser)
 		case <-c.menu["corrLidarr"].Clicked():
-			c.website.Trigger.SendLidarrCorruption(notifiarr.EventUser)
+			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Lidarr)
 		case <-c.menu["corrProwlarr"].Clicked():
-			c.website.Trigger.SendProwlarrCorruption(notifiarr.EventUser)
+			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Prowlarr)
 		case <-c.menu["corrRadarr"].Clicked():
-			c.website.Trigger.SendRadarrCorruption(notifiarr.EventUser)
+			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Radarr)
 		case <-c.menu["corrReadarr"].Clicked():
-			c.website.Trigger.SendReadarrCorruption(notifiarr.EventUser)
+			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Readarr)
 		case <-c.menu["corrSonarr"].Clicked():
-			c.website.Trigger.SendSonarrCorruption(notifiarr.EventUser)
+			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Sonarr)
 		case <-c.menu["backLidarr"].Clicked():
-			c.website.Trigger.SendLidarrBackups(notifiarr.EventUser)
+			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Lidarr)
 		case <-c.menu["backProwlarr"].Clicked():
-			c.website.Trigger.SendProwlarrBackups(notifiarr.EventUser)
+			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Prowlarr)
 		case <-c.menu["backRadarr"].Clicked():
-			c.website.Trigger.SendRadarrBackups(notifiarr.EventUser)
+			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Radarr)
 		case <-c.menu["backReadarr"].Clicked():
-			c.website.Trigger.SendReadarrBackups(notifiarr.EventUser)
+			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Readarr)
 		case <-c.menu["backSonarr"].Clicked():
-			c.website.Trigger.SendSonarrBackups(notifiarr.EventUser)
+			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Sonarr)
 		}
 	}
 }

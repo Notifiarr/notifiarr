@@ -34,7 +34,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printPlex()
 	c.printTautulli()
 	c.printMySQL()
-	c.Printf(" => Timeout: %v, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
+	c.Printf(" => Timeout: %s, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
@@ -101,7 +101,7 @@ func (c *Client) printLidarr() {
 	if len(c.Config.Lidarr) == 1 {
 		f := c.Config.Lidarr[0]
 
-		c.Printf(" => Lidarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" => Lidarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
@@ -111,7 +111,7 @@ func (c *Client) printLidarr() {
 	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "servers")
 
 	for i, f := range c.Config.Lidarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem,
 			f.Corrupt != "" && f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
@@ -122,7 +122,7 @@ func (c *Client) printProwlarr() {
 	if len(c.Config.Prowlarr) == 1 {
 		f := c.Config.Prowlarr[0]
 
-		c.Printf(" => Prowlarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v backup:%v",
+		c.Printf(" => Prowlarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v corrupt:%v backup:%v",
 			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
@@ -132,7 +132,7 @@ func (c *Client) printProwlarr() {
 	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), "servers")
 
 	for i, f := range c.Config.Prowlarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v corrupt:%v backup:%v",
 			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
@@ -143,7 +143,7 @@ func (c *Client) printRadarr() {
 	if len(c.Config.Radarr) == 1 {
 		f := c.Config.Radarr[0]
 
-		c.Printf(" => Radarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" => Radarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
@@ -153,7 +153,7 @@ func (c *Client) printRadarr() {
 	c.Print(" => Radarr Config:", len(c.Config.Radarr), "servers")
 
 	for i, f := range c.Config.Radarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
@@ -164,7 +164,7 @@ func (c *Client) printReadarr() {
 	if len(c.Config.Readarr) == 1 {
 		f := c.Config.Readarr[0]
 
-		c.Printf(" => Readarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" => Readarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
@@ -174,7 +174,7 @@ func (c *Client) printReadarr() {
 	c.Print(" => Readarr Config:", len(c.Config.Readarr), "servers")
 
 	for i, f := range c.Config.Readarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
@@ -185,8 +185,8 @@ func (c *Client) printSonarr() {
 	if len(c.Config.Sonarr) == 1 {
 		f := c.Config.Sonarr[0]
 
-		c.Printf(" => Sonarr Config: 1 server: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
+		c.Printf(" => Sonarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+			f.URL, f.APIKey != "", f.Timeout.String(), f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 
 		return
@@ -195,7 +195,7 @@ func (c *Client) printSonarr() {
 	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "servers")
 
 	for i, f := range c.Config.Sonarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%v verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
 				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
 	}
@@ -206,7 +206,7 @@ func (c *Client) printDeluge() {
 	if len(c.Config.Deluge) == 1 {
 		f := c.Config.Deluge[0]
 
-		c.Printf(" => Deluge Config: 1 server: %s password:%v timeout:%v verify_ssl:%v",
+		c.Printf(" => Deluge Config: 1 server: %s password:%v timeout:%s verify_ssl:%v",
 			f.Config.URL, f.Password != "", f.Timeout, f.VerifySSL)
 
 		return
@@ -215,7 +215,7 @@ func (c *Client) printDeluge() {
 	c.Print(" => Deluge Config:", len(c.Config.Deluge), "servers")
 
 	for i, f := range c.Config.Deluge {
-		c.Printf(" =>    Server %d: %s password:%v timeout:%v verify_ssl:%v",
+		c.Printf(" =>    Server %d: %s password:%v timeout:%s verify_ssl:%v",
 			i+1, f.Config.URL, f.Password != "", f.Timeout, f.VerifySSL)
 	}
 }
@@ -225,7 +225,7 @@ func (c *Client) printQbit() {
 	if len(c.Config.Qbit) == 1 {
 		f := c.Config.Qbit[0]
 
-		c.Printf(" => Qbit Config: 1 server: %s username:%s password:%v timeout:%v verify_ssl:%v",
+		c.Printf(" => Qbit Config: 1 server: %s username:%s password:%v timeout:%s verify_ssl:%v",
 			f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
 
 		return
@@ -234,7 +234,7 @@ func (c *Client) printQbit() {
 	c.Print(" => Qbit Config:", len(c.Config.Qbit), "servers")
 
 	for i, f := range c.Config.Qbit {
-		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%v verify_ssl:%v",
+		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
 			i+1, f.Config.URL, f.User, f.Pass != "", f.Timeout, f.VerifySSL)
 	}
 }
@@ -244,7 +244,7 @@ func (c *Client) printSABnzbd() {
 	if len(c.Config.SabNZB) == 1 {
 		f := c.Config.SabNZB[0]
 
-		c.Printf(" => SABnzbd Config: 1 server: %s api_key:%v timeout:%v", f.URL, f.APIKey != "", f.Timeout)
+		c.Printf(" => SABnzbd Config: 1 server: %s api_key:%v timeout:%s", f.URL, f.APIKey != "", f.Timeout)
 
 		return
 	}
@@ -252,7 +252,7 @@ func (c *Client) printSABnzbd() {
 	c.Print(" => SABnzbd Config:", len(c.Config.SabNZB), "servers")
 
 	for i, f := range c.Config.SabNZB {
-		c.Printf(" =>    Server %d: %s, api_key:%v timeout:%v", i+1, f.URL, f.APIKey != "", f.Timeout)
+		c.Printf(" =>    Server %d: %s, api_key:%v timeout:%s", i+1, f.URL, f.APIKey != "", f.Timeout)
 	}
 }
 
@@ -262,10 +262,10 @@ func (c *Client) printTautulli() {
 	case t == nil, t.URL == "":
 		c.Printf(" => Tautulli Config (enables name map): 0 servers")
 	case t.Name != "":
-		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:s%v check_interval:%v name:%s",
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:s%v check_interval:%s name:%s",
 			t.URL, t.Timeout, t.Interval, t.Name)
 	default:
-		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%v", t.URL, t.Timeout)
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%s", t.URL, t.Timeout)
 	}
 }
 
@@ -277,10 +277,10 @@ func (c *Client) printMySQL() {
 
 	if len(c.Config.Snapshot.MySQL) == 1 {
 		if m := c.Config.Snapshot.MySQL[0]; m.Name != "" {
-			c.Printf(" => MySQL Config: 1 server: %s user:%v timeout:%v check_interval:%v name:%s",
+			c.Printf(" => MySQL Config: 1 server: %s user:%v timeout:%s check_interval:%s name:%s",
 				m.Host, m.User, m.Timeout, m.Interval, m.Name)
 		} else {
-			c.Printf(" => MySQL Config: 1 server: %s user:%v timeout:%v", m.Host, m.User, m.Timeout)
+			c.Printf(" => MySQL Config: 1 server: %s user:%v timeout:%s", m.Host, m.User, m.Timeout)
 		}
 
 		return
@@ -290,10 +290,10 @@ func (c *Client) printMySQL() {
 
 	for i, m := range c.Config.Snapshot.MySQL {
 		if m.Name != "" {
-			c.Printf(" =>    Server %d: %s user:%v timeout:%v check_interval:%v name:%s",
+			c.Printf(" =>    Server %d: %s user:%v timeout:%s check_interval:%s name:%s",
 				i+1, m.Host, m.User, m.Timeout, m.Interval, m.Name)
 		} else {
-			c.Printf(" =>    Server %d: %s user:%v timeout:%v", i+1, m.Host, m.User, m.Timeout)
+			c.Printf(" =>    Server %d: %s user:%v timeout:%s", i+1, m.Host, m.User, m.Timeout)
 		}
 	}
 }
