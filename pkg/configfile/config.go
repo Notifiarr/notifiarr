@@ -121,7 +121,7 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 		Snap:     c.Snapshot,
 		Logger:   c.Services.Logger,
 		BaseURL:  notifiarr.BaseURL,
-		Timeout:  c.Timeout.Duration,
+		Timeout:  c.Timeout,
 		MaxBody:  c.MaxBody,
 		Services: svcs,
 	}
