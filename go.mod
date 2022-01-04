@@ -5,7 +5,7 @@ go 1.17
 // home grown goodness.
 require (
 	golift.io/cnfg v0.1.1-0.20220103045145-0c0d80e8da3f
-	golift.io/deluge v0.9.3
+	golift.io/deluge v0.9.4-0.20220103091211-1842b313e264
 	golift.io/qbit v0.0.0-20211121074815-1558e8969b98
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
 	golift.io/starr v0.12.2-0.20220103050138-44b7a8ef1c52
