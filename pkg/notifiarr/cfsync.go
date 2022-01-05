@@ -129,39 +129,39 @@ func (c *Config) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byt
 
 	maps := &cfMapIDpayload{QP: []idMap{}, CF: []idMap{}, Instance: instance}
 
-	for i, profile := range reply.CustomFormats {
-		id := profile.ID
-		if _, err := app.UpdateCustomFormat(profile, id); err != nil {
+	for idx, profile := range reply.CustomFormats {
+		profileID := profile.ID
+		if _, err := app.UpdateCustomFormat(profile, profileID); err != nil {
 			profile.ID = 0
 
 			c.Debugf("Error Updating custom format [%d/%d] (attempting to ADD %d): %v",
-				i, len(reply.CustomFormats), id, err)
+				idx, len(reply.CustomFormats), profileID, err)
 
 			newID, err2 := app.AddCustomFormat(profile)
 			if err2 != nil {
 				return fmt.Errorf("[%d/%d] updating custom format: %d: (update) %v, (add) %w",
-					i, len(reply.CustomFormats), id, err, err2)
+					idx, len(reply.CustomFormats), profileID, err, err2)
 			}
 
-			maps.CF = append(maps.CF, idMap{int64(id), int64(newID.ID)})
+			maps.CF = append(maps.CF, idMap{int64(profileID), int64(newID.ID)})
 		}
 	}
 
-	for i, profile := range reply.QualityProfiles {
+	for idx, profile := range reply.QualityProfiles {
 		if err := app.UpdateQualityProfile(profile); err != nil {
-			id := profile.ID
+			profileID := profile.ID
 			profile.ID = 0
 
 			c.Debugf("Error Updating quality profile [%d/%d] (attempting to ADD %d): %v",
-				i, len(reply.QualityProfiles), id, err)
+				idx, len(reply.QualityProfiles), profileID, err)
 
 			newID, err2 := app.AddQualityProfile(profile)
 			if err2 != nil {
 				return fmt.Errorf("[%d/%d] updating quality profile: %d: (update) %v, (add) %w",
-					i, len(reply.QualityProfiles), id, err, err2)
+					idx, len(reply.QualityProfiles), profileID, err, err2)
 			}
 
-			maps.QP = append(maps.QP, idMap{id, newID})
+			maps.QP = append(maps.QP, idMap{profileID, newID})
 		}
 	}
 
@@ -271,39 +271,39 @@ func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byt
 
 	maps := &cfMapIDpayload{RP: []idMap{}, QP: []idMap{}, Instance: instance}
 
-	for i, profile := range reply.ReleaseProfiles {
+	for idx, profile := range reply.ReleaseProfiles {
 		if err := app.UpdateReleaseProfile(profile); err != nil {
-			id := profile.ID
+			profileID := profile.ID
 			profile.ID = 0
 
 			c.Debugf("Error Updating release profile [%d/%d] (attempting to ADD %d): %v",
-				i, len(reply.ReleaseProfiles), id, err)
+				idx, len(reply.ReleaseProfiles), profileID, err)
 
 			newID, err2 := app.AddReleaseProfile(profile)
 			if err2 != nil {
 				return fmt.Errorf("[%d/%d] updating release profiles: %d: (update) %v, (add) %w",
-					i, len(reply.ReleaseProfiles), id, err, err2)
+					idx, len(reply.ReleaseProfiles), profileID, err, err2)
 			}
 
-			maps.RP = append(maps.RP, idMap{id, newID})
+			maps.RP = append(maps.RP, idMap{profileID, newID})
 		}
 	}
 
-	for i, profile := range reply.QualityProfiles {
+	for idx, profile := range reply.QualityProfiles {
 		if err := app.UpdateQualityProfile(profile); err != nil {
-			id := profile.ID
+			profileID := profile.ID
 			profile.ID = 0
 
 			c.Debugf("Error Updating quality format [%d/%d] (attempting to ADD %d): %v",
-				i, len(reply.QualityProfiles), id, err)
+				idx, len(reply.QualityProfiles), profileID, err)
 
 			newID, err2 := app.AddQualityProfile(profile)
 			if err2 != nil {
 				return fmt.Errorf("[%d/%d] updating quality profile: %d: (update) %v, (add) %w",
-					i, len(reply.QualityProfiles), id, err, err2)
+					idx, len(reply.QualityProfiles), profileID, err, err2)
 			}
 
-			maps.QP = append(maps.QP, idMap{id, newID})
+			maps.QP = append(maps.QP, idMap{profileID, newID})
 		}
 	}
 

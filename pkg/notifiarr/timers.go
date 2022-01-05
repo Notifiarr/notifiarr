@@ -102,7 +102,7 @@ func (c *Config) runTimers() {
 
 // runTimerLoop does all of the timer/cron routines for starr apps and plex.
 // Many of the menu items and trigger handlers feed into this routine too.
-func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) {
+func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { //nolint:cyclop
 	defer c.stopTimerLoop(actions)
 
 	for sent := make(map[string]struct{}); ; {

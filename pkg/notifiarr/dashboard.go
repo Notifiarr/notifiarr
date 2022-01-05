@@ -116,7 +116,7 @@ func (c *Config) sendDashboardState(event EventType) {
 
 // getStates fires a routine for each app type and tries to get a lot of data fast!
 func (c *Config) getStates() *States {
-	s := &States{}
+	states := &States{}
 
 	var wg sync.WaitGroup
 
@@ -124,58 +124,58 @@ func (c *Config) getStates() *States {
 
 	go func() {
 		defer c.CapturePanic()
-		s.Deluge = c.getDelugeStates()
+		states.Deluge = c.getDelugeStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
 		defer c.CapturePanic()
-		s.Lidarr = c.getLidarrStates()
+		states.Lidarr = c.getLidarrStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
 		defer c.CapturePanic()
-		s.Qbit = c.getQbitStates()
+		states.Qbit = c.getQbitStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
 		defer c.CapturePanic()
-		s.Radarr = c.getRadarrStates()
+		states.Radarr = c.getRadarrStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
 		defer c.CapturePanic()
-		s.Readarr = c.getReadarrStates()
+		states.Readarr = c.getReadarrStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
 		defer c.CapturePanic()
-		s.Sonarr = c.getSonarrStates()
+		states.Sonarr = c.getSonarrStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
 		defer c.CapturePanic()
-		s.SabNZB = c.getSabNZBStates()
+		states.SabNZB = c.getSabNZBStates()
 		wg.Done() //nolint:wsl
 	}()
 	wg.Wait()
 
-	return s
+	return states
 }
 
 func (c *Config) getDelugeStates() []*State {
 	states := []*State{}
 
-	for instance, d := range c.Apps.Deluge {
-		if d.Deluge.URL == "" {
+	for instance, app := range c.Apps.Deluge {
+		if app.Deluge.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting Deluge State: %d:%s", instance+1, d.Deluge.URL)
+		c.Debugf("Getting Deluge State: %d:%s", instance+1, app.Deluge.URL)
 
-		state, err := c.getDelugeState(instance+1, d)
+		state, err := c.getDelugeState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, d.Deluge.URL, err)
+			c.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, app.Deluge.URL, err)
 		}
 
 		states = append(states, state)
@@ -187,17 +187,17 @@ func (c *Config) getDelugeStates() []*State {
 func (c *Config) getLidarrStates() []*State {
 	states := []*State{}
 
-	for instance, r := range c.Apps.Lidarr {
-		if r.URL == "" {
+	for instance, app := range c.Apps.Lidarr {
+		if app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting Lidarr State: %d:%s", instance+1, r.URL)
+		c.Debugf("Getting Lidarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getLidarrState(instance+1, r)
+		state, err := c.getLidarrState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Lidarr Queue from %d:%s: %v", instance+1, r.URL, err)
+			c.Errorf("Getting Lidarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -209,17 +209,17 @@ func (c *Config) getLidarrStates() []*State {
 func (c *Config) getRadarrStates() []*State {
 	states := []*State{}
 
-	for instance, r := range c.Apps.Radarr {
-		if r.URL == "" {
+	for instance, app := range c.Apps.Radarr {
+		if app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting Radarr State: %d:%s", instance+1, r.URL)
+		c.Debugf("Getting Radarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getRadarrState(instance+1, r)
+		state, err := c.getRadarrState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Radarr Queue from %d:%s: %v", instance+1, r.URL, err)
+			c.Errorf("Getting Radarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -231,17 +231,17 @@ func (c *Config) getRadarrStates() []*State {
 func (c *Config) getReadarrStates() []*State {
 	states := []*State{}
 
-	for instance, r := range c.Apps.Readarr {
-		if r.URL == "" {
+	for instance, app := range c.Apps.Readarr {
+		if app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting Readarr State: %d:%s", instance+1, r.URL)
+		c.Debugf("Getting Readarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getReadarrState(instance+1, r)
+		state, err := c.getReadarrState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Readarr Queue from %d:%s: %v", instance+1, r.URL, err)
+			c.Errorf("Getting Readarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -253,17 +253,17 @@ func (c *Config) getReadarrStates() []*State {
 func (c *Config) getQbitStates() []*State {
 	states := []*State{}
 
-	for instance, q := range c.Apps.Qbit {
-		if q.URL == "" {
+	for instance, app := range c.Apps.Qbit {
+		if app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting Qbit State: %d:%s", instance+1, q.URL)
+		c.Debugf("Getting Qbit State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getQbitState(instance+1, q)
+		state, err := c.getQbitState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Qbit Data from %d:%s: %v", instance+1, q.URL, err)
+			c.Errorf("Getting Qbit Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -275,17 +275,17 @@ func (c *Config) getQbitStates() []*State {
 func (c *Config) getSonarrStates() []*State {
 	states := []*State{}
 
-	for instance, s := range c.Apps.Sonarr {
-		if s.URL == "" {
+	for instance, app := range c.Apps.Sonarr {
+		if app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting Sonarr State: %d:%s", instance+1, s.URL)
+		c.Debugf("Getting Sonarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getSonarrState(instance+1, s)
+		state, err := c.getSonarrState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Sonarr Queue from %d:%s: %v", instance+1, s.URL, err)
+			c.Errorf("Getting Sonarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -294,14 +294,13 @@ func (c *Config) getSonarrStates() []*State {
 	return states
 }
 
-//nolint:funlen
-func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, error) {
+func (c *Config) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
 	start := time.Now()
-	xfers, err := d.GetXfersCompat()
+	xfers, err := app.GetXfersCompat()
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
 		Instance: instance,
-		Name:     d.Name,
+		Name:     app.Name,
 		Next:     []*Sortable{},
 		Latest:   []*Sortable{},
 	}
@@ -363,11 +362,11 @@ func (c *Config) getDelugeState(instance int, d *apps.DelugeConfig) (*State, err
 	return state, nil
 }
 
-func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, error) {
-	state := &State{Instance: instance, Next: []*Sortable{}, Name: l.Name}
+func (c *Config) getLidarrState(instance int, app *apps.LidarrConfig) (*State, error) {
+	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
-	albums, err := l.GetAlbum("") // all albums
+	albums, err := app.GetAlbum("") // all albums
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
@@ -410,7 +409,7 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 	sort.Sort(dateSorter(state.Next))
 	state.Next.Shrink(showNext)
 
-	if state.Latest, err = c.getLidarrHistory(l); err != nil {
+	if state.Latest, err = c.getLidarrHistory(app); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
@@ -418,8 +417,8 @@ func (c *Config) getLidarrState(instance int, l *apps.LidarrConfig) (*State, err
 }
 
 // getLidarrHistory is not done.
-func (c *Config) getLidarrHistory(l *apps.LidarrConfig) ([]*Sortable, error) {
-	history, err := l.GetHistory(showLatest*40, 100) //nolint:gomnd
+func (c *Config) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
+	history, err := app.GetHistory(showLatest*40, 100) //nolint:gomnd
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
@@ -441,7 +440,7 @@ FORLOOP:
 		albumIDs[rec.AlbumID] = &struct{}{}
 
 		// An error here gets swallowed.
-		if album, err := l.GetAlbumByID(rec.AlbumID); err == nil {
+		if album, err := app.GetAlbumByID(rec.AlbumID); err == nil {
 			table = append(table, &Sortable{
 				Name: album.Title,
 				Sub:  album.Artist.ArtistName,
@@ -453,13 +452,13 @@ FORLOOP:
 	return table, nil
 }
 
-func (c *Config) getQbitState(instance int, q *apps.QbitConfig) (*State, error) {
+func (c *Config) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop
 	start := time.Now()
-	xfers, err := q.GetXfers()
+	xfers, err := app.GetXfers()
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
 		Instance: instance,
-		Name:     q.Name,
+		Name:     app.Name,
 		Next:     []*Sortable{},
 		Latest:   []*Sortable{},
 	}
@@ -532,7 +531,7 @@ func (c *Config) getRadarrState(instance int, r *apps.RadarrConfig) (*State, err
 	return state, nil
 }
 
-func processRadarrState(state *State, movies []*radarr.Movie) {
+func processRadarrState(state *State, movies []*radarr.Movie) { //nolint:cyclop
 	for _, movie := range movies {
 		state.Movies++
 		state.Size += movie.SizeOnDisk
@@ -561,11 +560,11 @@ func processRadarrState(state *State, movies []*radarr.Movie) {
 	}
 }
 
-func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, error) {
-	state := &State{Instance: instance, Next: []*Sortable{}, Name: r.Name}
+func (c *Config) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, error) {
+	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
-	books, err := r.GetBook("") // all books
+	books, err := app.GetBook("") // all books
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
@@ -608,7 +607,7 @@ func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, e
 	sort.Sort(dateSorter(state.Next))
 	state.Next.Shrink(showNext)
 
-	if state.Latest, err = c.getReadarrHistory(r); err != nil {
+	if state.Latest, err = c.getReadarrHistory(app); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
@@ -616,8 +615,8 @@ func (c *Config) getReadarrState(instance int, r *apps.ReadarrConfig) (*State, e
 }
 
 // getReadarrHistory is not done.
-func (c *Config) getReadarrHistory(r *apps.ReadarrConfig) ([]*Sortable, error) {
-	history, err := r.GetHistory(showLatest*20, 100) //nolint:gomnd
+func (c *Config) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
+	history, err := app.GetHistory(showLatest*20, 100) //nolint:gomnd
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
@@ -632,7 +631,7 @@ func (c *Config) getReadarrHistory(r *apps.ReadarrConfig) ([]*Sortable, error) {
 		}
 
 		// An error here gets swallowed.
-		if book, err := r.GetBookByID(rec.BookID); err == nil {
+		if book, err := app.GetBookByID(rec.BookID); err == nil {
 			table = append(table, &Sortable{
 				Name: book.Title,
 				Sub:  book.Author.AuthorName,
@@ -644,11 +643,11 @@ func (c *Config) getReadarrHistory(r *apps.ReadarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Config) getSonarrState(instance int, s *apps.SonarrConfig) (*State, error) {
-	state := &State{Instance: instance, Next: []*Sortable{}, Name: s.Name}
+func (c *Config) getSonarrState(instance int, app *apps.SonarrConfig) (*State, error) {
+	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
-	allshows, err := s.GetAllSeries()
+	allshows, err := app.GetAllSeries()
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
@@ -680,19 +679,19 @@ func (c *Config) getSonarrState(instance int, s *apps.SonarrConfig) (*State, err
 		state.Percent = 100
 	}
 
-	if state.Next, err = c.getSonarrStateUpcoming(s, state.Next); err != nil {
+	if state.Next, err = c.getSonarrStateUpcoming(app, state.Next); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
-	if state.Latest, err = c.getSonarrHistory(s); err != nil {
+	if state.Latest, err = c.getSonarrHistory(app); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
 	return state, nil
 }
 
-func (c *Config) getSonarrHistory(s *apps.SonarrConfig) ([]*Sortable, error) {
-	history, err := s.GetHistory(showLatest*20, 100) //nolint:gomnd
+func (c *Config) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
+	history, err := app.GetHistory(showLatest*20, 100) //nolint:gomnd
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
@@ -706,21 +705,21 @@ func (c *Config) getSonarrHistory(s *apps.SonarrConfig) ([]*Sortable, error) {
 			continue
 		}
 
-		series, err := s.GetSeriesByID(rec.SeriesID)
+		series, err := app.GetSeriesByID(rec.SeriesID)
 		if err != nil {
 			continue
 		}
 
 		// An error here gets swallowed.
-		if eps, err := s.GetSeriesEpisodes(rec.SeriesID); err == nil {
-			for _, ep := range eps {
-				if ep.ID == rec.EpisodeID {
+		if eps, err := app.GetSeriesEpisodes(rec.SeriesID); err == nil {
+			for _, episode := range eps {
+				if episode.ID == rec.EpisodeID {
 					table = append(table, &Sortable{
 						Name:    series.Title,
-						Sub:     ep.Title,
+						Sub:     episode.Title,
 						Date:    rec.Date,
-						Season:  ep.SeasonNumber,
-						Episode: ep.EpisodeNumber,
+						Season:  episode.SeasonNumber,
+						Episode: episode.EpisodeNumber,
 					})
 				}
 			}
@@ -730,26 +729,27 @@ func (c *Config) getSonarrHistory(s *apps.SonarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Config) getSonarrStateUpcoming(s *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
+func (c *Config) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
 	sort.Sort(dateSorter(next))
 
 	redo := []*Sortable{}
 
 	for _, item := range next {
-		eps, err := s.GetSeriesEpisodes(item.id)
+		eps, err := app.GetSeriesEpisodes(item.id)
 		if err != nil {
 			return nil, fmt.Errorf("getting series ID %d (%s): %w", item.id, item.Name, err)
 		}
 
-		for _, ep := range eps {
-			if ep.AirDateUtc.Year() == item.Date.Year() && ep.AirDateUtc.YearDay() == item.Date.YearDay() &&
-				ep.SeasonNumber != 0 && ep.EpisodeNumber != 0 {
+		for _, episode := range eps {
+			if episode.AirDateUtc.Year() == item.Date.Year() &&
+				episode.AirDateUtc.YearDay() == item.Date.YearDay() &&
+				episode.SeasonNumber != 0 && episode.EpisodeNumber != 0 {
 				redo = append(redo, &Sortable{
 					Name:    item.Name,
-					Sub:     ep.Title,
-					Date:    ep.AirDateUtc,
-					Season:  ep.SeasonNumber,
-					Episode: ep.EpisodeNumber,
+					Sub:     episode.Title,
+					Date:    episode.AirDateUtc,
+					Season:  episode.SeasonNumber,
+					Episode: episode.EpisodeNumber,
 				})
 
 				break
@@ -767,17 +767,17 @@ func (c *Config) getSonarrStateUpcoming(s *apps.SonarrConfig, next []*Sortable) 
 func (c *Config) getSabNZBStates() []*State {
 	states := []*State{}
 
-	for instance, s := range c.Apps.SabNZB {
-		if s.URL == "" {
+	for instance, app := range c.Apps.SabNZB {
+		if app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting SabNZB State: %d:%s", instance+1, s.URL)
+		c.Debugf("Getting SabNZB State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getSabNZBState(instance+1, s)
+		state, err := c.getSabNZBState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting SabNZB Data from %d:%s: %v", instance+1, s.URL, err)
+			c.Errorf("Getting SabNZB Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)

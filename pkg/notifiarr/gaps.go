@@ -27,17 +27,17 @@ func (c *Config) sendGaps(event EventType) {
 		return
 	}
 
-	for i, r := range c.Apps.Radarr {
-		instance := i + 1
-		if r.URL == "" || r.APIKey == "" || !c.Actions.Gaps.Instances.Has(instance) {
+	for idx, app := range c.Apps.Radarr {
+		instance := idx + 1
+		if app.URL == "" || app.APIKey == "" || !c.Actions.Gaps.Instances.Has(instance) {
 			continue
 		}
 
-		if resp, err := c.sendInstanceGaps(event, instance, r); err != nil {
-			c.Errorf("[%s requested] Radarr Collection Gaps request for '%d:%s' failed: %v", event, instance, r.URL, err)
+		if resp, err := c.sendInstanceGaps(event, instance, app); err != nil {
+			c.Errorf("[%s requested] Radarr Collection Gaps request for '%d:%s' failed: %v", event, instance, app.URL, err)
 		} else {
 			c.Printf("[%s requested] Sent Collection Gaps to Notifiarr for Radarr: %d:%s. %s",
-				event, instance, r.URL, resp)
+				event, instance, app.URL, resp)
 		}
 	}
 }

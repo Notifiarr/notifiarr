@@ -246,7 +246,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 
 	timeout := time.Until(deadline).Round(time.Millisecond)
 
-	for i := 0; ; i++ {
+	for retry := 0; ; retry++ {
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
@@ -266,16 +266,16 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 
 		switch {
 		case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
-			if i == 0 {
+			if retry == 0 {
 				return resp, fmt.Errorf("notifiarr req timed out after %s: %s: %w", timeout, req.URL, err)
 			}
 
 			return resp, fmt.Errorf("[%d/%d] Notifiarr req timed out after %s, giving up: %w",
-				i+1, h.Retries+1, timeout, err)
-		case i == h.Retries:
-			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", i+1, h.Retries+1, err)
+				retry+1, h.Retries+1, timeout, err)
+		case retry == h.Retries:
+			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			h.Printf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", i+1, h.Retries+1, RetryDelay, err)
+			h.Printf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
