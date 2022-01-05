@@ -15,7 +15,7 @@ HBREPO="golift/homebrew-mugs"
 AUREPO="golift/aur"
 MAINT="David Newhall II <captain at golift dot io>"
 DESC="Unified Client for Notifiarr.com"
-GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,forbidigo,cyclop,interfacer,maligned,scopelint,dupl,tagliatelle,golint,varnamelen,gomoddirectives"
+GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,interfacer,maligned,scopelint,golint"
 # Example must exist at examples/$CONFIG_FILE.example
 CONFIG_FILE="notifiarr.conf"
 LICENSE="MIT"
