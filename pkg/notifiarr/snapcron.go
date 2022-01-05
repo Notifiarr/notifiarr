@@ -7,7 +7,7 @@ func (c *Config) logSnapshotStartup() {
 
 	var ex string
 
-	for k, v := range map[string]bool{
+	for key, val := range map[string]bool{
 		"cpu, load, memory, uptime, users, temps": true,
 		"raid":   c.Snap.Raid,
 		"disks":  c.Snap.DiskUsage,
@@ -18,7 +18,7 @@ func (c *Config) logSnapshotStartup() {
 		"zfs":    len(c.Snap.ZFSPools) > 0,
 		"sudo":   c.Snap.UseSudo && c.Snap.DriveData,
 	} {
-		if !v {
+		if !val {
 			continue
 		}
 
@@ -26,7 +26,7 @@ func (c *Config) logSnapshotStartup() {
 			ex += ", "
 		}
 
-		ex += k
+		ex += key
 	}
 
 	c.Printf("==> System Snapshot Collection Started, interval: %v, timeout: %v, enabled: %s",

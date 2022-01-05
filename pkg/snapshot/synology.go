@@ -15,6 +15,7 @@ import (
 var ErrNotSynology = fmt.Errorf("the running host is not a Synology")
 
 // Synology is the data we care about from the config file.
+//nolint:tagliatelle
 type Synology struct {
 	Build   string `json:"last_admin_login_build"` // 254263
 	Manager string `json:"manager"`                // Synology DiskStation
@@ -78,16 +79,16 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 }
 
 // SetInfo writes synology data INTO the provided InfoStat.
-func (s *Synology) SetInfo(hi *host.InfoStat) {
-	if hi.Platform == "" && s.Vendor != "" {
-		hi.Platform = s.Vendor
+func (s *Synology) SetInfo(hostInfo *host.InfoStat) {
+	if hostInfo.Platform == "" && s.Vendor != "" {
+		hostInfo.Platform = s.Vendor
 	}
 
-	if hi.PlatformFamily == "" && s.Manager != "" {
-		hi.PlatformFamily = s.Manager + " " + s.Model
+	if hostInfo.PlatformFamily == "" && s.Manager != "" {
+		hostInfo.PlatformFamily = s.Manager + " " + s.Model
 	}
 
-	if hi.PlatformVersion == "" && s.Version != "" {
-		hi.PlatformVersion = s.Version + "-" + s.Build
+	if hostInfo.PlatformVersion == "" && s.Version != "" {
+		hostInfo.PlatformVersion = s.Version + "-" + s.Build
 	}
 }

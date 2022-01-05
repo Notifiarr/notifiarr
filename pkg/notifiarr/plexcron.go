@@ -40,16 +40,16 @@ func (c *Config) sendPlexSessions(event EventType) {
 // This reaches back into Plex, asks for sessions and then sends the whole
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
-func (c *Config) collectSessions(event EventType, v *plexIncomingWebhook) {
+func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
 	wait := false
 	msg := ""
 
-	if v != nil {
+	if hook != nil {
 		wait = true
 		msg = " (and webhook)"
 	}
 
-	if resp, err := c.sendPlexMeta(event, v, wait); err != nil {
+	if resp, err := c.sendPlexMeta(event, hook, wait); err != nil {
 		c.Errorf("[%s requested] Sending Plex Sessions%s to Notifiarr: %v", event, msg, err)
 	} else {
 		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar. %s", event, msg, resp)
@@ -75,7 +75,7 @@ func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
 	return s.sessions, s.error
 }
 
-func (c *Config) runSessionHolder() {
+func (c *Config) runSessionHolder() { //nolint:cyclop
 	defer c.CapturePanic()
 
 	sessions, err := c.Plex.GetSessions() // err not used until for loop.
@@ -151,17 +151,17 @@ func (c *Config) checkPlexFinishedItems(sent map[string]struct{}) {
 		return
 	}
 
-	for _, s := range sessions.Sessions {
+	for _, session := range sessions.Sessions {
 		var (
-			_, ok = sent[s.Session.ID+s.SessionKey]
-			pct   = s.ViewOffset / s.Duration * 100
+			_, ok = sent[session.Session.ID+session.SessionKey]
+			pct   = session.ViewOffset / session.Duration * 100
 			msg   = statusSent
 		)
 
 		if !ok { // ok means we already sent a message for this session.
-			msg = c.checkSessionDone(s, pct)
+			msg = c.checkSessionDone(session, pct)
 			if strings.HasPrefix(msg, statusSending) {
-				sent[s.Session.ID+s.SessionKey] = struct{}{}
+				sent[session.Session.ID+session.SessionKey] = struct{}{}
 			}
 		}
 
@@ -170,41 +170,41 @@ func (c *Config) checkPlexFinishedItems(sent map[string]struct{}) {
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
 		if strings.HasPrefix(msg, statusSending) || strings.HasPrefix(msg, statusError) {
 			c.Printf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
-				c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
-				s.Type, s.Title, s.Player.State, pct, msg)
+				c.Plex.URL, session.Session.ID, session.SessionKey, session.User.Title,
+				session.Type, session.Title, session.Player.State, pct, msg)
 		} else {
 			c.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
-				c.Plex.URL, s.Session.ID, s.SessionKey, s.User.Title,
-				s.Type, s.Title, s.Player.State, pct, msg)
+				c.Plex.URL, session.Session.ID, session.SessionKey, session.User.Title,
+				session.Type, session.Title, session.Player.State, pct, msg)
 		}
 	}
 }
 
-func (c *Config) checkSessionDone(s *plex.Session, pct float64) string {
+func (c *Config) checkSessionDone(session *plex.Session, pct float64) string {
 	switch {
-	case s.Duration == 0:
+	case session.Duration == 0:
 		return statusIgnoring
-	case s.Player.State != "playing":
+	case session.Player.State != "playing":
 		return statusPaused
-	case c.Plex.MoviesPC > 0 && EventType(s.Type) == EventMovie:
+	case c.Plex.MoviesPC > 0 && EventType(session.Type) == EventMovie:
 		if pct < float64(c.Plex.MoviesPC) {
 			return statusWatching
 		}
 
-		return c.sendSessionDone(s)
-	case c.Plex.SeriesPC > 0 && EventType(s.Type) == EventEpisode:
+		return c.sendSessionDone(session)
+	case c.Plex.SeriesPC > 0 && EventType(session.Type) == EventEpisode:
 		if pct < float64(c.Plex.SeriesPC) {
 			return statusWatching
 		}
 
-		return c.sendSessionDone(s)
+		return c.sendSessionDone(session)
 	default:
 		return statusIgnoring
 	}
 }
 
-func (c *Config) sendSessionDone(s *plex.Session) string {
-	if err := c.checkPlexAgent(s); err != nil {
+func (c *Config) sendSessionDone(session *plex.Session) string {
+	if err := c.checkPlexAgent(session); err != nil {
 		return statusError + ": " + err.Error()
 	}
 
@@ -212,11 +212,11 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 	snap := c.getMetaSnap(ctx)
 	cancel() //nolint:wsl
 
-	route := PlexRoute.Path(EventType(s.Type))
+	route := PlexRoute.Path(EventType(session.Type))
 
 	_, err := c.SendData(route, &Payload{
 		Snap: snap,
-		Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{s}},
+		Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
 	}, true)
 	if err != nil {
 		return statusError + ": sending to " + route + ": " + err.Error()
@@ -225,19 +225,19 @@ func (c *Config) sendSessionDone(s *plex.Session) string {
 	return statusSending
 }
 
-func (c *Config) checkPlexAgent(s *plex.Session) error {
-	if !strings.Contains(s.GUID, "plex://") || s.Key == "" {
+func (c *Config) checkPlexAgent(session *plex.Session) error {
+	if !strings.Contains(session.GUID, "plex://") || session.Key == "" {
 		return nil
 	}
 
-	sections, err := c.Plex.GetPlexSectionKey(s.Key)
+	sections, err := c.Plex.GetPlexSectionKey(session.Key)
 	if err != nil {
-		return fmt.Errorf("getting plex key %s: %w", s.Key, err)
+		return fmt.Errorf("getting plex key %s: %w", session.Key, err)
 	}
 
 	for _, section := range sections.Metadata {
-		if section.RatingKey == s.RatingKey {
-			s.GuID = section.GuID
+		if section.RatingKey == session.RatingKey {
+			session.GuID = section.GuID
 			return nil
 		}
 	}

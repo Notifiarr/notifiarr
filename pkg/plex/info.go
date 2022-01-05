@@ -1,3 +1,4 @@
+//nolint:tagliatelle
 package plex
 
 import (
@@ -28,7 +29,6 @@ func (s *Server) GetInfo() (*PMSInfo, error) {
 
 // PMSInfo is the `/` path on Plex.
 type PMSInfo struct {
-	Size                          int64        `json:"size"`
 	AllowCameraUpload             bool         `json:"allowCameraUpload"`
 	AllowChannelAccess            bool         `json:"allowChannelAccess"`
 	AllowSharing                  bool         `json:"allowSharing"`
@@ -39,6 +39,7 @@ type PMSInfo struct {
 	CompanionProxy                bool         `json:"companionProxy"`
 	CountryCode                   string       `json:"countryCode"`
 	Diagnostics                   string       `json:"diagnostics"`
+	Directory                     []*Directory `json:"Directory"`
 	EventStream                   bool         `json:"eventStream"`
 	FriendlyName                  string       `json:"friendlyName"`
 	HubSearch                     bool         `json:"hubSearch"`
@@ -64,6 +65,7 @@ type PMSInfo struct {
 	PushNotifications             bool         `json:"pushNotifications"`
 	ReadOnlyLibraries             bool         `json:"readOnlyLibraries"`
 	RequestParametersInCookie     bool         `json:"requestParametersInCookie"`
+	Size                          int64        `json:"size"`
 	StreamingBrainABRVersion      int64        `json:"streamingBrainABRVersion"`
 	StreamingBrainVersion         int64        `json:"streamingBrainVersion"`
 	Sync                          bool         `json:"sync"`
@@ -80,7 +82,6 @@ type PMSInfo struct {
 	Updater                       bool         `json:"updater"`
 	Version                       string       `json:"version"`
 	VoiceSearch                   bool         `json:"voiceSearch"`
-	Directory                     []*Directory `json:"Directory"`
 } // `json:"MediaContainer"`
 
 // Directory is part of the PMSInfo.

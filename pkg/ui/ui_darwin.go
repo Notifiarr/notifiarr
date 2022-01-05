@@ -14,6 +14,7 @@ import (
 // SystrayIcon is the icon in the menu bar.
 const SystrayIcon = "files/macos.png"
 
+//nolint:gochecknoglobals
 var hasGUI = os.Getenv("USEGUI") == "true"
 
 // HasGUI returns false on Linux, true on Windows and optional on macOS.
@@ -27,7 +28,7 @@ func HideConsoleWindow() {}
 // ShowConsoleWindow does nothing on OSes besides Windows.
 func ShowConsoleWindow() {}
 
-func Notify(msg string, v ...interface{}) error {
+func Notify(msg string, vars ...interface{}) error {
 	if !hasGUI {
 		return nil
 	}
@@ -43,7 +44,7 @@ func Notify(msg string, v ...interface{}) error {
 		return fmt.Errorf("cannot find terminal-notifier: %w", err)
 	}
 
-	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, v...), "-sender", "com.notifiarr.client")
+	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "com.notifiarr.client")
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}
@@ -98,7 +99,7 @@ func StartCmd(c string, v ...string) error {
 	cmd.Stdout = ioutil.Discard
 	cmd.Stderr = ioutil.Discard
 
-	return cmd.Run()
+	return cmd.Run() //nolint:wrapcheck
 }
 
 // OpenCmd opens anything.

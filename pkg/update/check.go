@@ -1,3 +1,4 @@
+//nolint:tagliatelle
 package update
 
 import (
@@ -78,7 +79,7 @@ func GetRelease(uri string) (*GitHubReleasesLatest, error) {
 
 // FillUpdate compares a current version with the latest GitHub release.
 func FillUpdate(release *GitHubReleasesLatest, version string) (*Update, error) {
-	u := &Update{
+	update := &Update{
 		RelDate: release.PublishedAt,
 		CurrURL: release.HTMLURL,
 		Current: release.TagName,
@@ -101,18 +102,18 @@ func FillUpdate(release *GitHubReleasesLatest, version string) (*Update, error) 
 
 	for _, file := range release.Assets {
 		if strings.HasSuffix(file.BrowserDownloadURL, suffix) {
-			u.CurrURL = file.BrowserDownloadURL
-			u.RelDate = file.UpdatedAt
+			update.CurrURL = file.BrowserDownloadURL
+			update.RelDate = file.UpdatedAt
 
 			break
 		}
 	}
 
-	if release.HTMLURL == u.CurrURL {
-		return u, fmt.Errorf("%w: %s", ErrNoFile, u.CurrURL)
+	if release.HTMLURL == update.CurrURL {
+		return update, fmt.Errorf("%w: %s", ErrNoFile, update.CurrURL)
 	}
 
-	return u, nil
+	return update, nil
 }
 
 // GitHubReleasesLatest is the output from the releases/latest API on GitHub.

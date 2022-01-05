@@ -112,7 +112,7 @@ func (c *Client) checkAndUpdate(how string) error {
 func (c *Client) updateNow(u *update.Update, msg string) error {
 	c.Printf("[UPDATE] Downloading and installing update! %s => %s: %s", u.Version, u.Current, u.CurrURL)
 
-	uc := &update.Command{
+	cmd := &update.Command{
 		URL:    u.CurrURL,
 		Logger: c.Logger.DebugLog,
 		Args:   []string{"--restart", "--config", c.Flags.ConfigFile},
@@ -120,19 +120,19 @@ func (c *Client) updateNow(u *update.Update, msg string) error {
 	}
 
 	if path, err := osext.Executable(); err == nil {
-		uc.Path = path
+		cmd.Path = path
 	}
 
 	// This downloads the new file to a temp name in the same folder as the running file.
 	// Moves the running file to a backup name in the same folder.
 	// Moves the new file to the same location that the running file was at.
 	// Triggers another invocation of the app that sleeps 5 seconds then restarts.
-	backupFile, err := update.Now(uc)
+	backupFile, err := update.Now(cmd)
 	if err != nil {
 		return fmt.Errorf("installing update: %w", err)
 	}
 
-	c.Printf("Update installed to %s restarting! Backup: %s", uc.Path, backupFile)
+	c.Printf("Update installed to %s restarting! Backup: %s", cmd.Path, backupFile)
 	// And exit, so we can restart.
 	c.sigkil <- &update.Signal{Text: "upgrade request: " + msg}
 

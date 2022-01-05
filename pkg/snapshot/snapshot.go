@@ -108,7 +108,7 @@ type Partition struct {
 }
 
 // Validate makes sure the snapshot configuration is valid.
-func (c *Config) Validate() { //nolint:cyclop
+func (c *Config) Validate() {
 	switch {
 	case c.Timeout.Duration == 0:
 		c.Timeout.Duration = DefaultTimeout
@@ -138,50 +138,50 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
-	s := &Snapshot{
+	snap := &Snapshot{
 		Version: version.Version + "-" + version.Revision,
 		Uptime:  time.Since(version.Started),
 	}
-	errs, debug := c.getSnapshot(ctx, s)
+	errs, debug := c.getSnapshot(ctx, snap)
 
-	return s, errs, debug
+	return snap, errs, debug
 }
 
-func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error) {
-	errs := s.GetProcesses(ctx, c.PSTop)
-	errs = append(errs, s.GetCPUSample(ctx))
+func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []error) {
+	errs := snap.GetProcesses(ctx, c.PSTop)
+	errs = append(errs, snap.GetCPUSample(ctx))
 
-	if err := s.GetLocalData(ctx); len(err) != 0 {
+	if err := snap.GetLocalData(ctx); len(err) != 0 {
 		errs = append(errs, err...)
 	}
 
 	if syn, err := GetSynology(); err != nil && !errors.Is(err, ErrNotSynology) {
 		errs = append(errs, err)
 	} else if syn != nil {
-		syn.SetInfo(s.System.InfoStat)
+		syn.SetInfo(snap.System.InfoStat)
 	}
 
-	if err := s.getDisksUsage(ctx, c.DiskUsage, c.AllDrives); len(err) != 0 {
+	if err := snap.getDisksUsage(ctx, c.DiskUsage, c.AllDrives); len(err) != 0 {
 		errs = append(errs, err...)
 	}
 
 	var debug []error
 
-	if err := s.getDriveData(ctx, c.DriveData, c.UseSudo); len(err) != 0 {
+	if err := snap.getDriveData(ctx, c.DriveData, c.UseSudo); len(err) != 0 {
 		debug = append(debug, err...) // these can be noisy, so debug/hide them.
 	}
 
-	if err := s.GetMySQL(ctx, c.Plugins.MySQL, c.MyTop); len(err) != 0 {
+	if err := snap.GetMySQL(ctx, c.Plugins.MySQL, c.MyTop); len(err) != 0 {
 		errs = append(errs, err...)
 	}
 
-	errs = append(errs, s.GetMemoryUsage(ctx))
-	errs = append(errs, s.getZFSPoolData(ctx, c.ZFSPools))
-	errs = append(errs, s.getRaidData(ctx, c.UseSudo, c.Raid))
-	errs = append(errs, s.getSystemTemps(ctx))
-	errs = append(errs, s.getIOTop(ctx, c.UseSudo, c.IOTop))
-	errs = append(errs, s.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
-	errs = append(errs, s.getIoStat2(ctx, c.DiskUsage))
+	errs = append(errs, snap.GetMemoryUsage(ctx))
+	errs = append(errs, snap.getZFSPoolData(ctx, c.ZFSPools))
+	errs = append(errs, snap.getRaidData(ctx, c.UseSudo, c.Raid))
+	errs = append(errs, snap.getSystemTemps(ctx))
+	errs = append(errs, snap.getIOTop(ctx, c.UseSudo, c.IOTop))
+	errs = append(errs, snap.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
+	errs = append(errs, snap.getIoStat2(ctx, c.DiskUsage))
 
 	return errs, debug
 }
@@ -222,14 +222,14 @@ func readyCommand(ctx context.Context, useSudo bool, run string, args ...string)
 }
 
 // runCommand executes the readied command and waits for the output loop to finish.
-func runCommand(cmd *exec.Cmd, wg *sync.WaitGroup) error {
-	wg.Add(1)
+func runCommand(cmd *exec.Cmd, waitg *sync.WaitGroup) error {
+	waitg.Add(1)
 
 	stderr := &bytes.Buffer{}
 	cmd.Stderr = stderr
 	err := cmd.Run() //nolint:ifshort
 
-	wg.Wait()
+	waitg.Wait()
 
 	if err != nil {
 		return fmt.Errorf("%v %w: %s", cmd.Args, err, stderr)

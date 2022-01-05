@@ -58,12 +58,12 @@ const (
 // Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
 type LogConfig struct {
 	AppName   string   `json:"-"`
-	LogFile   string   `json:"log_file" toml:"log_file" xml:"log_file" yaml:"log_file"`
-	DebugLog  string   `json:"debug_log" toml:"debug_log" xml:"debug_log" yaml:"debug_log"`
-	HTTPLog   string   `json:"http_log" toml:"http_log" xml:"http_log" yaml:"http_log"`
-	LogFiles  int      `json:"log_files" toml:"log_files" xml:"log_files" yaml:"log_files"`
-	LogFileMb int      `json:"log_file_mb" toml:"log_file_mb" xml:"log_file_mb" yaml:"log_file_mb"`
-	FileMode  FileMode `json:"file_mode" toml:"file_mode" xml:"file_mode" yaml:"file_mode"`
+	LogFile   string   `json:"logFile" toml:"log_file" xml:"log_file" yaml:"logFile"`
+	DebugLog  string   `json:"debugLog" toml:"debug_log" xml:"debug_log" yaml:"debugLog"`
+	HTTPLog   string   `json:"httpLog" toml:"http_log" xml:"http_log" yaml:"httpLog"`
+	LogFiles  int      `json:"logFiles" toml:"log_files" xml:"log_files" yaml:"logFiles"`
+	LogFileMb int      `json:"logFileMb" toml:"log_file_mb" xml:"log_file_mb" yaml:"logFileMb"`
+	FileMode  FileMode `json:"fileMode" toml:"file_mode" xml:"file_mode" yaml:"fileMode"`
 	Debug     bool     `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
 	Quiet     bool     `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
 }
@@ -165,7 +165,7 @@ func (l *Logger) CapturePanic() {
 func (l *Logger) Debug(v ...interface{}) {
 	err := l.DebugLog.Output(callDepth, fmt.Sprintln(v...))
 	if err != nil {
-		fmt.Println("Logger Error:", err)
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
 }
 
@@ -173,7 +173,7 @@ func (l *Logger) Debug(v ...interface{}) {
 func (l *Logger) Debugf(msg string, v ...interface{}) {
 	err := l.DebugLog.Output(callDepth, fmt.Sprintf(msg, v...))
 	if err != nil {
-		fmt.Println("Logger Error:", err)
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
 }
 
@@ -181,7 +181,7 @@ func (l *Logger) Debugf(msg string, v ...interface{}) {
 func (l *Logger) Print(v ...interface{}) {
 	err := l.InfoLog.Output(callDepth, fmt.Sprintln(v...))
 	if err != nil {
-		fmt.Println("Logger Error:", err)
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
 }
 
@@ -189,7 +189,7 @@ func (l *Logger) Print(v ...interface{}) {
 func (l *Logger) Printf(msg string, v ...interface{}) {
 	err := l.InfoLog.Output(callDepth, fmt.Sprintf(msg, v...))
 	if err != nil {
-		fmt.Println("Logger Error:", err)
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
 }
 
@@ -197,7 +197,7 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 func (l *Logger) Error(v ...interface{}) {
 	err := l.ErrorLog.Output(callDepth, fmt.Sprintln(v...))
 	if err != nil {
-		fmt.Println("Logger Error:", err)
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
 }
 
@@ -205,7 +205,7 @@ func (l *Logger) Error(v ...interface{}) {
 func (l *Logger) Errorf(msg string, v ...interface{}) {
 	err := l.ErrorLog.Output(callDepth, fmt.Sprintf(msg, v...))
 	if err != nil {
-		fmt.Println("Logger Error:", err)
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
 }
 

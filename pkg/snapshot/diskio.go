@@ -1,3 +1,4 @@
+//nolint:tagliatelle
 package snapshot
 
 import (
@@ -98,28 +99,28 @@ func (s *Snapshot) getIOTop(ctx context.Context, useSudo bool, procs int) error 
 
 	args := []string{"--batch", "--only", "--iter=2", "--kilobytes"}
 
-	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "iotop", args...)
+	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "iotop", args...)
 	if err != nil {
 		return err
 	}
 
 	s.IOTop = &IOTopData{}
 
-	go s.scanIOTop(stdout, wg)
+	go s.scanIOTop(stdout, waitg)
 
 	defer func() {
 		sort.Sort(s.IOTop.Processes)
 		s.IOTop.Processes.Shrink(procs)
 	}()
 
-	return runCommand(cmd, wg)
+	return runCommand(cmd, waitg)
 }
 
 // scanIOTop turns the iotop output into structured data using a Scanner.
 func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	re := regexp.MustCompile(`[0-9]+\.[0-9]+`)
+	regex := regexp.MustCompile(`[0-9]+\.[0-9]+`)
 	captured := map[string]*IOTopProc{} // used to de-dup by pid.
 
 	for stdout.Scan() {
@@ -135,7 +136,7 @@ func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup) {
 			continue
 		case fields[0] == "Total":
 			//	Total DISK READ:         0.00 K/s | Total DISK WRITE:         0.00 K/s
-			if nums := re.FindAllString(text, 2); len(nums) == 2 { //nolint:gomnd
+			if nums := regex.FindAllString(text, 2); len(nums) == 2 { //nolint:gomnd
 				s.IOTop.TotalRead, _ = strconv.ParseFloat(nums[0], mnd.Bits64)
 				s.IOTop.TotalWrite, _ = strconv.ParseFloat(nums[1], mnd.Bits64)
 				s.IOTop.TotalRead *= mnd.Kilobyte  // convert to bytes.
@@ -143,7 +144,7 @@ func (s *Snapshot) scanIOTop(stdout *bufio.Scanner, wg *sync.WaitGroup) {
 			}
 		case fields[0] == "Current", fields[0] == "Actual":
 			//	Current DISK READ:       0.00 K/s | Current DISK WRITE:       0.00 K/s
-			if nums := re.FindAllString(text, 2); len(nums) == 2 { //nolint:gomnd
+			if nums := regex.FindAllString(text, 2); len(nums) == 2 { //nolint:gomnd
 				s.IOTop.CurrRead, _ = strconv.ParseFloat(nums[0], mnd.Bits64)
 				s.IOTop.CurrWrite, _ = strconv.ParseFloat(nums[1], mnd.Bits64)
 				s.IOTop.CurrRead *= mnd.Kilobyte  // convert to bytes.

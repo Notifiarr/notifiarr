@@ -29,13 +29,13 @@ md1 : active raid1 sdd2[3] sdb2[1] sdc2[2] sda2[0]
 unused devices: <none>.
 */
 func (s *Snapshot) getRaidMDstat() {
-	b, _ := ioutil.ReadFile("/proc/mdstat")
+	data, _ := ioutil.ReadFile("/proc/mdstat")
 	// Remove the first line "Personalities".
-	if i := bytes.IndexByte(b, '\n'); i != -1 && len(b) > i+1 {
-		b = b[i+1:]
+	if i := bytes.IndexByte(data, '\n'); i != -1 && len(data) > i+1 {
+		data = data[i+1:]
 	}
 
-	s.Raid.MDstat = string(b)
+	s.Raid.MDstat = string(data)
 }
 
 /* getRaidMegaCLI parses this:
@@ -75,7 +75,7 @@ func (s *Snapshot) getRaidMegaCLI(ctx context.Context, useSudo bool) error {
 		return nil //nolint:nilerr
 	}
 
-	cmd, stdout, wg, err := readyCommand(ctx, useSudo, megacli, "-LDInfo", "-Lall", "-aALL")
+	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, megacli, "-LDInfo", "-Lall", "-aALL")
 	if err != nil {
 		return err
 	}
@@ -88,8 +88,8 @@ func (s *Snapshot) getRaidMegaCLI(ctx context.Context, useSudo bool) error {
 				s.Raid.MegaCLI[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
 			}
 		}
-		wg.Done()
+		waitg.Done()
 	}()
 
-	return runCommand(cmd, wg)
+	return runCommand(cmd, waitg)
 }

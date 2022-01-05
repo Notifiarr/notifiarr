@@ -91,12 +91,12 @@ func (t *Triggers) Backup(event EventType, app starr.App) error {
 }
 
 func (c *Config) sendLidarrBackups(event EventType) {
-	for i, app := range c.Apps.Lidarr {
+	for idx, app := range c.Apps.Lidarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Lidarr,
-				int:   i + 1,
+				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
 			})
@@ -105,12 +105,12 @@ func (c *Config) sendLidarrBackups(event EventType) {
 }
 
 func (c *Config) sendProwlarrBackups(event EventType) {
-	for i, app := range c.Apps.Prowlarr {
+	for idx, app := range c.Apps.Prowlarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Prowlarr,
-				int:   i + 1,
+				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
 			})
@@ -119,12 +119,12 @@ func (c *Config) sendProwlarrBackups(event EventType) {
 }
 
 func (c *Config) sendRadarrBackups(event EventType) {
-	for i, app := range c.Apps.Radarr {
+	for idx, app := range c.Apps.Radarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Radarr,
-				int:   i + 1,
+				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
 			})
@@ -133,12 +133,12 @@ func (c *Config) sendRadarrBackups(event EventType) {
 }
 
 func (c *Config) sendReadarrBackups(event EventType) {
-	for i, app := range c.Apps.Readarr {
+	for idx, app := range c.Apps.Readarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Readarr,
-				int:   i + 1,
+				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
 			})
@@ -147,13 +147,13 @@ func (c *Config) sendReadarrBackups(event EventType) {
 }
 
 func (c *Config) sendSonarrBackups(event EventType) {
-	for i, app := range c.Apps.Sonarr {
+	for idx, app := range c.Apps.Sonarr {
 		if app.Backup != mnd.Disabled || event != EventCron {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Sonarr,
 				cName: app.Name,
-				int:   i + 1,
+				int:   idx + 1,
 				app:   app,
 			})
 		}

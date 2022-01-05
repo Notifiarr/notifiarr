@@ -76,22 +76,22 @@ func (s *Service) check() bool {
 }
 
 // Return true if the service state changed.
-func (s *Service) update(r *result) bool {
+func (s *Service) update(res *result) bool {
 	if s.lastCheck = time.Now().Round(time.Microsecond); s.since.IsZero() {
 		s.since = s.lastCheck
 	}
 
-	s.output = r.output
+	s.output = res.output
 
-	if s.state == r.state {
+	if s.state == res.state {
 		s.log.Printf("Service Checked: %s, state: %s for %v, output: %s",
 			s.Name, s.state, time.Since(s.since).Round(time.Second), s.output)
 		return false
 	}
 
-	s.log.Printf("Service Checked: %s, state: %s => %s, output: %s", s.Name, s.state, r.state, s.output)
+	s.log.Printf("Service Checked: %s, state: %s => %s, output: %s", s.Name, s.state, res.state, s.output)
 	s.since = s.lastCheck
-	s.state = r.state
+	s.state = res.state
 
 	return true
 }
@@ -99,7 +99,7 @@ func (s *Service) update(r *result) bool {
 const maxBody = 150
 
 func (s *Service) checkHTTP() *result {
-	r := &result{
+	res := &result{
 		state:  StateUnknown,
 		output: "unknown",
 	}
@@ -109,50 +109,50 @@ func (s *Service) checkHTTP() *result {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.Value, nil)
 	if err != nil {
-		r.output = "creating request: " + RemoveSecrets(s.Value, err.Error())
-		return r
+		res.output = "creating request: " + RemoveSecrets(s.Value, err.Error())
+		return res
 	}
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		r.output = "making request: " + RemoveSecrets(s.Value, err.Error())
-		return r
+		res.output = "making request: " + RemoveSecrets(s.Value, err.Error())
+		return res
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		r.output = "reading body: " + RemoveSecrets(s.Value, err.Error())
-		return r
+		res.output = "reading body: " + RemoveSecrets(s.Value, err.Error())
+		return res
 	}
 
 	if strconv.Itoa(resp.StatusCode) == s.Expect {
-		r.state = StateOK
-		r.output = resp.Status
+		res.state = StateOK
+		res.output = resp.Status
 
-		return r
+		return res
 	}
 
-	b := string(body)
-	if len(b) > maxBody {
-		b = b[:maxBody]
+	bodyStr := string(body)
+	if len(bodyStr) > maxBody {
+		bodyStr = bodyStr[:maxBody]
 	}
 
-	r.state = StateCritical
-	r.output = resp.Status + ": " + strings.TrimSpace(RemoveSecrets(s.Value, b))
+	res.state = StateCritical
+	res.output = resp.Status + ": " + strings.TrimSpace(RemoveSecrets(s.Value, bodyStr))
 
-	return r
+	return res
 }
 
 // RemoveSecrets removes secret token values in a message parsed from a url.
 func RemoveSecrets(appURL, message string) string {
-	u, err := url.Parse(appURL)
+	url, err := url.Parse(appURL)
 	if err != nil {
 		return message
 	}
 
 	for _, keyName := range []string{"apikey", "token", "pass", "password", "secret"} {
-		if secret := u.Query().Get(keyName); secret != "" {
+		if secret := url.Query().Get(keyName); secret != "" {
 			message = strings.ReplaceAll(message, secret, "********")
 		}
 	}
@@ -161,26 +161,26 @@ func RemoveSecrets(appURL, message string) string {
 }
 
 func (s *Service) checkTCP() *result {
-	r := &result{
+	res := &result{
 		state:  StateUnknown,
 		output: "unknown",
 	}
 
 	switch conn, err := net.DialTimeout("tcp", s.Value, s.Timeout.Duration); {
 	case err != nil:
-		r.state = StateCritical
-		r.output = "connection error: " + err.Error()
+		res.state = StateCritical
+		res.output = "connection error: " + err.Error()
 	case conn == nil:
-		r.state = StateUnknown
-		r.output = "connection failed, no specific error"
+		res.state = StateUnknown
+		res.output = "connection failed, no specific error"
 	default:
 		conn.Close()
 
-		r.state = StateOK
-		r.output = "connected to port " + strings.Split(s.Value, ":")[1] + " OK"
+		res.state = StateOK
+		res.output = "connected to port " + strings.Split(s.Value, ":")[1] + " OK"
 	}
 
-	return r
+	return res
 }
 
 func (s *Service) checkPING() *result {

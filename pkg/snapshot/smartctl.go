@@ -57,7 +57,7 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 }
 
 func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) error {
-	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", "--scan-open")
+	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "smartctl", "--scan-open")
 	if err != nil {
 		return err
 	}
@@ -75,10 +75,10 @@ func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) e
 				disks[fields[0]] = fields[2]
 			}
 		}
-		wg.Done()
+		waitg.Done()
 	}()
 
-	return runCommand(cmd, wg)
+	return runCommand(cmd, waitg)
 }
 
 // works well on mac and linux, probably windows too.
@@ -130,18 +130,18 @@ func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bo
 		args = []string{"-d", dev, "-AH", name}
 	}
 
-	cmd, stdout, wg, err := readyCommand(ctx, useSudo, "smartctl", args...)
+	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "smartctl", args...)
 	if err != nil {
 		return err
 	}
 
-	go s.scanSmartctl(stdout, name, wg)
+	go s.scanSmartctl(stdout, name, waitg)
 
-	return runCommand(cmd, wg)
+	return runCommand(cmd, waitg)
 }
 
 //nolint: cyclop
-func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, wg *sync.WaitGroup) {
+func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.WaitGroup) {
 	for stdout.Scan() {
 		text := stdout.Text()
 
@@ -162,5 +162,5 @@ func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, wg *sync.Wai
 			s.DriveAges[name], _ = strconv.Atoi(fields[9])
 		}
 	}
-	wg.Done()
+	waitg.Done()
 }

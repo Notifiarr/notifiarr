@@ -61,19 +61,19 @@ func NewDefaults() *Client {
 
 // Start runs the app.
 func Start() error {
-	c := NewDefaults()
-	c.Flags.ParseArgs(os.Args[1:])
+	config := NewDefaults()
+	config.Flags.ParseArgs(os.Args[1:])
 
 	switch {
-	case c.Flags.VerReq: // print version and exit.
-		fmt.Println(version.Print(c.Flags.Name())) //nolint:forbidigo
+	case config.Flags.VerReq: // print version and exit.
+		fmt.Println(version.Print(config.Flags.Name())) //nolint:forbidigo
 		return nil
-	case c.Flags.PSlist: // print process list and exit.
+	case config.Flags.PSlist: // print process list and exit.
 		return printProcessList()
-	case c.Flags.Curl != "": // curl a URL and exit.
-		return curlURL(c.Flags.Curl, c.Flags.Headers)
+	case config.Flags.Curl != "": // curl a URL and exit.
+		return curlURL(config.Flags.Curl, config.Flags.Headers)
 	default:
-		return c.start()
+		return config.start()
 	}
 }
 
@@ -144,33 +144,33 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 
 // Load configuration from the website.
 func (c *Client) loadSiteConfig(source notifiarr.EventType) {
-	ci, err := c.website.GetClientInfo(source)
-	if err != nil || ci == nil {
-		c.Printf("==> [WARNING] API Key may be invalid: %v, info: %s", err, ci)
+	clientInfo, err := c.website.GetClientInfo(source)
+	if err != nil || clientInfo == nil {
+		c.Printf("==> [WARNING] API Key may be invalid: %v, info: %s", err, clientInfo)
 		return
 	}
 
-	c.Printf("==> %s", ci)
+	c.Printf("==> %s", clientInfo)
 
-	if ci.Actions.Snapshot != nil {
-		ci.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins // use local data for plugins.
-		c.website.Snap, c.Config.Snapshot = ci.Actions.Snapshot, ci.Actions.Snapshot
+	if clientInfo.Actions.Snapshot != nil {
+		clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins // use local data for plugins.
+		c.website.Snap, c.Config.Snapshot = clientInfo.Actions.Snapshot, clientInfo.Actions.Snapshot
 	}
 
-	if ci.Actions.Plex != nil && c.Config.Plex != nil {
-		c.Config.Plex.Interval = ci.Actions.Plex.Interval
-		c.Config.Plex.Cooldown = ci.Actions.Plex.Cooldown
-		c.Config.Plex.MoviesPC = ci.Actions.Plex.MoviesPC
-		c.Config.Plex.SeriesPC = ci.Actions.Plex.SeriesPC
-		c.Config.Plex.NoActivity = ci.Actions.Plex.NoActivity
-		c.Config.Plex.Delay = ci.Actions.Plex.Delay
+	if clientInfo.Actions.Plex != nil && c.Config.Plex != nil {
+		c.Config.Plex.Interval = clientInfo.Actions.Plex.Interval
+		c.Config.Plex.Cooldown = clientInfo.Actions.Plex.Cooldown
+		c.Config.Plex.MoviesPC = clientInfo.Actions.Plex.MoviesPC
+		c.Config.Plex.SeriesPC = clientInfo.Actions.Plex.SeriesPC
+		c.Config.Plex.NoActivity = clientInfo.Actions.Plex.NoActivity
+		c.Config.Plex.Delay = clientInfo.Actions.Plex.Delay
 	}
 
-	c.loadSiteAppsConfig(ci)
+	c.loadSiteAppsConfig(clientInfo)
 }
 
-func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
-	for _, app := range ci.Actions.Apps.Lidarr {
+func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint:cyclop
+	for _, app := range clientInfo.Actions.Apps.Lidarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Lidarr) {
 			c.Errorf("Website provided configuration for missing Lidarr app: %d:%s", app.Instance, app.Name)
 			continue
@@ -181,7 +181,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		c.Config.Apps.Lidarr[app.Instance-1].Backup = app.Backup
 	}
 
-	for _, app := range ci.Actions.Apps.Prowlarr {
+	for _, app := range clientInfo.Actions.Apps.Prowlarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Prowlarr) {
 			c.Errorf("Website provided configuration for missing Prowlarr app: %d:%s", app.Instance, app.Name)
 			continue
@@ -191,7 +191,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		c.Config.Apps.Prowlarr[app.Instance-1].Backup = app.Backup
 	}
 
-	for _, app := range ci.Actions.Apps.Radarr {
+	for _, app := range clientInfo.Actions.Apps.Radarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Radarr) {
 			c.Errorf("Website provided configuration for missing Radarr app: %d:%s", app.Instance, app.Name)
 			continue
@@ -202,7 +202,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		c.Config.Apps.Radarr[app.Instance-1].Backup = app.Backup
 	}
 
-	for _, app := range ci.Actions.Apps.Readarr {
+	for _, app := range clientInfo.Actions.Apps.Readarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Readarr) {
 			c.Errorf("Website provided configuration for missing Readarr app: %d:%s", app.Instance, app.Name)
 			continue
@@ -213,7 +213,7 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		c.Config.Apps.Readarr[app.Instance-1].Backup = app.Backup
 	}
 
-	for _, app := range ci.Actions.Apps.Sonarr {
+	for _, app := range clientInfo.Actions.Apps.Sonarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Sonarr) {
 			c.Errorf("Website provided configuration for missing Sonarr app: %d:%s", app.Instance, app.Name)
 			continue

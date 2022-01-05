@@ -42,7 +42,7 @@ type Command struct {
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
 func Restart(u *Command) error {
-	fmt.Printf("Sleeping %v before restarting.", SleepTime)
+	fmt.Printf("Sleeping %v before restarting.", SleepTime) //nolint:forbidigo
 	time.Sleep(SleepTime)
 
 	if err := exec.Command(u.Path, u.Args...).Start(); err != nil { //nolint:gosec
@@ -77,23 +77,23 @@ func Now(u *Command) (string, error) {
 }
 
 // NowWithContext is the same as Now() except you can pass in your own context.
-func NowWithContext(ctx context.Context, u *Command) (string, error) {
-	if u.Path == "" {
+func NowWithContext(ctx context.Context, update *Command) (string, error) {
+	if update.Path == "" {
 		return "", ErrNoPath
-	} else if _, err := os.Stat(u.Path); err != nil {
+	} else if _, err := os.Stat(update.Path); err != nil {
 		return "", fmt.Errorf("checking path: %w", err)
-	} else if !strings.HasPrefix(u.URL, "http") {
+	} else if !strings.HasPrefix(update.URL, "http") {
 		return "", ErrInvalidURL
 	}
 
-	backupFile, err := u.replaceFile(ctx)
+	backupFile, err := update.replaceFile(ctx)
 	if err != nil {
 		return backupFile, err
 	}
 
-	u.Printf("[Update] Triggering Restart: %s %s", u.Path, strings.Join(u.Args, " "))
+	update.Printf("[Update] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
 
-	if err := exec.Command(u.Path, u.Args...).Start(); err != nil { //nolint:gosec
+	if err := exec.Command(update.Path, update.Args...).Start(); err != nil { //nolint:gosec
 		return backupFile, fmt.Errorf("executing restart command %w", err)
 	}
 
@@ -186,13 +186,13 @@ func (u *Command) decompressFile(tempFile *os.File, resp io.Reader, size int64) 
 }
 
 func (u *Command) writeGZipFile(tempFile *os.File, resp io.Reader) error {
-	gz, err := gzip.NewReader(resp)
+	gzFile, err := gzip.NewReader(resp)
 	if err != nil {
 		return fmt.Errorf("reading gzip file: %w", err)
 	}
-	defer gz.Close()
+	defer gzFile.Close()
 
-	if _, err := io.Copy(tempFile, gz); err != nil { //nolint:gosec
+	if _, err := io.Copy(tempFile, gzFile); err != nil { //nolint:gosec
 		return fmt.Errorf("gunzipping temporary file: %w", err)
 	}
 
@@ -213,13 +213,13 @@ func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error
 	// Find the exe file and write that.
 	for _, zipFile := range zipReader.File {
 		if runtime.GOOS == mnd.Windows && strings.HasSuffix(zipFile.Name, ".exe") {
-			f, err := zipFile.Open()
+			zipOpen, err := zipFile.Open()
 			if err != nil {
 				return fmt.Errorf("reading zipped exe file: %w", err)
 			}
-			defer f.Close()
+			defer zipOpen.Close()
 
-			if _, err := io.Copy(tempFile, f); err != nil { //nolint:gosec
+			if _, err := io.Copy(tempFile, zipOpen); err != nil { //nolint:gosec
 				return fmt.Errorf("unzipping temporary file: %w", err)
 			}
 

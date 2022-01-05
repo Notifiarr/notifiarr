@@ -100,13 +100,13 @@ func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
 		return nil, fmt.Errorf("sending client info: %w", err)
 	}
 
-	v := ClientInfo{}
-	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
-		return &v, fmt.Errorf("parsing response: %w, %s", err, string(body.Details.Response))
+	clientInfo := ClientInfo{}
+	if err = json.Unmarshal(body.Details.Response, &clientInfo); err != nil {
+		return &clientInfo, fmt.Errorf("parsing response: %w, %s", err, string(body.Details.Response))
 	}
 
 	// Only set this if there was no error.
-	c.extras.ClientInfo = &v
+	c.extras.ClientInfo = &clientInfo
 
 	return c.extras.ClientInfo, nil
 }
