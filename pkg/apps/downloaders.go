@@ -12,35 +12,35 @@ import (
 /* Notifiarr Client provides minimal support for pulling data from Download clients. */
 
 type DelugeConfig struct {
-	Name     string        `toml:"name"`
-	Interval cnfg.Duration `toml:"interval"`
+	Name     string        `toml:"name" xml:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval"`
 	*deluge.Config
 	*deluge.Deluge
 }
 
 type QbitConfig struct {
-	Name     string        `toml:"name"`
-	Interval cnfg.Duration `toml:"interval"`
+	Name     string        `toml:"name" xml:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval"`
 	*qbit.Config
 	*qbit.Qbit
 }
 
 type TautulliConfig struct {
-	Name     string        `toml:"name"`
-	Interval cnfg.Duration `toml:"interval"`
-	Timeout  cnfg.Duration `toml:"timeout"`
-	URL      string        `toml:"url"`
-	APIKey   string        `toml:"api_key"`
+	Name     string        `toml:"name" xml:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval"`
+	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout"`
+	URL      string        `toml:"url" xml:"url"`
+	APIKey   string        `toml:"api_key" xml:"api_key"`
 }
 
 func (a *Apps) setupDeluge(timeout time.Duration) error {
-	for i := range a.Deluge {
-		if a.Deluge[i] == nil || a.Deluge[i].Config == nil || a.Deluge[i].Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, i+1)
+	for idx := range a.Deluge {
+		if a.Deluge[idx] == nil || a.Deluge[idx].Config == nil || a.Deluge[idx].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, idx+1)
 		}
 
 		// a.Deluge[i].Debugf = a.DebugLog.Printf
-		if err := a.Deluge[i].setup(timeout); err != nil {
+		if err := a.Deluge[idx].setup(timeout); err != nil {
 			return err
 		}
 	}
@@ -62,13 +62,13 @@ func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
 }
 
 func (a *Apps) setupQbit(timeout time.Duration) error {
-	for i := range a.Qbit {
-		if a.Qbit[i].Config == nil || a.Qbit[i].URL == "" {
-			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, i+1)
+	for idx := range a.Qbit {
+		if a.Qbit[idx].Config == nil || a.Qbit[idx].URL == "" {
+			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, idx+1)
 		}
 
 		// a.Qbit[i].Debugf = a.DebugLog.Printf
-		if err := a.Qbit[i].setup(timeout); err != nil {
+		if err := a.Qbit[idx].setup(timeout); err != nil {
 			return err
 		}
 	}

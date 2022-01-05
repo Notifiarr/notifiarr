@@ -29,7 +29,7 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey   string            `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
+	APIKey   string            `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
 	URLBase  string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
 	Sonarr   []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
 	Radarr   []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
@@ -88,7 +88,7 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
 func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		var (
 			msg     interface{}
 			ctx     = r.Context()
@@ -135,7 +135,8 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		}
 
 		if len(post) > 0 {
-			a.DebugLog.Printf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, msg)
+			s, _ := json.MarshalIndent(msg, "", " ")
+			a.DebugLog.Printf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, s)
 		}
 
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
@@ -145,7 +146,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 
 // CheckAPIKey drops a 403 if the API key doesn't match, otherwise run next handler.
 func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		if r.Header.Get("X-API-Key") != a.APIKey {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -213,7 +214,7 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) {
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) { //nolint:varnamelen
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
 		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
 		w.Header().Set("Location", msg.(string))

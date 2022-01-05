@@ -49,14 +49,14 @@ type ReadarrConfig struct {
 }
 
 func (a *Apps) setupReadarr(timeout time.Duration) error {
-	for i := range a.Readarr {
-		if a.Readarr[i].Config == nil || a.Readarr[i].Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, i+1)
+	for idx := range a.Readarr {
+		if a.Readarr[idx].Config == nil || a.Readarr[idx].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Readarr[i].Debugf = a.DebugLog.Printf
-		a.Readarr[i].Errorf = a.ErrorLog.Printf
-		a.Readarr[i].setup(timeout)
+		a.Readarr[idx].Debugf = a.DebugLog.Printf
+		a.Readarr[idx].Errorf = a.ErrorLog.Printf
+		a.Readarr[idx].setup(timeout)
 	}
 
 	return nil
@@ -78,10 +78,10 @@ func (r *ReadarrConfig) setup(timeout time.Duration) {
 	}
 }
 
-func readarrAddBook(r *http.Request) (int, interface{}) {
+func readarrAddBook(req *http.Request) (int, interface{}) {
 	payload := &readarr.AddBookInput{}
 	// Extract payload and check for GRID ID.
-	switch err := json.NewDecoder(r.Body).Decode(payload); {
+	switch err := json.NewDecoder(req.Body).Decode(payload); {
 	case err != nil:
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	case len(payload.Editions) != 1:
@@ -91,7 +91,7 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
 	}
 
-	app := getReadarr(r)
+	app := getReadarr(req)
 	// Check for existing book.
 	m, err := app.GetBook(payload.Editions[0].ForeignEditionID)
 	if err != nil {
@@ -109,10 +109,10 @@ func readarrAddBook(r *http.Request) (int, interface{}) {
 	return http.StatusCreated, book
 }
 
-func readarrGetAuthor(r *http.Request) (int, interface{}) {
-	authorID, _ := strconv.ParseInt(mux.Vars(r)["authorid"], mnd.Base10, mnd.Bits64)
+func readarrGetAuthor(req *http.Request) (int, interface{}) {
+	authorID, _ := strconv.ParseInt(mux.Vars(req)["authorid"], mnd.Base10, mnd.Bits64)
 
-	author, err := getReadarr(r).GetAuthorByID(authorID)
+	author, err := getReadarr(req).GetAuthorByID(authorID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting author: %w", err)
 	}
@@ -134,10 +134,10 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 }
 
 // Check for existing book.
-func readarrCheckBook(r *http.Request) (int, interface{}) {
-	grid := mux.Vars(r)["grid"]
+func readarrCheckBook(req *http.Request) (int, interface{}) {
+	grid := mux.Vars(req)["grid"]
 
-	m, err := getReadarr(r).GetBook(grid)
+	m, err := getReadarr(req).GetBook(grid)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
@@ -147,10 +147,10 @@ func readarrCheckBook(r *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
-func readarrGetBook(r *http.Request) (int, interface{}) {
-	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], mnd.Base10, mnd.Bits64)
+func readarrGetBook(req *http.Request) (int, interface{}) {
+	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
-	book, err := getReadarr(r).GetBookByID(bookID)
+	book, err := getReadarr(req).GetBookByID(bookID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	}
@@ -158,10 +158,10 @@ func readarrGetBook(r *http.Request) (int, interface{}) {
 	return http.StatusOK, book
 }
 
-func readarrTriggerSearchBook(r *http.Request) (int, interface{}) {
-	bookID, _ := strconv.ParseInt(mux.Vars(r)["bookid"], mnd.Base10, mnd.Bits64)
+func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
+	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getReadarr(r).SendCommand(&readarr.CommandRequest{
+	output, err := getReadarr(req).SendCommand(&readarr.CommandRequest{
 		Name:    "BookSearch",
 		BookIDs: []int64{bookID},
 	})
@@ -173,8 +173,8 @@ func readarrTriggerSearchBook(r *http.Request) (int, interface{}) {
 }
 
 // Get the metadata profiles from readarr.
-func readarrMetaProfiles(r *http.Request) (int, interface{}) {
-	profiles, err := getReadarr(r).GetMetadataProfiles()
+func readarrMetaProfiles(req *http.Request) (int, interface{}) {
+	profiles, err := getReadarr(req).GetMetadataProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -189,8 +189,8 @@ func readarrMetaProfiles(r *http.Request) (int, interface{}) {
 }
 
 // Get the quality profiles from readarr.
-func readarrQualityProfiles(r *http.Request) (int, interface{}) {
-	profiles, err := getReadarr(r).GetQualityProfiles()
+func readarrQualityProfiles(req *http.Request) (int, interface{}) {
+	profiles, err := getReadarr(req).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -205,8 +205,8 @@ func readarrQualityProfiles(r *http.Request) (int, interface{}) {
 }
 
 // Get the all quality profiles data from readarr.
-func readarrGetQualityProfile(r *http.Request) (int, interface{}) {
-	profiles, err := getReadarr(r).GetQualityProfiles()
+func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
+	profiles, err := getReadarr(req).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -214,17 +214,17 @@ func readarrGetQualityProfile(r *http.Request) (int, interface{}) {
 	return http.StatusOK, profiles
 }
 
-func readarrAddQualityProfile(r *http.Request) (int, interface{}) {
+func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	var profile readarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
-	err := json.NewDecoder(r.Body).Decode(&profile)
+	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
 	// Get the profiles from radarr.
-	id, err := getReadarr(r).AddQualityProfile(&profile)
+	id, err := getReadarr(req).AddQualityProfile(&profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
 	}
@@ -232,22 +232,22 @@ func readarrAddQualityProfile(r *http.Request) (int, interface{}) {
 	return http.StatusOK, id
 }
 
-func readarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
+func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	var profile readarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
-	err := json.NewDecoder(r.Body).Decode(&profile)
+	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], mnd.Base10, mnd.Bits64)
+	profile.ID, _ = strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
 
 	// Get the profiles from radarr.
-	err = getReadarr(r).UpdateQualityProfile(&profile)
+	err = getReadarr(req).UpdateQualityProfile(&profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -256,8 +256,8 @@ func readarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
 }
 
 // Get folder list from Readarr.
-func readarrRootFolders(r *http.Request) (int, interface{}) {
-	folders, err := getReadarr(r).GetRootFolders()
+func readarrRootFolders(req *http.Request) (int, interface{}) {
+	folders, err := getReadarr(req).GetRootFolders()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -271,18 +271,18 @@ func readarrRootFolders(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func readarrSearchBook(r *http.Request) (int, interface{}) {
-	books, err := getReadarr(r).GetBook("")
+func readarrSearchBook(req *http.Request) (int, interface{}) {
+	books, err := getReadarr(req).GetBook("")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
 	}
 
-	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
-	returnBooks := make([]map[string]interface{}, 0)                  // out
+	query := strings.TrimSpace(strings.ToLower(mux.Vars(req)["query"])) // in
+	returnBooks := make([]map[string]interface{}, 0)                    // out
 
 	for _, book := range books {
 		if bookSearch(query, book.Title, book.Editions) {
-			b := map[string]interface{}{
+			item := map[string]interface{}{
 				"id":       book.ID,
 				"title":    book.Title,
 				"release":  book.ReleaseDate,
@@ -296,11 +296,11 @@ func readarrSearchBook(r *http.Request) (int, interface{}) {
 			}
 
 			if book.Statistics != nil {
-				b["files"] = book.Statistics.BookFileCount
-				b["exists"] = book.Statistics.SizeOnDisk > 0
+				item["files"] = book.Statistics.BookFileCount
+				item["exists"] = book.Statistics.SizeOnDisk > 0
 			}
 
-			returnBooks = append(returnBooks, b)
+			returnBooks = append(returnBooks, item)
 		}
 	}
 
@@ -321,8 +321,8 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 	return false
 }
 
-func readarrGetTags(r *http.Request) (int, interface{}) {
-	tags, err := getReadarr(r).GetTags()
+func readarrGetTags(req *http.Request) (int, interface{}) {
+	tags, err := getReadarr(req).GetTags()
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
 	}
@@ -330,10 +330,10 @@ func readarrGetTags(r *http.Request) (int, interface{}) {
 	return http.StatusOK, tags
 }
 
-func readarrUpdateTag(r *http.Request) (int, interface{}) {
-	id, _ := strconv.Atoi(mux.Vars(r)["tid"])
+func readarrUpdateTag(req *http.Request) (int, interface{}) {
+	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getReadarr(r).UpdateTag(id, mux.Vars(r)["label"])
+	tagID, err := getReadarr(req).UpdateTag(id, mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
@@ -341,8 +341,8 @@ func readarrUpdateTag(r *http.Request) (int, interface{}) {
 	return http.StatusOK, tagID
 }
 
-func readarrSetTag(r *http.Request) (int, interface{}) {
-	tagID, err := getReadarr(r).AddTag(mux.Vars(r)["label"])
+func readarrSetTag(req *http.Request) (int, interface{}) {
+	tagID, err := getReadarr(req).AddTag(mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
@@ -350,15 +350,15 @@ func readarrSetTag(r *http.Request) (int, interface{}) {
 	return http.StatusOK, tagID
 }
 
-func readarrUpdateBook(r *http.Request) (int, interface{}) {
+func readarrUpdateBook(req *http.Request) (int, interface{}) {
 	var book readarr.Book
 
-	err := json.NewDecoder(r.Body).Decode(&book)
+	err := json.NewDecoder(req.Body).Decode(&book)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getReadarr(r).UpdateBook(book.ID, &book)
+	err = getReadarr(req).UpdateBook(book.ID, &book)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating book: %w", err)
 	}
@@ -366,15 +366,15 @@ func readarrUpdateBook(r *http.Request) (int, interface{}) {
 	return http.StatusOK, "readarr seems to have worked"
 }
 
-func readarrUpdateAuthor(r *http.Request) (int, interface{}) {
+func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 	var author readarr.Author
 
-	err := json.NewDecoder(r.Body).Decode(&author)
+	err := json.NewDecoder(req.Body).Decode(&author)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getReadarr(r).UpdateAuthor(author.ID, &author)
+	err = getReadarr(req).UpdateAuthor(author.ID, &author)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating author: %w", err)
 	}

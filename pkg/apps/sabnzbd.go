@@ -18,16 +18,11 @@ import (
 var ErrUnknownByteType = fmt.Errorf("unknown byte type")
 
 type SabNZBConfig struct {
-	Name     string        `toml:"name"`
-	Interval cnfg.Duration `toml:"interval"`
-	Timeout  cnfg.Duration `toml:"timeout"`
-	URL      string        `toml:"url"`
-	APIKey   string        `toml:"api_key"`
-}
-
-type StageLog struct {
-	Name    string   `json:"name"`
-	Actions []string `json:"actions"`
+	Name     string        `toml:"name" xml:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval"`
+	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout"`
+	URL      string        `toml:"url" xml:"url"`
+	APIKey   string        `toml:"api_key" xml:"api_key"`
 }
 
 // QueueSlots has the following data structure.
@@ -56,6 +51,7 @@ type StageLog struct {
   "has_rating": false
 }
 Payload for this structure. */
+//nolint:tagliatelle
 type QueueSlots struct {
 	Status     string     `json:"status"`
 	Index      int        `json:"index"`
@@ -79,6 +75,14 @@ type QueueSlots struct {
 	Unpackopts string     `json:"unpackopts"`
 }
 
+// StageLog is part of the json response from SABnzbd.
+type StageLog struct {
+	Name    string   `json:"name"`
+	Actions []string `json:"actions"`
+}
+
+// HistorySlots is part of the json response from SABnzbd.
+//nolint:tagliatelle
 type HistorySlots struct {
 	ID           int64       `json:"id"`
 	Completed    int64       `json:"completed"`
@@ -113,6 +117,7 @@ type HistorySlots struct {
 	Retry        int         `json:"retry"`
 }
 
+//nolint:tagliatelle
 type History struct {
 	TotalSize         SabNZBSize     `json:"total_size"`
 	MonthSize         SabNZBSize     `json:"month_size"`
@@ -124,11 +129,10 @@ type History struct {
 	Version           string         `json:"version"`
 }
 
+//nolint:tagliatelle
 type Queue struct {
 	Version           string       `json:"version"`
-	Paused            bool         `json:"paused"`
 	PauseInt          string       `json:"pause_int"`
-	PausedAll         bool         `json:"paused_all"`
 	Diskspace1        float64      `json:"diskspace1,string"`
 	Diskspace2        float64      `json:"diskspace2,string"`
 	Diskspace1Norm    SabNZBSize   `json:"diskspace1_norm"`
@@ -141,7 +145,6 @@ type Queue struct {
 	HaveWarnings      string       `json:"have_warnings"`
 	Finishaction      interface{}  `json:"finishaction"`
 	Quota             string       `json:"quota"`
-	HaveQuota         bool         `json:"have_quota"`
 	LeftQuota         string       `json:"left_quota"`
 	CacheArt          string       `json:"cache_art"`
 	CacheSize         SabNZBSize   `json:"cache_size"`
@@ -160,12 +163,15 @@ type Queue struct {
 	InterfaceSettings string       `json:"interface_settings"`
 	Scripts           []string     `json:"scripts"`
 	Categories        []string     `json:"categories"`
-	RatingEnable      bool         `json:"rating_enable"`
 	Noofslots         int          `json:"noofslots"`
 	Start             int64        `json:"start"`
 	Limit             int64        `json:"limit"`
 	Finish            int64        `json:"finish"`
 	Slots             []QueueSlots `json:"slots"`
+	PausedAll         bool         `json:"paused_all"`
+	RatingEnable      bool         `json:"rating_enable"`
+	Paused            bool         `json:"paused"`
+	HaveQuota         bool         `json:"have_quota"`
 }
 
 func (s *SabNZBConfig) setup(timeout time.Duration) {
@@ -180,6 +186,7 @@ func (s *SabNZBConfig) setup(timeout time.Duration) {
 	s.URL = strings.TrimRight(s.URL, "/")
 }
 
+// GetHistory returns the history items in SABnzbd.
 func (s *SabNZBConfig) GetHistory() (*History, error) {
 	if s == nil || s.URL == "" {
 		return &History{}, nil
@@ -202,6 +209,7 @@ func (s *SabNZBConfig) GetHistory() (*History, error) {
 	return h.History, nil
 }
 
+// GetHistory returns the active queued items in SABnzbd.
 func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 	if s == nil || s.URL == "" {
 		return &Queue{}, nil
@@ -225,7 +233,7 @@ func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func GetURLInto(timeout time.Duration, url string, params url.Values, v interface{}) error {
+func GetURLInto(timeout time.Duration, url string, params url.Values, into interface{}) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -242,13 +250,13 @@ func GetURLInto(timeout time.Duration, url string, params url.Values, v interfac
 	}
 	defer resp.Body.Close()
 
-	b, err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(b))
+		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
 	}
 
-	if err := json.Unmarshal(b, v); err != nil {
-		return fmt.Errorf("decoding response (%s): %w: %s", resp.Status, err, string(b))
+	if err := json.Unmarshal(body, into); err != nil {
+		return fmt.Errorf("decoding response (%s): %w: %s", resp.Status, err, string(body))
 	}
 
 	return nil

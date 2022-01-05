@@ -58,14 +58,14 @@ type LidarrConfig struct {
 }
 
 func (a *Apps) setupLidarr(timeout time.Duration) error {
-	for i := range a.Lidarr {
-		if a.Lidarr[i].Config == nil || a.Lidarr[i].Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, i+1)
+	for idx := range a.Lidarr {
+		if a.Lidarr[idx].Config == nil || a.Lidarr[idx].Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Lidarr[i].Debugf = a.DebugLog.Printf
-		a.Lidarr[i].Errorf = a.ErrorLog.Printf
-		a.Lidarr[i].setup(timeout)
+		a.Lidarr[idx].Debugf = a.DebugLog.Printf
+		a.Lidarr[idx].Errorf = a.ErrorLog.Printf
+		a.Lidarr[idx].setup(timeout)
 	}
 
 	return nil
@@ -87,17 +87,17 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	}
 }
 
-func lidarrAddAlbum(r *http.Request) (int, interface{}) {
+func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 	var payload lidarr.AddAlbumInput
 
-	err := json.NewDecoder(r.Body).Decode(&payload)
+	err := json.NewDecoder(req.Body).Decode(&payload)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	} else if payload.ForeignAlbumID == "" {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoMBID)
 	}
 
-	app := getLidarr(r)
+	app := getLidarr(req)
 	// Check for existing album.
 	m, err := app.GetAlbum(payload.ForeignAlbumID)
 	if err != nil {
@@ -114,10 +114,10 @@ func lidarrAddAlbum(r *http.Request) (int, interface{}) {
 	return http.StatusCreated, album
 }
 
-func lidarrGetArtist(r *http.Request) (int, interface{}) {
-	artistID, _ := strconv.ParseInt(mux.Vars(r)["artistid"], mnd.Base10, mnd.Bits64)
+func lidarrGetArtist(req *http.Request) (int, interface{}) {
+	artistID, _ := strconv.ParseInt(mux.Vars(req)["artistid"], mnd.Base10, mnd.Bits64)
 
-	artist, err := getLidarr(r).GetArtistByID(artistID)
+	artist, err := getLidarr(req).GetArtistByID(artistID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking artist: %w", err)
 	}
@@ -138,10 +138,10 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 	}
 }
 
-func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
-	id := mux.Vars(r)["mbid"]
+func lidarrCheckAlbum(req *http.Request) (int, interface{}) {
+	id := mux.Vars(req)["mbid"]
 
-	m, err := getLidarr(r).GetAlbum(id)
+	m, err := getLidarr(req).GetAlbum(id)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
@@ -151,10 +151,10 @@ func lidarrCheckAlbum(r *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
-func lidarrGetAlbum(r *http.Request) (int, interface{}) {
-	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], mnd.Base10, mnd.Bits64)
+func lidarrGetAlbum(req *http.Request) (int, interface{}) {
+	albumID, _ := strconv.ParseInt(mux.Vars(req)["albumid"], mnd.Base10, mnd.Bits64)
 
-	album, err := getLidarr(r).GetAlbumByID(albumID)
+	album, err := getLidarr(req).GetAlbumByID(albumID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	}
@@ -162,10 +162,10 @@ func lidarrGetAlbum(r *http.Request) (int, interface{}) {
 	return http.StatusOK, album
 }
 
-func lidarrTriggerSearchAlbum(r *http.Request) (int, interface{}) {
-	albumID, _ := strconv.ParseInt(mux.Vars(r)["albumid"], mnd.Base10, mnd.Bits64)
+func lidarrTriggerSearchAlbum(req *http.Request) (int, interface{}) {
+	albumID, _ := strconv.ParseInt(mux.Vars(req)["albumid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getLidarr(r).SendCommand(&lidarr.CommandRequest{
+	output, err := getLidarr(req).SendCommand(&lidarr.CommandRequest{
 		Name:     "AlbumSearch",
 		AlbumIDs: []int64{albumID},
 	})
@@ -176,8 +176,8 @@ func lidarrTriggerSearchAlbum(r *http.Request) (int, interface{}) {
 	return http.StatusOK, output.Status
 }
 
-func lidarrMetadata(r *http.Request) (int, interface{}) {
-	profiles, err := getLidarr(r).GetMetadataProfiles()
+func lidarrMetadata(req *http.Request) (int, interface{}) {
+	profiles, err := getLidarr(req).GetMetadataProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -191,9 +191,9 @@ func lidarrMetadata(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func lidarrQualityDefs(r *http.Request) (int, interface{}) {
+func lidarrQualityDefs(req *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
-	definitions, err := getLidarr(r).GetQualityDefinition()
+	definitions, err := getLidarr(req).GetQualityDefinition()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -207,9 +207,9 @@ func lidarrQualityDefs(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func lidarrQualityProfiles(r *http.Request) (int, interface{}) {
+func lidarrQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
-	profiles, err := getLidarr(r).GetQualityProfiles()
+	profiles, err := getLidarr(req).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -223,9 +223,9 @@ func lidarrQualityProfiles(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func lidarrGetQualityProfile(r *http.Request) (int, interface{}) {
+func lidarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
-	profiles, err := getLidarr(r).GetQualityProfiles()
+	profiles, err := getLidarr(req).GetQualityProfiles()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -233,17 +233,17 @@ func lidarrGetQualityProfile(r *http.Request) (int, interface{}) {
 	return http.StatusOK, profiles
 }
 
-func lidarrAddQualityProfile(r *http.Request) (int, interface{}) {
+func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	var profile lidarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
-	err := json.NewDecoder(r.Body).Decode(&profile)
+	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
 	// Get the profiles from radarr.
-	id, err := getLidarr(r).AddQualityProfile(&profile)
+	id, err := getLidarr(req).AddQualityProfile(&profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
 	}
@@ -251,22 +251,22 @@ func lidarrAddQualityProfile(r *http.Request) (int, interface{}) {
 	return http.StatusOK, id
 }
 
-func lidarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
+func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	var profile lidarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
-	err := json.NewDecoder(r.Body).Decode(&profile)
+	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	profile.ID, _ = strconv.ParseInt(mux.Vars(r)["profileID"], mnd.Base10, mnd.Bits64)
+	profile.ID, _ = strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
 
 	// Get the profiles from radarr.
-	err = getLidarr(r).UpdateQualityProfile(&profile)
+	err = getLidarr(req).UpdateQualityProfile(&profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -274,9 +274,9 @@ func lidarrUpdateQualityProfile(r *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
-func lidarrRootFolders(r *http.Request) (int, interface{}) {
+func lidarrRootFolders(req *http.Request) (int, interface{}) {
 	// Get folder list from Lidarr.
-	folders, err := getLidarr(r).GetRootFolders()
+	folders, err := getLidarr(req).GetRootFolders()
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -290,18 +290,18 @@ func lidarrRootFolders(r *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-func lidarrSearchAlbum(r *http.Request) (int, interface{}) {
-	albums, err := getLidarr(r).GetAlbum("")
+func lidarrSearchAlbum(req *http.Request) (int, interface{}) {
+	albums, err := getLidarr(req).GetAlbum("")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting albums: %w", err)
 	}
 
-	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
-	output := make([]map[string]interface{}, 0)                       // out
+	query := strings.TrimSpace(mux.Vars(req)["query"]) // in
+	output := make([]map[string]interface{}, 0)        // out
 
 	for _, album := range albums {
 		if albumSearch(query, album.Title, album.Releases) {
-			a := map[string]interface{}{
+			output = append(output, map[string]interface{}{
 				"id":         album.ID,
 				"mbid":       album.ForeignAlbumID,
 				"metadataId": album.Artist.MetadataProfileID,
@@ -314,15 +314,9 @@ func lidarrSearchAlbum(r *http.Request) (int, interface{}) {
 				"overview":   album.Overview,
 				"ratings":    album.Ratings.Value,
 				"type":       album.AlbumType,
-				"exists":     false,
+				"exists":     album.Statistics != nil && album.Statistics.SizeOnDisk > 0,
 				"files":      0,
-			}
-
-			if album.Statistics != nil {
-				a["exists"] = album.Statistics.SizeOnDisk > 0
-			}
-
-			output = append(output, a)
+			})
 		}
 	}
 
@@ -330,12 +324,12 @@ func lidarrSearchAlbum(r *http.Request) (int, interface{}) {
 }
 
 func albumSearch(query, title string, releases []*lidarr.Release) bool {
-	if strings.Contains(strings.ToLower(title), query) {
+	if strings.Contains(strings.ToLower(title), strings.ToLower(query)) {
 		return true
 	}
 
 	for _, t := range releases {
-		if strings.Contains(strings.ToLower(t.Title), query) {
+		if strings.Contains(strings.ToLower(t.Title), strings.ToLower(query)) {
 			return true
 		}
 	}
@@ -343,8 +337,8 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 	return false
 }
 
-func lidarrGetTags(r *http.Request) (int, interface{}) {
-	tags, err := getLidarr(r).GetTags()
+func lidarrGetTags(req *http.Request) (int, interface{}) {
+	tags, err := getLidarr(req).GetTags()
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
 	}
@@ -352,10 +346,10 @@ func lidarrGetTags(r *http.Request) (int, interface{}) {
 	return http.StatusOK, tags
 }
 
-func lidarrUpdateTag(r *http.Request) (int, interface{}) {
-	id, _ := strconv.Atoi(mux.Vars(r)["tid"])
+func lidarrUpdateTag(req *http.Request) (int, interface{}) {
+	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getLidarr(r).UpdateTag(id, mux.Vars(r)["label"])
+	tagID, err := getLidarr(req).UpdateTag(id, mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
@@ -363,8 +357,8 @@ func lidarrUpdateTag(r *http.Request) (int, interface{}) {
 	return http.StatusOK, tagID
 }
 
-func lidarrSetTag(r *http.Request) (int, interface{}) {
-	tagID, err := getLidarr(r).AddTag(mux.Vars(r)["label"])
+func lidarrSetTag(req *http.Request) (int, interface{}) {
+	tagID, err := getLidarr(req).AddTag(mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
@@ -372,15 +366,15 @@ func lidarrSetTag(r *http.Request) (int, interface{}) {
 	return http.StatusOK, tagID
 }
 
-func lidarrUpdateAlbum(r *http.Request) (int, interface{}) {
+func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 	var album lidarr.Album
 
-	err := json.NewDecoder(r.Body).Decode(&album)
+	err := json.NewDecoder(req.Body).Decode(&album)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	_, err = getLidarr(r).UpdateAlbum(album.ID, &album)
+	_, err = getLidarr(req).UpdateAlbum(album.ID, &album)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating album: %w", err)
 	}
@@ -388,15 +382,15 @@ func lidarrUpdateAlbum(r *http.Request) (int, interface{}) {
 	return http.StatusOK, "success"
 }
 
-func lidarrUpdateArtist(r *http.Request) (int, interface{}) {
+func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
 	var artist lidarr.Artist
 
-	err := json.NewDecoder(r.Body).Decode(&artist)
+	err := json.NewDecoder(req.Body).Decode(&artist)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	_, err = getLidarr(r).UpdateArtist(&artist)
+	_, err = getLidarr(req).UpdateArtist(&artist)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating artist: %w", err)
 	}
