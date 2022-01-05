@@ -372,48 +372,42 @@ func sonarrSearchSeries(r *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting series: %w", err)
 	}
 
-	query := strings.TrimSpace(strings.ToLower(mux.Vars(r)["query"])) // in
-	returnSeries := make([]map[string]interface{}, 0)                 // out
+	query := strings.TrimSpace(mux.Vars(r)["query"]) // in
+	resp := make([]map[string]interface{}, 0)        // out
 
-	for _, s := range series {
-		if seriesSearch(query, s.Title, s.AlternateTitles) {
-			b := map[string]interface{}{
-				"id":                s.ID,
-				"title":             s.Title,
-				"first":             s.FirstAired,
-				"next":              s.NextAiring,
-				"prev":              s.PreviousAiring,
-				"added":             s.Added,
-				"status":            s.Status,
-				"path":              s.Path,
-				"tvdbId":            s.TvdbID,
-				"monitored":         s.Monitored,
-				"qualityProfileId":  s.QualityProfileID,
-				"seasonFolder":      s.SeasonFolder,
-				"seriesType":        s.SeriesType,
-				"languageProfileId": s.LanguageProfileID,
-				"seasons":           s.Seasons,
-				"exists":            false,
-			}
-
-			if s.Statistics != nil {
-				b["exists"] = s.Statistics.SizeOnDisk > 0
-			}
-
-			returnSeries = append(returnSeries, b)
+	for _, item := range series {
+		if seriesSearch(query, item.Title, item.AlternateTitles) {
+			resp = append(resp, map[string]interface{}{
+				"id":                item.ID,
+				"title":             item.Title,
+				"first":             item.FirstAired,
+				"next":              item.NextAiring,
+				"prev":              item.PreviousAiring,
+				"added":             item.Added,
+				"status":            item.Status,
+				"path":              item.Path,
+				"tvdbId":            item.TvdbID,
+				"monitored":         item.Monitored,
+				"qualityProfileId":  item.QualityProfileID,
+				"seasonFolder":      item.SeasonFolder,
+				"seriesType":        item.SeriesType,
+				"languageProfileId": item.LanguageProfileID,
+				"seasons":           item.Seasons,
+				"exists":            item.Statistics != nil && item.Statistics.SizeOnDisk > 0,
+			})
 		}
 	}
 
-	return http.StatusOK, returnSeries
+	return http.StatusOK, resp
 }
 
 func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
-	if strings.Contains(strings.ToLower(title), query) {
+	if strings.Contains(strings.ToLower(title), strings.ToLower(query)) {
 		return true
 	}
 
 	for _, t := range alts {
-		if strings.Contains(strings.ToLower(t.Title), query) {
+		if strings.Contains(strings.ToLower(t.Title), strings.ToLower(query)) {
 			return true
 		}
 	}
