@@ -48,7 +48,7 @@ func (c *Client) PrintStartupInfo() {
 	c.printLogFileInfo()
 }
 
-func (c *Client) printLogFileInfo() {
+func (c *Client) printLogFileInfo() { //nolint:cyclop
 	if c.Config.LogFile != "" {
 		if c.Config.LogFiles > 0 {
 			c.Printf(" => Log File: %s (%d @ %dMb)", c.Config.LogFile, c.Config.LogFiles, c.Config.LogFileMb)
@@ -259,14 +259,14 @@ func (c *Client) printSABnzbd() {
 
 // printTautulli is called on startup to print info about configured Tautulli instance(s).
 func (c *Client) printTautulli() {
-	switch t := c.Config.Apps.Tautulli; {
-	case t == nil, t.URL == "":
+	switch taut := c.Config.Apps.Tautulli; {
+	case taut == nil, taut.URL == "":
 		c.Printf(" => Tautulli Config (enables name map): 0 servers")
-	case t.Name != "":
+	case taut.Name != "":
 		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:s%v check_interval:%s name:%s",
-			t.URL, t.Timeout, t.Interval, t.Name)
+			taut.URL, taut.Timeout, taut.Interval, taut.Name)
 	default:
-		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%s", t.URL, t.Timeout)
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%s", taut.URL, taut.Timeout)
 	}
 }
 

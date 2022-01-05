@@ -82,13 +82,13 @@ func (c *Client) setupMenus() {
 		c.menu["svcs"].Uncheck()
 	}
 
-	if ci, err := c.website.GetClientInfo(notifiarr.EventStart); err == nil {
-		if ci.IsSub() {
+	if clientInfo, err := c.website.GetClientInfo(notifiarr.EventStart); err == nil {
+		if clientInfo.IsSub() {
 			c.menu["sub"].SetTitle("Subscriber \u2764\ufe0f")
 			c.menu["sub"].Check()
 			c.menu["sub"].Disable()
 			c.menu["sub"].SetTooltip("THANK YOU for supporting the project!")
-		} else if ci.IsPatron() {
+		} else if clientInfo.IsPatron() {
 			c.menu["sub"].SetTitle("Patron \U0001f9e1")
 			c.menu["sub"].SetTooltip("THANK YOU for supporting the project!")
 			c.menu["sub"].Check()
@@ -163,14 +163,14 @@ func (c *Client) makeMoreChannels() {
 	if ci, err := c.website.GetClientInfo(notifiarr.EventStart); err == nil {
 		ui.WrapMenu(data.AddSubMenuItem("- Custom Timers -", "")).Disable()
 
-		for _, t := range ci.Actions.Custom {
+		for _, timer := range ci.Actions.Custom {
 			desc := "this is a dynamic custom timer"
-			if t.Desc != "" {
-				desc = t.Desc
+			if timer.Desc != "" {
+				desc = timer.Desc
 			}
 
-			c.menu["timer"+t.Name] = ui.WrapMenu(data.AddSubMenuItem(t.Name,
-				fmt.Sprintf("%s; config: interval: %s, path: %s", desc, t.Interval, t.URI)))
+			c.menu["timer"+timer.Name] = ui.WrapMenu(data.AddSubMenuItem(timer.Name,
+				fmt.Sprintf("%s; config: interval: %s, path: %s", desc, timer.Interval, timer.URI)))
 		}
 	}
 
@@ -202,13 +202,13 @@ func (c *Client) watchTopChannels() {
 
 // dynamic menu items with reflection, anyone?
 func (c *Client) watchTimerChannels() {
-	ci, err := c.website.GetClientInfo(notifiarr.EventStart)
-	if err != nil || len(ci.Actions.Custom) == 0 {
+	clientInfo, err := c.website.GetClientInfo(notifiarr.EventStart)
+	if err != nil || len(clientInfo.Actions.Custom) == 0 {
 		return
 	}
 
-	cases := make([]reflect.SelectCase, len(ci.Actions.Custom))
-	for i, t := range ci.Actions.Custom {
+	cases := make([]reflect.SelectCase, len(clientInfo.Actions.Custom))
+	for i, t := range clientInfo.Actions.Custom {
 		cases[i] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(c.menu["timer"+t.Name].Clicked())}
 	}
 
@@ -224,7 +224,7 @@ func (c *Client) watchTimerChannels() {
 			continue
 		}
 
-		ci.Actions.Custom[index].Run(notifiarr.EventUser)
+		clientInfo.Actions.Custom[index].Run(notifiarr.EventUser)
 	}
 }
 
@@ -333,7 +333,7 @@ func (c *Client) watchLogsChannels() {
 	}
 }
 
-//nolint:errcheck
+//nolint:errcheck,cyclop
 func (c *Client) watchNotifiarrMenu() {
 	for {
 		select {

@@ -62,29 +62,29 @@ func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte("<p>" + c.Flags.Name() + ": <strong>working</strong></p>\n"))
 }
 
-func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) {
-	b, err := bindata.Asset("files/favicon.ico")
+func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+	ico, err := bindata.Asset("files/favicon.ico")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(b))
+	http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(ico))
 }
 
 // stripSecrets runs first to save a redacted URI in a special request header.
 // The logger uses this special value to save a redacted URI in the log file.
 func (c *Client) stripSecrets(next http.Handler) http.Handler {
-	s := []string{c.Config.Apps.APIKey}
+	secrets := []string{c.Config.Apps.APIKey}
 	// gather configured/known secrets.
 	if c.Config.Plex != nil {
-		s = append(s, c.Config.Plex.Token)
+		secrets = append(secrets, c.Config.Plex.Token)
 	}
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		uri := r.RequestURI
 		// then redact secrets from request.
-		for _, s := range s {
+		for _, s := range secrets {
 			if s != "" {
 				uri = strings.ReplaceAll(uri, s, "<redacted>")
 			}
@@ -99,7 +99,7 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 // fixForwardedFor sets the X-Forwarded-For header to the client IP
 // under specific circumstances.
 func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		ip := strings.Trim(r.RemoteAddr[:strings.LastIndex(r.RemoteAddr, ":")], "[]")
 		if x := r.Header.Get("X-Forwarded-For"); x == "" || !c.Config.Allow.Contains(ip) {
 			r.Header.Set("X-Forwarded-For", ip)
