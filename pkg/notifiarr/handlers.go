@@ -143,8 +143,7 @@ func (c *Config) sendPlexWebhook(v *plexIncomingWebhook) {
 		return
 	}
 
-	c.Printf("Plex => Notifiarr: %s '%s' => %s. Website took %s and replied with: %s, %s",
-		v.Account.Title, v.Event, v.Metadata.Title, resp.Details.Elapsed, resp.Result, resp.Details.Response)
+	c.Printf("Plex => Notifiarr: %s '%s' => %s. %s", v.Account.Title, v.Event, v.Metadata.Title, resp)
 }
 
 type appStatus struct {

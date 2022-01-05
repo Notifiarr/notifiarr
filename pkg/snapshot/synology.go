@@ -30,8 +30,8 @@ type Synology struct {
 */
 
 // GetSynology checks if the app is running on a Synology, and gets system info.
-func GetSynology(run bool) (*Synology, error) { //nolint:cyclop
-	if !run || !mnd.IsSynology {
+func GetSynology() (*Synology, error) { //nolint:cyclop
+	if !mnd.IsSynology {
 		return nil, ErrNotSynology
 	}
 
@@ -77,6 +77,7 @@ func GetSynology(run bool) (*Synology, error) { //nolint:cyclop
 	return syn, nil
 }
 
+// SetInfo writes synology data INTO the provided InfoStat.
 func (s *Synology) SetInfo(hi *host.InfoStat) {
 	if hi.Platform == "" && s.Vendor != "" {
 		hi.Platform = s.Vendor

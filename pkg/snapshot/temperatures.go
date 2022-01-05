@@ -9,11 +9,7 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 )
 
-func (s *Snapshot) getSystemTemps(ctx context.Context, run bool) error {
-	if !run {
-		return nil
-	}
-
+func (s *Snapshot) getSystemTemps(ctx context.Context) error {
 	s.System.Temps = make(map[string]float64)
 
 	temps, err := host.SensorsTemperaturesWithContext(ctx)

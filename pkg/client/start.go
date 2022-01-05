@@ -134,7 +134,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	}
 
 	// Parse the config file and environment variables.
-	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
+	c.website, err = c.Config.Get(c.Flags)
 	if err != nil {
 		return msg, newCon, fmt.Errorf("getting config: %w", err)
 	}
@@ -177,6 +177,18 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Lidarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Lidarr[app.Instance-1].Corrupt = app.Corrupt
+		c.Config.Apps.Lidarr[app.Instance-1].Backup = app.Backup
+	}
+
+	for _, app := range ci.Actions.Apps.Prowlarr {
+		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Prowlarr) {
+			c.Errorf("Website provided configuration for missing Prowlarr app: %d:%s", app.Instance, app.Name)
+			continue
+		}
+
+		c.Config.Apps.Prowlarr[app.Instance-1].Corrupt = app.Corrupt
+		c.Config.Apps.Prowlarr[app.Instance-1].Backup = app.Backup
 	}
 
 	for _, app := range ci.Actions.Apps.Radarr {
@@ -186,6 +198,8 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Radarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Radarr[app.Instance-1].Corrupt = app.Corrupt
+		c.Config.Apps.Radarr[app.Instance-1].Backup = app.Backup
 	}
 
 	for _, app := range ci.Actions.Apps.Readarr {
@@ -195,6 +209,8 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Readarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Readarr[app.Instance-1].Corrupt = app.Corrupt
+		c.Config.Apps.Readarr[app.Instance-1].Backup = app.Backup
 	}
 
 	for _, app := range ci.Actions.Apps.Sonarr {
@@ -204,6 +220,8 @@ func (c *Client) loadSiteAppsConfig(ci *notifiarr.ClientInfo) { //nolint:cyclop
 		}
 
 		c.Config.Apps.Sonarr[app.Instance-1].StuckItem = app.Stuck
+		c.Config.Apps.Sonarr[app.Instance-1].Corrupt = app.Corrupt
+		c.Config.Apps.Sonarr[app.Instance-1].Backup = app.Backup
 	}
 }
 
@@ -288,7 +306,7 @@ func (c *Client) reloadConfiguration(source string) error {
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
 
-	c.website, err = c.Config.Get(c.Flags.ConfigFile, c.Flags.EnvPrefix)
+	c.website, err = c.Config.Get(c.Flags)
 	if err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}

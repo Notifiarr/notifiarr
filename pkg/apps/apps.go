@@ -21,6 +21,7 @@ import (
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
+	"golift.io/starr/prowlarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
 	"golift.io/starr/sonarr"
@@ -28,19 +29,20 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey   string           `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
-	URLBase  string           `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	Sonarr   []*SonarrConfig  `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr   []*RadarrConfig  `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr   []*LidarrConfig  `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr  []*ReadarrConfig `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Deluge   []*DelugeConfig  `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
-	Qbit     []*QbitConfig    `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
-	SabNZB   []*SabNZBConfig  `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
-	Tautulli *TautulliConfig  `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
-	Router   *mux.Router      `json:"-" toml:"-" xml:"-" yaml:"-"`
-	ErrorLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
-	DebugLog *log.Logger      `json:"-" toml:"-" xml:"-" yaml:"-"`
+	APIKey   string            `json:"api_key" toml:"api_key" xml:"api_key" yaml:"api_key"`
+	URLBase  string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	Sonarr   []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
+	Radarr   []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
+	Lidarr   []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
+	Readarr  []*ReadarrConfig  `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Prowlarr []*ProwlarrConfig `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
+	Deluge   []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
+	Qbit     []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
+	SabNZB   []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
+	Tautulli *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
+	Router   *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
+	ErrorLog *log.Logger       `json:"-" toml:"-" xml:"-" yaml:"-"`
+	DebugLog *log.Logger       `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
 // Errors sent to client web requests.
@@ -102,24 +104,28 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
 		// Make sure the id is within range of the available service.
-		case app == starr.Radarr && (id >= len(a.Radarr) || id < 0):
-			msg = fmt.Errorf("%v: %w", id, ErrNoRadarr)
 		case app == starr.Lidarr && (id >= len(a.Lidarr) || id < 0):
 			msg = fmt.Errorf("%v: %w", id, ErrNoLidarr)
-		case app == starr.Sonarr && (id >= len(a.Sonarr) || id < 0):
-			msg = fmt.Errorf("%v: %w", id, ErrNoSonarr)
+		case app == starr.Prowlarr && (id >= len(a.Prowlarr) || id < 0):
+			msg = fmt.Errorf("%v: %w", id, ErrNoLidarr)
+		case app == starr.Radarr && (id >= len(a.Radarr) || id < 0):
+			msg = fmt.Errorf("%v: %w", id, ErrNoRadarr)
 		case app == starr.Readarr && (id >= len(a.Readarr) || id < 0):
 			msg = fmt.Errorf("%v: %w", id, ErrNoReadarr)
-		// Store the application configuration (starr) in a context then pass that into the api() method.
-		// Retrieve the return code and output, and send a response via a.Respond().
-		case app == starr.Radarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Radarr[id])))
+		case app == starr.Sonarr && (id >= len(a.Sonarr) || id < 0):
+			msg = fmt.Errorf("%v: %w", id, ErrNoSonarr)
+			// Store the application configuration (starr) in a context then pass that into the api() method.
+			// Retrieve the return code and output, and send a response via a.Respond().
 		case app == starr.Lidarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Lidarr[id])))
-		case app == starr.Sonarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[id])))
+		case app == starr.Prowlarr:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Prowlarr[id])))
+		case app == starr.Radarr:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Radarr[id])))
 		case app == starr.Readarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Readarr[id])))
+		case app == starr.Sonarr:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[id])))
 		case app == "":
 			// no app, just run the handler.
 			code, msg = api(r) // unknown app, just run the handler.
@@ -151,15 +157,16 @@ func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
 
 // InitHandlers activates all our handlers. This is part of the web server init.
 func (a *Apps) InitHandlers() {
+	a.lidarrHandlers()
+	a.prowlarrHandlers()
 	a.radarrHandlers()
 	a.readarrHandlers()
-	a.lidarrHandlers()
 	a.sonarrHandlers()
 }
 
 // Setup creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
-func (a *Apps) Setup(timeout time.Duration) error {
+func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 	if a.DebugLog == nil {
 		a.DebugLog = log.New(io.Discard, "", 0)
 	}
@@ -169,6 +176,10 @@ func (a *Apps) Setup(timeout time.Duration) error {
 	}
 
 	if err := a.setupLidarr(timeout); err != nil {
+		return err
+	}
+
+	if err := a.setupProwlarr(timeout); err != nil {
 		return err
 	}
 
@@ -233,6 +244,11 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) {
 
 func getLidarr(r *http.Request) *lidarr.Lidarr {
 	return r.Context().Value(starr.Lidarr).(*LidarrConfig).Lidarr
+}
+
+//nolint:deadcode,unused // will be used when we add http handlers for prowlarr.
+func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
+	return r.Context().Value(starr.Prowlarr).(*ProwlarrConfig).Prowlarr
 }
 
 func getRadarr(r *http.Request) *radarr.Radarr {

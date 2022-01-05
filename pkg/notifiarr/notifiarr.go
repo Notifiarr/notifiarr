@@ -19,110 +19,20 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/shirou/gopsutil/v3/host"
+	"golift.io/cnfg"
 )
 
 // Errors returned by this library.
 var (
 	ErrNon200          = fmt.Errorf("return code was not 200")
 	ErrInvalidResponse = fmt.Errorf("invalid response")
-)
-
-// Route is used to give us methods on our route paths.
-type Route string
-
-// Notifiarr URLs. Data sent to these URLs:
-/*
-api/v1/notification/plex?event=...
-  api (was plexcron)
-  user (was plexcron)
-  cron (was plexcron)
-  webhook (was plexhook)
-  movie
-  episode
-
-api/v1/notification/services?event=...
-  api
-  user
-  cron
-  start (only fires on startup)
-
-api/v1/notification/snapshot?event=...
-  api
-  user
-  cron
-
-api/v1/notification/dashboard?event=... (requires interval from website/client endpoint)
-  api
-  user
-  cron
-
-api/v1/notification/stuck?event=...
-  api
-  user
-  cron
-
-api/v1/user/gaps?app=radarr&event=...
-  api
-  user
-  cron
-
-api/v2/user/client?event=start
-  see description https://github.com/Notifiarr/notifiarr/pull/115
-
-api/v1/user/trash?app=...
-  radarr
-  sonarr
-*/
-const (
-	BaseURL           = "https://notifiarr.com"
-	DevBaseURL        = "https://dev.notifiarr.com"
-	userRoute1  Route = "/api/v1/user"
-	userRoute2  Route = "/api/v2/user"
-	ClientRoute Route = userRoute2 + "/client"
-	CFSyncRoute Route = userRoute1 + "/trash"
-	GapsRoute   Route = userRoute1 + "/gaps"
-	notifiRoute Route = "/api/v1/notification"
-	DashRoute   Route = notifiRoute + "/dashboard"
-	StuckRoute  Route = notifiRoute + "/stuck"
-	PlexRoute   Route = notifiRoute + "/plex"
-	SnapRoute   Route = notifiRoute + "/snapshot"
-	SvcRoute    Route = notifiRoute + "/services"
+	ErrInvalidApp      = fmt.Errorf("invalid application provided")
 )
 
 const (
 	ModeDev  = "development"
 	ModeProd = "production"
 )
-
-// EventType identifies the type of event that sent a paylaod to notifiarr.
-type EventType string
-
-// These are all our known event types.
-const (
-	EventCron    EventType = "cron"
-	EventUser    EventType = "user"
-	EventAPI     EventType = "api"
-	EventHook    EventType = "webhook"
-	EventStart   EventType = "start"
-	EventMovie   EventType = "movie"
-	EventEpisode EventType = "episode"
-	EventPoll    EventType = "poll"
-	EventReload  EventType = "reload"
-)
-
-// Path adds parameter to a route path and turns it into a string.
-func (r Route) Path(event EventType, params ...string) string {
-	switch {
-	case len(params) == 0 && event == "":
-		return string(r)
-	case len(params) == 0:
-		return string(r) + "?event=" + string(event)
-	case event == "":
-		return string(r) + "?" + strings.Join(params, "&")
-	default:
-		return string(r) + "?" + strings.Join(append(params, "event="+string(event)), "&")
-	}
-}
 
 const (
 	// DefaultRetries is the number of times to attempt a request to notifiarr.com.
@@ -132,16 +42,6 @@ const (
 	RetryDelay = 222 * time.Millisecond
 )
 
-// success is a ssuccessful tatus message from notifiarr.com.
-const success = "success"
-
-// Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
-type Payload struct {
-	Plex *plex.Sessions       `json:"plex,omitempty"`
-	Snap *snapshot.Snapshot   `json:"snapshot,omitempty"`
-	Load *plexIncomingWebhook `json:"payload,omitempty"`
-}
-
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
 	Apps     *apps.Apps       // has API key
@@ -150,7 +50,7 @@ type Config struct {
 	Services *ServiceConfig
 	Retries  int
 	BaseURL  string
-	Timeout  time.Duration
+	Timeout  cnfg.Duration
 	Trigger  Triggers
 	MaxBody  int
 	Sighup   chan os.Signal
@@ -172,14 +72,9 @@ type extras struct {
 // Triggers allow trigger actions in the timer routine.
 type Triggers struct {
 	stop  *action        // Triggered by calling Stop()
-	sync  *action        // Sync Radarr CF and Sonarr RP
-	gaps  *action        // Send Radarr Collection Gaps
-	stuck *action        // Stuck Items
-	plex  *action        // Send Plex Sessions
-	dash  *action        // Dashboard State
-	snap  *action        // Snapshot
 	sess  chan time.Time // Return Plex Sessions
 	sessr chan *holder   // Session Return Channel
+	List  []*action      // List of action triggers
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -215,51 +110,137 @@ func (c *Config) Setup(mode string) string {
 // Start runs the timers.
 func (c *Config) Start() {
 	if c.Trigger.stop != nil {
-		panic("notifiarr timers cannot run twice")
+		panic("notifiarr timers cannot run more than once")
 	}
 
-	c.Trigger.stuck = &action{
-		Fn:  c.sendStuckQueueItems,
-		Msg: "Checking app queues and sending stuck items.",
-		C:   make(chan EventType, 1),
-		T:   time.NewTicker(stuckDur),
-	}
-	c.Trigger.plex = &action{
-		Fn:  c.sendPlexSessions,
-		Msg: "Gathering and sending Plex Sessions.",
-		C:   make(chan EventType, 1),
-	}
-	c.Trigger.gaps = &action{
-		Fn:  c.sendGaps,
-		Msg: "Sending Radarr Collection Gaps.",
-		C:   make(chan EventType, 1),
-	}
-	c.Trigger.sync = &action{
-		Fn:  c.syncCF,
-		Msg: "Starting Custom Formats and Quality Profiles Sync for Radarr and Sonarr.",
-		C:   make(chan EventType, 1),
-	}
-	c.Trigger.dash = &action{
-		Fn:  c.sendDashboardState,
-		Msg: "Initiating State Collection for Dashboard.",
-		C:   make(chan EventType, 1),
-	}
-	c.Trigger.snap = &action{
-		Fn:  c.sendSnapshot,
-		Msg: "Gathering and sending System Snapshot.",
-		C:   make(chan EventType, 1),
-	}
-	c.Trigger.stop = &action{
-		Msg: "Stop Channel is used for reloads and must not have a function.",
-		C:   make(chan EventType),
-	}
 	c.Trigger.sess = make(chan time.Time, 1)
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
 
+	// Order is important here.
 	go c.runSessionHolder()
-	c.startTimers()
+	c.logSnapshotStartup()
+	c.makeBaseTriggers()
+	c.makeCorruptionTriggers()
+	c.makeBackupTriggers()
+	c.setPlexTimers()
+
+	if _, err := c.GetClientInfo(EventStart); err == nil { // only run this if we have clientinfo
+		c.setClientInfoTimerTriggers() // sync, gaps, dashboard, custom
+	}
+
+	c.makeCustomClientInfoTimerTriggers()
+	c.runTimers()
+}
+
+func (c *Config) makeBaseTriggers() {
+	c.Trigger.stop = &action{
+		Name: TrigStop,
+		C:    make(chan EventType),
+	}
+	c.Trigger.add(&action{
+		Name: TrigStuckItems,
+		Fn:   c.sendStuckQueueItems,
+		C:    make(chan EventType, 1),
+		T:    time.NewTicker(stuckDur),
+	}, &action{
+		Name: TrigPlexSessions,
+		Fn:   c.sendPlexSessions,
+		C:    make(chan EventType, 1),
+	}, &action{
+		Name: TrigCollectionGaps,
+		Fn:   c.sendGaps,
+		C:    make(chan EventType, 1),
+	}, &action{
+		Name: TrigCFSync,
+		Fn:   c.syncCF,
+		C:    make(chan EventType, 1),
+	}, &action{
+		Name: TrigDashboard,
+		Fn:   c.sendDashboardState,
+		C:    make(chan EventType, 1),
+	}, &action{
+		Name: TrigSnapshot,
+		T:    tickerOrNil(c.Snap.Interval.Duration),
+		Fn:   c.sendSnapshot,
+		C:    make(chan EventType, 1),
+	})
+}
+
+func (c *Config) setPlexTimers() {
+	if !c.Plex.Configured() {
+		return
+	}
+
+	if c.Plex.Interval.Duration > 0 {
+		// Add a little splay to the timers to not hit plex at the same time too often.
+		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
+			c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown, c.Plex.Delay)
+		c.Trigger.get(TrigPlexSessions).T = time.NewTicker(c.Plex.Interval.Duration + 139*time.Millisecond) // nolint:wsl
+	}
+
+	if c.Plex.MoviesPC != 0 || c.Plex.SeriesPC != 0 {
+		c.Printf("==> Plex Completed Items Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%%",
+			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
+		c.Trigger.add( // this has no name, which keeps it from logging _every minute_
+			&action{SFn: c.checkPlexFinishedItems, T: time.NewTicker(time.Minute + 179*time.Millisecond)})
+	}
+}
+
+func (c *Config) setClientInfoTimerTriggers() {
+	if c.Actions.Gaps.Interval.Duration > 0 && len(c.Apps.Radarr) > 0 {
+		c.Trigger.get(TrigCollectionGaps).T = time.NewTicker(c.Actions.Gaps.Interval.Duration)
+		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", c.Actions.Gaps.Interval)
+	}
+
+	if c.Actions.Sync.Interval.Duration > 0 && (len(c.Apps.Radarr) > 0 || len(c.Apps.Sonarr) > 0) {
+		c.Trigger.get(TrigCFSync).T = time.NewTicker(c.Actions.Sync.Interval.Duration)
+		c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced, interval:%s",
+			c.Actions.Sync.Radarr, c.Actions.Sync.Sonarr, c.Actions.Sync.Interval)
+	}
+
+	if c.Actions.Dashboard.Interval.Duration > 0 {
+		c.Trigger.get(TrigDashboard).T = time.NewTicker(c.Actions.Dashboard.Interval.Duration)
+		c.Printf("==> Sending Current State Data for Dashboard, interval:%s", c.Actions.Dashboard.Interval)
+	}
+
+	if len(c.Actions.Custom) > 0 { // This is not directly triggerable.
+		c.Printf("==> Custom Timers Enabled: %d timers provided", len(c.Actions.Custom))
+	}
+}
+
+func (c *Config) makeCustomClientInfoTimerTriggers() {
+	// This poller is sorta shoehorned in here for lack of a better place to put it.
+	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
+		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s timeout:%s",
+			c.ClientInfo != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)}, c.Timeout)
+		c.Trigger.add(&action{Name: TrigPollSite, Fn: c.pollForReload, T: time.NewTicker(pollDur)})
+	}
+
+	if c.ClientInfo == nil {
+		return
+	}
+
+	for _, custom := range c.Actions.Custom {
+		custom.setup(c)
+
+		var ticker *time.Ticker
+
+		if custom.Interval.Duration < time.Minute {
+			c.Errorf("Website provided custom cron interval under 1 minute. Ignored! Interval: %s Name: %s, URI: %s",
+				custom.Interval, custom.Name, custom.URI)
+		} else {
+			ticker = time.NewTicker(custom.Interval.Duration)
+		}
+
+		c.Trigger.add(&action{
+			Name: TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s' GET %s", custom.Name, custom.URI)),
+			Fn:   custom.run,
+			C:    custom.ch,
+			T:    ticker,
+		})
+	}
 }
 
 // Stop all internal cron timers and Triggers.

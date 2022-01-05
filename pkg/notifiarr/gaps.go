@@ -17,11 +17,7 @@ type gapsConfig struct {
 }
 
 func (t *Triggers) SendGaps(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	t.gaps.C <- event
+	t.exec(event, TrigCollectionGaps)
 }
 
 func (c *Config) sendGaps(event EventType) {
@@ -40,9 +36,8 @@ func (c *Config) sendGaps(event EventType) {
 		if resp, err := c.sendInstanceGaps(event, instance, r); err != nil {
 			c.Errorf("[%s requested] Radarr Collection Gaps request for '%d:%s' failed: %v", event, instance, r.URL, err)
 		} else {
-			c.Printf("[%s requested] Sent Collection Gaps to Notifiarr for Radarr: %d:%s. "+
-				"Website took %s and replied with: %s, %s",
-				event, instance, r.URL, resp.Details.Elapsed, resp.Result, resp.Details.Response)
+			c.Printf("[%s requested] Sent Collection Gaps to Notifiarr for Radarr: %d:%s. %s",
+				event, instance, r.URL, resp)
 		}
 	}
 }

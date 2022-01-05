@@ -10,19 +10,15 @@ import (
 )
 
 // GetMemoryUsage returns current host memory consumption.
-func (s *Snapshot) GetMemoryUsage(ctx context.Context, run bool) error {
-	if !run {
-		return nil
-	}
-
+func (s *Snapshot) GetMemoryUsage(ctx context.Context) error {
 	pageSize, err := unix.SysctlUint32("hw.pagesize")
 	if err != nil {
-		return s.getMemoryUsageShared(ctx, run)
+		return s.getMemoryUsageShared(ctx)
 	}
 
 	s.System.MemTotal, err = unix.SysctlUint64("hw.physmem")
 	if err != nil {
-		return s.getMemoryUsageShared(ctx, run)
+		return s.getMemoryUsageShared(ctx)
 	}
 
 	// If the above two worked, these are unlikely to fail.

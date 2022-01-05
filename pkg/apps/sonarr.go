@@ -38,6 +38,7 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/update", sonarrUpdateSeries, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/command/{commandid:[0-9]+}", sonarrStatusCommand, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/command", sonarrTriggerCommand, "POST")
+	a.HandleAPIpath(starr.Sonarr, "/command/search/{seriesid:[0-9]+}", sonarrTriggerSearchSeries, "GET")
 }
 
 // SonarrConfig represents the input data for a Sonarr server.
@@ -45,7 +46,8 @@ type SonarrConfig struct {
 	Name      string        `toml:"name" xml:"name"`
 	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
 	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
+	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
+	Backup    string        `toml:"backup" xml:"backup"`
 	*starr.Config
 	*sonarr.Sonarr
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
@@ -69,14 +71,6 @@ func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.Sonarr = sonarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
-	}
-
-	// These things are not used in this package but this package configures them.
-	if r.StuckItem && r.CheckQ == nil {
-		i := uint(0)
-		r.CheckQ = &i
-	} else if r.CheckQ != nil {
-		r.StuckItem = true
 	}
 
 	r.URL = strings.TrimRight(r.URL, "/")
@@ -175,6 +169,20 @@ func sonarrUnmonitorEpisode(r *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, episodes[0]
+}
+
+func sonarrTriggerSearchSeries(r *http.Request) (int, interface{}) {
+	seriesID, _ := strconv.ParseInt(mux.Vars(r)["seriesid"], mnd.Base10, mnd.Bits64)
+
+	output, err := getSonarr(r).SendCommand(&sonarr.CommandRequest{
+		Name:     "SeriesSearch",
+		SeriesID: seriesID,
+	})
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("triggering series search: %w", err)
+	}
+
+	return http.StatusOK, output.Status
 }
 
 func sonarrTriggerCommand(r *http.Request) (int, interface{}) {

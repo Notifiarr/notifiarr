@@ -22,15 +22,18 @@ type appConfig struct {
 	Instance int           `json:"instance"`
 	Name     string        `json:"name"`
 	Stuck    bool          `json:"stuck"`
+	Corrupt  string        `json:"corrupt"`
+	Backup   string        `json:"backup"`
 	Interval cnfg.Duration `json:"interval"`
 }
 
 // appConfigs is the configuration returned from the notifiarr website.
 type appConfigs struct {
-	Lidarr  []*appConfig `json:"lidarr"`
-	Radarr  []*appConfig `json:"radarr"`
-	Readarr []*appConfig `json:"readarr"`
-	Sonarr  []*appConfig `json:"sonarr"`
+	Lidarr   []*appConfig `json:"lidarr"`
+	Prowlarr []*appConfig `json:"prowlarr"`
+	Radarr   []*appConfig `json:"radarr"`
+	Readarr  []*appConfig `json:"readarr"`
+	Sonarr   []*appConfig `json:"sonarr"`
 }
 
 type ListItem struct {
@@ -63,11 +66,7 @@ func (i ItemList) Empty() bool {
 }
 
 func (t *Triggers) SendStuckQueueItems(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	t.stuck.C <- event
+	t.exec(event, TrigStuckItems)
 }
 
 func (c *Config) sendStuckQueueItems(event EventType) {
@@ -89,10 +88,8 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), err)
 	} else {
 		c.Printf("[%s requested] Sent Stuck Items to Notifiarr "+
-			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d. "+
-			"Website took %s and replied with: %s, %s",
-			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(),
-			resp.Details.Elapsed, resp.Result, resp.Details.Response)
+			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d. %s",
+			event, apps, elapsed, q.Lidarr.Len(), q.Radarr.Len(), q.Readarr.Len(), q.Sonarr.Len(), resp)
 	}
 }
 
@@ -137,7 +134,7 @@ func (c *Config) getFinishedItemsLidarr() ItemList {
 
 		start := time.Now()
 
-		queue, err := l.GetQueue(getItemsMax)
+		queue, err := l.GetQueue(getItemsMax, getItemsMax)
 		if err != nil {
 			c.Errorf("Getting Lidarr Queue (%d): %v", instance, err)
 			continue
@@ -221,7 +218,7 @@ func (c *Config) getFinishedItemsReadarr() ItemList {
 
 		start := time.Now()
 
-		queue, err := l.GetQueue(getItemsMax)
+		queue, err := l.GetQueue(getItemsMax, getItemsMax)
 		if err != nil {
 			c.Errorf("Getting Readarr Queue (%d): %v", instance, err)
 			continue

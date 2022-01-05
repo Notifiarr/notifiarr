@@ -20,6 +20,10 @@ OPTIONS
         Provide a configuration file (instead of the default).
         Can also be passed as environment variable: DN_CONFIG_FILE
 
+    -e, --extraconfig <config file>[,<config file>[,<config file> ...]]
+        You may load in multiple config files. Useful for storing
+        passwords and api keys in a different location.
+
     -p, --prefix
         The default environment variable configuration prefix is `DN`.
         Use this tunable to change it.
@@ -31,6 +35,8 @@ OPTIONS
     -w, --write <file>
         This flag allows you to read in a config file and re-write it to another file.
         Use - as a shortcut argument to over write the file provided by --config.
+        This will not touch config files added with --extraconfig, but it will
+        write their content/settings into the new config (now combined) file.
 
     --curl <url>
         This flags allows you to make the application GET a URL and print

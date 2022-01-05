@@ -112,8 +112,14 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 }
 
 func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop
+	content := mux.Vars(r)["content"]
 	trigger := mux.Vars(r)["trigger"]
-	c.Debugf("Incoming API Trigger: %s", trigger)
+
+	if content != "" {
+		c.Debugf("Incoming API Trigger: %s (%s)", trigger, content)
+	} else {
+		c.Debugf("Incoming API Trigger: %s", trigger)
+	}
 
 	switch trigger {
 	case "cfsync":
@@ -134,10 +140,20 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 		c.website.Trigger.SendSnapshot(notifiarr.EventAPI)
 	case "gaps":
 		c.website.Trigger.SendGaps(notifiarr.EventAPI)
+	case "corrupt":
+		err := c.website.Trigger.Corruption(notifiarr.EventAPI, starr.App(strings.Title(content)))
+		if err != nil {
+			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err)
+		}
+	case "backup":
+		err := c.website.Trigger.Backup(notifiarr.EventAPI, starr.App(strings.Title(content)))
+		if err != nil {
+			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err)
+		}
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}
 	case "notification":
-		if content := mux.Vars(r)["content"]; content != "" {
+		if content != "" {
 			ui.Notify("Notification: %s", content) //nolint:errcheck
 			c.Printf("NOTIFICATION: %s", content)
 		} else {
@@ -145,6 +161,10 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 		}
 	default:
 		return http.StatusBadRequest, "unknown trigger '" + trigger + "'"
+	}
+
+	if content != "" {
+		return http.StatusOK, trigger + " (" + content + ") initiated"
 	}
 
 	return http.StatusOK, trigger + " initiated"

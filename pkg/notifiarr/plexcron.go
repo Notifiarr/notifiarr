@@ -28,11 +28,7 @@ var ErrNoChannel = fmt.Errorf("no channel to send session request")
 
 // SendPlexSessions sends plex sessions in a go routine through a channel.
 func (t *Triggers) SendPlexSessions(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	t.plex.C <- event
+	t.exec(event, TrigPlexSessions)
 }
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
@@ -56,8 +52,7 @@ func (c *Config) collectSessions(event EventType, v *plexIncomingWebhook) {
 	if resp, err := c.sendPlexMeta(event, v, wait); err != nil {
 		c.Errorf("[%s requested] Sending Plex Sessions%s to Notifiarr: %v", event, msg, err)
 	} else {
-		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar. Website took %s and replied with: %s, %s",
-			event, msg, resp.Details.Elapsed, resp.Result, resp.Details.Response)
+		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar. %s", event, msg, resp)
 	}
 }
 

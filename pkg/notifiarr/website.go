@@ -15,63 +15,13 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
-	"golift.io/cnfg"
 )
 
-// Response is what notifiarr replies to our requests with.
-/* try this
-{
-    "response": "success",
-    "message": {
-        "response": {
-            "instance": 1,
-            "debug": null
-        },
-        "started": "23:57:03",
-        "finished": "23:57:03",
-        "elapsed": "0s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Service status cron processed.",
-        "started": "00:04:15",
-        "finished": "00:04:15",
-        "elapsed": "0s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Channel stats cron processed.",
-        "started": "00:04:31",
-        "finished": "00:04:36",
-        "elapsed": "5s"
-    }
-}
-
-{
-    "response": "success",
-    "message": {
-        "response": "Dashboard payload processed.",
-        "started": "00:02:04",
-        "finished": "00:02:11",
-        "elapsed": "7s"
-    }
-}
-*/
-// nitsua: all responses should be that way.. but response might not always be an object.
-type Response struct {
-	Result  string `json:"result"`
-	Details struct {
-		Response json.RawMessage `json:"response"` // can be anything. type it out later.
-		Started  time.Time       `json:"started"`
-		Finished time.Time       `json:"finished"`
-		Elapsed  cnfg.Duration   `json:"elapsed"`
-	} `json:"details"`
+// httpClient is our custom http client to wrap Do and provide retries.
+type httpClient struct {
+	Retries int
+	*log.Logger
+	*http.Client
 }
 
 // sendPlexMeta is kicked off by the webserver in go routine.
@@ -143,15 +93,15 @@ func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 
 	wg.Add(3) //nolint: gomnd,wsl
 	go func() {
-		rep <- snap.GetCPUSample(ctx, true)
+		rep <- snap.GetCPUSample(ctx)
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
-		rep <- snap.GetMemoryUsage(ctx, true)
+		rep <- snap.GetMemoryUsage(ctx)
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
-		for _, err := range snap.GetLocalData(ctx, false) {
+		for _, err := range snap.GetLocalData(ctx) {
 			rep <- err
 		}
 		wg.Done() //nolint:wsl
@@ -163,7 +113,7 @@ func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 }
 
 func (c *Config) GetData(url string) (*Response, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -252,7 +202,7 @@ func unmarshalResponse(url string, code int, body []byte) (*Response, error) {
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
 func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
@@ -285,13 +235,6 @@ func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error
 	}
 
 	return resp.StatusCode, body, nil
-}
-
-// httpClient is our custom http client to wrap Do and provide retries.
-type httpClient struct {
-	Retries int
-	*log.Logger
-	*http.Client
 }
 
 // Do performs an http Request with retries and logging!

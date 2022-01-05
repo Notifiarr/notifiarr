@@ -37,20 +37,17 @@ const (
 // Config determines which checks to run, etc.
 //nolint:lll
 type Config struct {
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                           // total run time allowed.
-	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                        // how often to send snaps (cron).
-	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfsPools"`                       // zfs pools to monitor.
-	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"useSudo"`                         // use sudo for smartctl commands.
-	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`             // include mdstat and/or megaraid.
-	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"`       // smartctl commands.
-	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`          // get disk usage.
-	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`                   // usage for all drives?
-	Uptime    bool          `toml:"monitor_uptime" xml:"monitor_uptime" json:"monitorUptime"`       // all system stats.
-	CPUMem    bool          `toml:"monitor_cpuMemory" xml:"monitor_cpuMemory" json:"monitorCpuMem"` // cpu perct and memory used/free.
-	CPUTemp   bool          `toml:"monitor_cpuTemp" xml:"monitor_cpuTemp" json:"monitorCpuTemp"`    // not everything supports temps.
-	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`                                 // number of processes to include from ioTop
-	PSTop     int           `toml:"pstop" xml:"pstop" json:"psTop"`                                 // number of processes to include from top (cpu usage)
-	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                                 // number of processes to include from mysql servers.
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                     // total run time allowed.
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`                  // how often to send snaps (cron).
+	ZFSPools  []string      `toml:"zfs_pools" xml:"zfs_pool" json:"zfsPools"`                 // zfs pools to monitor.
+	UseSudo   bool          `toml:"use_sudo" xml:"use_sudo" json:"useSudo"`                   // use sudo for smartctl commands.
+	Raid      bool          `toml:"monitor_raid" xml:"monitor_raid" json:"monitorRaid"`       // include mdstat and/or megaraid.
+	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"` // smartctl commands.
+	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`    // get disk usage.
+	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`             // usage for all drives?
+	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`                           // number of processes to include from ioTop
+	PSTop     int           `toml:"pstop" xml:"pstop" json:"psTop"`                           // number of processes to include from top (cpu usage)
+	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                           // number of processes to include from mysql servers.
 	*Plugins
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
 }
@@ -152,13 +149,13 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 
 func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error) {
 	errs := s.GetProcesses(ctx, c.PSTop)
-	errs = append(errs, s.GetCPUSample(ctx, c.CPUMem))
+	errs = append(errs, s.GetCPUSample(ctx))
 
-	if err := s.GetLocalData(ctx, c.Uptime); len(err) != 0 {
+	if err := s.GetLocalData(ctx); len(err) != 0 {
 		errs = append(errs, err...)
 	}
 
-	if syn, err := GetSynology(c.Uptime); err != nil && !errors.Is(err, ErrNotSynology) {
+	if syn, err := GetSynology(); err != nil && !errors.Is(err, ErrNotSynology) {
 		errs = append(errs, err)
 	} else if syn != nil {
 		syn.SetInfo(s.System.InfoStat)
@@ -178,10 +175,10 @@ func (c *Config) getSnapshot(ctx context.Context, s *Snapshot) ([]error, []error
 		errs = append(errs, err...)
 	}
 
-	errs = append(errs, s.GetMemoryUsage(ctx, c.CPUMem))
+	errs = append(errs, s.GetMemoryUsage(ctx))
 	errs = append(errs, s.getZFSPoolData(ctx, c.ZFSPools))
 	errs = append(errs, s.getRaidData(ctx, c.UseSudo, c.Raid))
-	errs = append(errs, s.getSystemTemps(ctx, c.CPUTemp))
+	errs = append(errs, s.getSystemTemps(ctx))
 	errs = append(errs, s.getIOTop(ctx, c.UseSudo, c.IOTop))
 	errs = append(errs, s.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
 	errs = append(errs, s.getIoStat2(ctx, c.DiskUsage))

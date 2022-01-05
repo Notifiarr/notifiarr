@@ -48,7 +48,8 @@ type RadarrConfig struct {
 	Name      string        `toml:"name" xml:"name"`
 	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
 	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	CheckQ    *uint         `toml:"check_q" xml:"check_q"`
+	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
+	Backup    string        `toml:"backup" xml:"backup"`
 	*starr.Config
 	*radarr.Radarr
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
@@ -72,14 +73,6 @@ func (r *RadarrConfig) setup(timeout time.Duration) {
 	r.Radarr = radarr.New(r.Config)
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
-	}
-
-	// These things are not used in this package but this package configures them.
-	if r.StuckItem && r.CheckQ == nil {
-		i := uint(0)
-		r.CheckQ = &i
-	} else if r.CheckQ != nil {
-		r.StuckItem = true
 	}
 
 	r.URL = strings.TrimRight(r.URL, "/")

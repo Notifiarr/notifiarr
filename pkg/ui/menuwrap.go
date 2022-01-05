@@ -9,7 +9,7 @@ type menuItem struct {
 }
 
 // WrapMenu is just gross.
-func WrapMenu(m *systray.MenuItem) MenuItem { //nolint:ireturn
+func WrapMenu(m *systray.MenuItem) MenuItem { //nolint:ireturn,nolintlint
 	return MenuItem(&menuItem{MenuItem: m})
 }
 

@@ -1,20 +1,22 @@
 package notifiarr
 
 func (c *Config) logSnapshotStartup() {
+	if c.Snap.Interval.Duration < 1 {
+		return
+	}
+
 	var ex string
 
 	for k, v := range map[string]bool{
-		"raid":    c.Snap.Raid,
-		"disks":   c.Snap.DiskUsage,
-		"drives":  c.Snap.DriveData,
-		"uptime":  c.Snap.Uptime,
-		"cpumem":  c.Snap.CPUMem,
-		"cputemp": c.Snap.CPUTemp,
-		"iotop":   c.Snap.IOTop > 0,
-		"pstop":   c.Snap.PSTop > 0,
-		"mysql":   c.Snap.Plugins != nil && len(c.Snap.MySQL) > 0,
-		"zfs":     len(c.Snap.ZFSPools) > 0,
-		"sudo":    c.Snap.UseSudo && c.Snap.DriveData,
+		"cpu, load, memory, uptime, users, temps": true,
+		"raid":   c.Snap.Raid,
+		"disks":  c.Snap.DiskUsage,
+		"drives": c.Snap.DriveData,
+		"iotop":  c.Snap.IOTop > 0,
+		"pstop":  c.Snap.PSTop > 0,
+		"mysql":  c.Snap.Plugins != nil && len(c.Snap.MySQL) > 0,
+		"zfs":    len(c.Snap.ZFSPools) > 0,
+		"sudo":   c.Snap.UseSudo && c.Snap.DriveData,
 	} {
 		if !v {
 			continue
@@ -32,11 +34,7 @@ func (c *Config) logSnapshotStartup() {
 }
 
 func (t *Triggers) SendSnapshot(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	t.snap.C <- event
+	t.exec(event, TrigSnapshot)
 }
 
 func (c *Config) sendSnapshot(event EventType) {
@@ -58,8 +56,6 @@ func (c *Config) sendSnapshot(event EventType) {
 	if err != nil {
 		c.Errorf("[%s requested] Sending snapshot to Notifiarr: %v", event, err)
 	} else {
-		c.Printf("[%s requested] System Snapshot sent to Notifiarr, cron interval: %s. "+
-			"Website took %s and replied with: %s, %s",
-			event, c.Snap.Interval, resp.Details.Elapsed, resp.Result, resp.Details.Response)
+		c.Printf("[%s requested] System Snapshot sent to Notifiarr, cron interval: %s. %s", event, c.Snap.Interval, resp)
 	}
 }

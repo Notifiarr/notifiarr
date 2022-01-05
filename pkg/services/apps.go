@@ -10,6 +10,7 @@ import (
 func (c *Config) collectApps() []*Service {
 	svcs := []*Service{}
 	svcs = c.collectLidarrApps(svcs)
+	svcs = c.collectProwlarrApps(svcs)
 	svcs = c.collectRadarrApps(svcs)
 	svcs = c.collectReadarrApps(svcs)
 	svcs = c.collectSonarrApps(svcs)
@@ -34,6 +35,27 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
 				Interval: a.Interval,
+			})
+		}
+	}
+
+	return svcs
+}
+
+func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
+	for _, app := range c.Apps.Prowlarr {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
+		}
+
+		if app.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     app.Name,
+				Type:     CheckHTTP,
+				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}

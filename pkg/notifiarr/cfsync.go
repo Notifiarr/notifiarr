@@ -33,6 +33,9 @@ type idMap struct {
 	NewID int64 `json:"newId"`
 }
 
+// success is a ssuccessful status message from notifiarr.com.
+const success = "success"
+
 /*//*****/ // Radarr /*//*****///
 
 // RadarrCustomFormatPayload is the payload sent and received
@@ -46,11 +49,7 @@ type RadarrCustomFormatPayload struct {
 }
 
 func (t *Triggers) SyncCF(event EventType) {
-	if t.stop == nil {
-		return
-	}
-
-	t.sync.C <- event
+	t.exec(event, (TrigCFSync))
 }
 
 func (c *Config) syncCF(event EventType) {

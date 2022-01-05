@@ -114,100 +114,151 @@ timeout = "{{.Timeout}}"
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
-{{if .Lidarr}}{{range .Lidarr}}
-[[lidarr]]
+
+{{if .Lidarr}}{{range .Lidarr}}[[lidarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[lidarr]]
 #name     = "" # Set a name to enable checks of your service.
 #url      = "http://lidarr:8989/"
-#api_key  = "".{{end}}
+#api_key  = ""
 
-{{if .Radarr}}{{range .Radarr}}
-[[radarr]]
+
+{{end}}{{if .Prowlarr}}{{range .Prowlarr}}[[prowlarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"{{if .MaxBody}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
+{{else}}#[[prowlarr]]
+#name     = "" # Set a name to enable checks of your service.
+#url      = "http://prowlarr:9696/"
+#api_key  = ""
+
+
+{{end}}{{if .Radarr}}{{range .Radarr}}[[radarr]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{ if .MaxBody }}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
 #url       = "http://127.0.0.1:7878/radarr"
-#api_key   = ""{{end}}
+#api_key   = ""
 
-{{if .Readarr}}{{range .Readarr}}
-[[readarr]]
+
+{{end}}{{if .Readarr}}{{range .Readarr}}[[readarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
 #url       = "http://127.0.0.1:8787/readarr"
-#api_key   = ""{{end}}
+#api_key   = ""
 
-{{if .Sonarr}}{{range .Sonarr}}
-[[sonarr]]
+
+{{end}}{{if .Sonarr}}{{range .Sonarr}}[[sonarr]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
-  api_key  = "{{.APIKey}}"
+  api_key  = "{{.APIKey}}"{{if .Username}}
+  username = "{{.Username}}"
+  password = "{{.Password}}"{{end}}{{if .HTTPUser}}
+  http_user = "{{.HTTPUser}}"
+  http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
-	max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{end -}}
+  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+
+{{end}}
 {{else}}#[[sonarr]]
 #name      = ""  # Set a name to enable checks of your service.
 #url       = "http://sonarr:8989/"
-#api_key   = ""{{end}}
+#api_key   = ""
 
+
+{{end -}}
 
 # Download Client Configs (below) are used for dashboard state and service checks.
 
-{{if .Deluge}}{{range .Deluge -}}
-[[deluge]]
+{{if .Deluge}}{{range .Deluge }}[[deluge]]
   name     = "{{.Name}}"
   url      = "{{.Config.URL}}"
   password = "{{.Password}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{end}}{{else}}#[[deluge]]
+  timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[deluge]]
 #name     = ""  # Set a name to enable checks of your service.
 #url      = "http://deluge:8112/"
-#password = ""{{end}}
+#password = ""
 
-{{if .Qbit}}{{range .Qbit}}
-[[qbit]]
+
+{{end}}{{if .Qbit}}{{range .Qbit}}[[qbit]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   user     = "{{.User}}"
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{end}}
-{{else}}
-#[[qbit]]
+  timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[qbit]]
 #name     = ""  # Set a name to enable checks of your service.
 #url      = "http://qbit:8080/"
 #user     = ""
-#pass     = ""{{end}}
+#pass     = ""
 
-{{if .SabNZB}}{{range .SabNZB}}
-[[sabnzbd]]
+
+{{end}}{{if .SabNZB}}{{range .SabNZB}}[[sabnzbd]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{end}}
-{{else}}
-#[[sabnzbd]]
+  timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[sabnzbd]]
 #name     = ""  # Set a name to enable checks of this application.
 #url      = "http://sabnzbd:8080/"
 #api_key  = ""
-{{end}}
+
+
+{{end -}}
 
 #################
 # Plex Settings #
@@ -215,13 +266,13 @@ timeout = "{{.Timeout}}"
 
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
-[plex]{{if and .Plex (not force)}}
-  url     = "{{.Plex.URL}}"  # Your plex URL
-  token   = "{{.Plex.Token}}"  # your plex token; get this from a web inspector
-  timeout = "{{.Plex.Timeout}}"    # how long to wait for HTTP responses
-{{- else}}
-  url     = "http://localhost:32400" # Your plex URL
-  token   = "" # your plex token; get this from a web inspector
+{{if and .Plex (not force)}}[plex]
+  url     = "{{.Plex.URL}}"   # Your plex URL
+  token   = "{{.Plex.Token}}"   # your plex token; get this from a web inspector
+  timeout = "{{.Plex.Timeout}}"  # how long to wait for HTTP responses
+{{- else}}#[plex]
+#url     = "http://localhost:32400" # Your plex URL
+#token   = "" # your plex token; get this from a web inspector
 {{- end }}
 
 #####################
@@ -278,14 +329,14 @@ timeout = "{{.Timeout}}"
 ## Use the [[service]] directive to add more service checks. Example below.
 
 [services]
-  disabled = {{.Services.Disabled}}   # Setting this to true disables all service checking routines.
-  parallel = {{.Services.Parallel}}       # How many services to check concurrently. 1 should be enough.
+  disabled = {{.Services.Disabled}} # Setting this to true disables all service checking routines.
+  parallel = {{.Services.Parallel}}     # How many services to check concurrently. 1 should be enough.
   interval = "{{.Services.Interval}}" # How often to send service states to Notifiarr.com. Minimum = 5m.
-  log_file = '{{.Services.LogFile}}'      # Service Check logs go to the app log by default. Change that by setting a services.log file here.
+  log_file = '{{.Services.LogFile}}'    # Service Check logs go to the app log by default. Change that by setting a services.log file here.
 
 ## Uncomment the following section to create a service check on a URL or IP:port.
 ## You may include as many [[service]] sections as you have services to check.
-## Do not add Radarr, Sonarr, Readarr or Lidarr here! Add a name to enable their checks.
+## Do not add Radarr, Sonarr, Readarr, Prowlarr, or Lidarr here! Add a name to enable their checks.
 ##
 ## Example with comments follows.
 #[[service]]

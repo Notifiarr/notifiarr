@@ -120,9 +120,9 @@ timeout = "1m0s"
 
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
-[plex]
-  url     = "http://localhost:32400" # Your plex URL
-  token   = "" # your plex token; get this from a web inspector
+#[plex]
+#  url     = "http://localhost:32400" # Your plex URL
+#  token   = "" # your plex token; get this from a web inspector
 
 #####################
 # Tautulli Settings #
