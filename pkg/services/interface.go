@@ -41,15 +41,15 @@ func (c *Config) getResults() []*CheckResult {
 	svcs := make([]*CheckResult, len(c.services))
 	count := 0
 
-	for _, s := range c.services {
+	for _, svc := range c.services {
 		svcs[count] = &CheckResult{
-			Interval: s.Interval.Duration.Seconds(),
-			Name:     s.Name,
-			State:    s.state,
-			Output:   s.output,
-			Type:     s.Type,
-			Time:     s.lastCheck,
-			Since:    s.since,
+			Interval: svc.Interval.Duration.Seconds(),
+			Name:     svc.Name,
+			State:    svc.state,
+			Output:   svc.output,
+			Type:     svc.Type,
+			Time:     svc.lastCheck,
+			Since:    svc.since,
 		}
 		count++
 	}

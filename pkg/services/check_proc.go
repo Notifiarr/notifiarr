@@ -48,7 +48,7 @@ func GetAllProcesses() ([]*ProcInfo, error) {
 		return nil, fmt.Errorf("getting process list: %w", err)
 	}
 
-	p := []*ProcInfo{}
+	procs := []*ProcInfo{}
 
 	for _, proc := range processes {
 		procinfo, errs := getProcInfo(ctx, proc)
@@ -61,10 +61,10 @@ func GetAllProcesses() ([]*ProcInfo, error) {
 		} //nolint:wsl
 
 		procinfo.PID = proc.Pid
-		p = append(p, procinfo)
+		procs = append(procs, procinfo)
 	}
 
-	return p, nil
+	return procs, nil
 }
 
 // start a loop through processes to find the one we care about.
@@ -159,41 +159,41 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, a
 		age = fmt.Sprintf(", age: %v", durafmt.ParseShort(time.Since(ages[0]).Round(time.Second)))
 	}
 
-	for _, p := range pids {
+	for _, activePid := range pids {
 		if pid == "" {
 			pid = ", pids: "
 		} else {
 			pid += ";"
 		}
 
-		pid += fmt.Sprintf("%v", p)
+		pid += fmt.Sprintf("%v", activePid)
 	}
 
 	return
 }
 
 // getProcInfo returns age and cli args for a process.
-func getProcInfo(ctx context.Context, p *process.Process) (*ProcInfo, []error) {
+func getProcInfo(ctx context.Context, proc *process.Process) (*ProcInfo, []error) {
 	var (
 		err      error
 		errs     []error
 		procinfo ProcInfo
 	)
 
-	procinfo.CmdLine, err = p.CmdlineWithContext(ctx)
+	procinfo.CmdLine, err = proc.CmdlineWithContext(ctx)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("CmdlineWithContext: %w", err))
 	}
 
 	if procinfo.CmdLine == "" {
-		if procinfo.CmdLine, err = p.NameWithContext(ctx); err != nil {
+		if procinfo.CmdLine, err = proc.NameWithContext(ctx); err != nil {
 			errs = append(errs, fmt.Errorf("NameWithContext: %w", err))
 		}
 	}
 
 	// FreeBSD doesn't have create time.
 	if !mnd.IsFreeBSD {
-		created, err := p.CreateTimeWithContext(ctx)
+		created, err := proc.CreateTimeWithContext(ctx)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("CreateTimeWithContext: %w", err))
 		} else {

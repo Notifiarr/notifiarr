@@ -22,19 +22,19 @@ func (c *Config) collectApps() []*Service {
 }
 
 func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
-	for _, a := range c.Apps.Lidarr {
-		if a.Interval.Duration == 0 {
-			a.Interval.Duration = DefaultCheckInterval
+	for _, app := range c.Apps.Lidarr {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
-		if a.Name != "" {
+		if app.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:     a.Name,
+				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v1/system/status?apikey=" + a.APIKey,
+				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
-				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: a.Interval,
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}
@@ -64,19 +64,19 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 }
 
 func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
-	for _, a := range c.Apps.Radarr {
-		if a.Interval.Duration == 0 {
-			a.Interval.Duration = DefaultCheckInterval
+	for _, app := range c.Apps.Radarr {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
-		if a.Name != "" {
+		if app.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:     a.Name,
+				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v3/system/status?apikey=" + a.APIKey,
+				Value:    app.URL + "/api/v3/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
-				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: a.Interval,
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}
@@ -85,19 +85,19 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 }
 
 func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
-	for _, a := range c.Apps.Readarr {
-		if a.Interval.Duration == 0 {
-			a.Interval.Duration = DefaultCheckInterval
+	for _, app := range c.Apps.Readarr {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
-		if a.Name != "" {
+		if app.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:     a.Name,
+				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v1/system/status?apikey=" + a.APIKey,
+				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
-				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: a.Interval,
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}
@@ -106,19 +106,19 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 }
 
 func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
-	for _, a := range c.Apps.Sonarr {
-		if a.Interval.Duration == 0 {
-			a.Interval.Duration = DefaultCheckInterval
+	for _, app := range c.Apps.Sonarr {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
-		if a.Name != "" {
+		if app.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:     a.Name,
+				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    a.URL + "/api/v3/system/status?apikey=" + a.APIKey,
+				Value:    app.URL + "/api/v3/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
-				Timeout:  cnfg.Duration{Duration: a.Timeout.Duration},
-				Interval: a.Interval,
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}
@@ -127,56 +127,56 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 }
 
 func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
-	// Deluge instances.
-	for _, d := range c.Apps.Deluge {
-		if d.Interval.Duration == 0 {
-			d.Interval.Duration = DefaultCheckInterval
+	// Deluge instanceapp.
+	for _, app := range c.Apps.Deluge {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
-		if d.Name != "" {
+		if app.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:     d.Name,
+				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    strings.TrimSuffix(d.Config.URL, "/json"),
+				Value:    strings.TrimSuffix(app.Config.URL, "/json"),
 				Expect:   "200",
-				Timeout:  cnfg.Duration{Duration: d.Timeout.Duration},
-				Interval: d.Interval,
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}
 
-	// Qbittorrent instances.
-	for _, q := range c.Apps.Qbit {
-		if q.Interval.Duration == 0 {
-			q.Interval.Duration = DefaultCheckInterval
+	// Qbittorrent instanceapp.
+	for _, app := range c.Apps.Qbit {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
-		if q.Name != "" {
+		if app.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:     q.Name,
+				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    q.URL,
+				Value:    app.URL,
 				Expect:   "200",
-				Timeout:  cnfg.Duration{Duration: q.Timeout.Duration},
-				Interval: q.Interval,
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}
 
-	// SabNBZd instances.
-	for _, s := range c.Apps.SabNZB {
-		if s.Interval.Duration == 0 {
-			s.Interval.Duration = DefaultCheckInterval
+	// SabNBZd instanceapp.
+	for _, app := range c.Apps.SabNZB {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
-		if s.Name != "" {
+		if app.Name != "" {
 			svcs = append(svcs, &Service{
-				Name:     s.Name,
+				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    s.URL + "/api?mode=version&apikey=" + s.APIKey,
+				Value:    app.URL + "/api?mode=version&apikey=" + app.APIKey,
 				Expect:   "200",
-				Timeout:  cnfg.Duration{Duration: s.Timeout.Duration},
-				Interval: s.Interval,
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
 			})
 		}
 	}
@@ -186,18 +186,18 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 	// Tautulli instance (1).
-	if t := c.Apps.Tautulli; t != nil && t.URL != "" && t.Name != "" {
-		if t.Interval.Duration == 0 {
-			t.Interval.Duration = DefaultCheckInterval
+	if app := c.Apps.Tautulli; app != nil && app.URL != "" && app.Name != "" {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
 		}
 
 		svcs = append(svcs, &Service{
-			Name:     t.Name,
+			Name:     app.Name,
 			Type:     CheckHTTP,
-			Value:    t.URL + "/api/v2?cmd=status&apikey=" + t.APIKey,
+			Value:    app.URL + "/api/v2?cmd=status&apikey=" + app.APIKey,
 			Expect:   "200",
-			Timeout:  t.Timeout,
-			Interval: t.Interval,
+			Timeout:  app.Timeout,
+			Interval: app.Interval,
 		})
 	}
 
@@ -209,17 +209,17 @@ func (c *Config) collectMySQLApps(svcs []*Service) []*Service {
 		return svcs
 	}
 
-	for _, m := range c.Plugins.MySQL {
-		if m.Interval.Duration == 0 {
-			m.Interval.Duration = DefaultCheckInterval
+	for _, plugin := range c.Plugins.MySQL {
+		if plugin.Interval.Duration == 0 {
+			plugin.Interval.Duration = DefaultCheckInterval
 		}
 
-		if m.Timeout.Duration == 0 {
-			m.Timeout.Duration = DefaultTimeout
+		if plugin.Timeout.Duration == 0 {
+			plugin.Timeout.Duration = DefaultTimeout
 		}
 
-		host := strings.TrimLeft(strings.TrimRight(m.Host, ")"), "@tcp(")
-		if m.Name == "" || host == "" || strings.HasPrefix(host, "@") {
+		host := strings.TrimLeft(strings.TrimRight(plugin.Host, ")"), "@tcp(")
+		if plugin.Name == "" || host == "" || strings.HasPrefix(host, "@") {
 			continue
 		}
 
@@ -228,11 +228,11 @@ func (c *Config) collectMySQLApps(svcs []*Service) []*Service {
 		}
 
 		svcs = append(svcs, &Service{
-			Name:     m.Name,
+			Name:     plugin.Name,
 			Type:     CheckTCP,
 			Value:    host,
-			Timeout:  m.Timeout,
-			Interval: m.Interval,
+			Timeout:  plugin.Timeout,
+			Interval: plugin.Interval,
 		})
 	}
 

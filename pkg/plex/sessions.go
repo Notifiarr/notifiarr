@@ -32,6 +32,7 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 
 	var (
 		v struct {
+			//nolint:tagliatelle
 			MediaContainer struct {
 				Sessions []*Session `json:"Metadata"`
 			} `json:"MediaContainer"`

@@ -38,14 +38,14 @@ func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 		Checks:   make([]*notifiarr.ServiceCheck, len(services)),
 	}
 
-	for i, check := range services {
-		if err := services[i].validate(); err != nil {
+	for idx, check := range services {
+		if err := services[idx].validate(); err != nil {
 			return nil, err
 		}
 
 		// Add this validated service to our service map.
-		c.services[services[i].Name] = services[i]
-		scnfg.Checks[i] = &notifiarr.ServiceCheck{
+		c.services[services[idx].Name] = services[idx]
+		scnfg.Checks[idx] = &notifiarr.ServiceCheck{
 			Name:     check.Name,
 			Type:     string(check.Type),
 			Expect:   check.Expect,

@@ -21,17 +21,17 @@ import (
 // Server is the Plex configuration from a config file.
 // Without a URL or Token, nothing works and this package is unused.
 type Server struct {
-	Timeout    cnfg.Duration `toml:"timeout"   json:"timeout"`
-	Interval   cnfg.Duration `toml:"interval"  json:"interval"`
-	URL        string        `toml:"url"  json:"url"`
-	Token      string        `toml:"token" json:"token"`
-	AccountMap string        `toml:"-"  json:"accountMap"`
-	Name       string        `toml:"-"  json:"-"`
-	NoActivity bool          `toml:"-"  json:"noActivity"`
-	Delay      cnfg.Duration `toml:"-"  json:"activityDelay"`
-	Cooldown   cnfg.Duration `toml:"-"  json:"cooldown"`
-	SeriesPC   uint          `toml:"-"  json:"seriesPc"`
-	MoviesPC   uint          `toml:"-"  json:"moviesPc"`
+	Timeout    cnfg.Duration `toml:"timeout" json:"timeout" xml:"timeout"`
+	Interval   cnfg.Duration `toml:"interval" json:"interval" xml:"interval"`
+	URL        string        `toml:"url" json:"url" xml:"url"`
+	Token      string        `toml:"token" json:"token" xml:"token"`
+	AccountMap string        `toml:"-" json:"accountMap" xml:"-"`
+	Name       string        `toml:"-" json:"-" xml:"-"`
+	NoActivity bool          `toml:"-" json:"noActivity" xml:"-"`
+	Delay      cnfg.Duration `toml:"-" json:"activityDelay" xml:"-"`
+	Cooldown   cnfg.Duration `toml:"-" json:"cooldown" xml:"-"`
+	SeriesPC   uint          `toml:"-" json:"seriesPc" xml:"-"`
+	MoviesPC   uint          `toml:"-" json:"moviesPc" xml:"-"`
 	client     *http.Client
 }
 
