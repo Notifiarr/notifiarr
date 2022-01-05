@@ -666,6 +666,10 @@ golift.io/cnfg v0.1.1-0.20220103045145-0c0d80e8da3f h1:lC5ZHwgsKkSgh7sUKFe74jMcE
 golift.io/cnfg v0.1.1-0.20220103045145-0c0d80e8da3f/go.mod h1:cjgsYXSEgyWJEbSk+QehZuGN26jw+1CzwceGCbJ0Lck=
 golift.io/deluge v0.9.3 h1:yO8S3x4ikGCWI4W7SmtNFVaaCeiudWUn5Zt3S5HmRQ8=
 golift.io/deluge v0.9.3/go.mod h1:4AEg/gqM2FiqLGAGT8ZYrYmeSVS8vTqTtG+nItc8CAk=
+golift.io/deluge v0.9.4-0.20220103090915-06a14c005fa3 h1:N7kO5wePH7oZD9MFU3AjvITKZPnW91DVBABNr1rokl8=
+golift.io/deluge v0.9.4-0.20220103090915-06a14c005fa3/go.mod h1:4AEg/gqM2FiqLGAGT8ZYrYmeSVS8vTqTtG+nItc8CAk=
+golift.io/deluge v0.9.4-0.20220103091211-1842b313e264 h1:rWXCarms5PwR/Vl6nA7cpSEZP4lB0Elio7MyitGbSyA=
+golift.io/deluge v0.9.4-0.20220103091211-1842b313e264/go.mod h1:4AEg/gqM2FiqLGAGT8ZYrYmeSVS8vTqTtG+nItc8CAk=
 golift.io/qbit v0.0.0-20211121074815-1558e8969b98 h1:Nr+zd738zKl3DVd1+DOp5vbkEmD7eAW4M4LEfh78JMs=
 golift.io/qbit v0.0.0-20211121074815-1558e8969b98/go.mod h1:dUZrJv4PE34QTxUSFXPSWw6P8kd0LFLR9CBOxD3HxYw=
 golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9 h1:j/WeLF6Ew1lc/m8/bh5qleZ66aSeJ72B1fUWigF69OE=

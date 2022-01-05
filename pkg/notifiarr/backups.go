@@ -98,6 +98,7 @@ func (c *Config) sendLidarrBackups(event EventType) {
 				name:  starr.Lidarr,
 				int:   i + 1,
 				app:   app,
+				cName: app.Name,
 			})
 		}
 	}
@@ -111,6 +112,7 @@ func (c *Config) sendProwlarrBackups(event EventType) {
 				name:  starr.Prowlarr,
 				int:   i + 1,
 				app:   app,
+				cName: app.Name,
 			})
 		}
 	}
@@ -124,6 +126,7 @@ func (c *Config) sendRadarrBackups(event EventType) {
 				name:  starr.Radarr,
 				int:   i + 1,
 				app:   app,
+				cName: app.Name,
 			})
 		}
 	}
@@ -137,6 +140,7 @@ func (c *Config) sendReadarrBackups(event EventType) {
 				name:  starr.Readarr,
 				int:   i + 1,
 				app:   app,
+				cName: app.Name,
 			})
 		}
 	}
