@@ -89,38 +89,38 @@ func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit i
 	return errs
 }
 
-func getMySQL(ctx context.Context, s *MySQLConfig) (MySQLProcesses, MySQLStatus, error) {
-	id := s.Host
-	if s.Name != "" {
-		id = s.Name
+func getMySQL(ctx context.Context, mysql *MySQLConfig) (MySQLProcesses, MySQLStatus, error) {
+	hostID := mysql.Host
+	if mysql.Name != "" {
+		hostID = mysql.Name
 	}
 
-	host := "@tcp(" + s.Host + ")"
-	if strings.HasPrefix(s.Host, "@") {
-		host = s.Host
+	host := "@tcp(" + mysql.Host + ")"
+	if strings.HasPrefix(mysql.Host, "@") {
+		host = mysql.Host
 	}
 
-	db, err := sql.Open("mysql", s.User+":"+s.Pass+host+"/")
+	dbase, err := sql.Open("mysql", mysql.User+":"+mysql.Pass+host+"/")
 	if err != nil {
-		return nil, nil, fmt.Errorf("mysql server %s: connecting: %w", id, err)
+		return nil, nil, fmt.Errorf("mysql server %s: connecting: %w", hostID, err)
 	}
-	defer db.Close()
+	defer dbase.Close()
 
-	list, err := scanMySQLProcessList(ctx, db)
+	list, err := scanMySQLProcessList(ctx, dbase)
 	if err != nil {
-		return list, nil, fmt.Errorf("mysql server %s: %w", id, err)
+		return list, nil, fmt.Errorf("mysql server %s: %w", hostID, err)
 	}
 
-	status, err := scanMySQLStatus(ctx, db)
+	status, err := scanMySQLStatus(ctx, dbase)
 	if err != nil {
-		return list, nil, fmt.Errorf("mysql server %s: %w", id, err)
+		return list, nil, fmt.Errorf("mysql server %s: %w", hostID, err)
 	}
 
 	return list, status, nil
 }
 
-func scanMySQLProcessList(ctx context.Context, db *sql.DB) (MySQLProcesses, error) {
-	rows, err := db.QueryContext(ctx, "SHOW FULL PROCESSLIST")
+func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, error) {
+	rows, err := dbase.QueryContext(ctx, "SHOW FULL PROCESSLIST")
 	if err != nil {
 		return nil, fmt.Errorf("getting processes: %w", err)
 	} else if err = rows.Err(); err != nil {
@@ -149,7 +149,7 @@ func scanMySQLProcessList(ctx context.Context, db *sql.DB) (MySQLProcesses, erro
 	return list, nil
 }
 
-func scanMySQLStatus(ctx context.Context, db *sql.DB) (MySQLStatus, error) {
+func scanMySQLStatus(ctx context.Context, dbase *sql.DB) (MySQLStatus, error) {
 	var (
 		list  = make(MySQLStatus)
 		likes = []string{
@@ -171,7 +171,7 @@ func scanMySQLStatus(ctx context.Context, db *sql.DB) (MySQLStatus, error) {
 	)
 
 	for _, name := range likes {
-		rows, err := db.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'")
+		rows, err := dbase.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'")
 		if err != nil {
 			return nil, fmt.Errorf("getting global status: %w", err)
 		} else if err = rows.Err(); err != nil {

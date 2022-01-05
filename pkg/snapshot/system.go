@@ -96,27 +96,29 @@ func (s *Snapshot) GetProcesses(ctx context.Context, count int) (errs []error) {
 
 	s.Processes = make(Processes, len(procs))
 
-	for i, p := range procs {
-		s.Processes[i] = &Process{Pid: p.Pid}
+	for idx, proc := range procs {
+		s.Processes[idx] = &Process{Pid: proc.Pid}
 
-		if s.Processes[i].Name, err = p.NameWithContext(ctx); err != nil {
-			errs = append(errs, fmt.Errorf("pid %d, no name: %w", p.Pid, err))
+		if s.Processes[idx].Name, err = proc.NameWithContext(ctx); err != nil {
+			errs = append(errs, fmt.Errorf("pid %d, no name: %w", proc.Pid, err))
 		}
 
 		// This for loop primes the second run of PercentWithContext.
 		// Then sleep a moment, and gather the cpu samples for all PIDs across that moment.
-		_, _ = p.PercentWithContext(ctx, 0)
+		_, _ = proc.PercentWithContext(ctx, 0)
 	}
 
 	time.Sleep(4 * time.Second) // nolint:gomnd
 
-	for i, p := range procs {
-		if s.Processes[i].CPUPercent, err = p.PercentWithContext(ctx, 0); err != nil && !errors.Is(err, os.ErrNotExist) {
-			errs = append(errs, fmt.Errorf("pid %d, cpu percent: %w", p.Pid, err))
+	for idx, proc := range procs {
+		s.Processes[idx].CPUPercent, err = proc.PercentWithContext(ctx, 0)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			errs = append(errs, fmt.Errorf("pid %d, cpu percent: %w", proc.Pid, err))
 		}
 
-		if s.Processes[i].MemPercent, err = p.MemoryPercentWithContext(ctx); err != nil && !errors.Is(err, os.ErrNotExist) {
-			errs = append(errs, fmt.Errorf("pid %d, mem percent: %w", p.Pid, err))
+		s.Processes[idx].MemPercent, err = proc.MemoryPercentWithContext(ctx)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			errs = append(errs, fmt.Errorf("pid %d, mem percent: %w", proc.Pid, err))
 		}
 	}
 

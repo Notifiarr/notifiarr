@@ -27,24 +27,24 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 
 	var errs []error
 
-	for i := range partitions {
-		u, err := disk.UsageWithContext(ctx, partitions[i].Mountpoint)
+	for idx := range partitions {
+		usage, err := disk.UsageWithContext(ctx, partitions[idx].Mountpoint)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[i].Mountpoint, err))
+			errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[idx].Mountpoint, err))
 			continue
 		}
 
-		if u.Total == 0 ||
+		if usage.Total == 0 ||
 			((runtime.GOOS == "darwin" || strings.HasSuffix(runtime.GOOS, "bsd")) &&
-				!strings.HasPrefix(partitions[i].Device, "/dev/")) {
+				!strings.HasPrefix(partitions[idx].Device, "/dev/")) {
 			continue
 		}
 
-		s.DiskUsage[partitions[i].Device] = &Partition{
-			Device: partitions[i].Mountpoint,
-			Total:  u.Total,
-			Free:   u.Free,
-			Used:   u.Used,
+		s.DiskUsage[partitions[idx].Device] = &Partition{
+			Device: partitions[idx].Mountpoint,
+			Total:  usage.Total,
+			Free:   usage.Free,
+			Used:   usage.Used,
 		}
 	}
 
@@ -57,7 +57,7 @@ func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 		return nil
 	}
 
-	cmd, stdout, wg, err := readyCommand(ctx, false, "zpool", "list", "-pH")
+	cmd, stdout, waitg, err := readyCommand(ctx, false, "zpool", "list", "-pH")
 	if err != nil {
 		return err
 	}
@@ -76,8 +76,8 @@ func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 				}
 			}
 		}
-		wg.Done()
+		waitg.Done()
 	}()
 
-	return runCommand(cmd, wg)
+	return runCommand(cmd, waitg)
 }
