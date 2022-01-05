@@ -155,13 +155,13 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, str
 	var confFile string
 
 	defaultConfigFile, configFileList := defaultLocactions()
-	for _, f := range append([]string{configFile}, configFileList...) {
-		if d, err := homedir.Expand(f); err == nil {
-			f = d
+	for _, fileName := range append([]string{configFile}, configFileList...) {
+		if d, err := homedir.Expand(fileName); err == nil {
+			fileName = d
 		}
 
-		if _, err := os.Stat(f); err == nil {
-			confFile = f
+		if _, err := os.Stat(fileName); err == nil {
+			confFile = fileName
 			break
 		} // else { c.Print("rip:", err) }
 	}
