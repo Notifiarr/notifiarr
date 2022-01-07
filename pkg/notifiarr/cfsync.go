@@ -1,3 +1,4 @@
+//nolint:dupl
 package notifiarr
 
 import (
@@ -60,7 +61,7 @@ func (c *Config) syncCF(event EventType) {
 
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *Config) syncRadarr(event EventType) {
-	if c.ClientInfo == nil || len(c.Actions.Sync.RadarrInstances) < 1 {
+	if c.clientInfo == nil || len(c.clientInfo.Actions.Sync.RadarrInstances) < 1 {
 		c.Debugf("Cannot sync Radarr Custom Formats. Website provided 0 instances.")
 		return
 	} else if len(c.Apps.Radarr) < 1 {
@@ -70,8 +71,9 @@ func (c *Config) syncRadarr(event EventType) {
 
 	for i, app := range c.Apps.Radarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || !c.Actions.Sync.RadarrInstances.Has(instance) {
-			c.Debugf("CF Sync Skipping Radarr instance %d. Not in sync list: %v", instance, c.Actions.Sync.RadarrInstances)
+		if app.URL == "" || app.APIKey == "" || !c.clientInfo.Actions.Sync.RadarrInstances.Has(instance) {
+			c.Debugf("CF Sync Skipping Radarr instance %d. Not in sync list: %v",
+				instance, c.clientInfo.Actions.Sync.RadarrInstances)
 			continue
 		}
 
@@ -84,7 +86,7 @@ func (c *Config) syncRadarr(event EventType) {
 	}
 }
 
-func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) error { //nolint:dupl
+func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 	var (
 		err     error
 		payload = RadarrCustomFormatPayload{Instance: instance, Name: app.Name, NewMaps: c.radarrCF[instance]}
@@ -202,7 +204,7 @@ type SonarrCustomFormatPayload struct {
 
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *Config) syncSonarr(event EventType) {
-	if c.ClientInfo == nil || len(c.Actions.Sync.SonarrInstances) < 1 {
+	if c.clientInfo == nil || len(c.clientInfo.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Website provided 0 instances.")
 		return
 	} else if len(c.Apps.Sonarr) < 1 {
@@ -212,8 +214,9 @@ func (c *Config) syncSonarr(event EventType) {
 
 	for i, app := range c.Apps.Sonarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || !c.Actions.Sync.SonarrInstances.Has(instance) {
-			c.Debugf("CF Sync Skipping Sonarr instance %d. Not in sync list: %v", instance, c.Actions.Sync.SonarrInstances)
+		if app.URL == "" || app.APIKey == "" || !c.clientInfo.Actions.Sync.SonarrInstances.Has(instance) {
+			c.Debugf("CF Sync Skipping Sonarr instance %d. Not in sync list: %v",
+				instance, c.clientInfo.Actions.Sync.SonarrInstances)
 			continue
 		}
 
@@ -226,7 +229,7 @@ func (c *Config) syncSonarr(event EventType) {
 	}
 }
 
-func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error { //nolint:dupl
+func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	var (
 		err     error
 		payload = SonarrCustomFormatPayload{Instance: instance, Name: app.Name, NewMaps: c.sonarrRP[instance]}

@@ -8,8 +8,20 @@ import (
 	"syscall"
 )
 
-func (c *Client) printUpdateMessage() {}
-func (c *Client) setupMenus()         {}
+// If you need more fake methods, add them.
+//nolint:gochecknoglobals
+var menu = make(map[string]*fakeMenu)
+
+type fakeMenu struct{}
+
+func (f *fakeMenu) Uncheck()               {}
+func (f *fakeMenu) Check()                 {}
+func (f *fakeMenu) SetTooltip(interface{}) {}
+
+func (c *Client) printUpdateMessage()     {}
+func (c *Client) setupMenus(interface{})  {}
+func (c *Client) closeDynamicTimerMenus() {}
+func (c *Client) startTray(interface{})   {}
 
 // AutoWatchUpdate is not used on this OS.
 func (c *Client) AutoWatchUpdate() {}
@@ -32,5 +44,3 @@ func (c *Client) setSignals() {
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	signal.Notify(c.sighup, syscall.SIGHUP, syscall.SIGUSR1)
 }
-
-func (c *Client) startTray() {}
