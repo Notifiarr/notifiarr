@@ -93,7 +93,7 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 
 	app := getReadarr(req)
 	// Check for existing book.
-	m, err := app.GetBook(payload.Editions[0].ForeignEditionID)
+	m, err := app.GetBookContext(req.Context(), payload.Editions[0].ForeignEditionID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
@@ -101,7 +101,7 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 	}
 
 	// Add book using payload.
-	book, err := app.AddBook(payload)
+	book, err := app.AddBookContext(req.Context(), payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding book: %w", err)
 	}
@@ -112,7 +112,7 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 func readarrGetAuthor(req *http.Request) (int, interface{}) {
 	authorID, _ := strconv.ParseInt(mux.Vars(req)["authorid"], mnd.Base10, mnd.Bits64)
 
-	author, err := getReadarr(req).GetAuthorByID(authorID)
+	author, err := getReadarr(req).GetAuthorByIDContext(req.Context(), authorID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting author: %w", err)
 	}
@@ -137,7 +137,7 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 func readarrCheckBook(req *http.Request) (int, interface{}) {
 	grid := mux.Vars(req)["grid"]
 
-	m, err := getReadarr(req).GetBook(grid)
+	m, err := getReadarr(req).GetBookContext(req.Context(), grid)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
@@ -150,7 +150,7 @@ func readarrCheckBook(req *http.Request) (int, interface{}) {
 func readarrGetBook(req *http.Request) (int, interface{}) {
 	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
-	book, err := getReadarr(req).GetBookByID(bookID)
+	book, err := getReadarr(req).GetBookByIDContext(req.Context(), bookID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	}
@@ -161,7 +161,7 @@ func readarrGetBook(req *http.Request) (int, interface{}) {
 func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getReadarr(req).SendCommand(&readarr.CommandRequest{
+	output, err := getReadarr(req).SendCommandContext(req.Context(), &readarr.CommandRequest{
 		Name:    "BookSearch",
 		BookIDs: []int64{bookID},
 	})
@@ -174,7 +174,7 @@ func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 
 // Get the metadata profiles from readarr.
 func readarrMetaProfiles(req *http.Request) (int, interface{}) {
-	profiles, err := getReadarr(req).GetMetadataProfiles()
+	profiles, err := getReadarr(req).GetMetadataProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -190,7 +190,7 @@ func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 
 // Get the quality profiles from readarr.
 func readarrQualityProfiles(req *http.Request) (int, interface{}) {
-	profiles, err := getReadarr(req).GetQualityProfiles()
+	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -206,7 +206,7 @@ func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 
 // Get the all quality profiles data from readarr.
 func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
-	profiles, err := getReadarr(req).GetQualityProfiles()
+	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -224,7 +224,7 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	id, err := getReadarr(req).AddQualityProfile(&profile)
+	id, err := getReadarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
 	}
@@ -247,7 +247,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getReadarr(req).UpdateQualityProfile(&profile)
+	err = getReadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -257,7 +257,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 
 // Get folder list from Readarr.
 func readarrRootFolders(req *http.Request) (int, interface{}) {
-	folders, err := getReadarr(req).GetRootFolders()
+	folders, err := getReadarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -272,7 +272,7 @@ func readarrRootFolders(req *http.Request) (int, interface{}) {
 }
 
 func readarrSearchBook(req *http.Request) (int, interface{}) {
-	books, err := getReadarr(req).GetBook("")
+	books, err := getReadarr(req).GetBookContext(req.Context(), "")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
 	}
@@ -322,7 +322,7 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 }
 
 func readarrGetTags(req *http.Request) (int, interface{}) {
-	tags, err := getReadarr(req).GetTags()
+	tags, err := getReadarr(req).GetTagsContext(req.Context())
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
 	}
@@ -333,7 +333,7 @@ func readarrGetTags(req *http.Request) (int, interface{}) {
 func readarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getReadarr(req).UpdateTag(id, mux.Vars(req)["label"])
+	tagID, err := getReadarr(req).UpdateTagContext(req.Context(), id, mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
@@ -342,7 +342,7 @@ func readarrUpdateTag(req *http.Request) (int, interface{}) {
 }
 
 func readarrSetTag(req *http.Request) (int, interface{}) {
-	tagID, err := getReadarr(req).AddTag(mux.Vars(req)["label"])
+	tagID, err := getReadarr(req).AddTagContext(req.Context(), mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
@@ -358,7 +358,7 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getReadarr(req).UpdateBook(book.ID, &book)
+	err = getReadarr(req).UpdateBookContext(req.Context(), book.ID, &book)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating book: %w", err)
 	}
@@ -374,7 +374,7 @@ func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getReadarr(req).UpdateAuthor(author.ID, &author)
+	err = getReadarr(req).UpdateAuthorContext(req.Context(), author.ID, &author)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating author: %w", err)
 	}

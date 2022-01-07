@@ -1,6 +1,7 @@
 package notifiarr
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"io"
@@ -11,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"golang.org/x/net/context"
 	"golift.io/starr"
 	"golift.io/xtractr"
 )
@@ -23,6 +23,7 @@ const (
 	radarrCorruptCheckDur   = 5*time.Hour + 30*time.Minute
 	readarrCorruptCheckDur  = 5*time.Hour + 40*time.Minute
 	sonarrCorruptCheckDur   = 5*time.Hour + 50*time.Minute
+	maxCheckTime            = 10 * time.Minute
 )
 
 // Trigger Types.
@@ -191,6 +192,9 @@ func (c *Config) sendSonarrCorruption(event EventType) {
 }
 
 func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
+	ctx, cancel := context.WithTimeout(context.Background(), maxCheckTime)
+	defer cancel()
+
 	if input.last == mnd.Disabled || input.last == "" {
 		c.Printf("[%s requested] Disabled: %s Backup File Corruption Check (%d), Last File: '%s'",
 			input.event, input.name, input.int, input.last)
@@ -213,7 +217,7 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 		return latest
 	}
 
-	backup, err := c.checkBackupFileCorruption(input, latest)
+	backup, err := c.checkBackupFileCorruption(ctx, input, latest)
 	if err != nil {
 		// XXX: Send "error" to notifirr.com here?
 		c.Errorf("[%s requested] Checking %s Backup File Corruption (%d): %s: %v",
@@ -242,7 +246,8 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	return backup.Name
 }
 
-func (c *Config) checkBackupFileCorruption(input *genericInstance, remotePath string) (*BackupInfo, error) {
+func (c *Config) checkBackupFileCorruption(ctx context.Context,
+	input *genericInstance, remotePath string) (*BackupInfo, error) {
 	// XXX: Set TMPDIR to configure this.
 	folder, err := ioutil.TempDir("", "notifiarr_tmp_dir")
 	if err != nil {
@@ -252,7 +257,7 @@ func (c *Config) checkBackupFileCorruption(input *genericInstance, remotePath st
 	defer os.RemoveAll(folder) // clean up when we're done.
 	c.Debugf("[%s requested] Downloading %s backup file (%d): %s", input.event, input.name, input.int, remotePath)
 
-	fileName, err := input.saveBackupFile(remotePath, folder)
+	fileName, err := input.saveBackupFile(ctx, remotePath, folder)
 	if err != nil {
 		return nil, err
 	}
@@ -273,28 +278,29 @@ func (c *Config) checkBackupFileCorruption(input *genericInstance, remotePath st
 		if path.Ext(filePath) == ".db" {
 			c.Debugf("[%s requested] Checking %s backup sqlite3 file (%d): %s",
 				input.event, input.name, input.int, filePath)
-			return input.checkCorruptSQLite(filePath)
+			return input.checkCorruptSQLite(ctx, filePath)
 		}
 	}
 
 	return nil, ErrNoDBInBackup
 }
 
-func (c *genericInstance) saveBackupFile(remotePath, localPath string) (string, error) {
-	reader, status, err := c.app.GetBody(context.Background(), remotePath, nil)
+func (c *genericInstance) saveBackupFile(ctx context.Context,
+	remotePath, localPath string) (string, error) {
+	reader, status, err := c.app.GetBody(ctx, remotePath, nil)
 	if err != nil {
 		return "", fmt.Errorf("getting http response body: %w", err)
 	}
 	defer reader.Close()
 
 	if status >= http.StatusMultipleChoices && status <= http.StatusPermanentRedirect {
-		if err := c.app.Login(); err != nil {
+		if err := c.app.Login(ctx); err != nil {
 			return "", fmt.Errorf("(%d) %w: you may need to set a username and password to download backup files: %s",
 				status, err, remotePath)
 		}
 
 		// Try again after logging in.
-		reader, status, err = c.app.GetBody(context.Background(), remotePath, nil)
+		reader, status, err = c.app.GetBody(ctx, remotePath, nil)
 		if err != nil {
 			return "", fmt.Errorf("getting http response body: %w", err)
 		}
@@ -319,7 +325,8 @@ func (c *genericInstance) saveBackupFile(remotePath, localPath string) (string, 
 	return file.Name(), nil
 }
 
-func (c *genericInstance) checkCorruptSQLite(filePath string) (*BackupInfo, error) {
+func (c *genericInstance) checkCorruptSQLite(ctx context.Context,
+	filePath string) (*BackupInfo, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("checking db file: %w", err)
@@ -334,20 +341,21 @@ func (c *genericInstance) checkCorruptSQLite(filePath string) (*BackupInfo, erro
 	backup := &BackupInfo{
 		Name:   filePath,
 		Size:   fileInfo.Size(),
-		Tables: c.getSQLLiteRowInt64(conn, "SELECT count(*) FROM sqlite_master WHERE type = 'table'"),
+		Tables: c.getSQLLiteRowInt64(ctx, conn, "SELECT count(*) FROM sqlite_master WHERE type = 'table'"),
 	}
-	backup.Ver, _ = c.getSQLLiteRowString(conn, "select sqlite_version()")
-	backup.Integ, backup.Rows = c.getSQLLiteRowString(conn, "PRAGMA integrity_check")
-	backup.Quick, _ = c.getSQLLiteRowString(conn, "PRAGMA quick_check")
+	backup.Ver, _ = c.getSQLLiteRowString(ctx, conn, "select sqlite_version()")
+	backup.Integ, backup.Rows = c.getSQLLiteRowString(ctx, conn, "PRAGMA integrity_check")
+	backup.Quick, _ = c.getSQLLiteRowString(ctx, conn, "PRAGMA quick_check")
 
 	return backup, nil
 }
 
-func (c *genericInstance) getSQLLiteRowString(conn *sql.DB, sql string) (string, int) {
+func (c *genericInstance) getSQLLiteRowString(ctx context.Context,
+	conn *sql.DB, sql string) (string, int) {
 	text := "<no data returned>"
 	count := 0
 
-	rows, err := conn.Query(sql)
+	rows, err := conn.QueryContext(ctx, sql)
 	if err != nil {
 		return fmt.Sprintf("%s: running DB query: %v", text, err), 0
 	}
@@ -368,8 +376,9 @@ func (c *genericInstance) getSQLLiteRowString(conn *sql.DB, sql string) (string,
 	return text, count
 }
 
-func (c *genericInstance) getSQLLiteRowInt64(conn *sql.DB, sql string) int64 {
-	rows, err := conn.Query(sql)
+func (c *genericInstance) getSQLLiteRowInt64(ctx context.Context,
+	conn *sql.DB, sql string) int64 {
+	rows, err := conn.QueryContext(ctx, sql)
 	if err != nil {
 		return 0
 	}

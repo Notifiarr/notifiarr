@@ -148,11 +148,12 @@ func (c *Config) sendPlexWebhook(hook *plexIncomingWebhook) {
 }
 
 type appStatus struct {
-	Lidarr  []*conTest `json:"lidarr"`
-	Radarr  []*conTest `json:"radarr"`
-	Readarr []*conTest `json:"readarr"`
-	Sonarr  []*conTest `json:"sonarr"`
-	Plex    []*conTest `json:"plex"`
+	Lidarr   []*conTest `json:"lidarr"`
+	Prowlarr []*conTest `json:"prowlarr"`
+	Radarr   []*conTest `json:"radarr"`
+	Readarr  []*conTest `json:"readarr"`
+	Sonarr   []*conTest `json:"sonarr"`
+	Plex     []*conTest `json:"plex"`
 }
 
 type conTest struct {
@@ -207,6 +208,7 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 func appStatsForVersion(apps *apps.Apps) *appStatus {
 	var (
 		lid  = make([]*conTest, len(apps.Lidarr))
+		prl  = make([]*conTest, len(apps.Prowlarr))
 		rad  = make([]*conTest, len(apps.Radarr))
 		read = make([]*conTest, len(apps.Readarr))
 		son  = make([]*conTest, len(apps.Sonarr))
@@ -215,6 +217,11 @@ func appStatsForVersion(apps *apps.Apps) *appStatus {
 	for i, app := range apps.Lidarr {
 		stat, err := app.GetSystemStatus()
 		lid[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	}
+
+	for i, app := range apps.Prowlarr {
+		stat, err := app.GetSystemStatus()
+		prl[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
 	}
 
 	for i, app := range apps.Radarr {
@@ -232,5 +239,5 @@ func appStatsForVersion(apps *apps.Apps) *appStatus {
 		son[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
 	}
 
-	return &appStatus{Radarr: rad, Readarr: read, Sonarr: son, Lidarr: lid}
+	return &appStatus{Radarr: rad, Readarr: read, Sonarr: son, Lidarr: lid, Prowlarr: prl}
 }

@@ -95,14 +95,14 @@ func sonarrAddSeries(req *http.Request) (int, interface{}) {
 
 	app := getSonarr(req)
 	// Check for existing series.
-	m, err := app.GetSeries(payload.TvdbID)
+	m, err := app.GetSeriesContext(req.Context(), payload.TvdbID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, sonarrData(m[0])
 	}
 
-	series, err := app.AddSeries(&payload)
+	series, err := app.AddSeriesContext(req.Context(), &payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
 	}
@@ -126,7 +126,7 @@ func sonarrData(series *sonarr.Series) map[string]interface{} {
 func sonarrCheckSeries(req *http.Request) (int, interface{}) {
 	tvdbid, _ := strconv.ParseInt(mux.Vars(req)["tvdbid"], mnd.Base10, mnd.Bits64)
 	// Check for existing series.
-	m, err := getSonarr(req).GetSeries(tvdbid)
+	m, err := getSonarr(req).GetSeriesContext(req.Context(), tvdbid)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
@@ -139,7 +139,7 @@ func sonarrCheckSeries(req *http.Request) (int, interface{}) {
 func sonarrGetSeries(req *http.Request) (int, interface{}) {
 	seriesID, _ := strconv.ParseInt(mux.Vars(req)["seriesid"], mnd.Base10, mnd.Bits64)
 
-	series, err := getSonarr(req).GetSeriesByID(seriesID)
+	series, err := getSonarr(req).GetSeriesByIDContext(req.Context(), seriesID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	}
@@ -150,7 +150,7 @@ func sonarrGetSeries(req *http.Request) (int, interface{}) {
 func sonarrGetEpisodes(req *http.Request) (int, interface{}) {
 	seriesID, _ := strconv.ParseInt(mux.Vars(req)["seriesid"], mnd.Base10, mnd.Bits64)
 
-	episodes, err := getSonarr(req).GetSeriesEpisodes(seriesID)
+	episodes, err := getSonarr(req).GetSeriesEpisodesContext(req.Context(), seriesID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	}
@@ -161,7 +161,7 @@ func sonarrGetEpisodes(req *http.Request) (int, interface{}) {
 func sonarrUnmonitorEpisode(req *http.Request) (int, interface{}) {
 	episodeID, _ := strconv.ParseInt(mux.Vars(req)["episodeid"], mnd.Base10, mnd.Bits64)
 
-	episodes, err := getSonarr(req).MonitorEpisode([]int64{episodeID}, false)
+	episodes, err := getSonarr(req).MonitorEpisodeContext(req.Context(), []int64{episodeID}, false)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(episodes) != 1 {
@@ -174,7 +174,7 @@ func sonarrUnmonitorEpisode(req *http.Request) (int, interface{}) {
 func sonarrTriggerSearchSeries(req *http.Request) (int, interface{}) {
 	seriesID, _ := strconv.ParseInt(mux.Vars(req)["seriesid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getSonarr(req).SendCommand(&sonarr.CommandRequest{
+	output, err := getSonarr(req).SendCommandContext(req.Context(), &sonarr.CommandRequest{
 		Name:     "SeriesSearch",
 		SeriesID: seriesID,
 	})
@@ -193,7 +193,7 @@ func sonarrTriggerCommand(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding command payload: %w", err)
 	}
 
-	output, err := getSonarr(req).SendCommand(&command)
+	output, err := getSonarr(req).SendCommandContext(req.Context(), &command)
 	if err != nil {
 		return http.StatusServiceUnavailable,
 			fmt.Errorf("triggering command '%s' on series %d: %w", command.Name, command.SeriesID, err)
@@ -205,7 +205,7 @@ func sonarrTriggerCommand(req *http.Request) (int, interface{}) {
 func sonarrStatusCommand(req *http.Request) (int, interface{}) {
 	commandID, _ := strconv.ParseInt(mux.Vars(req)["commandid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getSonarr(req).GetCommandStatus(commandID)
+	output, err := getSonarr(req).GetCommandStatusContext(req.Context(), commandID)
 	if err != nil {
 		return http.StatusServiceUnavailable,
 			fmt.Errorf("getting command status for ID %d: %w", commandID, err)
@@ -216,7 +216,7 @@ func sonarrStatusCommand(req *http.Request) (int, interface{}) {
 
 func sonarrLangProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
-	profiles, err := getSonarr(req).GetLanguageProfiles()
+	profiles, err := getSonarr(req).GetLanguageProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting language profiles: %w", err)
 	}
@@ -232,7 +232,7 @@ func sonarrLangProfiles(req *http.Request) (int, interface{}) {
 
 func sonarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
-	profiles, err := getSonarr(req).GetQualityProfiles()
+	profiles, err := getSonarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -242,7 +242,7 @@ func sonarrGetQualityProfile(req *http.Request) (int, interface{}) {
 
 func sonarrGetQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
-	profiles, err := getSonarr(req).GetQualityProfiles()
+	profiles, err := getSonarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -266,7 +266,7 @@ func sonarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	id, err := getSonarr(req).AddQualityProfile(&profile)
+	id, err := getSonarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
 	}
@@ -289,7 +289,7 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getSonarr(req).UpdateQualityProfile(&profile)
+	err = getSonarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -299,7 +299,7 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 
 func sonarrGetReleaseProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
-	profiles, err := getSonarr(req).GetReleaseProfiles()
+	profiles, err := getSonarr(req).GetReleaseProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -317,7 +317,7 @@ func sonarrAddReleaseProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	id, err := getSonarr(req).AddReleaseProfile(&profile)
+	id, err := getSonarr(req).AddReleaseProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
 	}
@@ -340,7 +340,7 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getSonarr(req).UpdateReleaseProfile(&profile)
+	err = getSonarr(req).UpdateReleaseProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -350,7 +350,7 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 
 func sonarrRootFolders(req *http.Request) (int, interface{}) {
 	// Get folder list from Sonarr.
-	folders, err := getSonarr(req).GetRootFolders()
+	folders, err := getSonarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -366,7 +366,7 @@ func sonarrRootFolders(req *http.Request) (int, interface{}) {
 
 func sonarrSearchSeries(req *http.Request) (int, interface{}) {
 	// Get all movies
-	series, err := getSonarr(req).GetAllSeries()
+	series, err := getSonarr(req).GetAllSeriesContext(req.Context())
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting series: %w", err)
 	}
@@ -415,7 +415,7 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 }
 
 func sonarrGetTags(req *http.Request) (int, interface{}) {
-	tags, err := getSonarr(req).GetTags()
+	tags, err := getSonarr(req).GetTagsContext(req.Context())
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
 	}
@@ -426,7 +426,7 @@ func sonarrGetTags(req *http.Request) (int, interface{}) {
 func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getSonarr(req).UpdateTag(id, mux.Vars(req)["label"])
+	tagID, err := getSonarr(req).UpdateTagContext(req.Context(), id, mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
@@ -435,7 +435,7 @@ func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 }
 
 func sonarrSetTag(req *http.Request) (int, interface{}) {
-	tagID, err := getSonarr(req).AddTag(mux.Vars(req)["label"])
+	tagID, err := getSonarr(req).AddTagContext(req.Context(), mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
@@ -451,7 +451,7 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getSonarr(req).UpdateSeries(series.ID, &series)
+	err = getSonarr(req).UpdateSeriesContext(req.Context(), series.ID, &series)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating series: %w", err)
 	}
