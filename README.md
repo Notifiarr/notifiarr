@@ -92,10 +92,11 @@ to the `main` branch in GitHub and may be broken.
 -   You must set `privileged` to use `smartctl` (`monitor_drives`) and/or `MegaCli` (`monitor_raid`).
 -   Map the `/var/run/utmp` volume if you want to count users.
 -   Mount any volumes you want to report storage space for. Where does not matter, "where" is the "name".
+-   You MUST set a static hostname. Each client is identified by hostname.
 
 ```shell
 docker pull golift/notifiarr
-docker run -d \
+docker run --hostname=$(hostname) -d \
 -v /your/config/notifiarr.conf:/config/notifiarr.conf \
 -v /var/run/utmp:/var/run/utmp \
 golift/notifiarr
@@ -109,7 +110,7 @@ You must set `--privileged` when `monitor drives` is enabled on the website.
 
 ```shell
 docker pull golift/notifiarr
-docker run -d --privileged \
+docker run --hostname $(hostname) -d --privileged \
   -v /var/run/utmp:/var/run/utmp \
   -e "DN_API_KEY=abcdef-12345-bcfead-43312-bbbaaa-123" \
   -e "DN_SONARR_0_URL=http://localhost:8989" \
