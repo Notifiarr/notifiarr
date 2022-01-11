@@ -1,0 +1,10 @@
+  notifiarr:
+    container_name: notifiarr
+    hostname: notifiarr
+    image: golift/notifiarr
+    restart: unless-stopped
+    ports:
+      - "5454:5454"
+    volumes:
+      - ${APPDATA}/notifiarr:/config
+      - /var/run/utmp:/var/run/utmp
