@@ -19,6 +19,7 @@ import (
 
 /* This file handles the OS GUI elements. */
 
+// This is arbitrary to avoid conflicts.
 const timerPrefix = "TimErr"
 
 // This variable holds all the menu items.
@@ -90,7 +91,7 @@ func (c *Client) setupMenus(clientInfo *notifiarr.ClientInfo) {
 		return
 	}
 
-	c.buildDynamicTimerMenus(clientInfo)
+	go c.buildDynamicTimerMenus(clientInfo)
 
 	if clientInfo.IsSub() {
 		menu["sub"].SetTitle("Subscriber \u2764\ufe0f")
@@ -167,6 +168,7 @@ func (c *Client) makeMoreChannels() {
 	menu["backRadarr"] = data.AddSubMenuItem("Send Radarr Backups", "send backup file list for each instance to Notifiarr")
 	menu["backReadarr"] = data.AddSubMenuItem("Send Readarr Backups", "send backup file list for each instance to Notifiarr")
 	menu["backSonarr"] = data.AddSubMenuItem("Send Sonarr Backups", "send backup file list for each instance to Notifiarr")
+	// custom timers get added onto data after this.
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	menu["debug"] = debug
@@ -196,53 +198,52 @@ func (c *Client) watchTopChannels() {
 
 func (c *Client) closeDynamicTimerMenus() {
 	for name := range menu {
-		if !strings.HasPrefix(name, timerPrefix) {
+		if !strings.HasPrefix(name, timerPrefix) || menu[name].ClickedCh == nil {
 			continue
 		}
 
-		if menu[name].ClickedCh != nil {
-			close(menu[name].ClickedCh)
-			menu[name].ClickedCh = nil
-		}
+		close(menu[name].ClickedCh)
+		menu[name].ClickedCh = nil
 	}
 }
 
-// dynamic menu items with reflection, anyone?
+// dynamic & reusable menu items with reflection, anyone?
 func (c *Client) buildDynamicTimerMenus(clientInfo *notifiarr.ClientInfo) {
+	defer c.CapturePanic()
+
 	if clientInfo == nil || len(clientInfo.Actions.Custom) == 0 {
 		return
 	}
 
 	if menu["timerinfo"] == nil {
 		menu["timerinfo"] = menu["data"].AddSubMenuItem("- Custom Timers -", "")
-		menu["timerinfo"].Disable()
 	} else {
 		// Re-use the already-created menu. This happens after reload.
 		menu["timerinfo"].Show()
-		menu["timerinfo"].Disable()
 	}
+
+	menu["timerinfo"].Disable()
 	defer menu["timerinfo"].Hide()
 
 	timers := clientInfo.Actions.Custom
 	cases := make([]reflect.SelectCase, len(timers))
 
 	for idx, timer := range timers {
-		desc := "dynamic custom timer with no provided description"
-		if timer.Desc != "" {
-			desc = timer.Desc
+		desc := fmt.Sprintf("%s; config: interval: %s, path: %s", timer.Desc, timer.Interval, timer.URI)
+		if timer.Desc == "" {
+			desc = fmt.Sprintf("dynamic custom timer; config: interval: %s, path: %s", timer.Interval, timer.URI)
 		}
 
 		name := timerPrefix + timer.Name
 		if menu[name] == nil {
-			menu[name] = menu["data"].AddSubMenuItem(timer.Name,
-				fmt.Sprintf("%s; config: interval: %s, path: %s", desc, timer.Interval, timer.URI))
+			menu[name] = menu["data"].AddSubMenuItem(timer.Name, desc)
 		} else {
 			// Re-use the already-created menu. This happens after reload.
-			menu[name].Show()
-			menu[name].SetTooltip(fmt.Sprintf("%s; config: interval: %s, path: %s", desc, timer.Interval, timer.URI))
 			menu[name].ClickedCh = make(chan struct{})
+			menu[name].SetTooltip(desc)
 		}
 
+		menu[name].Show()
 		defer menu[name].Hide()
 
 		cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(menu[name].ClickedCh)}
@@ -252,13 +253,11 @@ func (c *Client) buildDynamicTimerMenus(clientInfo *notifiarr.ClientInfo) {
 	defer c.Debugf("All %d Notifiarr custom timer menu channels stopped.", len(cases))
 
 	for {
-		if idx, _, ok := reflect.Select(cases); !ok {
-			// Channel cases[index] has been closed, remove it.
-			if cases = append(cases[:idx], cases[idx+1:]...); len(cases) < 1 {
-				return // no menus left to watch, exit.
-			}
-		} else {
+		if idx, _, ok := reflect.Select(cases); ok {
 			timers[idx].Run(notifiarr.EventUser)
+		} else if cases = append(cases[:idx], cases[idx+1:]...); len(cases) < 1 {
+			// Channel cases[idx] has been closed, remove it.
+			return // no menus left to watch, exit.
 		}
 	}
 }
@@ -301,7 +300,7 @@ func (c *Client) watchGuiChannels() {
 		case <-menu["disc2"].ClickedCh:
 			go ui.OpenURL("https://golift.io/discord")
 		case <-menu["sub"].ClickedCh:
-			go ui.OpenURL("https://www.buymeacoffee.com/nitsua")
+			go ui.OpenURL("https://github.com/sponsors/Notifiarr")
 		}
 	}
 }
