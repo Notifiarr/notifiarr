@@ -97,7 +97,7 @@ func radarrAddMovie(req *http.Request) (int, interface{}) {
 
 	app := getRadarr(req)
 	// Check for existing movie.
-	m, err := app.GetMovie(payload.TmdbID)
+	m, err := app.GetMovieContext(req.Context(), payload.TmdbID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
@@ -114,7 +114,7 @@ func radarrAddMovie(req *http.Request) (int, interface{}) {
 	}
 
 	// Add movie using fixed payload.
-	movie, err := app.AddMovie(&payload)
+	movie, err := app.AddMovieContext(req.Context(), &payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
 	}
@@ -133,7 +133,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 func radarrCheckMovie(req *http.Request) (int, interface{}) {
 	tmdbID, _ := strconv.ParseInt(mux.Vars(req)["tmdbid"], mnd.Base10, mnd.Bits64)
 	// Check for existing movie.
-	m, err := getRadarr(req).GetMovie(tmdbID)
+	m, err := getRadarr(req).GetMovieContext(req.Context(), tmdbID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
@@ -146,7 +146,7 @@ func radarrCheckMovie(req *http.Request) (int, interface{}) {
 func radarrGetMovie(req *http.Request) (int, interface{}) {
 	movieID, _ := strconv.ParseInt(mux.Vars(req)["movieid"], mnd.Base10, mnd.Bits64)
 
-	movie, err := getRadarr(req).GetMovieByID(movieID)
+	movie, err := getRadarr(req).GetMovieByIDContext(req.Context(), movieID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	}
@@ -157,7 +157,7 @@ func radarrGetMovie(req *http.Request) (int, interface{}) {
 func radarrTriggerSearchMovie(req *http.Request) (int, interface{}) {
 	movieID, _ := strconv.ParseInt(mux.Vars(req)["movieid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getRadarr(req).SendCommand(&radarr.CommandRequest{
+	output, err := getRadarr(req).SendCommandContext(req.Context(), &radarr.CommandRequest{
 		Name:     "MoviesSearch",
 		MovieIDs: []int64{movieID},
 	})
@@ -169,7 +169,7 @@ func radarrTriggerSearchMovie(req *http.Request) (int, interface{}) {
 }
 
 func radarrGetAllMovies(req *http.Request) (int, interface{}) {
-	movies, err := getRadarr(req).GetMovie(0)
+	movies, err := getRadarr(req).GetMovieContext(req.Context(), 0)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	}
@@ -179,7 +179,7 @@ func radarrGetAllMovies(req *http.Request) (int, interface{}) {
 
 func radarrQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from radarr.
-	profiles, err := getRadarr(req).GetQualityProfiles()
+	profiles, err := getRadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -189,7 +189,7 @@ func radarrQualityProfile(req *http.Request) (int, interface{}) {
 
 func radarrQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from radarr.
-	profiles, err := getRadarr(req).GetQualityProfiles()
+	profiles, err := getRadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
 	}
@@ -213,7 +213,7 @@ func radarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	id, err := getRadarr(req).AddQualityProfile(&profile)
+	id, err := getRadarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
 	}
@@ -236,7 +236,7 @@ func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getRadarr(req).UpdateQualityProfile(&profile)
+	err = getRadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -246,7 +246,7 @@ func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 
 func radarrRootFolders(req *http.Request) (int, interface{}) {
 	// Get folder list from Radarr.
-	folders, err := getRadarr(req).GetRootFolders()
+	folders, err := getRadarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
 	}
@@ -262,20 +262,22 @@ func radarrRootFolders(req *http.Request) (int, interface{}) {
 
 func radarrSearchMovie(req *http.Request) (int, interface{}) {
 	// Get all movies
-	movies, err := getRadarr(req).GetMovie(0)
+	movies, err := getRadarr(req).GetMovieContext(req.Context(), 0)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting movies: %w", err)
 	}
 
 	query := strings.TrimSpace(strings.ToLower(mux.Vars(req)["query"])) // in
-	returnMovies := make([]map[string]interface{}, 0)                   // out
+	output := make([]map[string]interface{}, 0)                         // out
 
 	for _, movie := range movies {
 		if movieSearch(query, []string{movie.Title, movie.OriginalTitle}, movie.AlternateTitles) {
-			returnMovies = append(returnMovies, map[string]interface{}{
+			output = append(output, map[string]interface{}{
 				"id":                  movie.ID,
 				"title":               movie.Title,
 				"cinemas":             movie.InCinemas,
+				"digital":             movie.DigitalRelease,
+				"physical":            movie.PhysicalRelease,
 				"status":              movie.Status,
 				"exists":              movie.HasFile,
 				"added":               movie.Added,
@@ -289,7 +291,7 @@ func radarrSearchMovie(req *http.Request) (int, interface{}) {
 		}
 	}
 
-	return http.StatusOK, returnMovies
+	return http.StatusOK, output
 }
 
 func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle) bool {
@@ -309,7 +311,7 @@ func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle)
 }
 
 func radarrGetTags(req *http.Request) (int, interface{}) {
-	tags, err := getRadarr(req).GetTags()
+	tags, err := getRadarr(req).GetTagsContext(req.Context())
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
 	}
@@ -320,7 +322,7 @@ func radarrGetTags(req *http.Request) (int, interface{}) {
 func radarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getRadarr(req).UpdateTag(id, mux.Vars(req)["label"])
+	tagID, err := getRadarr(req).UpdateTagContext(req.Context(), id, mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
@@ -329,7 +331,7 @@ func radarrUpdateTag(req *http.Request) (int, interface{}) {
 }
 
 func radarrSetTag(req *http.Request) (int, interface{}) {
-	tagID, err := getRadarr(req).AddTag(mux.Vars(req)["label"])
+	tagID, err := getRadarr(req).AddTagContext(req.Context(), mux.Vars(req)["label"])
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
@@ -346,7 +348,7 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 	}
 
 	// Check for existing movie.
-	err = getRadarr(req).UpdateMovie(movie.ID, &movie)
+	err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating movie: %w", err)
 	}
@@ -363,7 +365,7 @@ func radarrAddExclusions(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getRadarr(req).AddExclusions(exclusions)
+	err = getRadarr(req).AddExclusionsContext(req.Context(), exclusions)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding exclusions: %w", err)
 	}
@@ -372,7 +374,7 @@ func radarrAddExclusions(req *http.Request) (int, interface{}) {
 }
 
 func radarrGetExclusions(req *http.Request) (int, interface{}) {
-	exclusions, err := getRadarr(req).GetExclusions()
+	exclusions, err := getRadarr(req).GetExclusionsContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting exclusions: %w", err)
 	}
@@ -390,7 +392,7 @@ func radarrDelExclusions(req *http.Request) (int, interface{}) {
 		}
 	}
 
-	err := getRadarr(req).DeleteExclusions(exclusions)
+	err := getRadarr(req).DeleteExclusionsContext(req.Context(), exclusions)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("deleting exclusions: %w", err)
 	}
@@ -406,7 +408,7 @@ func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	resp, err := getRadarr(req).AddCustomFormat(&cf)
+	resp, err := getRadarr(req).AddCustomFormatContext(req.Context(), &cf)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding custom format: %w", err)
 	}
@@ -415,7 +417,7 @@ func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
 }
 
 func radarrGetCustomFormats(req *http.Request) (int, interface{}) {
-	cf, err := getRadarr(req).GetCustomFormats()
+	cf, err := getRadarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
 	}
@@ -431,7 +433,7 @@ func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 
 	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
 
-	output, err := getRadarr(req).UpdateCustomFormat(&cf, cfID)
+	output, err := getRadarr(req).UpdateCustomFormatContext(req.Context(), &cf, cfID)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
 	}
@@ -440,7 +442,7 @@ func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 }
 
 func radarrGetImportLists(req *http.Request) (int, interface{}) {
-	il, err := getRadarr(req).GetImportLists()
+	il, err := getRadarr(req).GetImportListsContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting import lists: %w", err)
 	}
@@ -456,7 +458,7 @@ func radarrUpdateImportList(req *http.Request) (int, interface{}) {
 
 	il.ID, _ = strconv.ParseInt(mux.Vars(req)["ilid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getRadarr(req).UpdateImportList(&il)
+	output, err := getRadarr(req).UpdateImportListContext(req.Context(), &il)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating import list: %w", err)
 	}
@@ -470,7 +472,7 @@ func radarrAddImportList(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	output, err := getRadarr(req).CreateImportList(&il)
+	output, err := getRadarr(req).CreateImportListContext(req.Context(), &il)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("creating import list: %w", err)
 	}

@@ -105,7 +105,11 @@ func (c *Config) runTimers() {
 func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { //nolint:cyclop
 	defer c.stopTimerLoop(actions)
 
-	for sent := make(map[string]struct{}); ; {
+	// Sent is used a memory buffer for plex session tracking.
+	// This specifically makes sure we don't send a "finished item" more than once.
+	sent := make(map[string]struct{})
+
+	for {
 		index, val, _ := reflect.Select(cases)
 
 		action := actions[index]
@@ -141,6 +145,7 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 // stopTimerLoop is defered by runTimerLoop.
 func (c *Config) stopTimerLoop(actions []*action) {
 	defer c.CapturePanic()
+	c.Printf("WARNING: Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 	c.Trigger.stop = nil
 
 	for _, action := range actions {

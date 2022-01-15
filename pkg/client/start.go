@@ -32,7 +32,6 @@ type Client struct {
 	server  *http.Server
 	sigkil  chan os.Signal
 	sighup  chan os.Signal
-	menu    map[string]ui.MenuItem
 	website *notifiarr.Config
 }
 
@@ -48,7 +47,6 @@ func NewDefaults() *Client {
 	return &Client{
 		sigkil: make(chan os.Signal, 1),
 		sighup: make(chan os.Signal, 1),
-		menu:   make(map[string]ui.MenuItem),
 		Logger: logger,
 		Config: configfile.NewConfig(logger),
 		Flags: &configfile.Flags{
@@ -97,7 +95,7 @@ func (c *Client) start() error {
 		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
-	c.configureServices(notifiarr.EventStart)
+	clientInfo := c.configureServices(notifiarr.EventStart)
 
 	if newCon {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
@@ -111,7 +109,7 @@ func (c *Client) start() error {
 
 	if ui.HasGUI() {
 		// This starts the web server and calls os.Exit() when done.
-		c.startTray()
+		c.startTray(clientInfo)
 		return nil
 	}
 
@@ -143,11 +141,11 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 }
 
 // Load configuration from the website.
-func (c *Client) loadSiteConfig(source notifiarr.EventType) {
+func (c *Client) loadSiteConfig(source notifiarr.EventType) *notifiarr.ClientInfo {
 	clientInfo, err := c.website.GetClientInfo(source)
 	if err != nil || clientInfo == nil {
 		c.Printf("==> [WARNING] API Key may be invalid: %v, info: %s", err, clientInfo)
-		return
+		return nil
 	}
 
 	c.Printf("==> %s", clientInfo)
@@ -167,6 +165,8 @@ func (c *Client) loadSiteConfig(source notifiarr.EventType) {
 	}
 
 	c.loadSiteAppsConfig(clientInfo)
+
+	return clientInfo
 }
 
 func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint:cyclop
@@ -226,8 +226,8 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices(source notifiarr.EventType) {
-	c.loadSiteConfig(source)
+func (c *Client) configureServices(source notifiarr.EventType) *notifiarr.ClientInfo {
+	clientInfo := c.loadSiteConfig(source)
 
 	if c.Config.Plex.Configured() {
 		if info, err := c.Config.Plex.GetInfo(); err != nil {
@@ -249,6 +249,8 @@ func (c *Client) configureServices(source notifiarr.EventType) {
 	os.Exit(1)
 	/**/
 	c.Config.Services.Start()
+
+	return clientInfo
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
@@ -293,6 +295,7 @@ func (c *Client) exit() error {
 // Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(source string) error {
 	c.Print("==> Reloading Configuration: " + source)
+	c.closeDynamicTimerMenus()
 	c.website.Stop(notifiarr.EventReload)
 	c.Config.Services.Stop()
 
@@ -316,8 +319,7 @@ func (c *Client) reloadConfiguration(source string) error {
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.configureServices(notifiarr.EventReload)
-	c.setupMenus()
+	c.setupMenus(c.configureServices(notifiarr.EventReload))
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {

@@ -60,13 +60,13 @@ type Config struct {
 }
 
 type extras struct {
-	ciMutex sync.Mutex
-	*ClientInfo
-	client    *httpClient
-	radarrCF  map[int]*cfMapIDpayload
-	sonarrRP  map[int]*cfMapIDpayload
-	plexTimer *Timer
-	hostInfo  *host.InfoStat
+	ciMutex    sync.Mutex
+	clientInfo *ClientInfo
+	client     *httpClient
+	radarrCF   map[int]*cfMapIDpayload
+	sonarrRP   map[int]*cfMapIDpayload
+	plexTimer  *Timer
+	hostInfo   *host.InfoStat
 }
 
 // Triggers allow trigger actions in the timer routine.
@@ -189,40 +189,40 @@ func (c *Config) setPlexTimers() {
 }
 
 func (c *Config) setClientInfoTimerTriggers() {
-	if c.Actions.Gaps.Interval.Duration > 0 && len(c.Apps.Radarr) > 0 {
-		c.Trigger.get(TrigCollectionGaps).T = time.NewTicker(c.Actions.Gaps.Interval.Duration)
-		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", c.Actions.Gaps.Interval)
+	if c.clientInfo.Actions.Gaps.Interval.Duration > 0 && len(c.Apps.Radarr) > 0 {
+		c.Trigger.get(TrigCollectionGaps).T = time.NewTicker(c.clientInfo.Actions.Gaps.Interval.Duration)
+		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", c.clientInfo.Actions.Gaps.Interval)
 	}
 
-	if c.Actions.Sync.Interval.Duration > 0 && (len(c.Apps.Radarr) > 0 || len(c.Apps.Sonarr) > 0) {
-		c.Trigger.get(TrigCFSync).T = time.NewTicker(c.Actions.Sync.Interval.Duration)
+	if c.clientInfo.Actions.Sync.Interval.Duration > 0 && (len(c.Apps.Radarr) > 0 || len(c.Apps.Sonarr) > 0) {
+		c.Trigger.get(TrigCFSync).T = time.NewTicker(c.clientInfo.Actions.Sync.Interval.Duration)
 		c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced, interval:%s",
-			c.Actions.Sync.Radarr, c.Actions.Sync.Sonarr, c.Actions.Sync.Interval)
+			c.clientInfo.Actions.Sync.Radarr, c.clientInfo.Actions.Sync.Sonarr, c.clientInfo.Actions.Sync.Interval)
 	}
 
-	if c.Actions.Dashboard.Interval.Duration > 0 {
-		c.Trigger.get(TrigDashboard).T = time.NewTicker(c.Actions.Dashboard.Interval.Duration)
-		c.Printf("==> Sending Current State Data for Dashboard, interval:%s", c.Actions.Dashboard.Interval)
+	if c.clientInfo.Actions.Dashboard.Interval.Duration > 0 {
+		c.Trigger.get(TrigDashboard).T = time.NewTicker(c.clientInfo.Actions.Dashboard.Interval.Duration)
+		c.Printf("==> Sending Current State Data for Dashboard, interval:%s", c.clientInfo.Actions.Dashboard.Interval)
 	}
 
-	if len(c.Actions.Custom) > 0 { // This is not directly triggerable.
-		c.Printf("==> Custom Timers Enabled: %d timers provided", len(c.Actions.Custom))
+	if len(c.clientInfo.Actions.Custom) > 0 { // This is not directly triggerable.
+		c.Printf("==> Custom Timers Enabled: %d timers provided", len(c.clientInfo.Actions.Custom))
 	}
 }
 
 func (c *Config) makeCustomClientInfoTimerTriggers() {
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
-	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
+	if c.clientInfo == nil || c.clientInfo.Actions.Poll {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s timeout:%s",
-			c.ClientInfo != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)}, c.Timeout)
+			c.clientInfo != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)}, c.Timeout)
 		c.Trigger.add(&action{Name: TrigPollSite, Fn: c.pollForReload, T: time.NewTicker(pollDur)})
 	}
 
-	if c.ClientInfo == nil {
+	if c.clientInfo == nil {
 		return
 	}
 
-	for _, custom := range c.Actions.Custom {
+	for _, custom := range c.clientInfo.Actions.Custom {
 		custom.setup(c)
 
 		var ticker *time.Ticker

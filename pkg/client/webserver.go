@@ -46,9 +46,9 @@ func (c *Client) runWebServer() {
 
 	var err error
 
-	if c.menu["stat"] != nil {
-		c.menu["stat"].Check()
-		c.menu["stat"].SetTooltip("web server running, uncheck to pause")
+	if menu["stat"] != nil {
+		menu["stat"].Check()
+		menu["stat"].SetTooltip("web server running, uncheck to pause")
 	}
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
@@ -74,9 +74,9 @@ func (c *Client) StopWebServer() error {
 		return ErrNoServer
 	}
 
-	if c.menu["stat"] != nil {
-		c.menu["stat"].Uncheck()
-		c.menu["stat"].SetTooltip("web server paused, click to start")
+	if menu["stat"] != nil {
+		menu["stat"].Uncheck()
+		menu["stat"].SetTooltip("web server paused, click to start")
 	}
 
 	if err := c.server.Shutdown(ctx); err != nil {

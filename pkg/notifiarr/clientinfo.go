@@ -91,8 +91,8 @@ func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
 	c.extras.ciMutex.Lock()
 	defer c.extras.ciMutex.Unlock()
 
-	if c.extras.ClientInfo != nil {
-		return c.extras.ClientInfo, nil
+	if c.extras.clientInfo != nil {
+		return c.extras.clientInfo, nil
 	}
 
 	body, err := c.SendData(ClientRoute.Path(event), c.Info(), true)
@@ -106,9 +106,9 @@ func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
 	}
 
 	// Only set this if there was no error.
-	c.extras.ClientInfo = &clientInfo
+	c.extras.clientInfo = &clientInfo
 
-	return c.extras.ClientInfo, nil
+	return c.extras.clientInfo, nil
 }
 
 // Info is used for JSON input for our outgoing client info.
@@ -241,7 +241,7 @@ func (c *Config) pollForReload(event EventType) {
 		c.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!"+
 			" Last Sync: %v, Last Change: %v, Diff: %v", event, v.LastSync, v.LastChange, v.LastSync.Sub(v.LastChange))
 		c.Sighup <- &update.Signal{Text: "poll triggered reload"}
-	} else if c.ClientInfo == nil {
+	} else if c.clientInfo == nil {
 		c.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", event)
 		c.Sighup <- &update.Signal{Text: "client info reload"}
 	}

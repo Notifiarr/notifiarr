@@ -21,7 +21,7 @@ func (t *Triggers) SendGaps(event EventType) {
 }
 
 func (c *Config) sendGaps(event EventType) {
-	if c.ClientInfo == nil || len(c.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
+	if c.clientInfo == nil || len(c.clientInfo.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
 		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
 			event, len(c.Apps.Radarr))
 		return
@@ -29,7 +29,7 @@ func (c *Config) sendGaps(event EventType) {
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
-		if app.URL == "" || app.APIKey == "" || !c.Actions.Gaps.Instances.Has(instance) {
+		if app.URL == "" || app.APIKey == "" || !c.clientInfo.Actions.Gaps.Instances.Has(instance) {
 			continue
 		}
 

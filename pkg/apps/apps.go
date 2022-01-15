@@ -237,7 +237,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) { //nol
 
 	err := json.Encode(map[string]interface{}{"status": statusTxt, "message": msg})
 	if err != nil {
-		a.ErrorLog.Printf("JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
+		a.ErrorLog.Printf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
 }
 
