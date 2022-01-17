@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -147,15 +148,6 @@ func (c *Config) sendPlexWebhook(hook *plexIncomingWebhook) {
 	c.Printf("Plex => Notifiarr: %s '%s' => %s. %s", hook.Account.Title, hook.Event, hook.Metadata.Title, resp)
 }
 
-type appStatus struct {
-	Lidarr   []*conTest `json:"lidarr"`
-	Prowlarr []*conTest `json:"prowlarr"`
-	Radarr   []*conTest `json:"radarr"`
-	Readarr  []*conTest `json:"readarr"`
-	Sonarr   []*conTest `json:"sonarr"`
-	Plex     []*conTest `json:"plex"`
-}
-
 type conTest struct {
 	Instance int         `json:"instance"`
 	Up       bool        `json:"up"`
@@ -164,37 +156,8 @@ type conTest struct {
 
 // VersionHandler returns application run and build time data and application statuses: /api/version.
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
-	var (
-		output = c.Info()
-		status = appStatsForVersion(c.Apps)
-	)
-
-	if c.Plex.Configured() {
-		stat, err := c.Plex.GetInfo()
-		if stat == nil {
-			stat = &plex.PMSInfo{}
-		}
-
-		status.Plex = []*conTest{{
-			Instance: 1,
-			Up:       err == nil,
-			Status: map[string]interface{}{
-				"friendlyName":             stat.FriendlyName,
-				"version":                  stat.Version,
-				"updatedAt":                stat.UpdatedAt,
-				"platform":                 stat.Platform,
-				"platformVersion":          stat.PlatformVersion,
-				"size":                     stat.Size,
-				"myPlexSigninState":        stat.MyPlexSigninState,
-				"myPlexSubscription":       stat.MyPlexSubscription,
-				"pushNotifications":        stat.PushNotifications,
-				"streamingBrainVersion":    stat.StreamingBrainVersion,
-				"streamingBrainABRVersion": stat.StreamingBrainABRVersion,
-			},
-		}}
-	}
-
-	output["appsStatus"] = status
+	output := c.Info()
+	output["appsStatus"] = c.appStatsForVersion()
 
 	if host, err := c.GetHostInfoUID(); err != nil {
 		output["hostError"] = err.Error()
@@ -205,39 +168,130 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 	return http.StatusOK, output
 }
 
-func appStatsForVersion(apps *apps.Apps) *appStatus {
+// appStatsForVersion loops each app and gets the version info.
+func (c *Config) appStatsForVersion() map[string]interface{} {
 	var (
-		lid  = make([]*conTest, len(apps.Lidarr))
-		prl  = make([]*conTest, len(apps.Prowlarr))
-		rad  = make([]*conTest, len(apps.Radarr))
-		read = make([]*conTest, len(apps.Readarr))
-		son  = make([]*conTest, len(apps.Sonarr))
+		lid  = make([]*conTest, len(c.Apps.Lidarr))
+		prl  = make([]*conTest, len(c.Apps.Prowlarr))
+		rad  = make([]*conTest, len(c.Apps.Radarr))
+		read = make([]*conTest, len(c.Apps.Readarr))
+		son  = make([]*conTest, len(c.Apps.Sonarr))
+		plx  = []*conTest{}
+		wg   sync.WaitGroup
 	)
 
-	for i, app := range apps.Lidarr {
-		stat, err := app.GetSystemStatus()
-		lid[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
-	}
+	getPlexVersion(&wg, c.Plex, plx)
+	getLidarrVersion(&wg, c.Apps.Lidarr, lid)
+	getProwlarrVersion(&wg, c.Apps.Prowlarr, prl)
+	getRadarrVersion(&wg, c.Apps.Radarr, rad)
+	getReadarrVersion(&wg, c.Apps.Readarr, read)
+	getSonarrVersion(&wg, c.Apps.Sonarr, son)
+	wg.Wait()
 
-	for i, app := range apps.Prowlarr {
-		stat, err := app.GetSystemStatus()
-		prl[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+	return map[string]interface{}{
+		"lidarr":   lid,
+		"radarr":   rad,
+		"readarr":  read,
+		"sonarr":   son,
+		"prowlarr": prl,
+		"plex":     plx,
 	}
+}
 
-	for i, app := range apps.Radarr {
-		stat, err := app.GetSystemStatus()
-		rad[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+func getLidarrVersion(wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*conTest) {
+	for idx, app := range lidarrs {
+		wait.Add(1)
+
+		go func(idx int, app *apps.LidarrConfig) {
+			defer wait.Done()
+
+			stat, err := app.GetSystemStatus()
+			lid[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+		}(idx, app)
 	}
+}
 
-	for i, app := range apps.Readarr {
-		stat, err := app.GetSystemStatus()
-		read[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+func getProwlarrVersion(wait *sync.WaitGroup, prowlarrs []*apps.ProwlarrConfig, prl []*conTest) {
+	for idx, app := range prowlarrs {
+		wait.Add(1)
+
+		go func(idx int, app *apps.ProwlarrConfig) {
+			defer wait.Done()
+
+			stat, err := app.GetSystemStatus()
+			prl[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+		}(idx, app)
 	}
+}
 
-	for i, app := range apps.Sonarr {
-		stat, err := app.GetSystemStatus()
-		son[i] = &conTest{Instance: i + 1, Up: err == nil, Status: stat}
+func getRadarrVersion(wait *sync.WaitGroup, radarrs []*apps.RadarrConfig, rad []*conTest) {
+	for idx, app := range radarrs {
+		wait.Add(1)
+
+		go func(idx int, app *apps.RadarrConfig) {
+			defer wait.Done()
+
+			stat, err := app.GetSystemStatus()
+			rad[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+		}(idx, app)
 	}
+}
 
-	return &appStatus{Radarr: rad, Readarr: read, Sonarr: son, Lidarr: lid, Prowlarr: prl}
+func getReadarrVersion(wait *sync.WaitGroup, readarrs []*apps.ReadarrConfig, read []*conTest) {
+	for idx, app := range readarrs {
+		wait.Add(1)
+
+		go func(idx int, app *apps.ReadarrConfig) {
+			defer wait.Done()
+
+			stat, err := app.GetSystemStatus()
+			read[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+		}(idx, app)
+	}
+}
+
+func getSonarrVersion(wait *sync.WaitGroup, sonarrs []*apps.SonarrConfig, son []*conTest) {
+	for idx, app := range sonarrs {
+		wait.Add(1)
+
+		go func(idx int, app *apps.SonarrConfig) {
+			defer wait.Done()
+
+			stat, err := app.GetSystemStatus()
+			son[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+		}(idx, app)
+	}
+}
+
+func getPlexVersion(wait *sync.WaitGroup, plexServer *plex.Server, plx []*conTest) {
+	if plexServer.Configured() {
+		wait.Add(1)
+
+		go func() {
+			defer wait.Done()
+
+			stat, err := plexServer.GetInfo()
+			if stat == nil {
+				stat = &plex.PMSInfo{}
+			}
+
+			plx = []*conTest{{
+				Instance: 1,
+				Up:       err == nil,
+				Status: map[string]interface{}{
+					"friendlyName":             stat.FriendlyName,
+					"version":                  stat.Version,
+					"updatedAt":                stat.UpdatedAt,
+					"platform":                 stat.Platform,
+					"platformVersion":          stat.PlatformVersion,
+					"size":                     stat.Size,
+					"myPlexSigninState":        stat.MyPlexSigninState,
+					"myPlexSubscription":       stat.MyPlexSubscription,
+					"pushNotifications":        stat.PushNotifications,
+					"streamingBrainVersion":    stat.StreamingBrainVersion,
+					"streamingBrainABRVersion": stat.StreamingBrainABRVersion,
+				},
+			}}
+		}()
+	}
 }
