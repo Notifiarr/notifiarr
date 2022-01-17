@@ -171,21 +171,21 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 // appStatsForVersion loops each app and gets the version info.
 func (c *Config) appStatsForVersion() map[string]interface{} {
 	var (
-		wg   sync.WaitGroup
 		lid  = make([]*conTest, len(c.Apps.Lidarr))
 		prl  = make([]*conTest, len(c.Apps.Prowlarr))
 		rad  = make([]*conTest, len(c.Apps.Radarr))
 		read = make([]*conTest, len(c.Apps.Readarr))
 		son  = make([]*conTest, len(c.Apps.Sonarr))
 		plx  = []*conTest{}
+		wg   sync.WaitGroup
 	)
 
+	getPlexVersion(&wg, c.Plex, plx)
 	getLidarrVersion(&wg, c.Apps.Lidarr, lid)
 	getProwlarrVersion(&wg, c.Apps.Prowlarr, prl)
 	getRadarrVersion(&wg, c.Apps.Radarr, rad)
 	getReadarrVersion(&wg, c.Apps.Readarr, read)
 	getSonarrVersion(&wg, c.Apps.Sonarr, son)
-	getPlexVersion(&wg, c.Plex, plx)
 	wg.Wait()
 
 	return map[string]interface{}{
