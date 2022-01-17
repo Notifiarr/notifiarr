@@ -118,6 +118,11 @@ func (c *Config) Info() map[string]interface{} {
 		numPlex = 1
 	}
 
+	numTautulli := 0 // maybe one day we'll support more than 1 tautulli.
+	if c.Apps.Tautulli != nil && c.Apps.Tautulli.URL != "" && c.Apps.Tautulli.APIKey != "" {
+		numTautulli = 1
+	}
+
 	return map[string]interface{}{
 		"client": map[string]interface{}{
 			"arch":      runtime.GOARCH,
@@ -139,6 +144,7 @@ func (c *Config) Info() map[string]interface{} {
 			"qbit":     len(c.Apps.Qbit),
 			"radarr":   len(c.Apps.Radarr),
 			"readarr":  len(c.Apps.Readarr),
+			"tautulli": numTautulli,
 			"sabnzbd":  len(c.Apps.SabNZB),
 			"sonarr":   len(c.Apps.Sonarr),
 		},
