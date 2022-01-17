@@ -61,6 +61,8 @@ func (c *Client) setupMenus(clientInfo *notifiarr.ClientInfo) {
 		return
 	}
 
+	menu["mode"].SetTitle("Mode: " + strings.Title(c.Config.Mode))
+
 	if !c.Config.Debug {
 		menu["debug"].Hide()
 	} else {
