@@ -9,7 +9,11 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"golift.io/cnfg"
+	"golift.io/starr"
+	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
+	"golift.io/starr/readarr"
+	"golift.io/starr/sonarr"
 )
 
 /* This file sends state of affairs to notifiarr.com */
@@ -418,7 +422,13 @@ func (c *Config) getLidarrState(instance int, app *apps.LidarrConfig) (*State, e
 
 // getLidarrHistory is not done.
 func (c *Config) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistory(showLatest*40, 100) //nolint:gomnd
+	history, err := app.GetHistoryPage(&starr.Req{
+		Page:     1,
+		PageSize: showLatest + 20, //nolint:gomnd // grab extra in case some are tracks and not albums.
+		SortDir:  starr.SortDescend,
+		SortKey:  "date",
+		Filter:   lidarr.FilterTrackFileImported,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
@@ -426,15 +436,11 @@ func (c *Config) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 	table := []*Sortable{}
 	albumIDs := make(map[int64]*struct{})
 
-FORLOOP:
 	for _, rec := range history.Records {
-		switch {
-		case len(table) >= showLatest:
-			break FORLOOP
-		case rec.EventType != "trackFileImported":
-			continue
-		case albumIDs[rec.AlbumID] != nil:
-			continue
+		if len(table) >= showLatest {
+			break
+		} else if albumIDs[rec.AlbumID] != nil {
+			continue // we already have this album
 		}
 
 		albumIDs[rec.AlbumID] = &struct{}{}
@@ -616,26 +622,26 @@ func (c *Config) getReadarrState(instance int, app *apps.ReadarrConfig) (*State,
 
 // getReadarrHistory is not done.
 func (c *Config) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistory(showLatest*20, 100) //nolint:gomnd
+	history, err := app.GetHistoryPage(&starr.Req{
+		Page:     1,
+		PageSize: showLatest,
+		SortDir:  starr.SortDescend,
+		SortKey:  "date",
+		Filter:   readarr.FilterBookFileImported,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
 
 	table := []*Sortable{}
 
-	for _, rec := range history.Records {
-		if len(table) >= showLatest {
-			break
-		} else if rec.EventType != "bookFileImported" {
-			continue
-		}
-
+	for idx := 0; idx < len(history.Records) && len(table) < showLatest; idx++ {
 		// An error here gets swallowed.
-		if book, err := app.GetBookByID(rec.BookID); err == nil {
+		if book, err := app.GetBookByID(history.Records[idx].BookID); err == nil {
 			table = append(table, &Sortable{
 				Name: book.Title,
 				Sub:  book.Author.AuthorName,
-				Date: rec.Date,
+				Date: history.Records[idx].Date,
 			})
 		}
 	}
@@ -691,7 +697,13 @@ func (c *Config) getSonarrState(instance int, app *apps.SonarrConfig) (*State, e
 }
 
 func (c *Config) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistory(showLatest*20, 100) //nolint:gomnd
+	history, err := app.GetHistoryPage(&starr.Req{
+		Page:     1,
+		PageSize: showLatest + 5, //nolint:gomnd // grab extra in case there's an error.
+		SortDir:  starr.SortDescend,
+		SortKey:  "date",
+		Filter:   sonarr.FilterDownloadFolderImported,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("getting history: %w", err)
 	}
@@ -701,8 +713,6 @@ func (c *Config) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 	for _, rec := range history.Records {
 		if len(table) >= showLatest {
 			break
-		} else if rec.EventType != "downloadFolderImported" {
-			continue
 		}
 
 		series, err := app.GetSeriesByID(rec.SeriesID)
