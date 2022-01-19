@@ -18,7 +18,7 @@ import (
 
 // internalHandlers initializes "special" internal API paths.
 func (c *Client) internalHandlers() {
-	c.Config.HandleAPIpath("", "version", c.website.VersionHandler, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
 
