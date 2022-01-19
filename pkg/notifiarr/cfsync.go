@@ -46,6 +46,7 @@ type RadarrCustomFormatPayload struct {
 	Name            string                   `json:"name"`
 	CustomFormats   []*radarr.CustomFormat   `json:"customFormats,omitempty"`
 	QualityProfiles []*radarr.QualityProfile `json:"qualityProfiles,omitempty"`
+	Error           string                   `json:"error"`
 	// Purposely not exported so as to not use it externally.
 	NewMaps *cfMapIDpayload `json:"newMaps,omitempty"`
 }
@@ -80,7 +81,7 @@ func (c *Config) syncRadarr(event EventType) {
 
 		if err := c.syncRadarrCF(instance, app); err != nil {
 			c.Errorf("[%s requested] Radarr Custom Formats sync request for '%d:%s' failed: %v", event, instance, app.URL, err)
-			return
+			continue
 		}
 
 		c.Printf("[%s requested] Synced Custom Formats from Notifiarr for Radarr: %d:%s", event, instance, app.URL)
@@ -200,7 +201,9 @@ type SonarrCustomFormatPayload struct {
 	Name            string                   `json:"name"`
 	ReleaseProfiles []*sonarr.ReleaseProfile `json:"releaseProfiles,omitempty"`
 	QualityProfiles []*sonarr.QualityProfile `json:"qualityProfiles,omitempty"`
-	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
+	Error           string                   `json:"error"`
+	// Purposely not exported so as to not use it externally.
+	NewMaps *cfMapIDpayload `json:"newMaps,omitempty"`
 }
 
 // syncSonarr triggers a custom format sync for Sonarr.
@@ -223,7 +226,7 @@ func (c *Config) syncSonarr(event EventType) {
 
 		if err := c.syncSonarrRP(instance, app); err != nil {
 			c.Errorf("[%s requested] Sonarr Release Profiles sync for '%d:%s' failed: %v", event, instance, app.URL, err)
-			return
+			continue
 		}
 
 		c.Printf("[%s requested] Synced Sonarr Release Profiles from Notifiarr: %d:%s", event, instance, app.URL)
