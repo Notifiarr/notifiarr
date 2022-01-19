@@ -15,9 +15,9 @@ import (
 type syncConfig struct {
 	Interval        cnfg.Duration `json:"interval"`        // how often to fire in minutes.
 	Radarr          int64         `json:"radarr"`          // items in sync
-	RadarrInstances intList       `json:"radarrInstances"` // which instance IDs we sync
+	RadarrInstances IntList       `json:"radarrInstances"` // which instance IDs we sync
 	Sonarr          int64         `json:"sonarr"`          // items in sync
-	SonarrInstances intList       `json:"sonarrInstances"` // which instance IDs we sync
+	SonarrInstances IntList       `json:"sonarrInstances"` // which instance IDs we sync
 }
 
 // cfMapIDpayload is used to post-back ID changes for profiles and formats.
@@ -46,7 +46,8 @@ type RadarrCustomFormatPayload struct {
 	Name            string                   `json:"name"`
 	CustomFormats   []*radarr.CustomFormat   `json:"customFormats,omitempty"`
 	QualityProfiles []*radarr.QualityProfile `json:"qualityProfiles,omitempty"`
-	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
+	// Purposely not exported so as to not use it externally.
+	NewMaps *cfMapIDpayload `json:"newMaps,omitempty"`
 }
 
 func (t *Triggers) SyncCF(event EventType) {

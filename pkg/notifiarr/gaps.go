@@ -12,7 +12,7 @@ import (
 
 // gapsConfig is the configuration returned from the notifiarr website.
 type gapsConfig struct {
-	Instances intList       `json:"instances"`
+	Instances IntList       `json:"instances"`
 	Interval  cnfg.Duration `json:"interval"`
 }
 

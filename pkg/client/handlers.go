@@ -16,8 +16,8 @@ import (
 	"golift.io/starr"
 )
 
-// internalHandlers initializes "special" internal API paths.
-func (c *Client) internalHandlers() {
+// httpHandlers initializes internaland other API routes.
+func (c *Client) httpHandlers() {
 	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
