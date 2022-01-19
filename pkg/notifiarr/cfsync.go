@@ -11,6 +11,11 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+/* CF Sync means Custom Format Sync. This is a premium feature that allows syncing
+   TRaSH's custom Radarr formats and Sonarr Release Profiles.
+	 The code in this file deals with sending data and getting updates at an interval.
+*/
+
 // syncConfig is the configuration returned from the notifiarr website.
 type syncConfig struct {
 	Interval        cnfg.Duration `json:"interval"`        // how often to fire in minutes.
@@ -39,9 +44,10 @@ const success = "success"
 
 /*//*****/ // Radarr /*//*****///
 
-// RadarrCustomFormatPayload is the payload sent and received
+// RadarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Radarr.
-type RadarrCustomFormatPayload struct {
+// This is used in other places, like the trash API handler in the 'client' module.
+type RadarrTrashPayload struct {
 	Instance        int                      `json:"instance"`
 	Name            string                   `json:"name"`
 	CustomFormats   []*radarr.CustomFormat   `json:"customFormats,omitempty"`
@@ -91,7 +97,7 @@ func (c *Config) syncRadarr(event EventType) {
 func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 	var (
 		err     error
-		payload = RadarrCustomFormatPayload{Instance: instance, Name: app.Name, NewMaps: c.radarrCF[instance]}
+		payload = RadarrTrashPayload{Instance: instance, Name: app.Name, NewMaps: c.radarrCF[instance]}
 	)
 
 	payload.QualityProfiles, err = app.GetQualityProfiles()
@@ -123,7 +129,7 @@ func (c *Config) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 }
 
 func (c *Config) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) error {
-	reply := &RadarrCustomFormatPayload{}
+	reply := &RadarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
@@ -178,7 +184,7 @@ func (c *Config) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 		return nil
 	}
 
-	_, err := c.SendData(CFSyncRoute.Path("", "app=radarr", "updateIDs=true"), &RadarrCustomFormatPayload{
+	_, err := c.SendData(CFSyncRoute.Path("", "app=radarr", "updateIDs=true"), &RadarrTrashPayload{
 		Instance: instance,
 		NewMaps:  maps,
 	}, false)
@@ -194,9 +200,9 @@ func (c *Config) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 
 /*//*****/ // Sonarr /*//*****///
 
-// SonarrCustomFormatPayload is the payload sent and received
+// SonarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Sonarr.
-type SonarrCustomFormatPayload struct {
+type SonarrTrashPayload struct {
 	Instance        int                      `json:"instance"`
 	Name            string                   `json:"name"`
 	ReleaseProfiles []*sonarr.ReleaseProfile `json:"releaseProfiles,omitempty"`
@@ -236,7 +242,7 @@ func (c *Config) syncSonarr(event EventType) {
 func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	var (
 		err     error
-		payload = SonarrCustomFormatPayload{Instance: instance, Name: app.Name, NewMaps: c.sonarrRP[instance]}
+		payload = SonarrTrashPayload{Instance: instance, Name: app.Name, NewMaps: c.sonarrRP[instance]}
 	)
 
 	payload.QualityProfiles, err = app.GetQualityProfiles()
@@ -268,7 +274,7 @@ func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 }
 
 func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) error {
-	reply := &SonarrCustomFormatPayload{}
+	reply := &SonarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
@@ -323,7 +329,7 @@ func (c *Config) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
 		return nil
 	}
 
-	_, err := c.SendData(CFSyncRoute.Path("", "app=sonarr", "updateIDs=true"), &SonarrCustomFormatPayload{
+	_, err := c.SendData(CFSyncRoute.Path("", "app=sonarr", "updateIDs=true"), &SonarrTrashPayload{
 		Instance: instance,
 		NewMaps:  maps,
 	}, false)
