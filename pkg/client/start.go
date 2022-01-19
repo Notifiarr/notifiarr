@@ -228,16 +228,7 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices(source notifiarr.EventType) *notifiarr.ClientInfo {
 	clientInfo := c.loadSiteConfig(source)
-
-	if c.Config.Plex.Configured() {
-		if info, err := c.Config.Plex.GetInfo(); err != nil {
-			c.Config.Plex.Name = ""
-			c.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
-		} else {
-			c.Config.Plex.Name = info.FriendlyName
-		}
-	}
-
+	c.configureServicesPlex()
 	c.website.Sighup = c.sighup
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo()
@@ -251,6 +242,22 @@ func (c *Client) configureServices(source notifiarr.EventType) *notifiarr.Client
 	c.Config.Services.Start()
 
 	return clientInfo
+}
+
+func (c *Client) configureServicesPlex() {
+	if !c.Config.Plex.Configured() {
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Plex.Timeout.Duration)
+	defer cancel()
+
+	if info, err := c.Config.Plex.GetInfo(ctx); err != nil {
+		c.Config.Plex.Name = ""
+		c.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
+	} else {
+		c.Config.Plex.Name = info.FriendlyName
+	}
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
