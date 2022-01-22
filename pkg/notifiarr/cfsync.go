@@ -35,8 +35,9 @@ type cfMapIDpayload struct {
 
 // idMap is used a mapping list from old ID to new ID. Part of cfMapIDpayload.
 type idMap struct {
-	OldID int64 `json:"oldId"`
-	NewID int64 `json:"newId"`
+	Name  string `json:"name"`
+	OldID int64  `json:"oldId"`
+	NewID int64  `json:"newId"`
 }
 
 // success is a ssuccessful status message from notifiarr.com.
@@ -140,39 +141,47 @@ func (c *Config) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byt
 	maps := &cfMapIDpayload{QP: []idMap{}, CF: []idMap{}, Instance: instance}
 
 	for idx, profile := range reply.CustomFormats {
-		profileID := profile.ID
-		if _, err := app.UpdateCustomFormat(profile, profileID); err != nil {
+		newID, existingID := profile.ID, profile.ID
+
+		if _, err := app.UpdateCustomFormat(profile, existingID); err != nil {
 			profile.ID = 0
 
 			c.Debugf("Error Updating custom format [%d/%d] (attempting to ADD %d): %v",
-				idx, len(reply.CustomFormats), profileID, err)
+				idx+1, len(reply.CustomFormats), existingID, err)
 
-			newID, err2 := app.AddCustomFormat(profile)
+			newAdd, err2 := app.AddCustomFormat(profile)
 			if err2 != nil {
-				return fmt.Errorf("[%d/%d] updating custom format: %d: (update) %v, (add) %w",
-					idx, len(reply.CustomFormats), profileID, err, err2)
+				c.Errorf("Ensuring custom format [%d/%d] %d: (update) %v, (add) %v",
+					idx+1, len(reply.CustomFormats), existingID, err, err2)
+				continue
 			}
 
-			maps.CF = append(maps.CF, idMap{int64(profileID), int64(newID.ID)})
+			newID = newAdd.ID
 		}
+
+		maps.CF = append(maps.CF, idMap{profile.Name, int64(existingID), int64(newID)})
 	}
 
 	for idx, profile := range reply.QualityProfiles {
+		newID, existingID := profile.ID, profile.ID
+
 		if err := app.UpdateQualityProfile(profile); err != nil {
-			profileID := profile.ID
 			profile.ID = 0
 
 			c.Debugf("Error Updating quality profile [%d/%d] (attempting to ADD %d): %v",
-				idx, len(reply.QualityProfiles), profileID, err)
+				idx+1, len(reply.QualityProfiles), existingID, err)
 
-			newID, err2 := app.AddQualityProfile(profile)
+			newAddID, err2 := app.AddQualityProfile(profile)
 			if err2 != nil {
-				return fmt.Errorf("[%d/%d] updating quality profile: %d: (update) %v, (add) %w",
-					idx, len(reply.QualityProfiles), profileID, err, err2)
+				c.Errorf("Ensuring quality profile [%d/%d] %d: (update) %v, (add) %v",
+					idx+1, len(reply.QualityProfiles), existingID, err, err2)
+				continue
 			}
 
-			maps.QP = append(maps.QP, idMap{profileID, newID})
+			newID = newAddID
 		}
+
+		maps.QP = append(maps.QP, idMap{profile.Name, existingID, newID})
 	}
 
 	return c.postbackRadarrCF(instance, maps)
@@ -187,7 +196,7 @@ func (c *Config) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 	_, err := c.SendData(CFSyncRoute.Path("", "app=radarr", "updateIDs=true"), &RadarrTrashPayload{
 		Instance: instance,
 		NewMaps:  maps,
-	}, false)
+	}, true)
 	if err != nil {
 		c.radarrCF[instance] = maps
 		return fmt.Errorf("updating custom format ID map: %w", err)
@@ -285,39 +294,47 @@ func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byt
 	maps := &cfMapIDpayload{RP: []idMap{}, QP: []idMap{}, Instance: instance}
 
 	for idx, profile := range reply.ReleaseProfiles {
+		newID, existingID := profile.ID, profile.ID
+
 		if err := app.UpdateReleaseProfile(profile); err != nil {
-			profileID := profile.ID
 			profile.ID = 0
 
 			c.Debugf("Error Updating release profile [%d/%d] (attempting to ADD %d): %v",
-				idx, len(reply.ReleaseProfiles), profileID, err)
+				idx+1, len(reply.ReleaseProfiles), existingID, err)
 
-			newID, err2 := app.AddReleaseProfile(profile)
+			newAddID, err2 := app.AddReleaseProfile(profile)
 			if err2 != nil {
-				return fmt.Errorf("[%d/%d] updating release profiles: %d: (update) %v, (add) %w",
-					idx, len(reply.ReleaseProfiles), profileID, err, err2)
+				c.Errorf("Ensuring release profile [%d/%d] %d: (update) %v, (add) %v",
+					idx+1, len(reply.ReleaseProfiles), existingID, err, err2)
+				continue
 			}
 
-			maps.RP = append(maps.RP, idMap{profileID, newID})
+			newID = newAddID
 		}
+
+		maps.RP = append(maps.RP, idMap{profile.Name, existingID, newID})
 	}
 
 	for idx, profile := range reply.QualityProfiles {
+		newID, existingID := profile.ID, profile.ID
+
 		if err := app.UpdateQualityProfile(profile); err != nil {
-			profileID := profile.ID
 			profile.ID = 0
 
 			c.Debugf("Error Updating quality format [%d/%d] (attempting to ADD %d): %v",
-				idx, len(reply.QualityProfiles), profileID, err)
+				idx+1, len(reply.QualityProfiles), existingID, err)
 
-			newID, err2 := app.AddQualityProfile(profile)
+			newAddID, err2 := app.AddQualityProfile(profile)
 			if err2 != nil {
-				return fmt.Errorf("[%d/%d] updating quality profile: %d: (update) %v, (add) %w",
-					idx, len(reply.QualityProfiles), profileID, err, err2)
+				c.Errorf("Ensuring quality format [%d/%d] %d: (update) %v, (add) %v",
+					idx+1, len(reply.QualityProfiles), existingID, err, err2)
+				continue
 			}
 
-			maps.QP = append(maps.QP, idMap{profileID, newID})
+			newID = newAddID
 		}
+
+		maps.QP = append(maps.QP, idMap{profile.Name, existingID, newID})
 	}
 
 	return c.postbackSonarrRP(instance, maps)
@@ -332,7 +349,7 @@ func (c *Config) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
 	_, err := c.SendData(CFSyncRoute.Path("", "app=sonarr", "updateIDs=true"), &SonarrTrashPayload{
 		Instance: instance,
 		NewMaps:  maps,
-	}, false)
+	}, true)
 	if err != nil {
 		c.sonarrRP[instance] = maps
 		return fmt.Errorf("updating quality release ID map: %w", err)
