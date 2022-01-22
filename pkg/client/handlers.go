@@ -21,6 +21,8 @@ func (c *Client) httpHandlers() {
 	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
+	// Aggregate handlers. Non-app specific.
+	c.Config.HandleAPIpath("", "/trash/{app}", c.aggregateTrash, "POST")
 
 	if c.Config.Plex.Configured() {
 		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
