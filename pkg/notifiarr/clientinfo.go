@@ -55,9 +55,11 @@ type ServiceCheck struct {
 	Interval cnfg.Duration `json:"interval"`
 }
 
-type intList []int
+// IntList has a method to abstract lookups.
+type IntList []int
 
-func (l intList) Has(instance int) bool {
+// Has returns true if the list has an instance ID.
+func (l IntList) Has(instance int) bool {
 	for _, i := range l {
 		if instance == i {
 			return true

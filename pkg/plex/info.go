@@ -7,10 +7,7 @@ import (
 	"fmt"
 )
 
-func (s *Server) GetInfo() (*PMSInfo, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
-	defer cancel()
-
+func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
 	data, err := s.getPlexURL(ctx, s.URL, nil)
 	if err != nil {
 		return nil, err

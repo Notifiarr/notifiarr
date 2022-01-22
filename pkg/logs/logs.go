@@ -81,6 +81,7 @@ func New() *Logger {
 
 // SetupLogging splits log writers into a file and/or stdout.
 func (l *Logger) SetupLogging(config *LogConfig) {
+	fileMode = config.FileMode.Mode()
 	l.logs = config
 	l.setDefaultLogPaths()
 	l.setLogPaths()

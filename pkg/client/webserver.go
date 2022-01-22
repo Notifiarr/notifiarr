@@ -35,7 +35,7 @@ func (c *Client) StartWebServer() {
 
 	// Initialize all the application API paths.
 	c.Config.Apps.InitHandlers()
-	c.internalHandlers()
+	c.httpHandlers()
 	// Run the server.
 	go c.runWebServer()
 }

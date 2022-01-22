@@ -29,20 +29,22 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey   string            `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
-	URLBase  string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	Sonarr   []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr   []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr   []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr  []*ReadarrConfig  `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Prowlarr []*ProwlarrConfig `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
-	Deluge   []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
-	Qbit     []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
-	SabNZB   []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
-	Tautulli *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
-	Router   *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
-	ErrorLog *log.Logger       `json:"-" toml:"-" xml:"-" yaml:"-"`
-	DebugLog *log.Logger       `json:"-" toml:"-" xml:"-" yaml:"-"`
+	APIKey   string              `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
+	ExKeys   []string            `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
+	URLBase  string              `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	Sonarr   []*SonarrConfig     `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
+	Radarr   []*RadarrConfig     `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
+	Lidarr   []*LidarrConfig     `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
+	Readarr  []*ReadarrConfig    `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Prowlarr []*ProwlarrConfig   `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
+	Deluge   []*DelugeConfig     `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
+	Qbit     []*QbitConfig       `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
+	SabNZB   []*SabNZBConfig     `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
+	Tautulli *TautulliConfig     `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
+	Router   *mux.Router         `json:"-" toml:"-" xml:"-" yaml:"-"`
+	ErrorLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
+	DebugLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
+	keys     map[string]struct{} // for fast key lookup.
 }
 
 // Errors sent to client web requests.
@@ -147,7 +149,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 // CheckAPIKey drops a 403 if the API key doesn't match, otherwise run next handler.
 func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-		if r.Header.Get("X-API-Key") != a.APIKey {
+		if _, ok := a.keys[r.Header.Get("X-API-Key")]; !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -158,6 +160,13 @@ func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
 
 // InitHandlers activates all our handlers. This is part of the web server init.
 func (a *Apps) InitHandlers() {
+	a.keys = make(map[string]struct{})
+	for _, key := range append(a.ExKeys, a.APIKey) {
+		if len(key) > 3 { //nolint:gomnd
+			a.keys[key] = struct{}{}
+		}
+	}
+
 	a.lidarrHandlers()
 	a.prowlarrHandlers()
 	a.radarrHandlers()

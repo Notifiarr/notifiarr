@@ -156,6 +156,7 @@ Recommend not messing with these unless instructed to do so.
 
 |Config Name|Variable Name|Default / Note|
 |---|---|---|
+|extra_keys|`DN_EXTRA_KEYS_0`|`[]` (empty list) / Add keys to allow API requests from places besides notifiarr.com|
 |mode|`DN_MODE`|`production` / Change application mode: `development` or `production`|
 |debug|`DN_DEBUG`|`false` / Adds payloads and other stuff to the log output; very verbose/noisy|
 |debug_log|`DN_DEBUG_LOG`|`""` / Set a file system path to write debug logs to a dedicated file|
