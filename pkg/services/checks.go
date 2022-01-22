@@ -89,7 +89,7 @@ func (s *Service) update(res *result) bool {
 		return false
 	}
 
-	s.log.Printf("Service Checked: %s, state: %s => %s, output: %s", s.Name, s.state, res.state, s.output)
+	s.log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.state, res.state, s.output)
 	s.since = s.lastCheck
 	s.state = res.state
 

@@ -111,26 +111,26 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "media.rate"):
 		fallthrough
 	case strings.EqualFold(v.Event, "admin.database.corrupt"):
-		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (relaying to Notifiarr)",
+		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		c.sendPlexWebhook(&v)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		c.Apps.Respond(w, http.StatusAccepted, "processing")
 	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(c.Plex.Cooldown.Duration):
-		c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' => %s",
+		c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		c.Apps.Respond(w, http.StatusAlreadyReported, "ignored, cooldown")
 	case strings.EqualFold(v.Event, "media.play"):
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
 		go c.collectSessions(EventHook, &v)
-		c.Printf("Plex Incoming Webhook: %s, %s '%s' => %s (collecting sessions)",
+		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		c.Apps.Respond(w, http.StatusAccepted, "processing")
 	default:
 		c.Apps.Respond(w, http.StatusAlreadyReported, "ignored, unsupported")
-		c.Printf("Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' => %s",
+		c.Printf("Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' ~> %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 	}
 }
@@ -143,5 +143,5 @@ func (c *Config) sendPlexWebhook(hook *plexIncomingWebhook) {
 		return
 	}
 
-	c.Printf("Plex => Notifiarr: %s '%s' => %s. %s", hook.Account.Title, hook.Event, hook.Metadata.Title, resp)
+	c.Printf("Plex ~> Notifiarr: %s '%s' ~> %s. %s", hook.Account.Title, hook.Event, hook.Metadata.Title, resp)
 }
