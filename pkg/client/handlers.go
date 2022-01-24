@@ -48,7 +48,7 @@ func (c *Client) httpHandlers() {
 	c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandlerPost)).Methods("POST")
 	c.Config.Router.Handle(path.Join(base, "/status"), c.checkAuthorized(c.statusHandler)).Methods("GET")
 	c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
-	c.Config.Router.HandleFunc(path.Join(base, "/get/{config}"), c.getSettingsHandler).Methods("GET")
+	c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
 
 	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything else
 }
