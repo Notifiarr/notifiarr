@@ -36,6 +36,7 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
+	UIPassword string              `json:"uiPassword" toml:"ui_password" xml:"ui_password" yaml:"uiPassword"`
 	BindAddr   string              `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
 	SSLCrtFile string              `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
 	SSLKeyFile string              `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`

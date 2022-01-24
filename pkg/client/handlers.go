@@ -30,25 +30,29 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.slash)) // "hi" page on /urlbase
 		c.Config.Router.Handle(base, http.HandlerFunc(c.slash))                          // "hi" page on /urlbase/
 
-		// Handle static files under the new url base too.
-		for _, route := range []string{"/js/", "/css/", "/files/"} {
-			c.Config.Router.PathPrefix(path.Join(base, route)).
-				Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
+		if c.Config.UIPassword != "" {
+			// Handle static files under the new url base too.
+			for _, route := range []string{"/js/", "/css/", "/files/"} {
+				c.Config.Router.PathPrefix(path.Join(base, route)).
+					Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
+			}
 		}
-	} else {
+	} else if c.Config.UIPassword != "" {
 		// Or handle static files without a url base.
 		for _, route := range []string{"/js/", "/css/", "/files/"} {
 			c.Config.Router.PathPrefix(route).HandlerFunc(c.handleStaticAssets).Methods("GET")
 		}
 	}
 
-	c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
-	c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
-	c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandler)).Methods("GET")
-	c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandlerPost)).Methods("POST")
-	c.Config.Router.Handle(path.Join(base, "/status"), c.checkAuthorized(c.statusHandler)).Methods("GET")
-	c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
-	c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+	if c.Config.UIPassword != "" {
+		c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
+		c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
+		c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandlerPost)).Methods("POST")
+		c.Config.Router.Handle(path.Join(base, "/status"), c.checkAuthorized(c.statusHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+	}
 
 	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything else
 }

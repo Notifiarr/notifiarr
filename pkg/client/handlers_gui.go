@@ -34,6 +34,7 @@ func (c *Client) parseGUITemplates() (err error) {
 	c.templat = template.Must(template.New("index.html").Parse(index))
 	c.templat = template.Must(c.templat.New("404.html").Parse("NOT FOUND! Check your request parameters and try again."))
 	c.templat = c.templat.Funcs(template.FuncMap{
+		"base":     func() string { return c.Config.URLBase },
 		"instance": func(idx int) int { return idx + 1 },
 	})
 
@@ -103,18 +104,24 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 }
 
 func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
-	switch username := request.FormValue("name"); {
+	validUsername, validPassword := "admin", c.Config.UIPassword
+	if spl := strings.SplitN(validPassword, ":", 2); len(spl) == 2 { //nolint:gomnd
+		validUsername = spl[0]
+		validPassword = spl[1]
+	}
+
+	switch providedUsername := request.FormValue("name"); {
+	case len(validPassword) < 16: // nolint:gomnd
+		c.loginPage(response, request, "Invalid Password Configured")
 	case c.getUserName(request) != "":
 		http.Redirect(response, request, path.Join(c.Config.URLBase, "config"), http.StatusFound)
 	case request.Method == http.MethodGet:
 		c.loginPage(response, request, "")
-	case username == "":
-		c.loginPage(response, request, "Must Provide Username")
-	case c.Config.APIKey == request.FormValue("password"):
-		c.setSession(username, response)
+	case providedUsername == validUsername && validPassword == request.FormValue("password"):
+		c.setSession(providedUsername, response)
 		http.Redirect(response, request, path.Join(c.Config.URLBase, "config"), http.StatusFound)
 	default: // Start over.
-		c.loginPage(response, request, "Invalid API Key")
+		c.loginPage(response, request, "Invalid Password")
 	}
 }
 
@@ -256,7 +263,7 @@ type templateData struct {
 }
 
 func (c *Client) loginPage(response http.ResponseWriter, request *http.Request, msg string) {
-	response.Header().Add("Content-Type", "text/html")
+	response.Header().Add("content-type", "text/html")
 
 	if request.Method != http.MethodGet {
 		response.WriteHeader(http.StatusUnauthorized)

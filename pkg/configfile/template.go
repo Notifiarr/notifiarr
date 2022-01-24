@@ -35,8 +35,11 @@ const tmpl = `###############################################
 
 # This API key must be copied from your notifiarr.com account.
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}{{if .ExKeys}}
-
 extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
+
+# Setting a UI password enables the human accessible web GUI. Must be at least 16 characters.
+# The default username is admin; change it by setting this to "username:password"
+ui_password = "{{.UIPassword}}"
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
 ## You may use "127.0.0.1:5454" to listen only on localhost; good if using a local proxy.
