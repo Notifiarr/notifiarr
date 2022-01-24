@@ -1,0 +1,10 @@
+<html>
+{{template "head.html" .}}  <body>
+   <img src="{{.Config.URLBase}}files/favicon.png" width="100px"><br>{{ if .Username }}
+   <form method="post" action="logout">
+    Navigation:
+    <a href="config">Config</a> -
+    <a href="status">Status</a> -
+    <button style="display: inline-block;" type="submit">Logout</button>
+  </form>
+  <hr>{{end}}

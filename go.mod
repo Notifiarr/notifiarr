@@ -102,3 +102,5 @@ require (
 	modernc.org/strutil v1.1.1 // indirect
 	modernc.org/token v1.0.0 // indirect
 )
+
+require github.com/gorilla/securecookie v1.1.1 // indirect

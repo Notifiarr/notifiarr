@@ -1,0 +1,11 @@
+{{template "header.html" . -}}
+{{if .Msg}}    <p><b>{{.Msg}}</b></p>
+{{end}}    <h1>Login</h1>
+    <form method="post" action="login">
+       <label for="name">Username</label>
+       <input type="text" id="name" name="name">
+       <label for="password">API Key</label>
+       <input type="password" id="password" name="password">
+       <button type="submit">Login</button>
+    </form>
+{{template "footer.html" .}}

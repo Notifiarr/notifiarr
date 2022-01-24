@@ -33,13 +33,13 @@ var (
 
 // Config for this Services plugin comes from a config file.
 type Config struct {
-	Interval     cnfg.Duration     `toml:"interval" xml:"interval"`
-	Parallel     uint              `toml:"parallel" xml:"parallel"`
-	Disabled     bool              `toml:"disabled" xml:"disabled"`
-	LogFile      string            `toml:"log_file" xml:"log_file"`
-	Apps         *apps.Apps        `toml:"-"`
-	Notifiarr    *notifiarr.Config `toml:"-"`
-	Plugins      *snapshot.Plugins `toml:"-"`
+	Interval     cnfg.Duration     `toml:"interval" xml:"interval" json:"interval"`
+	Parallel     uint              `toml:"parallel" xml:"parallel" json:"parallel"`
+	Disabled     bool              `toml:"disabled" xml:"disabled" json:"disabled"`
+	LogFile      string            `toml:"log_file" xml:"log_file" json:"logFile"`
+	Apps         *apps.Apps        `toml:"-" json:"-"`
+	Notifiarr    *notifiarr.Config `toml:"-" json:"-"`
+	Plugins      *snapshot.Plugins `toml:"-" json:"-"`
 	*logs.Logger `json:"-"`        // log file writer
 	services     map[string]*Service
 	checks       chan *Service
@@ -91,12 +91,12 @@ type CheckResult struct {
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name      string        `toml:"name" xml:"name"`         // Radarr
-	Type      CheckType     `toml:"type" xml:"type"`         // http
-	Value     string        `toml:"check" xml:"check"`       // http://some.url
-	Expect    string        `toml:"expect" xml:"expect"`     // 200
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout"`   // 10s
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"` // 1m
+	Name      string        `toml:"name" xml:"name" json:"name"`             // Radarr
+	Type      CheckType     `toml:"type" xml:"type" json:"type"`             // http
+	Value     string        `toml:"check" xml:"check" json:"value"`          // http://some.url
+	Expect    string        `toml:"expect" xml:"expect" json:"expect"`       // 200
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`    // 10s
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"` // 1m
 	log       *logs.Logger
 	output    string
 	state     CheckState

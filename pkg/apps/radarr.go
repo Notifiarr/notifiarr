@@ -10,7 +10,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/radarr"
 )
@@ -45,14 +44,10 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup"`
+	starrConfig
 	*starr.Config
-	*radarr.Radarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	*radarr.Radarr `toml:"-" xml:"-" json:"-"`
+	Errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupRadarr(timeout time.Duration) error {

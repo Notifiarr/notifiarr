@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
@@ -132,7 +133,7 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 
 func (c *Config) setup() {
 	c.Mode = c.Services.Notifiarr.Setup(c.Mode)
-	c.URLBase = path.Join("/", c.URLBase)
+	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
 
 	if c.Timeout.Duration == 0 {

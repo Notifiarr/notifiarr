@@ -1,0 +1,97 @@
+{{template "header.html" .}}
+<h1>Notifiarr Client Configuration</h1>
+<small>User: {{.Username}}</small>
+<hr>
+
+<h2>Notifiarr Config</h2>
+
+<table border="1">
+<tr><td>API Key</td><td>{{.Config.Apps.APIKey}}</td></tr>
+<tr><td>Bind Addr</td><td>{{.Config.BindAddr}}</td></tr>
+{{if eq .Version.os "windows"}}<tr><td>Auto Update</td><td>{{.Config.AutoUpdate}}</td></tr>{{end}}
+<tr><td>Mode</td><td>{{.Config.Mode}}</td></tr>
+<tr><td>Quiet</td><td>{{.Config.LogConfig.Quiet}}</td></tr>
+<tr><td>Debug</td><td>{{.Config.LogConfig.Debug}}</td></tr>
+<tr><td>URL Base</td><td>{{.Config.Apps.URLBase}}</td></tr>
+<tr><td>Upstreams</td><td>{{.Config.Upstreams}}</td></tr>
+<tr><td>SSL Key File</td><td>{{.Config.SSLKeyFile}}</td></tr>
+<tr><td>SSL Cert File</td><td>{{.Config.SSLCrtFile}}</td></tr>
+<tr><td>App Log File</td><td>{{.Config.LogConfig.LogFile}}</td></tr>
+<tr><td>HTTP Log File</td><td>{{.Config.LogConfig.HTTPLog}}</td></tr>
+<tr><td>Log File Max Size</td><td>{{.Config.LogConfig.LogFileMb}}</td></tr>
+<tr><td>Log File Count</td><td>{{.Config.LogConfig.LogFiles}}</td></tr>
+<tr><td>Log File Mode</td><td>{{.Config.LogConfig.FileMode}}</td></tr>
+<tr><td>Notifiarr Max Body</td><td>{{.Config.MaxBody}}</td></tr>
+<tr><td>Global Timeout</td><td>{{.Config.Timeout}}</td></tr>
+</table>
+
+<h2>Applications</h2>
+
+{{ range $idx, $app := .Config.Apps.Lidarr }}
+Lidarr {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.Lidarr}}<br>{{end -}}
+
+{{ range $idx, $app := .Config.Apps.Prowlarr }}
+Prowlarr {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.Prowlarr}}<br>{{end -}}
+
+{{ range $idx, $app := .Config.Apps.Radarr }}
+Radarr {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.Radarr}}<br>{{end -}}
+
+{{ range $idx, $app := .Config.Apps.Readarr }}
+Readarr {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.Readarr}}<br>{{end -}}
+
+{{ range $idx, $app := .Config.Apps.Sonarr }}
+Sonarr {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.Sonarr}}<br>{{end -}}
+
+{{ range $idx, $app := .Config.Apps.Deluge }}
+Deluge {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.Deluge}}<br>{{end -}}
+
+{{ range $idx, $app := .Config.Apps.Qbit }}
+Qbit {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.Qbit}}<br>{{end -}}
+
+{{ range $idx, $app := .Config.Apps.SabNZB }}
+SabNZB {{ instance $idx }} URL: {{ $app.URL }}<br>
+{{- end }}{{if .Config.Apps.SabNZB}}<br>{{end -}}
+
+{{if .Config.Plex.Configured}}
+Plex 1 URL: {{.Config.Plex.URL}}<br>
+<br>{{end -}}
+
+{{if .Config.Apps.Tautulli.URL}}
+Tautulli 1 URL: {{.Config.Apps.Tautulli.URL}}<br>
+<br>{{end -}}
+
+<h2>MySQL Snapshot</h2>
+
+{{ range $idx, $app := .Config.Snapshot.MySQL }}
+MySQL {{ instance $idx }} Host: {{ $app.Host }}<br>
+{{- end }}{{if .Config.Snapshot.MySQL}}<br>{{end -}}
+
+<h2>Service Checks</h2>
+
+Disabled: {{.Config.Services.Disabled}}<br>
+Parallel: {{.Config.Services.Parallel}}<br>
+Interval: {{.Config.Services.Interval}}<br>
+Log File: {{.Config.Services.LogFile}}<br>
+
+{{ range $idx, $svc := .Config.Service }}
+Service {{ instance $idx }} Name: {{ $svc.Name }} (type: {{$svc.Type}})<br>
+{{- end }}{{if .Config.Service}}<br>{{end -}}
+
+<hr>
+
+<form method="post" action="config">
+    <input name="textBox" id="textBox" type="text">
+    <button type="submit">POST</button>
+</form>
+
+{{if .Data}}
+<p>Data:
+{{index .Data.textBox 0}}</p>{{end -}}
+{{template "footer.html" .}}

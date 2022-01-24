@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/prowlarr"
@@ -45,6 +46,14 @@ type Apps struct {
 	ErrorLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
 	DebugLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
 	keys     map[string]struct{} // for fast key lookup.
+}
+
+type starrConfig struct {
+	Name      string        `toml:"name" xml:"name" json:"name"`
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	StuckItem bool          `toml:"stuck_items" xml:"stuck_items" json:"stuckItems"`
+	Corrupt   string        `toml:"corrupt" xml:"corrupt" json:"corrupt"`
+	Backup    string        `toml:"backup" xml:"backup" json:"backup"`
 }
 
 // Errors sent to client web requests.

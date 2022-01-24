@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"strings"
@@ -20,6 +21,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
+	"github.com/gorilla/securecookie"
 	flag "github.com/spf13/pflag"
 	"golift.io/version"
 )
@@ -33,6 +35,8 @@ type Client struct {
 	sigkil  chan os.Signal
 	sighup  chan os.Signal
 	website *notifiarr.Config
+	cookies *securecookie.SecureCookie
+	templat *template.Template
 }
 
 // Errors returned by this package.
@@ -40,8 +44,8 @@ var (
 	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file, OR with environment variable")
 )
 
-// NewDefaults returns a new Client pointer with default settings.
-func NewDefaults() *Client {
+// newDefaults returns a new Client pointer with default settings.
+func newDefaults() *Client {
 	logger := logs.New() // This persists throughout the app.
 
 	return &Client{
@@ -54,12 +58,13 @@ func NewDefaults() *Client {
 			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
 			EnvPrefix:  mnd.DefaultEnvPrefix,
 		},
+		cookies: securecookie.New(securecookie.GenerateRandomKey(mnd.Bits64), securecookie.GenerateRandomKey(mnd.Bits32)),
 	}
 }
 
 // Start runs the app.
 func Start() error {
-	config := NewDefaults()
+	config := newDefaults()
 	config.Flags.ParseArgs(os.Args[1:])
 
 	switch {
@@ -95,6 +100,11 @@ func (c *Client) start() error {
 		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
+
+	if err := c.parseGUITemplates(); err != nil {
+		return err
+	}
+
 	clientInfo := c.configureServices(notifiarr.EventStart)
 
 	if newCon {
@@ -327,6 +337,11 @@ func (c *Client) reloadConfiguration(source string) error {
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.setupMenus(c.configureServices(notifiarr.EventReload))
+
+	if err := c.parseGUITemplates(); err != nil {
+		return err
+	}
+
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {

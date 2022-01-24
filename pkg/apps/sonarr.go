@@ -11,7 +11,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
@@ -44,14 +43,10 @@ func (a *Apps) sonarrHandlers() {
 
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup"`
+	starrConfig
 	*starr.Config
-	*sonarr.Sonarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
+	Errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupSonarr(timeout time.Duration) error {

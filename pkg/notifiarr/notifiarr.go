@@ -44,18 +44,17 @@ const (
 
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
-	Apps     *apps.Apps       // has API key
-	Plex     *plex.Server     // plex sessions
-	Snap     *snapshot.Config // system snapshot data
-	Services *ServiceConfig
-	Retries  int
-	BaseURL  string
-	Timeout  cnfg.Duration
-	Trigger  Triggers
-	MaxBody  int
-	Sighup   chan os.Signal
-
-	*logs.Logger // log file writer
+	Apps         *apps.Apps       `json:"apps"`      // has API key
+	Plex         *plex.Server     `json:"plex"`      // plex sessions
+	Snap         *snapshot.Config `json:"snapshots"` // system snapshot data
+	Services     *ServiceConfig   `json:"services"`
+	Retries      int              `json:"retries"`
+	BaseURL      string           `json:"-"`
+	Timeout      cnfg.Duration    `json:"timeout"`
+	Trigger      Triggers         `json:"-"`
+	MaxBody      int              `json:"maxBody"`
+	Sighup       chan os.Signal   `json:"-"`
+	*logs.Logger `json:"-"`       // log file writer
 	extras
 }
 

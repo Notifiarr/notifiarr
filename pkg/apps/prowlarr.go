@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/prowlarr"
 )
@@ -16,13 +15,10 @@ func (a *Apps) prowlarrHandlers() {
 
 // ProwlarrConfig represents the input data for a Prowlarr server.
 type ProwlarrConfig struct {
-	Name     string        `toml:"name" xml:"name"`         // if set, turn on service checks.
-	Interval cnfg.Duration `toml:"interval" xml:"interval"` // service check interval.
-	Corrupt  string        `toml:"corrupt" xml:"corrupt"`
-	Backup   string        `toml:"backup" xml:"backup"`
+	starrConfig
 	*starr.Config
-	*prowlarr.Prowlarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	*prowlarr.Prowlarr `toml:"-" xml:"-" json:"-"`
+	Errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupProwlarr(timeout time.Duration) error {

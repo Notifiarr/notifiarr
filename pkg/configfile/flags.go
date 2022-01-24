@@ -13,17 +13,19 @@ import (
 
 // Flags are our CLI input flags.
 type Flags struct {
-	*flag.FlagSet
-	VerReq     bool
-	Restart    bool
-	Updated    bool
-	PSlist     bool
-	Write      string
-	Curl       string
-	ConfigFile string
-	ExtraConf  []string
-	EnvPrefix  string
-	Headers    []string
+	*flag.FlagSet `json:"-"`
+	VerReq        bool     `json:"verReq"`
+	Restart       bool     `json:"restart"`
+	Updated       bool     `json:"updated"`
+	PSlist        bool     `json:"pslist"`
+	Write         string   `json:"wrte"`
+	Curl          string   `json:"curl"`
+	ConfigFile    string   `json:"configFile"`
+	ExtraConf     []string `json:"extraConf"`
+	EnvPrefix     string   `json:"envPrefix"`
+	Headers       []string `json:"headers"`
+	TmplPath      string   `json:"templatePath"`
+	StaticDir     string   `json:"staticDif"`
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
@@ -38,6 +40,8 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
+	f.StringVarP(&f.TmplPath, "templates", "t", "", "Provide path to custom http templates.")
+	f.StringVarP(&f.StaticDir, "staticdir", "s", "", "Provide path to custom static files.")
 
 	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.Restart, "restart", false, "This is used by auto-update, do not call it.")

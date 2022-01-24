@@ -12,25 +12,25 @@ import (
 /* Notifiarr Client provides minimal support for pulling data from Download clients. */
 
 type DelugeConfig struct {
-	Name     string        `toml:"name" xml:"name"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval"`
+	Name     string        `toml:"name" xml:"name" json:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	*deluge.Config
-	*deluge.Deluge
+	*deluge.Deluge `toml:"-" xml:"-" json:"-"`
 }
 
 type QbitConfig struct {
-	Name     string        `toml:"name" xml:"name"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval"`
+	Name     string        `toml:"name" xml:"name" json:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	*qbit.Config
-	*qbit.Qbit
+	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
 }
 
 type TautulliConfig struct {
-	Name     string        `toml:"name" xml:"name"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval"`
-	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout"`
-	URL      string        `toml:"url" xml:"url"`
-	APIKey   string        `toml:"api_key" xml:"api_key"`
+	Name     string        `toml:"name" xml:"name" json:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
+	URL      string        `toml:"url" xml:"url" json:"url"`
+	APIKey   string        `toml:"api_key" xml:"api_key" json:"apiKey"`
 }
 
 func (a *Apps) setupDeluge(timeout time.Duration) error {

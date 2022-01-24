@@ -11,7 +11,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
 )
@@ -42,20 +41,12 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/command/search/{albumid:[0-9]+}", lidarrTriggerSearchAlbum, "GET")
 }
 
-type starrConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup"`
-}
-
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
 	starrConfig
 	*starr.Config
-	*lidarr.Lidarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	*lidarr.Lidarr `toml:"-" xml:"-" json:"-"`
+	Errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupLidarr(timeout time.Duration) error {

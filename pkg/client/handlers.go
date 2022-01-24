@@ -16,8 +16,45 @@ import (
 	"golift.io/starr"
 )
 
-// httpHandlers initializes internal and other API routes.
+// httpHandlers initializes GUI HTTP routes.
 func (c *Client) httpHandlers() {
+	c.httpAPIHandlers() // Init API handlers up front.
+	base := c.Config.URLBase
+	// These two are base with no baseurl.
+	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon)) // built-in icon.
+	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))              // "hi" page on /
+
+	if !strings.EqualFold(base, "/") {
+		// Handle the same URLs as above on the different base URL too.
+		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
+		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.slash)) // "hi" page on /urlbase
+		c.Config.Router.Handle(base, http.HandlerFunc(c.slash))                          // "hi" page on /urlbase/
+
+		// Handle static files under the new url base too.
+		for _, route := range []string{"/js/", "/css/", "/files/"} {
+			c.Config.Router.PathPrefix(path.Join(base, route)).
+				Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
+		}
+	} else {
+		// Or handle static files without a url base.
+		for _, route := range []string{"/js/", "/css/", "/files/"} {
+			c.Config.Router.PathPrefix(route).HandlerFunc(c.handleStaticAssets).Methods("GET")
+		}
+	}
+
+	c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
+	c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
+	c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandler)).Methods("GET")
+	c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandlerPost)).Methods("POST")
+	c.Config.Router.Handle(path.Join(base, "/status"), c.checkAuthorized(c.statusHandler)).Methods("GET")
+	c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+	c.Config.Router.HandleFunc(path.Join(base, "/get/{config}"), c.getSettingsHandler).Methods("GET")
+
+	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything else
+}
+
+// httpAPIHandlers initializes API routes.
+func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
@@ -39,29 +76,25 @@ func (c *Client) httpHandlers() {
 				http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
 		}
 	}
-
-	// Initialize internal-only paths.
-	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon)) // built-in icon.
-	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))              // "hi" page on /
-
-	if base := c.Config.URLBase; !strings.EqualFold(base, "/") {
-		// Handle the same URLs on the different base URL too.
-		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
-		c.Config.Router.Handle(base, http.HandlerFunc(c.slash))     // "hi" page on /urlbase
-		c.Config.Router.Handle(base+"/", http.HandlerFunc(c.slash)) // "hi" page on /urlbase/
-	}
-
-	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything
 }
 
 // notFound is the handler for paths that are not found: 404s.
 func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
-	c.Config.Respond(w, http.StatusNotFound, "Check your request parameters and try again.")
+	w.WriteHeader(http.StatusNotFound)
+
+	if err := c.templat.ExecuteTemplate(w, "404.html", nil); err != nil {
+		c.Errorf("Sending HTTP Reply: %v", err)
+	}
 }
 
 // slash is the handler for /.
 func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
-	_, _ = w.Write([]byte("<p>" + c.Flags.Name() + ": <strong>working</strong></p>\n"))
+	if c.getUserName(r) != "" {
+		// Logged in user (has a cookie), send them to config page.
+		http.Redirect(w, r, path.Join(c.Config.URLBase, "config"), http.StatusFound)
+	} else if err := c.templat.ExecuteTemplate(w, "index.html", nil); err != nil {
+		c.Errorf("Sending HTTP Reply: %v", err)
+	}
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
