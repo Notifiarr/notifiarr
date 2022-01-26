@@ -1,5 +1,4 @@
-The files in this folder are auto generated from the files/ folder.
-Currently bindata is used to store the favicon.ico file. That is all.
+The files in this folder are auto generated from the files/ and templates/ folders.
 
 - To generate the binary base64 data you need to install `go-bindata`:
 

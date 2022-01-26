@@ -1,10 +1,76 @@
-<html>
-{{template "head.html" .}}  <body>
-   <img src="{{.Config.URLBase}}files/favicon.png" width="100px"><br>{{ if .Username }}
-   <form method="post" action="logout">
-    Navigation:
-    <a href="config">Config</a> -
-    <a href="status">Status</a> -
-    <button style="display: inline-block;" type="submit">Logout</button>
-  </form>
-  <hr>{{end}}
+<!doctype html>
+<html lang="en" class="no-js">
+    <head>
+        <title>Notifiarr</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+        <meta name="description" content="Automated discord notifications">
+        <meta name="author" content="twitchcaptain, nitsua">
+
+        <!-- Font awesome -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/fontawesome/css/all.css" />
+        <!-- Sandstone Bootstrap CSS -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/bootstrap/bootstrap.min.css">
+        <!-- jQuery UI -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/jquery/jquery-ui.min.css">
+        <!-- Bootstrap Datatables -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/bootstrap/dataTables.bootstrap.min.css">
+        <!-- Bootstrap social button library -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/bootstrap/bootstrap-social.css">
+        <!-- Bootstrap select -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/bootstrap/bootstrap-select.css">
+        <!-- Styles -->
+        <link rel="stylesheet" type="text/css" href="files/css/style.css">
+        <link rel="stylesheet" type="text/css" href="files/css/dark.css">
+        <!-- Toast -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/toast/toast.css">
+        <!-- Accordion -->
+        <link rel="stylesheet" type="text/css" href="files/libraries/accordion/accordion.css">
+        <!-- JS Libraries -->
+        <script src="files/libraries/jquery/jquery.min.js" type="text/javascript"></script>
+        <script src="files/libraries/jquery/jquery.ui.min.js" type="text/javascript"></script>
+        <script src="files/libraries/jquery/jquery.ui.touch.js" type="text/javascript"></script>
+        <script src="files/libraries/jquery/jquery.custom.js" type="text/javascript"></script>
+        <script src="files/libraries/jquery/jquery.dataTables.min.js" type="text/javascript"></script>
+        <script src="files/libraries/jquery/jquery-migrate-3.0.0.min.js" type="text/javascript"></script>
+        <script src="files/libraries/bootstrap/bootstrap.min.js" type="text/javascript"></script>
+        <script src="files/libraries/bootstrap/bootstrap-select.min.js" type="text/javascript"></script>
+        <script src="files/libraries/bootstrap/dataTables.bootstrap.min.js" type="text/javascript"></script>
+        <script src="files/libraries/balloon/jquery.balloon.min.js" type="text/javascript"></script>
+        <!-- Internal -->
+        <script src="files/js/common.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            let conf = {{ . }};
+
+            $(function() {
+                jsLoader();
+                setTooltips();
+            });
+        </script>
+    </head>
+    <body>
+        {{ if not .Username }}
+        <div class="brand clearfix" style="z-index:100;">
+            <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px"><img src="files/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr</h4>
+            <span class="menu-btn"><i class="fa fa-bars"></i></span>
+            <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
+        </div>
+        {{else}}
+        <div class="brand clearfix" style="z-index:100;">
+            <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px"><i class="fa fa-user"></i>&nbsp; {{.Username}}</h4>
+            <span class="menu-btn"><i class="fa fa-bars"></i></span>
+            <ul class="ts-profile-nav">
+                <li class="ts-account">
+                    <a href="#"><img src="files/images/logo/notifiarr.png" style="height:30px;"> Account <i class="fa fa-angle-down hidden-side"></i></a>
+                    <ul>
+                        <li style="cursor: pointer;"><a onclick="logout()">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        {{end}}
+        <div class="ts-main-content">
+            {{template "navigation.html" . -}}
+            <div class="content-wrapper">
+                <div class="container-fluid">

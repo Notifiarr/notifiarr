@@ -42,7 +42,7 @@ func (c *Client) ParseGUITemplates() (err error) {
 	// Parse all our compiled-in templates.
 	for _, name := range bindata.AssetNames() {
 		if strings.HasPrefix(name, "templates/") {
-			c.templat = template.Must(c.templat.New(filepath.Base(name)).Parse(bindata.MustAssetString(name)))
+			c.templat = template.Must(c.templat.New(path.Base(name)).Parse(bindata.MustAssetString(name)))
 		}
 	}
 
@@ -315,7 +315,6 @@ func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http
 
 	mime := mime.TypeByExtension(path.Ext(request.URL.Path))
 	response.Header().Set("content-type", mime)
-	c.Errorf("Serving %s with mime %s", request.URL.Path, mime)
 
 	if _, err = response.Write(data); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)

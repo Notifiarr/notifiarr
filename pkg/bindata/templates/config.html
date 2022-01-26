@@ -1,99 +1,131 @@
-{{template "header.html" .}}
-<h1>Notifiarr Client Configuration</h1>
-<small>User: {{.Username}}</small>
-<hr>
+<h1><i class="fas fa-cogs"></i> Configuration</h1>
 
-<h2>Notifiarr Config</h2>
-
-<table border="1">
-<tr><td>API Key</td><td>{{.Config.Apps.APIKey}}</td></tr>
-<tr><td>Bind Addr</td><td>{{.Config.BindAddr}}</td></tr>
-{{if eq .Version.os "windows"}}<tr><td>Auto Update</td><td>{{.Config.AutoUpdate}}</td></tr>{{end}}
-<tr><td>Mode</td><td>{{.Config.Mode}}</td></tr>
-<tr><td>Quiet</td><td>{{.Config.LogConfig.Quiet}}</td></tr>
-<tr><td>Debug</td><td>{{.Config.LogConfig.Debug}}</td></tr>
-<tr><td>URL Base</td><td>{{.Config.Apps.URLBase}}</td></tr>
-<tr><td>Upstreams</td><td>{{.Config.Upstreams}}</td></tr>
-<tr><td>SSL Key File</td><td>{{.Config.SSLKeyFile}}</td></tr>
-<tr><td>SSL Cert File</td><td>{{.Config.SSLCrtFile}}</td></tr>
-<tr><td>App Log File</td><td>{{.Config.LogConfig.LogFile}}</td></tr>
-<tr><td>Debug Log File</td><td>{{.Config.LogConfig.DebugLog}}</td></tr>
-<tr><td>Debug Log 1 File</td><td>{{.Config.DebugLog}}</td></tr>
-<tr><td>HTTP Log File</td><td>{{.Config.LogConfig.HTTPLog}}</td></tr>
-<tr><td>Log File Max Size</td><td>{{.Config.LogConfig.LogFileMb}}</td></tr>
-<tr><td>Log File Count</td><td>{{.Config.LogConfig.LogFiles}}</td></tr>
-<tr><td>Log File Mode</td><td>{{.Config.LogConfig.FileMode}}</td></tr>
-<tr><td>Notifiarr Max Body</td><td>{{.Config.MaxBody}}</td></tr>
-<tr><td>Global Timeout</td><td>{{.Config.Timeout}}</td></tr>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <td>Setting</td>
+            <td>Current Value</td>
+            <td>New Value</td>
+        </tr>
+        <tr><td colspan="3" align="center"><h4 class="mb-3">General</h4></td></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="API key from your Notifiarr.com account, required for security validation"></i> API Key</td>
+            <td>{{.Config.APIKey}}</td>
+            <td><input type="text" id="Config-APIKey" value="{{.Config.APIKey}}"></td>
+        </tr>
+        <tr>
+            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="Default is usually fine unless you modify the port"></i> Bind Address</td>
+            <td>{{.Config.BindAddr}}</td>
+            <td><input type="text" id="" value="{{.Config.BindAddr}}"></td>
+        </tr>
+        {{if eq .Version.os "windows"}}
+            <tr>
+                <td><i class="help-icon balloon-tooltip far fa-question-circle" title="This is how often the app will check for updates"></i> Auto Update</td>
+                <td>{{.Config.AutoUpdate}}</td>
+                <td><input type="text" id="" value="{{.Config.AutoUpdate}}"></td>
+            </tr>
+        {{end}}
+        <tr>
+            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="Only enable when asked, your Notifiarr account must have dev access for this to work"></i> Mode</td>
+            <td>{{.Config.Mode}}</td>
+            <td>
+                <select id="">
+                    <option {{if eq .Config.Mode "dev"}} selected {{end}} value="dev">Development</option>
+                    <option {{if not .Config.Mode}} selected {{end}} value="">Live</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>URL Base</td>
+            <td>{{.Config.URLBase}}</td>
+            <td><input type="text" id="" value="{{.Config.URLBase}}"></td>
+        </tr>
+        <tr>
+            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="One upstream entry per line"></i> Upstreams</td>
+            <td>{{range $s := .Config.Upstreams}}{{$s}}<br>{{end}}</td>
+            <td>
+                <textarea id="">
+{{range $s := .Config.Upstreams}}{{$s}}
+{{end}}
+                </textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>Timeout</td>
+            <td>{{.Config.Timeout}}</td>
+            <td><input type="text" id="" value="{{.Config.Timeout}}"></td>
+        </tr>
+    </tbody>    
+    <thead>
+        <tr><td colspan="3" align="center"><h4 class="mb-3">SSL</h4></td></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Key File</td>
+            <td>{{.Config.SSLKeyFile}}</td>
+            <td><input type="text" id="" value="{{.Config.SSLKeyFile}}"></td>
+        </tr>
+        <tr>
+            <td>Cert File</td>
+            <td>{{.Config.SSLCrtFile}}</td>
+            <td><input type="text" id="" value="{{.Config.SSLCrtFile}}"></td>
+        </tr>
+    </tbody>
+    <thead>
+        <tr><td colspan="3" align="center"><h4 class="mb-3">Logging</h4></td></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Debug Logging</td>
+            <td>{{.Config.Debug}}</td>
+            <td><input type="checkbox" id="" {{if .Config.Debug}} checked {{end}}></td>
+        </tr>
+        <tr>
+            <td>Quiet Logging</td>
+            <td>{{.Config.Quiet}}</td>
+            <td><input type="checkbox" id="" {{if .Config.Quiet}} checked {{end}}></td>
+        </tr>
+        <tr>
+            <td>App Logfile</td>
+            <td>{{.Config.LogFile}}</td>
+            <td><input type="text" id="" value="{{.Config.LogFile}}"></td>
+        </tr>
+        <tr>
+            <td>HTTP Logfile</td>
+            <td>{{.Config.HTTPLog}}</td>
+            <td><input type="text" id="" value="{{.Config.HTTPLog}}"></td>
+        </tr>
+        <tr>
+            <td>Services Logfile</td>
+            <td>{{.Config.Services.LogFile}}</td>
+            <td><input type="text" id="" value="{{.Config.Services.LogFile}}"></td>
+        </tr>
+        <tr>
+            <td>Debug Logfile</td>
+            <td>{{.Config.LogConfig.DebugLog}}</td>
+            <td><input type="text" id="" value="{{.Config.LogConfig.DebugLog}}"></td>
+        </tr>
+        <tr>
+            <td>Logfile Mode</td>
+            <td>{{.Config.FileMode}}</td>
+            <td><input type="text" id="" value="{{.Config.FileMode}}"></td>
+        </tr>
+        <tr>
+            <td>Max Payload Length</td>
+            <td>{{.Config.MaxBody}}</td>
+            <td><input type="text" id="" value="{{.Config.MaxBody}}"></td>
+        </tr>
+        <tr>
+            <td>Max Log Size</td>
+            <td>{{.Config.LogFileMb}}</td>
+            <td><input type="text" id="" value="{{.Config.LogFileMb}}"></td>
+        </tr>
+        <tr>
+            <td>Max Log Count</td>
+            <td>{{.Config.LogFiles}}</td>
+            <td><input type="text" id="" value="{{.Config.LogFiles}}"></td>
+        </tr>
+    </tbody>
 </table>
-
-<h2>Applications</h2>
-
-{{ range $idx, $app := .Config.Apps.Lidarr }}
-Lidarr {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.Lidarr}}<br>{{end -}}
-
-{{ range $idx, $app := .Config.Apps.Prowlarr }}
-Prowlarr {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.Prowlarr}}<br>{{end -}}
-
-{{ range $idx, $app := .Config.Apps.Radarr }}
-Radarr {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.Radarr}}<br>{{end -}}
-
-{{ range $idx, $app := .Config.Apps.Readarr }}
-Readarr {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.Readarr}}<br>{{end -}}
-
-{{ range $idx, $app := .Config.Apps.Sonarr }}
-Sonarr {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.Sonarr}}<br>{{end -}}
-
-{{ range $idx, $app := .Config.Apps.Deluge }}
-Deluge {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.Deluge}}<br>{{end -}}
-
-{{ range $idx, $app := .Config.Apps.Qbit }}
-Qbit {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.Qbit}}<br>{{end -}}
-
-{{ range $idx, $app := .Config.Apps.SabNZB }}
-SabNZB {{ instance $idx }} URL: {{ $app.URL }}<br>
-{{- end }}{{if .Config.Apps.SabNZB}}<br>{{end -}}
-
-{{if .Config.Plex.Configured}}
-Plex 1 URL: {{.Config.Plex.URL}}<br>
-<br>{{end -}}
-
-{{if .Config.Apps.Tautulli.URL}}
-Tautulli 1 URL: {{.Config.Apps.Tautulli.URL}}<br>
-<br>{{end -}}
-
-<h2>MySQL Snapshot</h2>
-
-{{ range $idx, $app := .Config.Snapshot.MySQL }}
-MySQL {{ instance $idx }} Host: {{ $app.Host }}<br>
-{{- end }}{{if .Config.Snapshot.MySQL}}<br>{{end -}}
-
-<h2>Service Checks</h2>
-
-Disabled: {{.Config.Services.Disabled}}<br>
-Parallel: {{.Config.Services.Parallel}}<br>
-Interval: {{.Config.Services.Interval}}<br>
-Log File: {{.Config.Services.LogFile}}<br>
-
-{{ range $idx, $svc := .Config.Service }}
-Service {{ instance $idx }} Name: {{ $svc.Name }} (type: {{$svc.Type}})<br>
-{{- end }}{{if .Config.Service}}<br>{{end -}}
-
-<hr>
-
-<form method="post" action="config">
-    <input name="textBox" id="textBox" type="text">
-    <button type="submit">POST</button>
-</form>
-
-{{if .Data}}
-<p>Data:
-{{index .Data.textBox 0}}</p>{{end -}}
-{{template "footer.html" .}}

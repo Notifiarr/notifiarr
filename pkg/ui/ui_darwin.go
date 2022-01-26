@@ -12,7 +12,7 @@ import (
 )
 
 // SystrayIcon is the icon in the menu bar.
-const SystrayIcon = "files/macos.png"
+const SystrayIcon = "files/images/macos.png"
 
 //nolint:gochecknoglobals
 var hasGUI = os.Getenv("USEGUI") == "true"
