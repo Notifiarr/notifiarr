@@ -80,7 +80,7 @@ func Start() error {
 	}
 }
 
-func (c *Client) start() error {
+func (c *Client) start() error { //nolint:cyclop
 	msg, newCon, err := c.loadConfiguration()
 
 	switch {

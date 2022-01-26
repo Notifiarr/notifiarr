@@ -1,13 +1,14 @@
             <div class="content-wrapper">
-                <div class="container-fluid">{{ template "header.html" . }}{{if .Username}}
+                <div class="container-fluid">
+{{ template "header.html" . }}{{if .Username}}
                   <div class="navigation-item" id="template-landing">
 {{ template "landing.html"  .}}
                   </div>
                   <div class="navigation-item" id="template-config" style="display: none;">
 {{ template "config.html" . }}
                   </div>
-                  <div class="navigation-item" id="template-status" style="display: none;">
-{{ template "status.html" . }}
+                  <div class="navigation-item" id="template-services" style="display: none;">
+{{ template "services.html" . }}
                   </div>
                   <div class="navigation-item" id="template-system" style="display: none;">
 {{ template "system.html" . }}
@@ -29,5 +30,5 @@
                   </div>
                   <div class="navigation-item" id="template-misc" style="display: none;">
 {{ template "misc.html" . }}
-                  </div>
-{{ else }}{{ template "login.html" . }}{{end}}{{template "footer.html"}}
+                  </div>{{ else }}{{ template "login.html" . }}{{end}}
+{{ template "footer.html" }}

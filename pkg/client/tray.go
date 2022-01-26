@@ -5,6 +5,7 @@ package client
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -308,7 +309,7 @@ func (c *Client) watchGuiChannels() {
 	}
 }
 
-// nolint:errcheck
+// nolint:errcheck,cyclop
 func (c *Client) watchConfigChannels() {
 	for {
 		select {
@@ -344,8 +345,8 @@ func (c *Client) watchConfigChannels() {
 				c.Errorf("[user requested] Parsing HTML Templates Failed: %v", err)
 				ui.Notify("Parsing HTML Templates Failed: %v", err)
 			} else {
-				c.Printf("[user requested] Parsed HTML Templates.")
-				ui.Notify("Parsed HTML Templates")
+				c.Printf("[user requested] Parsed HTML Templates: %s", filepath.Join(c.Flags.Assets, "templates", "*.html"))
+				ui.Notify("Parsed HTML Templates: %s", filepath.Join(c.Flags.Assets, "templates", "*.html"))
 			}
 		}
 	}
