@@ -1,95 +1,65 @@
-<h1><i class="fas fa-star"></i> Starr Apps</h1>
+                          <h1><i class="fas fa-star"></i> Starr Apps</h1>
 
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <td>Instance</td>
-            <td>Name</td>
-            <td>URL</td>
-            <td>API Key</td>
-        </tr>
-        <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/lidarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Lidarr</h4></td></tr>
-    </thead>
-    <tbody>
-        {{if .Config.Apps.Lidarr}}
-            {{range $index, $app := .Config.Apps.Lidarr}}
-                <tr>
-                    <td>{{instance $index}}</td>
-                    <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                </tr>
-            {{- end}}
-        {{else}}
-            <tr><td colspan="4">No instances configured</td></tr>
-        {{end}}
-    </tbody>
-    <thead>
-        <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/prowlarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Prowlarr</h4></td></tr>
-    </thead>
-    <tbody>
-        {{if .Config.Apps.Prowlarr}}
-            {{range $index, $app := .Config.Apps.Prowlarr}}
-                <tr>
-                    <td>{{instance $index}}</td>
-                    <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                </tr>
-            {{- end}}
-        {{else}}
-            <tr><td colspan="4">No instances configured</td></tr>
-        {{end}}
-    </tbody>
-    <thead>
-        <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/radarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Radarr</h4></td></tr>
-    </thead>
-    <tbody>
-        {{if .Config.Apps.Radarr}}
-            {{range $index, $app := .Config.Apps.Radarr}}
-                <tr>
-                    <td>{{instance $index}}</td>
-                    <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                </tr>
-            {{- end}}
-        {{else}}
-            <tr><td colspan="4">No instances configured</td></tr>
-        {{end}}
-    </tbody>
-    <thead>
-        <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/readarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Readarr</h4></td></tr>
-    </thead>
-    <tbody>
-        {{if .Config.Apps.Readarr}}
-            {{range $index, $app := .Config.Apps.Readarr}}
-                <tr>
-                    <td>{{instance $index}}</td>
-                    <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                </tr>
-            {{- end}}
-        {{else}}
-            <tr><td colspan="4">No instances configured</td></tr>
-        {{end}}
-    </tbody>
-    <thead>
-        <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/sonarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Sonarr</h4></td></tr>
-    </thead>
-    <tbody>
-        {{if .Config.Apps.Sonarr}}
-            {{range $index, $app := .Config.Apps.Sonarr}}
-                <tr>
-                    <td>{{instance $index}}</td>
-                    <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                    <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                </tr>
-            {{- end}}
-        {{else}}
-            <tr><td colspan="4">No instances configured</td></tr>
-        {{end}}
-    </tbody>
-</table>
+                          <table class="table table-striped table-bordered">
+                              <thead>
+                                  <tr>
+                                      <td>Instance</td>
+                                      <td>Name</td>
+                                      <td>URL</td>
+                                      <td>API Key</td>
+                                  </tr>
+                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/lidarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Lidarr</h4></td></tr>
+                              </thead>
+                              <tbody>
+                                  {{if .Config.Apps.Lidarr}}{{range $index, $app := .Config.Apps.Lidarr}}<tr>
+                                      <td>{{instance $index}}</td>
+                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
+                              </tbody>
+                              <thead>
+                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/prowlarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Prowlarr</h4></td></tr>
+                              </thead>
+                              <tbody>
+                                  {{if .Config.Apps.Prowlarr}}{{range $index, $app := .Config.Apps.Prowlarr}}<tr>
+                                      <td>{{instance $index}}</td>
+                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
+                              </tbody>
+                              <thead>
+                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/radarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Radarr</h4></td></tr>
+                              </thead>
+                              <tbody>
+                                  {{if .Config.Apps.Radarr}}{{range $index, $app := .Config.Apps.Radarr}}<tr>
+                                      <td>{{instance $index}}</td>
+                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
+                              </tbody>
+                              <thead>
+                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/readarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Readarr</h4></td></tr>
+                              </thead>
+                              <tbody>
+                                  {{if .Config.Apps.Readarr}}{{range $index, $app := .Config.Apps.Readarr}}<tr>
+                                      <td>{{instance $index}}</td>
+                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
+                              </tbody>
+                              <thead>
+                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/sonarr.png" style="height:30px;"></div><h4 class="mb-3" style="margin-right: 2em;">Sonarr</h4></td></tr>
+                              </thead>
+                              <tbody>
+                                  {{if .Config.Apps.Sonarr}}{{range $index, $app := .Config.Apps.Sonarr}}<tr>
+                                      <td>{{instance $index}}</td>
+                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
+                              </tbody>
+                          </table>

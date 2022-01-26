@@ -9,7 +9,7 @@
         <meta name="author" content="twitchcaptain, nitsua">
 
         <!-- Font awesome -->
-        <link rel="stylesheet" type="text/css" href="files/libraries/fontawesome/css/all.css" />
+        <link rel="stylesheet" type="text/css" href="files/libraries/fontawesome/css/all.min.css" />
         <!-- Sandstone Bootstrap CSS -->
         <link rel="stylesheet" type="text/css" href="files/libraries/bootstrap/bootstrap.min.css">
         <!-- jQuery UI -->
@@ -50,13 +50,13 @@
         </script>
     </head>
     <body>
-        {{ if not .Username }}
+{{ if not .Username }}
         <div class="brand clearfix" style="z-index:100;">
             <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px"><img src="files/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr</h4>
             <span class="menu-btn"><i class="fa fa-bars"></i></span>
             <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
         </div>
-        {{else}}
+{{else}}
         <div class="brand clearfix" style="z-index:100;">
             <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px"><i class="fa fa-user"></i>&nbsp; {{.Username}}</h4>
             <span class="menu-btn"><i class="fa fa-bars"></i></span>
@@ -69,8 +69,8 @@
                 </li>
             </ul>
         </div>
-        {{end}}
+{{end}}
         <div class="ts-main-content">
-            {{template "navigation.html" . -}}
+{{template "navigation.html" .}}
             <div class="content-wrapper">
                 <div class="container-fluid">

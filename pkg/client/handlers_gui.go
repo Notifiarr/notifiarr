@@ -276,18 +276,6 @@ func (c *Client) loginPage(response http.ResponseWriter, request *http.Request, 
 	c.renderHTTPtemplate(response, request, "index.html", msg)
 }
 
-func (c *Client) statusHandler(response http.ResponseWriter, request *http.Request) {
-	c.renderHTTPtemplate(response, request, "status.html", "")
-}
-
-func (c *Client) configHandler(response http.ResponseWriter, request *http.Request) {
-	c.renderHTTPtemplate(response, request, "config.html", "")
-}
-
-func (c *Client) configHandlerPost(response http.ResponseWriter, request *http.Request) {
-	c.renderHTTPtemplate(response, request, "config.html", "")
-}
-
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
 func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.Request) {
 	if c.Flags.Assets == "" {

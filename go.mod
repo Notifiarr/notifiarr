@@ -7,7 +7,7 @@ require (
 	golift.io/cnfg v0.1.1
 	golift.io/deluge v0.9.4-0.20220103091211-1842b313e264
 	golift.io/qbit v0.0.0-20211121074815-1558e8969b98
-	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
+	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
 	golift.io/starr v0.13.1-0.20220117233154-f0fdc3b60b5c
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.0.11
@@ -103,4 +103,4 @@ require (
 	modernc.org/token v1.0.0 // indirect
 )
 
-require github.com/gorilla/securecookie v1.1.1 // indirect
+require github.com/gorilla/securecookie v1.1.1

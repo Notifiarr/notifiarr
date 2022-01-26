@@ -38,7 +38,7 @@ const tmpl = `###############################################
 extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
 
 # Setting a UI password enables the human accessible web GUI. Must be at least 16 characters.
-# The default username is admin; change it by setting this to "username:password"
+# The default username is admin; change it by setting ui_password to "username:password"
 ui_password = "{{.UIPassword}}"
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!

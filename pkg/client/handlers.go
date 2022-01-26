@@ -36,9 +36,6 @@ func (c *Client) httpHandlers() {
 			Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
 		c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
 		c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
-		c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandlerPost)).Methods("POST")
-		c.Config.Router.Handle(path.Join(base, "/status"), c.checkAuthorized(c.statusHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
 	}
@@ -118,6 +115,7 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varn
 // The logger uses this special value to save a redacted URI in the log file.
 func (c *Client) stripSecrets(next http.Handler) http.Handler {
 	secrets := []string{c.Config.Apps.APIKey}
+	secrets = append(secrets, c.Config.ExKeys...)
 	// gather configured/known secrets.
 	if c.Config.Plex != nil {
 		secrets = append(secrets, c.Config.Plex.Token)

@@ -1,21 +1,19 @@
-{{if .Msg}}    
-    <p><b>{{.Msg}}</b></p>
-{{end}}
-<div class="row">
-    <div class="col-md-10">
-        <div class="col-md-4">
-            <h1 class="text-center text-bold mt-4x">Login</h1>
-            <div class="well row pt-2x pb-3x bk-dark">
-                <div class="col-md-8 col-md-offset-2">
-                    <form method="post">
-                        <label for="" class="text-uppercase text-sm">Username</label>
-                        <input type="text" placeholder="username" name="name" class="form-control mb" required>
-                        <label for="" class="text-uppercase text-sm">Password</label>
-                        <input type="password" placeholder="Password" name="password" class="form-control mb" required>
-                        <button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                    {{if .Msg}}<p><b>{{.Msg}}</b></p>{{end}}
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="col-md-4">
+                                <h1 class="text-center text-bold mt-4x">Login</h1>
+                                <div class="well row pt-2x pb-3x bk-dark">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <form method="post">
+                                            <label for="" class="text-uppercase text-sm">Username</label>
+                                            <input type="text" placeholder="username" name="name" class="form-control mb" required>
+                                            <label for="" class="text-uppercase text-sm">Password</label>
+                                            <input type="password" placeholder="Password" name="password" class="form-control mb" required>
+                                            <button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
