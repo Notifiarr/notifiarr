@@ -273,7 +273,7 @@ func (c *Client) loginPage(response http.ResponseWriter, request *http.Request, 
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 
-	c.renderHTTPtemplate(response, request, "login.html", msg)
+	c.renderHTTPtemplate(response, request, "index.html", msg)
 }
 
 func (c *Client) statusHandler(response http.ResponseWriter, request *http.Request) {
