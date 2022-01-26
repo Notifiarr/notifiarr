@@ -1,9 +1,8 @@
-                  <h1>
-                     {{if eq .Version.os "windows"}}<i class="fab fa-windows"></i>&nbsp;&nbsp;
+                  <h1>{{if eq .Version.os "windows"}}<i class="fab fa-windows"></i>&nbsp;&nbsp;
                      {{else if eq .Version.os "linux"}}<i class="fab fa-linux"></i>&nbsp;&nbsp;
-                     {{else if eq .Version.os "mac"}}<i class="fab fa-apple"></i>&nbsp;&nbsp;
-                     {{else}}<i class="fas fa-microchip"></i>&nbsp;{{end}} System
-                  </h1>
+                     {{else if eq .Version.os "freebsd"}}<i class="fab fa-freebsd"></i>&nbsp;&nbsp;
+                     {{else if eq .Version.os "darwin"}}<i class="fab fa-apple"></i>&nbsp;&nbsp;
+                     {{else}}<i class="fas fa-microchip"></i>&nbsp;{{end}} System</h1>
                   <table class="table table-striped table-bordered">
                      <thead>
                          <tr><td colspan="3" align="center"><h4 class="mb-3">Client</h4></td></tr>
