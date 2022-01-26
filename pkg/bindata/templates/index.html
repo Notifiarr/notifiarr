@@ -1,12 +1,13 @@
 {{template "header.html" . -}}
-    {{ if not .Username }}
+    {{if not .Username}}
         {{template "login.html" . -}}
     {{else}}
-        <div class="navigation-item" id="template-config" style="display: none;">{{ template "config.html" . -}}</div>
-        <div class="navigation-item" id="template-status" style="display: none;">{{ template "status.html" . -}}</div>
-        <div class="navigation-item" id="template-starr" style="display: none;">{{ template "starr.html" . -}}</div>
-        <div class="navigation-item" id="template-downloadClients" style="display: none;">{{ template "downloadClients.html" . -}}</div>
-        <div class="navigation-item" id="template-media" style="display: none;">{{ template "media.html" . -}}</div>
-        <div class="navigation-item" id="template-misc" style="display: none;">{{ template "misc.html" . -}}</div>
+        <div class="navigation-item" id="template-landing">{{template "landing.html" . -}}</div>
+        <div class="navigation-item" id="template-config" style="display: none;">{{template "config.html" . -}}</div>
+        <div class="navigation-item" id="template-status" style="display: none;">{{template "status.html" . -}}</div>
+        <div class="navigation-item" id="template-starr" style="display: none;">{{template "starr.html" . -}}</div>
+        <div class="navigation-item" id="template-downloadClients" style="display: none;">{{template "downloadClients.html" . -}}</div>
+        <div class="navigation-item" id="template-media" style="display: none;">{{template "media.html" . -}}</div>
+        <div class="navigation-item" id="template-misc" style="display: none;">{{template "misc.html" . -}}</div>
     {{end}}
-{{template "footer.html" .}}
+{{template "footer.html"}}
