@@ -11,24 +11,24 @@
     </thead>
     <tbody>
         <tr>
-            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="API key from your Notifiarr.com account, required for security validation"></i> API Key</td>
+            <td><i class="help-icon far fa-question-circle" title="API key from your Notifiarr.com account, required for security validation"></i> API Key</td>
             <td>{{.Config.APIKey}}</td>
             <td><input type="text" id="Config-APIKey" value="{{.Config.APIKey}}"></td>
         </tr>
         <tr>
-            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="Default is usually fine unless you modify the port"></i> Bind Address</td>
+            <td><i class="help-icon far fa-question-circle" title="Default is usually fine unless you modify the port"></i> Bind Address</td>
             <td>{{.Config.BindAddr}}</td>
             <td><input type="text" id="" value="{{.Config.BindAddr}}"></td>
         </tr>
         {{if eq .Version.os "windows"}}
             <tr>
-                <td><i class="help-icon balloon-tooltip far fa-question-circle" title="This is how often the app will check for updates"></i> Auto Update</td>
+                <td><i class="help-icon far fa-question-circle" title="This is how often the app will check for updates"></i> Auto Update</td>
                 <td>{{.Config.AutoUpdate}}</td>
                 <td><input type="text" id="" value="{{.Config.AutoUpdate}}"></td>
             </tr>
         {{end}}
         <tr>
-            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="Only enable when asked, your Notifiarr account must have dev access for this to work"></i> Mode</td>
+            <td><i class="help-icon far fa-question-circle" title="Only enable when asked, your Notifiarr account must have dev access for this to work"></i> Mode</td>
             <td>{{.Config.Mode}}</td>
             <td>
                 <select id="">
@@ -43,7 +43,7 @@
             <td><input type="text" id="" value="{{.Config.URLBase}}"></td>
         </tr>
         <tr>
-            <td><i class="help-icon balloon-tooltip far fa-question-circle" title="One upstream entry per line"></i> Upstreams</td>
+            <td><i class="help-icon far fa-question-circle" title="One upstream entry per line"></i> Upstreams</td>
             <td>{{range $s := .Config.Upstreams}}{{$s}}<br>{{end}}</td>
             <td>
                 <textarea id="">
