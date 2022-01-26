@@ -1,3 +1,17 @@
 {{template "header.html" .}}
 <h1>Status Page</h1>
+
+<table border="1">
+  <tr><td>Application</td><td>{{.Version.program}}</td></tr>
+  <tr><td>Started</td><td>{{.Version.started}}</td></tr>
+  <tr><td>Uptime</td><td>{{.Version.uptime}}</td></tr>
+  <tr><td>Version</td><td>{{.Version.version}}-{{.Version.revision}}</td></tr>
+  <tr><td>Branch</td><td>{{.Version.branch}}</td></tr>
+  <tr><td>Build User</td><td>{{.Version.buildUser}}</td></tr>
+  <tr><td>Build Date</td><td>{{.Version.buildDate}}</td></tr>
+  <tr><td>Go version</td><td>{{.Version.goVersion}}</td></tr>
+  <tr><td>OS / Arch</td><td>{{.Version.os}} / {{.Version.arch}}</td></tr>
+</table>
+
+
 {{template "footer.html" .}}

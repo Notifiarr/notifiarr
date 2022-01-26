@@ -15,6 +15,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
@@ -27,8 +28,8 @@ type userNameValue string
 
 const userNameStr userNameValue = "username"
 
-// parseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
-func (c *Client) parseGUITemplates() (err error) {
+// ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
+func (c *Client) ParseGUITemplates() (err error) {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p> <p>(<a href="login">login</a>)</p>`
 	c.templat = template.Must(template.New("index.html").Parse(index))
@@ -46,8 +47,8 @@ func (c *Client) parseGUITemplates() (err error) {
 	}
 
 	// Parse custom templates if provided. These override compiled-in templates.
-	if c.Flags.TmplPath != "" {
-		c.templat, err = c.templat.ParseGlob(filepath.Join(c.Flags.TmplPath, "*.html"))
+	if c.Flags.Assets != "" {
+		c.templat, err = c.templat.ParseGlob(filepath.Join(c.Flags.Assets, "templates", "*.html"))
 		if err != nil {
 			return fmt.Errorf("parsing custom template: %w", err)
 		}
@@ -114,12 +115,12 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	case len(validPassword) < 16: // nolint:gomnd
 		c.loginPage(response, request, "Invalid Password Configured")
 	case c.getUserName(request) != "":
-		http.Redirect(response, request, path.Join(c.Config.URLBase, "config"), http.StatusFound)
+		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method == http.MethodGet:
 		c.loginPage(response, request, "")
 	case providedUsername == validUsername && validPassword == request.FormValue("password"):
 		c.setSession(providedUsername, response)
-		http.Redirect(response, request, path.Join(c.Config.URLBase, "config"), http.StatusFound)
+		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	default: // Start over.
 		c.loginPage(response, request, "Invalid Password")
 	}
@@ -158,7 +159,8 @@ func (c *Client) getSettingsHandler(response http.ResponseWriter, req *http.Requ
 		err = json.NewEncoder(response).Encode(map[string]string{config: c.getUserName(req)})
 	case "version":
 		err = json.NewEncoder(response).Encode(map[string]string{
-			"started":   version.Started.String(),
+			"started":   version.Started.Round(time.Second).String(),
+			"uptime":    time.Since(version.Started).Round(time.Second).String(),
 			"program":   c.Flags.Name(),
 			"version":   version.Version,
 			"revision":  version.Revision,
@@ -175,7 +177,8 @@ func (c *Client) getSettingsHandler(response http.ResponseWriter, req *http.Requ
 			Flags:    c.Flags,
 			Username: c.getUserName(req),
 			Version: map[string]string{
-				"started":   version.Started.String(),
+				"started":   version.Started.Round(time.Second).String(),
+				"uptime":    time.Since(version.Started).Round(time.Second).String(),
 				"program":   c.Flags.Name(),
 				"version":   version.Version,
 				"revision":  version.Revision,
@@ -236,7 +239,8 @@ func (c *Client) renderHTTPtemplate(w io.Writer, req *http.Request, tmpl string,
 		Data:     req.PostForm,
 		Msg:      msg,
 		Version: map[string]string{
-			"started":   version.Started.String(),
+			"started":   version.Started.Round(time.Second).String(),
+			"uptime":    time.Since(version.Started).Round(time.Second).String(),
 			"program":   c.Flags.Name(),
 			"version":   version.Version,
 			"revision":  version.Revision,
@@ -286,28 +290,20 @@ func (c *Client) configHandlerPost(response http.ResponseWriter, request *http.R
 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
 func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.Request) {
-	if c.Flags.StaticDir == "" {
+	if c.Flags.Assets == "" {
 		c.handleInternalAsset(response, request)
 		return
 	}
 
 	// get the absolute path to prevent directory traversal
-	path, err := filepath.Abs(request.URL.Path)
-	if err != nil {
+	f, err := filepath.Abs(filepath.Join(c.Flags.Assets, request.URL.Path))
+	if _, err2 := os.Stat(f); err != nil || err2 != nil { // Check if it exists.
 		c.handleInternalAsset(response, request)
 		return
 	}
 
-	// prepend the path with the path to the static directory
-	// check whether a file exists at the given path
-	_, err = os.Stat(filepath.Join(c.Flags.StaticDir, path))
-	if err != nil {
-		c.handleInternalAsset(response, request)
-		return
-	}
-
-	// file exists on disk, use http.FileServer to serve the static dir
-	http.FileServer(http.Dir(c.Flags.StaticDir)).ServeHTTP(response, request)
+	// file exists on disk, use http.FileServer to serve the static dir it's in.
+	http.FileServer(http.Dir(c.Flags.Assets)).ServeHTTP(response, request)
 }
 
 func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http.Request) {
@@ -317,7 +313,9 @@ func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http
 		return
 	}
 
-	response.Header().Set("content-type", mime.TypeByExtension(filepath.Ext(request.URL.Path)))
+	mime := mime.TypeByExtension(path.Ext(request.URL.Path))
+	response.Header().Set("content-type", mime)
+	c.Errorf("Serving %s with mime %s", request.URL.Path, mime)
 
 	if _, err = response.Write(data); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)

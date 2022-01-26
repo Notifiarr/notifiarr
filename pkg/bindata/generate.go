@@ -6,4 +6,4 @@
 // See: https://github.com/kevinburke/go-bindata or the README.md file.
 package bindata
 
-//go:generate go-bindata -pkg bindata -modtime 1587356420 -o bindata.go files/ templates/ js/ css/
+//go:generate go-bindata -pkg bindata -modtime 1587356420 -o bindata.go files/ templates/

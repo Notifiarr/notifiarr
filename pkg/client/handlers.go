@@ -18,33 +18,22 @@ import (
 
 // httpHandlers initializes GUI HTTP routes.
 func (c *Client) httpHandlers() {
-	c.httpAPIHandlers() // Init API handlers up front.
-	base := c.Config.URLBase
-	// These two are base with no baseurl.
-	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon)) // built-in icon.
-	c.Config.Router.Handle("/", http.HandlerFunc(c.slash))              // "hi" page on /
+	c.httpAPIHandlers()                                                                     // Init API handlers up front.
+	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))                     // built-in icon.
+	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.slash)).Methods("GET")      // "hi" page on /urlbase/
+	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.slashPost)).Methods("POST") // login POST.
 
+	base := c.Config.URLBase
 	if !strings.EqualFold(base, "/") {
 		// Handle the same URLs as above on the different base URL too.
 		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
 		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.slash)) // "hi" page on /urlbase
-		c.Config.Router.Handle(base, http.HandlerFunc(c.slash))                          // "hi" page on /urlbase/
-
-		if c.Config.UIPassword != "" {
-			// Handle static files under the new url base too.
-			for _, route := range []string{"/js/", "/css/", "/files/"} {
-				c.Config.Router.PathPrefix(path.Join(base, route)).
-					Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
-			}
-		}
-	} else if c.Config.UIPassword != "" {
-		// Or handle static files without a url base.
-		for _, route := range []string{"/js/", "/css/", "/files/"} {
-			c.Config.Router.PathPrefix(route).HandlerFunc(c.handleStaticAssets).Methods("GET")
-		}
+		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.slashPost)).Methods("POST")
 	}
 
 	if c.Config.UIPassword != "" {
+		c.Config.Router.PathPrefix(path.Join(base, "/files/")).
+			Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
 		c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
 		c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
 		c.Config.Router.Handle(path.Join(base, "/config"), c.checkAuthorized(c.configHandler)).Methods("GET")
@@ -54,7 +43,8 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
 	}
 
-	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound)) // 404 everything else
+	// 404 (or redirect to base path) everything else
+	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound))
 }
 
 // httpAPIHandlers initializes API routes.
@@ -73,6 +63,8 @@ func (c *Client) httpAPIHandlers() {
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.Handle("/plex",
 			http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
+		c.Config.Router.Handle("/",
+			http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
 
 		if c.Config.URLBase != "/" {
 			// Allow plex to use the base url too.
@@ -83,21 +75,32 @@ func (c *Client) httpAPIHandlers() {
 }
 
 // notFound is the handler for paths that are not found: 404s.
-func (c *Client) notFound(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
+func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
+	if !strings.HasPrefix(request.URL.Path, c.Config.URLBase) {
+		// If the request did not have the base url, redirect.
+		http.Redirect(response, request, path.Join(c.Config.URLBase, request.URL.Path), http.StatusPermanentRedirect)
+		return
+	}
 
-	if err := c.templat.ExecuteTemplate(w, "404.html", nil); err != nil {
+	response.WriteHeader(http.StatusNotFound)
+
+	if err := c.templat.ExecuteTemplate(response, "404.html", nil); err != nil {
 		c.Errorf("Sending HTTP Reply: %v", err)
 	}
 }
 
-// slash is the handler for /.
-func (c *Client) slash(w http.ResponseWriter, r *http.Request) {
-	if c.getUserName(r) != "" {
-		// Logged in user (has a cookie), send them to config page.
-		http.Redirect(w, r, path.Join(c.Config.URLBase, "config"), http.StatusFound)
-	} else if err := c.templat.ExecuteTemplate(w, "index.html", nil); err != nil {
-		c.Errorf("Sending HTTP Reply: %v", err)
+// slash is the GET handler for /.
+func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
+	c.renderHTTPtemplate(response, request, "index.html", "")
+}
+
+// slashPost is the POST handler for /.
+func (c *Client) slashPost(response http.ResponseWriter, request *http.Request) {
+	switch {
+	case request.FormValue("name") != "":
+		c.loginHandler(response, request)
+	default:
+		http.Error(response, "invalid POST request", http.StatusBadRequest)
 	}
 }
 

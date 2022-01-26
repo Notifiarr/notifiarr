@@ -101,7 +101,7 @@ func (c *Client) start() error {
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
 
-	if err := c.parseGUITemplates(); err != nil {
+	if err := c.ParseGUITemplates(); err != nil {
 		return err
 	}
 
@@ -338,7 +338,7 @@ func (c *Client) reloadConfiguration(source string) error {
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.setupMenus(c.configureServices(notifiarr.EventReload))
 
-	if err := c.parseGUITemplates(); err != nil {
+	if err := c.ParseGUITemplates(); err != nil {
 		return err
 	}
 

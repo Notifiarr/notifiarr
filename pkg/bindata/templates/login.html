@@ -1,7 +1,7 @@
 {{template "header.html" . -}}
 {{if .Msg}}    <p><b>{{.Msg}}</b></p>
 {{end}}    <h1>Login</h1>
-    <form method="post" action="login">
+    <form method="post" action="{{.Config.URLBase}}">
        <label for="name">Username</label>
        <input type="text" id="name" name="name">
        <label for="password">API Key</label>

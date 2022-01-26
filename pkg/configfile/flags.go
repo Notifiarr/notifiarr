@@ -24,8 +24,7 @@ type Flags struct {
 	ExtraConf     []string `json:"extraConf"`
 	EnvPrefix     string   `json:"envPrefix"`
 	Headers       []string `json:"headers"`
-	TmplPath      string   `json:"templatePath"`
-	StaticDir     string   `json:"staticDif"`
+	Assets        string   `json:"staticDif"`
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
@@ -40,8 +39,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
-	f.StringVarP(&f.TmplPath, "templates", "t", "", "Provide path to custom http templates.")
-	f.StringVarP(&f.StaticDir, "staticdir", "s", "", "Provide path to custom static files.")
+	f.StringVarP(&f.Assets, "assets", "a", "", "Provide path to custom web assets: static files and templates")
 
 	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.Restart, "restart", false, "This is used by auto-update, do not call it.")
