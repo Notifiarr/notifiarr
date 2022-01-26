@@ -1,0 +1,322 @@
+@import 'less/vars';
+@import 'less/components';
+
+/*
+ * Theme Struck - Harmony - Free responsive Bootstrap admin template by Themestruck.com (http://themestruck.com)
+ * Code licensed under the MIT
+ * For details, see #
+ */
+
+ul,
+li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Social Button Modifications */
+.btn{
+	text-transform: none;
+}
+.btn-social>:first-child {
+    width: 42px;
+    line-height: 46px;
+}
+.btn-social {
+    padding-left: 58px;
+}
+
+/* Circle buttons */
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.428571429;
+}
+.btn-circle.btn-lg {
+    width: 50px;
+    height: 50px;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-size: 18px;
+    line-height: 1.33;
+}
+.btn-circle.btn-xl {
+    width: 70px;
+    height: 70px;
+    padding: 10px 16px;
+    border-radius: 35px;
+    font-size: 24px;
+    line-height: 1.33;
+}
+
+/* Chart design */
+/* Charts */
+.chart-dot-list {
+  display: block;
+  margin-top: 60px;
+  margin-left: 20px;
+}
+.chart-dot-list li {
+  margin-bottom: 4px;
+}
+.chart-dot-list li:before {
+  content: '';
+  height: 12px;
+  width: 12px;
+  margin-right: 6px;
+  display: inline-block;
+  background: #222;
+  border-radius: 50%;
+}
+.chart-dot-list li.a1:before {
+  background: #F7464A;
+}
+.chart-dot-list li.a2:before {
+  background: #46BFBD;
+}
+.chart-dot-list li.a3:before {
+  background: #FDB45C;
+}
+.chart-doughnut {
+  padding: 41px 0;
+}
+
+/* component */
+
+.page-title{
+	padding-bottom: 15px;
+	margin-bottom: 20px;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.brand{
+//	padding: 10px;
+	background: #3e454c;
+	.logo{
+		box-sizing: border-box;
+		padding: 20px;
+		float: left;
+		display: block;
+		width: 200px;
+		@media @desktop{
+			width: 250px;
+		}
+		img{
+			height: 20px;
+		}
+	}
+	.menu-btn {
+		float: right;
+		background: #232d3b;
+		text-align: center;
+		cursor: pointer;
+		color: #fff;
+		padding: 20px 20px;
+		@media @desktop{
+			display: none;
+		}
+	}
+	.ts-profile-nav{
+		float: right;
+		li{
+			float: left;
+			a{
+				display: block;
+				padding: 20px;
+				color: #fff;
+			}
+			position: relative;
+			ul{
+				visibility: hidden;
+				opacity: 0;
+				right: 0;
+				position: absolute;
+				li{
+					float: none;
+					width: 180px;
+					a{
+						padding: 10px 20px;
+						background: #222;
+					}
+				}
+			}
+		}
+		.ts-account{
+			.fa-angle-down{
+				float: right;
+			}
+			&>a{
+				width: 180px;
+				background: #2c3136;
+			}
+			.ts-avatar{
+				border-radius: 50%;
+				height: 28px;				
+				margin: -10px 0;
+				margin-right: 10px;
+			}
+			&:hover{
+				ul{
+					visibility: visible;
+					opacity: 1;
+				}
+			}
+		}
+		display: none;
+		@media @desktop{
+			display: block;
+		}
+	}
+	
+	position: relative;
+	z-index: 3;
+	position: fixed;
+	width: 100%;
+	top: 0;
+}
+
+.ts-sidebar::-webkit-scrollbar-track
+{
+	background-color: transparent;
+}
+
+.ts-sidebar::-webkit-scrollbar
+{
+	width: 5px;
+	background-color: transparent;
+}
+
+.ts-sidebar::-webkit-scrollbar-thumb
+{
+	background-color: #b4b4b4;
+}
+
+.ts-sidebar{
+	background: #2c3136;
+	.hidden-side{
+		display: none;
+	}
+	.ts-sidebar-search{
+		width: 100%;
+		background: #25292a;
+		border: none;
+		padding: 10px 15px;
+		color: #fff;
+	}
+	.ts-profile-nav{
+		@media @desktop{
+			display: none;
+		}
+	}
+	max-height: 0;
+	transition: max-height 0.3s;
+	overflow: hidden;
+	
+	
+	position: fixed;
+	z-index: 2;
+	width: 100%;
+	bottom: 0;
+	top: 60px;
+	overflow-y: auto;
+	
+	@media @desktop{
+//		height: 100vh;
+		max-height: 100%;
+//		position: relative;
+//		top: 0;
+		bottom: 0;
+//		top: 0; 
+	}
+	
+}
+
+.ts-sidebar-menu {
+	.ts-label{
+		color: #585c64;
+		font-weight: bold;
+		padding: 8px 15px;
+		text-transform: uppercase;
+		font-size: 10px;
+		letter-spacing: 3px;
+		margin-top: 10px;
+	}
+	a {
+		display: block;
+		text-decoration: none;
+		padding: 12px 15px;
+		color: #fff;
+	}
+	li {
+		position: relative;
+		i{
+			color: #585c64;
+			margin-right: 10px;
+		}
+		ul {
+			display: block;
+			background: rgba(255, 0, 0, 0.12);
+			background: rgba(0, 0, 0, 0.32);
+			max-height: 0;
+			overflow: hidden;
+			transition: all 0.3s ease;
+		}
+	}
+}
+
+.menu-open,
+.ts-sidebar-menu .open > ul {
+	max-height: 2000px;
+}
+.ts-sidebar-menu .open{
+	&>a{
+		background: rgba(51, 56, 62, 0.35);
+	}
+}
+.ts-sidebar-menu > .open{
+	&>a{
+		background: #33383e;
+		border-left: 3px solid @color1;	
+	}
+}
+
+.ts-sidebar-menu .open > .more i {
+	transform: rotate(180deg);
+}
+.more i {
+	color: #fff;
+	padding: 15px;
+	transition: transform 0.3s;
+}
+.more {
+	float: right;
+	min-width: 10%;
+	cursor: pointer;
+}
+
+.ts-main-content{
+	.content-wrapper{
+		padding-top: 15px;
+		margin-top: 60px;
+	}
+	@media @desktop{
+		.ts-sidebar{
+			width: 250px;
+			float: left;
+		}
+		.content-wrapper{
+			margin-left: 250px;
+		}
+	}
+}
+
+/* Login page */
+.login-page{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+}
