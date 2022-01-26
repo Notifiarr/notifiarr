@@ -1,0 +1,83 @@
+body {
+    font-size: 1em;
+    background: #1e2225 !important;
+    color: #ffffff !important;
+}
+
+button {
+    color: #ffffff;
+    background: #585c64;
+}
+
+select,
+input,
+textarea {
+    color: #000000;
+    background: #cccccc;
+}
+
+table,
+label,
+div,
+.ui-accordion-icons,
+.page-title {
+    color: #ffffff !important;
+}
+
+.ts-sidebar-menu a {
+    color: #efeaea;
+}
+
+.ts-sidebar {
+    background: #2c3136 !important;
+    color: #ffffff !important;
+}
+
+.panel {
+    overflow: hidden;
+    background: #1e2225;
+    color: #ffffff;
+}
+
+.brand,
+.brand .ts-profile-nav li ul li a,
+.brand .ts-profile-nav .ts-account > a,
+.ui-accordion-header,
+.ui-tabs-panel,
+.panel-heading,
+.ui-dialog-titlebar {
+    background: #3e454c !important;
+    color: #ffffff !important;
+}
+
+.link,
+.ui-dialog-title a,
+td a,
+a sup {
+    color: #37a6c4 !important;
+}
+
+.ui-dialog-content,
+.ui-accordion-content {
+    background: #1e2225 !important;
+    color: #ffffff !important;
+}
+
+.ui-state-active {
+    border: #c5c5c5 !important;
+}
+
+.ui-tabs-nav,
+.table-striped > tbody > tr:nth-child(2n+1) > td {
+    background: #222222 !important;
+}
+
+.table-striped > tbody > tr:hover:nth-child(2n+1) > td,
+.table-striped > tbody > tr:hover:nth-child(2n) > td {
+    background: #3e454c !important;
+}
+
+.pagination > li > a, .pagination > li > span {
+    background: #585c64 !important;
+    color: #ffffff !important;
+}
