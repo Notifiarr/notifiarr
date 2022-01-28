@@ -17,4 +17,9 @@
                       {{else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>&nbsp;
                       {{else}}<i class="nav-icon fas fa-microchip"></i>&nbsp;{{end}}<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>{{ end }}
               </ul>
+              <div id="pending-change-container" style="display: none;">
+                  <hr>
+                  Pending Changes: <span id="pending-change-counter">0</span><br>
+                  <div style="margin-left: 1em;" id="pending-change-list"></div>
+              </div>
           </nav>

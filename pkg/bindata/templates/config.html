@@ -12,12 +12,12 @@
                             <tr>
                                 <td><i class="help-icon far fa-question-circle" title="API key from your Notifiarr.com account, required for security validation"></i> API Key</td>
                                 <td>{{.Config.APIKey}}</td>
-                                <td><input type="text" id="Config-APIKey" value="{{.Config.APIKey}}"></td>
+                                <td><input class="client-parameter" data-group="config" data-label="API Key" data-original="{{.Config.APIKey}}" type="text" id="APIKey" value="{{.Config.APIKey}}"></td>
                             </tr>
                             <tr>
                                 <td><i class="help-icon far fa-question-circle" title="Default is usually fine unless you modify the port"></i> Bind Address</td>
                                 <td>{{.Config.BindAddr}}</td>
-                                <td><input type="text" id="" value="{{.Config.BindAddr}}"></td>
+                                <td><input class="client-parameter" data-group="config" data-label="Bind Address" data-original="{{.Config.BindAddr}}" type="text" id="BindAddr" value="{{.Config.BindAddr}}"></td>
                             </tr>
                             {{if eq .Version.os "windows"}}
                                 <tr>

@@ -46,6 +46,9 @@
             $(function() {
                 jsLoader();
                 setTooltips();
+                $(document).on('change', '.client-parameter', function(){
+                    findPendingChanges()
+                });
             });
         </script>
     </head>

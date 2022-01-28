@@ -83,3 +83,37 @@ function setTooltips() {
 
 }
 // ---------------------------------------------------------------------------------------------
+
+function findPendingChanges() {
+    $('#pending-change-container').hide();
+    $('#pending-change-list').html('');
+    $('#pending-change-counter').html('0');
+
+    let group;
+    let label;
+    let original;
+    let current;
+    let id;
+    let changes = '';
+    let counter = 0;
+
+    $.each($('.client-parameter'), function() {
+        id          = $(this).attr('id');
+        label       = $(this).attr('data-label');
+        group       = $(this).attr('data-group');
+        original    = $(this).attr('data-original');
+        current     = $(this).val();
+
+        if (original != current) {
+            counter++;
+            changes += group.charAt(0).toUpperCase() + group.slice(1) +': '+ label +'<br>';
+        }
+    });
+
+    if (changes) {
+        $('#pending-change-list').html(changes);
+        $('#pending-change-counter').html(counter);
+        $('#pending-change-container').show();
+    }
+}
+// ---------------------------------------------------------------------------------------------
