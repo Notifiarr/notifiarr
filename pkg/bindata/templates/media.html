@@ -12,9 +12,9 @@
                           <tbody>
                               {{if .Config.Plex}}<tr>
                                   <td>1</td>
-                                  <td><input type="text" value="{{.Config.Plex.URL}}" style="width: 100%;"></td>
-                                  <td><input type="text" value="{{.Config.Plex.Token}}" style="width: 100%;"></td>
-                                  <td><input type="text" value="{{.Config.Plex.Cooldown}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="PlexURL" class="client-parameter" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="PlexToken" class="client-parameter" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="PlexCooldown" class="client-parameter" data-group="media" data-label="Plex Cooldown" data-original="{{.Config.Plex.Cooldown}}" value="{{.Config.Plex.Cooldown}}" style="width: 100%;"></td>
                               </tr>{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
                           </tbody>
                           <thead>
@@ -29,9 +29,9 @@
                           <tbody>
                               {{if .Config.Apps.Tautulli}}<tr>
                                   <td>1</td>
-                                  <td><input type="text" value="{{.Config.Apps.Tautulli.Name}}" style="width: 100%;"></td>
-                                  <td><input type="text" value="{{.Config.Apps.Tautulli.URL}}" style="width: 100%;"></td>
-                                  <td><input type="text" value="{{.Config.Apps.Tautulli.APIKey}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="TautulliName" class="client-parameter" data-group="media" data-label="Tautulli Name" data-original="{{.Config.Apps.Tautulli.Name}}" value="{{.Config.Apps.Tautulli.Name}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="TautulliURL" class="client-parameter" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="TautulliAPIKey" class="client-parameter" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}" style="width: 100%;"></td>
                               </tr>{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
                           </tbody>
                       </table>

@@ -12,9 +12,9 @@
                               <tbody>
                                   {{if .Config.Apps.Lidarr}}{{range $index, $app := .Config.Apps.Lidarr}}<tr>
                                       <td>{{instance $index}}</td>
-                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Lidarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Lidarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Lidarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
                                   </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
                               </tbody>
                               <thead>
@@ -23,9 +23,9 @@
                               <tbody>
                                   {{if .Config.Apps.Prowlarr}}{{range $index, $app := .Config.Apps.Prowlarr}}<tr>
                                       <td>{{instance $index}}</td>
-                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Prowlarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Prowlarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Prowlarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
                                   </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
                               </tbody>
                               <thead>
@@ -34,9 +34,9 @@
                               <tbody>
                                   {{if .Config.Apps.Radarr}}{{range $index, $app := .Config.Apps.Radarr}}<tr>
                                       <td>{{instance $index}}</td>
-                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Radarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Radarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Radarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
                                   </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
                               </tbody>
                               <thead>
@@ -45,9 +45,9 @@
                               <tbody>
                                   {{if .Config.Apps.Readarr}}{{range $index, $app := .Config.Apps.Readarr}}<tr>
                                       <td>{{instance $index}}</td>
-                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Readarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Readarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Readarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
                                   </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
                               </tbody>
                               <thead>
@@ -56,9 +56,9 @@
                               <tbody>
                                   {{if .Config.Apps.Sonarr}}{{range $index, $app := .Config.Apps.Sonarr}}<tr>
                                       <td>{{instance $index}}</td>
-                                      <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.URL}}" style="width: 100%;"></td>
-                                      <td><input type="text" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Sonarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Sonarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                      <td><input type="text" id="Sonarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
                                   </tr>{{end}}{{else}}<tr><td colspan="4">No instances configured</td></tr>{{end}}
                               </tbody>
                           </table>
