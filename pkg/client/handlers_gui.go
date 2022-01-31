@@ -19,7 +19,9 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"github.com/mitchellh/go-homedir"
 	"golift.io/version"
 )
 
@@ -278,6 +280,14 @@ func (c *Client) loginPage(response http.ResponseWriter, request *http.Request, 
 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
 func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.Request) {
+	if request.URL.Path == "/files/css/custom.css" {
+		if cssFileDir := filepath.Dir(c.haveCustomFile("custom.css")); cssFileDir != "" && cssFileDir != "/" {
+			// custom css file exists on disk, use http.FileServer to serve the dir it's in.
+			http.StripPrefix("/files/css", http.FileServer(http.Dir(cssFileDir))).ServeHTTP(response, request)
+			return
+		}
+	}
+
 	if c.Flags.Assets == "" {
 		c.handleInternalAsset(response, request)
 		return
@@ -307,4 +317,55 @@ func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http
 	if _, err = response.Write(data); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)
 	}
+}
+
+// haveCustomFile searches known locatinos for a file. Returns the file's path.
+func (c *Client) haveCustomFile(fileName string) string {
+	cwd, _ := os.Getwd()
+	exe, _ := os.Executable()
+
+	paths := map[string][]string{
+		mnd.Windows: {
+			`~/notifiarr`,
+			cwd,
+			filepath.Dir(exe),
+			`C:\ProgramData\notifiarr`,
+		},
+		"darwin": {
+			"~/.notifiarr",
+			"/usr/local/etc/notifiarr",
+		},
+		"default": {
+			`~/notifiarr`,
+			"/config",
+			"/etc/notifiarr",
+		},
+	}
+
+	findIn := paths[runtime.GOOS]
+	if len(findIn) == 0 {
+		findIn = paths["default"]
+	}
+
+	for _, find := range findIn {
+		if find == "" {
+			continue
+		}
+
+		custom, err := homedir.Expand(filepath.Join(find, fileName))
+		if err != nil {
+			custom = filepath.Join(find, fileName)
+		}
+
+		custom2, err := filepath.Abs(custom)
+		if err == nil {
+			custom = custom2
+		}
+
+		if _, err = os.Stat(custom); err == nil {
+			return custom
+		}
+	}
+
+	return ""
 }
