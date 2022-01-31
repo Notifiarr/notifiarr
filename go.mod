@@ -8,7 +8,7 @@ require (
 	golift.io/deluge v0.9.4-0.20220103091211-1842b313e264
 	golift.io/qbit v0.0.0-20211121074815-1558e8969b98
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.13.1-0.20220117233154-f0fdc3b60b5c
+	golift.io/starr v0.13.1-0.20220131084043-040595401905
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.0.11
 )

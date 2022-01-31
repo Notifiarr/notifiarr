@@ -678,6 +678,8 @@ golift.io/starr v0.13.1-0.20220117212508-f1d3ae11b103 h1:Nr5oYDKYTIcUcAi019ujfWV
 golift.io/starr v0.13.1-0.20220117212508-f1d3ae11b103/go.mod h1:IZIzdT5/NBdhM08xAEO5R1INgGN+Nyp4vCwvgHrbKVs=
 golift.io/starr v0.13.1-0.20220117233154-f0fdc3b60b5c h1:7qtem+mFuWd/m3ZS2NuzFwBfqvmij9ecjFYZ+SwGGU0=
 golift.io/starr v0.13.1-0.20220117233154-f0fdc3b60b5c/go.mod h1:IZIzdT5/NBdhM08xAEO5R1INgGN+Nyp4vCwvgHrbKVs=
+golift.io/starr v0.13.1-0.20220131084043-040595401905 h1:5INcjhDnKWphEYbtcljmrOHzMQSnXnqd2ca4G/fbyv8=
+golift.io/starr v0.13.1-0.20220131084043-040595401905/go.mod h1:IZIzdT5/NBdhM08xAEO5R1INgGN+Nyp4vCwvgHrbKVs=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 golift.io/xtractr v0.0.11 h1:6SVjqX7aCT7Zl4y1rVunBnzwAqK56m90IMywbgeh3r8=
