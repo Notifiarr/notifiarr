@@ -13,7 +13,7 @@
                           <tbody>
                               {{if .Config.Snapshot.MySQL}}{{range $index, $app := .Config.Snapshot.MySQL}}<tr>
                                   <td>{{instance $index}}</td>
-                                  <td><input type="text" value="{{$app.Name}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="MySQL{{instance $index}}Name" value="{{$app.Name}}" style="width: 100%;"></td>
                                   <td><input type="text" value="" style="width: 100%;"></td>
                                   <td><input type="text" value="" style="width: 100%;"></td>
                                   <td><input type="text" value="" style="width: 100%;"></td>

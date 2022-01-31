@@ -281,9 +281,9 @@ func (c *Client) loginPage(response http.ResponseWriter, request *http.Request, 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
 func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.Request) {
 	if request.URL.Path == "/files/css/custom.css" {
-		if cssFileDir := filepath.Dir(c.haveCustomFile("custom.css")); cssFileDir != "" && cssFileDir != "/" {
+		if cssFileDir := c.haveCustomFile("custom.css"); cssFileDir != "" {
 			// custom css file exists on disk, use http.FileServer to serve the dir it's in.
-			http.StripPrefix("/files/css", http.FileServer(http.Dir(cssFileDir))).ServeHTTP(response, request)
+			http.StripPrefix("/files/css", http.FileServer(http.Dir(filepath.Dir(cssFileDir)))).ServeHTTP(response, request)
 			return
 		}
 	}
