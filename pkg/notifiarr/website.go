@@ -3,6 +3,7 @@ package notifiarr
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -170,7 +171,10 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
 	}
 
-	code, body, err := c.sendJSON(c.BaseURL+uri, post, log)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
+	defer cancel()
+
+	code, body, err := c.sendJSON(ctx, c.BaseURL+uri, post, log)
 	if err != nil {
 		return nil, err
 	}
@@ -201,10 +205,7 @@ func unmarshalResponse(url string, code int, body []byte) (*Response, error) {
 }
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
-func (c *Config) sendJSON(url string, data []byte, log bool) (int, []byte, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
-	defer cancel()
-
+func (c *Config) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, []byte, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return 0, nil, fmt.Errorf("creating http request: %w", err)
@@ -310,4 +311,114 @@ func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, 
 		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
 			url, time.Since(start).Round(time.Microsecond), data, status, headers, body)
 	}
+}
+
+// SetValue sets a value stored in the website database.
+func (c *Config) SetValue(values map[string][]byte) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
+	defer cancel()
+
+	return c.SetValueContext(ctx, values)
+}
+
+// SetValueContext sets a value stored in the website database.
+func (c *Config) SetValueContext(ctx context.Context, values map[string][]byte) error {
+	for key, val := range values {
+		if val != nil { // ignore nil byte slices.
+			values[key] = []byte(base64.StdEncoding.EncodeToString(val))
+		}
+	}
+
+	data, err := json.Marshal(map[string]interface{}{"fields": values})
+	if err != nil {
+		return fmt.Errorf("converting values to json: %w", err)
+	}
+
+	code, body, err := c.sendJSON(ctx, c.BaseURL+ClientRoute.Path("setStates"), data, true)
+	if err != nil {
+		return fmt.Errorf("inalid response (%d): %w", code, err)
+	}
+
+	_, err = unmarshalResponse(c.BaseURL+ClientRoute.Path("getStates"), code, body)
+
+	return err
+}
+
+// DelValue deletes a value stored in the website database.
+func (c *Config) DelValue(keys ...string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
+	defer cancel()
+
+	return c.DelValueContext(ctx, keys...)
+}
+
+// DelValueContext deletes a value stored in the website database.
+func (c *Config) DelValueContext(ctx context.Context, keys ...string) error {
+	values := make(map[string]interface{})
+	for _, key := range keys {
+		values[key] = nil
+	}
+
+	data, err := json.Marshal(map[string]interface{}{"fields": values})
+	if err != nil {
+		return fmt.Errorf("converting values to json: %w", err)
+	}
+
+	code, body, err := c.sendJSON(ctx, c.BaseURL+ClientRoute.Path("setStates"), data, true)
+	if err != nil {
+		return fmt.Errorf("inalid response (%d): %w", code, err)
+	}
+
+	_, err = unmarshalResponse(c.BaseURL+ClientRoute.Path("setStates"), code, body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetValue gets a value stored in the website database.
+func (c *Config) GetValue(keys ...string) (map[string][]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
+	defer cancel()
+
+	return c.GetValueContext(ctx, keys...)
+}
+
+// GetValueContext gets a value stored in the website database.
+func (c *Config) GetValueContext(ctx context.Context, keys ...string) (map[string][]byte, error) {
+	data, err := json.Marshal(map[string][]string{"fields": keys})
+	if err != nil {
+		return nil, fmt.Errorf("converting keys to json: %w", err)
+	}
+
+	code, body, err := c.sendJSON(ctx, c.BaseURL+ClientRoute.Path("getStates"), data, true)
+	if err != nil {
+		return nil, fmt.Errorf("inalid response (%d): %w", code, err)
+	}
+
+	resp, err := unmarshalResponse(c.BaseURL+ClientRoute.Path("getStates"), code, body)
+	if err != nil {
+		return nil, err
+	}
+
+	var output struct {
+		LastUpdated time.Time         `json:"lastUpdated"`
+		Fields      map[string][]byte `json:"fields"`
+	}
+
+	if err := json.Unmarshal(resp.Details.Response, &output); err != nil {
+		return nil, fmt.Errorf("converting response values to json: %w", err)
+	}
+
+	for key, val := range output.Fields {
+		b, err := base64.StdEncoding.DecodeString(string(val))
+		if err != nil {
+			return nil, fmt.Errorf("invalid base64 encoded data: %w", err)
+		}
+
+		output.Fields[key] = b
+	}
+
+	return output.Fields, nil
 }
