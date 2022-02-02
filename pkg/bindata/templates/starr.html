@@ -1,64 +1,108 @@
                           <h1><i class="fas fa-star"></i> Starr Apps</h1>
                           <table class="table table-striped table-bordered">
                               <thead>
+                                  <tr><td colspan="4" align="center">
+                                      <div style="float: left;"><img src="{{files}}/images/logo/lidarr.png" style="height:50px;"></div>
+                                      <h2 class="mb-3" style="display: inline;">Lidarr</h2>
+                                      <div style="float: right;"><button type="button" id="AddLidarr" title="Add another instance of Lidarr" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                  </td></tr>
                                   <tr>
                                       <td>Instance</td>
                                       <td>Name</td>
                                       <td>URL</td>
                                       <td>API Key</td>
                                   </tr>
-                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/lidarr.png" style="height:50px;"></div><h2 class="mb-3" style="margin-right: 2em;">Lidarr</h2></td></tr>
                               </thead>
                               <tbody>
                                   {{if .Config.Apps.Lidarr}}{{range $index, $app := .Config.Apps.Lidarr}}<tr>
-                                      <td>{{instance $index}}</td>
+                                      <td>{{instance $index}} <div style="float: right;"><button type="button" id="Lidarr{{instance $index}}Delete" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
                                       <td><input type="text" id="Lidarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Lidarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Lidarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Lidarr instances confiugred.</td></tr>{{end}}
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Lidarr instances configured.</td></tr>{{end}}
                               </tbody>
                               <thead>
-                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/prowlarr.png" style="height:50px;"></div><h2 class="mb-3" style="margin-right: 2em;">Prowlarr</h2></td></tr>
+                                  <tr><td colspan="4" align="center">
+                                      <div style="float: left;"><img src="{{files}}/images/logo/prowlarr.png" style="height:50px;"></div>
+                                      <h2 class="mb-3" style="display: inline;">Prowlarr</h2>
+                                      <div style="float: right;"><button type="button" id="AddProwlarr" title="Add another instance of Prowlarr" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                  </td></tr>
+                                  <tr>
+                                      <td>Instance</td>
+                                      <td>Name</td>
+                                      <td>URL</td>
+                                      <td>API Key</td>
+                                  </tr>
                               </thead>
                               <tbody>
                                   {{if .Config.Apps.Prowlarr}}{{range $index, $app := .Config.Apps.Prowlarr}}<tr>
-                                      <td>{{instance $index}}</td>
+                                      <td>{{instance $index}} <div style="float: right;"><button type="button" id="Prowlarr{{instance $index}}Delete" title="Delete this instance of Prowlarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
                                       <td><input type="text" id="Prowlarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Prowlarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Prowlarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Prowlarr instances confiugred.</td></tr>{{end}}
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Prowlarr instances configured.</td></tr>{{end}}
                               </tbody>
                               <thead>
-                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/radarr.png" style="height:50px;"></div><h2 class="mb-3" style="margin-right: 2em;">Radarr</h2></td></tr>
+                                  <tr><td colspan="4" align="center">
+                                      <div style="float: left;"><img src="{{files}}/images/logo/radarr.png" style="height:50px;"></div>
+                                      <h2 class="mb-3" style="display: inline;">Radarr</h2>
+                                      <div style="float: right;"><button type="button" id="AddRadarr" title="Add another instance of Radarr" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                  </td></tr>
+                                  <tr>
+                                      <td>Instance</td>
+                                      <td>Name</td>
+                                      <td>URL</td>
+                                      <td>API Key</td>
+                                  </tr>
                               </thead>
                               <tbody>
                                   {{if .Config.Apps.Radarr}}{{range $index, $app := .Config.Apps.Radarr}}<tr>
-                                      <td>{{instance $index}}</td>
+                                      <td>{{instance $index}} <div style="float: right;"><button type="button" id="Radarr{{instance $index}}Delete" title="Delete this instance of Radarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
                                       <td><input type="text" id="Radarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Radarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Radarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Radarr instances confiugred.</td></tr>{{end}}
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Radarr instances configured.</td></tr>{{end}}
                               </tbody>
                               <thead>
-                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/readarr.png" style="height:50px;"></div><h2 class="mb-3" style="margin-right: 2em;">Readarr</h2></td></tr>
+                                  <tr><td colspan="4" align="center"><div style="float: left;">
+                                      <img src="{{files}}/images/logo/readarr.png" style="height:50px;"></div>
+                                      <h2 class="mb-3" style="display: inline;">Readarr</h2>
+                                      <div style="float: right;"><button type="button" id="AddReadarr" title="Add another instance of Readarr" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                  </td></tr>
+                                  <tr>
+                                      <td>Instance</td>
+                                      <td>Name</td>
+                                      <td>URL</td>
+                                      <td>API Key</td>
+                                  </tr>
                               </thead>
                               <tbody>
                                   {{if .Config.Apps.Readarr}}{{range $index, $app := .Config.Apps.Readarr}}<tr>
-                                      <td>{{instance $index}}</td>
+                                      <td>{{instance $index}} <div style="float: right;"><button type="button" id="Readarr{{instance $index}}Delete" title="Delete this instance of Readarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
                                       <td><input type="text" id="Readarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Readarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Readarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Readarr instances confiugred.</td></tr>{{end}}
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Readarr instances configured.</td></tr>{{end}}
                               </tbody>
                               <thead>
-                                  <tr><td colspan="4" align="center"><div style="float: left;"><img src="files/images/logo/sonarr.png" style="height:50px;"></div><h2 class="mb-3" style="margin-right: 2em;">Sonarr</h2></td></tr>
+                                  <tr><td colspan="4" align="center">
+                                      <div style="float: left;"><img src="{{files}}/images/logo/sonarr.png" style="height:50px;"></div>
+                                      <h2 class="mb-3" style="display: inline;">Sonarr</h2>
+                                      <div style="float: right;"><button type="button" id="AddSonarr" title="Add another instance of Sonarr" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                  </td></tr>
+                                  <tr>
+                                      <td>Instance</td>
+                                      <td>Name</td>
+                                      <td>URL</td>
+                                      <td>API Key</td>
+                                  </tr>
                               </thead>
                               <tbody>
                                   {{if .Config.Apps.Sonarr}}{{range $index, $app := .Config.Apps.Sonarr}}<tr>
-                                      <td>{{instance $index}}</td>
+                                      <td>{{instance $index}} <div style="float: right;"><button type="button" id="Sonarr{{instance $index}}Delete" title="Delete this instance of Sonarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
                                       <td><input type="text" id="Sonarr{{instance $index}}Name" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Sonarr{{instance $index}}URL" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                       <td><input type="text" id="Sonarr{{instance $index}}APIKey" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Sonarr instances confiugred.</td></tr>{{end}}
+                                  </tr>{{end}}{{else}}<tr><td colspan="4">No Sonarr instances configured.</td></tr>{{end}}
                               </tbody>
                           </table>

@@ -37,7 +37,8 @@ func (c *Client) ParseGUITemplates() (err error) {
 	c.templat = template.Must(template.New("index.html").Parse(index))
 	c.templat = template.Must(c.templat.New("404.html").Parse("NOT FOUND! Check your request parameters and try again."))
 	c.templat = c.templat.Funcs(template.FuncMap{
-		"base":     func() string { return c.Config.URLBase },
+		"base":     func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
+		"files":    func() string { return path.Join(c.Config.URLBase, "files") },
 		"instance": func(idx int) int { return idx + 1 },
 	})
 

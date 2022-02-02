@@ -12,18 +12,21 @@
                             <tr>
                                 <td><i class="help-icon far fa-question-circle" title="API key from your Notifiarr.com account, required for security validation"></i> API Key</td>
                                 <td>{{.Config.APIKey}}</td>
-                                <td><input class="client-parameter" data-group="config" data-label="API Key" type="text" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}"></td>
+                                <td><input class="client-parameter" data-group="config" data-label="API Key" type="text" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td><i class="help-icon far fa-question-circle" title="Default is usually fine unless you modify the port"></i> Bind Address</td>
                                 <td>{{.Config.BindAddr}}</td>
-                                <td><input class="client-parameter" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}"></td>
+                                <td><input class="client-parameter" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}" style="width: 100%;"></td>
                             </tr>
                             {{if eq .Version.os "windows"}}
                                 <tr>
                                     <td><i class="help-icon far fa-question-circle" title="This is how often the app will check for updates"></i> Auto Update</td>
                                     <td>{{.Config.AutoUpdate}}</td>
-                                    <td><input type="text" id="AutoUpdate" class="client-parameter" data-group="config" data-label="Auto Update" data-original="{{.Config.AutoUpdate}}" value="{{.Config.AutoUpdate}}"></td>
+                                    <select class="client-parameter" data-group="config" data-label="Auto Update" id="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
+                                        <option {{if .Config.AutoUpdate}}selected {{end}}value="true">Enabled</option>
+                                        <option {{if not .Config.AutoUpdate}}selected {{end}}value="false">Disabled</option>
+                                    </select>
                                 </tr>
                             {{end}}
                             <tr>
@@ -39,19 +42,19 @@
                             <tr>
                                 <td>URL Base</td>
                                 <td>{{.Config.URLBase}}</td>
-                                <td><input type="text" id="URLBase" class="client-parameter" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}"></td>
+                                <td><input type="text" id="URLBase" class="client-parameter" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td><i class="help-icon far fa-question-circle" title="Separate with spaces or new lines."></i> Upstreams</td>
                                 <td>{{range $s := .Config.Upstreams}}{{$s}}<br>{{end}}</td>
                                 <td>
-                                    <textarea id="Upstreams" class="client-parameter" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
+                                    <textarea id="Upstreams" class="client-parameter" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}" style="width: 100%;">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
                                 </td>
                             </tr>
                             <tr>
                                 <td>Timeout</td>
                                 <td>{{.Config.Timeout}}</td>
-                                <td><input type="text" id="Timeout" class="client-parameter" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}"></td>
+                                <td><input type="text" id="Timeout" class="client-parameter" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}" style="width: 100%;"></td>
                             </tr>
                         </tbody>
                         <thead>
@@ -61,12 +64,12 @@
                             <tr>
                                 <td>Key File</td>
                                 <td>{{.Config.SSLKeyFile}}</td>
-                                <td><input type="text" id="SSLKeyFile" class="client-parameter" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}"></td>
+                                <td><input type="text" id="SSLKeyFile" class="client-parameter" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Cert File</td>
                                 <td>{{.Config.SSLCrtFile}}</td>
-                                <td><input type="text" id="SSL Cert File" class="client-parameter" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}"></td>
+                                <td><input type="text" id="SSL Cert File" class="client-parameter" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}" style="width: 100%;"></td>
                             </tr>
                         </tbody>
                         <thead>
@@ -96,42 +99,42 @@
                             <tr>
                                 <td>App Logfile</td>
                                 <td>{{.Config.LogFile}}</td>
-                                <td><input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}"></td>
+                                <td><input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>HTTP Logfile</td>
                                 <td>{{.Config.HTTPLog}}</td>
-                                <td><input type="text" id="HTTPLog" class="client-parameter" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}"></td>
+                                <td><input type="text" id="HTTPLog" class="client-parameter" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Services Logfile</td>
                                 <td>{{.Config.Services.LogFile}}</td>
-                                <td><input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}"></td>
+                                <td><input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Debug Logfile</td>
                                 <td>{{.Config.LogConfig.DebugLog}}</td>
-                                <td><input type="text" id="DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}"></td>
+                                <td><input type="text" id="DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Logfile Unix Mode</td>
                                 <td>{{.Config.FileMode}}</td>
-                                <td><input type="text" id="FileMode" class="client-parameter" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}"></td>
+                                <td><input type="text" id="FileMode" class="client-parameter" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Max Payload Length</td>
                                 <td>{{.Config.MaxBody}}</td>
-                                <td><input type="text" id="MaxBody" class="client-parameter" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}"></td>
+                                <td><input type="text" id="MaxBody" class="client-parameter" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Max Log Size</td>
                                 <td>{{.Config.LogFileMb}}</td>
-                                <td><input type="text" id="LogFileMb" class="client-parameter" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}"></td>
+                                <td><input type="text" id="LogFileMb" class="client-parameter" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Max Log Count</td>
                                 <td>{{.Config.LogFiles}}</td>
-                                <td><input type="text" id="LogFiles" class="client-parameter" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}"></td>
+                                <td><input type="text" id="LogFiles" class="client-parameter" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}" style="width: 100%;"></td>
                             </tr>
                         </tbody>
                     </table>

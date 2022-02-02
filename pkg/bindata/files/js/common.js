@@ -3,7 +3,7 @@ function jsLoader() {
     let script      = '';
     const files     = ['navigation'];
 
-    for (const file of files){ 
+    for (const file of files){
         path        = 'files/js/' + file + '.js';
         script      = document.createElement('script');
         script.src  = path;
@@ -24,21 +24,13 @@ function ajax(url, method, type) {
         });
     });
 }
-// -------------------------------------------------------------------------------------------
 
-function logout() {
-    ajax('/logout', 'POST').then(function(result) {
-        window.location.href = '/';
-    }).catch(function() {
-        console.log('logout() failed');
-    });
-}
 // -------------------------------------------------------------------------------------------
 
 function setTooltips() {
     $('[class*="balloon-tooltip"]').hide();
 
-    $('a, div, i, img, input, span, td').balloon({
+    $('a, div, i, img, input, span, td, button').balloon({
         position: 'bottom',
         classname: 'balloon-tooltip',
         css: {

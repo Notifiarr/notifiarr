@@ -18,17 +18,17 @@ import (
 
 // httpHandlers initializes GUI HTTP routes.
 func (c *Client) httpHandlers() {
-	c.httpAPIHandlers()                                                                     // Init API handlers up front.
-	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))                     // built-in icon.
-	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.slash)).Methods("GET")      // "hi" page on /urlbase/
-	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.slashPost)).Methods("POST") // login POST.
+	c.httpAPIHandlers() // Init API handlers up front.
+	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
+	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.slash)).Methods("GET")
+	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.loginHandler)).Methods("POST")
 
 	base := c.Config.URLBase
 	if !strings.EqualFold(base, "/") {
 		// Handle the same URLs as above on the different base URL too.
 		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
 		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.slash)) // "hi" page on /urlbase
-		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.slashPost)).Methods("POST")
+		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.loginHandler)).Methods("POST")
 	}
 
 	if c.Config.UIPassword != "" {
@@ -89,16 +89,6 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 // slash is the GET handler for /.
 func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
 	c.renderHTTPtemplate(response, request, "index.html", "")
-}
-
-// slashPost is the POST handler for /.
-func (c *Client) slashPost(response http.ResponseWriter, request *http.Request) {
-	switch {
-	case request.FormValue("name") != "":
-		c.loginHandler(response, request)
-	default:
-		http.Error(response, "invalid POST request", http.StatusBadRequest)
-	}
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
