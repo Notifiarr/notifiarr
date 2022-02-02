@@ -18,7 +18,7 @@
                           </thead>
                           <tbody>
                               {{if .Config.Snapshot.MySQL}}{{range $index, $app := .Config.Snapshot.MySQL}}<tr>
-                                  <td>{{instance $index}} <div style="float: right;"><button type="button" id="MySQL{{instance $index}}Delete" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
+                                  <td style="font-size: 22px;">{{instance $index}} <div style="float: right;"><button type="button" id="MySQL{{instance $index}}Delete" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
                                   <td><input type="text" id="MySQL{{instance $index}}Name"  class="client-parameter" data-group="miscApp" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                   <td><input type="text" id="MySQL{{instance $index}}Host" class="client-parameter" data-group="miscApp" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
                                   <td><input type="text" id="MySQL{{instance $index}}User" class="client-parameter" data-group="miscApp" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>

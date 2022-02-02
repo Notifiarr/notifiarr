@@ -1,7 +1,7 @@
                       <h1><i class="fas fa-photo-video"></i> Media Apps</h1>
                       <table class="table table-striped table-bordered">
                           <thead>
-                              <tr><td colspan="4" align="center">
+                              <tr><td colspan="6" align="center">
                                   <div style="float: left;"><img src="{{files}}/images/logo/plex.png" style="height:50px;"></div>
                                   <h2 class="mb-3" style="display: inline;">Plex</h2>
                                   <!-- div style="float: right;"><button type="button" id="AddPlex" title="Add another instance of Plex" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div -->
@@ -11,18 +11,22 @@
                                   <td>URL</td>
                                   <td>Token</td>
                                   <td>Cooldown</td>
+                                  <td>Check Interval</td>
+                                  <td>Timeout</td>
                               </tr>
                           </thead>
                           <tbody>
                               {{if .Config.Plex}}<tr>
-                                  <td>1</td>
+                                  <td style="font-size: 22px;">1</td>
                                   <td><input type="text" id="PlexURL" class="client-parameter" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}" style="width: 100%;"></td>
                                   <td><input type="text" id="PlexToken" class="client-parameter" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}" style="width: 100%;"></td>
                                   <td><input type="text" id="PlexCooldown" class="client-parameter" data-group="media" data-label="Plex Cooldown" data-original="{{.Config.Plex.Cooldown}}" value="{{.Config.Plex.Cooldown}}" style="width: 100%;"></td>
-                              </tr>{{else}}<tr><td colspan="4">No Plex instance configured.</td></tr>{{end}}
+                                  <td><input type="text" id="PlexInterval" class="client-parameter" data-group="media" data-label="Plex Interval" data-original="{{.Config.Plex.Interval}}" value="{{.Config.Plex.Interval}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="PlexTimeout" class="client-parameter" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}" value="{{.Config.Plex.Timeout}}" style="width: 100%;"></td>
+                              </tr>{{else}}<tr><td colspan="6">No Plex instance configured.</td></tr>{{end}}
                           </tbody>
                           <thead>
-                              <tr><td colspan="4" align="center">
+                              <tr><td colspan="6" align="center">
                                   <div style="float: left;"><img src="{{files}}/images/logo/tautulli.png" style="height:50px;"></div>
                                   <h2 class="mb-3" style="display: inline;">Tautulli</h2>
                                   <!-- div style="float: right;"><button type="button" id="AddTautulli" title="Add another instance of Tautulli" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div -->
@@ -32,14 +36,18 @@
                                   <td>Name</td>
                                   <td>URL</td>
                                   <td>API Key</td>
+                                  <td>Check Interval</td>
+                                  <td>Timeout</td>
                               </tr>
                           </thead>
                           <tbody>
                               {{if .Config.Apps.Tautulli}}<tr>
-                                  <td>1</td>
+                                  <td style="font-size: 22px;">1</td>
                                   <td><input type="text" id="TautulliName" class="client-parameter" data-group="media" data-label="Tautulli Name" data-original="{{.Config.Apps.Tautulli.Name}}" value="{{.Config.Apps.Tautulli.Name}}" style="width: 100%;"></td>
                                   <td><input type="text" id="TautulliURL" class="client-parameter" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}" style="width: 100%;"></td>
                                   <td><input type="text" id="TautulliAPIKey" class="client-parameter" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}" style="width: 100%;"></td>
-                              </tr>{{else}}<tr><td colspan="4">No Tautulli instance configured.</td></tr>{{end}}
+                                  <td><input type="text" id="TautulliInterval" class="client-parameter" data-group="media" data-label="Tautulli Interval" data-original="{{.Config.Apps.Tautulli.Interval}}" value="{{.Config.Apps.Tautulli.Interval}}" style="width: 100%;"></td>
+                                  <td><input type="text" id="TautulliTimeout" class="client-parameter" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}" value="{{.Config.Apps.Tautulli.Timeout}}" style="width: 100%;"></td>
+                              </tr>{{else}}<tr><td colspan="6">No Tautulli instance configured.</td></tr>{{end}}
                           </tbody>
                       </table>
