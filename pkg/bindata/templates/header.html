@@ -44,8 +44,8 @@
             $(function() {
                 jsLoader();
                 setTooltips();
-                $(document).on('change', '.client-parameter', function(){
-                    findPendingChanges()
+                $(document).bind('change keyup mouseup', '.client-parameter', function(){
+                    findPendingChanges();
                 });
             });
         </script>
