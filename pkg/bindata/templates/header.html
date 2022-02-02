@@ -41,8 +41,6 @@
         <!-- Internal -->
         <script src="files/js/common.js" type="text/javascript"></script>
         <script type="text/javascript">
-            let conf = {{ . }};
-
             $(function() {
                 jsLoader();
                 setTooltips();
@@ -70,7 +68,3 @@
                 </li>
             </ul>
         </div>{{end}}
-        <div class="ts-main-content">
-{{ template "navigation.html" .}}
-            <div class="content-wrapper">
-                <div class="container-fluid">

@@ -6,7 +6,7 @@
                                 <td>Current Value</td>
                                 <td>New Value</td>
                             </tr>
-                            <tr><td colspan="3" align="center"><h4 class="mb-3">General</h4></td></tr>
+                            <tr><td colspan="3" align="center"><h2 class="mb-3">General</h2></td></tr>
                         </thead>
                         <tbody>
                             <tr>
@@ -55,7 +55,7 @@
                             </tr>
                         </tbody>
                         <thead>
-                            <tr><td colspan="3" align="center"><h4 class="mb-3">SSL</h4></td></tr>
+                            <tr><td colspan="3" align="center"><h2 class="mb-3">SSL</h2></td></tr>
                         </thead>
                         <tbody>
                             <tr>
@@ -70,18 +70,28 @@
                             </tr>
                         </tbody>
                         <thead>
-                            <tr><td colspan="3" align="center"><h4 class="mb-3">Logging</h4></td></tr>
+                            <tr><td colspan="3" align="center"><h2 class="mb-3">Logging</h2></td></tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Debug Logging</td>
-                                <td>{{.Config.Debug}}</td>
-                                <td><input type="checkbox" id="Debug" class="client-parameter" data-group="config" data-label="Debug"{{if .Config.Debug}} checked{{end}}></td>
+                                <td>{{if .Config.Debug}}Enabled{{else}}Disabled{{end}}</td>
+                                <td>
+                                  <select class="client-parameter" data-group="config" data-label="Debug" id="Debug" data-original="{{.Config.Debug}}">
+                                      <option {{if .Config.Debug}}selected {{end}}value="true">Enabled</option>
+                                      <option {{if not .Config.Debug}}selected {{end}}value="false">Disabled</option>
+                                  </select>
+                                </td>
                             </tr>
                             <tr>
                                 <td>Quiet Logging</td>
-                                <td>{{.Config.Quiet}}</td>
-                                <td><input type="checkbox" id="Quiet" class="client-parameter" data-group="config" data-label="Quiet"{{if .Config.Quiet}} checked{{end}}></td>
+                                <td>{{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}</td>
+                                <td>
+                                  <select class="client-parameter" data-group="config" data-label="Quiet" id="Quiet" data-original="{{.Config.Quiet}}">
+                                      <option {{if .Config.Quiet}}selected {{end}}value="true">Enabled</option>
+                                      <option {{if not .Config.Quiet}}selected {{end}}value="false">Disabled</option>
+                                  </select>
+                                </td>
                             </tr>
                             <tr>
                                 <td>App Logfile</td>
@@ -104,7 +114,7 @@
                                 <td><input type="text" id="DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}"></td>
                             </tr>
                             <tr>
-                                <td>Logfile Mode</td>
+                                <td>Logfile Unix Mode</td>
                                 <td>{{.Config.FileMode}}</td>
                                 <td><input type="text" id="FileMode" class="client-parameter" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}"></td>
                             </tr>

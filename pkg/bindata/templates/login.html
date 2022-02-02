@@ -1,8 +1,8 @@
-                    {{if .Msg}}<p><b>{{.Msg}}</b></p>{{end}}
                     <div class="row">
                         <div class="col-md-10">
                             <div class="col-md-4">
-                                <h1 class="text-center text-bold mt-4x">Login</h1>
+                                <h1 class="text-center text-bold mt-4x">Login</h1>{{if .Msg}}
+                                <div class="col-md-8 col-md-offset-2 alert alert-danger"><center>{{.Msg}}</center></div>{{end}}
                                 <div class="well row pt-2x pb-3x bk-dark">
                                     <div class="col-md-8 col-md-offset-2">
                                         <form method="post">
