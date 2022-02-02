@@ -48,6 +48,7 @@ type Config struct {
 	Plex     *plex.Server     // plex sessions
 	Snap     *snapshot.Config // system snapshot data
 	Services *ServiceConfig
+	Serial   bool
 	Retries  int
 	BaseURL  string
 	Timeout  cnfg.Duration

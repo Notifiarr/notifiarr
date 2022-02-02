@@ -101,9 +101,14 @@ func (t *Triggers) SendDashboardState(event EventType) {
 }
 
 func (c *Config) sendDashboardState(event EventType) {
+	cmd := c.getStatesParallel
+	if c.Serial {
+		cmd = c.getStatesSerial
+	}
+
 	var (
 		start  = time.Now()
-		states = c.getStates()
+		states = cmd()
 		apps   = time.Since(start).Round(time.Millisecond)
 	)
 
@@ -118,8 +123,21 @@ func (c *Config) sendDashboardState(event EventType) {
 		event, apps, time.Since(start).Round(time.Millisecond), resp)
 }
 
-// getStates fires a routine for each app type and tries to get a lot of data fast!
-func (c *Config) getStates() *States {
+// getStatesSerial grabs data for each app serially.
+func (c *Config) getStatesSerial() *States {
+	return &States{
+		Deluge:  c.getDelugeStates(),
+		Lidarr:  c.getLidarrStates(),
+		Qbit:    c.getQbitStates(),
+		Radarr:  c.getRadarrStates(),
+		Readarr: c.getReadarrStates(),
+		Sonarr:  c.getSonarrStates(),
+		SabNZB:  c.getSabNZBStates(),
+	}
+}
+
+// getStatesParallel fires a routine for each app type and tries to get a lot of data fast!
+func (c *Config) getStatesParallel() *States {
 	states := &States{}
 
 	var wg sync.WaitGroup
