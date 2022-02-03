@@ -85,6 +85,8 @@ github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a/go.mod h1:7Ga40eg
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
+github.com/fsnotify/fsnotify v1.5.1 h1:mZcQUHVQUQWoPXXtuf9yuEXKudkV2sx1E06UadKWpgI=
+github.com/fsnotify/fsnotify v1.5.1/go.mod h1:T3375wBYaZdLLcVNkcVbzGHY7f1l/uK5T5Ai1i3InKU=
 github.com/gen2brain/beeep v0.0.0-20210529141713-5586760f0cc1 h1:Xh9mvwEmhbdXlRSsgn+N0zj/NqnKvpeqL08oKDHln2s=
 github.com/gen2brain/beeep v0.0.0-20210529141713-5586760f0cc1/go.mod h1:ElSskYZe3oM8kThaHGJ+kiN2yyUMVXMZ7WxF9QqLDS8=
 github.com/gen2brain/dlgs v0.0.0-20211108104213-bade24837f0b h1:M0/hjawi9ur15zpqL/h66ga87jlYA7iAuZ4HC6ak08k=

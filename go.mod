@@ -104,3 +104,5 @@ require (
 )
 
 require github.com/gorilla/securecookie v1.1.1
+
+require github.com/fsnotify/fsnotify v1.5.1 // indirect

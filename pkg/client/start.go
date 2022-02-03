@@ -101,7 +101,7 @@ func (c *Client) start() error { //nolint:cyclop
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
 
-	if err := c.ParseGUITemplates(); err != nil {
+	if err := c.watchAssetsTemplates(); err != nil {
 		return err
 	}
 

@@ -19,16 +19,18 @@ import (
 // httpHandlers initializes GUI HTTP routes.
 func (c *Client) httpHandlers() {
 	c.httpAPIHandlers() // Init API handlers up front.
-	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
-	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.slash)).Methods("GET")
-	c.Config.Router.Handle(c.Config.URLBase, http.HandlerFunc(c.loginHandler)).Methods("POST")
 
-	base := c.Config.URLBase
+	base := path.Join("/", c.Config.URLBase)
+
+	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
+	c.Config.Router.Handle(base+"/", http.HandlerFunc(c.slash)).Methods("GET")
+	c.Config.Router.Handle(base+"/", http.HandlerFunc(c.loginHandler)).Methods("POST")
+
 	if !strings.EqualFold(base, "/") {
 		// Handle the same URLs as above on the different base URL too.
 		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
-		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.slash)) // "hi" page on /urlbase
-		c.Config.Router.Handle(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.loginHandler)).Methods("POST")
+		c.Config.Router.Handle(base, http.HandlerFunc(c.slash)).Methods("GET") // "hi" page on /urlbase
+		c.Config.Router.Handle(base, http.HandlerFunc(c.loginHandler)).Methods("POST")
 	}
 
 	if c.Config.UIPassword != "" {

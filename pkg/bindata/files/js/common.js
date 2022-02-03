@@ -109,3 +109,24 @@ function findPendingChanges() {
     }
 }
 // ---------------------------------------------------------------------------------------------
+
+$(document).ready((function() { /*
+    $(".ts-sidebar-menu li a").each((function() {
+        $(this).next().length > 0 && $(this).addClass("parent")
+    }));
+    var e = $(".ts-sidebar-menu li a.parent");
+    $('<div class="more"><i class="fa fa-angle-down"></i></div>').insertBefore(e),
+    $(".more").click((function() {
+        $(this).parent("li").toggleClass("open")
+    })),
+    $(".parent").click((function(e) {
+        e.preventDefault(),
+        $(this).parent("li").toggleClass("open")
+    })), */
+    $(".nav-link").click((function() {
+        $("nav.ts-sidebar").toggleClass("menu-open")
+    }))
+    $(".menu-btn").click((function() {
+        $("nav.ts-sidebar").toggleClass("menu-open")
+    }))
+}));

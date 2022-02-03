@@ -3,8 +3,8 @@
         <div class="ts-main-content">
           <div class="ts-main-content">
             <nav class="ts-sidebar">
-                <ul class="ts-sidebar-menu">{{ if .Username }}
-                    <li class="ts-label" style="text-align: center;">Navigation</li>
+                <ul class="ts-sidebar-menu">
+                    <li class="ts-label" style="text-align: center;">Navigation</li>{{ if .Username }}
                     <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" onclick="swapNavigationTemplate('config')">Configuration</a></li>
                     <li><i class="nav-icon fas fa-star"></i><a class="nav-link" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
                     <li><i class="nav-icon fas fa-file-download"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('downloadClients')">Download Clients</a></li>
@@ -19,7 +19,9 @@
                         {{else if eq .Version.os "linux"}}<i class="nav-icon fab fa-linux"></i>
                         {{else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
                         {{else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
-                        {{else}}<i class="nav-icon fas fa-microchip"></i>{{end}}<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>{{ end }}
+                        {{else}}<i class="nav-icon fas fa-microchip"></i>{{end}}<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>
+                    <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="{{base}}/logout">Logout</a></li>{{ else }}
+                    <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>{{ end }}
                 </ul>
                 <div id="pending-change-container" style="display: none;">
                     <hr>

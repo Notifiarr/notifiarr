@@ -3,8 +3,6 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"html/template"
 	"io"
 	"mime"
 	"net/http"
@@ -29,36 +27,6 @@ import (
 type userNameValue string
 
 const userNameStr userNameValue = "username"
-
-// ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
-func (c *Client) ParseGUITemplates() (err error) {
-	// Index and 404 do not have template files, but they can be customized.
-	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p> <p>(<a href="login">login</a>)</p>`
-	c.templat = template.Must(template.New("index.html").Parse(index))
-	c.templat = template.Must(c.templat.New("404.html").Parse("NOT FOUND! Check your request parameters and try again."))
-	c.templat = c.templat.Funcs(template.FuncMap{
-		"base":     func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
-		"files":    func() string { return path.Join(c.Config.URLBase, "files") },
-		"instance": func(idx int) int { return idx + 1 },
-	})
-
-	// Parse all our compiled-in templates.
-	for _, name := range bindata.AssetNames() {
-		if strings.HasPrefix(name, "templates/") {
-			c.templat = template.Must(c.templat.New(path.Base(name)).Parse(bindata.MustAssetString(name)))
-		}
-	}
-
-	// Parse custom templates if provided. These override compiled-in templates.
-	if c.Flags.Assets != "" {
-		c.templat, err = c.templat.ParseGlob(filepath.Join(c.Flags.Assets, "templates", "*.html"))
-		if err != nil {
-			return fmt.Errorf("parsing custom template: %w", err)
-		}
-	}
-
-	return nil
-}
 
 func (c *Client) checkAuthorized(next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {

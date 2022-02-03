@@ -5,7 +5,6 @@ package client
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -178,7 +177,6 @@ func (c *Client) makeMoreChannels() {
 	menu["mode"] = debug.AddSubMenuItem("Mode: "+strings.Title(c.Config.Mode), "toggle application mode")
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
-	menu["parse_templ"] = debug.AddSubMenuItem("Parse Go HTML Templates", "if custom templates are in use, this will re-arse them")
 
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
 	menu["debug_panic"] = debug.AddSubMenuItem("Application Panic", "cause an application panic (crash)")
@@ -339,14 +337,6 @@ func (c *Client) watchConfigChannels() {
 				menu["svcs"].Check()
 				c.Config.Services.Start()
 				ui.Notify("Service checks started!")
-			}
-		case <-menu["parse_templ"].ClickedCh:
-			if err := c.ParseGUITemplates(); err != nil {
-				c.Errorf("[user requested] Parsing HTML Templates Failed: %v", err)
-				ui.Notify("Parsing HTML Templates Failed: %v", err)
-			} else {
-				c.Printf("[user requested] Parsed HTML Templates: %s", filepath.Join(c.Flags.Assets, "templates", "*.html"))
-				ui.Notify("Parsed HTML Templates: %s", filepath.Join(c.Flags.Assets, "templates", "*.html"))
 			}
 		}
 	}

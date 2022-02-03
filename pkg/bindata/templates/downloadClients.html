@@ -4,7 +4,7 @@
                                 <tr><td colspan="7" align="center">
                                     <div style="float: left;"><img src="{{files}}/images/logo/qbittorrent.png" style="height:50px;"></div>
                                     <h2 class="mb-3" style="display: inline;">Qbittorrent</h2>
-                                    <div style="float: right;"><button type="button" id="AddQbit" title="Add another instance of Qbit" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                    <div style="float: right;"><button type="button" id="AddQbit" title="Add another instance of Qbit" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button></div>
                                 </td></tr>
                                 <tr>
                                     <td>Instance</td>
@@ -12,13 +12,13 @@
                                     <td>URL</td>
                                     <td>User</td>
                                     <td>Pass</td>
-                                    <td>Check Interval</td>
-                                    <td>Timeout</td>
+                                    <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
+                                    <td style="width:70px">Timeout</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 {{if .Config.Apps.Qbit}}{{range $index, $app := .Config.Apps.Qbit}}<tr>
-                                    <td style="font-size: 22px;">{{instance $index}} <div style="float: right;"><button type="button" id="Qbit{{instance $index}}Delete" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
+                                    <td style="font-size: 22px;">{{instance $index}} <div style="float: right;"><button type="button" id="Qbit{{instance $index}}Delete" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></button></div></td>
                                     <td><input type="text" id="Qbit{{instance $index}}Name" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                     <td><input type="text" id="Qbit{{instance $index}}URL" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                     <td><input type="text" id="Qbit{{instance $index}}User" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
@@ -31,20 +31,20 @@
                                 <tr><td colspan="7" align="center">
                                     <div style="float: left;"><img src="{{files}}/images/logo/deluge.png" style="height:50px;">
                                     </div><h2 class="mb-3" style="display: inline;">Deluge</h2>
-                                    <div style="float: right;"><button type="button" id="AddDeluge" title="Add another instance of Deluge" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                    <div style="float: right;"><button type="button" id="AddDeluge" title="Add another instance of Deluge" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button></div>
                                 </td></tr>
                                 <tr>
                                     <td>Instance</td>
                                     <td>Name</td>
                                     <td colspan="2">URL</td>
                                     <td>Pass</td>
-                                    <td>Check Interval</td>
-                                    <td>Timeout</td>
+                                    <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
+                                    <td style="width:70px">Timeout</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 {{if .Config.Apps.Deluge}}{{range $index, $app := .Config.Apps.Deluge}}<tr>
-                                    <td style="font-size: 22px;">{{instance $index}} <div style="float: right;"><button type="button" id="Deluge{{instance $index}}Delete" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
+                                    <td style="font-size: 22px;">{{instance $index}} <div style="float: right;"><button type="button" id="Deluge{{instance $index}}Delete" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></button></div></td>
                                     <td><input type="text" id="Deluge{{instance $index}}Name" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                     <td colspan="2"><input type="text" id="Deluge{{instance $index}}URL" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                     <td><input type="text" id="Deluge{{instance $index}}Password" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Pass" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
@@ -56,20 +56,20 @@
                                 <tr><td colspan="7" align="center">
                                     <div style="float: left;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
                                     <h2 class="mb-3" style="display: inline;">SabNZB</h2>
-                                    <div style="float: right;"><button type="button" id="AddSabNZB" title="Add another instance of SabNZB" class="add-new-item-button btn btn-success"><i class="fa fa-plus"></i></button></div>
+                                    <div style="float: right;"><button type="button" id="AddSabNZB" title="Add another instance of SabNZB" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button></div>
                                 </td></tr>
                                 <tr>
                                     <td>Instance</td>
                                     <td>Name</td>
                                     <td colspan="2">URL</td>
                                     <td>API Key</td>
-                                    <td>Check Interval</td>
-                                    <td>Timeout</td>
+                                    <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
+                                    <td style="width:70px">Timeout</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 {{if .Config.Apps.SabNZB}}{{range $index, $app := .Config.Apps.SabNZB}}<tr>
-                                    <td style="font-size: 22px;">{{instance $index}} <div style="float: right;"><button type="button" id="SabNZB{{instance $index}}Delete" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></div></td>
+                                    <td style="font-size: 22px;">{{instance $index}} <div style="float: right;"><button type="button" id="SabNZB{{instance $index}}Delete" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></button></div></td>
                                     <td><input type="text" id="SabNZB{{instance $index}}Name" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                     <td colspan="2"><input type="text" id="SabNZB{{instance $index}}URL" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.Name}}" value="{{$app.URL}}" style="width: 100%;"></td>
                                     <td><input type="text" id="SabNZB{{instance $index}}APIKey" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} API Key" data-original="{{$app.Name}}" value="{{$app.ApiKey}}" style="width: 100%;"></td>
