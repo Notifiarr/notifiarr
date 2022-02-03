@@ -20,7 +20,11 @@
                         {{else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
                         {{else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
                         {{else}}<i class="nav-icon fas fa-microchip"></i>{{end}}<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>
-                    <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="{{base}}/logout">Logout</a></li>{{ else }}
+                    <li><i class="nav-icon fas fa-user"></i> <a class="nav-link" href="{{base}}/logout">Logout</a></li>
+                    <hr>
+                    <li class="ts-label" style="text-align: center;">External Resources</li>
+                    <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.com">Notifiarr.com</a></li>
+                    <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.wiki">Notifiarr.Wiki</a></li>{{ else }}
                     <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>{{ end }}
                 </ul>
                 <div id="pending-change-container" style="display: none;">
