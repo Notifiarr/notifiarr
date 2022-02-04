@@ -1,5 +1,12 @@
 {{- if not .Config.UIPassword }}<p>notifiarr: <strong>working</strong></p>{{else -}}
 {{ template "header.html" . }}
+        <div class="brand clearfix" style="z-index:100;">
+            <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
+              <img src="{{files}}/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr Client
+            </h4>
+            <span class="menu-btn"><i class="fa fa-bars"></i></span>
+            <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
+        </div>
         <div class="ts-main-content">
           <div class="ts-main-content">
             <nav class="ts-sidebar">
@@ -20,11 +27,13 @@
                         {{else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
                         {{else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
                         {{else}}<i class="nav-icon fas fa-microchip"></i>{{end}}<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>
-                    <li><i class="nav-icon fas fa-user"></i> <a class="nav-link" href="{{base}}/logout">Logout</a></li>
+                    <li><i class="nav-icon fas fa-user"></i> <a class="nav-link" href="{{base}}/logout">Logout ({{.Username}})</a></li>
                     <hr>
                     <li class="ts-label" style="text-align: center;">External Resources</li>
                     <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.com">Notifiarr.com</a></li>
-                    <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.wiki">Notifiarr.Wiki</a></li>{{ else }}
+                    <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.wiki">Notifiarr.Wiki</a></li>
+                    <li>&nbsp;<i class="nav-icon fab fa-discord"></i><a class="nav-link" href="https://notifiarr.com/discord">Notifiarr Discord</a></li>
+                    <li>&nbsp;<img src="{{files}}/images/golift.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://golift.io/">Go Lift</a></li>{{ else }}
                     <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>{{ end }}
                 </ul>
                 <div id="pending-change-container" style="display: none;">
@@ -38,10 +47,10 @@
             </nav>
             <div class="content-wrapper">
                 <div class="container-fluid">{{ if .Username }}
-                  <!-- Load everything hidden, and switch divs with the Nav-menu above. -->
                   <div class="navigation-item" id="template-landing">
 {{ template "landing.html"  .}}
                   </div>
+                  <!-- Load everything hidden, and switch divs with the Nav-menu above. -->
                   <div class="navigation-item" id="template-config" style="display: none;">
 {{ template "config.html" . }}
                   </div>

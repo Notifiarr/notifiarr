@@ -39,6 +39,10 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
 		c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
 		c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/getLog/{id}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}/{skip}"),
+			c.checkAuthorized(c.getLogHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
 	}
 

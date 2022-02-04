@@ -1,11 +1,15 @@
 package logs
 
 import (
+	"encoding/base64"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	homedir "github.com/mitchellh/go-homedir"
@@ -154,4 +158,90 @@ func (l *Logger) openHTTPLog() {
 		l.web = rotatorr.NewMust(rotateHTTP)
 		l.HTTPLog.SetOutput(l.web)
 	}
+}
+
+type LogFileInfos struct {
+	Dirs []string
+	Size int64
+	Logs []*LogFileInfo
+}
+
+// LogFileInfo is returned by GetAllLogFilePaths.
+type LogFileInfo struct {
+	ID   string
+	Path string
+	Size int64
+	Time time.Time
+	Mode fs.FileMode
+	Used bool
+	User string
+}
+
+// GetAllLogFilePaths searches the disk for log file names.
+func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
+	logFiles := []string{
+		l.logs.LogFile,
+		l.logs.HTTPLog,
+		l.logs.DebugLog,
+	}
+
+	for cust := range customLog {
+		logFiles = append(logFiles, cust)
+	}
+
+	contain := make(map[string]struct{})
+	dirs := make(map[string]struct{})
+
+	for _, logFilePath := range logFiles {
+		files, err := filepath.Glob(filepath.Join(filepath.Dir(logFilePath), "*.log"))
+		if err != nil {
+			continue
+		}
+
+		dirs[filepath.Dir(logFilePath)] = struct{}{}
+
+		for _, filePath := range files {
+			contain[filePath] = struct{}{}
+		}
+	}
+
+	output := &LogFileInfos{Logs: []*LogFileInfo{}, Dirs: map2list(dirs)}
+
+	for filePath := range contain {
+		fileInfo, err := os.Stat(filePath)
+		if err != nil || fileInfo.IsDir() {
+			continue
+		}
+
+		used := false
+
+		for _, name := range logFiles {
+			if name == filePath {
+				used = true
+			}
+		}
+		// fileDate := strings.TrimPrefix(strings.TrimSuffix(filePath, ".log"), strings.TrimSuffix(logFilePath, ".log"))
+		// parsedDate, _ := time.Parse(timerotator.FormatDefault, fileDate)
+		output.Logs = append(output.Logs, &LogFileInfo{
+			ID:   strings.TrimRight(base64.StdEncoding.EncodeToString([]byte(filePath)), "="),
+			Path: filePath,
+			Size: fileInfo.Size(),
+			Time: fileInfo.ModTime().Round(time.Second),
+			Mode: fileInfo.Mode(),
+			Used: used,
+			User: getFileOwner(fileInfo),
+		})
+		output.Size += fileInfo.Size()
+	}
+
+	return output
+}
+
+func map2list(input map[string]struct{}) []string {
+	output := []string{}
+	for name := range input {
+		output = append(output, name)
+	}
+
+	return output
 }

@@ -110,23 +110,107 @@ function findPendingChanges() {
 }
 // ---------------------------------------------------------------------------------------------
 
-$(document).ready((function() { /*
-    $(".ts-sidebar-menu li a").each((function() {
-        $(this).next().length > 0 && $(this).addClass("parent")
-    }));
-    var e = $(".ts-sidebar-menu li a.parent");
-    $('<div class="more"><i class="fa fa-angle-down"></i></div>').insertBefore(e),
-    $(".more").click((function() {
-        $(this).parent("li").toggleClass("open")
-    })),
-    $(".parent").click((function(e) {
-        e.preventDefault(),
-        $(this).parent("li").toggleClass("open")
-    })), */
+$(document).ready((function() {
+// ----- Navbar
     $(".nav-link").click((function() {
-        $("nav.ts-sidebar").toggleClass("menu-open")
+      $("nav.ts-sidebar").toggleClass("menu-open", false)
     }))
+
     $(".menu-btn").click((function() {
         $("nav.ts-sidebar").toggleClass("menu-open")
     }))
+
+// ----- Log File Display
+    $('#LogFileSelector').change(function(){
+      var logFileID = $(this).val();
+      var filename = $("#fileinfo-"+logFileID).data('filename')
+      var used = $("#fileinfo-"+logFileID).data('used')
+      var lineCount = 500
+
+      $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+filename+' ...');
+      $("[id^=fileinfo-]").hide()
+      $("#fileinfo-"+logFileID).show()
+      $('#log-file-actions').hide();
+      $('#logHelpMsg').hide()
+      $('#log-file-ajax-error').hide();
+
+      if (used == true) {
+        $('#logHelpMsg').show()
+      }
+
+      $.ajax({
+        url: "getLog/"+logFileID+"/"+lineCount+"/0",
+        context: document.body,
+        success:function(data) {
+          $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+lineCount+'</span> log lines.');
+          $('#log-file-actions').show()
+          $('#log-file-content').text(data);
+          updatePreCounters($('#log-file-content'))
+        },
+        error: function (request, status, error) {
+          $('#log-file-ajax-error').show();
+          $('#log-file-ajax-error').html("<h4>"+error+"</h4>\n"+request.responseText)
+          // $('#log-file-content').html("An error occurred getting the file contents:\n"+error+"\n"+request.responseText);
+        },
+      });
+    });
+
+    $('#triggerLogLoad').click(function(){
+      var logFileID = $('#LogFileSelector').val();
+      var filename = $("#fileinfo-"+logFileID).data('filename');
+      var used = $("#fileinfo-"+logFileID).data('used');
+      var lineCount = parseInt($('#logLinesCount').val());
+      var lineAction = $('#logLinesAction').val(); // add/reload
+      var offSetCount = parseInt($('#logsCurrentLineCount').html());
+      var totalLines = lineCount+offSetCount;
+
+      $('#log-file-ajax-error').hide();
+
+      // make go button spin?
+
+      if (lineAction == "linesAdd") {
+        $.ajax({
+          url: "getLog/"+logFileID+"/"+lineCount+"/"+offSetCount,
+          context: document.body,
+          success:function(data) {
+            $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+totalLines+'</span> log lines.');
+            $('#log-file-content').prepend(document.createTextNode(data));
+            updatePreCounters($('#log-file-content'))
+          },
+          error: function (request, status, error) {
+            $('#log-file-ajax-error').show();
+            $('#log-file-ajax-error').html("<h4>"+error+"</h4>\n"+request.responseText)
+          },
+        });
+      } else {
+        $.ajax({
+          url: "getLog/"+logFileID+"/"+lineCount+"/0",
+          context: document.body,
+          success:function(data) {
+            $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+lineCount+'</span> log lines.');
+            $('#log-file-actions').show()
+            $('#log-file-content').text(data);
+            updatePreCounters($('#log-file-content'))
+          },
+          error: function (request, status, error) {
+            $('#log-file-ajax-error').show();
+            $('#log-file-ajax-error').html("<h4>"+error+"</h4>\n"+request.responseText)
+          },
+        });
+      }
+    });
+    updatePreCounters()
 }));
+
+function updatePreCounters() {
+    var tags = $('pre'), pl = tags.length
+    for (var i = 0; i < pl; i++) {
+        tags[i].innerHTML = '<span class="line-number"></span>' +
+          tags[i].innerHTML + '<span class="cl"></span>';
+        var num = tags[i].innerHTML.split(/\n/).length;
+        for (var j = 0; j < num; j++) {
+            var line_num = tags[i].getElementsByTagName('span')[0];
+            line_num.innerHTML += '<span>' + (j + 1) + '</span>';
+        }
+    }
+}

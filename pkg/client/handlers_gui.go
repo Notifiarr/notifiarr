@@ -12,16 +12,26 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/gorilla/mux"
-	"github.com/mitchellh/go-homedir"
 	"golift.io/version"
 )
+
+type templateData struct {
+	Config   *configfile.Config `json:"config"`
+	Flags    *configfile.Flags  `json:"flags"`
+	Username string             `json:"username"`
+	Data     url.Values         `json:"data,omitempty"`
+	Msg      string             `json:"msg,omitempty"`
+	Version  map[string]string  `json:"version"`
+	LogFiles *logs.LogFileInfos `json:"logFileInfo"`
+}
 
 // userNameValue is used a context value key.
 type userNameValue string
@@ -105,6 +115,35 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 		MaxAge: -1,
 	})
 	http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+}
+
+func (c *Client) getLogHandler(response http.ResponseWriter, req *http.Request) {
+	logID := mux.Vars(req)["id"]
+	logs := c.Logger.GetAllLogFilePaths()
+	skip, _ := strconv.Atoi(mux.Vars(req)["skip"])
+
+	count, _ := strconv.Atoi(mux.Vars(req)["lines"])
+	if count == 0 {
+		count = 500
+	}
+
+	for _, logFile := range logs.Logs {
+		if logFile.ID != logID {
+			continue
+		}
+
+		lines, err := getLastLinesInFile(logFile.Path, count, skip)
+		if err != nil {
+			c.Errorf("Handling Log File Request: %v", err)
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+		} else if logFile.Size == 0 {
+			http.Error(response, "the file is empty", http.StatusInternalServerError)
+		} else if _, err = response.Write(lines); err != nil {
+			c.Errorf("Writing HTTP Response: %v", err)
+		}
+
+		return
+	}
 }
 
 // getSettingsHandler returns all settings in a json blob. Useful for ajax requests.
@@ -209,6 +248,7 @@ func (c *Client) renderHTTPtemplate(w io.Writer, req *http.Request, tmpl string,
 		Username: c.getUserName(req),
 		Data:     req.PostForm,
 		Msg:      msg,
+		LogFiles: c.Logger.GetAllLogFilePaths(),
 		Version: map[string]string{
 			"started":   version.Started.Round(time.Second).String(),
 			"uptime":    time.Since(version.Started).Round(time.Second).String(),
@@ -226,15 +266,6 @@ func (c *Client) renderHTTPtemplate(w io.Writer, req *http.Request, tmpl string,
 	if err != nil {
 		c.Errorf("Sending HTTP Response: %v", err)
 	}
-}
-
-type templateData struct {
-	Config   *configfile.Config `json:"config"`
-	Flags    *configfile.Flags  `json:"flags"`
-	Username string             `json:"username"`
-	Data     url.Values         `json:"data,omitempty"`
-	Msg      string             `json:"msg,omitempty"`
-	Version  map[string]string  `json:"version"`
 }
 
 func (c *Client) loginPage(response http.ResponseWriter, request *http.Request, msg string) {
@@ -286,55 +317,4 @@ func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http
 	if _, err = response.Write(data); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)
 	}
-}
-
-// haveCustomFile searches known locatinos for a file. Returns the file's path.
-func (c *Client) haveCustomFile(fileName string) string {
-	cwd, _ := os.Getwd()
-	exe, _ := os.Executable()
-
-	paths := map[string][]string{
-		mnd.Windows: {
-			`~/notifiarr`,
-			cwd,
-			filepath.Dir(exe),
-			`C:\ProgramData\notifiarr`,
-		},
-		"darwin": {
-			"~/.notifiarr",
-			"/usr/local/etc/notifiarr",
-		},
-		"default": {
-			`~/notifiarr`,
-			"/config",
-			"/etc/notifiarr",
-		},
-	}
-
-	findIn := paths[runtime.GOOS]
-	if len(findIn) == 0 {
-		findIn = paths["default"]
-	}
-
-	for _, find := range findIn {
-		if find == "" {
-			continue
-		}
-
-		custom, err := homedir.Expand(filepath.Join(find, fileName))
-		if err != nil {
-			custom = filepath.Join(find, fileName)
-		}
-
-		custom2, err := filepath.Abs(custom)
-		if err == nil {
-			custom = custom2
-		}
-
-		if _, err = os.Stat(custom); err == nil {
-			return custom
-		}
-	}
-
-	return ""
 }

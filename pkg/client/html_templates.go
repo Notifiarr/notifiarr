@@ -3,12 +3,17 @@ package client
 import (
 	"fmt"
 	"html/template"
+	"io"
+	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/fsnotify/fsnotify"
+	"github.com/mitchellh/go-homedir"
 )
 
 // loadAssetsTemplates watches for changs to template files, and loads them.
@@ -73,6 +78,7 @@ func (c *Client) ParseGUITemplates() (err error) {
 	c.templat = template.Must(template.New("index.html").Parse(index))
 	c.templat = template.Must(c.templat.New("404.html").Parse("NOT FOUND! Check your request parameters and try again."))
 	c.templat = c.templat.Funcs(template.FuncMap{
+		"megabyte": func(size int64) int64 { return size / mnd.Megabyte },
 		"base":     func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
 		"files":    func() string { return path.Join(c.Config.URLBase, "files") },
 		"instance": func(idx int) int { return idx + 1 },
@@ -98,4 +104,105 @@ func (c *Client) ParseGUITemplates() (err error) {
 	}
 
 	return nil
+}
+
+// haveCustomFile searches known locatinos for a file. Returns the file's path.
+func (c *Client) haveCustomFile(fileName string) string {
+	cwd, _ := os.Getwd()
+	exe, _ := os.Executable()
+
+	paths := map[string][]string{
+		mnd.Windows: {
+			`~/notifiarr`,
+			cwd,
+			filepath.Dir(exe),
+			`C:\ProgramData\notifiarr`,
+		},
+		"darwin": {
+			"~/.notifiarr",
+			"/usr/local/etc/notifiarr",
+		},
+		"default": {
+			`~/notifiarr`,
+			"/config",
+			"/etc/notifiarr",
+		},
+	}
+
+	findIn := paths[runtime.GOOS]
+	if len(findIn) == 0 {
+		findIn = paths["default"]
+	}
+
+	for _, find := range findIn {
+		if find == "" {
+			continue
+		}
+
+		custom, err := homedir.Expand(filepath.Join(find, fileName))
+		if err != nil {
+			custom = filepath.Join(find, fileName)
+		}
+
+		custom2, err := filepath.Abs(custom)
+		if err == nil {
+			custom = custom2
+		}
+
+		if _, err = os.Stat(custom); err == nil {
+			return custom
+		}
+	}
+
+	return ""
+}
+
+func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //nolint:cyclop
+	fileHandle, err := os.Open(filepath)
+	if err != nil {
+		return nil, fmt.Errorf("opening file: %w", err)
+	}
+	defer fileHandle.Close()
+
+	stat, err := fileHandle.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("stating open file: %w", err)
+	}
+
+	var (
+		output   = []byte{}
+		location int64
+		filesize = stat.Size()
+		char     = make([]byte, 1)
+		found    int
+	)
+
+	for {
+		location-- // read 1 byte
+		if _, err = fileHandle.Seek(location, io.SeekEnd); err != nil {
+			return output, fmt.Errorf("seeking open file: %w", err)
+		}
+
+		if _, err := fileHandle.Read(char); err != nil {
+			return output, fmt.Errorf("reading open file: %w", err)
+		}
+
+		if location != -1 && (char[0] == 10) { // nolint:gomnd
+			found++ // we found a line
+		}
+
+		if skip == 0 || found > skip {
+			output = append(char, output...)
+		}
+
+		if location == -filesize {
+			return output, nil // beginning of file,
+		}
+
+		if found >= count+skip {
+			// we found enough lines.
+			// remove the first character, a newline.
+			return output[1:], nil
+		}
+	}
 }

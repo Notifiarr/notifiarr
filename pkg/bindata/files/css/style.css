@@ -435,17 +435,7 @@ a:hover {
   border-left: none;
   padding-left: 1em;
 }
-.content-format pre {
-  background: #fff;
-  border: 1px solid #ededed;
-  color: #666;
-  font-family: Consolas, Monaco, Lucida Console, monospace;
-  font-size: .9em;
-  line-height: 1.714285714;
-  margin: 24px 0;
-  margin: 1.714285714rem 0;
-  overflow: auto;
-}
+
 .content-format ol {
   margin: 24px 0 24px;
   margin: 1.714285714rem 0 1.714285714rem;
@@ -968,4 +958,31 @@ select[multiple] option:checked {
 
 .help-icon {
     cursor: help;
+}
+
+pre {
+  white-space: pre;
+  color: #fff;
+  font-family: Consolas, Monaco, Lucida Console, monospace;
+  font-size: .9em;
+  line-height: 1.714285714;
+  overflow: auto;
+  display:block;
+}
+
+pre .line-number {
+  float:left;
+  margin:0 1em 0 -1em;
+  border-right:1px solid;
+  text-align:right;
+}
+
+pre span {
+  display:block;
+  padding:0 .3em 0 .7em;
+}
+
+pre .cl {
+  display:block;
+  clear:both;
 }
