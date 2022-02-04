@@ -1,6 +1,7 @@
 package client
 
 import (
+	"archive/zip"
 	"context"
 	"encoding/json"
 	"io"
@@ -115,6 +116,42 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 		MaxAge: -1,
 	})
 	http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+}
+
+func (c *Client) getLogDeleteHandler(response http.ResponseWriter, req *http.Request) {
+}
+
+func (c *Client) getLogDownloadHandler(response http.ResponseWriter, req *http.Request) {
+	logID := mux.Vars(req)["id"]
+	logs := c.Logger.GetAllLogFilePaths()
+
+	for _, logFile := range logs.Logs {
+		if logFile.ID != logID {
+			continue
+		}
+
+		zipWriter := zip.NewWriter(response)
+		defer zipWriter.Close()
+
+		logOpen, err := os.Open(logFile.Path)
+		if err != nil {
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+		}
+		defer logOpen.Close()
+
+		newZippedFile, err := zipWriter.Create(logFile.Name)
+		if err != nil {
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+		}
+
+		response.Header().Set("Content-Disposition", "attachment; filename="+logFile.Name+".zip")
+		response.Header().Set("Content-Type", "application/zip")
+
+		if _, err := io.Copy(newZippedFile, logOpen); err != nil {
+			c.Errorf("Sending Zipped Log File: %v", err)
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+		}
+	}
 }
 
 func (c *Client) getLogHandler(response http.ResponseWriter, req *http.Request) {

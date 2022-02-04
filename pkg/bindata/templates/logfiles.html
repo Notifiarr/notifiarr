@@ -6,19 +6,19 @@
                       <select id="LogFileSelector">
                         <option id= "logfile-placeholder" value="placeholder" selected disabled>- Select a log file -</option>
                       {{- range $file := .LogFiles.Logs }}
-                        <option id="logfile-{{ $file.ID }}" value="{{ $file.ID }}">{{ $file.Path }}</option>
+                        <option id="logfile-{{ $file.ID }}" value="{{ $file.ID }}">{{ $file.Name }}</option>
                       {{- end }}
                       </select><hr>
                       <div id="log-file-actions" style="display:none;">
                         <div id="log-file-action-menu">
                           <div class="col-sm-6">
-                            <select>
+                            <select id="logfileAction">
                               <option selected disabled>- Actions -</option>
                               <option value="notifiarr">Send to Notifiarr.com</option>
                               <option value="delete">Delete File</option>
                               <option value="download">Download File</option>
                             </select>
-                            <button class="btn btn-xs btn-primary">Go</button>
+                            <button id="triggerLogAction" class="btn btn-xs btn-primary">Go</button>
                           </div>
                           <div class="col-sm-6">
                             <i id="logHelpMsg" class="help-icon far fa-question-circle" title="This file is in use. Adding lines will likely skip some; recommend Reload."></i>

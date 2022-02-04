@@ -155,6 +155,18 @@ $(document).ready((function() {
           // $('#log-file-content').html("An error occurred getting the file contents:\n"+error+"\n"+request.responseText);
         },
       });
+  });
+
+    $('#triggerLogAction').click(function(){
+        var action = $('#logfileAction').val();
+        var logFileID = $('#LogFileSelector').val();
+
+        if (action == "download") {
+            window.location.href = "downloadLog/"+logFileID;
+        } else if (action == "delete") {
+            
+        }
+
     });
 
     $('#triggerLogLoad').click(function(){

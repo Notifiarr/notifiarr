@@ -43,6 +43,9 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}/{skip}"),
 			c.checkAuthorized(c.getLogHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/downloadLog/{id}"),
+			c.checkAuthorized(c.getLogDownloadHandler)).Methods("GET")
+
 		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
 	}
 

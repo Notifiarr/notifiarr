@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -169,6 +170,7 @@ type LogFileInfos struct {
 // LogFileInfo is returned by GetAllLogFilePaths.
 type LogFileInfo struct {
 	ID   string
+	Name string
 	Path string
 	Size int64
 	Time time.Time
@@ -224,6 +226,7 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 		// parsedDate, _ := time.Parse(timerotator.FormatDefault, fileDate)
 		output.Logs = append(output.Logs, &LogFileInfo{
 			ID:   strings.TrimRight(base64.StdEncoding.EncodeToString([]byte(filePath)), "="),
+			Name: fileInfo.Name(),
 			Path: filePath,
 			Size: fileInfo.Size(),
 			Time: fileInfo.ModTime().Round(time.Second),
@@ -234,7 +237,21 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 		output.Size += fileInfo.Size()
 	}
 
+	sort.Sort(output)
+
 	return output
+}
+
+func (l *LogFileInfos) Len() int {
+	return len(l.Logs)
+}
+
+func (l *LogFileInfos) Swap(i, j int) {
+	l.Logs[i], l.Logs[j] = l.Logs[j], l.Logs[i]
+}
+
+func (l *LogFileInfos) Less(i, j int) bool {
+	return l.Logs[i].Name < l.Logs[j].Name
 }
 
 func map2list(input map[string]struct{}) []string {
