@@ -145,7 +145,6 @@ $(document).ready((function() {
 
         $.ajax({
             url: 'getLog/'+ logFileID +'/'+ lineCount +'/0', // the zero is optional, skip counter.
-            context: document.body,
             success: function (data){
                 $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+ lineCount +'</span> log lines.');
                 $('#log-file-actions').show();
@@ -169,7 +168,6 @@ $(document).ready((function() {
         } else if (action == "delete") {
             $.ajax({
                 url: 'deleteLogFile/'+ logFileID,
-                context: document.body,
                 success: function (data){
                     // TODO: remove the item from the select
                     $('#log-file-ajax-msg').html("<h4>Deleted File</h4>"+filename).show().fadeOut(10000);
@@ -191,20 +189,21 @@ $(document).ready((function() {
         const offSetCount = parseInt($('#logsCurrentLineCount').html());
         const totalLines  = lineCount + offSetCount;
 
-        $('#log-file-ajax-error').hide();
-        $('#log-file-ajax-msg').hide();
+        $('#log-file-ajax-error, #log-file-ajax-msg').hide();
 
         // needs to update an "ok, working on that" box (that does not exist right now),
 
         if (lineAction == 'linesAdd') {
-            $('#log-file-ajax-msg').html("Getting "+lineCount+" more lines!");
+            $('.line-number').remove();
+            $('#log-file-content').html($('#log-file-content').html().toString().replaceAll('<span class="cl"></span>', '\n'));
+            $('#log-file-ajax-msg').html('Getting '+ lineCount +' more lines!');
             $('#log-file-ajax-msg').show().fadeOut(5000);
+
             $.ajax({
                 url: 'getLog/'+ logFileID +'/'+ lineCount +'/'+ offSetCount,
-                context: document.body,
                 success: function (data){
                     $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+ totalLines +'</span> log lines.');
-                    $('#log-file-content').prepend(document.createTextNode(data));
+                    $('#log-file-content').append(data);
                     updatePreCounters();
                 },
                 error: function (request, status, error){
@@ -216,8 +215,7 @@ $(document).ready((function() {
             $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+ filename +'...');
 
             $.ajax({
-                url: "getLog/"+logFileID+"/"+lineCount+"/0",
-                context: document.body,
+                url: 'getLog/'+ logFileID +'/'+ lineCount +'/0',
                 success: function (data){
                     $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+ lineCount +'</span> log lines.');
                     $('#log-file-actions').show()
@@ -238,13 +236,20 @@ $(document).ready((function() {
 
 function updatePreCounters() {
     $.each($('.log-file-content'), function() {
-        let logContainer = $(this);
-        let lines = logContainer.html().split(/\n/);
+        let logContainer    = $(this);
+        let lines           = logContainer.html().split(/\n/);
+        const length        = getCharacterLength(lines.length.toString().trim());
         logContainer.html('');
 
         $.each(lines, function(index, line) {
-            logContainer.append('<span class="line-number">'+ (index + 1) +'</span> '+ line +'<span class="cl"></span>');
+            let number = $('.line-number').length + 1;
+            logContainer.append('<span class="line-number">'+ number.toString().padStart(length, ' ') +'</span> '+ line +'<span class="cl"></span>');
         });
     });
+}
+// ---------------------------------------------------------------------------------------------
+
+function getCharacterLength (str) {
+    return [...str].length;
 }
 // ---------------------------------------------------------------------------------------------

@@ -50,7 +50,7 @@
                       {{- end}}
                           <tr><td width="10%">Size</td><td>No file selected.</td></tr>
                           <tr><td width="10%">Date</td><td>No file selected.</td></tr>
-                          <tr><td width="10%">Used</td><td>No file selected.</td></tr>
+                          <tr><td width="10%">In use</td><td>No file selected.</td></tr>
                       </table>
                       {{- range $file := .LogFiles.Logs }}
                       <table class="table table-striped table-bordered" style="display:none;" id="fileinfo-{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
@@ -61,7 +61,7 @@
                       {{- end}}
                           <tr><td width="10%">Size</td><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
                           <tr><td width="10%">Date</td><td>{{$file.Time}}</td></tr>
-                          <tr><td width="10%">Used</td><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively written."></i></td></tr>
+                          <tr><td width="10%">In use</td><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively written."></i></td></tr>
                       </table>
                       {{- end}}
                     </div>
