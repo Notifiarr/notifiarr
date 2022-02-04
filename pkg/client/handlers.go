@@ -23,8 +23,8 @@ func (c *Client) httpHandlers() {
 	base := path.Join("/", c.Config.URLBase)
 
 	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
-	c.Config.Router.Handle(base+"/", http.HandlerFunc(c.slash)).Methods("GET")
-	c.Config.Router.Handle(base+"/", http.HandlerFunc(c.loginHandler)).Methods("POST")
+	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", http.HandlerFunc(c.slash)).Methods("GET")
+	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", http.HandlerFunc(c.loginHandler)).Methods("POST")
 
 	if !strings.EqualFold(base, "/") {
 		// Handle the same URLs as above on the different base URL too.

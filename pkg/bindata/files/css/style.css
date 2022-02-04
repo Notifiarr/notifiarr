@@ -961,7 +961,6 @@ select[multiple] option:checked {
 }
 
 pre {
-  white-space: pre;
   color: #fff;
   font-family: Consolas, Monaco, Lucida Console, monospace;
   font-size: .9em;
