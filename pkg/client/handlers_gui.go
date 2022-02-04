@@ -119,6 +119,26 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 }
 
 func (c *Client) getLogDeleteHandler(response http.ResponseWriter, req *http.Request) {
+	logID := mux.Vars(req)["id"]
+	logs := c.Logger.GetAllLogFilePaths()
+
+	for _, logFile := range logs.Logs {
+		if logFile.ID != logID {
+			continue
+		}
+
+		if err := os.Remove(logFile.Path); err != nil {
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+		}
+
+		if _, err := response.Write([]byte("ok")); err != nil {
+			c.Errorf("Writing HTTP Response: %v", err)
+		}
+
+		break
+	}
+
+	// return new list of files here.
 }
 
 func (c *Client) getLogDownloadHandler(response http.ResponseWriter, req *http.Request) {
