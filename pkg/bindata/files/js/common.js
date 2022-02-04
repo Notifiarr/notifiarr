@@ -167,13 +167,11 @@ $(document).ready((function() {
             $('#log-file-ajax-msg').html("<h4>Downloading File</h4>"+filename+".zip").show().fadeOut(5000);
             window.location.href = "downloadLog/"+logFileID; // this works so nice!
         } else if (action == "delete") {
-            // ajax call to  deleteFile/logFileID. needs to update an "ok, file deleted" box, or produce an error if there was an error (which does exist)
-
             $.ajax({
                 url: 'deleteLogFile/'+ logFileID,
                 context: document.body,
                 success: function (data){
-                    // refresh file list? I can return the new list here, how....?
+                    // TODO: remove the item from the select
                     $('#log-file-ajax-msg').html("<h4>Deleted File</h4>"+filename).show().fadeOut(10000);
                 },
                 error: function (request, status, error){
