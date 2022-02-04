@@ -19,7 +19,7 @@
                                 <td>{{.Config.BindAddr}}</td>
                                 <td><input class="client-parameter" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}" style="width: 100%;"></td>
                             </tr>
-                            {{if eq .Version.os "windows"}}
+                            {{- if eq .Version.os "windows"}}
                                 <tr>
                                     <td><i class="help-icon far fa-question-circle" title="This is how often the app will check for updates"></i> Auto Update</td>
                                     <td>{{.Config.AutoUpdate}}</td>
@@ -28,7 +28,7 @@
                                         <option {{if not .Config.AutoUpdate}}selected {{end}}value="false">Disabled</option>
                                     </select>
                                 </tr>
-                            {{end}}
+                            {{- end}}
                             <tr>
                                 <td><i class="help-icon far fa-question-circle" title="Only enable when asked, your Notifiarr account must have dev access for this to work."></i> Mode</td>
                                 <td>{{.Config.Mode}}</td>

@@ -195,15 +195,20 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 	dirs := make(map[string]struct{})
 
 	for _, logFilePath := range logFiles {
-		files, err := filepath.Glob(filepath.Join(filepath.Dir(logFilePath), "*.log"))
+		dirExpanded, err := homedir.Expand(logFilePath)
+		if err != nil {
+			dirExpanded = logFilePath
+		}
+
+		files, err := filepath.Glob(filepath.Join(filepath.Dir(dirExpanded), "*.log"))
 		if err != nil {
 			continue
 		}
 
-		dirs[filepath.Dir(logFilePath)] = struct{}{}
-
 		for _, filePath := range files {
 			contain[filePath] = struct{}{}
+			dirs[filepath.Dir(filePath)] = struct{}{}
+
 		}
 	}
 
