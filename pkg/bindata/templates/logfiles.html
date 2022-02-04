@@ -20,9 +20,9 @@
                         </span>
                         <hr>
                         <div style="display:none;padding: 0 !important;" class="log-file-control col-md-6">
-                            <i id="logHelpMsg" class="help-icon far fa-question-circle" title="This file is in use. Adding lines will likely skip some; recommend Reload."></i>
+                            <i id="logHelpMsg" class="help-icon far fa-question-circle" title="This file is in use. Adding lines may cause duplicates; recommend Reload."></i>
                             <select id="logLinesAction">
-                                <option value="linesAdd">Add</option>
+                                <option id="logLinesAdd" value="linesAdd">Add</option>
                                 <option value="linesReload">Reload</option>
                             </select>
                             <select id="logLinesCount">
@@ -35,9 +35,10 @@
                             <button id="triggerLogLoad" class="btn btn-xs btn-primary">Go</button><br>
                             <span id="log-file-action-msg">Displaying last <span id="logsCurrentLineCount">0</span> log lines.'</span>
                         </div>
+                        <!-- 3 dynamic message boxes -->
                         <div id="log-file-small-msg" class="log-file-control col-md-6"></div>
-                        <div id="log-file-ajax-error" class="col-md-12 alert alert-danger" style="display:none;"></div>
                         <div id="log-file-ajax-msg" class="col-md-12 alert alert-info" style="display:none;"></div>
+                        <div id="log-file-ajax-error" class="col-md-12 alert alert-danger" style="display:none;"></div>
                     </div>
                     <div class="col-md-6 mb">
                         <table class="table table-striped table-bordered" id="fileinfo-placeholder">
@@ -51,7 +52,7 @@
                             <tr><td width="10%">Used</td><td>No file selected.</td></tr>
                         </table>
                         {{- range $file := .LogFiles.Logs }}
-                        <table class="table table-striped table-bordered" style="display:none;" data-lines="" id="fileinfo-{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
+                        <table class="table table-striped table-bordered" style="display:none;" id="fileinfo-{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
                             <tr><td width="10%">Path</td><td>{{$file.Path}}</td></tr>
                             {{- if not (eq $.Version.os "windows")}}
                             <tr><td width="10%">Mode</td><td>{{$file.Mode}}</td></tr>
@@ -63,7 +64,10 @@
                         </table>
                         {{- end}}
                     </div>
-                    <div class="col-md-12">
-                        <pre id="log-file-content" class="log-file-content well bk-brown brdr">Log file contents display here.</pre>
-                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <pre id="log-file-content" class="well well-sm log-file-content bk-brown brdr">Log file contents display here.
+                          </pre>
+                      </div>
                   </div>
