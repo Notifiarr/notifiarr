@@ -35,7 +35,13 @@ function setTooltips() {
         classname: 'balloon-tooltip',
         css: {
             fontSize: '18px',
-            borderRadius: '12px'
+            borderRadius: '12px',
+            height: 'auto',
+            maxWidth: '400px',
+            minWidth: '100px',
+            padding: '0.5em',
+            opacity: 0.95,
+            borderColor: '#FFF',
         }
     });
     /*
@@ -111,123 +117,136 @@ function findPendingChanges() {
 // ---------------------------------------------------------------------------------------------
 
 $(document).ready((function() {
-// ----- Navbar
-    $(".nav-link").click((function() {
-      $("nav.ts-sidebar").toggleClass("menu-open", false)
+    // ----- Navbar
+    $('.nav-link').click((function() {
+        $('nav.ts-sidebar').toggleClass('menu-open', false);
     }))
 
     $(".menu-btn").click((function() {
-        $("nav.ts-sidebar").toggleClass("menu-open")
+        $('nav.ts-sidebar').toggleClass('menu-open');
     }))
 
-// ----- Log File Display
-    $('#LogFileSelector').change(function(){
-      var logFileID = $(this).val();
-      var filename = $("#fileinfo-"+logFileID).data('filename')
-      var used = $("#fileinfo-"+logFileID).data('used')
-      var lineCount = 500
+    // ----- Log File Display
+    $('#LogFileSelector').change(function() {
+        const logFileID   = $(this).val();
+        const filename    = $('#fileinfo-'+ logFileID).data('filename');
+        const used        = $('#fileinfo-'+ logFileID).data('used');
+        const lineCount   = 500;
 
-      // start a spinner because this takes a few seconds.
-      $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+filename+' ...');
+        // start a spinner because this takes a few seconds.
+        $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+ filename +'...');
+        // hide all other file-info divs, hide actions (until file load completes), hide help msg (this is the active file warning tooltip), hide any error or info messages.
+        $('[id^=fileinfo-], #log-file-actions, #logHelpMsg, #log-file-ajax-error, #log-file-ajax-msg').hide()
+        $('#fileinfo-'+ logFileID).show() // show the file info div for the file requested.
 
-      $("[id^=fileinfo-]").hide() // hide all other file-info divs.
-      $("#fileinfo-"+logFileID).show() // show the file info div for the file requested.
-      $('#log-file-actions').hide(); // hide actions (until file load completes).
-      $('#logHelpMsg').hide() // hide help msg (this is the active file warning tooltip).
-      $('#log-file-ajax-error').hide();  // hide any error messages.
+        if (used == 'true') {
+            $('#logHelpMsg').show() // display the help tooltip for this 'special' file.
+        }
 
-      if (used == true) {
-        $('#logHelpMsg').show() // display the help tooltip for this file.
-      }
-
-      $.ajax({
-        url: "getLog/"+logFileID+"/"+lineCount+"/0", // the zero is optional, skip counter.
-        context: document.body,
-        success:function(data) {
-          $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+lineCount+'</span> log lines.');
-          $('#log-file-actions').show()
-          $('#log-file-content').text($.trim(data));
-          updatePreCounters($('#log-file-content'))
-        },
-        error: function (request, status, error) {
-          $('#log-file-ajax-error').show();
-          $('#log-file-ajax-error').html("<h4>"+error+"</h4>\n"+request.responseText)
-          // $('#log-file-content').html("An error occurred getting the file contents:\n"+error+"\n"+request.responseText);
-        },
-      });
-  });
+        $.ajax({
+            url: 'getLog/'+ logFileID +'/'+ lineCount +'/0', // the zero is optional, skip counter.
+            context: document.body,
+            success: function (data){
+                $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+ lineCount +'</span> log lines.');
+                $('#log-file-actions').show();
+                $('#log-file-content').html(data);
+                updatePreCounters();
+            },
+            error: function (request, status, error) {
+                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).show().fadeOut(10000);
+            },
+        });
+    });
 
     $('#triggerLogAction').click(function(){
-        var action = $('#logfileAction').val();
-        var logFileID = $('#LogFileSelector').val();
+        const action    = $('#logfileAction').val();
+        const logFileID = $('#LogFileSelector').val();
+        const filename  = $('#fileinfo-'+ logFileID).data('filename');
 
         if (action == "download") {
-            window.location.href = "downloadLog/"+logFileID;
+            $('#log-file-ajax-msg').html("<h4>Downloading File</h4>"+filename+".zip").show().fadeOut(5000);
+            window.location.href = "downloadLog/"+logFileID; // this works so nice!
         } else if (action == "delete") {
-            
+            // ajax call to  deleteFile/logFileID. needs to update an "ok, file deleted" box, or produce an error if there was an error (which does exist)
+
+            $.ajax({
+                url: 'deleteLogFile/'+ logFileID,
+                context: document.body,
+                success: function (data){
+                    // refresh file list? I can return the new list here, how....?
+                    $('#log-file-ajax-msg').html("<h4>Deleted File</h4>"+filename).show().fadeOut(10000);
+                },
+                error: function (request, status, error){
+                    $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText);
+                    $('#log-file-ajax-error').show().fadeOut(6000);
+                },
+            });
         }
-
     });
 
-    $('#triggerLogLoad').click(function(){
-      var logFileID = $('#LogFileSelector').val();
-      var filename = $("#fileinfo-"+logFileID).data('filename');
-      var used = $("#fileinfo-"+logFileID).data('used');
-      var lineCount = parseInt($('#logLinesCount').val());
-      var lineAction = $('#logLinesAction').val(); // add/reload
-      var offSetCount = parseInt($('#logsCurrentLineCount').html());
-      var totalLines = lineCount+offSetCount;
+    $('#triggerLogLoad').click(function() {
+        const logFileID   = $('#LogFileSelector').val();
+        const filename    = $('#fileinfo-'+ logFileID).data('filename');
+        const used        = $('#fileinfo-'+ logFileID).data('used');
+        const lineCount   = parseInt($('#logLinesCount').val());
+        const lineAction  = $('#logLinesAction').val(); // add/reload
+        const offSetCount = parseInt($('#logsCurrentLineCount').html());
+        const totalLines  = lineCount + offSetCount;
 
-      $('#log-file-ajax-error').hide();
+        $('#log-file-ajax-error').hide();
+        $('#log-file-ajax-msg').hide();
 
-      // make go button spin?
+        // needs to update an "ok, working on that" box (that does not exist right now),
 
-      if (lineAction == "linesAdd") {
-        $.ajax({
-          url: "getLog/"+logFileID+"/"+lineCount+"/"+offSetCount,
-          context: document.body,
-          success:function(data) {
-            $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+totalLines+'</span> log lines.');
-            $('#log-file-content').prepend(document.createTextNode(data));
-            updatePreCounters($('#log-file-content'))
-          },
-          error: function (request, status, error) {
-            $('#log-file-ajax-error').show();
-            $('#log-file-ajax-error').html("<h4>"+error+"</h4>\n"+request.responseText)
-          },
-        });
-      } else {
-        // start a spinner because this takes a few seconds.
-        $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+filename+' ...');
+        if (lineAction == 'linesAdd') {
+            $('#log-file-ajax-msg').html("Getting "+lineCount+" more lines!");
+            $('#log-file-ajax-msg').show().fadeOut(5000);
+            $.ajax({
+                url: 'getLog/'+ logFileID +'/'+ lineCount +'/'+ offSetCount,
+                context: document.body,
+                success: function (data){
+                    $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+ totalLines +'</span> log lines.');
+                    $('#log-file-content').prepend(document.createTextNode(data));
+                    updatePreCounters();
+                },
+                error: function (request, status, error){
+                    $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).show().fadeOut(10000);
+                },
+            });
+        } else { // reload
+            // start a spinner because this takes a few seconds.
+            $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+ filename +'...');
 
-        $.ajax({
-          url: "getLog/"+logFileID+"/"+lineCount+"/0",
-          context: document.body,
-          success:function(data) {
-            $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+lineCount+'</span> log lines.');
-            $('#log-file-actions').show()
-            $('#log-file-content').text($.trim(data));
-            updatePreCounters($('#log-file-content'))
-          },
-          error: function (request, status, error) {
-            $('#log-file-ajax-error').show();
-            $('#log-file-ajax-error').html("<h4>"+error+"</h4>\n"+request.responseText)
-          },
-        });
-      }
+            $.ajax({
+                url: "getLog/"+logFileID+"/"+lineCount+"/0",
+                context: document.body,
+                success: function (data){
+                    $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+ lineCount +'</span> log lines.');
+                    $('#log-file-actions').show()
+                    $('#log-file-content').html(data);
+                    updatePreCounters();
+                },
+                error: function (request, status, error){
+                    $('#log-file-ajax-error').show();
+                    $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText);
+                },
+            });
+        }
     });
-    updatePreCounters($('pre'))
+
+    updatePreCounters();
 }));
+// ---------------------------------------------------------------------------------------------
 
-function updatePreCounters(tags) {
-    var pl = tags.length
-    for (var i = 0; i < pl; i++) {
-        tags[i].innerHTML = '<span class="line-number"></span>' +
-          tags[i].innerHTML + '<span class="cl"></span>';
-        var num = tags[i].innerHTML.split(/\n/).length;
-        for (var j = 0; j < num; j++) {
-            var line_num = tags[i].getElementsByTagName('span')[0];
-            line_num.innerHTML += '<span>' + (j + 1) + '</span>';
-        }
-    }
+function updatePreCounters() {
+    $.each($('.log-file-content'), function() {
+        let logContainer = $(this);
+        let lines = logContainer.html().split(/\n/);
+        logContainer.html('');
+
+        $.each(lines, function(index, line) {
+            logContainer.append('<span class="line-number">'+ (index + 1) +'</span> '+ line +'<span class="cl"></span>');
+        });
+    });
 }
+// ---------------------------------------------------------------------------------------------
