@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io"
@@ -170,21 +171,25 @@ func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //no
 	}
 
 	var (
-		output   = []byte{}
+		output   bytes.Buffer
 		location int64
 		filesize = stat.Size()
 		char     = make([]byte, 1)
 		found    int
 	)
 
+	// This is a magic number.
+	// We assume 150 characters per line to optimize the buffer.
+	output.Grow(count * 150) // nolint:gomnd
+
 	for {
 		location-- // read 1 byte
 		if _, err = fileHandle.Seek(location, io.SeekEnd); err != nil {
-			return output, fmt.Errorf("seeking open file: %w", err)
+			return nil, fmt.Errorf("seeking open file: %w", err)
 		}
 
 		if _, err := fileHandle.Read(char); err != nil {
-			return output, fmt.Errorf("reading open file: %w", err)
+			return nil, fmt.Errorf("reading open file: %w", err)
 		}
 
 		if location != -1 && (char[0] == 10) { // nolint:gomnd
@@ -192,17 +197,27 @@ func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //no
 		}
 
 		if skip == 0 || found > skip {
-			output = append(char, output...)
+			output.WriteByte(char[0])
 		}
 
-		if location == -filesize {
-			return output, nil // beginning of file,
-		}
+		if found >= count+skip || // we found enough lines.
+			location == -filesize { // beginning of file.
+			out := revBytes(output)
+			if len(out) > 0 && out[0] == '\n' {
+				return out[1:], nil // strip off the /n
+			}
 
-		if found >= count+skip {
-			// we found enough lines.
-			// remove the first character, a newline.
-			return output[1:], nil
+			return out, nil
 		}
 	}
+}
+
+// revBytes returns a bytes buffer reversed.
+func revBytes(output bytes.Buffer) []byte {
+	data := output.Bytes()
+	for i, j := 0, len(data)-1; i < j; i, j = i+1, j-1 {
+		data[i], data[j] = data[j], data[i]
+	}
+
+	return data
 }

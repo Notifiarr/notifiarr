@@ -127,24 +127,26 @@ $(document).ready((function() {
       var used = $("#fileinfo-"+logFileID).data('used')
       var lineCount = 500
 
+      // start a spinner because this takes a few seconds.
       $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+filename+' ...');
-      $("[id^=fileinfo-]").hide()
-      $("#fileinfo-"+logFileID).show()
-      $('#log-file-actions').hide();
-      $('#logHelpMsg').hide()
-      $('#log-file-ajax-error').hide();
+
+      $("[id^=fileinfo-]").hide() // hide all other file-info divs.
+      $("#fileinfo-"+logFileID).show() // show the file info div for the file requested.
+      $('#log-file-actions').hide(); // hide actions (until file load completes).
+      $('#logHelpMsg').hide() // hide help msg (this is the active file warning tooltip).
+      $('#log-file-ajax-error').hide();  // hide any error messages.
 
       if (used == true) {
-        $('#logHelpMsg').show()
+        $('#logHelpMsg').show() // display the help tooltip for this file.
       }
 
       $.ajax({
-        url: "getLog/"+logFileID+"/"+lineCount+"/0",
+        url: "getLog/"+logFileID+"/"+lineCount+"/0", // the zero is optional, skip counter.
         context: document.body,
         success:function(data) {
           $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+lineCount+'</span> log lines.');
           $('#log-file-actions').show()
-          $('#log-file-content').text(data);
+          $('#log-file-content').text($.trim(data));
           updatePreCounters($('#log-file-content'))
         },
         error: function (request, status, error) {
@@ -183,13 +185,16 @@ $(document).ready((function() {
           },
         });
       } else {
+        // start a spinner because this takes a few seconds.
+        $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+filename+' ...');
+
         $.ajax({
           url: "getLog/"+logFileID+"/"+lineCount+"/0",
           context: document.body,
           success:function(data) {
             $('#log-file-action-msg').html('Displaying last <span id="logsCurrentLineCount">'+lineCount+'</span> log lines.');
             $('#log-file-actions').show()
-            $('#log-file-content').text(data);
+            $('#log-file-content').text($.trim(data));
             updatePreCounters($('#log-file-content'))
           },
           error: function (request, status, error) {
@@ -199,11 +204,11 @@ $(document).ready((function() {
         });
       }
     });
-    updatePreCounters()
+    updatePreCounters($('pre'))
 }));
 
-function updatePreCounters() {
-    var tags = $('pre'), pl = tags.length
+function updatePreCounters(tags) {
+    var pl = tags.length
     for (var i = 0; i < pl; i++) {
         tags[i].innerHTML = '<span class="line-number"></span>' +
           tags[i].innerHTML + '<span class="cl"></span>';
