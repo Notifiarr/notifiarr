@@ -133,11 +133,11 @@ $(document).ready((function() {
         const used        = $('#fileinfo-'+ logFileID).data('used');
         const lineCount   = 500;
 
-        // start a spinner because this takes a few seconds.
+        // start a spinner because it takes a few seconds to load a log file.
         $('#log-file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading content for file '+ filename +'...');
         // hide all other file-info divs, hide actions (until file load completes), hide help msg (this is the active file warning tooltip), hide any error or info messages.
         $('[id^=fileinfo-], #log-file-actions, #logHelpMsg, #log-file-ajax-error, #log-file-ajax-msg').hide()
-        $('#fileinfo-'+ logFileID).show() // show the file info div for the file requested.
+        $('#fileinfo-'+ logFileID).show() // show the file info div (right side panel) for the file requested.
 
         if (used == 'true') {
             $('#logHelpMsg').show() // display the help tooltip for this 'special' file.
@@ -153,18 +153,19 @@ $(document).ready((function() {
                 updatePreCounters();
             },
             error: function (request, status, error) {
-                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).show().fadeOut(10000);
+                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
     });
 
+    // This powers the Action menu: Send to notifiarr, delete, download.
     $('#triggerLogAction').click(function(){
         const action    = $('#logfileAction').val();
         const logFileID = $('#LogFileSelector').val();
         const filename  = $('#fileinfo-'+ logFileID).data('filename');
 
         if (action == "download") {
-            $('#log-file-ajax-msg').html("<h4>Downloading File</h4>"+filename+".zip").show().fadeOut(5000);
+            $('#log-file-ajax-msg').html("<h4>Downloading File</h4>"+filename+".zip").stop().animate({opacity:'100'}).show().fadeOut(3000);
             window.location.href = "downloadLog/"+logFileID; // this works so nice!
         } else if (action == "delete") {
             $.ajax({
@@ -172,16 +173,20 @@ $(document).ready((function() {
                 context: document.body,
                 success: function (data){
                     // TODO: remove the item from the select
-                    $('#log-file-ajax-msg').html("<h4>Deleted File</h4>"+filename).show().fadeOut(10000);
+                    $('#log-file-ajax-msg').html("<h4>Deleted File</h4>"+filename).stop().animate({opacity:'100'}).show().fadeOut(10000);
                 },
                 error: function (request, status, error){
                     $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText);
-                    $('#log-file-ajax-error').show().fadeOut(6000);
+                    $('#log-file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
                 },
             });
+        } else if (action == "notifiarr") {
+            $('#log-file-ajax-error').html('<h4>Invalid!</h4>This does not work yet.');
+            $('#log-file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(4000);
         }
     });
 
+    // This powers the log file add/reload menu.
     $('#triggerLogLoad').click(function() {
         const logFileID   = $('#LogFileSelector').val();
         const filename    = $('#fileinfo-'+ logFileID).data('filename');
@@ -198,7 +203,7 @@ $(document).ready((function() {
 
         if (lineAction == 'linesAdd') {
             $('#log-file-ajax-msg').html("Getting "+lineCount+" more lines!");
-            $('#log-file-ajax-msg').show().fadeOut(5000);
+            $('#log-file-ajax-msg').stop().animate({opacity:'100'}).show().fadeOut(5000);
             $.ajax({
                 url: 'getLog/'+ logFileID +'/'+ lineCount +'/'+ offSetCount,
                 context: document.body,
@@ -208,7 +213,7 @@ $(document).ready((function() {
                     updatePreCounters();
                 },
                 error: function (request, status, error){
-                    $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).show().fadeOut(10000);
+                    $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).stop().animate({opacity:'100'}).show().fadeOut(10000);
                 },
             });
         } else { // reload
