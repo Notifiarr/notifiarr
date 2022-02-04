@@ -137,8 +137,6 @@ func (c *Client) getLogDeleteHandler(response http.ResponseWriter, req *http.Req
 
 		break
 	}
-
-	// return new list of files here.
 }
 
 func (c *Client) getLogDownloadHandler(response http.ResponseWriter, req *http.Request) {
@@ -182,6 +180,7 @@ func (c *Client) getLogHandler(response http.ResponseWriter, req *http.Request) 
 	count, _ := strconv.Atoi(mux.Vars(req)["lines"])
 	if count == 0 {
 		count = 500
+		skip = 0
 	}
 
 	for _, logFile := range logs.Logs {

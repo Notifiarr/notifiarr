@@ -196,7 +196,7 @@ func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //no
 			found++ // we found a line
 		}
 
-		if skip == 0 || found > skip {
+		if skip == 0 || found >= skip {
 			output.WriteByte(char[0])
 		}
 
