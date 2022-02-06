@@ -109,6 +109,10 @@ timeout = "{{.Timeout}}"
 ## This spreads CPU usage out and uses a bit less memory.
 serial = {{.Serial}}
 
+## Retries controls how many times to retry requests to notifiarr.com.
+## Sometimes cloudflare returns a 521, and this mitigates those problems.
+retries = {{.Retries}}
+
 
 ##################
 # Starr Settings #
