@@ -111,6 +111,7 @@ serial = {{.Serial}}
 
 ## Retries controls how many times to retry requests to notifiarr.com.
 ## Sometimes cloudflare returns a 521, and this mitigates those problems.
+## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
 retries = {{.Retries}}
 
 
