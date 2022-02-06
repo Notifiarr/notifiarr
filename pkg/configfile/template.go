@@ -57,7 +57,7 @@ bind_addr = "{{.BindAddr}}"
 ##
 quiet = {{.Quiet}}{{if .Debug}}
 
-## Debug prints more data and json payloads. Recommend setting debug_log if enabled.
+## Debug prints more data and json payloads. This increases application memory usage.
 debug = true
 max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if and .Mode (ne .Mode "production")}}
 
@@ -104,6 +104,10 @@ file_mode = "{{.FileMode.String}}"
 ## Web server and application timeouts.
 ##
 timeout = "{{.Timeout}}"
+
+## Setting serial to true makes the app use fewer threads when polling apps.
+## This spreads CPU usage out and uses a bit less memory.
+serial = {{.Serial}}
 
 
 ##################
