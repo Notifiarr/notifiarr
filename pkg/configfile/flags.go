@@ -14,10 +14,11 @@ import (
 // Flags are our CLI input flags.
 type Flags struct {
 	*flag.FlagSet
-	VerReq     bool
-	Restart    bool
+	AptHook    bool `json:"aptHook"`
 	Updated    bool
 	PSlist     bool
+	VerReq     bool
+	Restart    bool
 	Write      string
 	Curl       string
 	ConfigFile string
@@ -38,6 +39,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
+	f.BoolVar(&f.AptHook, "apthook", false, "Process a payload from a dpkg Pre-Install-Pkgs hook.")
 
 	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.Restart, "restart", false, "This is used by auto-update, do not call it.")

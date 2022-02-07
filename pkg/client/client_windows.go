@@ -15,15 +15,6 @@ import (
 	"golift.io/version"
 )
 
-func (c *Client) checkReloadSignal(sigc os.Signal) error {
-	return c.reloadConfiguration("Caught Signal: " + sigc.String())
-}
-
-func (c *Client) setSignals() {
-	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	signal.Notify(c.sighup, syscall.SIGHUP)
-}
-
 // This is the pop-up a user sees when they click update in the menu.
 func (c *Client) upgradeWindows(update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
@@ -137,4 +128,17 @@ func (c *Client) updateNow(u *update.Update, msg string) error {
 	c.sigkil <- &update.Signal{Text: "upgrade request: " + msg}
 
 	return nil
+}
+
+func (c *Client) handleAptHook() error {
+	return fmt.Errorf("this feature is not supported on this platform") //nolint:goerr113
+}
+
+func (c *Client) checkReloadSignal(sigc os.Signal) error {
+	return c.reloadConfiguration("Caught Signal: " + sigc.String())
+}
+
+func (c *Client) setSignals() {
+	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(c.sighup, syscall.SIGHUP)
 }

@@ -75,10 +75,12 @@ func Start() error {
 	}
 }
 
-func (c *Client) start() error {
+func (c *Client) start() error { //nolint:cyclop
 	msg, newCon, err := c.loadConfiguration()
 
 	switch {
+	case c.Flags.AptHook:
+		return c.handleAptHook() // err?
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
 		c.Printf("==> %s", msg)
 		return c.forceWriteWithExit(c.Flags.Write)
@@ -95,6 +97,7 @@ func (c *Client) start() error {
 		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
+
 	clientInfo := c.configureServices(notifiarr.EventStart)
 
 	if newCon {
@@ -327,6 +330,7 @@ func (c *Client) reloadConfiguration(source string) error {
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.setupMenus(c.configureServices(notifiarr.EventReload))
+
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {

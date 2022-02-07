@@ -96,6 +96,7 @@ const (
 	SvcRoute     Route = notifiRoute + "/services"
 	CorruptRoute Route = notifiRoute + "/corruption"
 	BackupRoute  Route = notifiRoute + "/backup"
+	TestRoute    Route = notifiRoute + "/test"
 )
 
 // Path adds parameters to a route path and turns it into a string.
