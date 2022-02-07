@@ -23,15 +23,15 @@ import (
 
 // Logger provides some methods with baked in assumptions.
 type Logger struct {
-	ErrorLog *log.Logger // Shares a Writer with InfoLog.
-	DebugLog *log.Logger // Shares a Writer with InfoLog by default. Changeable.
-	InfoLog  *log.Logger
-	HTTPLog  *log.Logger
-	web      *rotatorr.Logger
-	app      *rotatorr.Logger
-	debug    *rotatorr.Logger
-	custom   *rotatorr.Logger // must not be set when web/app/debug are set.
-	logs     *LogConfig
+	ErrorLog  *log.Logger // Shares a Writer with InfoLog.
+	DebugLog  *log.Logger // Shares a Writer with InfoLog by default. Changeable.
+	InfoLog   *log.Logger
+	HTTPLog   *log.Logger
+	web       *rotatorr.Logger
+	app       *rotatorr.Logger
+	debug     *rotatorr.Logger
+	custom    *rotatorr.Logger // must not be set when web/app/debug are set.
+	LogConfig *LogConfig
 }
 
 // These are used for custom logs.
@@ -71,18 +71,18 @@ type LogConfig struct {
 // New returns a new Logger with debug off and sends everything to stdout.
 func New() *Logger {
 	return &Logger{
-		DebugLog: log.New(ioutil.Discard, "[DEBUG] ", log.LstdFlags),
-		InfoLog:  log.New(os.Stdout, "[INFO] ", log.LstdFlags),
-		ErrorLog: log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
-		HTTPLog:  log.New(os.Stdout, "", log.LstdFlags),
-		logs:     &LogConfig{},
+		DebugLog:  log.New(ioutil.Discard, "[DEBUG] ", log.LstdFlags),
+		InfoLog:   log.New(os.Stdout, "[INFO] ", log.LstdFlags),
+		ErrorLog:  log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
+		HTTPLog:   log.New(os.Stdout, "", log.LstdFlags),
+		LogConfig: &LogConfig{},
 	}
 }
 
 // SetupLogging splits log writers into a file and/or stdout.
 func (l *Logger) SetupLogging(config *LogConfig) {
 	fileMode = config.FileMode.Mode()
-	l.logs = config
+	l.LogConfig = config
 	l.setDefaultLogPaths()
 	l.setLogPaths()
 	l.openLogFile()
