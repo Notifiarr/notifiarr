@@ -10,12 +10,19 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"golift.io/cnfg"
+	"golift.io/version"
 )
 
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
-func (c *Client) PrintStartupInfo() {
+func (c *Client) PrintStartupInfo(clientInfo *notifiarr.ClientInfo) {
+	if clientInfo != nil {
+		c.Printf("==> %s", clientInfo)
+		c.printVersionChangeInfo()
+	}
+
 	if hi, err := c.website.GetHostInfoUID(); err != nil {
 		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
 	} else {
@@ -46,6 +53,31 @@ func (c *Client) PrintStartupInfo() {
 	}
 
 	c.printLogFileInfo()
+}
+
+func (c *Client) printVersionChangeInfo() {
+	const clientVersion = "clientVersion"
+
+	values, err := c.website.GetValue(clientVersion)
+	if err != nil {
+		c.Errorf("XX> Getting version from databse: %v", err)
+	}
+
+	previousVersion := string(values[clientVersion])
+	if previousVersion == "" ||
+		previousVersion == version.Version ||
+		version.Version == "" {
+		return
+	}
+
+	c.Printf("==> Detected application version change! %s => %s", previousVersion, version.Version)
+
+	go func() { // in background to improve startup time.
+		err := c.website.SetValue(clientVersion, []byte(version.Version))
+		if err != nil {
+			c.Errorf("Updating version in database: %v", err)
+		}
+	}()
 }
 
 func (c *Client) printLogFileInfo() { //nolint:cyclop

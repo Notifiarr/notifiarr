@@ -318,15 +318,25 @@ func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, 
 }
 
 // SetValue sets a value stored in the website database.
-func (c *Config) SetValue(values map[string][]byte) error {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
-	defer cancel()
-
-	return c.SetValueContext(ctx, values)
+func (c *Config) SetValue(key string, value []byte) error {
+	return c.SetValues(map[string][]byte{key: value})
 }
 
 // SetValueContext sets a value stored in the website database.
-func (c *Config) SetValueContext(ctx context.Context, values map[string][]byte) error {
+func (c *Config) SetValueContext(ctx context.Context, key string, value []byte) error {
+	return c.SetValuesContext(ctx, map[string][]byte{key: value})
+}
+
+// SetValues sets values stored in the website database.
+func (c *Config) SetValues(values map[string][]byte) error {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
+	defer cancel()
+
+	return c.SetValuesContext(ctx, values)
+}
+
+// SetValuesContext sets values stored in the website database.
+func (c *Config) SetValuesContext(ctx context.Context, values map[string][]byte) error {
 	for key, val := range values {
 		if val != nil { // ignore nil byte slices.
 			values[key] = []byte(base64.StdEncoding.EncodeToString(val))
