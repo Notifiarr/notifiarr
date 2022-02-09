@@ -175,11 +175,6 @@ func (r *Response) String() string {
 		return ""
 	}
 
-	if r.Details.Help != "" {
-		return fmt.Sprintf("Website took %s and replied with: %s, %s: help: %s",
-			r.Details.Elapsed, r.Result, r.Details.Response, r.Details.Help)
-	}
-
-	return fmt.Sprintf("Website took %s and replied with: %s, %s",
-		r.Details.Elapsed, r.Result, r.Details.Response)
+	return fmt.Sprintf("Website took %s and replied with: %s, %s %s",
+		r.Details.Elapsed, r.Result, r.Details.Response, r.Details.Help)
 }
