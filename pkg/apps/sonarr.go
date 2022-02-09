@@ -37,6 +37,7 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/tag/{tid:[0-9]+}/{label}", sonarrUpdateTag, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/tag/{label}", sonarrSetTag, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/update", sonarrUpdateSeries, "PUT")
+	a.HandleAPIpath(starr.Sonarr, "/seasonPass", sonarrSeasonPass, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/command/{commandid:[0-9]+}", sonarrStatusCommand, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/command", sonarrTriggerCommand, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/command/search/{seriesid:[0-9]+}", sonarrTriggerSearchSeries, "GET")
@@ -458,4 +459,20 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "sonarr seems to have worked"
+}
+
+func sonarrSeasonPass(req *http.Request) (int, interface{}) {
+	var seasonPass sonarr.SeasonPass
+
+	err := json.NewDecoder(req.Body).Decode(&seasonPass)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	err = getSonarr(req).UpdateSeasonPassContext(req.Context(), &seasonPass)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating seasonPass: %w", err)
+	}
+
+	return http.StatusOK, "ok"
 }

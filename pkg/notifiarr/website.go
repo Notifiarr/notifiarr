@@ -132,15 +132,20 @@ func (c *Config) GetData(url string) (*Response, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	if !c.LogConfig.Debug {
+		return unmarshalResponse(url, resp.StatusCode, resp.Body)
+	}
 
-	defer c.debughttplog(resp, url, start, "", string(body))
+	var buf bytes.Buffer
+	// copy the body into a buffer we can pass into json.Decode().
+	tee := io.TeeReader(resp.Body, &buf) // must read tee first.
+	defer c.debughttplog(resp, url, start, "", tee)
 
 	if err != nil {
 		return nil, fmt.Errorf("reading http response body: %w", err)
 	}
 
-	return unmarshalResponse(url, resp.StatusCode, body)
+	return unmarshalResponse(url, resp.StatusCode, &buf)
 }
 
 // SendData sends raw data to a notifiarr URL as JSON.
@@ -178,14 +183,15 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 	if err != nil {
 		return nil, err
 	}
+	defer body.Close()
 
 	return unmarshalResponse(c.BaseURL+uri, code, body)
 }
 
 // unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
-func unmarshalResponse(url string, code int, body []byte) (*Response, error) {
+func unmarshalResponse(url string, code int, body io.Reader) (*Response, error) {
 	var r Response
-	err := json.Unmarshal(body, &r)
+	err := json.NewDecoder(body).Decode(&r)
 
 	if code < http.StatusOK || code > http.StatusIMUsed {
 		if err != nil {
@@ -205,7 +211,7 @@ func unmarshalResponse(url string, code int, body []byte) (*Response, error) {
 }
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
-func (c *Config) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, []byte, error) {
+func (c *Config) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return 0, nil, fmt.Errorf("creating http request: %w", err)
@@ -218,24 +224,26 @@ func (c *Config) sendJSON(ctx context.Context, url string, data []byte, log bool
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		c.debughttplog(nil, url, start, string(data), "")
+		c.debughttplog(nil, url, start, string(data), nil)
 		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
-	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	if !c.LogConfig.Debug { // no debug, just return the body.
+		return resp.StatusCode, resp.Body, nil
+	}
+
+	var buf bytes.Buffer
+	tee := io.TeeReader(resp.Body, &buf)
+
+	defer resp.Body.Close() // close this since we return a fake one after logging.
 
 	if log {
-		defer c.debughttplog(resp, url, start, string(data), string(body))
+		defer c.debughttplog(resp, url, start, string(data), tee)
 	} else {
-		defer c.debughttplog(resp, url, start, "<data not logged>", string(body))
+		defer c.debughttplog(resp, url, start, "<data not logged>", tee)
 	}
 
-	if err != nil {
-		return resp.StatusCode, body, fmt.Errorf("reading http response body: %w", err)
-	}
-
-	return resp.StatusCode, body, nil
+	return resp.StatusCode, io.NopCloser(&buf), nil
 }
 
 // Do performs an http Request with retries and logging!
@@ -282,7 +290,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 	}
 }
 
-func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, data, body string) {
+func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, data string, body io.Reader) {
 	headers := ""
 	status := "0"
 
@@ -296,20 +304,16 @@ func (c *Config) debughttplog(resp *http.Response, url string, start time.Time, 
 		}
 	}
 
-	if c.MaxBody > 0 && len(body) > c.MaxBody {
-		body = fmt.Sprintf("%s <body truncated, max: %d>", body[:c.MaxBody], c.MaxBody)
-	}
-
 	if c.MaxBody > 0 && len(data) > c.MaxBody {
 		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:c.MaxBody], c.MaxBody)
 	}
 
 	if data == "" {
 		c.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), status, headers, body)
+			url, time.Since(start).Round(time.Microsecond), status, headers, readBodyForLog(body, int64(c.MaxBody)))
 	} else {
 		c.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), data, status, headers, body)
+			url, time.Since(start).Round(time.Microsecond), data, status, headers, readBodyForLog(body, int64(c.MaxBody)))
 	}
 }
 
@@ -421,4 +425,27 @@ func (c *Config) GetValueContext(ctx context.Context, keys ...string) (map[strin
 	}
 
 	return output.Fields, nil
+}
+
+// readBodyForLog truncates the response body, or not, for the debug log. errors are ignored.
+func readBodyForLog(body io.Reader, max int64) string {
+	if body == nil {
+		return ""
+	}
+
+	if max > 0 {
+		limitReader := io.LimitReader(body, max)
+		bodyBytes, _ := ioutil.ReadAll(limitReader)
+		remaining, _ := io.Copy(io.Discard, body) // finish reading to the end.
+
+		if remaining > 0 {
+			return fmt.Sprintf("%s <body truncated, max: %d>", string(bodyBytes), max)
+		}
+
+		return string(bodyBytes)
+	}
+
+	bodyBytes, _ := ioutil.ReadAll(body)
+
+	return string(bodyBytes)
 }
