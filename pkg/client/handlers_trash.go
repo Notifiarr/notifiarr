@@ -1,4 +1,3 @@
-//nolint:dupl
 package client
 
 import (
@@ -54,33 +53,44 @@ func (c *Client) aggregateTrash(req *http.Request) (int, interface{}) {
 func (c *Client) aggregateTrashSonarr(ctx context.Context, wait *sync.WaitGroup,
 	instances notifiarr.IntList) []*notifiarr.SonarrTrashPayload {
 	output := []*notifiarr.SonarrTrashPayload{}
+
 	// Create our known+requested instances, so we can write slice values in go routines.
-	for i, app := range c.Config.Apps.Sonarr {
-		if instance := i + 1; instances.Has(instance) {
+	for idx, app := range c.Config.Apps.Sonarr {
+		if instance := idx + 1; instances.Has(instance) {
 			output = append(output, &notifiarr.SonarrTrashPayload{Instance: instance, Name: app.Name})
 		}
 	}
 
-	var err error
 	// Grab data for each requested instance in parallel/go routine.
 	for idx := range output {
+		if c.Config.Serial {
+			c.aggregateTrashSonarrCall(ctx, idx, output[idx].Instance, wait, output)
+			continue
+		}
+
 		wait.Add(1)
 
-		go func(idx, instance int) {
-			defer wait.Done()
-			// Add the profiles, and/or error into our data structure/output data.
-			app := c.Config.Apps.Sonarr[instance-1]
-			if output[idx].QualityProfiles, err = app.GetQualityProfilesContext(ctx); err != nil {
-				output[idx].Error = fmt.Sprintf("getting quality profiles: %v", err)
-				c.Errorf("Handling Sonarr API request (%d): %s", instance, output[idx].Error)
-			} else if output[idx].ReleaseProfiles, err = app.GetReleaseProfilesContext(ctx); err != nil {
-				output[idx].Error = fmt.Sprintf("getting release profiles: %v", err)
-				c.Errorf("Handling Sonarr API request (%d): %s", instance, output[idx].Error)
-			}
-		}(idx, output[idx].Instance)
+		go c.aggregateTrashSonarrCall(ctx, idx, output[idx].Instance, wait, output)
 	}
 
 	return output
+}
+
+func (c *Client) aggregateTrashSonarrCall(ctx context.Context,
+	idx, instance int, wait *sync.WaitGroup, output []*notifiarr.SonarrTrashPayload) {
+	defer wait.Done()
+
+	var err error
+
+	// Add the profiles, and/or error into our data structure/output data.
+	app := c.Config.Apps.Sonarr[instance-1]
+	if output[idx].QualityProfiles, err = app.GetQualityProfilesContext(ctx); err != nil {
+		output[idx].Error = fmt.Sprintf("getting quality profiles: %v", err)
+		c.Errorf("Handling Sonarr API request (%d): %s", instance, output[idx].Error)
+	} else if output[idx].ReleaseProfiles, err = app.GetReleaseProfilesContext(ctx); err != nil {
+		output[idx].Error = fmt.Sprintf("getting release profiles: %v", err)
+		c.Errorf("Handling Sonarr API request (%d): %s", instance, output[idx].Error)
+	}
 }
 
 // This is basically a duplicate of the above code.
@@ -94,24 +104,34 @@ func (c *Client) aggregateTrashRadarr(ctx context.Context, wait *sync.WaitGroup,
 		}
 	}
 
-	var err error
 	// Grab data for each requested instance in parallel/go routine.
 	for idx := range output {
+		if c.Config.Serial {
+			c.aggregateTrashRadarrCall(ctx, idx, output[idx].Instance, wait, output)
+			continue
+		}
+
 		wait.Add(1)
 
-		go func(idx, instance int) {
-			defer wait.Done()
-			// Add the profiles, and/or error into our data structure/output data.
-			app := c.Config.Apps.Radarr[instance-1]
-			if output[idx].QualityProfiles, err = app.GetQualityProfilesContext(ctx); err != nil {
-				output[idx].Error = fmt.Sprintf("getting quality profiles: %v", err)
-				c.Errorf("Handling Radarr API request (%d): %s", instance, output[idx].Error)
-			} else if output[idx].CustomFormats, err = app.GetCustomFormatsContext(ctx); err != nil {
-				output[idx].Error = fmt.Sprintf("getting custom formats: %v", err)
-				c.Errorf("Handling Radarr API request (%d): %s", instance, output[idx].Error)
-			}
-		}(idx, output[idx].Instance)
+		go c.aggregateTrashRadarrCall(ctx, idx, output[idx].Instance, wait, output)
 	}
 
 	return output
+}
+
+func (c *Client) aggregateTrashRadarrCall(ctx context.Context,
+	idx, instance int, wait *sync.WaitGroup, output []*notifiarr.RadarrTrashPayload) {
+	defer wait.Done()
+
+	var err error
+
+	// Add the profiles, and/or error into our data structure/output data.
+	app := c.Config.Apps.Radarr[instance-1]
+	if output[idx].QualityProfiles, err = app.GetQualityProfilesContext(ctx); err != nil {
+		output[idx].Error = fmt.Sprintf("getting quality profiles: %v", err)
+		c.Errorf("Handling Radarr API request (%d): %s", instance, output[idx].Error)
+	} else if output[idx].CustomFormats, err = app.GetCustomFormatsContext(ctx); err != nil {
+		output[idx].Error = fmt.Sprintf("getting custom formats: %v", err)
+		c.Errorf("Handling Radarr API request (%d): %s", instance, output[idx].Error)
+	}
 }

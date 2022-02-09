@@ -1,3 +1,4 @@
+//nolint:lll
 package client
 
 import (
@@ -43,12 +44,12 @@ func (c *Client) appStatsForVersion(ctx context.Context) map[string]interface{} 
 		wg   sync.WaitGroup
 	)
 
-	getPlexVersion(ctx, &wg, c.Config.Plex, &plx)
-	getLidarrVersion(ctx, &wg, c.Config.Apps.Lidarr, lid)
-	getProwlarrVersion(ctx, &wg, c.Config.Apps.Prowlarr, prl)
-	getRadarrVersion(ctx, &wg, c.Config.Apps.Radarr, rad)
-	getReadarrVersion(ctx, &wg, c.Config.Apps.Readarr, read)
-	getSonarrVersion(ctx, &wg, c.Config.Apps.Sonarr, son)
+	getPlexVersion(ctx, &wg, c.Config.Plex, &plx, c.Config.Serial)
+	getLidarrVersion(ctx, &wg, c.Config.Apps.Lidarr, lid, c.Config.Serial)
+	getProwlarrVersion(ctx, &wg, c.Config.Apps.Prowlarr, prl, c.Config.Serial)
+	getRadarrVersion(ctx, &wg, c.Config.Apps.Radarr, rad, c.Config.Serial)
+	getReadarrVersion(ctx, &wg, c.Config.Apps.Readarr, read, c.Config.Serial)
+	getSonarrVersion(ctx, &wg, c.Config.Apps.Sonarr, son, c.Config.Serial)
 	wg.Wait()
 
 	return map[string]interface{}{
@@ -61,8 +62,14 @@ func (c *Client) appStatsForVersion(ctx context.Context) map[string]interface{} 
 	}
 }
 
-func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*conTest) {
+func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*conTest, fg bool) {
 	for idx, app := range lidarrs {
+		if fg {
+			stat, err := app.GetSystemStatusContext(ctx)
+			lid[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+			continue //nolint:wsl
+		}
+
 		wait.Add(1)
 
 		go func(idx int, app *apps.LidarrConfig) {
@@ -74,8 +81,14 @@ func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps
 	}
 }
 
-func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*apps.ProwlarrConfig, prl []*conTest) {
+func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*apps.ProwlarrConfig, prl []*conTest, fg bool) {
 	for idx, app := range prowlarrs {
+		if fg {
+			stat, err := app.GetSystemStatusContext(ctx)
+			prl[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+			continue //nolint:wsl
+		}
+
 		wait.Add(1)
 
 		go func(idx int, app *apps.ProwlarrConfig) {
@@ -87,8 +100,14 @@ func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*
 	}
 }
 
-func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps.RadarrConfig, rad []*conTest) {
+func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps.RadarrConfig, rad []*conTest, fg bool) {
 	for idx, app := range radarrs {
+		if fg {
+			stat, err := app.GetSystemStatusContext(ctx)
+			rad[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+			continue //nolint:wsl
+		}
+
 		wait.Add(1)
 
 		go func(idx int, app *apps.RadarrConfig) {
@@ -100,8 +119,14 @@ func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps
 	}
 }
 
-func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*apps.ReadarrConfig, read []*conTest) {
+func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*apps.ReadarrConfig, read []*conTest, fg bool) {
 	for idx, app := range readarrs {
+		if fg {
+			stat, err := app.GetSystemStatusContext(ctx)
+			read[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+			continue //nolint:wsl
+		}
+
 		wait.Add(1)
 
 		go func(idx int, app *apps.ReadarrConfig) {
@@ -113,8 +138,14 @@ func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*ap
 	}
 }
 
-func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps.SonarrConfig, son []*conTest) {
+func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps.SonarrConfig, son []*conTest, fg bool) {
 	for idx, app := range sonarrs {
+		if fg {
+			stat, err := app.GetSystemStatusContext(ctx)
+			son[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
+			continue //nolint:wsl
+		}
+
 		wait.Add(1)
 
 		go func(idx int, app *apps.SonarrConfig) {
@@ -126,8 +157,13 @@ func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps
 	}
 }
 
-func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *plex.Server, plx *[]*conTest) {
+func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *plex.Server, plx *[]*conTest, fg bool) {
 	if !plexServer.Configured() {
+		return
+	}
+
+	if fg {
+		*plx = plexVersionReply(plexServer.GetInfo(ctx))
 		return
 	}
 
@@ -135,28 +171,30 @@ func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *plex.
 
 	go func() {
 		defer wait.Done()
-
-		stat, err := plexServer.GetInfo(ctx)
-		if stat == nil {
-			stat = &plex.PMSInfo{}
-		}
-
-		*plx = []*conTest{{
-			Instance: 1,
-			Up:       err == nil,
-			Status: map[string]interface{}{
-				"friendlyName":             stat.FriendlyName,
-				"version":                  stat.Version,
-				"updatedAt":                stat.UpdatedAt,
-				"platform":                 stat.Platform,
-				"platformVersion":          stat.PlatformVersion,
-				"size":                     stat.Size,
-				"myPlexSigninState":        stat.MyPlexSigninState,
-				"myPlexSubscription":       stat.MyPlexSubscription,
-				"pushNotifications":        stat.PushNotifications,
-				"streamingBrainVersion":    stat.StreamingBrainVersion,
-				"streamingBrainABRVersion": stat.StreamingBrainABRVersion,
-			},
-		}}
+		*plx = plexVersionReply(plexServer.GetInfo(ctx)) //nolint:wsl
 	}()
+}
+
+func plexVersionReply(stat *plex.PMSInfo, err error) []*conTest {
+	if stat == nil {
+		stat = &plex.PMSInfo{}
+	}
+
+	return []*conTest{{
+		Instance: 1,
+		Up:       err == nil,
+		Status: map[string]interface{}{
+			"friendlyName":             stat.FriendlyName,
+			"version":                  stat.Version,
+			"updatedAt":                stat.UpdatedAt,
+			"platform":                 stat.Platform,
+			"platformVersion":          stat.PlatformVersion,
+			"size":                     stat.Size,
+			"myPlexSigninState":        stat.MyPlexSigninState,
+			"myPlexSubscription":       stat.MyPlexSubscription,
+			"pushNotifications":        stat.PushNotifications,
+			"streamingBrainVersion":    stat.StreamingBrainVersion,
+			"streamingBrainABRVersion": stat.StreamingBrainABRVersion,
+		},
+	}}
 }

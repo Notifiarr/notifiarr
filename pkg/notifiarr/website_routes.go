@@ -163,6 +163,7 @@ type Response struct {
 	Result  string `json:"result"`
 	Details struct {
 		Response json.RawMessage `json:"response"` // can be anything. type it out later.
+		Help     string          `json:"help"`
 		Started  time.Time       `json:"started"`
 		Finished time.Time       `json:"finished"`
 		Elapsed  cnfg.Duration   `json:"elapsed"`
@@ -175,6 +176,6 @@ func (r *Response) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf("Website took %s and replied with: %s, %s",
-		r.Details.Elapsed, r.Result, r.Details.Response)
+	return fmt.Sprintf("Website took %s and replied with: %s, %s %s",
+		r.Details.Elapsed, r.Result, r.Details.Response, r.Details.Help)
 }

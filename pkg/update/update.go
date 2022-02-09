@@ -115,7 +115,13 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 		_ = os.Chmod(tempFile, mnd.Mode0755)
 	}
 
-	backupFile := u.Path + ".backup." + time.Now().Format("060102T150405")
+	suff := ""
+	if strings.HasSuffix(u.Path, ".exe") {
+		suff = ".exe"
+	}
+
+	backupFile := strings.TrimSuffix(u.Path, ".exe")
+	backupFile += ".backup." + time.Now().Format("060102T150405") + suff
 	u.Printf("[Update] Renaming %s => %s", u.Path, backupFile)
 
 	if err := os.Rename(u.Path, backupFile); err != nil {
