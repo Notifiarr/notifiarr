@@ -48,6 +48,7 @@ type Config struct {
 	Plex     *plex.Server     // plex sessions
 	Snap     *snapshot.Config // system snapshot data
 	Services *ServiceConfig
+	Serial   bool
 	Retries  int
 	BaseURL  string
 	Timeout  cnfg.Duration
@@ -202,7 +203,8 @@ func (c *Config) setClientInfoTimerTriggers() {
 
 	if c.clientInfo.Actions.Dashboard.Interval.Duration > 0 {
 		c.Trigger.get(TrigDashboard).T = time.NewTicker(c.clientInfo.Actions.Dashboard.Interval.Duration)
-		c.Printf("==> Sending Current State Data for Dashboard, interval:%s", c.clientInfo.Actions.Dashboard.Interval)
+		c.Printf("==> Sending Current State Data for Dashboard, interval:%s, serial:%v",
+			c.clientInfo.Actions.Dashboard.Interval, c.Serial)
 	}
 
 	if len(c.clientInfo.Actions.Custom) > 0 { // This is not directly triggerable.
@@ -245,18 +247,16 @@ func (c *Config) makeCustomClientInfoTimerTriggers() {
 
 // Stop all internal cron timers and Triggers.
 func (c *Config) Stop(event EventType) {
+	// Neither of these if statemens should ever fire. That's a bug somewhere else.
 	if c == nil {
-		return
+		panic("Config is nil, cannot stop a nil config!!")
+	} else if c.Trigger.stop == nil {
+		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
-	c.Print("==> Stopping Notifiarr Timers.")
-
-	if c.Trigger.stop == nil {
-		c.Error("==> Notifiarr Timers cannot be stopped: not running!")
-		return
-	}
-
+	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.stop.C <- event
+	// Closes the Plex session holder.
 	defer close(c.Trigger.sess)
 	c.Trigger.sess = nil
 }

@@ -95,6 +95,15 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 
 // getQueues fires a routine for each app type and tries to get a lot of data fast!
 func (c *Config) getQueues() *QueuePayload {
+	if c.Serial {
+		return &QueuePayload{
+			Lidarr:  c.getFinishedItemsLidarr(),
+			Radarr:  c.getFinishedItemsRadarr(),
+			Readarr: c.getFinishedItemsReadarr(),
+			Sonarr:  c.getFinishedItemsSonarr(),
+		}
+	}
+
 	cue := &QueuePayload{}
 
 	var wg sync.WaitGroup

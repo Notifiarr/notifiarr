@@ -8,7 +8,7 @@ require (
 	golift.io/deluge v0.9.4-0.20220103091211-1842b313e264
 	golift.io/qbit v0.0.0-20211121074815-1558e8969b98
 	golift.io/rotatorr v0.0.0-20210307012029-65b11a8ea8f9
-	golift.io/starr v0.13.1-0.20220131084043-040595401905
+	golift.io/starr v0.13.1-0.20220206104728-5856b9d34028
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.0.11
 )
@@ -89,7 +89,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.20.0 // indirect
-	golang.org/x/tools v0.1.8 // indirect
+	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.35.22 // indirect
