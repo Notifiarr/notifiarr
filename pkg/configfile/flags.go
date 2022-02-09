@@ -14,11 +14,11 @@ import (
 // Flags are our CLI input flags.
 type Flags struct {
 	*flag.FlagSet
+	VerReq     bool
+	Restart    bool
 	AptHook    bool `json:"aptHook"`
 	Updated    bool
 	PSlist     bool
-	VerReq     bool
-	Restart    bool
 	Write      string
 	Curl       string
 	ConfigFile string

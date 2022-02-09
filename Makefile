@@ -18,7 +18,6 @@ UPXPATH=$(shell which upx)
 ifeq ($(shell uname -ps),Darwin arm)
   UPXPATH=
 endif
-UPXPATH=
 
 ifeq ($(shell grep -o 'Arch Linux' /etc/issue 2>/dev/null),Arch Linux)
   UPXPATH=

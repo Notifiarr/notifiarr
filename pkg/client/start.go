@@ -97,7 +97,6 @@ func (c *Client) start() error { //nolint:cyclop
 		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
-
 	clientInfo := c.configureServices(notifiarr.EventStart)
 
 	if newCon {
@@ -316,9 +315,7 @@ func (c *Client) reloadConfiguration(source string) error {
 
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
-
-	c.website, err = c.Config.Get(c.Flags)
-	if err != nil {
+	if c.website, err = c.Config.Get(c.Flags); err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}
 
@@ -328,7 +325,6 @@ func (c *Client) reloadConfiguration(source string) error {
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.setupMenus(c.configureServices(notifiarr.EventReload))
-
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
