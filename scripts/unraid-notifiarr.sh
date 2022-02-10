@@ -15,9 +15,10 @@ CHANNEL_ID="940876909158490154"
 # * If you use the Auto Updater, go into those Settings and Set Notifications to Yes.
 ############
 
+#### Settings ####
+
 # Debug prints the sent payload into the log file.
 DEBUG=false
-
 # greyish, default left sidebar color.
 COLOR="28282C"
 # yellowish, for any warning.
@@ -26,6 +27,8 @@ WARNING_COLOR="918c3d"
 ERROR_COLOR="ff5733"
 # bluish, for anything weird.
 ABNORMAL_COLOR="383582"
+# Format string for `date` (Time).
+DATE_FORMAT="+%Y-%m-%d %H:%M:%S"
 
 ##### SCRIPT BELOW, CHANGE ONLY IF YOU WANT TO BREAK THINGS #####
 
@@ -34,7 +37,7 @@ SCRIPTNAME=$(basename "$0")
 LOG="/var/log/notify_${SCRIPTNAME%.*}"
 # Sometimes CloudFlare has an error, mitigate with retries.
 RETRIES=4
-URL="https://notifiarr.com/api/v1/notification/passthrough?event=unraid"
+URL="https://notifiarr.com/api/v1/notification/passthrough"
 
 # This stuff may work on OSes besides Unraid, but don't count on it.
 #UPTIME_SEC=$(head -n1 /proc/uptime | cut -d. -f1)
@@ -45,21 +48,13 @@ UPTIME=$(echo "${UPTIME}" | grep -o 'up[^,]\+')
 CONTAINERS=$(docker ps -q 2>&1 | wc -l)
 KERNEL=$(uname -s -r)
 
-# Available fields from notification system
-# HOSTNAME
-# EVENT (notify -e)
-# IMPORTANCE (notify -i)
-# SUBJECT (notify -s)
-# DESCRIPTION (notify -d)
-# CONTENT (notify -m)
-# TIMESTAMP (seconds from epoch)
-
 # These values are generally only used when you run the script as a test.
 [[ "${EVENT}" ]]       || EVENT='No event'
 [[ "${SUBJECT}" ]]     || SUBJECT='No subject'
 [[ "${DESCRIPTION}" ]] || DESCRIPTION='No description'
-[[ "${IMPORTANCE}" ]]  || IMPORTANCE='abnormal'
+[[ "${IMPORTANCE}" ]]  || IMPORTANCE='test'
 [[ "${TIMESTAMP}" ]]   || TIMESTAMP="$(date +%s)"
+# Content is optional. Not always present. Add it only if it exists.
 [[ ! "${CONTENT}" ]]   || CONTENT=$(cat <<EOF
 ,
         {"title": "Content", "text": "${CONTENT}"}
@@ -71,8 +66,10 @@ EOF
 [ "${IMPORTANCE}" != "warning" ] || COLOR="${WARNING_COLOR}"
 [ "${IMPORTANCE}" != "error" ]   || COLOR="${ERROR_COLOR}"
 
-DATETIME=$(date -u "+%Y-%m-%dT%H:%M:%S.000Z" -d @"${TIMESTAMP}")
+# Format the eopch time stamp.
+DATETIME=$(date -u "${DATE_FORMAT} UTC" -d @"${TIMESTAMP}")
 
+# Create our payload for the website.
 PASSTHRU=$(cat <<EOF
 {
   "notification": { "update": false, "name": "Unraid: ${IMPORTANCE^} Alert" },
