@@ -44,9 +44,8 @@ URL="https://notifiarr.com/api/v1/notification/passthrough"
 RETRIES=4
 
 ## This stuff may work on OSes besides Unraid, but don't count on it.
-UPTIME=$(uptime)
-LOADAV=$(echo "${UPTIME}" | grep -o '[0-9]\+\.[0-9]\+, [0-9]\+\.[0-9]\+, [0-9]\+\.[0-9]\+$')
-UPTIME=$(echo "${UPTIME}" | grep -o 'up[^,]\+')
+UPTIME=$(uptime -p | sed -e 's/^up//g' -e 's/[aeiou]//g')
+LOADAV=$(uptime | cut -d: -f5)
 KERNEL=$(uname -s -r)
 DOCKER=$(docker ps -q 2>&1 | wc -l)
 STOPED=$(docker ps -aq 2>&1 | wc -l)
