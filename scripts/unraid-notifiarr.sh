@@ -29,6 +29,8 @@ ERROR_COLOR="ff5733"
 ABNORMAL_COLOR="383582"
 ## Format string for `date` (Time). Always in UTC.
 DATE_FORMAT="+%Y-%m-%d %H:%M:%S"
+## You can change this if you really want to.
+UNRAID_LOGO="https://craftassets.unraid.net/uploads/logos/un-mark-gradient@2x.png"
 ## Debug prints the sent payload into the log file: /var/log/notify_Notifiarr
 ## Remove comment (#) on the next line to enable debug.
 #DEBUG=true
@@ -88,7 +90,7 @@ PASSTHRU=$(cat <<EOF
     "color": "${COLOR}",
     "text": {
       "description": "${EVENT}\n${DESCRIPTION}",
-      "icon":    "https://raw.githubusercontent.com/limetech/Unraid.net/master/Unraid.net.png",
+      "icon":    "${UNRAID_LOGO}",
       "title":   "${SUBJECT}",
       "content": "Unraid: ${IMPORTANCE^} Alert! ${EVENT}",
       "footer":  "${HOSTNAME} • ${KERNEL} v${UNRAIDVER}",
@@ -111,7 +113,7 @@ EOF
 [ "${DEBUG}" != "true" ] || echo "[$(date)] Sending Payload to ${URL}:\n${PASSTHRU}" >> "${LOG}"
 
 ## Retry the curl in case CloudFlare is in a mood.
-for ((i = 1; i <= "${RETRIES}"; i++)); do
+for ((retry = 1; retry <= "${RETRIES}"; retry++)); do
   output=$(curl -sH "x-api-key: ${NOTIFIARR_API_KEY}" -d "${PASSTHRU}" "${URL}" 2>&1)
   if [ "$?" -eq "0" ]; then
     echo "[$(date)] Sent notification to notifiarr.com, subject: ${SUBJECT}" >> "${LOG}"
@@ -119,10 +121,11 @@ for ((i = 1; i <= "${RETRIES}"; i++)); do
   fi
 
   ## Log the error and curl output.
-  echo "[$(date)] Curl Attempt ${i} of ${RETRIES} failed, subject: ${SUBJECT}" >> "${LOG}"
+  echo "[$(date)] Curl Attempt ${retry} of ${RETRIES} failed, subject: ${SUBJECT}" >> "${LOG}"
   echo "[$(date)] Curl Output: ${output}" >> "${LOG}"
 
-  if [ "${i}" -eq "${RETRIES}" ]; then
+  if [ "${retry}" -eq "${RETRIES}" ]; then
+    echo "[$(date)] Curl Failed, giving up after ${RETRIES} retries." >> "${LOG}"
     logger -t "${SCRIPTNAME}" "Failed sending notification - retries met"
     break
   fi
