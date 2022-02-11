@@ -154,11 +154,9 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 func (c *Client) loadSiteConfig(source notifiarr.EventType) *notifiarr.ClientInfo {
 	clientInfo, err := c.website.GetClientInfo(source)
 	if err != nil || clientInfo == nil {
-		c.Printf("==> [WARNING] API Key may be invalid: %v, info: %s", err, clientInfo)
+		c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
 		return nil
 	}
-
-	c.Printf("==> %s", clientInfo)
 
 	if clientInfo.Actions.Snapshot != nil {
 		clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins // use local data for plugins.
@@ -241,7 +239,7 @@ func (c *Client) configureServices(source notifiarr.EventType) *notifiarr.Client
 	c.configureServicesPlex()
 	c.website.Sighup = c.sighup
 	c.Config.Snapshot.Validate()
-	c.PrintStartupInfo()
+	c.PrintStartupInfo(clientInfo)
 	c.website.Start()
 	/* // debug stuff.
 	snap, err, _ := c.Config.Snapshot.GetSnapshot()

@@ -48,6 +48,8 @@ type Config struct {
 	Mode       string              `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
 	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	Serial     bool                `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
+	Retries    int                 `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
 	Plex       *plex.Server        `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
 	Snapshot   *snapshot.Config    `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
 	Services   *services.Config    `json:"services" toml:"services" xml:"services" yaml:"services"`
@@ -152,6 +154,8 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 		BaseURL:  notifiarr.BaseURL,
 		Timeout:  c.Timeout,
 		MaxBody:  c.MaxBody,
+		Retries:  c.Retries,
+		Serial:   c.Serial,
 		Services: svcs,
 	}
 	c.setup()

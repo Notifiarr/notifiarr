@@ -360,7 +360,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 // Set a Decoder instance as a package global, because it caches
 // meta-data about structs, and an instance can be shared safely.
-var configPostDecoder = schema.NewDecoder()
+var configPostDecoder = schema.NewDecoder() //nolint:gochecknoglobals
 
 func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *http.Request) error {
 	configPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
@@ -371,12 +371,10 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		return fmt.Errorf("parsing form data failed: %w", err)
 	}
 
-	err := configPostDecoder.Decode(config, request.PostForm)
-	if err != nil {
+	if err := configPostDecoder.Decode(config, request.PostForm); err != nil {
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
 	}
 
-	// TODO: this method...
 	return nil
 }
 

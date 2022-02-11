@@ -60,7 +60,7 @@ bind_addr = "{{.BindAddr}}"
 ##
 quiet = {{.Quiet}}{{if .Debug}}
 
-## Debug prints more data and json payloads. Recommend setting debug_log if enabled.
+## Debug prints more data and json payloads. This increases application memory usage.
 debug = true
 max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if and .Mode (ne .Mode "production")}}
 
@@ -107,6 +107,15 @@ file_mode = "{{.FileMode.String}}"
 ## Web server and application timeouts.
 ##
 timeout = "{{.Timeout}}"
+
+## Setting serial to true makes the app use fewer threads when polling apps.
+## This spreads CPU usage out and uses a bit less memory.
+serial = {{.Serial}}
+
+## Retries controls how many times to retry requests to notifiarr.com.
+## Sometimes cloudflare returns a 521, and this mitigates those problems.
+## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
+retries = {{.Retries}}
 
 
 ##################

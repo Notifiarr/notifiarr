@@ -307,7 +307,7 @@ func (c *Client) watchGuiChannels() {
 	}
 }
 
-// nolint:errcheck,cyclop
+// nolint:errcheck
 func (c *Client) watchConfigChannels() {
 	for {
 		select {
