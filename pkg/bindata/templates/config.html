@@ -2,26 +2,35 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <td>Setting</td>
-                                <td>Current Value</td>
-                                <td>New Value</td>
+                                <td><b>Setting</b></td>
+                                <td><b>Current Value</b></td>
+                                <td><b>New Value</b></td>
                             </tr>
                             <tr><td colspan="3" align="center"><h2 class="mb-3">General</h2></td></tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><i class="help-icon far fa-question-circle" title="API key from your Notifiarr.com account, required for security validation"></i> API Key</td>
+                                <td>
+                                    <i title="API key from your Notifiarr.com account, required for security validation. This must be an 'All' key!" class="help-icon far fa-question-circle"></i>
+                                    API Key
+                                </td>
                                 <td>{{.Config.APIKey}}</td>
                                 <td><input class="client-parameter" data-group="config" data-label="API Key" type="text" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td><i class="help-icon far fa-question-circle" title="Default is usually fine unless you modify the port"></i> Bind Address</td>
+                                <td>
+                                    <i title="This is the IP and port the app will listen on. 0.0.0.0 means all IPs, and you should use that in almost all cases! Change the port if the default 5454 does not work for you. Example: 0.0.0.0:5454" class="help-icon far fa-question-circle"></i>
+                                    Bind Address
+                                </td>
                                 <td>{{.Config.BindAddr}}</td>
                                 <td><input class="client-parameter" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}" style="width: 100%;"></td>
                             </tr>
-                            {{- /* if eq .Version.os "windows" */}}
+                            {{- if eq .Version.os "windows" }}
                             <tr>
-                                <td><i class="help-icon far fa-question-circle" title="This is how often the app will check for updates"></i> Auto Update</td>
+                                <td>
+                                    <i title="This is how often the app will check for updates. When one is found it will be installed automatically." class="help-icon far fa-question-circle"></i>
+                                    Auto Update
+                                </td>
                                 <td>{{.Config.AutoUpdate}}</td>
                                 <td>
                                     <select class="client-parameter" data-group="config" data-label="Auto Update" id="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
@@ -33,9 +42,12 @@
                                     </select>
                                 </td>
                             </tr>
-                            {{- /* end */}}
+                            {{- end }}
                             <tr>
-                                <td><i class="help-icon far fa-question-circle" title="Only enable when asked, your Notifiarr account must have dev access for this to work."></i> Mode</td>
+                                <td>
+                                    <i title="Only choose Development when asked, your Notifiarr account must have dev access for this to work." class="help-icon far fa-question-circle"></i>
+                                    Mode
+                                </td>
                                 <td>{{.Config.Mode}}</td>
                                 <td>
                                     <select class="client-parameter" data-group="config" data-label="Client Mode" id="Mode" data-original="{{.Config.Mode}}">
@@ -45,19 +57,50 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>URL Base</td>
+                                <td>
+                                    <i title="This application serves HTTP on / by default. You can change that by typing in something else here. Example: /notifiarr/" class="help-icon far fa-question-circle"></i>
+                                    URL Base
+                                </td>
                                 <td>{{.Config.URLBase}}</td>
                                 <td><input type="text" id="URLBase" class="client-parameter" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td><i class="help-icon far fa-question-circle" title="Separate with spaces or new lines."></i> Upstreams</td>
+                                <td>
+                                    <i title="If notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or X-Forwarded-For). Separate with spaces or new lines." class="help-icon far fa-question-circle"></i>
+                                    Upstreams
+                                </td>
                                 <td>{{range $s := .Config.Upstreams}}{{$s}}<br>{{end}}</td>
                                 <td>
                                     <textarea id="Upstreams" class="client-parameter" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}" style="width: 100%;">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
                                 </td>
                             </tr>
+
                             <tr>
-                                <td>Timeout</td>
+                                <td>
+                                    <i title="Enabling serial will make the application use fewer go routines (threads) when gathering data from configured applications. Spreads out CPU usage and lowers memory footprint." class="help-icon far fa-question-circle"></i>
+                                    Serial
+                                </td>
+                                <td>{{if .Config.Serial}}Enabled{{else}}Disabled{{end}}</td>
+                                <td>
+                                    <select class="client-parameter" data-group="config" data-label="Serial" id="Serial" data-original="{{.Config.Serial}}">
+                                        <option {{if .Config.Serial}}selected {{end}}value="true">Enabled</option>
+                                        <option {{if not .Config.Serial}}selected {{end}}value="false">Disabled</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i title="Sometimes connections to notifiarr.com fail. This controls how many times each request will be attempted in case of failures. Default is 4. Settng 0 will take defailt of 4." class="help-icon far fa-question-circle"></i>
+                                    Retries
+                                </td>
+                                <td>{{.Config.Retries}}</td>
+                                <td><input type="text" id="Retries" class="client-parameter" data-group="config" data-label="Retries" data-original="{{.Config.Retries}}" value="{{.Config.Retries}}" style="width: 100%;"></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i title="This is the timeout for requests to notifiarr.com, and any other timeout that may be missing (global)." class="help-icon far fa-question-circle"></i>
+                                    Timeout
+                                </td>
                                 <td>{{.Config.Timeout}}</td>
                                 <td><input type="text" id="Timeout" class="client-parameter" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}" style="width: 100%;"></td>
                             </tr>
@@ -67,14 +110,62 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Key File</td>
+                                <td>
+                                    <i title="This is the path to the SSL certificate key file. This is a secret! See Certificate File help for more info." class="help-icon far fa-question-circle"></i>
+                                    Cert Key File Path
+                                </td>
                                 <td>{{.Config.SSLKeyFile}}</td>
                                 <td><input type="text" id="SSLKeyFile" class="client-parameter" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td>Cert File</td>
+                                <td>
+                                    <i title="This application can serve HTTPS. Enable that by specifying a certificate file path and key file path. The certificate file should have the full CA chain inclued." class="help-icon far fa-question-circle"></i>
+                                    Cert File Path
+                                </td>
                                 <td>{{.Config.SSLCrtFile}}</td>
                                 <td><input type="text" id="SSLCrtFile" class="client-parameter" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}" style="width: 100%;"></td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr><td colspan="3" align="center"><h2 class="mb-3">Services</h2></td></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <i title="Disable or enable monitoring all network and services checks right here." class="help-icon far fa-question-circle"></i>
+                                    Run Checks
+                                </td>
+                                <td>{{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}</td>
+                                <td>
+                                    <select class="client-parameter" data-group="config" data-label="Run Checks" id="Services.Disabled" data-original="{{.Config.Services.Disabled}}">
+                                        <option {{if .Config.Services.Disabled}}selected {{end}}value="true">Disabled</option>
+                                        <option {{if not .Config.Services.Disabled}}selected {{end}}value="false">Enabled</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i title="Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this. This controls how many checks may run at once." class="help-icon far fa-question-circle"></i>
+                                    Parallel Checks
+                                </td>
+                                <td>{{.Config.Services.Parallel}}</td>
+                                <td>
+                                  <select class="client-parameter" data-group="config" data-label="Parallel Checks" id="Services.Parallel" data-original="{{.Config.Services.Parallel}}">
+                                      <option {{if eq .Config.Services.Parallel 1}}selected {{end}}value="1">1</option>
+                                      <option {{if eq .Config.Services.Parallel 2}}selected {{end}}value="2">2</option>
+                                      <option {{if eq .Config.Services.Parallel 3}}selected {{end}}value="3">3</option>
+                                      <option {{if eq .Config.Services.Parallel 4}}selected {{end}}value="4">4</option>
+                                      <option {{if eq .Config.Services.Parallel 5}}selected {{end}}value="5">5</option>
+                                  </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <i title="How often to send service check results to notifiarr.com. Default: 10m, minimum: 5m." class="help-icon far fa-question-circle"></i>
+                                    Update Interval
+                                </td>
+                                <td>{{.Config.Services.Interval}}</td>
+                                <td><input type="text" id="Services.Interval" class="client-parameter" data-group="config" data-label="Update Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}" style="width: 100%;"></td>
                             </tr>
                         </tbody>
                         <thead>
@@ -82,7 +173,10 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Debug Logging</td>
+                                <td>
+                                    <i title="Enabling debug logging causes a lot more data to write to the log. Includes payloads to and from notifiarr.com and starr apps. Use Max Body settings to control payloads sizes." class="help-icon far fa-question-circle"></i>
+                                    Debug Logging
+                                </td>
                                 <td>{{if .Config.Debug}}Enabled{{else}}Disabled{{end}}</td>
                                 <td>
                                   <select class="client-parameter" data-group="config" data-label="Debug" id="Debug" data-original="{{.Config.Debug}}">
@@ -92,7 +186,10 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>Quiet Logging</td>
+                                <td>
+                                    <i title="Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too." class="help-icon far fa-question-circle"></i>
+                                    Quiet Logging
+                                </td>
                                 <td>{{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}</td>
                                 <td>
                                   <select class="client-parameter" data-group="config" data-label="Quiet" id="Quiet" data-original="{{.Config.Quiet}}">
@@ -102,42 +199,68 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>App Logfile</td>
+                                <td>
+                                    <i title="Setting a log file path here will make the application write logs to this path. Highly recommended!" class="help-icon far fa-question-circle"></i>
+                                    App Log File
+                                </td>
                                 <td>{{.Config.LogFile}}</td>
                                 <td><input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td>HTTP Logfile</td>
+                                <td>
+                                    <i title="Setting a log file path here will make the application write the http logs to a dedicated file. The file format is in apachelog. Highly recommended." class="help-icon far fa-question-circle"></i>
+                                    HTTP Logfile
+                                </td>
                                 <td>{{.Config.HTTPLog}}</td>
                                 <td><input type="text" id="HTTPLog" class="client-parameter" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td>Services Logfile</td>
+                                <td>
+                                    <i title="Setting a log file path here will make the application write service check results to a dedciated file. Recommended if you have a lot of services." class="help-icon far fa-question-circle"></i>
+                                    Services Log File
+                                </td>
                                 <td>{{.Config.Services.LogFile}}</td>
                                 <td><input type="text" id="Services.LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td>Debug Logfile</td>
+                                <td>
+                                    <i title="Setting a log file path here will make the application write debug messages to a dedicated log file. Otherwise debug messages write to the main app log." class="help-icon far fa-question-circle"></i>
+                                    Debug Log File
+                                </td>
                                 <td>{{.Config.LogConfig.DebugLog}}</td>
                                 <td><input type="text" id="LogConfig.DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}" style="width: 100%;"></td>
                             </tr>
+                            {{- if not (eq .Version.os "windows") }}
                             <tr>
-                                <td>Logfile Unix Mode</td>
+                                <td>
+                                    <i title="This is the unix file mode used when writing new log files. Recommended values in order of openness: 0600, 0640, 0644" class="help-icon far fa-question-circle"></i>
+                                    Log File Unix Mode
+                                </td>
                                 <td>{{.Config.FileMode}}</td>
                                 <td><input type="text" id="FileMode" class="client-parameter" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}" style="width: 100%;"></td>
                             </tr>
+                            {{ end }}
                             <tr>
-                                <td>Max Payload Length</td>
+                                <td>
+                                    <i title="When debug is enabled, this setting limits the amount of payload data written to the log, to or from notifiarr.com. Recommend 1000-5000." class="help-icon far fa-question-circle"></i>
+                                    Max Body Size
+                                </td>
                                 <td>{{.Config.MaxBody}}</td>
                                 <td><input type="text" id="MaxBody" class="client-parameter" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td>Max Log Size</td>
+                                <td>
+                                    <i title="When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation. Recommend 5-25 MB." class="help-icon far fa-question-circle"></i>
+                                    Log File Size (MB)
+                                </td>
                                 <td>{{.Config.LogFileMb}}</td>
                                 <td><input type="text" id="LogFileMb" class="client-parameter" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
-                                <td>Max Log Count</td>
+                                <td>
+                                    <i title="When this setting is 0 or 1, log file rotation is disabled. Setting this to a higher value will rotate all log files, and keep this many of each on disk. Controls all log files." class="help-icon far fa-question-circle"></i>
+                                    Log File Count
+                                </td>
                                 <td>{{.Config.LogFiles}}</td>
                                 <td><input type="text" id="LogFiles" class="client-parameter" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}" style="width: 100%;"></td>
                             </tr>

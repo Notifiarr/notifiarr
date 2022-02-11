@@ -58,14 +58,16 @@ bind_addr = "{{.BindAddr}}"
 ## This is always true on Windows and macOS app.
 ## Log files are automatically written on those platforms.
 ##
-quiet = {{.Quiet}}{{if .Debug}}
+quiet = {{.Quiet}}
 
 ## Debug prints more data and json payloads. This increases application memory usage.
-debug = true
-max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if and .Mode (ne .Mode "production")}}
+debug = {{.Debug}}
+max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
+{{- if and .Mode (ne .Mode "production")}}
 
 ## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
-mode  = "{{.Mode}}"{{end}}
+mode  = "{{.Mode}}"
+{{end}}
 
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
 ## Change it to /somethingelse/api by setting urlbase to "/somethingelse"

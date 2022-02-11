@@ -3,9 +3,11 @@
 {{- else}}
 {{- template "header.html" . }}
         <div class="brand clearfix" style="z-index:100;">
-            <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
-              <img src="{{files}}/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr Client
-            </h4>
+            <a class="nav-link" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
+                <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
+                  <img src="{{files}}/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr Client
+                </h4>
+            </a>
             <span class="menu-btn"><i class="fa fa-bars"></i></span>
             <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
         </div>
