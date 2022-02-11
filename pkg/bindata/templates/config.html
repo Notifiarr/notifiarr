@@ -19,6 +19,16 @@
                             </tr>
                             <tr>
                                 <td>
+                                    <i title="This application uses the notifiarr.com API key for incoming authentication. That's not safe if you want a third party to authenticate to this app. You can use this section to add extra api keys. Whatever you want. Separate them with newlines or spaces." class="help-icon far fa-question-circle"></i>
+                                    Extra Keys
+                                </td>
+                                <td>{{range $s := .Config.ExKeys}}{{$s}}<br>{{end}}</td>
+                                <td>
+                                    <textarea id="ExKeys" class="client-parameter" data-group="config" data-label="Extra Keys" data-original="{{range $s := .Config.ExKeys}}{{$s}} {{end}}" style="width: 100%;">{{range $s := .Config.ExKeys}}{{$s}} {{end}}</textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
                                     <i title="This is the IP and port the app will listen on. 0.0.0.0 means all IPs, and you should use that in almost all cases! Change the port if the default 5454 does not work for you. Example: 0.0.0.0:5454" class="help-icon far fa-question-circle"></i>
                                     Bind Address
                                 </td>
