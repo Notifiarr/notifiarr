@@ -7,12 +7,15 @@
 package configfile
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -78,6 +81,30 @@ func NewConfig(logger *logs.Logger) *Config {
 		},
 		Timeout: cnfg.Duration{Duration: mnd.DefaultTimeout},
 	}
+}
+
+// CopyConfig returns a copy of the configuration data.
+// Useful for writing a config file with different values than what's running.
+func (c *Config) CopyConfig() (*Config, error) {
+	var newConfig Config
+
+	buf := bytes.Buffer{}
+	if err := Template.Execute(&buf, c); err != nil {
+		return nil, fmt.Errorf("encoding config into toml for copying (this is a bug!): %w", err)
+	}
+
+	dec := toml.NewDecoder(&buf)
+	if _, err := dec.Decode(&newConfig); err != nil {
+		var parseErr toml.ParseError
+		if errors.As(err, &parseErr) {
+			return nil, fmt.Errorf("decoding config from toml for copying (this is a bug!): %w: %s",
+				err, parseErr.ErrorWithUsage())
+		}
+
+		return nil, fmt.Errorf("decoding config from toml for copying: %w", err)
+	}
+
+	return &newConfig, nil
 }
 
 // Get parses a config file and environment variables.

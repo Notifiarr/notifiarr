@@ -45,7 +45,7 @@ type Apps struct {
 	Router   *mux.Router         `json:"-" toml:"-" xml:"-" yaml:"-"`
 	ErrorLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
 	DebugLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
-	keys     map[string]struct{} // for fast key lookup.
+	keys     map[string]struct{} `toml:"-"` // for fast key lookup.
 }
 
 type starrConfig struct {

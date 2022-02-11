@@ -33,7 +33,7 @@
                                 <td><i class="help-icon far fa-question-circle" title="Only enable when asked, your Notifiarr account must have dev access for this to work."></i> Mode</td>
                                 <td>{{.Config.Mode}}</td>
                                 <td>
-                                    <select class="client-parameter" data-group="config" data-label="Client Mode" id="ClientMode" data-original="{{.Config.Mode}}">
+                                    <select class="client-parameter" data-group="config" data-label="Client Mode" id="Mode" data-original="{{.Config.Mode}}">
                                         <option {{if eq .Config.Mode "development"}}selected {{end}}value="development">Development</option>
                                         <option {{if eq .Config.Mode "production" }}selected {{end}}value="production">Production</option>
                                     </select>
@@ -69,7 +69,7 @@
                             <tr>
                                 <td>Cert File</td>
                                 <td>{{.Config.SSLCrtFile}}</td>
-                                <td><input type="text" id="SSL Cert File" class="client-parameter" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}" style="width: 100%;"></td>
+                                <td><input type="text" id="SSLCrtFile" class="client-parameter" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}" style="width: 100%;"></td>
                             </tr>
                         </tbody>
                         <thead>
@@ -109,12 +109,12 @@
                             <tr>
                                 <td>Services Logfile</td>
                                 <td>{{.Config.Services.LogFile}}</td>
-                                <td><input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Services.LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Debug Logfile</td>
                                 <td>{{.Config.LogConfig.DebugLog}}</td>
-                                <td><input type="text" id="DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}" style="width: 100%;"></td>
+                                <td><input type="text" id="LogConfig.DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}" style="width: 100%;"></td>
                             </tr>
                             <tr>
                                 <td>Logfile Unix Mode</td>

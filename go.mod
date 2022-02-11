@@ -8,7 +8,7 @@ require (
 	golift.io/deluge v0.9.4-0.20220103091211-1842b313e264
 	golift.io/qbit v0.0.0-20211121074815-1558e8969b98
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
-	golift.io/starr v0.13.1-0.20220117233154-f0fdc3b60b5c
+	golift.io/starr v0.14.0
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.0.11
 )
@@ -37,7 +37,7 @@ require (
 
 // snapshot and other stuff.
 require (
-	github.com/BurntSushi/toml v1.0.0 // indirect
+	github.com/BurntSushi/toml v1.0.0
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-stack/stack v1.8.1 // indirect
@@ -64,7 +64,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
 	golang.org/x/mod v0.5.1
-	golang.org/x/net v0.0.0-20220114011407-0dd24b26b47d // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
@@ -105,4 +105,6 @@ require (
 
 require github.com/gorilla/securecookie v1.1.1
 
-require github.com/fsnotify/fsnotify v1.5.1 // indirect
+require github.com/fsnotify/fsnotify v1.5.1
+
+require github.com/gorilla/schema v1.2.0 // indirect

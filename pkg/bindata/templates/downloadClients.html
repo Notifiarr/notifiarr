@@ -23,12 +23,12 @@
                                     <td style="font-size: 22px;">{{instance $index}}
                                         <div style="float: right;"><button type="button" id="Qbit{{instance $index}}Delete" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button></div>
                                     </td>
-                                    <td><input type="text" id="Qbit{{instance $index}}Name" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Qbit{{instance $index}}URL" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Qbit{{instance $index}}User" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Qbit{{instance $index}}Pass" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Qbit{{instance $index}}Interval" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Qbit{{instance $index}}Timeout" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Name" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Qbit.{{$index}}.URL" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Qbit.{{$index}}.User" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Pass" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Interval" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
                                 </tr>
                                 {{- end}}
                             {{- else}}
@@ -59,11 +59,11 @@
                                     <td style="font-size: 22px;">{{instance $index}}
                                         <div style="float: right;"><button type="button" id="Deluge{{instance $index}}Delete" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button></div>
                                     </td>
-                                    <td><input type="text" id="Deluge{{instance $index}}Name" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                    <td colspan="2"><input type="text" id="Deluge{{instance $index}}URL" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Deluge{{instance $index}}Password" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Pass" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Deluge{{instance $index}}Interval" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="Deluge{{instance $index}}Timeout" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Name" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                    <td colspan="2"><input type="text" id="Apps.Deluge.{{$index}}.Config.URL" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Config.Password" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Pass" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Interval" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Timeout" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
                                 </tr>
                                 {{- end}}
                             {{- else}}
@@ -92,11 +92,11 @@
                                     <td style="font-size: 22px;">{{instance $index}}
                                         <div style="float: right;"><button type="button" id="SabNZB{{instance $index}}Delete" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button></div>
                                     </td>
-                                    <td><input type="text" id="SabNZB{{instance $index}}Name" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                    <td colspan="2"><input type="text" id="SabNZB{{instance $index}}URL" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.Name}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="SabNZB{{instance $index}}APIKey" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} API Key" data-original="{{$app.Name}}" value="{{$app.ApiKey}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="SabNZB{{instance $index}}Interval" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                    <td><input type="text" id="SabNZB{{instance $index}}Timeout" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.Name" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                    <td colspan="2"><input type="text" id="Apps.SabNZB.{{$index}}.URL" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.Name}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.APIKey" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} API Key" data-original="{{$app.Name}}" value="{{$app.ApiKey}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.Interval" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.Timeout" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
                                 </tr>
                                 {{- end}}
                             {{- else}}

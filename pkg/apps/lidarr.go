@@ -46,7 +46,7 @@ type LidarrConfig struct {
 	starrConfig
 	*starr.Config
 	*lidarr.Lidarr `toml:"-" xml:"-" json:"-"`
-	Errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupLidarr(timeout time.Duration) error {
@@ -56,7 +56,7 @@ func (a *Apps) setupLidarr(timeout time.Duration) error {
 		}
 
 		a.Lidarr[idx].Debugf = a.DebugLog.Printf
-		a.Lidarr[idx].Errorf = a.ErrorLog.Printf
+		a.Lidarr[idx].errorf = a.ErrorLog.Printf
 		a.Lidarr[idx].setup(timeout)
 	}
 
@@ -72,9 +72,9 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Lidarr Path: %v", err)
+		r.errorf("Checking Lidarr Path: %v", err)
 	} else if u := strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Lidarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Lidarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }

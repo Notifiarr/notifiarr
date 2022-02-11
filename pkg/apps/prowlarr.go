@@ -18,7 +18,7 @@ type ProwlarrConfig struct {
 	starrConfig
 	*starr.Config
 	*prowlarr.Prowlarr `toml:"-" xml:"-" json:"-"`
-	Errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupProwlarr(timeout time.Duration) error {
@@ -28,7 +28,7 @@ func (a *Apps) setupProwlarr(timeout time.Duration) error {
 		}
 
 		prowl.Debugf = a.DebugLog.Printf
-		prowl.Errorf = a.ErrorLog.Printf
+		prowl.errorf = a.ErrorLog.Printf
 		prowl.setup(timeout)
 	}
 
@@ -44,9 +44,9 @@ func (r *ProwlarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Prowlarr Path: %v", err)
+		r.errorf("Checking Prowlarr Path: %v", err)
 	} else if u := strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Prowlarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Prowlarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }

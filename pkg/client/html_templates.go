@@ -19,12 +19,12 @@ import (
 
 // loadAssetsTemplates watches for changs to template files, and loads them.
 func (c *Client) loadAssetsTemplates() error {
-	if c.Flags.Assets == "" {
-		return nil
-	}
-
 	if err := c.ParseGUITemplates(); err != nil {
 		return err
+	}
+
+	if c.Flags.Assets == "" {
+		return nil
 	}
 
 	fsn, err := fsnotify.NewWatcher()
@@ -158,6 +158,7 @@ func (c *Client) haveCustomFile(fileName string) string {
 	return ""
 }
 
+// getLastLinesInFile makes it easy to tail a file. Sorta.
 func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //nolint:cyclop
 	fileHandle, err := os.Open(filepath)
 	if err != nil {

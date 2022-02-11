@@ -23,15 +23,15 @@ import (
 
 // Logger provides some methods with baked in assumptions.
 type Logger struct {
-	ErrorLog *log.Logger // Shares a Writer with InfoLog.
-	DebugLog *log.Logger // Shares a Writer with InfoLog by default. Changeable.
-	InfoLog  *log.Logger
-	HTTPLog  *log.Logger
-	web      *rotatorr.Logger
-	app      *rotatorr.Logger
-	debug    *rotatorr.Logger
-	custom   *rotatorr.Logger // must not be set when web/app/debug are set.
-	logs     *LogConfig
+	ErrorLog *log.Logger      `toml:"-"` // Shares a Writer with InfoLog.
+	DebugLog *log.Logger      `toml:"-"` // Shares a Writer with InfoLog by default. Changeable.
+	InfoLog  *log.Logger      `toml:"-"`
+	HTTPLog  *log.Logger      `toml:"-"`
+	web      *rotatorr.Logger `toml:"-"`
+	app      *rotatorr.Logger `toml:"-"`
+	debug    *rotatorr.Logger `toml:"-"`
+	custom   *rotatorr.Logger `toml:"-"` // must not be set when web/app/debug are set.
+	logs     *LogConfig       `toml:"-"`
 }
 
 // These are used for custom logs.

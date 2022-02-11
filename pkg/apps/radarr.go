@@ -47,7 +47,7 @@ type RadarrConfig struct {
 	starrConfig
 	*starr.Config
 	*radarr.Radarr `toml:"-" xml:"-" json:"-"`
-	Errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupRadarr(timeout time.Duration) error {
@@ -57,7 +57,7 @@ func (a *Apps) setupRadarr(timeout time.Duration) error {
 		}
 
 		a.Radarr[idx].Debugf = a.DebugLog.Printf
-		a.Radarr[idx].Errorf = a.ErrorLog.Printf
+		a.Radarr[idx].errorf = a.ErrorLog.Printf
 		a.Radarr[idx].setup(timeout)
 	}
 
@@ -73,9 +73,9 @@ func (r *RadarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Radarr Path: %v", err)
+		r.errorf("Checking Radarr Path: %v", err)
 	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Radarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Radarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }

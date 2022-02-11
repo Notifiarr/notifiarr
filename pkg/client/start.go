@@ -338,10 +338,6 @@ func (c *Client) reloadConfiguration(source string) error {
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.setupMenus(c.configureServices(notifiarr.EventReload))
 
-	if err := c.ParseGUITemplates(); err != nil {
-		return err
-	}
-
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {

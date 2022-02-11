@@ -38,7 +38,6 @@ func (c *Client) httpHandlers() {
 			Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
 		c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
 		c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
-		c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}/{skip}"),
@@ -47,7 +46,9 @@ func (c *Client) httpHandlers() {
 			c.checkAuthorized(c.getLogDownloadHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/deleteLogFile/{id}"),
 			c.checkAuthorized(c.getLogDeleteHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+		//		c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+		//		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/reconfig"), c.checkAuthorized(c.handleConfigPost)).Methods("POST")
 	}
 
 	// 404 (or redirect to base path) everything else
@@ -98,7 +99,7 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 
 // slash is the GET handler for /.
 func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
-	c.renderHTTPtemplate(response, request, "index.html", "")
+	c.indexPage(response, request, "")
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen

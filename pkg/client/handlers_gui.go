@@ -3,7 +3,7 @@ package client
 import (
 	"archive/zip"
 	"context"
-	"encoding/json"
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -20,7 +20,9 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	"golift.io/version"
 )
 
@@ -95,16 +97,16 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 
 	switch providedUsername := request.FormValue("name"); {
 	case len(validPassword) < 16: // nolint:gomnd
-		c.loginPage(response, request, "Invalid Password Configured")
+		c.indexPage(response, request, "Invalid Password Configured")
 	case c.getUserName(request) != "":
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method == http.MethodGet:
-		c.loginPage(response, request, "")
+		c.indexPage(response, request, "")
 	case providedUsername == validUsername && validPassword == request.FormValue("password"):
 		c.setSession(providedUsername, response)
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	default: // Start over.
-		c.loginPage(response, request, "Invalid Password")
+		c.indexPage(response, request, "Invalid Password")
 	}
 }
 
@@ -202,6 +204,7 @@ func (c *Client) getLogHandler(response http.ResponseWriter, req *http.Request) 
 	}
 }
 
+/*
 // getSettingsHandler returns all settings in a json blob. Useful for ajax requests.
 func (c *Client) getSettingsHandler(response http.ResponseWriter, req *http.Request) {
 	var err error
@@ -264,6 +267,7 @@ func (c *Client) getSettingsHandler(response http.ResponseWriter, req *http.Requ
 	}
 }
 
+
 // getFieldName allows pulling a config item by json tag name.
 func getFieldName(key string, config interface{}) interface{} {
 	sType := reflect.TypeOf(config)
@@ -296,13 +300,98 @@ func getFieldName(key string, config interface{}) interface{} {
 
 	return nil
 }
+*/
 
-func (c *Client) renderHTTPtemplate(w io.Writer, req *http.Request, tmpl string, msg string) {
-	err := c.templat.ExecuteTemplate(w, tmpl, &templateData{
+func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
+	// copy running config,
+	config, err := c.Config.CopyConfig()
+	if err != nil {
+		c.Errorf("Copying Config (GUI request): %v", err)
+		http.Error(response, "Error copying internal configuration: "+err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	// update config.
+	if err = c.mergeAndValidateNewConfig(config, request); err != nil {
+		c.Errorf("Validating Config: %v", err)
+		http.Error(response, "Validation Failed!"+err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	date := time.Now().Format("20060102T150405") // for file names.
+
+	// write new config file to temporary path.
+	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig."+date)
+	if _, err = config.Write(destFile); err != nil { // write our config file template.
+		c.Errorf("Writing new config file: %v", err)
+		http.Error(response, "Error writing new config file: "+err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	// make config file backup.
+	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
+	if err = configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
+		c.Errorf("Backing up config file (GUI request): %v", err)
+		http.Error(response, "Error backing up config file: "+err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	// move new config file to existing config file.
+	if err = os.Rename(destFile, c.Flags.ConfigFile); err != nil {
+		http.Error(response, "Error renaming temporary file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// reload.
+	defer func() {
+		c.sighup <- &update.Signal{Text: "reload gui triggered"}
+	}()
+
+	// respond.
+	_, err = response.Write([]byte("Config Svaed. Reloading in 5 seconds..."))
+	if err != nil {
+		c.Errorf("Writing HTTP Response: %v", err)
+	}
+}
+
+// Set a Decoder instance as a package global, because it caches
+// meta-data about structs, and an instance can be shared safely.
+var configPostDecoder = schema.NewDecoder()
+
+func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *http.Request) error {
+	configPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
+		return reflect.ValueOf(strings.Fields(input))
+	})
+
+	if err := request.ParseForm(); err != nil {
+		return fmt.Errorf("parsing form data failed: %w", err)
+	}
+
+	err := configPostDecoder.Decode(config, request.PostForm)
+	if err != nil {
+		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
+	}
+
+	// TODO: this method...
+	return nil
+}
+
+func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, msg string) {
+	response.Header().Add("content-type", "text/html")
+
+	if request.Method != http.MethodGet {
+		response.WriteHeader(http.StatusUnauthorized)
+	}
+
+	err := c.templat.ExecuteTemplate(response, "index.html", &templateData{
 		Config:   c.Config,
 		Flags:    c.Flags,
-		Username: c.getUserName(req),
-		Data:     req.PostForm,
+		Username: c.getUserName(request),
+		Data:     request.PostForm,
 		Msg:      msg,
 		LogFiles: c.Logger.GetAllLogFilePaths(),
 		Version: map[string]string{
@@ -322,16 +411,6 @@ func (c *Client) renderHTTPtemplate(w io.Writer, req *http.Request, tmpl string,
 	if err != nil {
 		c.Errorf("Sending HTTP Response: %v", err)
 	}
-}
-
-func (c *Client) loginPage(response http.ResponseWriter, request *http.Request, msg string) {
-	response.Header().Add("content-type", "text/html")
-
-	if request.Method != http.MethodGet {
-		response.WriteHeader(http.StatusUnauthorized)
-	}
-
-	c.renderHTTPtemplate(response, request, "index.html", msg)
 }
 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.

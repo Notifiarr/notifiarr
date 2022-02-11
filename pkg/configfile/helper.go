@@ -2,7 +2,9 @@ package configfile
 
 import (
 	"fmt"
+	"io"
 	"net"
+	"os"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -86,4 +88,34 @@ func CheckPort(addr string) (string, error) {
 	defer l.Close()
 
 	return addr, nil
+}
+
+// CopyFile can be used to make a config file backup.
+func CopyFile(src, dst string) error {
+	if _, err := os.Stat(dst); err == nil {
+		return fmt.Errorf("%w: cannot overwrite file: %s", os.ErrExist, dst)
+	}
+
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return fmt.Errorf("opening existing file: %w", err)
+	}
+	defer srcFile.Close()
+
+	srcStat, err := srcFile.Stat()
+	if err != nil {
+		return fmt.Errorf("stating existing file: %w", err)
+	}
+
+	dstFile, err := os.OpenFile(dst, os.O_CREATE|os.O_TRUNC|os.O_RDWR, srcStat.Mode())
+	if err != nil {
+		return fmt.Errorf("creating new file: %w", err)
+	}
+	defer dstFile.Close()
+
+	if _, err = io.Copy(dstFile, srcFile); err != nil {
+		return fmt.Errorf("copying data: %w", err)
+	}
+
+	return nil
 }

@@ -25,12 +25,12 @@
                                 <td style="font-size: 22px;">{{instance $index}}
                                         <div style="float: right;"><button type="button" id="MySQL{{instance $index}}Delete" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button></div>
                                 </td>
-                                <td><input type="text" id="MySQL{{instance $index}}Name"  class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                <td><input type="text" id="MySQL{{instance $index}}Host" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
-                                <td><input type="text" id="MySQL{{instance $index}}User" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
-                                <td><input type="text" id="MySQL{{instance $index}}Pass" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
-                                <td><input type="text" id="MySQL{{instance $index}}Interval" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                <td><input type="text" id="MySQL{{instance $index}}Timeout" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Host" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.User" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Pass" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Interval" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
                             </tr>
                             {{- end}}
                         {{- else}}

@@ -46,7 +46,7 @@ type SonarrConfig struct {
 	starrConfig
 	*starr.Config
 	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
-	Errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupSonarr(timeout time.Duration) error {
@@ -56,7 +56,7 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 		}
 
 		a.Sonarr[idx].Debugf = a.DebugLog.Printf
-		a.Sonarr[idx].Errorf = a.ErrorLog.Printf
+		a.Sonarr[idx].errorf = a.ErrorLog.Printf
 		a.Sonarr[idx].setup(timeout)
 	}
 
@@ -72,9 +72,9 @@ func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Sonarr Path: %v", err)
+		r.errorf("Checking Sonarr Path: %v", err)
 	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Sonarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Sonarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }

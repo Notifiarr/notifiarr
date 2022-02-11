@@ -40,7 +40,7 @@ type ReadarrConfig struct {
 	starrConfig
 	*starr.Config
 	*readarr.Readarr `toml:"-" xml:"-" json:"-"`
-	Errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupReadarr(timeout time.Duration) error {
@@ -50,7 +50,7 @@ func (a *Apps) setupReadarr(timeout time.Duration) error {
 		}
 
 		a.Readarr[idx].Debugf = a.DebugLog.Printf
-		a.Readarr[idx].Errorf = a.ErrorLog.Printf
+		a.Readarr[idx].errorf = a.ErrorLog.Printf
 		a.Readarr[idx].setup(timeout)
 	}
 
@@ -66,9 +66,9 @@ func (r *ReadarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Readarr Path: %v", err)
+		r.errorf("Checking Readarr Path: %v", err)
 	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Readarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Readarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }
