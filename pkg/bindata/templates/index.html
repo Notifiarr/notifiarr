@@ -15,7 +15,7 @@
           <div class="ts-main-content">
             <nav class="ts-sidebar">
                 <ul class="ts-sidebar-menu">
-                    {{- if .Username }}
+                {{- if .Username }}
                     <div class="dropdown"><!-- this is lame -->
                         <button class="btn btn-default dropdown-toggle nav-link" style="width:99%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                             <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
@@ -26,9 +26,9 @@
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </div>
-                    {{ end }}
+                {{ end }}
                     <li class="ts-label" style="text-align: center;">Navigation</li>
-                    {{- if .Username }}
+                {{- if .Username }}
                     <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" onclick="swapNavigationTemplate('config')">Configuration</a></li>
                     <li><i class="nav-icon fas fa-star"></i><a class="nav-link" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
                     <li><i class="nav-icon fas fa-file-download"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('clients')">Clients</a></li>
@@ -50,7 +50,7 @@
                     <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.wiki">Notifiarr.Wiki</a></li>
                     <li>&nbsp;<i class="nav-icon fab fa-discord"></i><a class="nav-link" href="https://notifiarr.com/discord">Notifiarr Discord</a></li>
                     <li>&nbsp;<img src="{{files}}/images/golift.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://golift.io/">Go Lift</a></li>
-                {{- else }}
+                {{- else }}<!-- nav bar for logged out user (nothing). -->
                     <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
                 {{- end }}
                 </ul>
