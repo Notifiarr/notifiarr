@@ -1,7 +1,12 @@
 {{- if not .Config.UIPassword -}}
     <p>notifiarr: <strong>working</strong></p>
 {{- else}}
+<!doctype html>
+<html lang="en" class="no-js">
+    <head>
 {{- template "header.html" . }}
+    </head>
+    <body>
         <div class="brand clearfix" style="z-index:100;">
             <a class="nav-link" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
                 <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
@@ -107,5 +112,9 @@
 {{- else }}       {{- /* if .Username */}}
 {{ template "login.html" . }}
 {{- end}}         {{- /* if .Username */}}
-{{- template "footer.html" }}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
 {{- end -}}       {{- /* if .Config.UIPassword */}}
