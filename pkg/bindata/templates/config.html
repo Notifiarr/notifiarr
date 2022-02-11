@@ -35,7 +35,7 @@
                                 <td>{{.Config.BindAddr}}</td>
                                 <td><input class="client-parameter" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}" style="width: 100%;"></td>
                             </tr>
-                            {{- if eq .Version.os "windows" }}
+                        {{- if eq .Version.os "windows" }}
                             <tr>
                                 <td>
                                     <i title="This is how often the app will check for updates. When one is found it will be installed automatically." class="help-icon far fa-question-circle"></i>
@@ -52,7 +52,7 @@
                                     </select>
                                 </td>
                             </tr>
-                            {{- end }}
+                        {{- end }}
                             <tr>
                                 <td>
                                     <i title="Only choose Development when asked, your Notifiarr account must have dev access for this to work." class="help-icon far fa-question-circle"></i>
@@ -240,7 +240,7 @@
                                 <td>{{.Config.LogConfig.DebugLog}}</td>
                                 <td><input type="text" id="LogConfig.DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}" style="width: 100%;"></td>
                             </tr>
-                            {{- if not (eq .Version.os "windows") }}
+                        {{- if not (eq .Version.os "windows") }}
                             <tr>
                                 <td>
                                     <i title="This is the unix file mode used when writing new log files. Recommended values in order of openness: 0600, 0640, 0644" class="help-icon far fa-question-circle"></i>
@@ -249,7 +249,7 @@
                                 <td>{{.Config.FileMode}}</td>
                                 <td><input type="text" id="FileMode" class="client-parameter" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}" style="width: 100%;"></td>
                             </tr>
-                            {{ end }}
+                        {{ end }}
                             <tr>
                                 <td>
                                     <i title="When debug is enabled, this setting limits the amount of payload data written to the log, to or from notifiarr.com. Recommend 1000-5000." class="help-icon far fa-question-circle"></i>
@@ -276,3 +276,4 @@
                             </tr>
                         </tbody>
                     </table>
+{{- /* end of config (leave this comment) */ -}}
