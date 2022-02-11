@@ -116,6 +116,41 @@ function findPendingChanges() {
 }
 // ---------------------------------------------------------------------------------------------
 
+function savePendingChanges() {
+    let fields = '';
+
+    $.each($('.client-parameter'), function() {
+        fields += '&'+ $(this).attr('id') +'='+ $(this).val();
+    });
+    
+    $.ajax({
+        type: 'POST',
+        url: '/reconfig',
+        data: fields,
+        success: function (data){
+            toast('Config Saved', 'Please wait for the app to reload with the new configuraction changes...', 'success');
+            $('#pending-change-container').remove();
+
+            setTimeout(function(){
+                window.location.href=window.location.href;
+            }, 5000);
+        },
+        error: function (response, data) {
+            let saveError = '';
+            switch (response.status) {
+                case 400:
+                    saveError = 'One or more issues with the config values: '+ data;
+                    break;
+                case 500:
+                    saveError = 'There was an internal error saving the config.';
+                    break;
+            }
+            toast('Save Error', saveError, 'error');
+        }
+    });
+}
+// ---------------------------------------------------------------------------------------------
+
 $(document).ready((function() {
     // ----- Navbar
     $('.nav-link').click((function() {
@@ -288,3 +323,19 @@ function getCharacterLength (str) {
     return [...str].length;
 }
 // ---------------------------------------------------------------------------------------------
+
+function toast(title, message, type)
+{
+    $.Toast(title, message, type, {
+        has_icon: true,
+        has_close_btn: true,
+        stack: true,
+        fullscreen: false,
+        timeout: 5000,
+        sticky: false,
+        has_progress: true,
+        rtl: false,
+    });
+
+}
+// -------------------------------------------------------------------------------------------
