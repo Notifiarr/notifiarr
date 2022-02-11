@@ -37,13 +37,4 @@
         <script src="{{files}}/libraries/toast/toast.script.js" type="text/javascript"></script>
         {{- /* Internal */}}
         <script src="{{files}}/js/common.js" type="text/javascript"></script>
-        <script type="text/javascript">
-            $(function() {
-                jsLoader();
-                setTooltips();
-                $(document).bind('change keyup mouseup', '.client-parameter', function(){
-                    findPendingChanges();
-                });
-            });
-        </script>
 {{- /* end of header (leave this comment) */ -}}

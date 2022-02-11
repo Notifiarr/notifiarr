@@ -1,12 +1,16 @@
                     <h1><i class="fas fa-star"></i> Starr Apps</h1>
                     <div class="table-responsive"><table class="table table-striped table-bordered">
-                          <thead>
-                              <tr><td colspan="8" style="text-align:center;">
-                                  <div style="float: left;"><img src="{{files}}/images/logo/lidarr.png" style="height:50px;"></div>
-                                  <h2 style="display: inline;">Lidarr</h2>
-                                  <div style="float: right;"><button type="button" id="AddLidarr" title="Add another instance of Lidarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button></div>
-                              </td></tr>
-                              <tr>
+                        <thead>
+                            <tr>
+                                <td colspan="8" style="text-align:center;">
+                                    <div style="float: left;"><img src="{{files}}/images/logo/lidarr.png" style="height:50px;"></div>
+                                    <h2 style="display: inline;">Lidarr</h2>
+                                    <div style="float: right;">
+                                        <button onclick="addStarrInstance('lidarr')" type="button" title="Add another instance of Lidarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
                                 <td>Instance</td>
                                 <td style="width:12%">Application Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
                                 <td>Application URL <i class="help-icon far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
@@ -15,28 +19,29 @@
                                 <td style="width:10%">Password <i class="help-icon far fa-question-circle" title="Password is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
                                 <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
                                 <td style="width:70px">Timeout</td>
-                              </tr>
-                          </thead>
-                          <tbody>
-                          {{- if .Config.Apps.Lidarr}}
-                              {{- range $index, $app := .Config.Apps.Lidarr}}
-                              <tr>
-                                  <td style="font-size: 22px;">{{instance $index}}
-                                      <div style="float: right;"><button type="button" id="Lidarr{{instance $index}}Delete" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button></div>
-                                  </td>
-                                  <td><input type="text" id="Apps.Lidarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                  <td><input type="text" id="Apps.Lidarr.{{$index}}.URL" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                  <td><input type="text" id="Apps.Lidarr.{{$index}}.APIKey" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                  <td><input type="text" id="Apps.Lidarr.{{$index}}.Username" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;"></td>
-                                  <td><input type="text" id="Apps.Lidarr.{{$index}}.Password" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
-                                  <td><input type="text" id="Apps.Lidarr.{{$index}}.Interval" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                  <td><input type="text" id="Apps.Lidarr.{{$index}}.Timeout" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
-                              </tr>
-                              {{- end}}
-                          {{- else}}
-                              <tr><td colspan="8">No Lidarr instances configured.</td></tr>
-                          {{- end}}
-                          </tbody>
+                            </tr>
+                        </thead>
+                        <tbody id="starr-lidarr-container">
+                        {{- if .Config.Apps.Lidarr}}
+                            {{- range $index, $app := .Config.Apps.Lidarr}}
+                            <tr class="starr-lidarr" id="starr-lidarr-{{$index}}">
+                                <td style="font-size: 22px;">{{instance $index}}
+                                    <div style="float: right;">
+                                        <button onclick="removeStarrInstance('lidarr', {{$index}})" type="button" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </td>
+                                <td><input type="text" id="Apps.Lidarr.Name[{{instance $index}}]" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Apps.Lidarr.URL[{{instance $index}}]" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Apps.Lidarr.APIKey[{{instance $index}}]" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Apps.Lidarr.Username[{{instance $index}}]" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Apps.Lidarr.Password[{{instance $index}}]" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Apps.Lidarr.Interval[{{instance $index}}]" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Apps.Lidarr.Timeout[{{instance $index}}]" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                            </tr>
+                            {{- end}}
+                        {{- end}}
+                            <tr id="starr-lidarr-none" style="display: none;"><td colspan="8">No Lidarr instances configured.</td></tr>
+                        </tbody>
                           <thead>
                               <tr><td colspan="8" style="text-align:center;">
                                   <div style="float: left;"><img src="{{files}}/images/logo/prowlarr.png" style="height:50px;"></div>
