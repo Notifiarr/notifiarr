@@ -1,11 +1,7 @@
 {{- if not .Config.UIPassword -}}
     <p>notifiarr: <strong>working</strong></p>
 {{- else}}
-<!doctype html>
-<html lang="en" class="no-js">
-    <head>
 {{- template "header.html" . }}
-    </head>
     <body>
         <div class="brand clearfix" style="z-index:100;">
             <a class="nav-link" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
@@ -36,7 +32,7 @@
                 {{- if .Username }}
                     <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" onclick="swapNavigationTemplate('config')">Configuration</a></li>
                     <li><i class="nav-icon fas fa-star"></i><a class="nav-link" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
-                    <li><i class="nav-icon fas fa-file-download"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('clients')">Clients</a></li>
+                    <li><i class="nav-icon fas fa-file-download"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('downloadClients')">Download Clients</a></li>
                     <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
                     <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" onclick="swapNavigationTemplate('snapshot')">Snapshot</a></li>
                     <hr>
@@ -94,8 +90,8 @@
                   <div class="navigation-item" id="template-starr" style="display: none;">
 {{ template "starr.html" . }}
                   </div>
-                  <div class="navigation-item" id="template-clients" style="display: none;">
-{{ template "clients.html" . }}
+                  <div class="navigation-item" id="template-downloadClients" style="display: none;">
+{{ template "downloadClients.html" . }}
                   </div>
                   <div class="navigation-item" id="template-media" style="display: none;">
 {{ template "media.html" . }}
@@ -112,9 +108,5 @@
 {{- else }}       {{- /* if .Username */}}
 {{ template "login.html" . }}
 {{- end}}         {{- /* if .Username */}}
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
+{{ template "footer.html" . }}
 {{- end -}}       {{- /* if .Config.UIPassword */}}
