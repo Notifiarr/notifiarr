@@ -306,7 +306,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	// copy running config,
 	config, err := c.Config.CopyConfig()
 	if err != nil {
-		c.Errorf("Copying Config (GUI request): %v", err)
+		c.Errorf("[gui requested] Copying Config (GUI request): %v", err)
 		http.Error(response, "Error copying internal configuration: "+err.Error(), http.StatusInternalServerError)
 
 		return
@@ -314,8 +314,8 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 	// update config.
 	if err = c.mergeAndValidateNewConfig(config, request); err != nil {
-		c.Errorf("Validating Config: %v", err)
-		http.Error(response, "Validation Failed!"+err.Error(), http.StatusBadRequest)
+		c.Errorf("[gui requested] Validating POSTed Config: %v", err)
+		http.Error(response, err.Error(), http.StatusBadRequest)
 
 		return
 	}
@@ -325,7 +325,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	// write new config file to temporary path.
 	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig."+date)
 	if _, err = config.Write(destFile); err != nil { // write our config file template.
-		c.Errorf("Writing new config file: %v", err)
+		c.Errorf("[gui requested] Writing new config file: %v", err)
 		http.Error(response, "Error writing new config file: "+err.Error(), http.StatusInternalServerError)
 
 		return
@@ -334,7 +334,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	// make config file backup.
 	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
 	if err = configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
-		c.Errorf("Backing up config file (GUI request): %v", err)
+		c.Errorf("[gui requested] Backing up config file (GUI request): %v", err)
 		http.Error(response, "Error backing up config file: "+err.Error(), http.StatusInternalServerError)
 
 		return
@@ -342,6 +342,8 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 	// move new config file to existing config file.
 	if err = os.Rename(destFile, c.Flags.ConfigFile); err != nil {
+		c.Errorf("[gui requested] Renaming Temporary File: %v", err)
+
 		http.Error(response, "Error renaming temporary file: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -354,7 +356,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	// respond.
 	_, err = response.Write([]byte("Config Svaed. Reloading in 5 seconds..."))
 	if err != nil {
-		c.Errorf("Writing HTTP Response: %v", err)
+		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
 	}
 }
 
@@ -370,6 +372,16 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	if err := request.ParseForm(); err != nil {
 		return fmt.Errorf("parsing form data failed: %w", err)
 	}
+
+	config.Apps.Lidarr = nil
+	config.Apps.Prowlarr = nil
+	config.Apps.Radarr = nil
+	config.Apps.Readarr = nil
+	config.Apps.Sonarr = nil
+	config.Apps.Qbit = nil
+	config.Apps.Deluge = nil
+	config.Apps.SabNZB = nil
+	config.Snapshot.Plugins.MySQL = nil
 
 	if err := configPostDecoder.Decode(config, request.PostForm); err != nil {
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
