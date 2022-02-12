@@ -155,7 +155,7 @@ function savePendingChanges()
         url: '/reconfig',
         data: fields,
         success: function (data){
-            toast('Config Saved', 'Please wait for the app to reload with the new configuraction changes...', 'success');
+            toast('Config Saved', 'Wait 5 seconds; reloading the new configuration...', 'success');
             $('#pending-change-container').remove();
 
             setTimeout(function(){
@@ -163,7 +163,12 @@ function savePendingChanges()
             }, 5000);
         },
         error: function (response, status, error) {
-            toast('Save Error', status+': '+response.responseText, 'error', 15000);
+            if (status === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Save Error', status+': '+response.responseText, 'error', 15000);
+            }
         }
     });
 }
