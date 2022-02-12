@@ -26,8 +26,8 @@
                             <input disabled style="display: none;" class="client-parameter lidarr{{$index}}-deleted" data-group="starr" data-label="Lidarr {{instance $index}} Deleted" data-original="false" value="false">
                             <tr class="starr-lidarr" id="starr-lidarr-{{$index}}">
                                 <td style="font-size: 22px;">{{instance $index}}
-                                    <div class="delete-lidarr-button" style="float: right;{{if ne (len $.Config.Apps.Lidarr) (instance $index)}} display: none;{{end}}">
-                                        <button onclick="removeStarrInstance('lidarr', {{$index}})" type="button" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                    <div class="starr-lidarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Lidarr) (instance $index)}} display: none;{{end}}">
+                                        <button onclick="removeInstance('starr', 'lidarr', {{$index}})" type="button" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                     </div>
                                 </td>
                                 <td><input type="text" id="Apps.Lidarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
@@ -65,8 +65,8 @@
                               <input disabled style="display: none;" class="client-parameter prowlarr{{$index}}-deleted" data-group="starr" data-label="Prowlarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-prowlarr" id="starr-prowlarr-{{$index}}">
                                   <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="delete-prowlarr-button" style="float: right;{{if ne (len $.Config.Apps.Prowlarr) (instance $index)}} display: none;{{end}}">
-                                          <button onclick="removeStarrInstance('prowlarr', {{$index}})" type="button" title="Delete this instance of Prowlarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                      <div class="starr-prowlarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Prowlarr) (instance $index)}} display: none;{{end}}">
+                                          <button onclick="removeInstance('starr', 'prowlarr', {{$index}})" type="button" title="Delete this instance of Prowlarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
                                   <td><input type="text" id="Apps.Prowlarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
@@ -104,8 +104,8 @@
                               <input disabled style="display: none;" class="client-parameter radarr{{$index}}-deleted" data-group="starr" data-label="Radarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-radarr" id="starr-radarr-{{$index}}">
                                   <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="delete-radarr-button" style="float: right;{{if ne (len $.Config.Apps.Radarr) (instance $index)}} display: none;{{end}}">
-                                          <button onclick="removeStarrInstance('radarr', {{$index}})" type="button" title="Delete this instance of Radarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                      <div class="starr-radarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Radarr) (instance $index)}} display: none;{{end}}">
+                                          <button onclick="removeInstance('starr', 'radarr', {{$index}})" type="button" title="Delete this instance of Radarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
                                   <td><input type="text" id="Apps.Radarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
@@ -143,8 +143,8 @@
                               <input disabled style="display: none;" class="client-parameter readarr{{$index}}-deleted" data-group="starr" data-label="Readarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-readarr" id="starr-readarr-{{$index}}">
                                   <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="delete-readarr-button" style="float: right;{{if ne (len $.Config.Apps.Readarr) (instance $index)}} display: none;{{end}}">
-                                          <button onclick="removeStarrInstance('readarr', {{$index}})" type="button" title="Delete this instance of Readarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                      <div class="starr-readarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Readarr) (instance $index)}} display: none;{{end}}">
+                                          <button onclick="removeInstance('starr', 'readarr', {{$index}})" type="button" title="Delete this instance of Readarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
                                   <td><input type="text" id="Apps.Readarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
@@ -182,8 +182,8 @@
                               <input disabled style="display: none;" class="client-parameter sonarr{{$index}}-deleted" data-group="starr" data-label="Sonarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-sonarr" id="starr-sonarr-{{$index}}">
                                   <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="delete-sonarr-button" style="float: right;{{if ne (len $.Config.Apps.Sonarr) (instance $index)}} display: none;{{end}}">
-                                          <button onclick="removeStarrInstance('sonarr', {{$index}})" type="button" title="Delete this instance of Sonarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                      <div class="starr-sonarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Sonarr) (instance $index)}} display: none;{{end}}">
+                                          <button onclick="removeInstance('starr', 'sonarr', {{$index}})" type="button" title="Delete this instance of Sonarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
                                   <td><input type="text" id="Apps.Sonarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>

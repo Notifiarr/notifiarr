@@ -10,7 +10,9 @@
                                 <td colspan="7" style="text-align:center;">
                                     <div style="float: left;"><img src="{{files}}/images/logo/mysql.png" style="height:50px;"></div>
                                     <h2 style="display: inline;">MySQL</h2>
-                                    <div style="float: right;"><button type="button" id="AddMySQL" title="Add another instance of MySQL" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button></div>
+                                    <div style="float: right;">
+                                        <button id="snapshot-MySQL-addbutton" onclick="addOpaqueInstance('snapshot', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of MySQL." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -23,12 +25,14 @@
                                 <td style="width:70px">Timeout</td>
                             </tr>
                         </thead>
-                        <tbody>
-                        {{- if .Config.Snapshot.MySQL}}
-                            {{- range $index, $app := .Config.Snapshot.MySQL}}
-                            <tr>
+                        <tbody id="snapshot-MySQL-container">
+                        {{- range $index, $app := .Config.Snapshot.MySQL}}
+                            <input disabled style="display: none;" class="client-parameter MySQL{{$index}}-deleted" data-group="downloader" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
+                            <tr class="snapshot-MySQL" id="snapshot-MySQL-{{$index}}">
                                 <td style="font-size: 22px;">{{instance $index}}
-                                        <div style="float: right;"><button type="button" id="MySQL{{instance $index}}Delete" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button></div>
+                                    <div class="snapshot-MySQL-deletebutton" style="float: right;{{if ne (len $.Config.Snapshot.MySQL) (instance $index)}} display: none;{{end}}">
+                                        <button onclick="removeInstance('snapshot', 'MySQL', {{$index}})" type="button" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                    </div>
                                 </td>
                                 <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                 <td><input type="text" id="Snapshot.MySQL.{{$index}}.Host" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
@@ -37,10 +41,9 @@
                                 <td><input type="text" id="Snapshot.MySQL.{{$index}}.Interval" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
                                 <td><input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
                             </tr>
-                            {{- end}}
-                        {{- else}}
-                          <tr><td colspan="5">No MySQL instances configured.</td></tr>
                         {{- end}}
+                            <tr id="snapshot-MySQL-none" style="display: none;"><td colspan="8">No MySQL instances configured.</td></tr>
+
                         </tbody>
                     </table>
 {{- /* end of snapshot (leave this comment) */ -}}
