@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -75,10 +76,9 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
 func (c *Client) ParseGUITemplates() (err error) {
 	// Index and 404 do not have template files, but they can be customized.
-	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p> <p>(<a href="login">login</a>)</p>`
-	c.templat = template.Must(template.New("index.html").Parse(index))
-	c.templat = template.Must(c.templat.New("404.html").Parse("NOT FOUND! Check your request parameters and try again."))
-	c.templat = c.templat.Funcs(template.FuncMap{
+	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
+	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(template.FuncMap{
+		"now":      time.Now,
 		"megabyte": func(size int64) int64 { return size / mnd.Megabyte },
 		"base":     func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
 		"files":    func() string { return path.Join(c.Config.URLBase, "files") },
