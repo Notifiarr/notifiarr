@@ -3,108 +3,109 @@
 {{- else}}
 {{- template "header.html" . }}
     <body>
-        <div class="brand clearfix" style="z-index:100;">
-            <a class="nav-link" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
-                <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
-                  <img src="{{files}}/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr Client
-                </h4>
-            </a>
-            <span class="menu-btn"><i class="fa fa-bars"></i></span>
-            <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
-        </div>
-        <div class="ts-main-content">
-          <div class="ts-main-content">
-            <nav class="ts-sidebar">
-                <ul class="ts-sidebar-menu">
-                {{- if .Username }}
-                    <div class="dropdown"><!-- this is lame -->
-                        <button class="btn btn-default dropdown-toggle nav-link" style="width:99%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
-                        </button>
-                        <ul style="width:92%;" class="dropdown-menu bk-brown" aria-labelledby="user menu">
-                            <li><a class="nav-link" onclick="swapNavigationTemplate('profile')">Profile</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="/logout">Logout</a></li>
-                        </ul>
-                    </div>
-                {{ end }}
-                    <li class="ts-label" style="text-align: center;">Navigation</li>
-                {{- if .Username }}
-                    <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" onclick="swapNavigationTemplate('config')">Configuration</a></li>
-                    <li><i class="nav-icon fas fa-star"></i><a class="nav-link" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
-                    <li><i class="nav-icon fas fa-file-download"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('downloadClients')">Download Clients</a></li>
-                    <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
-                    <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" onclick="swapNavigationTemplate('snapshot')">Snapshot</a></li>
-                    <hr>
-                    <li><i class="nav-icon fas fa-network-wired"></i><a class="nav-link" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
-                    <li><i class="nav-icon fas fa-chart-line"></i>&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('metrics')">Metrics</a></li>
-                    <li><i class="nav-icon fas fa-file-alt"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('logfiles')">Log Files</a></li>
-                    <li>{{if eq .Version.os "windows"}}<i class="nav-icon fab fa-windows"></i>
-                        {{else if eq .Version.os "linux"}}<i class="nav-icon fab fa-linux"></i>
-                        {{else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
-                        {{else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
-                        {{else}}<i class="nav-icon fas fa-microchip"></i>
-                        {{- end}}&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>
-                    <hr>
-                    <li class="ts-label" style="text-align: center;">External Resources</li>
-                    <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.com">Notifiarr.com</a></li>
-                    <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.wiki">Notifiarr.Wiki</a></li>
-                    <li>&nbsp;<i class="nav-icon fab fa-discord"></i><a class="nav-link" href="https://notifiarr.com/discord">Notifiarr Discord</a></li>
-                    <li>&nbsp;<img src="{{files}}/images/golift.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://golift.io/">Go Lift</a></li>
-                {{- else }}<!-- nav bar for logged out user (nothing). -->
-                    <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
-                {{- end }}
-                </ul>
-                <div id="pending-change-container" style="display: none;">
-                    <hr>
-                    <div align="center">
-                        <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
-                            Submit <span id="pending-change-counter">0</span> Pending Changes
-                        </button>
-                    </div>
-                    <div style="margin-left: 1em; margin-top: 1em;">
-                        List of Pending Changes:<br>
-                        <div style="margin-left: 1em;" id="pending-change-list"></div>
-                    </div>
+        <div class="page-container">
+            <div class="page-body">
+                <div class="brand clearfix" style="z-index:100;">
+                    <a class="nav-link" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
+                        <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
+                            <img src="{{files}}/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr Client
+                        </h4>
+                    </a>
+                    <span class="menu-btn"><i class="fa fa-bars"></i></span>
+                    <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
                 </div>
-            </nav>
-            <div class="content-wrapper">
-                <div class="container-fluid">
+                <div class="ts-main-content">
+                    <nav class="ts-sidebar">
+                        <ul class="ts-sidebar-menu">
+                        {{- if .Username }}
+                            <div class="dropdown"><!-- this is lame -->
+                                <button class="btn btn-default dropdown-toggle nav-link" style="width:99%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
+                                </button>
+                                <ul style="width:92%;" class="dropdown-menu bk-brown" aria-labelledby="user menu">
+                                    <li><a class="nav-link" onclick="swapNavigationTemplate('profile')">Profile</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="/logout">Logout</a></li>
+                                </ul>
+                            </div>
+                        {{ end }}
+                            <li class="ts-label" style="text-align: center;">Navigation</li>
+                        {{- if .Username }}
+                            <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" onclick="swapNavigationTemplate('config')">Configuration</a></li>
+                            <li><i class="nav-icon fas fa-star"></i><a class="nav-link" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
+                            <li><i class="nav-icon fas fa-file-download"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('downloadClients')">Download Clients</a></li>
+                            <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
+                            <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" onclick="swapNavigationTemplate('snapshot')">Snapshot</a></li>
+                            <hr>
+                            <li><i class="nav-icon fas fa-network-wired"></i><a class="nav-link" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
+                            <li><i class="nav-icon fas fa-chart-line"></i>&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('metrics')">Metrics</a></li>
+                            <li><i class="nav-icon fas fa-file-alt"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('logfiles')">Log Files</a></li>
+                            <li>{{if eq .Version.os "windows"}}<i class="nav-icon fab fa-windows"></i>
+                                {{else if eq .Version.os "linux"}}<i class="nav-icon fab fa-linux"></i>
+                                {{else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
+                                {{else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
+                                {{else}}<i class="nav-icon fas fa-microchip"></i>
+                                {{- end}}&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>
+                            <hr>
+                            <li class="ts-label" style="text-align: center;">External Resources</li>
+                            <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.com">Notifiarr.com</a></li>
+                            <li>&nbsp;<img src="{{files}}/images/favicon.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://notifiarr.wiki">Notifiarr.Wiki</a></li>
+                            <li>&nbsp;<i class="nav-icon fab fa-discord"></i><a class="nav-link" href="https://notifiarr.com/discord">Notifiarr Discord</a></li>
+                            <li>&nbsp;<img src="{{files}}/images/golift.png" style="height:20px"> &nbsp;<a class="nav-link" href="https://golift.io/">Go Lift</a></li>
+                        {{- else }}<!-- nav bar for logged out user (nothing). -->
+                            <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
+                        {{- end }}
+                        </ul>
+                        <div id="pending-change-container" style="display: none;">
+                            <hr>
+                            <div align="center">
+                                <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
+                                    Submit <span id="pending-change-counter">0</span> Pending Changes
+                                </button>
+                            </div>
+                            <div style="margin-left: 1em; margin-top: 1em;">
+                                List of Pending Changes:<br>
+                                <div style="margin-left: 1em;" id="pending-change-list"></div>
+                            </div>
+                        </div>
+                    </nav>
+                    <div class="content-wrapper">
+                        <div class="container-fluid">
 {{- if .Username }}
-                  <div class="navigation-item" id="template-landing">
+                            <div class="navigation-item" id="template-landing">
 {{ template "landing.html"  .}}
-                  </div>
-                  <div class="navigation-item" id="template-profile" style="display: none;">
+                            </div>
+                            <!-- Load everything hidden, and switch divs with the Nav-menu above. -->
+                            <div class="navigation-item" id="template-profile" style="display: none;">
 {{ template "profile.html"  .}}
-                  </div>
-                  <!-- Load everything hidden, and switch divs with the Nav-menu above. -->
-                  <div class="navigation-item" id="template-config" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-config" style="display: none;">
 {{ template "config.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-monitoring" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-monitoring" style="display: none;">
 {{ template "monitoring.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-system" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-system" style="display: none;">
 {{ template "system.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-starr" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-starr" style="display: none;">
 {{ template "starr.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-downloadClients" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-downloadClients" style="display: none;">
 {{ template "downloadClients.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-media" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-media" style="display: none;">
 {{ template "media.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-metrics" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-metrics" style="display: none;">
 {{ template "metrics.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-logfiles" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-logfiles" style="display: none;">
 {{ template "logfiles.html" . }}
-                  </div>
-                  <div class="navigation-item" id="template-snapshot" style="display: none;">
+                            </div>
+                            <div class="navigation-item" id="template-snapshot" style="display: none;">
 {{ template "snapshot.html" . }}
-                  </div>
+                            </div>
 {{- else }}       {{- /* if .Username */}}
 {{ template "login.html" . }}
 {{- end}}         {{- /* if .Username */}}

@@ -13,8 +13,23 @@
   /* Gecko Browsers */
   color: #fff;
 }
-html {
+html,body {
   font-size: 14px;
+  height: 100%;
+}
+.page-container {
+    min-height: 100%;
+    position: relative;    
+}
+.page-body {
+    /* footer height */
+    padding-bottom: 50px;
+}
+.page-footer {
+    height: 50px; 
+    width: 97%;
+    position: absolute;
+    bottom: 0px; 
 }
 @media only screen and (min-width: 480px) {
   html {
