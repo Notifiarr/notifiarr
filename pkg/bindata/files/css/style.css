@@ -848,46 +848,6 @@ li {
     content: '\b7\a0';
 }
 
-.lidarrButton {
-    background: url('../images/logo/lidarr.png') no-repeat;
-    background-position: center;
-    background-color: #325d88;
-    background-size: 20px auto;
-    width: 50px;
-    height: 45px;
-    position: relative;
-}
-
-.radarrButton {
-    background: url('../images/logo/radarr.png') no-repeat;
-    background-position: center;
-    background-color: #325d88;
-    background-size: 20px auto;
-    width: 50px;
-    height: 45px;
-    position: relative;
-}
-
-.readarrButton {
-    background: url('../images/logo/readarr.png') no-repeat;
-    background-position: center;
-    background-color: #325d88;
-    background-size: 20px auto;
-    width: 50px;
-    height: 45px;
-    position: relative;
-}
-
-.sonarrButton {
-    background: url('../images/logo/sonarr.png') no-repeat;
-    background-position: center;
-    background-color: #325d88;
-    background-size: 20px auto;
-    width: 50px;
-    height: 45px;
-    position: relative;
-}
-
 .details {
     top: 0;
     width: 100%;

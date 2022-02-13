@@ -22,7 +22,7 @@ function jsLoader()
 {
     let path        = '';
     let script      = '';
-    const files     = ['navigation', 'starr', 'logFiles'];
+    const files     = ['navigation', 'starr', 'logFiles', 'processList'];
 
     for (const file of files) {
         path        = 'files/js/' + file + '.js';
