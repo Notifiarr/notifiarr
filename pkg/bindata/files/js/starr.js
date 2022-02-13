@@ -72,9 +72,15 @@ function addOpaqueInstance(section, app)
 
     // Timeout and Interval must have valid go durations, or the parser errors.
     // Host or URL are set without an original value to make the save button appear.
+    let colspan = 1
     for (const name of names) {
         let nameval = ""
         let nameori = ""
+        if (name == "") {
+            colspan++
+            continue
+        }
+
         switch (name) {
             case "Config.Interval":
             case "Interval":
@@ -94,9 +100,10 @@ function addOpaqueInstance(section, app)
              break;
         }
 
-        row +=  '<td><input type="text" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +
+        row +=  '<td colspan="'+ colspan +'"><input type="text" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +
         '" class="client-parameter" data-group="'+ section +'" data-label="'+ app +' '+
          instance +' '+name+'" data-original="'+ nameori +'" value="'+ nameval +'" style="width: 100%;"></td>';
+         colspan = 1
     }
 
 
