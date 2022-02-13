@@ -23,13 +23,15 @@ html,body {
 }
 .page-body {
     /* footer height */
-    padding-bottom: 51px;
+    padding-bottom: 25px;
 }
 .page-footer {
-    height: 50px;
-    width: 97%;
-    position: absolute;
-    bottom: 1px;
+    height: 25px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    background: #2c3136;
+    padding-right: 20px;
 }
 @media only screen and (min-width: 480px) {
   html {
