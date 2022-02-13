@@ -78,6 +78,7 @@ func (c *Client) ParseGUITemplates() (err error) {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
 	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(template.FuncMap{
+		"username": func() string { u, _ := c.getUserPass(); return u },
 		"now":      time.Now,
 		"megabyte": func(size int64) int64 { return size / mnd.Megabyte },
 		"base":     func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },

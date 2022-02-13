@@ -167,7 +167,37 @@ function savePendingChanges()
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
-                toast('Save Error', status+': '+response.responseText, 'error', 15000);
+                toast('Save Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
+}
+
+function saveProfileChanges()
+{
+    let fields = '';
+
+    $.each($('.profile-parameter'), function() {
+        const id = $(this).attr('id')
+        if (id !== undefined) {
+            fields += '&'+ $(this).attr('id') +'='+ $(this).val();
+        }
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: '/profile',
+        data: fields,
+        success: function (data){
+            $('#current-username').html($('#NewUsername').val()); // update the html username.
+            toast('Profile Saved', 'New profile values have been successfully stored.', 'success');
+        },
+        error: function (response, status, error) {
+            if (status === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Save Error', error+': '+response.responseText, 'error', 15000);
             }
         }
     });
