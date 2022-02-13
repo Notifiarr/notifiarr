@@ -117,6 +117,7 @@ func sonarrData(series *sonarr.Series) map[string]interface{} {
 		"id":        series.ID,
 		"hasFile":   hasFile,
 		"monitored": series.Monitored,
+		"tags":      series.Tags,
 	}
 }
 

@@ -14,11 +14,25 @@ import (
 func getFileOwner(fileInfo os.FileInfo) string {
 	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
 	if !ok {
-		return "error with syscall"
+		return "error with syscall; might a Notifiarr bug, please report!"
 	}
 
-	userName, _ := user.LookupId(strconv.FormatUint(uint64(stat.Uid), mnd.Base10))
-	groupName, _ := user.LookupGroupId(strconv.FormatUint(uint64(stat.Gid), mnd.Base10))
+	uid := strconv.FormatUint(uint64(stat.Uid), mnd.Base10)
+	gid := strconv.FormatUint(uint64(stat.Gid), mnd.Base10)
+	name := ""
 
-	return userName.Name + ", " + userName.Username + ":" + groupName.Name
+	if userName, err := user.LookupId(uid); err == nil {
+		uid = userName.Username
+		name = userName.Name
+	}
+
+	if groupName, err := user.LookupGroupId(gid); err == nil {
+		gid = groupName.Name
+	}
+
+	if name != "" {
+		return name + ", " + uid + ":" + gid
+	}
+
+	return uid + ":" + gid
 }

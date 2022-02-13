@@ -127,6 +127,7 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 		"id":        album.ID,
 		"hasFile":   hasFile,
 		"monitored": album.Monitored,
+		"tags":      album.Artist.Tags,
 	}
 }
 

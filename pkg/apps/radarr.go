@@ -122,6 +122,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 		"id":        movie.ID,
 		"hasFile":   movie.HasFile,
 		"monitored": movie.Monitored,
+		"tags":      movie.Tags,
 	}
 }
 

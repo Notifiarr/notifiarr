@@ -370,16 +370,22 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		return fmt.Errorf("parsing form data failed: %w", err)
 	}
 
-	config.Apps.Lidarr = nil
-	config.Apps.Prowlarr = nil
-	config.Apps.Radarr = nil
-	config.Apps.Readarr = nil
-	config.Apps.Sonarr = nil
-	config.Apps.Qbit = nil
-	config.Apps.Deluge = nil
-	config.Apps.SabNZB = nil
-	config.Snapshot.Plugins.MySQL = nil
+	if config.Apps != nil {
+		config.Apps.Lidarr = nil
+		config.Apps.Prowlarr = nil
+		config.Apps.Radarr = nil
+		config.Apps.Readarr = nil
+		config.Apps.Sonarr = nil
+		config.Apps.Qbit = nil
+		config.Apps.Deluge = nil
+		config.Apps.SabNZB = nil
+	}
+
 	config.Service = nil
+
+	if config.Snapshot != nil && config.Snapshot.Plugins != nil {
+		config.Snapshot.Plugins.MySQL = nil
+	}
 
 	if err := configPostDecoder.Decode(config, request.PostForm); err != nil {
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)

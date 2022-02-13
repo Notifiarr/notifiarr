@@ -125,6 +125,7 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 		"id":        book.ID,
 		"hasFile":   hasFile,
 		"monitored": book.Monitored,
+		"tags":      book.Author.Tags,
 	}
 }
 
