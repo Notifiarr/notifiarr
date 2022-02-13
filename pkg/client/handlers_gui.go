@@ -21,6 +21,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/services"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
@@ -370,6 +371,14 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		return fmt.Errorf("parsing form data failed: %w", err)
 	}
 
+	if config.Snapshot == nil {
+		config.Snapshot = &snapshot.Config{}
+	}
+
+	if config.Snapshot.Plugins == nil {
+		config.Snapshot.Plugins = &snapshot.Plugins{}
+	}
+
 	if config.Apps != nil {
 		config.Apps.Lidarr = nil
 		config.Apps.Prowlarr = nil
@@ -382,10 +391,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	}
 
 	config.Service = nil
-
-	if config.Snapshot != nil && config.Snapshot.Plugins != nil {
-		config.Snapshot.Plugins.MySQL = nil
-	}
+	config.Snapshot.Plugins.MySQL = nil
 
 	if err := configPostDecoder.Decode(config, request.PostForm); err != nil {
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
