@@ -51,7 +51,7 @@
                                     <li><a class="nav-link text-grey" onClick="triggerAction('sessions')">Send Plex Sessions</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/lidarr')">Check Lidarr for Corruption</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/prowlarr')">Check Prowlarr for Corruption</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/redarr')">Check Radarr for Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/radarr')">Check Radarr for Corruption</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/readarr')">Check Readarr for Corruption</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/sonarr')">Check Sonarr for Corruption</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('backup/lidarr')">Check Lidarr Backups</a></li>
@@ -114,6 +114,9 @@
                             </div>
                             <div class="navigation-item" id="template-media" style="display: none;">
 {{ template "media.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-monitoring" style="display: none;">
+{{ template "monitoring.html" . }}
                             </div>
                             <div class="navigation-item" id="template-metrics" style="display: none;">
 {{ template "metrics.html" . }}
