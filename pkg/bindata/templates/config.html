@@ -87,14 +87,14 @@
 
                             <tr>
                                 <td>
-                                    <i title="Enabling serial will make the application use fewer go routines (threads) when gathering data from configured applications. Spreads out CPU usage and lowers memory footprint." class="help-icon far fa-question-circle"></i>
-                                    Serial
+                                    <i title="Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications. Spreads out CPU usage and lowers memory footprint." class="help-icon far fa-question-circle"></i>
+                                    Parallel Threads
                                 </td>
-                                <td>{{if .Config.Serial}}Enabled{{else}}Disabled{{end}}</td>
+                                <td>{{if .Config.Serial}}Disabled{{else}}Enabled{{end}}</td>
                                 <td>
                                     <select class="client-parameter" data-group="config" data-label="Serial" id="Serial" data-original="{{.Config.Serial}}">
-                                        <option {{if .Config.Serial}}selected {{end}}value="true">Enabled</option>
-                                        <option {{if not .Config.Serial}}selected {{end}}value="false">Disabled</option>
+                                        <option {{if .Config.Serial}}selected {{end}}value="true">Disabled</option>
+                                        <option {{if not .Config.Serial}}selected {{end}}value="false">Enabled</option>
                                     </select>
                                 </td>
                             </tr>
