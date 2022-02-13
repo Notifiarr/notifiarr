@@ -964,10 +964,17 @@ select[multiple] option:checked {
     margin-right: 0;
     padding-right: 0;
     display: inline-block;
-    color: #fff;
+    color: #585c64;
 }
 
 .nav-link {
+    margin-left: 0;
+    padding-left: 0;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.nav-div-link {
     margin-left: 0;
     padding-left: 0;
     display: inline-block;

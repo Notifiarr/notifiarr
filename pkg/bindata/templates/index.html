@@ -38,7 +38,30 @@
                             <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" onclick="swapNavigationTemplate('snapshot')">Snapshot Apps</a></li>
                             <li><i class="nav-icon fas fa-network-wired"></i><a class="nav-link" onclick="swapNavigationTemplate('services')">Service Checks</a></li>
                             <hr>
-                            <li><i class="nav-icon fas fa-baby-carriage"></i>&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
+                            <div class="dropdown">
+                                <a class="nav-div-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="nav-icon fas fa-fire-extinguisher"></i> &nbsp;&nbsp;&nbsp;Triggers &nbsp; &nbsp;<span class="caret"></span>
+                                </a>
+                                <ul style="width:92%;" class="dropdown-menu bk-dark" aria-labelledby="triggers menu">
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('gaps')">Send Radarr Gaps</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('cfsync')">Sync Custom Format</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('snapshot')">Send System Snapshot</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('stuckitems')">Stuck Queue Items Check</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('dashboard')">Send Dashboard States</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('sessions')">Send Plex Sessions</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/lidarr')">Check Lidarr for Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/prowlarr')">Check Prowlarr for Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/redarr')">Check Radarr for Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/readarr')">Check Readarr for Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/sonarr')">Check Sonarr for Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/lidarr')">Check Lidarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/prowlarr')">Check Prowlarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/radarr')">Check Radarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/readarr')">Check Readarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/sonarr')">Check Sonarr Backups</a></li>
+                                </ul>
+                            </div>
+                            <li><i class="nav-icon fas fa-camera"></i>&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
                             <li><i class="nav-icon fas fa-chart-line"></i>&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('metrics')">Metrics</a></li>
                             <li><i class="nav-icon fas fa-file-alt"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('logfiles')">Log Files</a></li>
                             <li>{{if eq .Version.os "windows"}}<i class="nav-icon fab fa-windows"></i>
@@ -55,7 +78,7 @@
                             <hr>
                             <div align="center">
                                 <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
-                                    Submit <span id="pending-change-counter">0</span> Pending Changes
+                                    Save <span id="pending-change-counter">0</span> Changes &amp; Reload
                                 </button>
                             </div>
                             <div style="margin-left: 1em; margin-top: 1em;">

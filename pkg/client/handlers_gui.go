@@ -281,6 +281,20 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	}
 }
 
+func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
+	code, data := c.runTrigger(mux.Vars(request)["action"], mux.Vars(request)["content"])
+	http.Error(response, data, code)
+}
+
+// handleProcessList just returns the running process list for a human to view.
+func (c *Client) handleProcessList(response http.ResponseWriter, request *http.Request) {
+	if ps, err := getProcessList(); err != nil {
+		http.Error(response, err.Error(), http.StatusInternalServerError)
+	} else if _, err = response.Write(ps.Bytes()); err != nil {
+		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
+	}
+}
+
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
 	// copy running config,
 	config, err := c.Config.CopyConfig()

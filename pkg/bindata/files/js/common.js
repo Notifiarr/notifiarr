@@ -222,7 +222,6 @@ function toast(title, message, type, duration=5000)
         has_progress: true,
         rtl: false,
     });
-
 }
 // -------------------------------------------------------------------------------------------
 
@@ -231,3 +230,21 @@ function titleCaseWord(word)
     return word.charAt(0).toUpperCase() + word.slice(1);
 }
 // -------------------------------------------------------------------------------------------
+
+function triggerAction(action) {
+    $.ajax({
+        type: 'GET',
+        url: '/trigger/'+action,
+        success: function (data){
+            toast('Trigger Sent', data, 'success');
+        },
+        error: function (response, status, error) {
+            if (error == "") {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Trigger Error', error+': '+response.responseText, 'error', 10000);
+            }
+        }
+    });
+}

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -48,16 +49,28 @@ func (c *Client) forceWriteWithExit(fileName string) error {
 }
 
 // printProcessList is triggered by the --ps command line arg.
-//nolint:forbidigo
 func printProcessList() error {
+	ps, err := getProcessList()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(ps.String()) //nolint:forbidigo
+
+	return nil
+}
+
+func getProcessList() (*bytes.Buffer, error) {
 	pslist, err := services.GetAllProcesses()
 	if err != nil {
-		return fmt.Errorf("unable to get processes: %w", err)
+		return nil, fmt.Errorf("unable to get processes: %w", err)
 	}
+
+	var buf bytes.Buffer
 
 	for _, proc := range pslist {
 		if mnd.IsFreeBSD {
-			fmt.Printf("[%-5d] %s\n", proc.PID, proc.CmdLine)
+			fmt.Fprintf(&buf, "[%-5d] %s\n", proc.PID, proc.CmdLine)
 			continue
 		}
 
@@ -66,10 +79,10 @@ func printProcessList() error {
 			t = time.Since(proc.Created).Round(time.Second).String()
 		}
 
-		fmt.Printf("[%-5d] %-11s: %s\n", proc.PID, t, proc.CmdLine)
+		fmt.Fprintf(&buf, "[%-5d] %-11s: %s\n", proc.PID, t, proc.CmdLine)
 	}
 
-	return nil
+	return &buf, nil
 }
 
 // curlURL is called from the --curl CLI arg.

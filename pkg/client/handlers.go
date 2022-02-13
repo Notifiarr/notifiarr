@@ -39,6 +39,9 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
 		c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
 		c.Config.Router.HandleFunc(path.Join(base, "/profile"), c.handleProfilePost).Methods("POST")
+		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}"), c.handleGUITrigger).Methods("GET")
+		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}/{content}"), c.handleGUITrigger).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/ps"), c.checkAuthorized(c.handleProcessList)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}/{skip}"),
@@ -153,10 +156,11 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
-func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cyclop
-	content := mux.Vars(r)["content"]
-	trigger := mux.Vars(r)["trigger"]
+func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
+	return c.runTrigger(mux.Vars(r)["trigger"], mux.Vars(r)["content"])
+}
 
+func (c *Client) runTrigger(trigger, content string) (int, string) { //nolint:cyclop
 	if content != "" {
 		c.Debugf("Incoming API Trigger: %s (%s)", trigger, content)
 	} else {
@@ -185,12 +189,12 @@ func (c *Client) handleTrigger(r *http.Request) (int, interface{}) { //nolint:cy
 	case "corrupt":
 		err := c.website.Trigger.Corruption(notifiarr.EventAPI, starr.App(strings.Title(content)))
 		if err != nil {
-			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err)
+			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err).Error()
 		}
 	case "backup":
 		err := c.website.Trigger.Backup(notifiarr.EventAPI, starr.App(strings.Title(content)))
 		if err != nil {
-			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err)
+			return http.StatusBadRequest, fmt.Errorf("trigger failed: %w", err).Error()
 		}
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}
