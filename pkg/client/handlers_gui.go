@@ -26,6 +26,8 @@ import (
 	"golift.io/version"
 )
 
+const minPasswordLen = 16
+
 type templateData struct {
 	Config   *configfile.Config `json:"config"`
 	Flags    *configfile.Flags  `json:"flags"`
@@ -39,7 +41,10 @@ type templateData struct {
 // userNameValue is used a context value key.
 type userNameValue string
 
-const userNameStr userNameValue = "username"
+const (
+	defaultUsername               = "admin"
+	userNameStr     userNameValue = "username"
+)
 
 func (c *Client) checkAuthorized(next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
@@ -88,15 +93,46 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 	})
 }
 
-func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
-	validUsername, validPassword := "admin", c.Config.UIPassword
-	if spl := strings.SplitN(validPassword, ":", 2); len(spl) == 2 { //nolint:gomnd
-		validUsername = spl[0]
-		validPassword = spl[1]
+// getUserPass turns the UIPassword config value into a usernam and password.
+// "password." => user:admin, pass:password.
+// ":password." => user:admin, pass::password.
+// "joe:password." => user:joe, pass:password.
+func (c *Client) getUserPass() (string, string) {
+	c.RLock()
+	defer c.RUnlock()
+
+	username, password := defaultUsername, c.Config.UIPassword
+	if spl := strings.SplitN(password, ":", 2); len(spl) == 2 { //nolint:gomnd
+		password = spl[1]
+
+		if spl[0] != "" {
+			username = spl[0]
+		}
 	}
 
+	return username, password
+}
+
+func (c *Client) setUserPass(username, password string) error {
+	c.Lock()
+	defer c.Unlock()
+
+	current := c.Config.UIPassword
+	c.Config.UIPassword = username + ":" + password
+
+	if err := c.saveNewConfig(c.Config); err != nil {
+		c.Config.UIPassword = current
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
+	validUsername, validPassword := c.getUserPass()
+
 	switch providedUsername := request.FormValue("name"); {
-	case len(validPassword) < 16: // nolint:gomnd
+	case len(validPassword) < minPasswordLen:
 		c.indexPage(response, request, "Invalid Password Configured")
 	case c.getUserName(request) != "":
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
@@ -204,110 +240,53 @@ func (c *Client) getLogHandler(response http.ResponseWriter, req *http.Request) 
 	}
 }
 
-/*
-// getSettingsHandler returns all settings in a json blob. Useful for ajax requests.
-func (c *Client) getSettingsHandler(response http.ResponseWriter, req *http.Request) {
-	var err error
-
-	response.Header().Set("content-type", "application/json")
-
-	switch config := mux.Vars(req)["config"]; config {
-	default:
-		item := getFieldName(config, *c.Config)
-		if item == nil {
-			http.Error(response, `{"error": "no config item: `+config+`"}`, http.StatusBadRequest)
-			return
-		}
-
-		err = json.NewEncoder(response).Encode(map[string]interface{}{config: item})
-	case "flags":
-		err = json.NewEncoder(response).Encode(map[string]interface{}{config: c.Flags})
-	case "config":
-		err = json.NewEncoder(response).Encode(map[string]interface{}{config: c.Config})
-	case "username":
-		err = json.NewEncoder(response).Encode(map[string]string{config: c.getUserName(req)})
-	case "version":
-		err = json.NewEncoder(response).Encode(map[string]string{
-			"started":   version.Started.Round(time.Second).String(),
-			"uptime":    time.Since(version.Started).Round(time.Second).String(),
-			"program":   c.Flags.Name(),
-			"version":   version.Version,
-			"revision":  version.Revision,
-			"branch":    version.Branch,
-			"buildUser": version.BuildUser,
-			"buildDate": version.BuildDate,
-			"goVersion": version.GoVersion,
-			"os":        runtime.GOOS,
-			"arch":      runtime.GOARCH,
-		})
-	case "all":
-		err = json.NewEncoder(response).Encode(&templateData{
-			Config:   c.Config,
-			Flags:    c.Flags,
-			Username: c.getUserName(req),
-			Version: map[string]string{
-				"started":   version.Started.Round(time.Second).String(),
-				"uptime":    time.Since(version.Started).Round(time.Second).String(),
-				"program":   c.Flags.Name(),
-				"version":   version.Version,
-				"revision":  version.Revision,
-				"branch":    version.Branch,
-				"buildUser": version.BuildUser,
-				"buildDate": version.BuildDate,
-				"goVersion": version.GoVersion,
-				"os":        runtime.GOOS,
-				"arch":      runtime.GOARCH,
-			},
-		})
+func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
+	realUser, realPass := c.getUserPass()
+	if realPass != request.PostFormValue("Password") {
+		http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
+		return
 	}
 
-	if err != nil {
-		c.Errorf("Sending HTTP JSON Response: %v", err)
-		http.Error(response, `{"error": "`+err.Error()+`"}`, http.StatusInternalServerError)
+	username := request.PostFormValue("NewUsername")
+	if username == "" {
+		username = realUser
+	}
+
+	newPassw := request.PostFormValue("NewPassword")
+	if newPassw == "" {
+		newPassw = realPass
+	}
+
+	if len(newPassw) < minPasswordLen {
+		http.Error(response, fmt.Sprintf("New password must be at least %d characters.",
+			minPasswordLen), http.StatusBadRequest)
+		return
+	}
+
+	if newPassw == realPass && username == realUser {
+		http.Error(response, "Values unchanged. Nothing to save.", http.StatusOK)
+		return
+	}
+
+	if err := c.setUserPass(username, newPassw); err != nil {
+		c.Errorf("[gui requested] Saving Config: %v", err)
+		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	if _, err := response.Write([]byte("New username and/or password saved.")); err != nil {
+		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
 	}
 }
-
-
-// getFieldName allows pulling a config item by json tag name.
-func getFieldName(key string, config interface{}) interface{} {
-	sType := reflect.TypeOf(config)
-	sVal := reflect.ValueOf(config)
-
-	if sType.Kind() == reflect.Ptr {
-		sType = reflect.TypeOf(config).Elem()
-		sVal = reflect.ValueOf(config).Elem()
-	}
-
-	if sType.Kind() != reflect.Struct {
-		return nil
-	}
-
-	for i := 0; i < sType.NumField(); i++ { //nolint:varnamelen
-		loopType := reflect.TypeOf(sType.Field(i))
-		//  Loop into exported anonymous structs.
-		if loopType.Kind() == reflect.Struct && sType.Field(i).Anonymous && sType.Field(i).IsExported() {
-			if item := getFieldName(key, sVal.Field(i).Interface()); item != nil {
-				return item
-			}
-		}
-
-		// See if this item has a json tag equal to our requested key.
-		v := strings.Split(sType.Field(i).Tag.Get("json"), ",")[0]
-		if v == key {
-			return sVal.Field(i).Interface()
-		}
-	}
-
-	return nil
-}
-*/
 
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
 	// copy running config,
 	config, err := c.Config.CopyConfig()
 	if err != nil {
 		c.Errorf("[gui requested] Copying Config (GUI request): %v", err)
-		http.Error(response, "Error copying internal configuration: "+err.Error(), http.StatusInternalServerError)
+		http.Error(response, "Error copying internal configuration (this is a bug): "+
+			err.Error(), http.StatusInternalServerError)
 
 		return
 	}
@@ -320,31 +299,10 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	date := time.Now().Format("20060102T150405") // for file names.
+	if err := c.saveNewConfig(config); err != nil {
+		c.Errorf("[gui requested] Saving Config: %v", err)
+		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
-	// write new config file to temporary path.
-	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig."+date)
-	if _, err = config.Write(destFile); err != nil { // write our config file template.
-		c.Errorf("[gui requested] Writing new config file: %v", err)
-		http.Error(response, "Error writing new config file: "+err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	// make config file backup.
-	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
-	if err = configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
-		c.Errorf("[gui requested] Backing up config file (GUI request): %v", err)
-		http.Error(response, "Error backing up config file: "+err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	// move new config file to existing config file.
-	if err = os.Rename(destFile, c.Flags.ConfigFile); err != nil {
-		c.Errorf("[gui requested] Renaming Temporary File: %v", err)
-
-		http.Error(response, "Error renaming temporary file: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -354,10 +312,34 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}()
 
 	// respond.
-	_, err = response.Write([]byte("Config Svaed. Reloading in 5 seconds..."))
+	_, err = response.Write([]byte("Config Saved. Reloading in 5 seconds..."))
 	if err != nil {
 		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
 	}
+}
+
+// saveNewConfig takes a fully built (copy) of config data, and
+func (c *Client) saveNewConfig(config *configfile.Config) error {
+	date := time.Now().Format("20060102T150405") // for file names.
+
+	// write new config file to temporary path.
+	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig."+date)
+	if _, err := config.Write(destFile); err != nil { // write our config file template.
+		return fmt.Errorf("writing new config file: %w", err)
+	}
+
+	// make config file backup.
+	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
+	if err := configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
+		return fmt.Errorf("backing up config file: %w", err)
+	}
+
+	// move new config file to existing config file.
+	if err := os.Rename(destFile, c.Flags.ConfigFile); err != nil {
+		return fmt.Errorf("renaming temporary file: %w", err)
+	}
+
+	return nil
 }
 
 // Set a Decoder instance as a package global, because it caches
