@@ -39,7 +39,7 @@ func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 	}
 
 	for idx, check := range services {
-		if err := services[idx].validate(); err != nil {
+		if err := services[idx].Validate(); err != nil {
 			return nil, err
 		}
 

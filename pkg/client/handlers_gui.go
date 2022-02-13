@@ -20,6 +20,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
@@ -318,7 +319,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 }
 
-// saveNewConfig takes a fully built (copy) of config data, and
+// saveNewConfig takes a fully built (copy) of config data, and saves it as the config file.
 func (c *Client) saveNewConfig(config *configfile.Config) error {
 	date := time.Now().Format("20060102T150405") // for file names.
 
@@ -364,9 +365,24 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	config.Apps.Deluge = nil
 	config.Apps.SabNZB = nil
 	config.Snapshot.Plugins.MySQL = nil
+	config.Service = nil
 
 	if err := configPostDecoder.Decode(config, request.PostForm); err != nil {
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
+	}
+
+	// Check service checks for non-unique names.
+	serviceNames := make(map[string]struct{})
+	for index, svc := range config.Service {
+		if _, ok := serviceNames[svc.Name]; ok {
+			return fmt.Errorf("%w (%d): %s", services.ErrNoName, index+1, svc.Name)
+		}
+
+		if err := svc.Validate(); err != nil {
+			return fmt.Errorf("validating service check %d: %w", index+1, err)
+		}
+
+		serviceNames[svc.Name] = struct{}{}
 	}
 
 	return nil

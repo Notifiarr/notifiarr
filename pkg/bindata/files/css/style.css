@@ -32,6 +32,7 @@ html,body {
     bottom: 0;
     background: #2c3136;
     padding-right: 20px;
+    z-index: 3;
 }
 @media only screen and (min-width: 480px) {
   html {

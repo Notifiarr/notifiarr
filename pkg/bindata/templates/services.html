@@ -1,3 +1,86 @@
-                    <h1><i class="fas fa-network-wired"></i> Service &amp; Network Checks</h1>
-                    nothing here yet....
-{{- /* end of monitoring (leave this comment) */ -}}
+                    <h1><i class="fas fa-network-wired"></i> Service Checks</h1>
+                    <div class="col-lg-10 col-md-12 col-sm-12 mb">
+                        <p>The notifiarr client application is capable of monitoring services via HTTP checks,
+                           TCP port checks or process running (and not running) checks. Use the form at the bottom
+                           of this page to configure service checks.</p>
+                        <h3>Process Check Type</h3>
+                        <p>The Process check type allows you to monitor that a process is running. <a href="#TODO">View the running process list.</a></p>
+                        <p>
+                            You may provide expect values to make sure a specific number or min/max count of process is running.
+                            The value argument should be a string to search for in the process list. By default a basic string
+                            match is used, but if the string begins and ends with a slash (/), then a regex match is used.
+                            The expect property can have three values: <code>count:min:max</code>, <code>restart</code> and
+                            <code>running</code>. These may be specified individually, or together by separating them with commas.<br>
+                            <li style="list-style: disc;">Providing the <code>count</code> expect value will trigger an unhealthy alert if fewer than <code>min</code> or greater than <code>max</code> matching processes are found.</li>
+                            <li style="list-style: disc;">Providing the <code>running</code> expect value will trigger an unhealthy alert if this application is found running. Rarely used.</li>
+                            <li style="list-style: disc;">Providing the <code>restart</code> expect value will trigger an unhealthy alert if this application is found to have restarted.</li>
+                            <li style="list-style: disc;">Example: <code>count:1:2,restart</code>; this will alert if fewer than 1 or more than 2 matching processes are found, or if a matching process restarts.
+                        </p>
+                        <h3>HTTP Check Type</h3>
+                        <p>The HTTP check type allows you to monitor a URL and expect a specific status code in response.</p>
+                        <p>
+                            The expect value should be a a valid HTTP response code like <code>200</code> or <code>400</code>.
+                            Providing an invalid code will default to 200. The check value must be a valid url beginning with
+                            <code>http://</code> or <code>https://</code>.
+                        </p>
+                        <h3>TCP Port Check Type</h3>
+                        <p>The TCP Port check type allows you to monitor a TCP port's connectivity.</p>
+                        <p>
+                            This check type does not take any special arguments and does not use the expect value.
+                            Simply provide a host (or IP) and port in the format <code>host:port</code>, example: <code>127.0.0.1:22</code>
+                        <p>
+                        </p>
+                    </div>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <td colspan="7" style="text-align:center;">
+                                    <div style="float: left;"><!-- icon goes here.--></div>
+                                    <h2 style="display: inline;">Checks</h2>
+                                    <div style="float: right;">
+                                        <button id="services-Checks-addbutton" onclick="addServiceCheck()" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Check</td>
+                                <td>Name</td>
+                                <td>Type</td>
+                                <td>Check Value</td>
+                                <td>Expect</td>
+                                <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="This interval value controls how often the service is checked."></i></td>
+                                <td style="width:70px">Timeout</td>
+                            </tr>
+                        </thead>
+                        <tbody id="services-Checks-container">
+                        {{- range $index, $svc := .Config.Service}}
+                            <input disabled style="display: none;" class="client-parameter Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
+                            <tr class="services-Checks" id="services-Checks-{{$index}}">
+                                <td style="font-size: 22px;">{{instance $index}}
+                                    <div class="services-Checks-deletebutton" style="float: right;{{if ne (len $.Config.Service) (instance $index)}} display: none;{{end}}">
+                                        <button onclick="removeInstance('services', 'Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                </td>
+                                <td><input type="text" id="Service.{{$index}}.Name"  class="client-parameter" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}" style="width: 100%;"></td>
+                                <td>
+                                    <select id="Service.{{$index}}.Type" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}" style="width: 100%;">
+                                        <option value="process">Process</option>
+                                        <option value="http">HTTP</option>
+                                        <option value="tcp">TCP Port</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" id="Service.{{$index}}.Value" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Service.{{$index}}.Expect" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Service.{{$index}}.Interval" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}" style="width: 100%;"></td>
+                                <td><input type="text" id="Service.{{$index}}.Timeout" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}" style="width: 100%;"></td>
+                            </tr>
+                        {{- end}}
+                            <tr id="services-Checks-none" style="display: none;"><td colspan="7">No Checks instances configured.</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="col-lg-10 col-md-12 col-sm-12 mb">
+                        <h3>Notes</h3>
+                        <li><i class="help-icon far fa-question-circle" title="If you wish to monitor an application configured on another page, just give it a name. Giving any app a name enables service checks."></i> Do not add starr, media, snapshot, or downloader apps here.</li>
+                        <li><i class="help-icon far fa-question-circle" title="Make sure you provide a unique name for each service check."></i> Service Checks must have non-empty unique names.</li>
+                    </div>
+{{- /* end of services (leave this comment) */ -}}

@@ -17,7 +17,7 @@ type result struct {
 	state  CheckState
 }
 
-func (s *Service) validate() error { //nolint:cyclop
+func (s *Service) Validate() error { //nolint:cyclop
 	s.state = StateUnknown
 
 	if s.Name == "" {

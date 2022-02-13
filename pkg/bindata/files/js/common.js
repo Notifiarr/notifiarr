@@ -190,10 +190,10 @@ function saveProfileChanges()
         data: fields,
         success: function (data){
             $('#current-username').html($('#NewUsername').val()); // update the html username.
-            toast('Profile Saved', 'New profile values have been successfully stored.', 'success');
+            toast('Profile Saved', data, 'success');
         },
         error: function (response, status, error) {
-            if (status === undefined) {
+            if (error == "") {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
