@@ -6,7 +6,9 @@ function showProcessList() {
     $.ajax({
         url: 'ps',
         success: function (data){
+            const lineCount = data.split(/\n/).length;
             $('#process-list-content').text(data);
+            $('#process-list-msg').html("Found "+lineCount+" running processes.");
             updateLogFileContentCounters();
         },
         error: function (request, status, error) {

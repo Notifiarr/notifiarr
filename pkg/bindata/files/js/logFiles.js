@@ -5,18 +5,21 @@ function updateLogFileContentCounters()
         let logContainer    = $(this);
         let lines           = logContainer.html().split(/\n/);
         const length        = getCharacterLength(lines.length.toString().trim());
-        logContainer.html('');
 
-        $.each(lines, function(index, line) {
-            if (index !== (lines.length-1)) { // skip the last newline.
-                let number = logContainer.find('.line-number').length+1;
-                logContainer.append('<span class="line-number">' + number.toString().padStart(length, ' ') + '</span>' + line + '<span class="cl"></span>');
-            }
-        });
+        if (logContainer.find('.cl').length == 0) { // avoid repeating this to an already formatted container.
+            logContainer.html('');
+            $.each(lines, function(index, line) {
+                if (index !== (lines.length-1)) { // skip the last newline.
+                    let number = logContainer.find('.line-number').length+1;
+                    logContainer.append('<span class="line-number">' + number.toString().padStart(length, ' ') + '</span>' + line + '<span class="cl"></span>');
+                }
+            });
+        }
     });
 
 }
 updateLogFileContentCounters();
+
 // ---------------------------------------------------------------------------------------------
 
 
