@@ -184,7 +184,7 @@ retries = {{.Retries}}
 {{end}}
 {{else}}#[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
-#url       = "http://127.0.0.1:7878/radarr"
+#url       = "http://127.0.0.1:7878/"
 #api_key   = ""
 
 
@@ -203,7 +203,7 @@ retries = {{.Retries}}
 {{end}}
 {{else}}#[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
-#url       = "http://127.0.0.1:8787/readarr"
+#url       = "http://127.0.0.1:8787/"
 #api_key   = ""
 
 
