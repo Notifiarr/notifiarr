@@ -12,7 +12,7 @@ function showProcessList() {
             updateLogFileContentCounters();
         },
         error: function (request, status, error) {
-            $('#process-list-content').html('<h4>'+ error +'</h4>\n'+ request.responseText).animate({opacity:'100'}).show().fadeOut(10000);
+            $('#process-list-content').html('<h4>'+ error +'</h4>\n'+ request.responseText);
         },
     });
 }
