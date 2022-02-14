@@ -970,3 +970,13 @@ pre .cl {
   display:block;
   clear:both;
 }
+
+.scroll-bar {
+     overflow: auto;
+     max-height: 86vh;
+}
+
+.scroll-bar-sm {
+     overflow: auto;
+     max-height: 73vh;
+}
