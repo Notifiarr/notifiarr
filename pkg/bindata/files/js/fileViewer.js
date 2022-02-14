@@ -17,16 +17,15 @@ function updateFileContentCounters()
             });
         }
     });
-
 }
 
 updateFileContentCounters();
 
 // ----- File Display
-$('.fileController .triggerFileSelector').change(function() {
-    const ctl       = $(this).parents('.fileController');
+function fileSelectorChange(caller) {
+    const ctl       = caller.parents('.fileController');
     const kind      = ctl.data("kind");
-    const fileID    = $(this).val();
+    const fileID    = ctl.find('.file-selector').val();
     const filename  = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used      = ctl.find('#fileinfo-'+ fileID).data('used');
     const lineCount = parseInt(ctl.data("lines"));
@@ -34,7 +33,7 @@ $('.fileController .triggerFileSelector').change(function() {
     // start a spinner because it may take a few seconds to load a file.
     ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
     // hide all other file-info divs, hide actions (until file load completes), hide help msg (this is the active file warning tooltip), hide any error or info messages.
-    ctl.find('[id^=fileinfo-], .file-control, .file-ajax-error, .file-ajax-msg').hide()
+    ctl.find('.fileinfo-table, .file-control, .file-ajax-error, .file-ajax-msg').hide()
     ctl.find('.file-actions, #fileinfo-'+ fileID).show() // show the file info div (right side panel) for the file requested.
     ctl.find('.fileLinesAdd').prop('disabled', false);
 
@@ -54,17 +53,22 @@ $('.fileController .triggerFileSelector').change(function() {
             updateFileContentCounters();
         },
         error: function (request, status, error) {
-            ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText).animate({opacity:'100'}).show().fadeOut(10000);
+            if (error == "") {
+                ctl.find('.file-ajax-error').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
+            } else {
+                ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+            }
+            ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
         },
     });
-});
+}
 
 // This powers the Action menu: Send to notifiarr, delete, download.
-$('.triggerFileAction').click(function(){
-    const ctl      = $(this).parents('.fileController');
+function triggerFileAction(caller) {
+    const ctl      = caller.parents('.fileController');
     const kind     = ctl.data("kind");
     const action   = ctl.find('.fileAction').val();
-    const fileID   = ctl.find('.triggerFileSelector').val();
+    const fileID   = ctl.find('.file-selector').val();
     const filename = ctl.find('#fileinfo-'+ fileID).data('filename');
 
     if (filename === undefined) {
@@ -78,11 +82,18 @@ $('.triggerFileAction').click(function(){
         $.ajax({
             url: 'deleteFile/'+ kind +'/'+ fileID,
             success: function (data){
-                // TODO: remove the item from the select
-                ctl.find('.file-ajax-msg').html("<h4>Deleted File</h4>"+filename).stop().animate({opacity:'100'}).show().fadeOut(10000);
+                ctl.find('.file-control').hide();                                       // hide controls for this deleted file.
+                ctl.find('.file-selector').val("placeholder");                    // set selection back to placeholder.
+                ctl.find(".file-selector option[value='"+ fileID +"']").remove(); // remove this file from the list.
+                ctl.find('.file-ajax-msg').html("<h4>Deleted File</h4>"+filename).      // give the user a success message.
+                    stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
             error: function (request, status, error){
-                ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+                if (error == "") {
+                    ctl.find('.file-ajax-error').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
+                } else {
+                    ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+                }
                 ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
@@ -90,13 +101,13 @@ $('.triggerFileAction').click(function(){
         ctl.find('.file-ajax-error').html('<h4>Invalid!</h4>This does not work yet.')
             .stop().animate({opacity:'100'}).show().fadeOut(4000);
     }
-});
+}
 
 // This powers the file add/reload menu.
-$('.triggerFileLoad').click(function() {
-    const ctl         = $(this).parents('.fileController');
+function triggerFileLoad(caller) {
+    const ctl         = caller.parents('.fileController');
     const kind        = ctl.data("kind");
-    const fileID      = ctl.find('.triggerFileSelector').val();
+    const fileID      = ctl.find('.file-selector').val();
     const filename    = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used        = ctl.find('#fileinfo-'+ fileID).data('used');
     const lineCount   = parseInt(ctl.find('.fileLinesCount').val());
@@ -132,11 +143,16 @@ $('.triggerFileLoad').click(function() {
                 ctl.find('.file-small-msg').html('');
             },
             error: function (request, status, error){
-                ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText).stop().animate({opacity:'100'}).show().fadeOut(10000);
+                if (error == "") {
+                    ctl.find('.file-ajax-error').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
+                } else {
+                    ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+                }
+                ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
-    } else { // reload
-        // start a spinner because this takes a few seconds.
+    } else { // reload (vs add).
+        // start a spinner because this might take a few seconds.
         ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
         $.ajax({
             url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/0',
@@ -155,9 +171,9 @@ $('.triggerFileLoad').click(function() {
                 ctl.find('.file-small-msg').html('');
             },
             error: function (request, status, error){
-                ctl.find('.file-ajax-error').show();
-                ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+                ctl.find('.file-ajax-error').show().html('<h4>'+ error +'</h4>'+ request.responseText);
+                ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
     }
-});
+}

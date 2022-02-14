@@ -2,9 +2,10 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h3><a class="nav-link" onClick="swapNavigationTemplate('services')"><i class="fas fa-angle-double-left"></i> Go Back</a></h3>
-                            <p id="process-list-msg"></p>
+                            <p><span id="process-list-msg">Stand by, Captain!</span> &nbsp;•&nbsp;
+                            <a href="#services" onClick="refreshPage('processlist');showProcessList();">Refresh Page</a></p>
                             <div class="scroll-bar">
-                                <pre id="process-list-content" class="well well-sm file-content bk-brown brdr">Process list content goes here.
+                                <pre id="process-list-content" class="well well-sm file-content bk-brown brdr"><h4><i class="fas fa-cog fa-spin"></i> Loading process list...</h4>
                                 </pre>
                             </div>
                         </div>

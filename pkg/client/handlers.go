@@ -43,6 +43,7 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}"), c.handleGUITrigger).Methods("GET")
 		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}/{content}"), c.handleGUITrigger).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/ps"), c.checkAuthorized(c.handleProcessList)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/template/{template}"), c.checkAuthorized(c.getTemplatePageHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}/{skip}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")

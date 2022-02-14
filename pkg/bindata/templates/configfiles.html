@@ -2,9 +2,10 @@
                     <div class="fileController" data-kind="config" data-lines="250">
                         <div class="row">
                           <div class="col-md-6">
-                              Found {{len .ConfigFiles.List}} config files.<br>
+                              Found {{len .ConfigFiles.List}} config files. &nbsp;•&nbsp;
+                              <a href="#configfiles" onClick="refreshPage('configfiles')">Refresh Page</a><br>
                               Total Size: {{.ConfigFiles.Size}} ({{megabyte .ConfigFiles.Size}} Mb)<br>
-                              <select class="triggerFileSelector">
+                              <select class="file-selector" onChange="fileSelectorChange($(this))">
                                   <option value="placeholder" selected disabled>- Select a config file -</option>
                                   {{- range $file := .ConfigFiles.List }}
                                   <option value="{{ $file.ID }}">{{ $file.Name }}</option>
@@ -17,7 +18,7 @@
                                       <option value="delete">Delete File</option>
                                       <option value="download">Download File</option>
                                   </select>
-                                  <button data-kind="config" class="triggerFileAction btn btn-xs btn-primary">Go</button>
+                                  <button onClick="triggerFileAction($(this))" class="btn btn-xs btn-primary">Go</button>
                               </span>
                               <hr>
                               <div style="display:none;padding: 0 !important;" class="file-control col-md-6">
@@ -31,16 +32,16 @@
                                       <option value="250" selected>250 lines</option>
                                       <option value="500">500 lines</option>
                                   </select>
-                                  <button data-kind="config" class="triggerFileLoad btn btn-xs btn-primary">Go</button><br>
+                                  <button onClick="triggerFileLoad($(this))" class="btn btn-xs btn-primary">Go</button><br>
                                   <span class="file-action-msg">Displaying last <span class="currentLineCount">0</span> file lines.'</span>
                               </div>
                               <!-- 3 dynamic message boxes -->
-                              <div class="file-control col-md-6"></div>
+                              <div class="file-small-msg file-control col-md-6"></div>
                               <div class="col-md-12 alert alert-info file-ajax-msg" style="display:none;"></div>
-                              <div class="col-md-12 alert alert-danger" style="display:none;"></div>
+                              <div class="col-md-12 alert alert-danger file-ajax-error" style="display:none;"></div>
                           </div>
                           <div class="col-md-6 mb">
-                              <table class="table table-striped table-bordered" id="fileinfo-placeholder">
+                              <table class="table table-striped table-bordered fileinfo-table">
                                   <tr><td width="10%">Path</td><td>No file selected.</td></tr>
                                   {{- if not (eq .Version.os "windows")}}
                                   <tr><td width="10%">Mode</td><td>No file selected.</td></tr>
@@ -51,18 +52,7 @@
                                   <tr><td width="10%">Used</td><td>No file selected.</td></tr>
                               </table>
                               <div class="fileTablesList">
-                              {{- range $file := .ConfigFiles.List }}
-                                  <table class="table table-striped table-bordered" style="display:none;" id="fileinfo-{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
-                                      <tr><td width="10%">Path</td><td>{{$file.Path}}</td></tr>
-                                      {{- if not (eq $.Version.os "windows")}}
-                                      <tr><td width="10%">Mode</td><td>{{$file.Mode}}</td></tr>
-                                      <tr><td width="10%">User</td><td>{{$file.User}}</td></tr>
-                                      {{- end}}
-                                      <tr><td width="10%">Size</td><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
-                                      <tr><td width="10%">Date</td><td>{{$file.Time}}</td></tr>
-                                      <tr><td width="10%">Used</td><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively written."></i></td></tr>
-                                  </table>
-                              {{- end}}
+                              {{- template "filetablelist.html" .ConfigFiles.List }}
                               </div>
                           </div>
                         </div>

@@ -167,6 +167,9 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 		fileInfos = c.Logger.GetAllLogFilePaths()
 	case "config":
 		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
+	default:
+		http.Error(response, "invalid source", http.StatusBadRequest)
+		return
 	}
 
 	id := mux.Vars(req)["id"]
@@ -195,6 +198,9 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 		fileInfos = c.Logger.GetAllLogFilePaths()
 	case "config":
 		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
+	default:
+		http.Error(response, "invalid source", http.StatusBadRequest)
+		return
 	}
 
 	id := mux.Vars(req)["id"]
@@ -237,9 +243,11 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 		fileInfos = c.Logger.GetAllLogFilePaths()
 	case "config":
 		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
+	default:
+		http.Error(response, "invalid source", http.StatusBadRequest)
+		return
 	}
 
-	id := mux.Vars(req)["id"]
 	skip, _ := strconv.Atoi(mux.Vars(req)["skip"])
 
 	count, _ := strconv.Atoi(mux.Vars(req)["lines"])
@@ -249,7 +257,7 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 	}
 
 	for _, fileInfo := range fileInfos.List {
-		if fileInfo.ID != id {
+		if fileInfo.ID != mux.Vars(req)["id"] {
 			continue
 		}
 
@@ -316,7 +324,7 @@ func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Re
 func (c *Client) handleProcessList(response http.ResponseWriter, request *http.Request) {
 	if ps, err := getProcessList(); err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
-	} else if _, err = response.Write(ps.Bytes()); err != nil {
+	} else if _, err = ps.WriteTo(response); err != nil {
 		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
 	}
 }
@@ -446,11 +454,19 @@ func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, 
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 
-	err := c.templat.ExecuteTemplate(response, "index.html", &templateData{
+	c.renderTemplate(response, request, "index.html", msg)
+}
+
+func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
+	c.renderTemplate(response, req, mux.Vars(req)["template"]+".html", "")
+}
+
+func (c *Client) renderTemplate(response io.Writer, req *http.Request,
+	templateName, msg string) {
+	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
 		Flags:       c.Flags,
-		Username:    c.getUserName(request),
-		Data:        request.PostForm,
+		Username:    c.getUserName(req),
 		Msg:         msg,
 		LogFiles:    c.Logger.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),

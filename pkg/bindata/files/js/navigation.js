@@ -15,3 +15,22 @@ function checkHashForNavPage() {
 }
 
 checkHashForNavPage()
+
+// refreshPage will re-download any template and replace it with new data.
+function refreshPage(template) {
+    $.ajax({
+        url: 'template/'+ template,
+        success: function (data){
+            $('#template-'+ template).html(data);
+            updateFileContentCounters();
+        },
+        error: function (request, status, error) {
+            if (error == "") {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Template Error', error+': '+response.responseText, 'error', 10000);
+            }
+        },
+    });
+}
