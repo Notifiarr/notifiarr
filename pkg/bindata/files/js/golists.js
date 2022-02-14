@@ -1,23 +1,22 @@
 // Remove an instance from a list of applications.
 // Example: Click delete button on one of the Radarrs.
 // Works for Snapshot and Download Clients too.
-function removeInstance(section, app, index)
+function removeInstance(name, index)
 {
-    $('#'+ section +'-'+ app +'-'+ index).remove();
+    $('#'+ name +'-'+ index).remove();
     // redo tooltips since some got nuked.
     setTooltips();
     // if all instances are deleted, show the "no instances" item.
-    if (!$('.'+ section +'-'+ app).length) {
-        $('#'+ section +'-'+ app +'-none').show();
+    if (!$('.'+ name).length) {
+        $('#'+ name +'-none').show();
     }
     // mark this instance as deleted (to bring up save changes button).
-    $('.'+ app + index +'-deleted').val(true);
+    $('.'+ name + index +'-deleted').val(true);
     // bring up the delete button on the next last row-item.
-    $('.'+ section +'-'+ app +'-deletebutton').last().show();
+    $('.'+ name +'-deletebutton').last().show();
     // bring up the save changes button.
     findPendingChanges();
 }
-// -------------------------------------------------------------------------------------------
 
 // addInstance is used to build the table rows.
 function addInstance(section, app)
@@ -30,8 +29,8 @@ function addInstance(section, app)
     let row = '<tr class="'+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
                 '   <td style="font-size: 22px;">'+instance+
                 '       <div class="'+ section +'-'+ app +'-deletebutton" style="float: right;">'+
-                '           <button onclick="removeInstance(\''+ section +'\', \''+ app +'\', '+ instance +
-                            ')" type="button" title="Delete this instance of '+ app +
+                '           <button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +
+                            ')" type="button" title="Delete this instance of '+ app +'.'+
                             '" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
                 '       </div>'+
                 '   </td>';
@@ -76,7 +75,6 @@ function addInstance(section, app)
     $('#'+ section +'-'+ app +'-container').append(row);
     // hide all delete buttons, and show only the one we just added.
     $('.'+ section +'-'+app+'-deletebutton').hide().last().show();
-//    $('.'+ section +'-delete-'+app+'-button').hide().last().show();
     // redo tooltips since some got added.
     setTooltips();
     // hide the "no instances" item that displays if no instances are configured.
@@ -84,5 +82,3 @@ function addInstance(section, app)
     // bring up the save changes button.
     findPendingChanges();
 }
-// -------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------

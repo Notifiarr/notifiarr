@@ -20,11 +20,11 @@
                             </thead>
                             <tbody id="downloader-Qbit-container">
                             {{- range $index, $app := .Config.Apps.Qbit}}
-                                <input disabled style="display: none;" class="client-parameter Qbit{{$index}}-deleted" data-group="downloader" data-label="Qbit {{instance $index}} Deleted" data-original="false" value="false">
+                                <input disabled style="display: none;" class="client-parameter downloader-Qbit{{$index}}-deleted" data-group="downloader" data-label="Qbit {{instance $index}} Deleted" data-original="false" value="false">
                                 <tr class="downloader-Qbit" id="downloader-Qbit-{{$index}}">
                                     <td style="font-size: 22px;">{{instance $index}}
                                         <div class="downloader-Qbit-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Qbit) (instance $index)}} display: none;{{end}}">
-                                            <button onclick="removeInstance('downloader', 'Qbit', {{$index}})" type="button" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                            <button onclick="removeInstance('downloader-Qbit', {{$index}})" type="button" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                         </div>
                                     </td>
                                     <td><input type="text" id="Apps.Qbit.{{$index}}.Name" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
@@ -56,11 +56,11 @@
                             </thead>
                             <tbody id="downloader-Deluge-container">
                             {{- range $index, $app := .Config.Apps.Deluge}}
-                                <input disabled style="display: none;" class="client-parameter Deluge{{$index}}-deleted" data-group="downloader" data-label="Deluge {{instance $index}} Deleted" data-original="false" value="false">
+                                <input disabled style="display: none;" class="client-parameter downloader-Deluge{{$index}}-deleted" data-group="downloader" data-label="Deluge {{instance $index}} Deleted" data-original="false" value="false">
                                 <tr class="downloader-Deluge" id="downloader-Deluge-{{$index}}">
                                     <td style="font-size: 22px;">{{instance $index}}
                                         <div class="downloader-Deluge-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Deluge) (instance $index)}} display: none;{{end}}">
-                                            <button onclick="removeInstance('downloader', 'Deluge', {{$index}})" type="button" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                            <button onclick="removeInstance('downloader-Deluge', {{$index}})" type="button" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                         </div>
                                     </td>
                                     <td><input type="text" id="Apps.Deluge.{{$index}}.Name" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
@@ -91,11 +91,11 @@
                             </thead>
                             <tbody id="downloader-SabNZB-container">
                             {{- range $index, $app := .Config.Apps.SabNZB}}
-                                <input disabled style="display: none;" class="client-parameter SabNZB{{$index}}-deleted" data-group="downloader" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
+                                <input disabled style="display: none;" class="client-parameter downloader-SabNZB{{$index}}-deleted" data-group="downloader" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
                                 <tr class="downloader-SabNZB" id="downloader-SabNZB-{{$index}}">
                                     <td style="font-size: 22px;">{{instance $index}}
                                         <div class="downloader-SabNZB-deletebutton" style="float: right;{{if ne (len $.Config.Apps.SabNZB) (instance $index)}} display: none;{{end}}">
-                                            <button onclick="removeInstance('downloader', 'SabNZB', {{$index}})" type="button" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                            <button onclick="removeInstance('downloader-SabNZB', {{$index}})" type="button" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                         </div>
                                     </td>
                                     <td><input type="text" id="Apps.SabNZB.{{$index}}.Name" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>

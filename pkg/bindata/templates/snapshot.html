@@ -27,11 +27,11 @@
                         </thead>
                         <tbody id="snapshot-MySQL-container">
                         {{- range $index, $app := .Config.Snapshot.MySQL}}
-                            <input disabled style="display: none;" class="client-parameter MySQL{{$index}}-deleted" data-group="snapshot" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
+                            <input disabled style="display: none;" class="client-parameter snapshot-MySQL{{$index}}-deleted" data-group="snapshot" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
                             <tr class="snapshot-MySQL" id="snapshot-MySQL-{{$index}}">
                                 <td style="font-size: 22px;">{{instance $index}}
                                     <div class="snapshot-MySQL-deletebutton" style="float: right;{{if ne (len $.Config.Snapshot.MySQL) (instance $index)}} display: none;{{end}}">
-                                        <button onclick="removeInstance('snapshot', 'MySQL', {{$index}})" type="button" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                        <button onclick="removeInstance('snapshot-MySQL', {{$index}})" type="button" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                     </div>
                                 </td>
                                 <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
