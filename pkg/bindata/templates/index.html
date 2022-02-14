@@ -29,18 +29,19 @@
                                 </ul>
                             </div>
                         {{ end }}
-                            <li class="ts-label" style="text-align: center;">Navigation</li>
+                            <li class="ts-label" style="text-align: center;">Settings</li>
                         {{- if .Username }}
-                            <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" onclick="swapNavigationTemplate('config')">Configuration</a></li>
-                            <li><i class="nav-icon fas fa-star"></i><a class="nav-link" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
-                            <li><i class="nav-icon fas fa-file-download"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('downloaders')">Download Apps</a></li>
-                            <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
-                            <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" onclick="swapNavigationTemplate('snapshot')">Snapshot Apps</a></li>
-                            <li><i class="nav-icon fas fa-network-wired"></i><a class="nav-link" onclick="swapNavigationTemplate('services')">Service Checks</a></li>
+                            <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" href="#config" onclick="swapNavigationTemplate('config')">Configuration</a></li>
+                            <li><i class="nav-icon fas fa-star"></i><a class="nav-link" href="#starr" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
+                            <li><i class="nav-icon fas fa-cart-arrow-down"></i><a href="#downloaders" class="nav-link" onclick="swapNavigationTemplate('downloaders')">Download Apps</a></li>
+                            <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" href="#media" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
+                            <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" href="#snapshot" onclick="swapNavigationTemplate('snapshot')">Snapshot Apps</a></li>
+                            <li><i class="nav-icon fas fa-network-wired"></i><a class="nav-link" href="#services" onclick="swapNavigationTemplate('services')">Service Checks</a></li>
                             <hr>
+                            <li class="ts-label" style="text-align: center;">Insights</li>
                             <div class="dropdown">
                                 <a class="nav-div-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <i class="nav-icon fas fa-fire-extinguisher"></i> &nbsp;&nbsp;&nbsp;Triggers &nbsp; &nbsp;<span class="caret"></span>
+                                    <i class="nav-icon far fa-fire-extinguisher" style="margin-left:0;"></i><span style="padding-left:15px;">Triggers &nbsp; &nbsp;<span class="caret"></span></span>
                                 </a>
                                 <ul style="width:92%;" class="dropdown-menu bk-dark" aria-labelledby="triggers menu">
                                     <li><a class="nav-link text-grey" onClick="triggerAction('gaps')">Send Radarr Gaps</a></li>
@@ -61,15 +62,16 @@
                                     <li><a class="nav-link text-grey" onClick="triggerAction('backup/sonarr')">Check Sonarr Backups</a></li>
                                 </ul>
                             </div>
-                            <li><i class="nav-icon fas fa-camera"></i>&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
-                            <li><i class="nav-icon fas fa-chart-line"></i>&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('metrics')">Metrics</a></li>
-                            <li><i class="nav-icon fas fa-file-alt"></i>&nbsp;&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('logfiles')">Log Files</a></li>
+                            <li><i class="nav-icon fas fa-temperature-high"></i><a class="nav-link" href="#monitoring" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
+                            <li><i class="nav-icon fas fa-chart-line"></i><a class="nav-link" href="#metrics" onclick="swapNavigationTemplate('metrics')">Metrics</a></li>
+                            <li><i class="nav-icon fas fa-file-medical-alt"></i><a class="nav-link" href="#logfiles" onclick="swapNavigationTemplate('logfiles')">Log Files</a></li>
+                            <li><i class="nav-icon fas fa-file-export"></i><a class="nav-link" href="#configfiles" onclick="swapNavigationTemplate('configfiles')">Config Files</a></li>
                             <li>{{if eq .Version.os "windows"}}<i class="nav-icon fab fa-windows"></i>
-                                {{else if eq .Version.os "linux"}}<i class="nav-icon fab fa-linux"></i>
-                                {{else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
-                                {{else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
-                                {{else}}<i class="nav-icon fas fa-microchip"></i>
-                                {{- end}}&nbsp;<a class="nav-link" onclick="swapNavigationTemplate('system')">System</a></li>
+                                {{- else if eq .Version.os "linux"}}<i class="nav-icon fab fa-linux"></i>
+                                {{- else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
+                                {{- else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
+                                {{- else}}<i class="nav-icon fas fa-microchip"></i>
+                                {{- end}}<a class="nav-link" href="#system" onclick="swapNavigationTemplate('system')">System</a></li>
                         {{- else }}<!-- nav bar for logged out user (nothing). -->
                             <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
                         {{- end }}
@@ -123,6 +125,9 @@
                             </div>
                             <div class="navigation-item" id="template-logfiles" style="display: none;">
 {{ template "logfiles.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-configfiles" style="display: none;">
+{{ template "configfiles.html" . }}
                             </div>
                             <div class="navigation-item" id="template-snapshot" style="display: none;">
 {{ template "snapshot.html" . }}

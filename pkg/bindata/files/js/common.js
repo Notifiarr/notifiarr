@@ -155,12 +155,9 @@ function savePendingChanges()
         url: '/reconfig',
         data: fields,
         success: function (data){
+            $('#pending-change-container').remove();          // remove save button.
+            setTimeout(function(){location.reload();}, 5000); // reload window in 5 seconds.
             toast('Config Saved', 'Wait 5 seconds; reloading the new configuration...', 'success');
-            $('#pending-change-container').remove();
-
-            setTimeout(function(){
-                window.location.href=window.location.href;
-            }, 5000);
         },
         error: function (response, status, error) {
             if (status === undefined) {

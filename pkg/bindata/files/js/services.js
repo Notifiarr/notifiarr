@@ -12,12 +12,18 @@ function showProcessList() {
             updateLogFileContentCounters();
         },
         error: function (request, status, error) {
-            $('#process-list-content').html('<h4>'+ error +'</h4>\n'+ request.responseText);
+            if (error == "") {
+                $('#process-list-content').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
+            } else {
+                $('#process-list-content').html('<h4>'+ error +'</h4>'+ request.responseText);
+            }
         },
     });
 }
 
 
+// addServiceCheck compliments the functions in golists.js.
+// This adds new service check inputs to the table.
 function addServiceCheck()
 {
      //-- DO NOT RELY ON 'index' FOR DIRECT IMPLEMENTATION, USE IT TO SORT AND RE-INDEX DURING THE SAVE

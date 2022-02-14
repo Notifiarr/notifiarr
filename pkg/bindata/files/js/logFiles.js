@@ -57,7 +57,7 @@ $('#LogFileSelector').change(function() {
             updateLogFileContentCounters();
         },
         error: function (request, status, error) {
-            $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).animate({opacity:'100'}).show().fadeOut(10000);
+            $('#log-file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText).animate({opacity:'100'}).show().fadeOut(10000);
         },
     });
 });
@@ -83,7 +83,7 @@ $('#triggerLogAction').click(function(){
                 $('#log-file-ajax-msg').html("<h4>Deleted File</h4>"+filename).stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
             error: function (request, status, error){
-                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText);
+                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
                 $('#log-file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
@@ -131,7 +131,7 @@ $('#triggerLogLoad').click(function() {
                 $('#log-file-small-msg').html('');
             },
             error: function (request, status, error){
-                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText).stop().animate({opacity:'100'}).show().fadeOut(10000);
+                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText).stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
     } else { // reload
@@ -154,7 +154,7 @@ $('#triggerLogLoad').click(function() {
             },
             error: function (request, status, error){
                 $('#log-file-ajax-error').show();
-                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>\n'+ request.responseText);
+                $('#log-file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
             },
         });
     }
