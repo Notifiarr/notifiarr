@@ -1,5 +1,10 @@
                     <h1><i class="fas fa-network-wired"></i> Service Checks</h1>
                     <div class="col-lg-10 col-md-12 col-sm-12 mb">
+                        <p class="text-danger">TODO:<br>
+                            1. Make delete buttons work on all services, not just the last one.<br>
+                            2. Make selecting `Type` dynamically update `Expect` to appropriate choices for the type.<br>
+                            <hr>
+                        </p>
                         <p>The notifiarr client application is capable of monitoring services via HTTP checks,
                            TCP port checks or process running (and not running) checks. Use the form at the bottom
                            of this page to configure service checks.</p>
@@ -66,9 +71,9 @@
                                 <td><input type="text" id="Service.{{$index}}.Name"  class="client-parameter" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}" style="width: 100%;"></td>
                                 <td>
                                     <select id="Service.{{$index}}.Type" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}" style="width: 100%;">
-                                        <option value="process">Process</option>
-                                        <option value="http">HTTP</option>
-                                        <option value="tcp">TCP Port</option>
+                                        <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
+                                        <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
+                                        <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
                                     </select>
                                 </td>
                                 <td><input type="text" id="Service.{{$index}}.Value" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}" style="width: 100%;"></td>

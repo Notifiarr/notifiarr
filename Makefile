@@ -428,7 +428,7 @@ generate: mockgen bindata
 ##### Docker #####
 ##################
 
-docker:
+docker: generate
 	docker build -f init/docker/Dockerfile \
 		--no-cache --pull \
 		--build-arg "BUILD_DATE=$(DATE)" \
