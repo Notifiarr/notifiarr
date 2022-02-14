@@ -6,7 +6,7 @@
         <div class="page-container">
             <div class="page-body">
                 <div class="brand clearfix" style="z-index:100;">
-                    <a class="nav-link" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
+                    <a class="nav-link" href="#landing" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
                         <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
                             <img src="{{files}}/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr Client
                         </h4>
@@ -23,7 +23,7 @@
                                     <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
                                 </button>
                                 <ul style="width:92%;" class="dropdown-menu bk-brown" aria-labelledby="user menu">
-                                    <li><a class="nav-link" onclick="swapNavigationTemplate('profile')">Profile</a></li>
+                                    <li><a class="nav-link" href="#profile" onclick="swapNavigationTemplate('profile')">Profile</a></li>
                                     <li role="separator" class="divider"></li>
                                     <li><a href="/logout">Logout</a></li>
                                 </ul>

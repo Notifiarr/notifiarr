@@ -161,10 +161,11 @@ func (l *Logger) openHTTPLog() {
 	}
 }
 
+// LogFileInfos holds metadata about files.
 type LogFileInfos struct {
 	Dirs []string
 	Size int64
-	Logs []*LogFileInfo
+	List []*LogFileInfo
 }
 
 // LogFileInfo is returned by GetAllLogFilePaths.
@@ -180,7 +181,7 @@ type LogFileInfo struct {
 }
 
 // GetAllLogFilePaths searches the disk for log file names.
-func (l *Logger) GetAllLogFilePaths() *LogFileInfos { //nolint:funlen,cyclop
+func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 	logFiles := []string{
 		l.LogConfig.LogFile,
 		l.LogConfig.HTTPLog,
@@ -191,16 +192,24 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos { //nolint:funlen,cyclop
 		logFiles = append(logFiles, cust)
 	}
 
+	return GetFilePaths(logFiles...)
+}
+
+// GetFilePaths is a helper function that returns data about similar files in
+// a folder with the provided file(s). This is useful to find "all the log files"
+// or "all the .conf files" in a folder. Simply pass in 1 or more file paths, and
+// any files in the same folder with the same extension will be returned.
+func GetFilePaths(files ...string) *LogFileInfos {
 	contain := make(map[string]struct{})
 	dirs := make(map[string]struct{})
 
-	for _, logFilePath := range logFiles {
+	for _, logFilePath := range files {
 		dirExpanded, err := homedir.Expand(logFilePath)
 		if err != nil {
 			dirExpanded = logFilePath
 		}
 
-		files, err := filepath.Glob(filepath.Join(filepath.Dir(dirExpanded), "*.log"))
+		files, err := filepath.Glob(filepath.Join(filepath.Dir(dirExpanded), "*"+filepath.Ext(logFilePath)))
 		if err != nil {
 			continue
 		}
@@ -211,7 +220,7 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos { //nolint:funlen,cyclop
 		}
 	}
 
-	output := &LogFileInfos{Logs: []*LogFileInfo{}, Dirs: map2list(dirs)}
+	output := &LogFileInfos{List: []*LogFileInfo{}, Dirs: map2list(dirs)}
 
 	for filePath := range contain {
 		fileInfo, err := os.Stat(filePath)
@@ -221,14 +230,14 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos { //nolint:funlen,cyclop
 
 		used := false
 
-		for _, name := range logFiles {
+		for _, name := range files {
 			if name == filePath {
 				used = true
 			}
 		}
 		// fileDate := strings.TrimPrefix(strings.TrimSuffix(filePath, ".log"), strings.TrimSuffix(logFilePath, ".log"))
 		// parsedDate, _ := time.Parse(timerotator.FormatDefault, fileDate)
-		output.Logs = append(output.Logs, &LogFileInfo{
+		output.List = append(output.List, &LogFileInfo{
 			ID:   strings.TrimRight(base64.StdEncoding.EncodeToString([]byte(filePath)), "="),
 			Name: fileInfo.Name(),
 			Path: filePath,
@@ -247,15 +256,15 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos { //nolint:funlen,cyclop
 }
 
 func (l *LogFileInfos) Len() int {
-	return len(l.Logs)
+	return len(l.List)
 }
 
 func (l *LogFileInfos) Swap(i, j int) {
-	l.Logs[i], l.Logs[j] = l.Logs[j], l.Logs[i]
+	l.List[i], l.List[j] = l.List[j], l.List[i]
 }
 
 func (l *LogFileInfos) Less(i, j int) bool {
-	return l.Logs[i].Name < l.Logs[j].Name
+	return l.List[i].Name < l.List[j].Name
 }
 
 func map2list(input map[string]struct{}) []string {

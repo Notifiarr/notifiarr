@@ -31,13 +31,14 @@ import (
 const minPasswordLen = 16
 
 type templateData struct {
-	Config   *configfile.Config `json:"config"`
-	Flags    *configfile.Flags  `json:"flags"`
-	Username string             `json:"username"`
-	Data     url.Values         `json:"data,omitempty"`
-	Msg      string             `json:"msg,omitempty"`
-	Version  map[string]string  `json:"version"`
-	LogFiles *logs.LogFileInfos `json:"logFileInfo"`
+	Config      *configfile.Config `json:"config"`
+	Flags       *configfile.Flags  `json:"flags"`
+	Username    string             `json:"username"`
+	Data        url.Values         `json:"data,omitempty"`
+	Msg         string             `json:"msg,omitempty"`
+	Version     map[string]string  `json:"version"`
+	LogFiles    *logs.LogFileInfos `json:"logFileInfo"`
+	ConfigFiles *logs.LogFileInfos `json:"configFileInfo"`
 }
 
 // userNameValue is used a context value key.
@@ -158,16 +159,23 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 	http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 }
 
-func (c *Client) getLogDeleteHandler(response http.ResponseWriter, req *http.Request) {
-	logID := mux.Vars(req)["id"]
-	logs := c.Logger.GetAllLogFilePaths()
+func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Request) {
+	var fileInfos *logs.LogFileInfos
 
-	for _, logFile := range logs.Logs {
-		if logFile.ID != logID {
+	switch mux.Vars(req)["source"] {
+	case "logs":
+		fileInfos = c.Logger.GetAllLogFilePaths()
+	case "config":
+		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
+	}
+
+	id := mux.Vars(req)["id"]
+	for _, fileInfo := range fileInfos.List {
+		if fileInfo.ID != id {
 			continue
 		}
 
-		if err := os.Remove(logFile.Path); err != nil {
+		if err := os.Remove(fileInfo.Path); err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 
@@ -175,46 +183,63 @@ func (c *Client) getLogDeleteHandler(response http.ResponseWriter, req *http.Req
 			c.Errorf("Writing HTTP Response: %v", err)
 		}
 
-		break
+		return
 	}
 }
 
-func (c *Client) getLogDownloadHandler(response http.ResponseWriter, req *http.Request) {
-	logID := mux.Vars(req)["id"]
-	logs := c.Logger.GetAllLogFilePaths()
+func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.Request) {
+	var fileInfos *logs.LogFileInfos
 
-	for _, logFile := range logs.Logs {
-		if logFile.ID != logID {
+	switch mux.Vars(req)["source"] {
+	case "logs":
+		fileInfos = c.Logger.GetAllLogFilePaths()
+	case "config":
+		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
+	}
+
+	id := mux.Vars(req)["id"]
+	for _, fileInfo := range fileInfos.List {
+		if fileInfo.ID != id {
 			continue
 		}
 
 		zipWriter := zip.NewWriter(response)
 		defer zipWriter.Close()
 
-		logOpen, err := os.Open(logFile.Path)
+		fileOpen, err := os.Open(fileInfo.Path)
 		if err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
-		defer logOpen.Close()
+		defer fileOpen.Close()
 
-		newZippedFile, err := zipWriter.Create(logFile.Name)
+		newZippedFile, err := zipWriter.Create(fileInfo.Name)
 		if err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 
-		response.Header().Set("Content-Disposition", "attachment; filename="+logFile.Name+".zip")
+		response.Header().Set("Content-Disposition", "attachment; filename="+fileInfo.Name+".zip")
 		response.Header().Set("Content-Type", "application/zip")
 
-		if _, err := io.Copy(newZippedFile, logOpen); err != nil {
-			c.Errorf("Sending Zipped Log File: %v", err)
+		if _, err := io.Copy(newZippedFile, fileOpen); err != nil {
+			c.Errorf("Sending Zipped File %s: %v", fileInfo.Path, err)
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
+
+		return
 	}
 }
 
-func (c *Client) getLogHandler(response http.ResponseWriter, req *http.Request) {
-	logID := mux.Vars(req)["id"]
-	logs := c.Logger.GetAllLogFilePaths()
+func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request) {
+	var fileInfos *logs.LogFileInfos
+
+	switch mux.Vars(req)["source"] {
+	case "logs":
+		fileInfos = c.Logger.GetAllLogFilePaths()
+	case "config":
+		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
+	}
+
+	id := mux.Vars(req)["id"]
 	skip, _ := strconv.Atoi(mux.Vars(req)["skip"])
 
 	count, _ := strconv.Atoi(mux.Vars(req)["lines"])
@@ -223,16 +248,16 @@ func (c *Client) getLogHandler(response http.ResponseWriter, req *http.Request) 
 		skip = 0
 	}
 
-	for _, logFile := range logs.Logs {
-		if logFile.ID != logID {
+	for _, fileInfo := range fileInfos.List {
+		if fileInfo.ID != id {
 			continue
 		}
 
-		lines, err := getLastLinesInFile(logFile.Path, count, skip)
+		lines, err := getLastLinesInFile(fileInfo.Path, count, skip)
 		if err != nil {
 			c.Errorf("Handling Log File Request: %v", err)
 			http.Error(response, err.Error(), http.StatusInternalServerError)
-		} else if logFile.Size == 0 {
+		} else if fileInfo.Size == 0 {
 			http.Error(response, "the file is empty", http.StatusInternalServerError)
 		} else if _, err = response.Write(lines); err != nil {
 			c.Errorf("Writing HTTP Response: %v", err)
@@ -422,12 +447,13 @@ func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, 
 	}
 
 	err := c.templat.ExecuteTemplate(response, "index.html", &templateData{
-		Config:   c.Config,
-		Flags:    c.Flags,
-		Username: c.getUserName(request),
-		Data:     request.PostForm,
-		Msg:      msg,
-		LogFiles: c.Logger.GetAllLogFilePaths(),
+		Config:      c.Config,
+		Flags:       c.Flags,
+		Username:    c.getUserName(request),
+		Data:        request.PostForm,
+		Msg:         msg,
+		LogFiles:    c.Logger.GetAllLogFilePaths(),
+		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
 		Version: map[string]string{
 			"started":   version.Started.Round(time.Second).String(),
 			"uptime":    time.Since(version.Started).Round(time.Second).String(),

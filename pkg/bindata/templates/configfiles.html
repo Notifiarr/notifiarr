@@ -1,5 +1,78 @@
                     <h1><i class="fas fa-file-export"></i> Config Files</h1>
-                    <p>This page will soon contain an interface to browse, view and delete the current and backup config files.
-                        It will look a lot like the log file browser.
-                    </p>
+                    <div class="fileController" data-kind="config" data-lines="250">
+                        <div class="row">
+                          <div class="col-md-6">
+                              Found {{len .ConfigFiles.List}} config files.<br>
+                              Total Size: {{.ConfigFiles.Size}} ({{megabyte .ConfigFiles.Size}} Mb)<br>
+                              <select class="triggerFileSelector">
+                                  <option value="placeholder" selected disabled>- Select a config file -</option>
+                                  {{- range $file := .ConfigFiles.List }}
+                                  <option value="{{ $file.ID }}">{{ $file.Name }}</option>
+                                  {{- end }}
+                              </select>
+                              <span class="file-actions" style="white-space: nowrap; display:none;"><!-- keep the Go button next to the menu. -->
+                                  <select class="fileAction">
+                                      <option selected disabled>- Actions -</option>
+                                      <option value="notifiarr">Send to Notifiarr.com</option>
+                                      <option value="delete">Delete File</option>
+                                      <option value="download">Download File</option>
+                                  </select>
+                                  <button data-kind="config" class="triggerFileAction btn btn-xs btn-primary">Go</button>
+                              </span>
+                              <hr>
+                              <div style="display:none;padding: 0 !important;" class="file-control col-md-6">
+                                  <select class="fileLinesAction">
+                                      <option class="fileLinesAdd" value="linesAdd">Add</option>
+                                      <option value="linesReload">Reload</option>
+                                  </select>
+                                  <select class="fileLinesCount">
+                                      <option value="50">50  lines</option>
+                                      <option value="100">100 lines</option>
+                                      <option value="250" selected>250 lines</option>
+                                      <option value="500">500 lines</option>
+                                  </select>
+                                  <button data-kind="config" class="triggerFileLoad btn btn-xs btn-primary">Go</button><br>
+                                  <span class="file-action-msg">Displaying last <span class="currentLineCount">0</span> file lines.'</span>
+                              </div>
+                              <!-- 3 dynamic message boxes -->
+                              <div class="file-control col-md-6"></div>
+                              <div class="col-md-12 alert alert-info file-ajax-msg" style="display:none;"></div>
+                              <div class="col-md-12 alert alert-danger" style="display:none;"></div>
+                          </div>
+                          <div class="col-md-6 mb">
+                              <table class="table table-striped table-bordered" id="fileinfo-placeholder">
+                                  <tr><td width="10%">Path</td><td>No file selected.</td></tr>
+                                  {{- if not (eq .Version.os "windows")}}
+                                  <tr><td width="10%">Mode</td><td>No file selected.</td></tr>
+                                  <tr><td width="10%">User</td><td>No file selected.</td></tr>
+                                  {{- end}}
+                                  <tr><td width="10%">Size</td><td>No file selected.</td></tr>
+                                  <tr><td width="10%">Date</td><td>No file selected.</td></tr>
+                                  <tr><td width="10%">Used</td><td>No file selected.</td></tr>
+                              </table>
+                              <div class="fileTablesList">
+                              {{- range $file := .ConfigFiles.List }}
+                                  <table class="table table-striped table-bordered" style="display:none;" id="fileinfo-{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
+                                      <tr><td width="10%">Path</td><td>{{$file.Path}}</td></tr>
+                                      {{- if not (eq $.Version.os "windows")}}
+                                      <tr><td width="10%">Mode</td><td>{{$file.Mode}}</td></tr>
+                                      <tr><td width="10%">User</td><td>{{$file.User}}</td></tr>
+                                      {{- end}}
+                                      <tr><td width="10%">Size</td><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
+                                      <tr><td width="10%">Date</td><td>{{$file.Time}}</td></tr>
+                                      <tr><td width="10%">Used</td><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively written."></i></td></tr>
+                                  </table>
+                              {{- end}}
+                              </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="scroll-bar-sm">
+                                    <pre class="well well-sm file-content log-file-content bk-brown brdr">Config file contents display here.
+                                    </pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 {{- /* end of config files (leave this comment) */ -}}

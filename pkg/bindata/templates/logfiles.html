@@ -1,75 +1,78 @@
                   <h1><i class="fas fa-file-medical-alt"></i> Log Files</h1>
-                  <div class="row">
-                    <div class="col-md-6">
-                        Found {{len .LogFiles.Logs}} log files in {{len .LogFiles.Dirs}} folders<br>
-                        Total Size: {{.LogFiles.Size}} ({{megabyte .LogFiles.Size}} Mb)<br>
-                        <select id="LogFileSelector">
-                            <option id= "logfile-placeholder" value="placeholder" selected disabled>- Select a log file -</option>
-                            {{- range $file := .LogFiles.Logs }}
-                            <option id="logfile-{{ $file.ID }}" value="{{ $file.ID }}">{{ $file.Name }}</option>
-                            {{- end }}
-                        </select>
-                        <span class="log-file-actions" style="white-space: nowrap; display:none;"><!-- keep the Go button next to the menu. -->
-                            <select id="logfileAction">
-                                <option selected disabled>- Actions -</option>
-                                <option value="notifiarr">Send to Notifiarr.com</option>
-                                <option value="delete">Delete File</option>
-                                <option value="download">Download File</option>
+                      <div class="fileController" data-kind="logs" data-lines="500">
+                      <div class="row">
+                        <div class="col-md-6">
+                            Found {{len .LogFiles.List}} log files in {{len .LogFiles.Dirs}} folders<br>
+                            Total Size: {{.LogFiles.Size}} ({{megabyte .LogFiles.Size}} Mb)<br>
+                            <select class="triggerFileSelector">
+                                <option value="placeholder" selected disabled>- Select a log file -</option>
+                                {{- range $file := .LogFiles.List }}
+                                <option value="{{ $file.ID }}">{{ $file.Name }}</option>
+                                {{- end }}
                             </select>
-                            <button id="triggerLogAction" class="btn btn-xs btn-primary">Go</button>
-                        </span>
-                        <hr>
-                        <div style="display:none;padding: 0 !important;" class="log-file-control col-md-6">
-                            <i id="logHelpMsg" class="help-icon far fa-question-circle" title="This file is in use. Adding lines may cause duplicates; recommend Reload."></i>
-                            <select id="logLinesAction">
-                                <option id="logLinesAdd" value="linesAdd">Add</option>
-                                <option value="linesReload">Reload</option>
-                            </select>
-                            <select id="logLinesCount">
-                                <option value="100">100 lines</option>
-                                <option value="500" selected>500 lines</option>
-                                <option value="1000">1000 lines</option>
-                                <option value="2000">2000 lines</option>
-                                <option value="5000">5000 lines</option>
-                            </select>
-                            <button id="triggerLogLoad" class="btn btn-xs btn-primary">Go</button><br>
-                            <span id="log-file-action-msg">Displaying last <span id="logsCurrentLineCount">0</span> log lines.'</span>
+                            <span class="file-actions" style="white-space: nowrap; display:none;"><!-- keep the Go button next to the menu. -->
+                                <select class="fileAction">
+                                    <option selected disabled>- Actions -</option>
+                                    <option value="notifiarr">Send to Notifiarr.com</option>
+                                    <option value="delete">Delete File</option>
+                                    <option value="download">Download File</option>
+                                </select>
+                                <button data-kind="config" class="triggerFileAction btn btn-xs btn-primary">Go</button>
+                            </span>
+                            <hr>
+                            <div style="display:none;padding: 0 !important;" class="file-control col-md-6">
+                                <select class="fileLinesAction">
+                                    <option class="fileLinesAdd" value="linesAdd">Add</option>
+                                    <option value="linesReload">Reload</option>
+                                </select>
+                                <select class="fileLinesCount">
+                                    <option value="100">100 lines</option>
+                                    <option value="500" selected>500 lines</option>
+                                    <option value="1000">1000 lines</option>
+                                    <option value="2000">2000 lines</option>
+                                    <option value="5000">5000 lines</option>
+                                </select>
+                                <button data-kind="config" class="triggerFileLoad btn btn-xs btn-primary">Go</button><br>
+                                <span class="file-action-msg">Displaying last <span class="currentLineCount">0</span> file lines.'</span>
+                            </div>
+                            <!-- 3 dynamic message boxes -->
+                            <div class="file-control col-md-6"></div>
+                            <div class="col-md-12 alert alert-info file-ajax-msg" style="display:none;"></div>
+                            <div class="col-md-12 alert alert-danger" style="display:none;"></div>
                         </div>
-                        <!-- 3 dynamic message boxes -->
-                        <div id="log-file-small-msg" class="log-file-control col-md-6"></div>
-                        <div id="log-file-ajax-msg" class="col-md-12 alert alert-info" style="display:none;"></div>
-                        <div id="log-file-ajax-error" class="col-md-12 alert alert-danger" style="display:none;"></div>
-                    </div>
-                    <div class="col-md-6 mb">
-                        <table class="table table-striped table-bordered" id="fileinfo-placeholder">
-                            <tr><td width="10%">Path</td><td>No file selected.</td></tr>
-                            {{- if not (eq .Version.os "windows")}}
-                            <tr><td width="10%">Mode</td><td>No file selected.</td></tr>
-                            <tr><td width="10%">User</td><td>No file selected.</td></tr>
+                        <div class="col-md-6 mb">
+                            <table class="table table-striped table-bordered" id="fileinfo-placeholder">
+                                <tr><td width="10%">Path</td><td>No file selected.</td></tr>
+                                {{- if not (eq .Version.os "windows")}}
+                                <tr><td width="10%">Mode</td><td>No file selected.</td></tr>
+                                <tr><td width="10%">User</td><td>No file selected.</td></tr>
+                                {{- end}}
+                                <tr><td width="10%">Size</td><td>No file selected.</td></tr>
+                                <tr><td width="10%">Date</td><td>No file selected.</td></tr>
+                                <tr><td width="10%">Used</td><td>No file selected.</td></tr>
+                            </table>
+                            <div class="fileTablesList">
+                            {{- range $file := .LogFiles.List }}
+                                <table class="table table-striped table-bordered" style="display:none;" id="fileinfo-{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
+                                    <tr><td width="10%">Path</td><td>{{$file.Path}}</td></tr>
+                                    {{- if not (eq $.Version.os "windows")}}
+                                    <tr><td width="10%">Mode</td><td>{{$file.Mode}}</td></tr>
+                                    <tr><td width="10%">User</td><td>{{$file.User}}</td></tr>
+                                    {{- end}}
+                                    <tr><td width="10%">Size</td><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
+                                    <tr><td width="10%">Date</td><td>{{$file.Time}}</td></tr>
+                                    <tr><td width="10%">Used</td><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively written."></i></td></tr>
+                                </table>
                             {{- end}}
-                            <tr><td width="10%">Size</td><td>No file selected.</td></tr>
-                            <tr><td width="10%">Date</td><td>No file selected.</td></tr>
-                            <tr><td width="10%">Used</td><td>No file selected.</td></tr>
-                        </table>
-                        {{- range $file := .LogFiles.Logs }}
-                        <table class="table table-striped table-bordered" style="display:none;" id="fileinfo-{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
-                            <tr><td width="10%">Path</td><td>{{$file.Path}}</td></tr>
-                            {{- if not (eq $.Version.os "windows")}}
-                            <tr><td width="10%">Mode</td><td>{{$file.Mode}}</td></tr>
-                            <tr><td width="10%">User</td><td>{{$file.User}}</td></tr>
-                            {{- end}}
-                            <tr><td width="10%">Size</td><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
-                            <tr><td width="10%">Date</td><td>{{$file.Time}}</td></tr>
-                            <tr><td width="10%">Used</td><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively written."></i></td></tr>
-                        </table>
-                        {{- end}}
-                    </div>
-                  </div>
-                  <div class="row">
-                      <div class="col-md-12">
-                          <div class="scroll-bar-sm">
-                              <pre id="log-file-content" class="well well-sm log-file-content bk-brown brdr">Log file contents display here.
-                              </pre>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                          <div class="col-md-12">
+                              <div class="scroll-bar-sm">
+                                  <pre class="well well-sm file-content log-file-content bk-brown brdr">Log file contents display here.
+                                  </pre>
+                              </div>
                           </div>
                       </div>
                   </div>

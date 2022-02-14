@@ -33,6 +33,7 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.Handle(base, http.HandlerFunc(c.loginHandler)).Methods("POST")
 	}
 
+	//nolint:lll
 	if c.Config.UIPassword != "" {
 		c.Config.Router.PathPrefix(path.Join(base, "/files/")).
 			Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
@@ -42,16 +43,11 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}"), c.handleGUITrigger).Methods("GET")
 		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}/{content}"), c.handleGUITrigger).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/ps"), c.checkAuthorized(c.handleProcessList)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/getLog/{id}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}"), c.checkAuthorized(c.getLogHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/getLog/{id}/{lines}/{skip}"),
-			c.checkAuthorized(c.getLogHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/downloadLog/{id}"),
-			c.checkAuthorized(c.getLogDownloadHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/deleteLogFile/{id}"),
-			c.checkAuthorized(c.getLogDeleteHandler)).Methods("GET")
-		//		c.Config.Router.Handle(path.Join(base, "/get"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
-		//		c.Config.Router.Handle(path.Join(base, "/get/{config}"), c.checkAuthorized(c.getSettingsHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}/{skip}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/downloadFile/{source}/{id}"), c.checkAuthorized(c.getFileDownloadHandler)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/deleteFile/{source}/{id}"), c.checkAuthorized(c.getFileDeleteHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/reconfig"), c.checkAuthorized(c.handleConfigPost)).Methods("POST")
 	}
 

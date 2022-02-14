@@ -9,7 +9,7 @@ function showProcessList() {
             const lineCount = data.split(/\n/).length-1; // do not count last newline.
             $('#process-list-msg').html("Displaying "+lineCount+" running processes.");
             $('#process-list-content').text(data);
-            updateLogFileContentCounters();
+            updateFileContentCounters();
         },
         error: function (request, status, error) {
             if (error == "") {
