@@ -78,12 +78,20 @@ func (c *Client) ParseGUITemplates() (err error) {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
 	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(template.FuncMap{
+		// returns the username the logged in.
 		"username": func() string { u, _ := c.getUserPass(); return u },
-		"now":      time.Now,
+		// returns the current time.
+		"now": time.Now,
+		// returns an integer divided by a million.
 		"megabyte": func(size int64) int64 { return size / mnd.Megabyte },
-		"base":     func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
-		"files":    func() string { return path.Join(c.Config.URLBase, "files") },
+		// returns the URL base.
+		"base": func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
+		// returns the files url base.
+		"files": func() string { return path.Join(c.Config.URLBase, "files") },
+		// adds 1 an integer, to deal with instance IDs for humans.
 		"instance": func(idx int) int { return idx + 1 },
+		// returns true if the environment variable has a value.
+		"locked": func(env string) bool { return os.Getenv(env) != "" },
 	})
 
 	// Parse all our compiled-in templates.

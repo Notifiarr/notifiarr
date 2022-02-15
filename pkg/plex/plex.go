@@ -22,7 +22,7 @@ import (
 // Without a URL or Token, nothing works and this package is unused.
 type Server struct {
 	Timeout    cnfg.Duration `toml:"timeout" json:"timeout" xml:"timeout"`
-	Interval   cnfg.Duration `toml:"interval" json:"interval" xml:"interval"`
+	Interval   cnfg.Duration `toml:"-" json:"interval" xml:"-"`
 	URL        string        `toml:"url" json:"url" xml:"url"`
 	Token      string        `toml:"token" json:"token" xml:"token"`
 	AccountMap string        `toml:"-" json:"accountMap" xml:"-"`

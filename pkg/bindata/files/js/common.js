@@ -152,7 +152,7 @@ function savePendingChanges()
 
     $.ajax({
         type: 'POST',
-        url: '/reconfig',
+        url: 'reconfig',
         data: fields,
         success: function (data){
             $('#pending-change-container').remove();          // remove save button.
@@ -183,7 +183,7 @@ function saveProfileChanges()
 
     $.ajax({
         type: 'POST',
-        url: '/profile',
+        url: 'profile',
         data: fields,
         success: function (data){
             $('#current-username').html($('#NewUsername').val()); // update the html username.

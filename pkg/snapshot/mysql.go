@@ -16,12 +16,12 @@ import (
 
 // MySQLConfig allows us to gather a process list for the snapshot.
 type MySQLConfig struct {
-	Name     string        `toml:"name"`
-	Host     string        `toml:"host"`
-	User     string        `toml:"user"`
-	Pass     string        `toml:"pass"`
-	Timeout  cnfg.Duration `toml:"timeout"`  // only used by service checks, snapshot timeout is used for mysql.
-	Interval cnfg.Duration `toml:"interval"` // only used by service checks, snapshot interval is used for mysql.
+	Name     string        `toml:"name" xml:"name"`
+	Host     string        `toml:"host" xml:"host"`
+	User     string        `toml:"user" xml:"user"`
+	Pass     string        `toml:"pass" xml:"pass"`
+	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout"`   // only used by service checks, snapshot timeout is used for mysql.
+	Interval cnfg.Duration `toml:"interval" xml:"interval"` // only used by service checks, snapshot interval is used for mysql.
 }
 
 // MySQLProcesses allows us to manipulate our list with methods.

@@ -4,6 +4,11 @@
                         Login there, navigate to Integration Setup and click Client Configuration.
                         Below you will find settings for Application "plugins" for the snapshot system.
                     </p>
+                    <p>
+                        You may add mysql credentials to your notifiarr configuration to snapshot MySQL service health.
+                        This feature snapshots <code>SHOW PROCESSLIST</code> and <code>SHOW STATUS</code> data.
+                        <br>Access to a database is not required. Example Grant: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>
+                    </p>
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
@@ -17,12 +22,12 @@
                             </tr>
                             <tr>
                                 <td>Instance</td>
-                                <td>Name</td>
-                                <td>Host</td>
-                                <td>Username</td>
-                                <td>Password</td>
+                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
+                                <td>Host <i class="help-icon far fa-question-circle" title="The MySQL host must be in the format host:port or ip:port. ie. localhost:3306. If you ommit the port, 3306 is used."></i></td>
+                                <td>Username <i class="help-icon far fa-question-circle" title="This must be the username used in the GRANT statement."></i></td>
+                                <td>Password <i class="help-icon far fa-question-circle" title="This must be the password used to authenticate the username."></i></td>
                                 <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                <td style="width:70px">Timeout</td>
+                                <td style="width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
                             </tr>
                         </thead>
                         <tbody id="snapshot-MySQL-container">
@@ -34,12 +39,55 @@
                                         <button onclick="removeInstance('snapshot-MySQL', {{$index}})" type="button" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                     </div>
                                 </td>
-                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Host" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
-                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.User" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
-                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Pass" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
-                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Interval" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                <td><input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                <td>
+                                    <table width="100%"><tr>
+                                    {{- if locked (printf "DN_SNAPSHOT_MYSQL_%d_NAME" $index) }}
+                                    <i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                    {{- end}}
+                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                    </tr></table>
+                                </td>
+                                <td>
+                                    <table width="100%"><tr>
+                                    {{- if locked (printf "DN_SNAPSHOT_MYSQL_%d_HOST" $index) }}
+                                        <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                    {{- end}}
+                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Host" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
+                                    </tr></table>
+                                </td>
+                                <td>
+                                    <table width="100%"><tr>
+                                    {{- if locked (printf "DN_SNAPSHOT_MYSQL_%d_USER" $index) }}
+                                        <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                    {{- end}}
+                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.User" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
+                                    </tr></table>
+                                </td>
+                                <td>
+                                    <table width="100%"><tr>
+                                    {{- if locked (printf "DN_SNAPSHOT_MYSQL_%d_PASS" $index) }}
+                                        <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                    {{- end}}
+                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Pass" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
+                                    </tr></table>
+
+                                </td>
+                                <td>
+                                    <table width="100%"><tr>
+                                    {{- if locked (printf "DN_SNAPSHOT_MYSQL_%d_INTERVAL" $index) }}
+                                        <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                    {{- end}}
+                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Interval" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                    </tr></table>
+                                </td>
+                                <td>
+                                    <table width="100%"><tr>
+                                    {{- if locked (printf "DN_SNAPSHOT_MYSQL_%d_TIMEOUT" $index) }}
+                                        <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                    {{- end}}
+                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                    </tr></table>
+                                </td>
                             </tr>
                         {{- end}}
                             <tr id="snapshot-MySQL-none" style="display: none;"><td colspan="8">No MySQL instances configured.</td></tr>
