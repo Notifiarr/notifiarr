@@ -271,7 +271,7 @@ func (l *LogFileInfos) Swap(i, j int) {
 }
 
 func (l *LogFileInfos) Less(i, j int) bool {
-	return l.List[i].Name < l.List[j].Name
+	return l.List[i].Time.After(l.List[j].Time)
 }
 
 func map2list(input map[string]struct{}) []string {

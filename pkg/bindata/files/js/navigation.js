@@ -17,11 +17,14 @@ function checkHashForNavPage() {
 checkHashForNavPage()
 
 // refreshPage will re-download any template and replace it with new data.
-function refreshPage(template) {
+function refreshPage(template, notice = true) {
     $.ajax({
         url: 'template/'+ template,
         success: function (data){
-            toast('Refreshed', 'Refresh complete.', 'success', 2000);
+            if (notice) {
+                toast('Refreshed', 'Refresh complete.', 'success', 2000);
+            }
+
             $('#template-'+ template).html(data);
             updateFileContentCounters();
         },

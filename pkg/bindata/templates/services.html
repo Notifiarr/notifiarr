@@ -3,15 +3,15 @@
                         <p class="text-danger">TODO:<br>
                             1. Make delete buttons work on all services, not just the last one.<br>
                             2. Make selecting `Type` dynamically update `Expect` to appropriate choices for the type.<br>
-                            <hr>
                         </p>
-                        <p>The notifiarr client application is capable of monitoring services via HTTP checks,
+                        <hr>
+                        <p>The Notifiarr client application is capable of monitoring services via HTTP checks,
                            TCP port checks or process running (and not running) checks. Use the form at the bottom
-                           of this page to configure service checks. <b>This client service checks work with the notifiarr.com
+                           of this page to configure service checks. <b>This client service checks work with the Notifiarr.com
                            Nework Integration.</b></p>
                         <h3>Process Check Type</h3>
                         <p>The Process check type allows you to monitor that a process is running.
-                            <a class="nav-link" onClick="refreshPage('processlist');showProcessList();">View the running process list.</a>
+                            <a class="nav-link" onClick="refreshPage('processlist', false);showProcessList();">View the running process list.</a>
                         </p>
                         <p>
                             You may provide expect values to make sure a specific number or min/max count of process is running.

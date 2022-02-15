@@ -1,8 +1,4 @@
                     <h1><i class="fas fa-cogs"></i> Configuration</h1>
-                    <p class="text-danger">TODO:<br>
-                        1. Add Lock icon to items that are configured via environment variables.
-                    </p>
-                    <hr>
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
@@ -28,7 +24,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <i title="This application uses the notifiarr.com API key for incoming authentication. That's not safe if you want a third party to authenticate to this app. You can use this section to add extra API keys. Whatever you want. Separate them with newlines or spaces." class="help-icon far fa-question-circle"></i>
+                                    <i title="This application uses the Notifiarr.com API key for incoming authentication. That's not safe if you want a third party to authenticate to this app. You can use this section to add extra API keys. Whatever you want. Separate them with newlines or spaces." class="help-icon far fa-question-circle"></i>
                                     Extra Keys
                                 </td>
                                 <td>
@@ -111,7 +107,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <i title="If notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or X-Forwarded-For). Separate with spaces or new lines." class="help-icon far fa-question-circle"></i>
+                                    <i title="If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or X-Forwarded-For). Separate with spaces or new lines." class="help-icon far fa-question-circle"></i>
                                     Upstreams
                                 </td>
                                 <td>
@@ -145,7 +141,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <i title="Sometimes connections to notifiarr.com fail. This controls how many times each request will be attempted in case of failures. Default is 4. Setting 0 will take default of 4." class="help-icon far fa-question-circle"></i>
+                                    <i title="Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures. Default is 4. Setting 0 will take default of 4." class="help-icon far fa-question-circle"></i>
                                     Retries
                                 </td>
                                 <td>
@@ -158,7 +154,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <i title="This is the timeout for requests to notifiarr.com, and any other timeout that may be missing (global). Exampes: 10s, 1m, 1m15s" class="help-icon far fa-question-circle"></i>
+                                    <i title="This is the timeout for requests to Notifiarr.com, and any other timeout that may be missing (global). Exampes: 10s, 1m, 1m15s" class="help-icon far fa-question-circle"></i>
                                     Timeout
                                 </td>
                                 <td>
@@ -246,7 +242,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <i title="How often to send service check results to notifiarr.com. Default: 10m, minimum: 5m." class="help-icon far fa-question-circle"></i>
+                                    <i title="How often to send service check results to Notifiarr.com. Default: 10m, minimum: 5m." class="help-icon far fa-question-circle"></i>
                                     Update Interval
                                 </td>
                                 <td>
@@ -264,7 +260,7 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <i title="Enabling debug logging causes a lot more data to write to the log. Includes payloads to and from notifiarr.com and starr apps. Use Max Body settings to control payloads sizes." class="help-icon far fa-question-circle"></i>
+                                    <i title="Enabling debug logging causes a lot more data to write to the log. Includes payloads to and from Notifiarr.com and starr apps. Use Max Body settings to control payloads sizes." class="help-icon far fa-question-circle"></i>
                                     Debug Logging
                                 </td>
                                 <td>
@@ -367,7 +363,7 @@
                         {{ end }}
                             <tr>
                                 <td>
-                                    <i title="When debug is enabled, this setting limits the amount of payload data written to the log, to or from notifiarr.com. Recommend 1000-5000." class="help-icon far fa-question-circle"></i>
+                                    <i title="When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com. Recommend 1000-5000." class="help-icon far fa-question-circle"></i>
                                     Max Body Size
                                 </td>
                                 <td>
