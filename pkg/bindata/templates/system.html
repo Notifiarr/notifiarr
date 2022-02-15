@@ -3,6 +3,9 @@
                      {{else if eq .Version.os "freebsd"}}<i class="fab fa-freebsd"></i>&nbsp;&nbsp;
                      {{else if eq .Version.os "darwin"}}<i class="fab fa-apple"></i>&nbsp;&nbsp;
                      {{else}}<i class="fas fa-microchip"></i>&nbsp;&nbsp;{{end}} System</h1>
+                     <p>
+                         <a href="#system" onClick="refreshPage('system');">Refresh Page</a><br>
+                     </p>
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr><td colspan="3" align="center"><h4 class="mb-3">User</h4></td></tr>

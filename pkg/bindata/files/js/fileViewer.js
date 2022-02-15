@@ -28,7 +28,16 @@ function fileSelectorChange(caller) {
     const fileID    = ctl.find('.file-selector').val();
     const filename  = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used      = ctl.find('#fileinfo-'+ fileID).data('used');
-    const lineCount = parseInt(ctl.data("lines"));
+    const lineCount = parseInt(ctl.find('.fileLinesCount').val());
+
+    if (fileID === null) {
+        return;
+    }
+
+    let sort = ctl.find('.fileSortDirection').data('sort');
+    if (sort  != "heads" && sort != "tails") {
+        sort = "tails"
+    }
 
     // start a spinner because it may take a few seconds to load a file.
     ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
@@ -38,7 +47,7 @@ function fileSelectorChange(caller) {
     ctl.find('.fileLinesAdd').prop('disabled', false);
 
     $.ajax({
-        url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/0', // the zero is optional, skip counter.
+        url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
         success: function (data){
             ctl.find('.file-content').text(data);
             const gotLines = ctl.find('.file-content').html().split(/\n/).length-1;
@@ -114,25 +123,40 @@ function triggerFileLoad(caller) {
     const lineAction  = ctl.find('.fileLinesAction').val(); // add/reload
     const offSetCount = parseInt(ctl.find('.currentLineCount').html());
 
+    let from = "last";
+    let sort = ctl.find('.fileSortDirection').data('sort');
+    if (sort == "tails") {
+        from = "last";
+    } else if (sort  != "heads" && sort != "tails") {
+        sort = "tails";
+    } else {
+        from = "first";
+    }
+
     ctl.find('.file-ajax-error, .file-ajax-msg').hide();
 
     // needs to update an "ok, working on that" box (that does not exist right now),
 
-    if (lineAction == 'linesAdd') {
+    if (lineAction == 'linesAdd') { // addlines
         ctl.find('.line-number').remove();
         ctl.find('.file-content').html(ctl.find('.file-content').html().toString().replaceAll('<span class="cl"></span>', '\n'));
         ctl.find('.file-ajax-msg').html('Getting '+ lineCount +' more lines!').stop().animate({opacity:'100'}).show().fadeOut(lineCount);
         ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
 
         $.ajax({
-            url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/'+ offSetCount,
+            url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/'+ offSetCount + '?sort='+sort,
             success: function (data){
-                ctl.find('.file-content').prepend(data);
+                if (sort == "tails") {
+                    ctl.find('.file-content').prepend(data);
+                } else {
+                    ctl.find('.file-content').append(data);
+                }
+
                 const gotLines = data.split(/\n/).length-1;
                 const totalLines  = gotLines + offSetCount;
 
                 if (gotLines === lineCount) {
-                    ctl.find('.file-action-msg').html('Displaying last <span class="currentLineCount">'+ totalLines +'</span> file lines.');
+                    ctl.find('.file-action-msg').html('Displaying '+ from +' <span class="currentLineCount">'+ totalLines +'</span> file lines.');
                 } else {
                     ctl.find('.fileLinesAdd').prop('disabled', true) // Disable the 'Add' action.
                     ctl.find('.fileLinesAction').val("linesReload"); // Set the selector to reload (instead of Add).
@@ -155,14 +179,14 @@ function triggerFileLoad(caller) {
         // start a spinner because this might take a few seconds.
         ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
         $.ajax({
-            url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/0',
+            url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
             success: function (data){
                 ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
                 ctl.find('.file-content').text(data);
                 const gotLines = ctl.find('.file-content').html().split(/\n/).length-1;
                 if (gotLines === lineCount) {
                     ctl.find('.fileLinesAdd').prop('disabled', false) // Enable the 'Add' action.
-                    ctl.find('.file-action-msg').html('Displaying last <span class="currentLineCount">'+ gotLines +'</span> file lines.');
+                    ctl.find('.file-action-msg').html('Displaying '+ from +' <span class="currentLineCount">'+ gotLines +'</span> file lines.');
                 } else {
                     ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file.');
                 }
@@ -176,4 +200,21 @@ function triggerFileLoad(caller) {
             },
         });
     }
+}
+
+// toggleButton handles the heads/tails toggle switch. Reloads current file.
+function toggleButton(from) {
+    const ctl = from.parent('.fileSortDirection');
+    ctl.find('.toggleButton').toggleClass('btn-seondary btn-brand');
+
+    if (ctl.data('sort') == 'heads') {
+        ctl.data('sort', 'tails'); // was heads now, going to tails.
+        ctl.find('.toggleIcon').attr('title', 'Tails, showing bottom of file first.').toggleClass('fa-sort-amount-up fa-sort-amount-down');
+    } else {
+        ctl.data('sort', 'heads'); // was tails now, going to heads.
+        ctl.find('.toggleIcon').attr('title', 'Heads, showing top of file first.').toggleClass('fa-sort-amount-up fa-sort-amount-down');
+    }
+
+    fileSelectorChange(ctl); // update the file viewer.
+    setTooltips();
 }

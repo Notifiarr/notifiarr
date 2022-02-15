@@ -21,6 +21,7 @@ function refreshPage(template) {
     $.ajax({
         url: 'template/'+ template,
         success: function (data){
+            toast('Refreshed', 'Refresh complete.', 'success', 2000);
             $('#template-'+ template).html(data);
             updateFileContentCounters();
         },

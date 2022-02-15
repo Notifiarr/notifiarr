@@ -201,7 +201,7 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 // a folder with the provided file(s). This is useful to find "all the log files"
 // or "all the .conf files" in a folder. Simply pass in 1 or more file paths, and
 // any files in the same folder with the same extension will be returned.
-func GetFilePaths(files ...string) *LogFileInfos {
+func GetFilePaths(files ...string) *LogFileInfos { //nolint:cyclop
 	contain := make(map[string]struct{})
 	dirs := make(map[string]struct{})
 

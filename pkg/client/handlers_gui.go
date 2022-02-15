@@ -28,7 +28,11 @@ import (
 	"golift.io/version"
 )
 
-const minPasswordLen = 16
+const (
+	minPasswordLen   = 16
+	fileSourceLogs   = "logs"
+	fileSourceConfig = "config"
+)
 
 type templateData struct {
 	Config      *configfile.Config    `json:"config"`
@@ -159,13 +163,14 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 	http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 }
 
+// getFileDeleteHandler deletes log and config files.
 func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Request) {
 	var fileInfos *logs.LogFileInfos
 
 	switch mux.Vars(req)["source"] {
-	case "logs":
+	case fileSourceLogs:
 		fileInfos = c.Logger.GetAllLogFilePaths()
-	case "config":
+	case fileSourceConfig:
 		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
 	default:
 		http.Error(response, "invalid source", http.StatusBadRequest)
@@ -190,13 +195,14 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 	}
 }
 
+// getFileDownloadHandler downloads config and log files.
 func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.Request) {
 	var fileInfos *logs.LogFileInfos
 
 	switch mux.Vars(req)["source"] {
-	case "logs":
+	case fileSourceLogs:
 		fileInfos = c.Logger.GetAllLogFilePaths()
-	case "config":
+	case fileSourceConfig:
 		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
 	default:
 		http.Error(response, "invalid source", http.StatusBadRequest)
@@ -235,13 +241,14 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 	}
 }
 
+// getFileHandler returns portions of a config or log file based on request paraeters.
 func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request) {
 	var fileInfos *logs.LogFileInfos
 
 	switch mux.Vars(req)["source"] {
-	case "logs":
+	case fileSourceLogs:
 		fileInfos = c.Logger.GetAllLogFilePaths()
-	case "config":
+	case fileSourceConfig:
 		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
 	default:
 		http.Error(response, "invalid source", http.StatusBadRequest)
@@ -261,7 +268,7 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 			continue
 		}
 
-		lines, err := getLastLinesInFile(fileInfo.Path, count, skip)
+		lines, err := getLinesFromFile(fileInfo.Path, mux.Vars(req)["sort"], count, skip)
 		if err != nil {
 			c.Errorf("Handling Log File Request: %v", err)
 			http.Error(response, err.Error(), http.StatusInternalServerError)

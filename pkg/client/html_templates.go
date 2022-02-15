@@ -159,8 +159,8 @@ func (c *Client) haveCustomFile(fileName string) string {
 	return ""
 }
 
-// getLastLinesInFile makes it easy to tail a file. Sorta.
-func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //nolint:cyclop
+// getLinesFromFile makes it easy to tail or head a file. Sorta.
+func getLinesFromFile(filepath, sort string, count, skip int) ([]byte, error) {
 	fileHandle, err := os.Open(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("opening file: %w", err)
@@ -172,10 +172,21 @@ func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //no
 		return nil, fmt.Errorf("stating open file: %w", err)
 	}
 
+	switch sort {
+	default:
+		fallthrough
+	case "tail", "tails":
+		return readFileTail(fileHandle, stat.Size(), count, skip)
+	case "head", "heads":
+		return readFileHead(fileHandle, stat.Size(), count, skip)
+	}
+}
+
+func readFileTail(fileHandle *os.File, fileSize int64, count, skip int) ([]byte, error) { //nolint:cyclop
 	var (
 		output   bytes.Buffer
 		location int64
-		filesize = stat.Size()
+		filesize = fileSize
 		char     = make([]byte, 1)
 		found    int
 	)
@@ -186,7 +197,7 @@ func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //no
 
 	for {
 		location-- // read 1 byte
-		if _, err = fileHandle.Seek(location, io.SeekEnd); err != nil {
+		if _, err := fileHandle.Seek(location, io.SeekEnd); err != nil {
 			return nil, fmt.Errorf("seeking open file: %w", err)
 		}
 
@@ -210,6 +221,42 @@ func getLastLinesInFile(filepath string, count, skip int) ([]byte, error) { //no
 			}
 
 			return out, nil
+		}
+	}
+}
+
+func readFileHead(fileHandle *os.File, fileSize int64, count, skip int) ([]byte, error) {
+	var (
+		output   bytes.Buffer
+		location int64
+		char     = make([]byte, 1)
+		found    int
+	)
+
+	// This is a magic number.
+	// We assume 150 characters per line to optimize the buffer.
+	output.Grow(count * 150) // nolint:gomnd
+
+	for ; ; location++ {
+		if _, err := fileHandle.Seek(location, io.SeekStart); err != nil {
+			return nil, fmt.Errorf("seeking open file: %w", err)
+		}
+
+		if _, err := fileHandle.Read(char); err != nil {
+			return nil, fmt.Errorf("reading open file: %w", err)
+		}
+
+		if char[0] == 10 { // nolint:gomnd
+			found++ // we found a line
+		}
+
+		if skip == 0 || found > skip {
+			output.WriteByte(char[0])
+		}
+
+		if found >= count+skip || // we found enough lines.
+			location >= fileSize-1 { // beginning of file.
+			return output.Bytes(), nil
 		}
 	}
 }

@@ -1,13 +1,9 @@
                     <h1><i class="fas fa-file-export"></i> Config Files</h1>
-                    <p class="text-danger">TODO:<br>
-                        1. Allow selecting file retieval order (heads or tails).<br>
-                    </p>
-                    <hr>
-                    <div class="fileController" data-kind="config" data-lines="250">
+                    <div class="fileController" data-kind="config">
                         <div class="row">
                           <div class="col-md-6">
                               Found {{len .ConfigFiles.List}} config files &nbsp;•&nbsp;
-                              <a href="#configfiles" onClick="refreshPage('configfiles');toast('Refreshed', 'Refresh complete.', 'success', 2000);">Refresh Page</a><br>
+                              <a href="#configfiles" onClick="refreshPage('configfiles');">Refresh Page</a><br>
                               Total Size: {{.ConfigFiles.Size}} ({{megabyte .ConfigFiles.Size}} Mb)<br>
                               <select class="file-selector" onChange="fileSelectorChange($(this))">
                                   <option value="placeholder" selected disabled>- Select a config file -</option>
@@ -15,6 +11,11 @@
                                   <option value="{{ $file.ID }}">{{ $file.Name }}</option>
                                   {{- end }}
                               </select>
+                              <div class="btn-group btn-toggle fileSortDirection" data-sort="heads">
+                            	  <button class="btn btn-xs btn-brand active toggleButton" onClick="toggleButton($(this));">Heads</button>
+                            	  <button class="btn btn-xs btn-seondary toggleButton" onClick="toggleButton($(this));">Tails
+                                  </button>&nbsp;<i class="fas fa-sort-amount-down sort-icon toggleIcon" style="font-size:22px;" title="Heads, showing top of file first."></i>
+                              </div>
                               <span class="file-actions" style="white-space: nowrap; display:none;"><!-- keep the Go button next to the menu. -->
                                   <select class="fileAction">
                                       <option selected disabled>- Actions -</option>
@@ -33,8 +34,9 @@
                                   <select class="fileLinesCount">
                                       <option value="50">50  lines</option>
                                       <option value="100">100 lines</option>
-                                      <option value="250" selected>250 lines</option>
-                                      <option value="500">500 lines</option>
+                                      <option value="200">200 lines</option>
+                                      <option value="300" selected>300 lines</option>
+                                      <option value="600">600 lines</option>
                                   </select>
                                   <button onClick="triggerFileLoad($(this))" class="btn btn-xs btn-primary">Go</button><br>
                                   <span class="file-action-msg">Displaying last <span class="currentLineCount">0</span> file lines.'</span>
