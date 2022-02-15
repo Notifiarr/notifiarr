@@ -1,4 +1,4 @@
-{{- /* This is imported by configfiles and logsfiles. It may also be used by a special route in the app to return fresh file results. */}}
+{{- /* This is imported by configfiles and logfiles, but may not need to be now that I decided how 'refresh page' works. */}}
                               {{- range $file := . }}
                                   <table class="table table-striped table-bordered fileinfo-table" style="display:none;" id="fileinfo-{{$file.ID}}" data-name="{{$file.Name}}" data-id="{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
                                       <tr><td width="10%">Path</td><td>{{$file.Path}}</td></tr>

@@ -41,11 +41,11 @@
                             <li class="ts-label" style="text-align: center;">Insights</li>
                             <div class="dropdown">
                                 <a class="nav-div-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <i class="nav-icon far fa-fire-extinguisher" style="margin-left:0;"></i><span style="padding-left:15px;">Triggers &nbsp; &nbsp;<span class="caret"></span></span>
+                                    <i class="nav-icon fas fa-fire-extinguisher" style="margin-left:0;"></i><span style="padding-left:15px;">Triggers &nbsp; &nbsp;<span class="caret"></span></span>
                                 </a>
                                 <ul style="width:92%;" class="dropdown-menu bk-dark" aria-labelledby="triggers menu">
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('gaps')">Send Radarr Gaps</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('cfsync')">Sync Custom Format</a></li>
+                                    <li><a class="nav-link text-grey" href="#triggers" onClick="swapNavigationTemplate('triggers')">- Open Triggers Page -</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('cfsync')">Sync Custom Formats</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('snapshot')">Send System Snapshot</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('stuckitems')">Stuck Queue Items Check</a></li>
                                     <li><a class="nav-link text-grey" onClick="triggerAction('dashboard')">Send Dashboard States</a></li>
@@ -116,6 +116,9 @@
                             </div>
                             <div class="navigation-item" id="template-media" style="display: none;">
 {{ template "media.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-triggers" style="display: none;">
+{{ template "triggers.html" . }}
                             </div>
                             <div class="navigation-item" id="template-monitoring" style="display: none;">
 {{ template "monitoring.html" . }}
