@@ -10,6 +10,12 @@
                     <i class="far fa-copyright"></i> 2020-{{now.Format "2006"}}
                     <a href="https://golift.io/">Go Lift</a> &nbsp;•&nbsp;
                     <a href="https://golift.io/notifiarr/blob/main/LICENSE">MIT license</a>
+                    {{- if or .ClientInfo.IsPatron}}
+                    &nbsp;•&nbsp; Patron
+                    {{- end}}
+                    {{- if or .ClientInfo.IsSub}}
+                    &nbsp;•&nbsp; Subscriber
+                    {{- end}}
                 </div>
             </div>
         </div> <!-- index :: page-container -->

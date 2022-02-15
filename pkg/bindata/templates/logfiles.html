@@ -1,13 +1,13 @@
                     <h1><i class="fas fa-file-medical-alt"></i> Log Files</h1>
                     <p class="text-danger">TODO:<br>
                         1. Live tailing a log file.<br>
-                        <hr>
                     </p>
+                    <hr>
                     <div class="fileController" data-kind="logs" data-lines="500">
                       <div class="row">
                         <div class="col-md-6">
                             Found {{len .LogFiles.List}} log files in {{len .LogFiles.Dirs}} folders &nbsp;•&nbsp;
-                            <a href="#logfiles" onClick="refreshPage('logfiles')">Refresh Page</a><br>
+                            <a href="#logfiles" onClick="refreshPage('logfiles');toast('Refreshed', 'Refresh complete.', 'success', 2000);">Refresh Page</a><br>
                             Total Size: {{.LogFiles.Size}} ({{megabyte .LogFiles.Size}} Mb)<br>
                             <select class="file-selector" onChange="fileSelectorChange($(this))">
                                 <option value="placeholder" selected disabled>- Select a log file -</option>

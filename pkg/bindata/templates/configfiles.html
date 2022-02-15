@@ -1,13 +1,13 @@
                     <h1><i class="fas fa-file-export"></i> Config Files</h1>
                     <p class="text-danger">TODO:<br>
                         1. Allow selecting file retieval order (heads or tails).<br>
-                        <hr/>
                     </p>
+                    <hr>
                     <div class="fileController" data-kind="config" data-lines="250">
                         <div class="row">
                           <div class="col-md-6">
-                              Found {{len .ConfigFiles.List}} config files. &nbsp;•&nbsp;
-                              <a href="#configfiles" onClick="refreshPage('configfiles')">Refresh Page</a><br>
+                              Found {{len .ConfigFiles.List}} config files &nbsp;•&nbsp;
+                              <a href="#configfiles" onClick="refreshPage('configfiles');toast('Refreshed', 'Refresh complete.', 'success', 2000);">Refresh Page</a><br>
                               Total Size: {{.ConfigFiles.Size}} ({{megabyte .ConfigFiles.Size}} Mb)<br>
                               <select class="file-selector" onChange="fileSelectorChange($(this))">
                                   <option value="placeholder" selected disabled>- Select a config file -</option>

@@ -287,7 +287,7 @@ retries = {{.Retries}}
   token   = "{{.Plex.Token}}"   # your plex token; get this from a web inspector
   timeout = "{{.Plex.Timeout}}"  # how long to wait for HTTP responses
 {{- else}}#[plex]
-#url     = "http://localhost:32400" # Your plex URL
+#url     = "http://localhost:32400/" # Your plex URL
 #token   = "" # your plex token; get this from a web inspector
 {{- end }}
 
@@ -301,13 +301,13 @@ retries = {{.Retries}}
 [tautulli]
   name     = "{{.Tautulli.Name}}" # only set a name to enable service checks.
   url      = "{{.Tautulli.URL}}" # Your Tautulli URL
-  api_key  = "{{.Tautulli.APIKey}}" # your plex token; get this from a web inspector
+  api_key  = "{{.Tautulli.APIKey}}" # your tautulli api key; get this from settings
   timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
   interval = "{{.Tautulli.Interval}}" # how often to send service checks
 {{- else}}
 #[tautulli]
 #  name    = "" # only set a name to enable service checks.
-#  url     = "http://localhost:8181" # Your Tautulli URL
+#  url     = "http://localhost:8181/" # Your Tautulli URL
 #  api_key = "" # your tautulli api key; get this from settings
 {{- end }}
 
@@ -358,7 +358,7 @@ retries = {{.Retries}}
 #[[service]]
 #  name     = "MyServer"          # name must be unique
 #  type     = "http"              # type can be "http" or "tcp"
-#  check    = 'http://127.0.0.1'  # url for 'http', host/IP:port for 'tcp'
+#  check    = 'http://127.0.0.1/'  # url for 'http', host/IP:port for 'tcp'
 #  expect   = "200"               # return code to expect (for http only)
 #  timeout  = "10s"               # how long to wait for tcp or http checks.
 #  interval = "5m"                # how often to check this service.

@@ -7,7 +7,6 @@ import (
 	"io"
 	"mime"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -20,6 +19,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -31,14 +31,14 @@ import (
 const minPasswordLen = 16
 
 type templateData struct {
-	Config      *configfile.Config `json:"config"`
-	Flags       *configfile.Flags  `json:"flags"`
-	Username    string             `json:"username"`
-	Data        url.Values         `json:"data,omitempty"`
-	Msg         string             `json:"msg,omitempty"`
-	Version     map[string]string  `json:"version"`
-	LogFiles    *logs.LogFileInfos `json:"logFileInfo"`
-	ConfigFiles *logs.LogFileInfos `json:"configFileInfo"`
+	Config      *configfile.Config    `json:"config"`
+	Flags       *configfile.Flags     `json:"flags"`
+	Username    string                `json:"username"`
+	Msg         string                `json:"msg,omitempty"`
+	Version     map[string]string     `json:"version"`
+	LogFiles    *logs.LogFileInfos    `json:"logFileInfo"`
+	ConfigFiles *logs.LogFileInfos    `json:"configFileInfo"`
+	ClientInfo  *notifiarr.ClientInfo `json:"clientInfo"`
 }
 
 // userNameValue is used a context value key.
@@ -463,6 +463,11 @@ func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.
 
 func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 	templateName, msg string) {
+	clientInfo, _ := c.website.GetClientInfo(notifiarr.EventUser)
+	if clientInfo == nil {
+		clientInfo = &notifiarr.ClientInfo{}
+	}
+
 	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
 		Flags:       c.Flags,
@@ -470,6 +475,7 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 		Msg:         msg,
 		LogFiles:    c.Logger.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
+		ClientInfo:  clientInfo,
 		Version: map[string]string{
 			"started":   version.Started.Round(time.Second).String(),
 			"uptime":    time.Since(version.Started).Round(time.Second).String(),

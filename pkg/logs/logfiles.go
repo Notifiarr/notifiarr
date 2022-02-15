@@ -189,7 +189,9 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 	}
 
 	for cust := range customLog {
-		logFiles = append(logFiles, cust)
+		if name := customLog[cust].File.Name(); name != "" {
+			logFiles = append(logFiles, name)
+		}
 	}
 
 	return GetFilePaths(logFiles...)
@@ -209,7 +211,12 @@ func GetFilePaths(files ...string) *LogFileInfos {
 			dirExpanded = logFilePath
 		}
 
-		files, err := filepath.Glob(filepath.Join(filepath.Dir(dirExpanded), "*"+filepath.Ext(logFilePath)))
+		ext := filepath.Ext(logFilePath)
+		if ext == "" {
+			continue
+		}
+
+		files, err := filepath.Glob(filepath.Join(filepath.Dir(dirExpanded), "*"+ext))
 		if err != nil {
 			continue
 		}
