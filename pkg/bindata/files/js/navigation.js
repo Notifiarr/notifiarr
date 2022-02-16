@@ -14,7 +14,7 @@ function checkHashForNavPage() {
     }
 }
 
-checkHashForNavPage()
+checkHashForNavPage();
 
 // refreshPage will re-download any template and replace it with new data.
 function refreshPage(template, notice = true) {

@@ -37,13 +37,13 @@ function addInstance(section, app)
 
     // Timeout and Interval must have valid go durations, or the parser errors.
     // Host or URL are set without an original value to make the save button appear.
-    let colspan = 1
+    let colspan = 1;
     for (const name of names) {
         let nameval = ""
         let nameori = ""
         if (name == "") {
-            colspan++
-            continue
+            colspan++;
+            continue;
         }
 
         switch (name) {
@@ -68,17 +68,17 @@ function addInstance(section, app)
         row +=  '<td colspan="'+ colspan +'"><input type="text" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +
         '" class="client-parameter" data-group="'+ section +'" data-label="'+ app +' '+
          instance +' '+name+'" data-original="'+ nameori +'" value="'+ nameval +'" style="width: 100%;"></td>';
-         colspan = 1
+         colspan = 1;
     }
 
-
+    // Add this new data row to our table.
     $('#'+ section +'-'+ app +'-container').append(row);
-    // hide all delete buttons, and show only the one we just added.
+    // Hide all delete buttons, and show only the one we just added.
     $('.'+ section +'-'+app+'-deletebutton').hide().last().show();
-    // redo tooltips since some got added.
+    // Redo tooltips since some got added.
     setTooltips();
-    // hide the "no instances" item that displays if no instances are configured.
+    // Hide the "no instances" item that displays when no instances are configured.
     $('#'+ section +'-'+ app +'-none').hide();
-    // bring up the save changes button.
+    // Bring up the save changes button.
     findPendingChanges();
 }
