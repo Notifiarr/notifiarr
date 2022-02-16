@@ -1,6 +1,7 @@
-// showProcessList open a hidden window and fills it with the current process list.
+// showProcessList displays/shows a hidden page(div) and fills it with the current process list.
 function showProcessList() {
     swapNavigationTemplate('processlist');
+    // Start with a spinner because this takes a second or 3.
     $('#process-list-content').html('<h4><i class="fas fa-cog fa-spin"></i> Loading process list...</h4>');
 
     $.ajax({
@@ -8,7 +9,9 @@ function showProcessList() {
         success: function (data){
             const lineCount = data.split(/\n/).length-1; // do not count last newline.
             $('#process-list-msg').html("Displaying "+lineCount+" running processes. Updated: "+ new Date().toLocaleTimeString());
+            // Put the data we just downloaded into the content div for the process list.
             $('#process-list-content').text(data);
+            // Process List uses line counter. Because why not? They're damn cool.
             updateFileContentCounters();
         },
         error: function (request, status, error) {
@@ -49,13 +52,14 @@ function addServiceCheck()
         '<td><input type="text" id="Service.'+ index +'.Timeout" class="client-parameter" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m" style="width: 100%;"></td>'+
         '</tr>';
 
+    // Add the row we just created to the end of the table.
     $('#services-Checks-container').append(row);
-    // hide all delete buttons, and show only the one we just added.
+    // Hide all delete buttons, and show only the one we just added.
     $('.services-Checks-deletebutton').hide().last().show();
-    // redo tooltips since some got added.
+    // Redo tooltips since some got added.
     setTooltips();
-    // hide the "no instances" item that displays if no instances are configured.
+    // Hide the "no instances" item that displays if no instances are configured.
     $('#services-Checks-none').hide();
-    // bring up the save changes button.
+    // Bring up the save changes button.
     findPendingChanges();
 }

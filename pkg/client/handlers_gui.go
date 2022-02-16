@@ -3,6 +3,7 @@ package client
 import (
 	"archive/zip"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -387,7 +388,10 @@ func (c *Client) saveNewConfig(config *configfile.Config) error {
 	// make config file backup.
 	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
 	if err := configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
-		return fmt.Errorf("backing up config file: %w", err)
+		notexist := os.ErrNotExist
+		if !errors.As(err, &notexist) {
+			return fmt.Errorf("backing up config file: %w", err)
+		}
 	}
 
 	// move new config file to existing config file.

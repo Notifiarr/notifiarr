@@ -1,4 +1,5 @@
 // triggerAction is called from a submenu in the nav bar.
+// triggers pretty simple. This only starts an action and is almost always successful.
 function triggerAction(action) {
     $.ajax({
         type: 'GET',

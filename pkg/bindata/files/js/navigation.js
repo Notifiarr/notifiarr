@@ -1,3 +1,4 @@
+// swapNavigationTemplate changes the currently displayed navigation page(div).
 function swapNavigationTemplate(template) {
     // only swap if there is 1 page to swap to.
     if ($('#template-'+ template).length === 1) {
@@ -14,6 +15,7 @@ function checkHashForNavPage() {
     }
 }
 
+// This only needs to run once on startup. This sends the user to the correct page (like when they refresh).
 checkHashForNavPage();
 
 // refreshPage will re-download any template and replace it with new data.
@@ -22,10 +24,12 @@ function refreshPage(template, notice = true) {
         url: 'template/'+ template,
         success: function (data){
             if (notice) {
+                // Sometimes refreshes happen so quick we need a message to tell us it worked.
                 toast('Refreshed', 'Refresh complete.', 'success', 2000);
             }
 
             $('#template-'+ template).html(data);
+            // refreshPage is used on at least 3 pages that have line counter boxes, so update those.
             updateFileContentCounters();
         },
         error: function (request, status, error) {

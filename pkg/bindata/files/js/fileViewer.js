@@ -1,5 +1,5 @@
-// updateFileContentCounters is used for things besides just the file viewer.
-// It's also used by the process list viewer. It adds numbers to lines.
+// updateFileContentCounters is used to add numbers to lines in a <pre> block.
+// It's also used by the process list viewer, not just the fileViewer.
 function updateFileContentCounters()
 {
     $.each($('.file-content'), function() {
@@ -19,6 +19,7 @@ function updateFileContentCounters()
     });
 }
 
+// Update them all on page load.
 updateFileContentCounters();
 
 // ----- File Display
@@ -138,18 +139,18 @@ function triggerFileLoad(caller) {
     // needs to update an "ok, working on that" box (that does not exist right now),
 
     if (lineAction == 'linesAdd') { // addlines
-        ctl.find('.line-number').remove();
-        ctl.find('.file-content').html(ctl.find('.file-content').html().toString().replaceAll('<span class="cl"></span>', '\n'));
-        ctl.find('.file-ajax-msg').html('Getting '+ lineCount +' more lines!').stop().animate({opacity:'100'}).show().fadeOut(lineCount);
+        ctl.find('.file-ajax-msg').html('Getting '+ lineCount +' more lines!').stop().animate({opacity:'100'}).show().fadeOut(lineCount+750);
         ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
 
         $.ajax({
             url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/'+ offSetCount + '?sort='+sort,
             success: function (data){
+                // These are slow when there's a lot of lines.
+                ctl.find('.line-number').remove();
                 if (sort == "tails") {
-                    ctl.find('.file-content').prepend(data);
+                    ctl.find('.file-content').html(ctl.find('.file-content').html().toString().replaceAll('<span class="cl"></span>', '\n')).prepend(data);
                 } else {
-                    ctl.find('.file-content').append(data);
+                    ctl.find('.file-content').html(ctl.find('.file-content').html().toString().replaceAll('<span class="cl"></span>', '\n')).append(data);
                 }
 
                 const gotLines = data.split(/\n/).length-1;

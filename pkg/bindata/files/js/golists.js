@@ -26,6 +26,7 @@ function addInstance(section, app)
     const instance = index+1;
     const prefix = $('#'+ section +'-'+ app +'-addbutton').data('prefix');  // storage location like Apps or Snapshot.
     const names = $('#'+ section +'-'+ app +'-addbutton').data('names'); // list of thinges like "Name" and "URL"
+    // This just sets the first few lines of the row. The more-dynamic bits get added below, in a for loop.
     let row = '<tr class="'+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
                 '   <td style="font-size: 22px;">'+instance+
                 '       <div class="'+ section +'-'+ app +'-deletebutton" style="float: right;">'+
@@ -36,11 +37,12 @@ function addInstance(section, app)
                 '   </td>';
 
     // Timeout and Interval must have valid go durations, or the parser errors.
-    // Host or URL are set without an original value to make the save button appear.
+    // Host or URL are set with a value, and without an original value to make the save button appear.
     let colspan = 1;
     for (const name of names) {
         let nameval = ""
         let nameori = ""
+        // Blank items in the name list add a colspan to the next item.
         if (name == "") {
             colspan++;
             continue;
