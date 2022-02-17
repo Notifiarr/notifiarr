@@ -33,7 +33,7 @@ function addServiceCheck()
     const index = $('.services-Checks').length;
     const instance = index+1;
     const row = '<tr class="services-Checks" id="services-Checks-'+ index +'">'+
-        '<td style="font-size: 22px;">'+ instance +
+        '<td style="font-size: 22px;"><span id="service-index-label-'+ index +'">'+ instance +'</span>'+
         '<div class="services-Checks-deletebutton" style="float: right;">'+
         '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
         '</div>'+
@@ -52,14 +52,14 @@ function addServiceCheck()
         '<td><input type="text" id="Service.'+ index +'.Timeout" class="client-parameter" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m" style="width: 100%;"></td>'+
         '</tr>';
 
-    // Add the row we just created to the end of the table.
     $('#services-Checks-container').append(row);
-    // Hide all delete buttons, and show only the one we just added.
-    $('.services-Checks-deletebutton').hide().last().show();
-    // Redo tooltips since some got added.
+
+    // redo tooltips since some got added.
     setTooltips();
-    // Hide the "no instances" item that displays if no instances are configured.
+    
+    // hide the "no instances" item that displays if no instances are configured.
     $('#services-Checks-none').hide();
-    // Bring up the save changes button.
+    
+    // bring up the save changes button.
     findPendingChanges();
 }

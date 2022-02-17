@@ -64,8 +64,8 @@
                         {{- range $index, $svc := .Config.Service}}
                             <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
                             <tr class="services-Checks" id="services-Checks-{{$index}}">
-                                <td style="font-size: 22px;">{{instance $index}}
-                                    <div class="services-Checks-deletebutton" style="float: right;{{if ne (len $.Config.Service) (instance $index)}} display: none;{{end}}">
+                                <td style="font-size: 22px;"><span id="service-index-label-{{$index}}">{{instance $index}}</span>
+                                    <div class="services-Checks-deletebutton" style="float: right;">
                                         <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                     </div>
                                 </td>
