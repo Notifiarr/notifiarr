@@ -31,9 +31,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                        {{- if locked (printf "%s_SERVICE_%d_CHECK" .Flags.EnvPrefix $index) }}
-
-                                        {{- if locked (printf "%s_PLEX_URL" .Flags.EnvPrefix)}}
+                                    {{- if locked (printf "%s_PLEX_URL" .Flags.EnvPrefix)}}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Plex.URL" class="client-parameter" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}" style="width: 100%;"></td>
@@ -41,7 +39,7 @@
                                 </td>
                                 <td colspan="2">
                                     <table width="100%"><tr>
-                                        {{- if locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix)}}
+                                    {{- if locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix)}}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Plex.Token" class="client-parameter" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}" style="width: 100%;"></td>
@@ -49,7 +47,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                        {{- if locked (printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix)}}
+                                    {{- if locked (printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix)}}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Plex.Timeout" class="client-parameter" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}" value="{{.Config.Plex.Timeout}}" style="width: 100%;"></td>

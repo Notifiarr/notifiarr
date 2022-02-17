@@ -71,7 +71,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked (printf "%s_SERVICE_%d_NAME" .Flags.EnvPrefix $index) }}
+                                    {{- if locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Service.{{$index}}.Name"  class="client-parameter" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}" style="width: 100%;"></td>
@@ -79,7 +79,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked (printf "%s_SERVICE_%d_TYPE" .Flags.EnvPrefix $index) }}
+                                    {{- if locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td>
@@ -93,7 +93,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked (printf "%s_SERVICE_%d_CHECK" .Flags.EnvPrefix $index) }}
+                                    {{- if locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Service.{{$index}}.Value" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}" style="width: 100%;"></td>
@@ -101,7 +101,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked (printf "%s_SERVICE_%d_EXPECT" .Flags.EnvPrefix $index) }}
+                                    {{- if locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Service.{{$index}}.Expect" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="width: 100%;"></td>
@@ -109,7 +109,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked (printf "%s_SERVICE_%d_INTERVAL" .Flags.EnvPrefix $index) }}
+                                    {{- if locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Service.{{$index}}.Interval" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}" style="width: 100%;"></td>
@@ -117,7 +117,7 @@
                                 </td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked (printf "%s_SERVICE_%d_TIMEOUT" .Flags.EnvPrefix $index) }}
+                                    {{- if locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input type="text" id="Service.{{$index}}.Timeout" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}" style="width: 100%;"></td>
