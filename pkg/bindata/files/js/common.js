@@ -241,14 +241,14 @@ function reindexList(group)
 
     let counter = 0;
     let uiCounter = 1;
-    let currentIndex = 0;
+    let currentIndex = '';
     let app = '';
 
     $.each($('[data-group='+ group +']'), function(index) {
-        switch (group) {
-            case 'starr':
-                const id = $(this).attr('id'); // Apps.<app>.<index>.<field>
+        const id = $(this).attr('id');
 
+        switch (group) {
+            case 'starr':  //-- id Apps.<app>.<index>.<field>
                 if (id) {
                     const parts = id.split('.');
 
@@ -257,8 +257,12 @@ function reindexList(group)
                         currentIndex = 0;
                     }
 
-                    if (parts[2] != currentIndex) {
-                        counter++;
+                    if (parts[2] !== currentIndex) {
+                        if (!currentIndex) {
+                            counter = 0;
+                        } else {
+                            counter++;
+                        }
                     }
 
                     //-- CHANGE id ATTR ON INPUT FIELDS
@@ -274,6 +278,32 @@ function reindexList(group)
                     //-- SET CURRENT VARIABLES
                     app = parts[1];
                     currentIndex = parts[2];
+                }
+                break;
+            case 'services': //-- id Service.<index>.<field>
+                if (id) {
+                    const parts = id.split('.');
+
+                    if (parts[1] !== currentIndex) {
+                        if (!currentIndex) {
+                            counter = 0;
+                        } else {
+                            counter++;
+                        }
+                    }
+
+                    //-- CHANGE id ATTR ON INPUT FIELDS
+                    $(this).attr('id', parts[0] +'.'+ counter +'.'+ parts[2]);
+
+                    //-- CHANGE data-label ON INPUT FIELDS
+                    const dataLabel = $(this).attr('data-label');
+                    $(this).attr('data-label', dataLabel.replace(dataLabel.replace(/[^.\d]/g, ''), (counter + 1)));
+
+                    //-- CHANGE id ATTR ON LABEL
+                    $('#'+ lowercaseWord(parts[0]) +'-index-label-'+ parts[1]).attr('id', lowercaseWord(parts[0]) +'-index-label-'+ counter).html(counter + 1);
+
+                    //-- SET CURRENT VARIABLES
+                    currentIndex = parts[1];
                 }
                 break;
         }
