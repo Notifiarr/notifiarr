@@ -12,8 +12,10 @@ function removeInstance(name, index)
     }
     // mark this instance as deleted (to bring up save changes button).
     $('.'+ name + index +'-deleted').val(true);
-    // bring up the delete button on the next last row-item.
-    $('.'+ name +'-deletebutton').last().show();
+
+    //-- FIX THE INDEXING
+    reindexList(name);
+
     // bring up the save changes button.
     findPendingChanges();
 }
@@ -27,7 +29,7 @@ function addInstance(section, app)
     const prefix = $('#'+ section +'-'+ app +'-addbutton').data('prefix');  // storage location like Apps or Snapshot.
     const names = $('#'+ section +'-'+ app +'-addbutton').data('names'); // list of thinges like "Name" and "URL"
     let row = '<tr class="'+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
-                '   <td style="font-size: 22px;">'+instance+
+                '   <td style="font-size: 22px;"><span id="'+ lowercaseWord(app) +'-index-label-'+ (instance-1) +'">'+instance+"</span>"+
                 '       <div class="'+ section +'-'+ app +'-deletebutton" style="float: right;">'+
                 '           <button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +
                             ')" type="button" title="Delete this instance of '+ app +'.'+
@@ -43,25 +45,25 @@ function addInstance(section, app)
         let nameori = ""
         if (name == "") {
             colspan++
-            continue
+            continue;
         }
 
         switch (name) {
             case "Config.Interval":
             case "Interval":
-             nameval = "5m";
-             nameori = "5m";
+                nameval = "5m";
+                nameori = "5m";
              break;
              case "Config.Timeout":
              case "Timeout":
-             nameval = "1m";
-             nameori = "1m";
+                nameval = "1m";
+                nameori = "1m";
              break;
              case "Config.URL":
              case "URL":
              case "Host":
-             nameval = "changeme";
-             nameori = "";
+                nameval = "changeme";
+                nameori = "";
              break;
         }
 
@@ -73,12 +75,13 @@ function addInstance(section, app)
 
 
     $('#'+ section +'-'+ app +'-container').append(row);
-    // hide all delete buttons, and show only the one we just added.
-    $('.'+ section +'-'+app+'-deletebutton').hide().last().show();
+
     // redo tooltips since some got added.
     setTooltips();
+
     // hide the "no instances" item that displays if no instances are configured.
     $('#'+ section +'-'+ app +'-none').hide();
+
     // bring up the save changes button.
     findPendingChanges();
 }

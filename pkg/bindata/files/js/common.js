@@ -227,3 +227,56 @@ function titleCaseWord(word)
     return word.charAt(0).toUpperCase() + word.slice(1);
 }
 // -------------------------------------------------------------------------------------------
+
+function lowercaseWord(word)
+{
+    return word.toLowerCase();
+}
+// -------------------------------------------------------------------------------------------
+
+function reindexList(group)
+{
+    group = group.split('-');
+    group = group[0];
+
+    let counter = 0;
+    let uiCounter = 1;
+    let currentIndex = 0;
+    let app = '';
+
+    $.each($('[data-group='+ group +']'), function(index) {
+        switch (group) {
+            case 'starr':
+                const id = $(this).attr('id'); // Apps.<app>.<index>.<field>
+
+                if (id) {
+                    const parts = id.split('.');
+
+                    if (parts[1] != app) {
+                        counter = 0;
+                        currentIndex = 0;
+                    }
+
+                    if (parts[2] != currentIndex) {
+                        counter++;
+                    }
+
+                    //-- CHANGE id ATTR ON INPUT FIELDS
+                    $(this).attr('id', parts[0] +'.'+ parts[1] +'.'+ counter +'.'+ parts[3]);
+
+                    //-- CHANGE data-label ON INPUT FIELDS
+                    const dataLabel = $(this).attr('data-label');
+                    $(this).attr('data-label', dataLabel.replace(dataLabel.replace(/[^.\d]/g, ''), (counter + 1)));
+
+                    //-- CHANGE id ATTR ON LABEL
+                    $('#'+ lowercaseWord(parts[1]) +'-index-label-'+ parts[2]).attr('id', lowercaseWord(parts[1]) +'-index-label-'+ counter).html(counter + 1);
+
+                    //-- SET CURRENT VARIABLES
+                    app = parts[1];
+                    currentIndex = parts[2];
+                }
+                break;
+        }
+    });
+}
+// -------------------------------------------------------------------------------------------
