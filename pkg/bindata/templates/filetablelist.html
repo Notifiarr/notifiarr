@@ -4,7 +4,7 @@
                                       <tr><td width="10%">Path</td><td>{{$file.Path}}</td></tr>
                                       {{- if and $file.Mode (ne $file.Mode.String "")}}
                                       <tr><td width="10%">Mode</td><td>{{$file.Mode}}</td></tr>
-                                      <tr><td width="10%">User</td><td>{{$file.User}}</td></tr>
+                                      <tr><td width="10%">Owner</td><td>{{$file.User}}</td></tr>
                                       {{- end}}
                                       <tr><td width="10%">Size</td><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
                                       <tr><td width="10%">Date</td><td>{{$file.Time}}</td></tr>
