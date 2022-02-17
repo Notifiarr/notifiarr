@@ -26,8 +26,8 @@
                         {{- range $index, $app := .Config.Apps.Lidarr}}
                             <input disabled style="display: none;" class="client-parameter starr-Lidarr{{$index}}-deleted" data-group="starr" data-label="Lidarr {{instance $index}} Deleted" data-original="false" value="false">
                             <tr class="starr-Lidarr" id="starr-Lidarr-{{$index}}">
-                                <td style="font-size: 22px;">{{instance $index}}
-                                    <div class="starr-Lidarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Lidarr) (instance $index)}} display: none;{{end}}">
+                                <td style="font-size: 22px;"><span id="lidarr-index-label-{{$index}}">{{instance $index}}</span>
+                                    <div class="starr-Lidarr-deletebutton" style="float: right;">
                                         <button onclick="removeInstance('starr-Lidarr', {{$index}})" type="button" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                     </div>
                                 </td>
@@ -114,8 +114,8 @@
                           {{- range $index, $app := .Config.Apps.Prowlarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Prowlarr{{$index}}-deleted" data-group="starr" data-label="Prowlarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Prowlarr" id="starr-Prowlarr-{{$index}}">
-                                  <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="starr-Prowlarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Prowlarr) (instance $index)}} display: none;{{end}}">
+                                  <td style="font-size: 22px;"><span id="prowlarr-index-label-{{$index}}">{{instance $index}}</span>
+                                      <div class="starr-Prowlarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Prowlarr', {{$index}})" type="button" title="Delete this instance of Prowlarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
@@ -202,8 +202,8 @@
                           {{- range $index, $app := .Config.Apps.Radarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Radarr{{$index}}-deleted" data-group="starr" data-label="Radarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Radarr" id="starr-Radarr-{{$index}}">
-                                  <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="starr-Radarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Radarr) (instance $index)}} display: none;{{end}}">
+                                  <td style="font-size: 22px;"><span id="radarr-index-label-{{$index}}">{{instance $index}}</span>
+                                      <div class="starr-Radarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Radarr', {{$index}})" type="button" title="Delete this instance of Radarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
@@ -290,8 +290,8 @@
                           {{- range $index, $app := .Config.Apps.Readarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Readarr{{$index}}-deleted" data-group="starr" data-label="Readarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Readarr" id="starr-Readarr-{{$index}}">
-                                  <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="starr-Readarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Readarr) (instance $index)}} display: none;{{end}}">
+                                  <td style="font-size: 22px;"><span id="readarr-index-label-{{$index}}">{{instance $index}}</span>
+                                      <div class="starr-Readarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Readarr', {{$index}})" type="button" title="Delete this instance of Readarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
@@ -378,8 +378,8 @@
                           {{- range $index, $app := .Config.Apps.Sonarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Sonarr{{$index}}-deleted" data-group="starr" data-label="Sonarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Sonarr" id="starr-Sonarr-{{$index}}">
-                                  <td style="font-size: 22px;">{{instance $index}}
-                                      <div class="starr-Sonarr-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Sonarr) (instance $index)}} display: none;{{end}}">
+                                  <td style="font-size: 22px;"><span id="sonarr-index-label-{{$index}}">{{instance $index}}</span>
+                                      <div class="starr-Sonarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Sonarr', {{$index}})" type="button" title="Delete this instance of Sonarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
                                   </td>
