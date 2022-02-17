@@ -26,7 +26,7 @@
                         {{- range $index, $app := .Config.Apps.Lidarr}}
                             <input disabled style="display: none;" class="client-parameter starr-Lidarr{{$index}}-deleted" data-group="starr" data-label="Lidarr {{instance $index}} Deleted" data-original="false" value="false">
                             <tr class="starr-Lidarr" id="starr-Lidarr-{{$index}}">
-                                <td style="font-size: 22px;"><span id="lidarr-index-label-{{$index}}">{{instance $index}}</span>
+                                <td style="font-size: 22px;"><span id="LidarrIndexLabel{{$index}}">{{instance $index}}</span>
                                     <div class="starr-Lidarr-deletebutton" style="float: right;">
                                         <button onclick="removeInstance('starr-Lidarr', {{$index}})" type="button" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                     </div>
@@ -36,7 +36,7 @@
                                     {{- if locked (printf "%s_LIDARR_%d_NAME" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
-                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
+                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Name" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
                                     </tr></table>
                                 </td>
                                 <td>
@@ -44,7 +44,7 @@
                                     {{- if locked (printf "%s_LIDARR_%d_URL" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
-                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.URL" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
+                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.URL" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
                                     </tr></table>
                                 </td>
                                 <td>
@@ -52,7 +52,7 @@
                                     {{- if locked (printf "%s_LIDARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
-                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.APIKey" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
+                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
                                     </tr></table>
                                 </td>
                                 <td>
@@ -60,7 +60,7 @@
                                     {{- if locked (printf "%s_LIDARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
-                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Username" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
+                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Username" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
                                     </tr></table>
                                 </td>
                                 <td>
@@ -68,7 +68,7 @@
                                     {{- if locked (printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
-                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Password" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
+                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Password" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
                                     </tr></table>
                                 </td>
                                 <td>
@@ -76,7 +76,7 @@
                                     {{- if locked (printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
-                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Interval" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
+                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
                                     </tr></table>
                                 </td>
                                 <td>
@@ -84,7 +84,7 @@
                                     {{- if locked (printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
-                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Timeout" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
+                                        <td><input type="text" id="Apps.Lidarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
                                     </tr></table>
                                 </td>
                             </tr>
@@ -114,7 +114,7 @@
                           {{- range $index, $app := .Config.Apps.Prowlarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Prowlarr{{$index}}-deleted" data-group="starr" data-label="Prowlarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Prowlarr" id="starr-Prowlarr-{{$index}}">
-                                  <td style="font-size: 22px;"><span id="prowlarr-index-label-{{$index}}">{{instance $index}}</span>
+                                  <td style="font-size: 22px;"><span id="ProwlarrIndexLabel{{$index}}">{{instance $index}}</span>
                                       <div class="starr-Prowlarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Prowlarr', {{$index}})" type="button" title="Delete this instance of Prowlarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
@@ -124,7 +124,7 @@
                                       {{- if locked (printf "%s_PROWLARR_%d_NAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.Name" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -132,7 +132,7 @@
                                       {{- if locked (printf "%s_PROWLARR_%d_URL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.URL" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.URL" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -140,7 +140,7 @@
                                       {{- if locked (printf "%s_PROWLARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.APIKey" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -148,7 +148,7 @@
                                       {{- if locked (printf "%s_PROWLARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.Username" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.Username" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -156,7 +156,7 @@
                                       {{- if locked (printf "%s_PROWLARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td> <input type="text" id="Apps.Prowlarr.{{$index}}.Password" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
+                                          <td> <input type="text" id="Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -164,7 +164,7 @@
                                       {{- if locked (printf "%s_PROWLARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.Interval" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Prowlarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -172,7 +172,7 @@
                                       {{- if locked (printf "%s_PROWLARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td> <input type="text" id="Apps.Prowlarr.{{$index}}.Timeout" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
+                                          <td> <input type="text" id="Apps.Prowlarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                               </tr>
@@ -202,7 +202,7 @@
                           {{- range $index, $app := .Config.Apps.Radarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Radarr{{$index}}-deleted" data-group="starr" data-label="Radarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Radarr" id="starr-Radarr-{{$index}}">
-                                  <td style="font-size: 22px;"><span id="radarr-index-label-{{$index}}">{{instance $index}}</span>
+                                  <td style="font-size: 22px;"><span id="RadarrIndexLabel{{$index}}">{{instance $index}}</span>
                                       <div class="starr-Radarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Radarr', {{$index}})" type="button" title="Delete this instance of Radarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
@@ -212,7 +212,7 @@
                                       {{- if locked (printf "%s_RADARR_%d_NAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Name" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -220,7 +220,7 @@
                                       {{- if locked (printf "%s_RADARR_%d_URL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Radarr.{{$index}}.URL" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Radarr.{{$index}}.URL" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -228,7 +228,7 @@
                                       {{- if locked (printf "%s_RADARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Radarr.{{$index}}.APIKey" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Radarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -236,7 +236,7 @@
                                       {{- if locked (printf "%s_RADARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Username" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Username" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -244,7 +244,7 @@
                                       {{- if locked (printf "%s_RADARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Password" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Password" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -252,7 +252,7 @@
                                       {{- if locked (printf "%s_RADARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Interval" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -260,7 +260,7 @@
                                       {{- if locked (printf "%s_RADARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Timeout" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Radarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="starr" data-label="Radarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                               </tr>
@@ -290,7 +290,7 @@
                           {{- range $index, $app := .Config.Apps.Readarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Readarr{{$index}}-deleted" data-group="starr" data-label="Readarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Readarr" id="starr-Readarr-{{$index}}">
-                                  <td style="font-size: 22px;"><span id="readarr-index-label-{{$index}}">{{instance $index}}</span>
+                                  <td style="font-size: 22px;"><span id="ReadarrIndexLabel{{$index}}">{{instance $index}}</span>
                                       <div class="starr-Readarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Readarr', {{$index}})" type="button" title="Delete this instance of Readarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
@@ -300,7 +300,7 @@
                                       {{- if locked (printf "%s_READARR_%d_NAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Name" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -308,7 +308,7 @@
                                       {{- if locked (printf "%s_READARR_%d_URL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Readarr.{{$index}}.URL" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Readarr.{{$index}}.URL" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -316,7 +316,7 @@
                                       {{- if locked (printf "%s_READARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Readarr.{{$index}}.APIKey" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Readarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -324,7 +324,7 @@
                                       {{- if locked (printf "%s_READARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td> <input type="text" id="Apps.Readarr.{{$index}}.Username" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
+                                          <td> <input type="text" id="Apps.Readarr.{{$index}}.Username" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -332,7 +332,7 @@
                                       {{- if locked (printf "%s_READARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Password" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Password" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -340,7 +340,7 @@
                                       {{- if locked (printf "%s_READARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Interval" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -348,7 +348,7 @@
                                       {{- if locked (printf "%s_READARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Timeout" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Readarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                               </tr>
@@ -378,7 +378,7 @@
                           {{- range $index, $app := .Config.Apps.Sonarr}}
                               <input disabled style="display: none;" class="client-parameter starr-Sonarr{{$index}}-deleted" data-group="starr" data-label="Sonarr {{instance $index}} Deleted" data-original="false" value="false">
                               <tr class="starr-Sonarr" id="starr-Sonarr-{{$index}}">
-                                  <td style="font-size: 22px;"><span id="sonarr-index-label-{{$index}}">{{instance $index}}</span>
+                                  <td style="font-size: 22px;"><span id="SonarrIndexLabel{{$index}}">{{instance $index}}</span>
                                       <div class="starr-Sonarr-deletebutton" style="float: right;">
                                           <button onclick="removeInstance('starr-Sonarr', {{$index}})" type="button" title="Delete this instance of Sonarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                       </div>
@@ -388,7 +388,7 @@
                                       {{- if locked (printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Name" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Name" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -396,7 +396,7 @@
                                       {{- if locked (printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td> <input type="text" id="Apps.Sonarr.{{$index}}.URL" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
+                                          <td> <input type="text" id="Apps.Sonarr.{{$index}}.URL" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -404,7 +404,7 @@
                                       {{- if locked (printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.APIKey" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -412,7 +412,7 @@
                                       {{- if locked (printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Username" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Username" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -420,7 +420,7 @@
                                       {{- if locked (printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Password" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -428,7 +428,7 @@
                                       {{- if locked (printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Interval" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                                   <td>
@@ -436,7 +436,7 @@
                                       {{- if locked (printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                           <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                       {{- end}}
-                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Timeout" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
+                                          <td><input type="text" id="Apps.Sonarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;">
                                       </tr></table>
                                   </td>
                               </tr>
