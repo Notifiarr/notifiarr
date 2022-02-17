@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -13,9 +14,12 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/fsnotify/fsnotify"
 	"github.com/mitchellh/go-homedir"
+	"golift.io/version"
 )
 
 // loadAssetsTemplates watches for changs to template files, and loads them.
@@ -114,6 +118,40 @@ func (c *Client) ParseGUITemplates() (err error) {
 	}
 
 	return nil
+}
+
+func (c *Client) renderTemplate(response io.Writer, req *http.Request,
+	templateName, msg string) {
+	clientInfo, _ := c.website.GetClientInfo(notifiarr.EventUser)
+	if clientInfo == nil {
+		clientInfo = &notifiarr.ClientInfo{}
+	}
+
+	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
+		Config:      c.Config,
+		Flags:       c.Flags,
+		Username:    c.getUserName(req),
+		Msg:         msg,
+		LogFiles:    c.Logger.GetAllLogFilePaths(),
+		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
+		ClientInfo:  clientInfo,
+		Version: map[string]string{
+			"started":   version.Started.Round(time.Second).String(),
+			"uptime":    time.Since(version.Started).Round(time.Second).String(),
+			"program":   c.Flags.Name(),
+			"version":   version.Version,
+			"revision":  version.Revision,
+			"branch":    version.Branch,
+			"buildUser": version.BuildUser,
+			"buildDate": version.BuildDate,
+			"goVersion": version.GoVersion,
+			"os":        runtime.GOOS,
+			"arch":      runtime.GOARCH,
+		},
+	})
+	if err != nil {
+		c.Errorf("Sending HTTP Response: %v", err)
+	}
 }
 
 // haveCustomFile searches known locatinos for a file. Returns the file's path.

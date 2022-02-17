@@ -14,7 +14,7 @@
                                 <td id="current-username">{{username}}</td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked "DN_UI_PASSWORD"}}
+                                    {{- if locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix)}}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}   <!-- the below element is in its own form to avoid browser auto complete -->
                                         <td><form><input type="text" id="NewUsername" value="{{username}}" class="profile-parameter" style="width: 100%;"></form></td>
@@ -26,7 +26,7 @@
                                 <td><input placeholder="enter current password" type="password" id="Password" class="profile-parameter" style="width: 100%;"></td>
                                 <td>
                                     <table width="100%"><tr>
-                                    {{- if locked "DN_UI_PASSWORD"}}
+                                    {{- if locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix)}}
                                         <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                     {{- end}}
                                         <td><input placeholder="must be least 16+ chars" type="password" autocomplete="new-password" id="NewPassword" class="profile-parameter" style="width: 100%;"></td>

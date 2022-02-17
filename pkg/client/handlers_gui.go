@@ -12,7 +12,6 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -26,7 +25,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
-	"golift.io/version"
 )
 
 const (
@@ -470,40 +468,6 @@ func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, 
 
 func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
 	c.renderTemplate(response, req, mux.Vars(req)["template"]+".html", "")
-}
-
-func (c *Client) renderTemplate(response io.Writer, req *http.Request,
-	templateName, msg string) {
-	clientInfo, _ := c.website.GetClientInfo(notifiarr.EventUser)
-	if clientInfo == nil {
-		clientInfo = &notifiarr.ClientInfo{}
-	}
-
-	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
-		Config:      c.Config,
-		Flags:       c.Flags,
-		Username:    c.getUserName(req),
-		Msg:         msg,
-		LogFiles:    c.Logger.GetAllLogFilePaths(),
-		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
-		ClientInfo:  clientInfo,
-		Version: map[string]string{
-			"started":   version.Started.Round(time.Second).String(),
-			"uptime":    time.Since(version.Started).Round(time.Second).String(),
-			"program":   c.Flags.Name(),
-			"version":   version.Version,
-			"revision":  version.Revision,
-			"branch":    version.Branch,
-			"buildUser": version.BuildUser,
-			"buildDate": version.BuildDate,
-			"goVersion": version.GoVersion,
-			"os":        runtime.GOOS,
-			"arch":      runtime.GOARCH,
-		},
-	})
-	if err != nil {
-		c.Errorf("Sending HTTP Response: %v", err)
-	}
 }
 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
