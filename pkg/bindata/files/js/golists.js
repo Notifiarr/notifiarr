@@ -21,7 +21,7 @@ function removeInstance(name, index)
 }
 
 // The Go app only accepts indexes on lists starting at 0 with no gaps.
-// It looks better on screen to see inrimental numbers.
+// It looks better on screen to see incremental numbers.
 // This procedure fixes the numbering on each row when an item is deleted.
 function reindexList(group)
 {

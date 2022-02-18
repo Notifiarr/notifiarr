@@ -23,7 +23,8 @@ function updateFileContentCounters()
 updateFileContentCounters();
 
 // ----- File Display
-function fileSelectorChange(caller) {
+function fileSelectorChange(caller)
+{
     const ctl       = caller.parents('.fileController');
     const kind      = ctl.data("kind");
     const fileID    = ctl.find('.file-selector').val();
@@ -74,7 +75,8 @@ function fileSelectorChange(caller) {
 }
 
 // This powers the Action menu: Send to notifiarr, delete, download.
-function triggerFileAction(caller) {
+function triggerFileAction(caller)
+{
     const ctl      = caller.parents('.fileController');
     const kind     = ctl.data("kind");
     const action   = ctl.find('.fileAction').val();
@@ -114,7 +116,8 @@ function triggerFileAction(caller) {
 }
 
 // This powers the file add/reload menu.
-function triggerFileLoad(caller) {
+function triggerFileLoad(caller)
+{
     const ctl         = caller.parents('.fileController');
     const kind        = ctl.data("kind");
     const fileID      = ctl.find('.file-selector').val();
@@ -204,7 +207,8 @@ function triggerFileLoad(caller) {
 }
 
 // toggleButton handles the heads/tails toggle switch. Reloads current file.
-function toggleButton(from) {
+function toggleButton(from)
+{
     const ctl = from.parent('.fileSortDirection');
     ctl.find('.toggleButton').toggleClass('btn-seondary btn-brand');
 

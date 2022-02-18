@@ -1,5 +1,6 @@
 // showProcessList displays/shows a hidden page(div) and fills it with the current process list.
-function showProcessList() {
+function showProcessList()
+{
     swapNavigationTemplate('processlist');
     // Start with a spinner because this takes a second or 3.
     $('#process-list-content').html('<h4><i class="fas fa-cog fa-spin"></i> Loading process list...</h4>');
@@ -73,6 +74,8 @@ function addServiceCheck()
     findPendingChanges();
 }
 
+// This fires when a check type is changed. It updates the "expect" for inputs
+// to appropriate and easy to use values for each type.
 function checkTypeChange(from)
 {
     const ctl = from.closest('.services-Checks'); // just this row.
@@ -93,6 +96,9 @@ function checkTypeChange(from)
     }
 }
 
+// This fires when an expect value (for process type) is changed.
+// Some values are incompatible with others, and the whole thing is copied
+// into the "real" value, so it can be POSTed properly (it's a string).
 function checkExpectChange(from)
 {
     const ctl = from.closest('.services-Checks'); // just this row.
@@ -101,15 +107,20 @@ function checkExpectChange(from)
     const res = ctl.find('.serviceProcessParamRestart').prop('checked');
     const run = ctl.find('.serviceProcessParamRunning').prop('checked');
 
+    // The "running" checkbox does not allow any other arguments, so deal with that here.
     if (run) {
+        // Copy "running" into real value that is POSTed.
         ctl.find('.serviceHTTPParam').val('running');
-        ctl.find('.serviceProcessParamMin').prop('disabled', true)
-        ctl.find('.serviceProcessParamMax').prop('disabled', true)
-        ctl.find('.serviceProcessParamRestart').prop('disabled', true)
+        // Disable incompatible options.
+        ctl.find('.serviceProcessParamMin').prop('disabled', true);
+        ctl.find('.serviceProcessParamMax').prop('disabled', true);
+        ctl.find('.serviceProcessParamRestart').prop('disabled', true);
     } else {
-        ctl.find('.serviceHTTPParam').val('count:'+ min +':'+ max + (res ? ',restart' : '')+ (run ? ',running' : ''));
-        ctl.find('.serviceProcessParamMin').prop('disabled', false)
-        ctl.find('.serviceProcessParamMax').prop('disabled', false)
-        ctl.find('.serviceProcessParamRestart').prop('disabled', false)
+        // Copy the concatenated string (from three sources) into the real value.
+        ctl.find('.serviceHTTPParam').val('count:'+ min +':'+ max + (res ? ',restart' : ''));
+        // Enable all values.
+        ctl.find('.serviceProcessParamMin').prop('disabled', false);
+        ctl.find('.serviceProcessParamMax').prop('disabled', false);
+        ctl.find('.serviceProcessParamRestart').prop('disabled', false);
     }
 }

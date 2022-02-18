@@ -1,5 +1,6 @@
 // swapNavigationTemplate changes the currently displayed navigation page(div).
-function swapNavigationTemplate(template) {
+function swapNavigationTemplate(template)
+{
     // only swap if there is 1 page to swap to.
     if ($('#template-'+ template).length === 1) {
         $('.navigation-item').hide();
@@ -8,7 +9,8 @@ function swapNavigationTemplate(template) {
 }
 
 // checkHashForNavPage allows passing in a URL #hash as a navigation page.
-function checkHashForNavPage() {
+function checkHashForNavPage()
+{
     const hash = $(location).attr('hash');
     if (hash != "") {
         swapNavigationTemplate(hash.substring(1)); // Remove the # on the beginning.
@@ -19,9 +21,11 @@ function checkHashForNavPage() {
 checkHashForNavPage();
 
 // refreshPage will re-download any template and replace it with new data.
-function refreshPage(template, notice = true) {
+function refreshPage(template, notice = true)
+{
     $.ajax({
         url: 'template/'+ template,
+        async: false,
         success: function (data){
             if (notice) {
                 // Sometimes refreshes happen so quick we need a message to tell us it worked.
