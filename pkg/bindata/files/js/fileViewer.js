@@ -23,11 +23,14 @@ function updateFileContentCounters()
 updateFileContentCounters();
 
 // ----- File Display
-function fileSelectorChange(caller)
+function fileSelectorChange(caller, fileID)
 {
     const ctl       = caller.parents('.fileController');
+    if (!fileID) {
+        fileID = ctl.data('currentid');
+    }
+
     const kind      = ctl.data("kind");
-    const fileID    = ctl.find('.file-selector').val();
     const filename  = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used      = ctl.find('#fileinfo-'+ fileID).data('used');
     const lineCount = parseInt(ctl.find('.fileLinesCount').val());
@@ -41,6 +44,8 @@ function fileSelectorChange(caller)
         sort = "tails"
     }
 
+    // set the current ID to a global area.
+    ctl.data('currentid', fileID)
     // start a spinner because it may take a few seconds to load a file.
     ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
     // hide all other file-info divs, hide actions (until file load completes), hide help msg (this is the active file warning tooltip), hide any error or info messages.
@@ -74,12 +79,9 @@ function fileSelectorChange(caller)
 }
 
 // This powers the Action menu: Send to notifiarr, delete, download.
-function triggerFileAction(caller)
+function triggerFileAction(caller, action, kind, fileID)
 {
     const ctl      = caller.parents('.fileController');
-    const kind     = ctl.data("kind");
-    const action   = ctl.find('.fileAction').val();
-    const fileID   = ctl.find('.file-selector').val();
     const filename = ctl.find('#fileinfo-'+ fileID).data('filename');
 
     if (filename === undefined) {
@@ -116,7 +118,7 @@ function triggerFileLoad(caller)
 {
     const ctl         = caller.parents('.fileController');
     const kind        = ctl.data("kind");
-    const fileID      = ctl.find('.file-selector').val();
+    const fileID      = ctl.data('currentid');
     const filename    = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used        = ctl.find('#fileinfo-'+ fileID).data('used');
     const lineCount   = parseInt(ctl.find('.fileLinesCount').val());

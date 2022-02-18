@@ -97,6 +97,14 @@ func (c *Client) ParseGUITemplates() (err error) {
 		// returns true if the environment variable has a value.
 		"locked":   func(env string) bool { return os.Getenv(env) != "" },
 		"contains": strings.Contains,
+		"since": func(t time.Time) string {
+			d := time.Since(t)
+			if d > time.Hour {
+				return strings.TrimSuffix(d.Round(time.Minute).String(), "0s")
+			}
+
+			return d.Round(time.Second).String()
+		},
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
 				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {
