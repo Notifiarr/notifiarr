@@ -44,7 +44,7 @@ function fileSelectorChange(caller)
     // start a spinner because it may take a few seconds to load a file.
     ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
     // hide all other file-info divs, hide actions (until file load completes), hide help msg (this is the active file warning tooltip), hide any error or info messages.
-    ctl.find('.fileinfo-table, .file-control, .file-ajax-error, .file-ajax-msg').hide()
+    ctl.find('.fileinfo-table, .file-control').hide()
     ctl.find('.file-actions, #fileinfo-'+ fileID).show() // show the file info div (right side panel) for the file requested.
     ctl.find('.fileLinesAdd').prop('disabled', false);
 
@@ -65,11 +65,10 @@ function fileSelectorChange(caller)
         },
         error: function (request, status, error) {
             if (error == "") {
-                ctl.find('.file-ajax-error').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
+                toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
             } else {
-                ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+                toast(error, request.responseText, 'error', 10000);
             }
-            ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
         },
     });
 }
@@ -88,30 +87,27 @@ function triggerFileAction(caller)
     }
 
     if (action == "download") {
-        ctl.find('.file-ajax-msg').html("<h4>Downloading File</h4>"+filename+".zip").stop().animate({opacity:'100'}).show().fadeOut(3000);
+        toast('Downloading File', filename+".zip", 'success')
         $(location).attr("href", "downloadFile/"+ kind +"/"+ fileID);
     } else if (action == "delete") {
         $.ajax({
             url: 'deleteFile/'+ kind +'/'+ fileID,
             success: function (data){
-                ctl.find('.file-control').hide();                                       // hide controls for this deleted file.
+                ctl.find('.file-control').hide();                                 // hide controls for this deleted file.
                 ctl.find('.file-selector').val("placeholder");                    // set selection back to placeholder.
                 ctl.find(".file-selector option[value='"+ fileID +"']").remove(); // remove this file from the list.
-                ctl.find('.file-ajax-msg').html("<h4>Deleted File</h4>"+filename).      // give the user a success message.
-                    stop().animate({opacity:'100'}).show().fadeOut(10000);
+                toast('Deleted File', filename, 'success', 8000)                  // give the user a success message.
             },
             error: function (request, status, error){
                 if (error == "") {
-                    ctl.find('.file-ajax-error').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
+                    toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
                 } else {
-                    ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+                    toast(error, request.responseText, 'error', 10000);
                 }
-                ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
     } else if (action == "notifiarr") {
-        ctl.find('.file-ajax-error').html('<h4>Invalid!</h4>This does not work yet.')
-            .stop().animate({opacity:'100'}).show().fadeOut(4000);
+        toast('Invalid', 'Sending to Notifiarr.com does not work yet.', 'warning')
     }
 }
 
@@ -137,12 +133,10 @@ function triggerFileLoad(caller)
         from = "first";
     }
 
-    ctl.find('.file-ajax-error, .file-ajax-msg').hide();
-
     // needs to update an "ok, working on that" box (that does not exist right now),
 
     if (lineAction == 'linesAdd') { // addlines
-        ctl.find('.file-ajax-msg').html('Getting '+ lineCount +' more lines!').stop().animate({opacity:'100'}).show().fadeOut(lineCount+750);
+        toast('Working', 'Getting '+ lineCount +' more lines!', 'success')
         ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
 
         $.ajax({
@@ -172,11 +166,10 @@ function triggerFileLoad(caller)
             },
             error: function (request, status, error){
                 if (error == "") {
-                    ctl.find('.file-ajax-error').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
+                    toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
                 } else {
-                    ctl.find('.file-ajax-error').html('<h4>'+ error +'</h4>'+ request.responseText);
+                    toast(error, request.responseText, 'error', 10000);
                 }
-                ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
             },
         });
     } else { // reload (vs add).
@@ -199,8 +192,11 @@ function triggerFileLoad(caller)
                 ctl.find('.file-small-msg').html('');
             },
             error: function (request, status, error){
-                ctl.find('.file-ajax-error').show().html('<h4>'+ error +'</h4>'+ request.responseText);
-                ctl.find('.file-ajax-error').stop().animate({opacity:'100'}).show().fadeOut(10000);
+                if (error == "") {
+                    toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
+                } else {
+                    toast(error, request.responseText, 'error', 10000);
+                }
             },
         });
     }
