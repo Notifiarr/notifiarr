@@ -95,7 +95,24 @@ func (c *Client) ParseGUITemplates() (err error) {
 		// adds 1 an integer, to deal with instance IDs for humans.
 		"instance": func(idx int) int { return idx + 1 },
 		// returns true if the environment variable has a value.
-		"locked": func(env string) bool { return os.Getenv(env) != "" },
+		"locked":   func(env string) bool { return os.Getenv(env) != "" },
+		"contains": strings.Contains,
+		"min": func(s string) string {
+			for _, pieces := range strings.Split(s, ",") {
+				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {
+					return split[1]
+				}
+			}
+			return "0"
+		},
+		"max": func(s string) string {
+			for _, pieces := range strings.Split(s, ",") {
+				if split := strings.Split(pieces, ":"); len(split) > 2 && split[0] == "count" {
+					return split[2]
+				}
+			}
+			return "0"
+		},
 	})
 
 	// Parse all our compiled-in templates.

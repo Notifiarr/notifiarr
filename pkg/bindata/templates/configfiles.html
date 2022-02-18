@@ -31,13 +31,7 @@
                                       <option class="fileLinesAdd" value="linesAdd">Add</option>
                                       <option value="linesReload">Reload</option>
                                   </select>
-                                  <select class="fileLinesCount">
-                                      <option value="50">50  lines</option>
-                                      <option value="100">100 lines</option>
-                                      <option value="200">200 lines</option>
-                                      <option value="300" selected>300 lines</option>
-                                      <option value="600">600 lines</option>
-                                  </select>
+                                  <input class="fileLinesCount" type="number" min="50" max="5000" value="300">
                                   <button onClick="triggerFileLoad($(this))" class="btn btn-xs btn-primary">Go</button><br>
                                   <span class="file-action-msg">Displaying last <span class="currentLineCount">0</span> file lines.'</span>
                               </div>
