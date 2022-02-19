@@ -35,6 +35,7 @@ function refreshPage(template, notice = true)
             $('#template-'+ template).html(data);
             // refreshPage is used on at least 3 pages that have line counter boxes, so update those.
             updateFileContentCounters();
+            setTooltips();
         },
         error: function (request, status, error) {
             if (error == "") {

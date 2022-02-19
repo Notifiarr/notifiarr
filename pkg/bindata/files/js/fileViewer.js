@@ -30,18 +30,21 @@ function fileSelectorChange(caller, fileID)
         fileID = ctl.data('currentid');
     }
 
+    if (!fileID) {
+        return; // a file has not been selected yet.
+    }
+
     const kind      = ctl.data("kind");
     const filename  = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used      = ctl.find('#fileinfo-'+ fileID).data('used');
     const lineCount = parseInt(ctl.find('.fileLinesCount').val());
 
-    if (fileID === null) {
-        return;
-    }
-
+    let from = "last";
     let sort = ctl.find('.fileSortDirection').data('sort');
     if (sort  != "heads" && sort != "tails") {
-        sort = "tails"
+        sort = "tails";
+    } else if (sort == "heads") {
+        from = "first";
     }
 
     // set the current ID to a global area.
@@ -59,11 +62,11 @@ function fileSelectorChange(caller, fileID)
             ctl.find('.file-content').text(data);
             const gotLines = ctl.find('.file-content').html().split(/\n/).length-1;
             if (gotLines === lineCount) {
-                ctl.find('.file-action-msg').html('Displaying last <span class="currentLineCount">'+ gotLines +'</span> file lines.');
+                ctl.find('.file-action-msg').html('Displaying '+ from +' <span class="currentLineCount">'+ gotLines +'</span> file lines.');
             } else { // EOF
                 ctl.find('.fileLinesAdd').prop('disabled', true) // Disable the 'Add' action.
                 ctl.find('.fileLinesAction').val("linesReload"); // Set the selector to reload (instead of Add).
-                ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file.');
+                ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file.<br>');
             }
             ctl.find('.file-control').show();
             updateFileContentCounters();
@@ -94,11 +97,22 @@ function triggerFileAction(caller, action, kind, fileID)
     } else if (action == "delete") {
         $.ajax({
             url: 'deleteFile/'+ kind +'/'+ fileID,
+
             success: function (data){
-                ctl.find('.file-control').hide();                                 // hide controls for this deleted file.
-                ctl.find('.file-selector').val("placeholder");                    // set selection back to placeholder.
-                ctl.find(".file-selector option[value='"+ fileID +"']").remove(); // remove this file from the list.
-                toast('Deleted File', filename, 'success', 8000)                  // give the user a success message.
+                let files = ' files';
+                const count = ctl.find('.fileRow').length-1;
+                if (count == 1) {
+                    files = ' file';
+                }
+
+                ctl.find('.file-control').hide();                        // hide controls for this deleted file.
+                ctl.data('currentid', "");                               // set selection back to placeholder.
+                ctl.find('.fileListDirInfo').html(
+                    count + files +' in ' +ctl.find('.fileListDirInfo').data('dirdata')); // update the counter at the top of the table.
+                ctl.find("#fileRow"+fileID).fadeOut(1200, function() {   // hide the table row.
+                    ctl.find("#fileRow"+fileID).remove()                 // remove this file from the list.
+                });
+                toast('Deleted File', filename, 'success', 8000)         // give the user a success message.
             },
             error: function (request, status, error){
                 if (error == "") {
@@ -108,9 +122,11 @@ function triggerFileAction(caller, action, kind, fileID)
                 }
             },
         });
+        setTooltips();
     } else if (action == "notifiarr") {
         toast('Invalid', 'Sending to Notifiarr.com does not work yet.', 'warning')
     }
+
 }
 
 // This powers the file add/reload menu.
@@ -160,7 +176,7 @@ function triggerFileLoad(caller)
                 } else {
                     ctl.find('.fileLinesAdd').prop('disabled', true) // Disable the 'Add' action.
                     ctl.find('.fileLinesAction').val("linesReload"); // Set the selector to reload (instead of Add).
-                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ totalLines +'</span> file lines. This is the whole file.');
+                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ totalLines +'</span> file lines. This is the whole file.<br>');
                 }
 
                 updateFileContentCounters();
@@ -187,7 +203,7 @@ function triggerFileLoad(caller)
                     ctl.find('.fileLinesAdd').prop('disabled', false) // Enable the 'Add' action.
                     ctl.find('.file-action-msg').html('Displaying '+ from +' <span class="currentLineCount">'+ gotLines +'</span> file lines.');
                 } else {
-                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file.');
+                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file.<br>');
                 }
 
                 updateFileContentCounters();
