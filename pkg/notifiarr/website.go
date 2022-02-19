@@ -139,13 +139,13 @@ func (c *Config) GetData(url string) (*Response, error) {
 	var buf bytes.Buffer
 	// copy the body into a buffer we can pass into json.Decode().
 	tee := io.TeeReader(resp.Body, &buf) // must read tee first.
-	defer c.debughttplog(resp, url, start, "", tee)
+	defer c.debughttplog(resp, url, start, "", &buf)
 
 	if err != nil {
 		return nil, fmt.Errorf("reading http response body: %w", err)
 	}
 
-	return unmarshalResponse(url, resp.StatusCode, &buf)
+	return unmarshalResponse(url, resp.StatusCode, tee)
 }
 
 // SendData sends raw data to a notifiarr URL as JSON.
