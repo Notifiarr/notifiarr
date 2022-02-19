@@ -17,28 +17,48 @@ let websocketCodes = {
     '1015': 'TLS Handshake'
 };
 
-function openWebsocket(url, elm) 
+// how to stop the websocket? when someone clicks a diff file, etc.
+function openWebsocket(caller, url)
 {
-    if ('WebSocket' in window) {       
-        let ws = new WebSocket('ws://localhost:5454'+ url);
-        
+    if ('WebSocket' in window) {
+        let ws = new WebSocket(location.origin.replace(/^http/, 'ws')  + url);
+        const ctl = caller.closest('.fileController');
+        const box = ctl.find('.file-content');
+        const sort = ctl.find('.fileSortDirection').data('sort');
+
+        box.html('');
+        ctl.find('.tailControl').show();
+
         ws.onopen = function() {}; //-- USED TO SEND MESSAGE TO THE CLIENT
-        
+
         ws.onmessage = function(incoming) {
-            const clientMessage = incoming.data;
-            console.log(clientMessage);
+
+            if (sort == "tails") {
+                box.append(incoming.data);
+                if (ctl.find('.tailAutoScroll').prop('checked')) {
+                    box.parent().scrollTop(box.parent().prop("scrollHeight"));
+                }
+            } else {
+                box.prepend(incoming.data);
+                if (ctl.find('.tailAutoScroll').prop('checked')) {
+                    box.parent().scrollTop(-1);
+                }
+            }
+            updateFileContentCounters(); // y only 1 line?
         };
 
-        ws.onerror = function(data) { 
+        ws.onerror = function(data) {
             toast('Websocket Error', 'Error connecting to the client websocket, details in console.', 'error');
             console.log('Websocket connection error');
             console.log(data);
+            ctl.find('.tailControl').hide();
         };
 
         ws.onclose = function(data) {
             toast('Websocket Closed', 'The client websocket has been closed, details in console.', 'info');
             console.log('Websocket connection closed: '+ websocketCodes[data.code]);
             console.log(data);
+            ctl.find('.tailControl').hide();
         };
     } else {
         toast('Websocket Error', 'Your browser does not support websockets, log tailing not available.', 'error');

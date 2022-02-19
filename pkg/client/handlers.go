@@ -53,6 +53,8 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.Handle(path.Join(base, "/downloadFile/{source}/{id}"), c.checkAuthorized(c.getFileDownloadHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/deleteFile/{source}/{id}"), c.checkAuthorized(c.getFileDeleteHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/reconfig"), c.checkAuthorized(c.handleConfigPost)).Methods("POST")
+		c.Config.Router.Handle(path.Join(c.Config.URLBase, "/ws"),
+			c.checkAuthorized(c.handleWebSockets)).Methods("GET").Queries("source", "{source}", "fileId", "{fileId}")
 	}
 
 	// 404 (or redirect to base path) everything else
