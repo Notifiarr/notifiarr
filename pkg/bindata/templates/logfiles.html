@@ -32,7 +32,8 @@
                                                 <td>
                                                     <a href="downloadFile/logs/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download log file."></a>
                                                     <i class="fas fa-cloud-upload-alt" onClick="triggerFileAction($(this), 'upload', 'logs', {{$file.ID}})" style="cursor: pointer; margin-right: 5px;" title="Upload log file."></i>
-                                                    <i class="fas fa-trash-alt" onClick="triggerFileAction($(this), 'delete', 'logs', {{$file.ID}})" style="cursor: pointer; color: red;" title="Delete log file."></i>
+                                                    <i class="fas fa-trash-alt" onClick="triggerFileAction($(this), 'delete', 'logs', {{$file.ID}})" style="cursor: pointer; margin-right: 5px; color: red;" title="Delete log file."></i>
+                                                    <i class="fas fa-stream" onClick="openWebsocket('/ws?source=logs&fileId={{$file.ID}}', 'log-viewer-element')" style="cursor: pointer; color: green;" title="Tail log file."></i>
                                                 </td>
                                             </tr>
                                             {{- end }}
