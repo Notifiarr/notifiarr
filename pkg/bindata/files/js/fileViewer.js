@@ -162,10 +162,11 @@ function triggerFileLoad(caller)
             success: function (data){
                 // These are slow when there's a lot of lines.
                 ctl.find('.line-number').remove();
+                ctl.find('.file-content .cl').after('\n').remove();
                 if (sort == "tails") {
-                    ctl.find('.file-content').html(ctl.find('.file-content').html().toString().replaceAll('<span class="cl"></span>', '\n')).prepend(data);
+                    ctl.find('.file-content').prepend(data);
                 } else {
-                    ctl.find('.file-content').html(ctl.find('.file-content').html().toString().replaceAll('<span class="cl"></span>', '\n')).append(data);
+                    ctl.find('.file-content').append(data);
                 }
 
                 const gotLines = data.split(/\n/).length-1;

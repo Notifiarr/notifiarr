@@ -13,6 +13,8 @@ import (
 	"github.com/nxadm/tail"
 )
 
+const startFileBytes = 20000
+
 //nolint:gochecknoglobals
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  mnd.Kilobyte,
@@ -28,23 +30,15 @@ func (c *Client) socketLog(code int, r *http.Request) {
 func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Request) {
 	defer c.CapturePanic()
 
-	socket, err := upgrader.Upgrade(response, request, nil)
-	if err != nil {
-		c.Errorf("[gui requested] Creating Websocket: %v", err)
-		c.socketLog(http.StatusInternalServerError, request)
-
-		return
-	}
-
 	var fileInfos *logs.LogFileInfos
 
-	switch mux.Vars(request)["source"] {
+	switch src := mux.Vars(request)["source"]; src {
 	case fileSourceLogs:
 		fileInfos = c.Logger.GetAllLogFilePaths()
 	case fileSourceConfig:
 		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
 	default:
-		http.Error(response, "invalid source", http.StatusBadRequest)
+		http.Error(response, "invalid source: "+src, http.StatusBadRequest)
 		c.socketLog(http.StatusBadRequest, request)
 
 		return
@@ -57,15 +51,23 @@ func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Re
 			continue
 		}
 
-		offset := int64(20000)
-		if fileInfo.Size < 20000 {
+		offset := int64(startFileBytes)
+		if fileInfo.Size < startFileBytes {
 			offset = fileInfo.Size
 		}
 
 		fileTail, err := tail.TailFile(fileInfo.Path,
 			tail.Config{Follow: true, ReOpen: true, Location: &tail.SeekInfo{Offset: -offset, Whence: io.SeekEnd}})
 		if err != nil {
-			http.Error(response, "tail error "+err.Error(), http.StatusBadRequest)
+			http.Error(response, "tail error: "+err.Error(), http.StatusBadRequest)
+			c.socketLog(http.StatusInternalServerError, request)
+
+			return
+		}
+
+		socket, err := upgrader.Upgrade(response, request, nil)
+		if err != nil {
+			c.Errorf("[gui requested] Creating Websocket: %v", err)
 			c.socketLog(http.StatusInternalServerError, request)
 
 			return
@@ -78,7 +80,7 @@ func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	http.Error(response, "file not found: "+fileID, http.StatusBadRequest)
+	http.Error(response, "file for ID not found: "+fileID, http.StatusBadRequest)
 	c.socketLog(http.StatusBadRequest, request)
 }
 
@@ -97,19 +99,21 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 		c.Errorf("websocket closed")
 	}()
 
+	linecounter := 0
+
 	for {
 		select {
 		case line := <-fileTail.Lines:
-			if line == nil {
-				line = &tail.Line{}
-				c.Errorf("nil tail line")
+			if linecounter++; linecounter == 1 {
+				continue
 			}
-			text := []byte(line.Text + "\n")
+
+			text := fmt.Sprintf(`<span class="line-number">%d</span>%s<span class="cl"></span>`, linecounter-1, line.Text)
 
 			if line.Err != nil {
 				if lineErr := line.Err.Error(); lineErr != lastError {
 					lastError = lineErr
-					text = []byte(line.Err.Error())
+					text = line.Err.Error()
 				}
 			} else {
 				lastError = ""
@@ -117,7 +121,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))
 
-			if err := socket.WriteMessage(websocket.TextMessage, text); err != nil {
+			if err := socket.WriteMessage(websocket.TextMessage, []byte(text)); err != nil {
 				return // ded sock
 			}
 		case <-pingTicker.C:

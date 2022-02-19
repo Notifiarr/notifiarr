@@ -1,23 +1,4 @@
-let websocketCodes = {
-    '1000': 'Normal Closure',
-    '1001': 'Going Away',
-    '1002': 'Protocol Error',
-    '1003': 'Unsupported Data',
-    '1004': '(For future)',
-    '1005': 'No Status Received',
-    '1006': 'Abnormal Closure',
-    '1007': 'Invalid frame payload data',
-    '1008': 'Policy Violation',
-    '1009': 'Message too big',
-    '1010': 'Missing Extension',
-    '1011': 'Internal Error',
-    '1012': 'Service Restart',
-    '1013': 'Try Again Later',
-    '1014': 'Bad Gateway',
-    '1015': 'TLS Handshake'
-};
-
-// how to stop the websocket? when someone clicks a diff file, etc.
+// TODO: how to stop the websocket? when someone clicks a different file, etc.
 function openWebsocket(caller, url)
 {
     if ('WebSocket' in window) {
@@ -26,13 +7,12 @@ function openWebsocket(caller, url)
         const box = ctl.find('.file-content');
         const sort = ctl.find('.fileSortDirection').data('sort');
 
-        box.html('');
         ctl.find('.tailControl').show();
+        box.html('');
 
         ws.onopen = function() {}; //-- USED TO SEND MESSAGE TO THE CLIENT
 
         ws.onmessage = function(incoming) {
-
             if (sort == "tails") {
                 box.append(incoming.data);
                 if (ctl.find('.tailAutoScroll').prop('checked')) {
@@ -44,7 +24,7 @@ function openWebsocket(caller, url)
                     box.parent().scrollTop(-1);
                 }
             }
-            updateFileContentCounters(); // y only 1 line?
+            // TODO: Truncate the box to an input byte count. Lets hard code to to 20000 for now.
         };
 
         ws.onerror = function(data) {
@@ -64,3 +44,22 @@ function openWebsocket(caller, url)
         toast('Websocket Error', 'Your browser does not support websockets, log tailing not available.', 'error');
     }
 }
+
+let websocketCodes = {
+    '1000': 'Normal Closure',
+    '1001': 'Going Away',
+    '1002': 'Protocol Error',
+    '1003': 'Unsupported Data',
+    '1004': '(For future)',
+    '1005': 'No Status Received',
+    '1006': 'Abnormal Closure',
+    '1007': 'Invalid frame payload data',
+    '1008': 'Policy Violation',
+    '1009': 'Message too big',
+    '1010': 'Missing Extension',
+    '1011': 'Internal Error',
+    '1012': 'Service Restart',
+    '1013': 'Try Again Later',
+    '1014': 'Bad Gateway',
+    '1015': 'TLS Handshake'
+};
