@@ -106,8 +106,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 				continue
 			}
 
-			text := fmt.Sprintf(`<span class="line-number">%d</span>%s<span class="cl"></span>`,
-				linecounter, line.Text)
+			text := line.Text
 
 			if line.Err != nil {
 				if lineErr := line.Err.Error(); lineErr != lastError {

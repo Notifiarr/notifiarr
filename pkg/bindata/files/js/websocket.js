@@ -6,6 +6,7 @@ function openWebsocket(caller, url, source, fileID)
         const ctl = caller.closest('.fileController');
         const box = ctl.find('.file-content');
         const sort = ctl.find('.fileSortDirection').data('sort');
+        let lineCounter = 0;
 
         ctl.find('.tailControl').show();
         // show the file info div (right side panel) for the file being tailed.
@@ -16,42 +17,38 @@ function openWebsocket(caller, url, source, fileID)
         ws.onopen = function() {}; //-- USED TO SEND MESSAGE TO THE CLIENT
 
         ws.onmessage = function(incoming) {
+            lineCounter++;
+            let count = 0;
+
             if (sort == "tails") {
-                box.append(incoming.data);
+                box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
                 if (ctl.find('.tailAutoScroll').prop('checked')) {
                     box.parent().scrollTop(box.parent().prop("scrollHeight"));
                 }
+
+                // Truncate box to 100 lines. Not fully tested yet.
+                box.find('.lineContent').reverse().each(function() { // this shit dont work anymore. uhg.
+                    alert('foo '+ count);
+                    if (count > 100) {
+                        $(this).remove();
+                    }
+                    count++;
+                });
             } else {
+                box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
                 box.prepend(incoming.data);
                 if (ctl.find('.tailAutoScroll').prop('checked')) {
                     box.parent().scrollTop(-1);
                 }
+
+                // Truncate box to 100 lines. Not fully tested yet.
+                box.find('.lineContent').each(function() {
+                    if (count > 100) {
+                        $(this).remove();
+                    }
+                    count++;
+                });
             }
-
-            let count = 0;
-            box.find('.lineContent').each(function() {
-                if (count > 100) {
-                    $(this).remove();
-                }
-                count++;
-            });
-            count = 0;
-            box.find('.cl').each(function() {
-                if (count > 100) {
-                    $(this).remove();
-                }
-                count++;
-            });
-            count = 0;
-            box.find('.line-number').each(function() {
-                if (count > 100) {
-                    $(this).remove();
-                }
-                count++;
-            });
-
-
-            // TODO: Truncate the box to an input byte count. Lets hard code to to 20000 for now.
         };
 
         ws.onerror = function(data) {
