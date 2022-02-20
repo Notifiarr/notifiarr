@@ -99,16 +99,15 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 		c.Errorf("websocket closed")
 	}()
 
-	linecounter := 0
-
-	for {
+	for linecounter := 0; ; linecounter++ {
 		select {
 		case line := <-fileTail.Lines:
-			if linecounter++; linecounter == 1 {
+			if linecounter == 0 {
 				continue
 			}
 
-			text := fmt.Sprintf(`<span class="line-number">%d</span>%s<span class="cl"></span>`, linecounter-1, line.Text)
+			text := fmt.Sprintf(`<span class="line-number">%d</span>%s<span class="cl"></span>`,
+				linecounter, line.Text)
 
 			if line.Err != nil {
 				if lineErr := line.Err.Error(); lineErr != lastError {

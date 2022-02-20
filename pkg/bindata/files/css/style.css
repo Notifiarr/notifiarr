@@ -961,9 +961,6 @@ pre .line-number {
   margin:0 1em 0 -1em;
   border-right:1px solid;
   text-align:right;
-}
-
-pre span {
   display:block;
   padding:0 .3em 0 .7em;
 }
@@ -971,6 +968,7 @@ pre span {
 pre .cl {
   display:block;
   clear:both;
+  padding:0 .3em 0 .7em;
 }
 
 .scroll-bar {
@@ -980,5 +978,5 @@ pre .cl {
 
 .scroll-bar-sm {
      overflow: auto;
-     max-height: 73vh;
+     max-height: 72vh;
 }

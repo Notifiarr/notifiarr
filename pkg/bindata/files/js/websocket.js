@@ -1,13 +1,16 @@
-// TODO: how to stop the websocket? when someone clicks a different file, etc.
-function openWebsocket(caller, url)
+function openWebsocket(caller, url, source, fileID)
 {
     if ('WebSocket' in window) {
-        let ws = new WebSocket(location.origin.replace(/^http/, 'ws')  + url);
+        // TODO: how to stop all other websockets? when someone clicks a different file, etc.
+        let ws = new WebSocket(location.origin.replace(/^http/, 'ws') + url +'?source='+ source +'&fileId='+ fileID);
         const ctl = caller.closest('.fileController');
         const box = ctl.find('.file-content');
         const sort = ctl.find('.fileSortDirection').data('sort');
 
         ctl.find('.tailControl').show();
+        // show the file info div (right side panel) for the file being tailed.
+        ctl.find('.fileinfo-table, .file-control').hide()
+        ctl.find('.file-actions, #fileinfo-'+ fileID).show()
         box.html('');
 
         ws.onopen = function() {}; //-- USED TO SEND MESSAGE TO THE CLIENT
@@ -24,6 +27,30 @@ function openWebsocket(caller, url)
                     box.parent().scrollTop(-1);
                 }
             }
+
+            let count = 0;
+            box.find('.lineContent').each(function() {
+                if (count > 100) {
+                    $(this).remove();
+                }
+                count++;
+            });
+            count = 0;
+            box.find('.cl').each(function() {
+                if (count > 100) {
+                    $(this).remove();
+                }
+                count++;
+            });
+            count = 0;
+            box.find('.line-number').each(function() {
+                if (count > 100) {
+                    $(this).remove();
+                }
+                count++;
+            });
+
+
             // TODO: Truncate the box to an input byte count. Lets hard code to to 20000 for now.
         };
 
