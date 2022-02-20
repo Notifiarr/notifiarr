@@ -1,22 +1,17 @@
 let websockets = [];
 
-function openWebsocket(caller, url, source, fileID, socket, fileName)
+function openWebsocket(caller, url, source, fileID, fileName)
 {
     //-- KILL THE SPECIFIED SOCKET
-    if (websockets.socket) {
-        websockets.socket.close();
+    if (websockets.source) {
+        websockets.source.close();
     }
 
     if ('WebSocket' in window) {
         $('#tailFile').html(fileName);
-        let tailLines = $('#tailFileLinesCount').val();
-
-        if (tailLines <= 0) {
-            tailLines = 1;
-        }
 
         let ws = new WebSocket(location.origin.replace(/^http/, 'ws') + url +'?source='+ source +'&fileId='+ fileID);
-        websockets.socket = ws;
+        websockets.source = ws;
 
         const ctl = caller.closest('.fileController');
         const box = ctl.find('.file-content');
@@ -26,7 +21,7 @@ function openWebsocket(caller, url, source, fileID, socket, fileName)
         ctl.find('.tailControl').show();
         // show the file info div (right side panel) for the file being tailed.
         ctl.find('.fileinfo-table, .file-control').hide()
-        ctl.find('.file-actions, #fileinfo-'+ fileID).show()
+        ctl.find('.file-actions, .fileTablesList, #fileinfo-'+ fileID).show()
         box.html('');
 
         ws.onopen = function() {
@@ -35,6 +30,10 @@ function openWebsocket(caller, url, source, fileID, socket, fileName)
 
         ws.onmessage = function(incoming) {
             lineCounter++;
+            let tailLines = $('#tailFileLinesCount').val();
+            if (tailLines <= 0) {
+                tailLines = 1;
+            }
 
             if (sort == "tails") {
                 box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
@@ -42,23 +41,22 @@ function openWebsocket(caller, url, source, fileID, socket, fileName)
                     box.parent().scrollTop(box.parent().prop("scrollHeight"));
                 }
 
-                // Truncate box to 100 lines. Not fully tested yet.
-                $.each($('#logFileContainer > pre > div'), function(counter) {
-                    if (counter == 99) {
-                        $('#logFileContainer > pre > div:first').remove();
+                // Truncate box to N lines.
+                $.each($('#logFileContainer > div > div'), function(counter) {
+                    if (counter >= tailLines) {
+                        $('#logFileContainer > div > div:first').remove();
                     }
                 });
             } else {
-                box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
-                box.prepend(incoming.data);
+                box.prepend('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
                 if (ctl.find('.tailAutoScroll').prop('checked')) {
                     box.parent().scrollTop(-1);
                 }
 
-                // Truncate box to 100 lines. Not fully tested yet.
-                $.each($('#logFileContainer > pre > div'), function(counter) {
-                    if (counter == 99) {
-                        $('#logFileContainer > pre > div').remove();
+                // Truncate box to N lines. Not fully tested yet.
+                $.each($('#logFileContainer > div > div'), function(counter) {
+                    if (counter >= tailLines) {
+                        $('#logFileContainer > div > div:last').remove();
                     }
                 });
             }
@@ -75,7 +73,6 @@ function openWebsocket(caller, url, source, fileID, socket, fileName)
             toast('Websocket Closed', 'The client websocket has been closed, details in console.', 'info');
             console.log('Websocket connection closed: '+ websocketCodes[data.code]);
             console.log(data);
-            ctl.find('.tailControl').hide();
         };
     } else {
         toast('Websocket Error', 'Your browser does not support websockets, log tailing not available.', 'error');

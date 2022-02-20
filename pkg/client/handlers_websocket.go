@@ -87,7 +87,7 @@ func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Re
 func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 	var (
 		lastError  = ""
-		pingTicker = time.NewTicker(29 * time.Second)
+		pingTicker = time.NewTicker(29 * time.Second) //nolint:gomnd
 		writeWait  = 10 * time.Second
 	)
 
@@ -96,7 +96,6 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 		pingTicker.Stop()
 		socket.Close()
 		fileTail.Stop() // nolint:errcheck
-		c.Errorf("websocket closed")
 	}()
 
 	for linecounter := 0; ; linecounter++ {
@@ -120,12 +119,14 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))
 
 			if err := socket.WriteMessage(websocket.TextMessage, []byte(text)); err != nil {
+				c.Debugf("websocket closed, write error: %v", err)
 				return // ded sock
 			}
 		case <-pingTicker.C:
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))
 
 			if err := socket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+				c.Debugf("websocket closed, ping error: %v", err)
 				return
 			}
 		}

@@ -7,12 +7,12 @@ function updateFileContentCounters()
         let lines           = fileContainer.html().split(/\n/);
         const length        = getCharacterLength(lines.length.toString().trim());
 
-        if (fileContainer.find('.cl').length == 0) { // avoid repeating this to an already formatted container.
+        if (fileContainer.find('.line-number').length == 0) { // avoid repeating this to an already formatted container.
             fileContainer.html('');
             $.each(lines, function(index, line) {
                 if (index !== (lines.length-1)) { // skip the last newline.
                     let number = fileContainer.find('.line-number').length+1;
-                    fileContainer.append('<span class="line-number">' + number.toString().padStart(length, ' ') + '</span>' + line + '<span class="cl"></span>');
+                    fileContainer.append('<span class="line-number">' + number.toString().padStart(length, ' ') + '</span>' + line + '<br>');
                 }
             });
         }
@@ -34,7 +34,7 @@ function fileSelectorChange(caller, fileID)
         return; // a file has not been selected yet.
     }
 
-    const kind      = ctl.data("kind");
+    const source    = ctl.data("kind");
     const filename  = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used      = ctl.find('#fileinfo-'+ fileID).data('used');
     const lineCount = parseInt(ctl.find('.fileLinesCount').val());
@@ -47,17 +47,21 @@ function fileSelectorChange(caller, fileID)
         from = "first";
     }
 
+    if (websockets.source) {
+        websockets.source.close(); // kill any websocket.
+    }
+
     // set the current ID to a global area.
     ctl.data('currentid', fileID)
     // start a spinner because it may take a few seconds to load a file.
     ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
     // hide all other file-info divs, hide actions (until file load completes), hide help msg (this is the active file warning tooltip), hide any error or info messages.
-    ctl.find('.fileinfo-table, .file-control').hide()
-    ctl.find('.file-actions, #fileinfo-'+ fileID).show() // show the file info div (right side panel) for the file requested.
+    ctl.find('.fileinfo-table, .tailControl, .file-control').hide()
+    ctl.find('.file-actions, .fileTablesList, #fileinfo-'+ fileID).show() // show the file info div (right side panel) for the file requested.
     ctl.find('.fileLinesAdd').prop('disabled', false);
 
     $.ajax({
-        url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
+        url: 'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
         success: function (data){
             ctl.find('.file-content').text(data);
             const gotLines = ctl.find('.file-content').html().split(/\n/).length-1;
@@ -66,7 +70,7 @@ function fileSelectorChange(caller, fileID)
             } else { // EOF
                 ctl.find('.fileLinesAdd').prop('disabled', true) // Disable the 'Add' action.
                 ctl.find('.fileLinesAction').val("linesReload"); // Set the selector to reload (instead of Add).
-                ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file.<br>');
+                ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file. ');
             }
             ctl.find('.file-control').show();
             updateFileContentCounters();
@@ -82,7 +86,7 @@ function fileSelectorChange(caller, fileID)
 }
 
 // This powers the Action menu: Send to notifiarr, delete, download.
-function triggerFileAction(caller, action, kind, fileID)
+function triggerFileAction(caller, action, source, fileID)
 {
     const ctl      = caller.parents('.fileController');
     const filename = ctl.find('#fileinfo-'+ fileID).data('filename');
@@ -93,10 +97,10 @@ function triggerFileAction(caller, action, kind, fileID)
 
     if (action == "download") {
         toast('Downloading File', filename+".zip", 'success')
-        $(location).attr("href", "downloadFile/"+ kind +"/"+ fileID);
+        $(location).attr("href", "downloadFile/"+ source +"/"+ fileID);
     } else if (action == "delete") {
         $.ajax({
-            url: 'deleteFile/'+ kind +'/'+ fileID,
+            url: 'deleteFile/'+ source +'/'+ fileID,
 
             success: function (data){
                 let files = ' files';
@@ -133,7 +137,7 @@ function triggerFileAction(caller, action, kind, fileID)
 function triggerFileLoad(caller)
 {
     const ctl         = caller.parents('.fileController');
-    const kind        = ctl.data("kind");
+    const source      = ctl.data("kind");
     const fileID      = ctl.data('currentid');
     const filename    = ctl.find('#fileinfo-'+ fileID).data('filename');
     const used        = ctl.find('#fileinfo-'+ fileID).data('used');
@@ -158,7 +162,7 @@ function triggerFileLoad(caller)
         ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
 
         $.ajax({
-            url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/'+ offSetCount + '?sort='+sort,
+            url: 'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/'+ offSetCount + '?sort='+sort,
             success: function (data){
                 // These are slow when there's a lot of lines.
                 ctl.find('.line-number').remove();
@@ -177,7 +181,7 @@ function triggerFileLoad(caller)
                 } else {
                     ctl.find('.fileLinesAdd').prop('disabled', true) // Disable the 'Add' action.
                     ctl.find('.fileLinesAction').val("linesReload"); // Set the selector to reload (instead of Add).
-                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ totalLines +'</span> file lines. This is the whole file.<br>');
+                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ totalLines +'</span> file lines. This is the whole file. ');
                 }
 
                 updateFileContentCounters();
@@ -195,7 +199,7 @@ function triggerFileLoad(caller)
         // start a spinner because this might take a few seconds.
         ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
         $.ajax({
-            url: 'getFile/'+ kind +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
+            url: 'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
             success: function (data){
                 ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
                 ctl.find('.file-content').text(data);
@@ -204,7 +208,7 @@ function triggerFileLoad(caller)
                     ctl.find('.fileLinesAdd').prop('disabled', false) // Enable the 'Add' action.
                     ctl.find('.file-action-msg').html('Displaying '+ from +' <span class="currentLineCount">'+ gotLines +'</span> file lines.');
                 } else {
-                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file.<br>');
+                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file. ');
                 }
 
                 updateFileContentCounters();
