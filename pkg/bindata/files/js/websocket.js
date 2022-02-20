@@ -1,8 +1,23 @@
-function openWebsocket(caller, url, source, fileID)
+let websockets = [];
+
+function openWebsocket(caller, url, source, fileID, socket, fileName)
 {
+    //-- KILL THE SPECIFIED SOCKET
+    if (websockets.socket) {
+        websockets.socket.close();
+    }
+
     if ('WebSocket' in window) {
-        // TODO: how to stop all other websockets? when someone clicks a different file, etc.
+        $('#tailFile').html(fileName);
+        let tailLines = $('#tailFileLinesCount').val();
+
+        if (tailLines <= 0) {
+            tailLines = 1;
+        }
+
         let ws = new WebSocket(location.origin.replace(/^http/, 'ws') + url +'?source='+ source +'&fileId='+ fileID);
+        websockets.socket = ws;
+
         const ctl = caller.closest('.fileController');
         const box = ctl.find('.file-content');
         const sort = ctl.find('.fileSortDirection').data('sort');
@@ -14,11 +29,12 @@ function openWebsocket(caller, url, source, fileID)
         ctl.find('.file-actions, #fileinfo-'+ fileID).show()
         box.html('');
 
-        ws.onopen = function() {}; //-- USED TO SEND MESSAGE TO THE CLIENT
+        ws.onopen = function() {
+            toast('Websocket Connected', 'Websocket connection established.', 'success');
+        };
 
         ws.onmessage = function(incoming) {
             lineCounter++;
-            let count = 0;
 
             if (sort == "tails") {
                 box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
@@ -27,12 +43,10 @@ function openWebsocket(caller, url, source, fileID)
                 }
 
                 // Truncate box to 100 lines. Not fully tested yet.
-                box.find('.lineContent').reverse().each(function() { // this shit dont work anymore. uhg.
-                    alert('foo '+ count);
-                    if (count > 100) {
-                        $(this).remove();
+                $.each($('#logFileContainer > pre > div'), function(counter) {
+                    if (counter == 99) {
+                        $('#logFileContainer > pre > div:first').remove();
                     }
-                    count++;
                 });
             } else {
                 box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
@@ -42,11 +56,10 @@ function openWebsocket(caller, url, source, fileID)
                 }
 
                 // Truncate box to 100 lines. Not fully tested yet.
-                box.find('.lineContent').each(function() {
-                    if (count > 100) {
-                        $(this).remove();
+                $.each($('#logFileContainer > pre > div'), function(counter) {
+                    if (counter == 99) {
+                        $('#logFileContainer > pre > div').remove();
                     }
-                    count++;
                 });
             }
         };

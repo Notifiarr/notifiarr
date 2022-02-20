@@ -4,7 +4,7 @@
                         <div class="col-lg-6 col-md-12">
                             <div style="max-height: 200px; overflow: auto;">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-bordered">
+                                    <table class="table table-striped table-bordered datatable" data-sortDirection="desc" data-sortIndex="2">
                                         <thead>
                                             <tr>
                                                 <td> <!-- TODO: make the header bar not scroll -->
@@ -16,8 +16,9 @@
                                                         <i class="fas fa-sync" style="cursor: pointer; margin-right: 5px;" title="Refresh list" onclick="refreshPage('logfiles')"></i>
                                                     </div>
                                                 </td>
+                                                <td><b>Size</b></td>
                                                 <td><b>Age</b></td>
-                                                <td>
+                                                <td class="no-sort">
                                                     <div class="btn-group btn-toggle fileSortDirection" data-sort="tails">
                                                         <button class="btn btn-xs btn-seondary toggleButton" onClick="toggleButton($(this));">Heads</button>
                                                         <button class="btn btn-xs btn-brand active toggleButton" onClick="toggleButton($(this));">Tails
@@ -30,12 +31,13 @@
                                             {{- range $file := .LogFiles.List }}
                                             <tr id="fileRow{{$file.ID}}" class="fileRow">
                                                 <td style="cursor: pointer;" onclick="fileSelectorChange($(this),{{ $file.ID }})">{{ $file.Name }}</td>
-                                                <td>{{since $file.Time}}</td>
+                                                <td data-sort="{{$file.Size}}">{{megabyte $file.Size}} Mb</td>
+                                                <td data-sort="{{$file.Time}}">{{since $file.Time}}</td>
                                                 <td>
                                                     <a href="downloadFile/logs/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download log file."></a>
                                                     <i class="fas fa-cloud-upload-alt" onClick="triggerFileAction($(this), 'upload', 'logs', {{$file.ID}})" style="cursor: pointer; margin-right: 5px;" title="Upload log file."></i>
+                                                    <i class="fas fa-stream" onClick="openWebsocket($(this), '{{base}}/ws', 'logs', '{{$file.ID}}', 'logFileTail', '{{ $file.Name }}')" style="cursor: pointer; color: green; margin-right: 5px;" title="Tail log file."></i>
                                                     {{if not $file.Used}}<i class="fas fa-trash-alt" onClick="triggerFileAction($(this), 'delete', 'logs', {{$file.ID}})" style="cursor: pointer; color: red;" title="Delete log file."></i>{{end}}
-                                                    <i class="fas fa-stream" onClick="openWebsocket($(this), '{{base}}/ws', 'logs', '{{$file.ID}}')" style="cursor: pointer; color: green;" title="Tail log file."></i>
                                                 </td>
                                             </tr>
                                             {{- end }}
@@ -55,8 +57,9 @@
                                 <span class="file-small-msg file-control"></span><!-- this will say "Still Loading..." -->
                             </div>
                             <div style="display:none;padding: 0 !important;" class="tailControl col-md-12">
-                                Auto Scroll <input class="tailAutoScroll" type="checkbox" checked>
-                                &nbsp;<i class="fas fa-cog fa-spin"></i> Tailing file...
+                                Auto Scroll <input class="tailAutoScroll" type="checkbox" checked> 
+                                <input id="tailFileLinesCount" type="number" min="50" max="5000" value="100"> Lines 
+                                &nbsp;<i class="fas fa-cog fa-spin"></i> Tailing file: <span id="tailFile"></span>...
                             </div>
                         </div>
                         <div class="col-md-12 col-lg-6 fileTablesList">
@@ -65,7 +68,7 @@
                       </div>
                       <div class="row">
                           <div class="col-md-12">
-                              <div class="scroll-bar-sm">
+                              <div id="logFileContainer" class="scroll-bar-sm">
                                   <pre class="well well-sm file-content log-file-content bk-brown brdr">Log file contents display here.
                                   </pre>
                               </div>

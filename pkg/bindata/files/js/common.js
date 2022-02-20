@@ -10,11 +10,21 @@ $(document).ready((function()
     // ----- Navbar
     $('.nav-link').click((function() {
         $('nav.ts-sidebar').toggleClass('menu-open', false);
-    }))
+    }));
 
     $(".menu-btn").click((function() {
         $('nav.ts-sidebar').toggleClass('menu-open');
-    }))
+    }));
+
+    //-- GIVE THE TABLE(S) TIME TO LOAD
+    setTimeout(function() {
+        $.each($('.datatable'), function() {
+            $(this).DataTable({
+                'order': [[(parseInt($(this).attr('data-sortIndex')) ?? 0), ($(this).attr('data-sortDirection') ?? 'desc')]],
+                'columnDefs': [{ targets: 'no-sort', orderable: false }]
+            });
+        });
+    }, 1000);
 }));
 
 // ---------------------------------------------------------------------------------------------
