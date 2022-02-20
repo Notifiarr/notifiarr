@@ -49,11 +49,13 @@ function newWebsocket(ctl, source, fileID)
     // Manipulate meta assets.
     ctl.data('currentid', fileID); // set the current active file id.
     ctl.find('.tailControl').show(); // show the file tail controls.
-    // show the file info div (right side panel) for the file being tailed.
     ctl.find('.fileinfo-table, .file-control').hide(); // hide non-tail file controls.
+    // show the file info div (right side panel) for the file being tailed.
     ctl.find('.file-actions, .fileTablesList, #fileinfo-'+ fileID).show(); // show file actions and file info box.
     $('#'+ source +'TailFile').html(ctl.find('#fileinfo-'+ fileID).data('name')+sortMsg); // set the file name + msg.
-    box.html(''); // empty the box out.
+    box.html(''); // empty the box out for fresh content.
+
+    //-- HANDLE SOCKET TRANSACTIONS
 
     ws.onopen = function() {
         toast('Websocket Connected', 'Websocket connection established.', 'success');
@@ -68,28 +70,28 @@ function newWebsocket(ctl, source, fileID)
 
         if (sort == "tails") {
             box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
-            if (ctl.find('.tailAutoScroll').prop('checked')) {
-                box.scrollTop(box.prop("scrollHeight"));
-            }
-
             // Truncate box to N lines.
             $.each($('#'+ source +'FileContainer > div > div'), function(counter) {
                 if (counter >= tailLines) {
                     $('#'+ source +'FileContainer > div > div:first').remove();
                 }
             });
+            // Scroll to bottom if auto scroll is enabled.
+            if (ctl.find('.tailAutoScroll').prop('checked')) {
+                box.scrollTop(box.prop("scrollHeight"));
+            }
         } else {
             box.prepend('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
-            if (ctl.find('.tailAutoScroll').prop('checked')) {
-                box.scrollTop(-1);
-            }
-
             // Truncate box to N lines. Not fully tested yet.
             $.each($('#'+ source +'FileContainer > div > div'), function(counter) {
                 if (counter >= tailLines) {
                     $('#'+ source +'FileContainer > div > div:last').remove();
                 }
             });
+            // Scroll to bottom if auto scroll is enabled.
+            if (ctl.find('.tailAutoScroll').prop('checked')) {
+                box.scrollTop(-1);
+            }
         }
     };
 

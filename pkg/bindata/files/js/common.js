@@ -23,7 +23,12 @@ $(document).ready((function()
                 'order': [[(parseInt($(this).attr('data-sortIndex')) ?? 0), ($(this).attr('data-sortDirection') ?? 'desc')]],
                 'columnDefs': [{ targets: 'no-sort', orderable: false }],
                 'scrollY': (parseInt($(this).attr('data-height')) ?? 500),
-                'paging': false
+                'paging': false,
+                "autoWidth": true,
+                "fnDrawCallback":function() {
+                    // fix the header column on window resize.
+                    this.api().columns.adjust();
+                },
             });
         });
     }, 1000);

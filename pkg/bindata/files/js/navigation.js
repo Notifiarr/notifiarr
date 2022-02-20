@@ -5,6 +5,9 @@ function swapNavigationTemplate(template)
     if ($('#template-'+ template).length === 1) {
         $('.navigation-item').hide();
         $('#template-'+ template).show();
+        // The following fixes any data tables.
+        // https://datatables.net/examples/api/tabs_and_scrolling.html
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
     }
 }
 

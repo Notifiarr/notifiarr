@@ -13,7 +13,7 @@ import (
 	"github.com/nxadm/tail"
 )
 
-const startFileBytes = 5000
+const startFileBytes = 1500
 
 //nolint:gochecknoglobals
 var upgrader = websocket.Upgrader{
@@ -21,6 +21,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: mnd.Kilobyte,
 }
 
+// Websockets cannot use our apachelog package, so we have to produce our own log line for those reqs.
 func (c *Client) socketLog(code int, r *http.Request) {
 	_, _ = c.Logger.HTTPLog.Writer().Write([]byte(fmt.Sprintf(`%s - - [%s] "%s %s %s" %d 0 "%s" "%s"`+"\n",
 		r.Header.Get("X-Forwarded-For"), time.Now().Format("02/Jan/2006:15:04:05 -0700"),
@@ -98,11 +99,11 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 		socket.Close()
 	}()
 
-	for linecounter := 0; ; linecounter++ {
+	for {
 		select {
 		case line := <-fileTail.Lines:
-			if linecounter == 0 {
-				continue
+			if line.Num == 1 {
+				continue // first line is never complete.
 			}
 
 			text := line.Text

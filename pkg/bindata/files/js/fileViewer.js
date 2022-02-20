@@ -243,8 +243,6 @@ function toggleButton(from)
     const source = ctl.closest('.fileController').data("kind");
     if (websockets.source) {
         openWebsocket(ctl);
-        // Empty the box, so when it starts going the other way, it's not weird.
-        // ctl.closest('.fileController').find('.file-content').html('');
     } else {
         fileSelectorChange(ctl); // update the file viewer.
         setTooltips();

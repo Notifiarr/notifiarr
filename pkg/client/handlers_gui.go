@@ -184,7 +184,10 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 
 		if err := os.Remove(fileInfo.Path); err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
+			c.Errorf("[gui requested] Deleting file: %v", err)
 		}
+
+		c.Printf("[gui requested] Deleted file: %s", fileInfo.Path)
 
 		if _, err := response.Write([]byte("ok")); err != nil {
 			c.Errorf("Writing HTTP Response: %v", err)
