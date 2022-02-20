@@ -21,7 +21,9 @@ $(document).ready((function()
         $.each($('.datatable'), function() {
             $(this).DataTable({
                 'order': [[(parseInt($(this).attr('data-sortIndex')) ?? 0), ($(this).attr('data-sortDirection') ?? 'desc')]],
-                'columnDefs': [{ targets: 'no-sort', orderable: false }]
+                'columnDefs': [{ targets: 'no-sort', orderable: false }],
+                'scrollY': (parseInt($(this).attr('data-height')) ?? 500),
+                'paging': false
             });
         });
     }, 1000);
