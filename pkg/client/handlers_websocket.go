@@ -13,7 +13,7 @@ import (
 	"github.com/nxadm/tail"
 )
 
-const startFileBytes = 20000
+const startFileBytes = 5000
 
 //nolint:gochecknoglobals
 var upgrader = websocket.Upgrader{
@@ -93,9 +93,9 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 
 	defer func() {
 		c.CapturePanic()
+		fileTail.Stop() // nolint:errcheck
 		pingTicker.Stop()
 		socket.Close()
-		fileTail.Stop() // nolint:errcheck
 	}()
 
 	for linecounter := 0; ; linecounter++ {
@@ -110,7 +110,10 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 			if line.Err != nil {
 				if lineErr := line.Err.Error(); lineErr != lastError {
 					lastError = lineErr
-					text = line.Err.Error()
+					text = lineErr
+				} else {
+					c.Debugf("closing websocket due to errors: %v", lineErr)
+					return // two errors.
 				}
 			} else {
 				lastError = ""

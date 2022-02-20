@@ -25,7 +25,8 @@ updateFileContentCounters();
 // ----- File Display
 function fileSelectorChange(caller, fileID)
 {
-    const ctl       = caller.parents('.fileController');
+    const ctl = caller.parents('.fileController');
+
     if (!fileID) {
         fileID = ctl.data('currentid');
     }
@@ -70,7 +71,7 @@ function fileSelectorChange(caller, fileID)
             } else { // EOF
                 ctl.find('.fileLinesAdd').prop('disabled', true) // Disable the 'Add' action.
                 ctl.find('.fileLinesAction').val("linesReload"); // Set the selector to reload (instead of Add).
-                ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file. ');
+                ctl.find('.file-action-msg').html('Displaying the whole file; <span class="currentLineCount">'+ gotLines +'</span> lines.');
             }
             ctl.find('.file-control').show();
             updateFileContentCounters();
@@ -181,7 +182,7 @@ function triggerFileLoad(caller)
                 } else {
                     ctl.find('.fileLinesAdd').prop('disabled', true) // Disable the 'Add' action.
                     ctl.find('.fileLinesAction').val("linesReload"); // Set the selector to reload (instead of Add).
-                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ totalLines +'</span> file lines. This is the whole file. ');
+                    ctl.find('.file-action-msg').html('Displaying the whole file; <span class="currentLineCount">'+ totalLines +'</span> lines.');
                 }
 
                 updateFileContentCounters();
@@ -208,7 +209,7 @@ function triggerFileLoad(caller)
                     ctl.find('.fileLinesAdd').prop('disabled', false) // Enable the 'Add' action.
                     ctl.find('.file-action-msg').html('Displaying '+ from +' <span class="currentLineCount">'+ gotLines +'</span> file lines.');
                 } else {
-                    ctl.find('.file-action-msg').html('Displaying all <span class="currentLineCount">'+ gotLines +'</span> file lines. This is the whole file. ');
+                    ctl.find('.file-action-msg').html('Displaying the whole file; <span class="currentLineCount">'+ gotLines +'</span> lines.');
                 }
 
                 updateFileContentCounters();
@@ -239,6 +240,13 @@ function toggleButton(from)
         ctl.find('.toggleIcon').attr('title', 'Heads, showing top of file first.').toggleClass('fa-sort-amount-up fa-sort-amount-down');
     }
 
-    fileSelectorChange(ctl); // update the file viewer.
-    setTooltips();
+    const source = ctl.closest('.fileController').data("kind");
+    if (websockets.source) {
+        openWebsocket(ctl);
+        // Empty the box, so when it starts going the other way, it's not weird.
+        // ctl.closest('.fileController').find('.file-content').html('');
+    } else {
+        fileSelectorChange(ctl); // update the file viewer.
+        setTooltips();
+    }
 }
