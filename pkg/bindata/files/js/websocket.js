@@ -111,6 +111,16 @@ function newWebsocket(ctl, source, fileID)
     };
 }
 
+function destroyWebsocket(source)
+{
+    if (websockets.source) {
+        try {
+            websockets.source.close();
+        } catch {}
+    }
+    delete websockets.source;
+}
+
 let websocketCodes = {
     '1000': 'Normal Closure',
     '1001': 'Going Away',

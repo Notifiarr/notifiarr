@@ -12,7 +12,7 @@
                                                     <span class="fileListDirInfo" data-dirdata="{{len .LogFiles.Dirs}} dir{{if ne (len .LogFiles.Dirs) 1}}s{{end}}">
                                                         {{len .LogFiles.List}} file{{if ne (len .LogFiles.List) 1}}s{{end}} in {{len .LogFiles.Dirs}} dir{{if ne (len .LogFiles.Dirs) 1}}s{{end}}&nbsp;
                                                     </span>
-                                                    <i class="fas fa-sync" style="cursor: pointer; margin-right: 5px;" title="Refresh list" onclick="refreshPage('logfiles')"></i>
+                                                    <i class="fas fa-sync" style="cursor: pointer; margin-right: 5px;" title="Refresh list" onclick="destroyWebsocket('logs');refreshPage('logfiles')"></i>
                                                 </div>
                                             </td>
                                             <td><b>Size</b></td>

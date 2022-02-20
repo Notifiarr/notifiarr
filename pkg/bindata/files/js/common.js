@@ -19,21 +19,26 @@ $(document).ready((function()
     //-- GIVE THE TABLE(S) TIME TO LOAD
     setTimeout(function() {
         $.each($('.datatable'), function() {
-            $(this).DataTable({
-                'order': [[(parseInt($(this).attr('data-sortIndex')) ?? 0), ($(this).attr('data-sortDirection') ?? 'desc')]],
-                'columnDefs': [{ targets: 'no-sort', orderable: false }],
-                'scrollY': (parseInt($(this).attr('data-height')) ?? 500),
-                'paging': false,
-                "autoWidth": true,
-                "fnDrawCallback":function() {
-                    // fix the header column on window resize.
-                    this.api().columns.adjust();
-                },
-            });
+            loadDataTable($(this));
         });
     }, 1000);
 }));
 
+function loadDataTable(table) {
+    table.DataTable({
+        'order': [[(parseInt(table.attr('data-sortIndex')) ?? 0), (table.attr('data-sortDirection') ?? 'desc')]],
+        'columnDefs': [{ targets: 'no-sort', orderable: false }],
+        'scrollY': (parseInt(table.attr('data-height')) ?? 500),
+        'scrollCollapse': true,
+        'paging': false,
+        "autoWidth": true,
+        "sScrollY": "0px",
+        "fnDrawCallback":function() {
+            // fix the header column on window resize.
+            this.api().columns.adjust();
+        }
+    });
+}
 // ---------------------------------------------------------------------------------------------
 
 function jsLoader()
