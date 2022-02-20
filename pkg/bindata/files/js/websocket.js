@@ -7,6 +7,7 @@ function openWebsocket(caller, fileID)
         return
     }
 
+    $('.socketLink').hide();
     // Set out controller and some other useful variables from data in the template.
     const ctl = caller.closest('.fileController');
     if (!fileID) {
@@ -17,19 +18,20 @@ function openWebsocket(caller, fileID)
     }
 
     const source = ctl.data("kind");
+    let delay = 1
     //-- KILL THE SPECIFIED SOCKET
     if (websockets.source) {
-        websockets.source.close();
+        destroyWebsocket(source);
+        delay = 250
         if (fileID == ctl.data('currentid')) {
-            // Tailing the same file needs a pause, or it doesn't work right.
-            setTimeout(function() {
-                newWebsocket(ctl, source, fileID);
-            }, 1000);
-            return;
+            // Tailing the same file needs a good pause, or it doesn't work right.
+            delay = 1000
         }
     }
 
-    newWebsocket(ctl, source, fileID);
+    setTimeout(function() {
+        newWebsocket(ctl, source, fileID);
+    }, delay);
 }
 
 function newWebsocket(ctl, source, fileID)
@@ -38,8 +40,7 @@ function newWebsocket(ctl, source, fileID)
     const box  = ctl.find('.file-content');
     const sort = ctl.find('.fileSortDirection').data('sort');
     let lineCounter = 0;
-    let ws = new WebSocket(location.origin.replace(/^http/, 'ws') + url +'?source='+ source +'&fileId='+ fileID);
-    websockets.source = ws;
+    websockets.source = new WebSocket(location.origin.replace(/^http/, 'ws') + url +'?source='+ source +'&fileId='+ fileID);
 
     let sortMsg = '';
     if (sort != "tails") {
@@ -57,11 +58,12 @@ function newWebsocket(ctl, source, fileID)
 
     //-- HANDLE SOCKET TRANSACTIONS
 
-    ws.onopen = function() {
+    websockets.source.onopen = function() {
         toast('Websocket Connected', 'Websocket connection established.', 'success');
+        $('.socketLink').show(); // allow changing sockets now that we're established.
     };
 
-    ws.onmessage = function(incoming) {
+    websockets.source.onmessage = function(incoming) {
         lineCounter++;
         let tailLines = $('#'+ source +'TailFileLinesCount').val();
         if (tailLines <= 0) {
@@ -95,7 +97,7 @@ function newWebsocket(ctl, source, fileID)
         }
     };
 
-    ws.onerror = function(data) {
+    websockets.source.onerror = function(data) {
         toast('Websocket Error', 'Error connecting to the client websocket, details in console.', 'error');
         console.log('Websocket connection error');
         console.log(data);
@@ -103,7 +105,7 @@ function newWebsocket(ctl, source, fileID)
         delete websockets.source;
     };
 
-    ws.onclose = function(data) {
+    websockets.source.onclose = function(data) {
         toast('Websocket Closed', 'The client websocket has been closed, details in console.', 'info');
         console.log('Websocket connection closed: '+ websocketCodes[data.code]);
         console.log(data);
@@ -111,13 +113,12 @@ function newWebsocket(ctl, source, fileID)
     };
 }
 
+// destroyWebsocket is called on page refresh.
 function destroyWebsocket(source)
 {
-    if (websockets.source) {
-        try {
-            websockets.source.close();
-        } catch {}
-    }
+    try {
+        websockets.source.close();
+    } catch {}
     delete websockets.source;
 }
 

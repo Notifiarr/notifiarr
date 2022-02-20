@@ -48,9 +48,7 @@ function fileSelectorChange(caller, fileID)
         from = "first";
     }
 
-    if (websockets.source) {
-        websockets.source.close(); // kill any websocket.
-    }
+    destroyWebsocket(source);
 
     // set the current ID to a global area.
     ctl.data('currentid', fileID)

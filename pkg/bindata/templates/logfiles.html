@@ -35,7 +35,7 @@
                                             <td>
                                                 <a href="downloadFile/logs/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download log file."></a>
                                                 <i class="fas fa-cloud-upload-alt" onClick="triggerFileAction($(this), 'upload', 'logs', {{$file.ID}})" style="cursor: pointer; margin-right: 5px;" title="Upload log file."></i>
-                                                <i class="fas fa-stream" onClick="openWebsocket($(this), '{{$file.ID}}')" style="cursor: pointer; color: green; margin-right: 5px;" title="Tail log file."></i>
+                                                <i class="fas fa-stream socketLink" onClick="openWebsocket($(this), '{{$file.ID}}')" style="cursor: pointer; color: green; margin-right: 5px;" title="Tail log file."></i>
                                                 {{if not $file.Used}}<i class="fas fa-trash-alt" onClick="triggerFileAction($(this), 'delete', 'logs', {{$file.ID}})" style="cursor: pointer; color: red;" title="Delete log file."></i>{{end}}
                                             </td>
                                         </tr>
@@ -64,7 +64,7 @@
                             {{- template "filetablelist.html" .LogFiles.List }}
                         </div>
                       </div>
-                      <div class="row">
+                      <div class="mt row">
                           <div class="col-md-12">
                               <div id="logsFileContainer">
                                   <div class="well well-sm file-content log-file-content bk-brown brdr scroll-bar-sm">Log file contents display here.
