@@ -19,9 +19,7 @@ function openWebsocket(caller, fileID)
 
     const source = ctl.data("kind");
     let delay = 1
-    //-- KILL THE SPECIFIED SOCKET
     if (websockets.source) {
-        destroyWebsocket(source);
         delay = 250
         if (fileID == ctl.data('currentid')) {
             // Tailing the same file needs a good pause, or it doesn't work right.
@@ -29,6 +27,8 @@ function openWebsocket(caller, fileID)
         }
     }
 
+    //-- KILL THE SPECIFIED SOCKET
+    destroyWebsocket(source);
     setTimeout(function() {
         newWebsocket(ctl, source, fileID);
     }, delay);
@@ -103,6 +103,7 @@ function newWebsocket(ctl, source, fileID)
         console.log(data);
         ctl.find('.tailControl').hide();
         delete websockets.source;
+        $('.socketLink').show(); // allow changing sockets now that we're established.
     };
 
     websockets.source.onclose = function(data) {

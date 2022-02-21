@@ -25,6 +25,23 @@ function showProcessList()
     });
 }
 
+function toggleServiceChecks(toggle, refresh) {
+    $.ajax({
+        url: 'services/'+toggle,
+        success: function (data){
+            refreshPage(refresh, false);
+            toast('Yay!', data, 'success')
+        },
+        error: function (request, status, error) {
+            if (error == "") {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Error', error+': '+response.responseText, 'error', 10000);
+            }
+        },
+    });
+}
 
 // addServiceCheck compliments the functions in golists.js.
 // This adds new service check inputs to the table.

@@ -14,10 +14,12 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/fsnotify/fsnotify"
+	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
 	"golift.io/version"
 )
@@ -77,17 +79,14 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 	}
 }
 
-// ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
-func (c *Client) ParseGUITemplates() (err error) {
-	// Index and 404 do not have template files, but they can be customized.
-	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
-	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(template.FuncMap{
+func (c *Client) getFuncMap() template.FuncMap {
+	return template.FuncMap{
 		// returns the username the logged in.
 		"username": func() string { u, _ := c.getUserPass(); return u },
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
-		"megabyte": func(size int64) int64 { return size / mnd.Megabyte },
+		"megabyte": func(size int64) string { return fmt.Sprintf("%.2f", float64(size)/float64(mnd.Megabyte)) },
 		// returns the URL base.
 		"base": func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
 		// returns the files url base.
@@ -98,12 +97,16 @@ func (c *Client) ParseGUITemplates() (err error) {
 		"locked":   func(env string) bool { return os.Getenv(env) != "" },
 		"contains": strings.Contains,
 		"since": func(t time.Time) string {
-			d := time.Since(t)
-			if d > time.Hour {
-				return strings.TrimSuffix(d.Round(time.Minute).String(), "0s")
-			}
-
-			return d.Round(time.Second).String()
+			return strings.ReplaceAll(durafmt.Parse(time.Since(t).Round(time.Second)).
+				LimitFirstN(3). //nolint:gomnd
+				Format(durafmt.Units{
+					Year:   durafmt.Unit{Singular: "y", Plural: "y"},
+					Week:   durafmt.Unit{Singular: "w", Plural: "w"},
+					Day:    durafmt.Unit{Singular: "d", Plural: "d"},
+					Hour:   durafmt.Unit{Singular: "h", Plural: "h"},
+					Minute: durafmt.Unit{Singular: "m", Plural: "m"},
+					Second: durafmt.Unit{Singular: "s", Plural: "s"},
+				}), " ", "")
 		},
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
@@ -121,7 +124,14 @@ func (c *Client) ParseGUITemplates() (err error) {
 			}
 			return "0"
 		},
-	})
+	}
+}
+
+// ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
+func (c *Client) ParseGUITemplates() (err error) {
+	// Index and 404 do not have template files, but they can be customized.
+	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
+	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
 
 	// Parse all our compiled-in templates.
 	for _, name := range bindata.AssetNames() {
@@ -143,6 +153,17 @@ func (c *Client) ParseGUITemplates() (err error) {
 	}
 
 	return nil
+}
+
+type templateData struct {
+	Config      *configfile.Config    `json:"config"`
+	Flags       *configfile.Flags     `json:"flags"`
+	Username    string                `json:"username"`
+	Msg         string                `json:"msg,omitempty"`
+	Version     map[string]string     `json:"version"`
+	LogFiles    *logs.LogFileInfos    `json:"logFileInfo"`
+	ConfigFiles *logs.LogFileInfos    `json:"configFileInfo"`
+	ClientInfo  *notifiarr.ClientInfo `json:"clientInfo"`
 }
 
 func (c *Client) renderTemplate(response io.Writer, req *http.Request,
@@ -177,6 +198,41 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 	if err != nil {
 		c.Errorf("Sending HTTP Response: %v", err)
 	}
+}
+
+// getUserPass turns the UIPassword config value into a usernam and password.
+// "password." => user:admin, pass:password.
+// ":password." => user:admin, pass::password.
+// "joe:password." => user:joe, pass:password.
+func (c *Client) getUserPass() (string, string) {
+	c.RLock()
+	defer c.RUnlock()
+
+	username, password := defaultUsername, c.Config.UIPassword
+	if spl := strings.SplitN(password, ":", 2); len(spl) == 2 { //nolint:gomnd
+		password = spl[1]
+
+		if spl[0] != "" {
+			username = spl[0]
+		}
+	}
+
+	return username, password
+}
+
+func (c *Client) setUserPass(username, password string) error {
+	c.Lock()
+	defer c.Unlock()
+
+	current := c.Config.UIPassword
+	c.Config.UIPassword = username + ":" + password
+
+	if err := c.saveNewConfig(c.Config); err != nil {
+		c.Config.UIPassword = current
+		return err
+	}
+
+	return nil
 }
 
 // haveCustomFile searches known locatinos for a file. Returns the file's path.

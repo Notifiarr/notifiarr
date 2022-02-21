@@ -18,10 +18,13 @@ $(document).ready((function()
 
     //-- GIVE THE TABLE(S) TIME TO LOAD
     setTimeout(function() {
-        $.each($('.datatable'), function() {
+        $.each($('.filetable'), function() {
             loadDataTable($(this));
         });
-    }, 1000);
+        $.each($('.servicetable'), function() {
+            loadServiceTable($(this));
+        });
+    }, 500);
 }));
 
 function loadDataTable(table) {
@@ -33,12 +36,61 @@ function loadDataTable(table) {
         'paging': false,
         "autoWidth": true,
         "sScrollY": "0px",
+        "oLanguage": {
+            "sSearch": "Filter File List:",
+            "sSearchPlaceholder": "filename.."
+        },
+        "columns": [
+            // only search first column (file name).
+            null,
+            { "searchable": false },
+            { "searchable": false },
+            { "searchable": false }
+        ],
         "fnDrawCallback":function() {
             // fix the header column on window resize.
             this.api().columns.adjust();
         }
     });
 }
+
+function loadServiceTable(table) {
+    table.DataTable({
+        'order': [[1,'desc'], [0, 'asc']],
+        'paging': true,
+        'pageLength': 100,
+        "autoWidth": true,
+        'scrollY': '80vh',
+        "sScrollY": "0px",
+        'scrollCollapse': true,
+        "oLanguage": {
+            "sSearch": "Filter Services:"
+        },
+        "columns": [
+            null,
+            {
+                "searchable": true,
+                "orderData": [2]
+            },
+            {
+                "searchable": false,
+                "visible": false,
+            },
+            // do not search duration columns.
+            { "searchable": false },
+            { "searchable": false },
+            { "searchable": false },
+            { "searchable": false },
+            null
+        ],
+        "lengthMenu": [20, 50, 100, 200, 500, 1000],
+        "fnDrawCallback":function() {
+            // fix the header column on window resize.
+            this.api().columns.adjust();
+        }
+    });
+}
+
 // ---------------------------------------------------------------------------------------------
 
 function jsLoader()
@@ -83,7 +135,7 @@ function setTooltips()
             fontSize: '18px',
             borderRadius: '12px',
             height: 'auto',
-            maxWidth: '400px',
+            maxWidth: '500px',
             minWidth: '100px',
             padding: '0.5em',
             opacity: 0.95,

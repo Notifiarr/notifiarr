@@ -40,8 +40,11 @@ function refreshPage(template, notice = true)
             updateFileContentCounters();
             setTooltips();
             // Load any data tables on this page.
-            $('#template-'+ template).find('.datatable').each(function() {
+            $('#template-'+ template).find('.filetable').each(function() {
                 loadDataTable($(this));
+            });
+            $('#template-'+ template).find('.servicetable').each(function() {
+                loadServiceTable($(this));
             });
         },
         error: function (request, status, error) {

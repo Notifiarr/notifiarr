@@ -120,13 +120,13 @@ a:hover {
   background: #325d88;
 }
 .bk-success {
-  background: #93c54b;
+  background: #1a542a;
 }
 .bk-warning {
-  background: #f47c3c;
+  background: #91760a;
 }
 .bk-danger {
-  background: #d9534f;
+  background: #451710;
 }
 .bk-info {
   background: #29abe0;
@@ -136,7 +136,7 @@ a:hover {
   background: #fff;
 }
 .bk-brand {
-  background: #37a6c4;
+  background: #6441A4;
 }
 .bk-dark {
   background: #222;
@@ -765,6 +765,7 @@ li {
 }
 
 
+
 .nav-icon {
     margin-left: 5px;
     margin-right: 2px;
@@ -793,7 +794,7 @@ li {
     cursor: help;
 }
 
-div .log-file-content {
+div .file-content {
     color: #fff;
     font-family: Consolas, Monaco, Lucida Console, monospace;
     font-size: .9em;
@@ -804,7 +805,7 @@ div .log-file-content {
     overflow-wrap: normal;
 }
 
-div .log-file-content .line-number {
+div .file-content .line-number {
     float:left;
     margin:0 1em 0 -1em;
     border-right:1px solid;

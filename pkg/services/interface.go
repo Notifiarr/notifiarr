@@ -36,20 +36,22 @@ func (c *Config) runChecks(forceAll bool) {
 	}
 }
 
-// getResults creates a copy of all the results and returns them.
-func (c *Config) getResults() []*CheckResult {
+// GetResults creates a copy of all the results and returns them.
+func (c *Config) GetResults() []*CheckResult {
 	svcs := make([]*CheckResult, len(c.services))
 	count := 0
 
 	for _, svc := range c.services {
 		svcs[count] = &CheckResult{
-			Interval: svc.Interval.Duration.Seconds(),
-			Name:     svc.Name,
-			State:    svc.state,
-			Output:   svc.output,
-			Type:     svc.Type,
-			Time:     svc.lastCheck,
-			Since:    svc.since,
+			Interval:    svc.Interval.Duration.Seconds(),
+			Name:        svc.Name,
+			State:       svc.state,
+			Output:      svc.output,
+			Type:        svc.Type,
+			Time:        svc.lastCheck,
+			Since:       svc.since,
+			Check:       svc.Value,
+			IntervalDur: svc.Interval.Duration,
 		}
 		count++
 	}
@@ -88,4 +90,8 @@ func (c CheckState) String() string {
 	case StateOK:
 		return "OK"
 	}
+}
+
+func (c CheckState) Value() uint {
+	return uint(c)
 }

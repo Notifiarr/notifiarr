@@ -19,7 +19,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -32,17 +31,6 @@ const (
 	fileSourceLogs   = "logs"
 	fileSourceConfig = "config"
 )
-
-type templateData struct {
-	Config      *configfile.Config    `json:"config"`
-	Flags       *configfile.Flags     `json:"flags"`
-	Username    string                `json:"username"`
-	Msg         string                `json:"msg,omitempty"`
-	Version     map[string]string     `json:"version"`
-	LogFiles    *logs.LogFileInfos    `json:"logFileInfo"`
-	ConfigFiles *logs.LogFileInfos    `json:"configFileInfo"`
-	ClientInfo  *notifiarr.ClientInfo `json:"clientInfo"`
-}
 
 // userNameValue is used a context value key.
 type userNameValue string
@@ -97,41 +85,6 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 		Value: encoded,
 		Path:  "/",
 	})
-}
-
-// getUserPass turns the UIPassword config value into a usernam and password.
-// "password." => user:admin, pass:password.
-// ":password." => user:admin, pass::password.
-// "joe:password." => user:joe, pass:password.
-func (c *Client) getUserPass() (string, string) {
-	c.RLock()
-	defer c.RUnlock()
-
-	username, password := defaultUsername, c.Config.UIPassword
-	if spl := strings.SplitN(password, ":", 2); len(spl) == 2 { //nolint:gomnd
-		password = spl[1]
-
-		if spl[0] != "" {
-			username = spl[0]
-		}
-	}
-
-	return username, password
-}
-
-func (c *Client) setUserPass(username, password string) error {
-	c.Lock()
-	defer c.Unlock()
-
-	current := c.Config.UIPassword
-	c.Config.UIPassword = username + ":" + password
-
-	if err := c.saveNewConfig(c.Config); err != nil {
-		c.Config.UIPassword = current
-		return err
-	}
-
-	return nil
 }
 
 func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
@@ -240,6 +193,21 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 		}
 
 		return
+	}
+}
+
+func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http.Request) {
+	switch action := mux.Vars(req)["action"]; action {
+	case "stop":
+		c.Config.Services.Stop()
+		c.Printf("[gui requested] Service Checks Stopped")
+		http.Error(response, "Service Checks Stopped", http.StatusOK)
+	case "start":
+		c.Config.Services.Start()
+		c.Printf("[gui requested] Service Checks Started")
+		http.Error(response, "Service Checks Started", http.StatusOK)
+	default:
+		http.Error(response, "invalid action: "+action, http.StatusBadRequest)
 	}
 }
 

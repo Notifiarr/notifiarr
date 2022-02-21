@@ -60,6 +60,9 @@ func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
 func (c *Config) Start() {
+	c.stopLock.Lock()
+	defer c.stopLock.Unlock()
+
 	if c.LogFile != "" {
 		c.Logger = logs.CustomLog(c.LogFile, "Services")
 	}
@@ -115,7 +118,7 @@ func (c *Config) runServiceChecker() {
 		defer second.Stop()
 
 		c.runChecks(true)
-		c.SendResults(&Results{What: notifiarr.EventStart, Svcs: c.getResults()})
+		c.SendResults(&Results{What: notifiarr.EventStart, Svcs: c.GetResults()})
 	}
 
 	for {
@@ -131,15 +134,15 @@ func (c *Config) runServiceChecker() {
 
 			return
 		case <-ticker.C:
-			c.SendResults(&Results{What: notifiarr.EventCron, Svcs: c.getResults()})
+			c.SendResults(&Results{What: notifiarr.EventCron, Svcs: c.GetResults()})
 		case event := <-c.triggerChan:
 			c.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(c.checks), cap(c.checks))
 			c.runChecks(true)
 
 			if event != "log" {
-				c.SendResults(&Results{What: event, Svcs: c.getResults()})
+				c.SendResults(&Results{What: event, Svcs: c.GetResults()})
 			} else {
-				data, _ := json.MarshalIndent(&Results{Svcs: c.getResults(), Interval: c.Interval.Seconds()}, "", " ")
+				data, _ := json.MarshalIndent(&Results{Svcs: c.GetResults(), Interval: c.Interval.Seconds()}, "", " ")
 				c.Debug("Service Checks Payload (log only):", string(data))
 			}
 		case <-second.C:
@@ -148,8 +151,18 @@ func (c *Config) runServiceChecker() {
 	}
 }
 
+func (c *Config) Running() bool {
+	c.stopLock.Lock()
+	defer c.stopLock.Unlock()
+
+	return c.stopChan != nil
+}
+
 // Stop ends all service checker routines.
 func (c *Config) Stop() {
+	c.stopLock.Lock()
+	defer c.stopLock.Unlock()
+
 	if c.stopChan == nil {
 		return
 	}

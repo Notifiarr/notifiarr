@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -46,6 +47,7 @@ type Config struct {
 	done         chan bool
 	stopChan     chan struct{}
 	triggerChan  chan notifiarr.EventType
+	stopLock     sync.Mutex
 }
 
 // CheckType locks us into a few specific types of checks.
@@ -80,13 +82,15 @@ type Results struct {
 
 // CheckResult represents the status of a service.
 type CheckResult struct {
-	Name     string     `json:"name"`   // "Radarr"
-	State    CheckState `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
-	Output   string     `json:"output"` // metadata message
-	Type     CheckType  `json:"type"`   // http, tcp, ping
-	Time     time.Time  `json:"time"`   // when it was checked, rounded to Microseconds
-	Since    time.Time  `json:"since"`  // how long it has been in this state, rounded to Microseconds
-	Interval float64    `json:"interval"`
+	Name        string        `json:"name"`   // "Radarr"
+	State       CheckState    `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
+	Output      string        `json:"output"` // metadata message
+	Type        CheckType     `json:"type"`   // http, tcp, ping
+	Time        time.Time     `json:"time"`   // when it was checked, rounded to Microseconds
+	Since       time.Time     `json:"since"`  // how long it has been in this state, rounded to Microseconds
+	Interval    float64       `json:"interval"`
+	Check       string        `json:"check"`
+	IntervalDur time.Duration `json:"-"`
 }
 
 // Service is a thing we check and report results for.
