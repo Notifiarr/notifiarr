@@ -75,6 +75,7 @@ func (c *Config) Start() {
 	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
 	c.triggerChan = make(chan notifiarr.EventType)
+	c.checkChan = make(chan triggerCheck)
 
 	for i := uint(0); i < c.Parallel; i++ {
 		go func() {
@@ -135,6 +136,11 @@ func (c *Config) runServiceChecker() {
 			return
 		case <-ticker.C:
 			c.SendResults(&Results{What: notifiarr.EventCron, Svcs: c.GetResults()})
+		case event := <-c.checkChan:
+			c.Debugf("Running service check '%s' via event: %s, buffer: %d/%d",
+				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
+			c.runCheck(event.Service, true)
+
 		case event := <-c.triggerChan:
 			c.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(c.checks), cap(c.checks))
 			c.runChecks(true)
@@ -168,11 +174,13 @@ func (c *Config) Stop() {
 	}
 
 	defer close(c.triggerChan)
+	defer close(c.checkChan)
 	defer close(c.stopChan)
 	defer close(c.checks)
 	defer close(c.done)
 
 	c.triggerChan = nil
+	c.checkChan = nil
 	c.stopChan <- struct{}{}
 	<-c.stopChan
 	c.checks = nil

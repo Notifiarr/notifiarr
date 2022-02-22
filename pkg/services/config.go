@@ -47,6 +47,7 @@ type Config struct {
 	done         chan bool
 	stopChan     chan struct{}
 	triggerChan  chan notifiarr.EventType
+	checkChan    chan triggerCheck
 	stopLock     sync.Mutex
 }
 
@@ -89,7 +90,8 @@ type CheckResult struct {
 	Time        time.Time     `json:"time"`   // when it was checked, rounded to Microseconds
 	Since       time.Time     `json:"since"`  // how long it has been in this state, rounded to Microseconds
 	Interval    float64       `json:"interval"`
-	Check       string        `json:"check"`
+	Check       string        `json:"-"`
+	Expect      string        `json:"-"`
 	IntervalDur time.Duration `json:"-"`
 }
 

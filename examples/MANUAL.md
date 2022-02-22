@@ -51,7 +51,7 @@ OPTIONS
         Use this flag to pass in a custom HTTP assets folder. This folder must
         contain a files/ folder and a templates/ folder. Files are served as
         static assets from the /files path and templates contains customized
-        HTML templates for the GUI web routes. This is an advanced feature.
+        HTML templates for the GUI web routes. This is a developer feature.
 
     -v, --version
         Display version and exit.

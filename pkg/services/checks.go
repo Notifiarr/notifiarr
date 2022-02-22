@@ -10,11 +10,19 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
 
 type result struct {
 	output string
 	state  CheckState
+}
+
+// triggerCheck is used to signal the check of one service.
+type triggerCheck struct {
+	Source  notifiarr.EventType
+	Service *Service
 }
 
 func (s *Service) Validate() error { //nolint:cyclop

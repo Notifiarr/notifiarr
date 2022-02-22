@@ -68,14 +68,8 @@ function loadServiceTable(table) {
         },
         "columns": [
             null,
-            {
-                "searchable": true,
-                "orderData": [2]
-            },
-            {
-                "searchable": false,
-                "visible": false,
-            },
+            { "orderData":  [2]   },
+            { "searchable": false },
             // do not search duration columns.
             { "searchable": false },
             { "searchable": false },

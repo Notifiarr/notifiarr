@@ -25,11 +25,14 @@ function showProcessList()
     });
 }
 
-function toggleServiceChecks(toggle, refresh) {
+// servicesAction can be used to toggle service checks or initiate service checks.
+function servicesAction(action, refresh, refreshDelay = 0) {
     $.ajax({
-        url: 'services/'+toggle,
+        url: 'services/'+action,
         success: function (data){
-            refreshPage(refresh, false);
+            setTimeout(function() {
+                refreshPage(refresh, false);
+            }, refreshDelay);
             toast('Yay!', data, 'success')
         },
         error: function (request, status, error) {
@@ -37,7 +40,7 @@ function toggleServiceChecks(toggle, refresh) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
-                toast('Error', error+': '+response.responseText, 'error', 10000);
+                toast('Error', error+': '+request.responseText, 'error', 10000);
             }
         },
     });

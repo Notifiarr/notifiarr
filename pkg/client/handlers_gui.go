@@ -19,6 +19,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -209,6 +210,17 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 	default:
 		http.Error(response, "invalid action: "+action, http.StatusBadRequest)
 	}
+}
+
+func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Request) {
+	svc := mux.Vars(req)["service"]
+	if err := c.Config.Services.RunCheck(notifiarr.EventAPI, svc); err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	c.Printf("[gui requested] Check Service: %s", svc)
+	http.Error(response, "Service Check Initiated", http.StatusOK)
 }
 
 // getFileHandler returns portions of a config or log file based on request paraeters.

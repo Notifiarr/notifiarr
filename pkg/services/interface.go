@@ -1,19 +1,52 @@
 package services
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
 
-// runChecks runs checks from an external package.
+var ErrSvcsStopped = fmt.Errorf("service check routine stopped")
+
+// RunChecks runs checks from an external package.
 func (c *Config) RunChecks(source notifiarr.EventType) {
+	c.stopLock.Lock()
+	defer c.stopLock.Unlock()
+
 	if c.triggerChan == nil || c.stopChan == nil {
 		c.Errorf("Cannot run service checks. Go routine is not running.")
 		return
 	}
 
 	c.triggerChan <- source
+}
+
+// runChecks runs checks from an external package.
+func (c *Config) RunCheck(source notifiarr.EventType, name string) error {
+	c.stopLock.Lock()
+	defer c.stopLock.Unlock()
+
+	if c.triggerChan == nil || c.stopChan == nil {
+		return fmt.Errorf("cannot check service, %w", ErrSvcsStopped)
+	}
+
+	svc, ok := c.services[name]
+	if !ok {
+		return fmt.Errorf("%w: service '%s' not found", ErrNoName, name)
+	}
+
+	c.checkChan <- triggerCheck{Source: source, Service: svc}
+
+	return nil
+}
+
+// runChecks runs checks that are due. Passing true, runs them even if they're not due.
+func (c *Config) runCheck(svc *Service, force bool) {
+	if force || svc.lastCheck.Add(svc.Interval.Duration).Before(time.Now()) {
+		c.checks <- svc
+		<-c.done
+	}
 }
 
 // runChecks runs checks that are due. Passing true, runs them even if they're not due.
@@ -51,6 +84,7 @@ func (c *Config) GetResults() []*CheckResult {
 			Time:        svc.lastCheck,
 			Since:       svc.since,
 			Check:       svc.Value,
+			Expect:      svc.Expect,
 			IntervalDur: svc.Interval.Duration,
 		}
 		count++
