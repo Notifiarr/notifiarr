@@ -5,6 +5,7 @@ package services
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs"
@@ -67,10 +68,14 @@ func (c *Config) Start() {
 		c.Logger = logs.CustomLog(c.LogFile, "Services")
 	}
 
-	for i := range c.services {
-		c.services[i].log = c.Logger
+	names := []string{}
+
+	for name := range c.services {
+		names = append(names, valuePrefix+name)
+		c.services[name].svc.log = c.Logger
 	}
 
+	c.loadServiceStates(names)
 	c.checks = make(chan *Service, DefaultBuffer)
 	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
@@ -103,6 +108,37 @@ func (c *Config) Start() {
 
 	c.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
 		word, len(c.services), c.Interval, c.Parallel)
+}
+
+// loadServiceStates brings service states from the website into the fold.
+// In other words, states are stored in the website's database.
+func (c *Config) loadServiceStates(names []string) {
+	values, err := c.Notifiarr.GetValue(names...)
+	if err != nil {
+		c.Errorf("Getting initial service states from Notifiarr.com: %v", err)
+		return
+	}
+
+	for name := range c.services {
+		for siteDataName := range values {
+			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
+				var svc service
+				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
+					c.Errorf("Service check data for '%s' returned from site is invalid: %v", name, err)
+					break
+				}
+
+				if time.Since(svc.LastCheck) < time.Hour {
+					c.services[name].svc.Output = svc.Output
+					c.services[name].svc.State = svc.State
+					c.services[name].svc.Since = svc.Since
+					c.services[name].svc.LastCheck = svc.LastCheck
+				}
+
+				break
+			}
+		}
+	}
 }
 
 func (c *Config) runServiceChecker() {

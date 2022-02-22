@@ -1,11 +1,14 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
+
+const valuePrefix = "serviceCheck-"
 
 var ErrSvcsStopped = fmt.Errorf("service check routine stopped")
 
@@ -41,9 +44,9 @@ func (c *Config) RunCheck(source notifiarr.EventType, name string) error {
 	return nil
 }
 
-// runChecks runs checks that are due. Passing true, runs them even if they're not due.
+// runCheck runs a service check if it is due. Passing force runs it regardless.
 func (c *Config) runCheck(svc *Service, force bool) {
-	if force || svc.lastCheck.Add(svc.Interval.Duration).Before(time.Now()) {
+	if force || svc.svc.LastCheck.Add(svc.Interval.Duration).Before(time.Now()) {
 		c.checks <- svc
 		<-c.done
 	}
@@ -58,14 +61,35 @@ func (c *Config) runChecks(forceAll bool) {
 	count := 0
 
 	for s := range c.services {
-		if forceAll || c.services[s].lastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
+		if forceAll || c.services[s].svc.LastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
 			count++
 			c.checks <- c.services[s]
 		}
 	}
 
+	somethingChanged := false
 	for ; count > 0; count-- {
-		<-c.done
+		somethingChanged = <-c.done || somethingChanged
+	}
+
+	if somethingChanged {
+		c.updateStatesOnSite()
+	}
+}
+
+func (c *Config) updateStatesOnSite() {
+	values := make(map[string][]byte)
+
+	for _, svc := range c.services {
+		values[valuePrefix+svc.Name], _ = json.Marshal(svc.svc)
+	}
+
+	if len(values) == 0 {
+		return
+	}
+
+	if err := c.Notifiarr.SetValues(values); err != nil {
+		c.Errorf("Setting Service States on Notifiarr.com: %v", err)
 	}
 }
 
@@ -78,11 +102,11 @@ func (c *Config) GetResults() []*CheckResult {
 		svcs[count] = &CheckResult{
 			Interval:    svc.Interval.Duration.Seconds(),
 			Name:        svc.Name,
-			State:       svc.state,
-			Output:      svc.output,
+			State:       svc.svc.State,
+			Output:      svc.svc.Output,
 			Type:        svc.Type,
-			Time:        svc.lastCheck,
-			Since:       svc.since,
+			Time:        svc.svc.LastCheck,
+			Since:       svc.svc.Since,
 			Check:       svc.Value,
 			Expect:      svc.Expect,
 			IntervalDur: svc.Interval.Duration,

@@ -97,16 +97,20 @@ type CheckResult struct {
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name      string        `toml:"name" xml:"name" json:"name"`             // Radarr
-	Type      CheckType     `toml:"type" xml:"type" json:"type"`             // http
-	Value     string        `toml:"check" xml:"check" json:"value"`          // http://some.url
-	Expect    string        `toml:"expect" xml:"expect" json:"expect"`       // 200
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`    // 10s
-	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"` // 1m
+	Name     string        `toml:"name" xml:"name" json:"name"`             // Radarr
+	Type     CheckType     `toml:"type" xml:"type" json:"type"`             // http
+	Value    string        `toml:"check" xml:"check" json:"value"`          // http://some.url
+	Expect   string        `toml:"expect" xml:"expect" json:"expect"`       // 200
+	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`    // 10s
+	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"` // 1m
+	svc      service
+}
+
+type service struct {
+	Output    string     `json:"output"`
+	State     CheckState `json:"state"`
+	Since     time.Time  `json:"since"`
+	LastCheck time.Time  `json:"lastCheck"`
 	log       *logs.Logger
-	output    string
-	state     CheckState
-	since     time.Time
-	lastCheck time.Time
 	proc      *procExpect // only used for process checks.
 }

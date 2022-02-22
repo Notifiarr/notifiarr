@@ -95,6 +95,10 @@ func (c *Client) getFuncMap() template.FuncMap {
 		"locked":   func(env string) bool { return os.Getenv(env) != "" },
 		"contains": strings.Contains,
 		"since": func(t time.Time) string {
+			if t.IsZero() {
+				return "N/A"
+			}
+
 			return strings.ReplaceAll(durafmt.Parse(time.Since(t).Round(time.Second)).
 				LimitFirstN(3). //nolint:gomnd
 				Format(durafmt.Units{
