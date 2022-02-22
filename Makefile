@@ -100,7 +100,7 @@ clean:
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
-	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service
+	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go
 	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
 
 ####################
@@ -137,18 +137,18 @@ $(shell go env GOPATH)/bin/rsrc:
 ##### Binaries #####
 ####################
 
-build: $(BINARY)
+build: generate $(BINARY)
 $(BINARY): main.go
 	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-linux: $(BINARY).amd64.linux
+linux: generate $(BINARY).amd64.linux
 $(BINARY).amd64.linux: main.go
 	# Building linux 64-bit x86 binary.
 	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-linux386: $(BINARY).i386.linux
+linux386: generate $(BINARY).i386.linux
 $(BINARY).i386.linux: main.go
 	# Building linux 32-bit x86 binary.
 	GOOS=linux GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
@@ -156,38 +156,38 @@ $(BINARY).i386.linux: main.go
 
 arm: arm64 armhf
 
-arm64: $(BINARY).arm64.linux
+arm64: generate $(BINARY).arm64.linux
 $(BINARY).arm64.linux: main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-armhf: $(BINARY).armhf.linux
+armhf: generate $(BINARY).armhf.linux
 $(BINARY).armhf.linux: main.go
 	# Building linux 32-bit ARM binary.
 	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-macos: $(BINARY).amd64.macos
+macos: generate $(BINARY).amd64.macos
 $(BINARY).amd64.macos: main.go
 	# Building darwin 64-bit x86 binary.
 	GOOS=darwin GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-freebsd: $(BINARY).amd64.freebsd
+freebsd: generate $(BINARY).amd64.freebsd
 $(BINARY).amd64.freebsd: main.go
 	GOOS=freebsd GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-freebsd386: $(BINARY).i386.freebsd
+freebsd386: generate $(BINARY).i386.freebsd
 $(BINARY).i386.freebsd: main.go
 	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@ || true
 
-freebsdarm: $(BINARY).armhf.freebsd
+freebsdarm: generate $(BINARY).armhf.freebsd
 $(BINARY).armhf.freebsd: main.go
 	GOOS=freebsd GOARCH=arm go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-exe: $(BINARY).amd64.exe
+exe: generate $(BINARY).amd64.exe
 windows: $(BINARY).amd64.exe
 $(BINARY).amd64.exe: rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
@@ -420,7 +420,8 @@ bindata: $(shell go env GOPATH)/bin/go-bindata
 $(shell go env GOPATH)/bin/go-bindata:
 	cd /tmp ; go get -u github.com/go-bindata/go-bindata/... ; go install github.com/go-bindata/go-bindata
 
-generate: mockgen bindata
+generate: mockgen bindata pkg/bindata/bindata.go
+pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./...
 
