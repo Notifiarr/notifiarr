@@ -8,7 +8,12 @@
                      </p>
                     <table class="table table-striped table-bordered">
                         <thead>
-                            <tr><td colspan="3" align="center"><h4 class="mb-3">User</h4></td></tr>
+                            <tr>
+                                <td colspan="3" align="center">
+                                    <i class="fas fa-user" style="float:left;font-size:40px"></i>
+                                    <h4>User</h4>
+                                </td>
+                            </tr>
                         </thead>
                         <tbody>
                             <tr>
@@ -27,7 +32,12 @@
                             {{end}}
                         </tbody>
                          <thead>
-                             <tr><td colspan="3" align="center"><h4 class="mb-3">Client</h4></td></tr>
+                             <tr>
+                                 <td colspan="3" align="center">
+                                     <img src="{{files}}/images/favicon.png" style="float:left;margin-top:-5px;height:50px;">
+                                     <h4>Client</h4>
+                                 </td>
+                             </tr>
                          </thead>
                          <tbody>
                              <tr>
@@ -48,7 +58,12 @@
                              </tr>
                          </tbody>
                          <thead>
-                             <tr><td colspan="3" align="center"><h4 class="mb-3">Build</h4></td></tr>
+                             <tr>
+                                 <td colspan="3" align="center">
+                                     <img src="{{files}}/images/golift.png" style="float:left;margin-top:-5px; height:50px;">
+                                     <h4>Build</h4>
+                                 </td>
+                             </tr>
                          </thead>
                          <tbody>
                              <tr>
@@ -65,7 +80,12 @@
                              </tr>
                          </tbody>
                          <thead>
-                             <tr><td colspan="3" align="center"><h4 class="mb-3">Operating System</h4></td></tr>
+                             <tr>
+                                 <td colspan="3" align="center">
+                                     <i class="fas fa-desktop" style="float:left;font-size:40px"></i>
+                                     <h4>Operating System</h4>
+                                 </td>
+                             </tr>
                          </thead>
                          <tbody>
                              <tr>
@@ -76,6 +96,36 @@
                                  <td>Architecture</td>
                                  <td>{{.Version.arch}}</td>
                              </tr>
+                         </tbody>
+                         <thead>
+                             <tr>
+                                 <td colspan="3" align="center">
+                                     <i class="fas fa-flag" style="float:left;font-size:40px"></i>
+                                     <h4>Flags</h4>
+                                 </td>
+                             </tr>
+                         </thead>
+                         <tbody>
+                             <tr>
+                                 <td>Binary</td>
+                                 <td>{{.Version.binary}}</td>
+                             </tr>
+                             <tr>
+                                 <td>Config File</td>
+                                 <td>{{.Flags.ConfigFile}}</td>
+                             </tr>
+                             {{- if .Flags.ExtraConf}}
+                             <tr>
+                                 <td>Extra Configs</td>
+                                 <td>{{.Flags.ExtraConf}}</td>
+                             </tr>
+                             {{- end}}
+                             {{- if .Flags.Assets}}
+                             <tr>
+                                 <td>Assets</td>
+                                 <td>{{.Flags.Assets}}</td>
+                             </tr>
+                             {{- end}}
                          </tbody>
                     </table>
 {{- /* end of system (leave this comment) */ -}}

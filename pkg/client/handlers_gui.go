@@ -201,6 +201,22 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 	}
 }
 
+func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
+	defer func() {
+		c.sigkil <- &update.Signal{Text: "shutdown gui triggered"}
+	}()
+
+	http.Error(response, "OK", http.StatusOK)
+}
+
+func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
+	defer func() {
+		c.sighup <- &update.Signal{Text: "reload gui triggered"}
+	}()
+
+	http.Error(response, "OK", http.StatusOK)
+}
+
 func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http.Request) {
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":

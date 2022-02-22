@@ -68,14 +68,11 @@ func (c *Config) Start() {
 		c.Logger = logs.CustomLog(c.LogFile, "Services")
 	}
 
-	names := []string{}
-
 	for name := range c.services {
-		names = append(names, valuePrefix+name)
 		c.services[name].svc.log = c.Logger
 	}
 
-	c.loadServiceStates(names)
+	c.loadServiceStates()
 	c.checks = make(chan *Service, DefaultBuffer)
 	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
@@ -112,7 +109,12 @@ func (c *Config) Start() {
 
 // loadServiceStates brings service states from the website into the fold.
 // In other words, states are stored in the website's database.
-func (c *Config) loadServiceStates(names []string) {
+func (c *Config) loadServiceStates() {
+	names := []string{}
+	for name := range c.services {
+		names = append(names, valuePrefix+name)
+	}
+
 	values, err := c.Notifiarr.GetValue(names...)
 	if err != nil {
 		c.Errorf("Getting initial service states from Notifiarr.com: %v", err)

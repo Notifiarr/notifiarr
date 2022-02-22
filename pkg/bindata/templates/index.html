@@ -13,6 +13,10 @@
                     </a>
                     <span class="menu-btn"><i class="fa fa-bars"></i></span>
                     <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
+                    {{- if .Username }}
+                    <a class="nav-button text-danger fas fa-power-off" title="Shut down application (quit)." onClick="shutDownApp();"></a>
+                    <a class="nav-button text-success fas fa-recycle" title="Reload application configuraton and refresh." onClick="reloadConfig();"></a>
+                    {{- end}}
                 </div>
                 <div class="ts-main-content">
                     <nav class="ts-sidebar">

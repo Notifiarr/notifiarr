@@ -175,6 +175,8 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 		clientInfo = &notifiarr.ClientInfo{}
 	}
 
+	binary, _ := os.Executable()
+
 	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
 		Flags:       c.Flags,
@@ -195,6 +197,7 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 			"goVersion": version.GoVersion,
 			"os":        runtime.GOOS,
 			"arch":      runtime.GOARCH,
+			"binary":    binary,
 		},
 	})
 	if err != nil {

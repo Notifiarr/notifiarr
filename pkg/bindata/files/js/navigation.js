@@ -57,3 +57,43 @@ function refreshPage(template, notice = true)
         },
     });
 }
+
+function shutDownApp()
+{
+    if (confirm('Really shut down application?')) {
+        $.ajax({
+            url: 'shutdown',
+            async: false,
+            success: function (data){
+                toast('Shuting Down', 'Application Shutdown Initiated', 'success', 15000);
+            },
+             error: function (request, status, error) {
+                 if (error == "") {
+                     toast('Web Server Error',
+                         'Notifiarr client appears to be down aleady.', 'error', 30000);
+                 } else {
+                     toast('Shutdown Error', error+': '+response.responseText, 'error', 10000);
+                 }
+             },
+         });
+     }
+}
+
+function reloadConfig()
+{
+    $.ajax({
+        url: 'reload',
+        success: function (data){
+            setTimeout(function(){location.reload();}, 5000); // reload window in 5 seconds.
+            toast('Reloading', 'Application Reload Initiated', 'success');
+        },
+         error: function (request, status, error) {
+             if (error == "") {
+                 toast('Web Server Error',
+                 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+             } else {
+                 toast('Reload Error', error+': '+response.responseText, 'error', 10000);
+             }
+         },
+     });
+}
