@@ -22,7 +22,7 @@ func (c *Config) RunChecks(source notifiarr.EventType) {
 	c.triggerChan <- source
 }
 
-// runChecks runs checks from an external package.
+// RunCheck runs a single check from an external package.
 func (c *Config) RunCheck(source notifiarr.EventType, name string) error {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()

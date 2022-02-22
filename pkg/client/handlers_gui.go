@@ -37,8 +37,7 @@ const (
 type userNameValue string
 
 const (
-	defaultUsername               = "admin"
-	userNameStr     userNameValue = "username"
+	userNameStr userNameValue = "username"
 )
 
 func (c *Client) checkAuthorized(next http.HandlerFunc) http.Handler {
@@ -89,21 +88,26 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 }
 
 func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
-	validUsername, validPassword := c.getUserPass()
-
 	switch providedUsername := request.FormValue("name"); {
-	case len(validPassword) < minPasswordLen:
-		c.indexPage(response, request, "Invalid Password Configured")
-	case c.getUserName(request) != "":
+	case c.getUserName(request) != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
-	case request.Method == http.MethodGet:
+	case request.Method == http.MethodGet: // dont handle login without POST
 		c.indexPage(response, request, "")
-	case providedUsername == validUsername && validPassword == request.FormValue("password"):
+	case len(request.FormValue("password")) < minPasswordLen:
+		c.indexPage(response, request, "Invalid Password Length")
+	case c.checkUserPass(providedUsername, request.FormValue("password")):
 		c.setSession(providedUsername, response)
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	default: // Start over.
 		c.indexPage(response, request, "Invalid Password")
 	}
+}
+
+func (c *Client) checkUserPass(username, password string) bool {
+	c.Lock()
+	defer c.Unlock()
+
+	return c.Config.UIPassword.Valid(username + ":" + password)
 }
 
 func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Request) {
@@ -265,20 +269,22 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	realUser, realPass := c.getUserPass()
-	if realPass != request.PostFormValue("Password") {
+	currUser := c.getUserName(request)
+	currPass := request.PostFormValue("Password")
+
+	if !c.checkUserPass(currUser, currPass) {
 		http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 		return
 	}
 
 	username := request.PostFormValue("NewUsername")
 	if username == "" {
-		username = realUser
+		username = currUser
 	}
 
 	newPassw := request.PostFormValue("NewPassword")
 	if newPassw == "" {
-		newPassw = realPass
+		newPassw = currPass
 	}
 
 	if len(newPassw) < minPasswordLen {
@@ -287,7 +293,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		return
 	}
 
-	if newPassw == realPass && username == realUser {
+	if newPassw == currPass && username == currUser {
 		http.Error(response, "Values unchanged. Nothing to save.", http.StatusOK)
 		return
 	}
@@ -298,6 +304,8 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 
 		return
 	}
+
+	c.setSession(username, response)
 
 	if _, err := response.Write([]byte("New username and/or password saved.")); err != nil {
 		c.Errorf("[gui requested] Writing HTTP Response: %v", err)

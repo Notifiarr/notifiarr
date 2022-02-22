@@ -81,8 +81,6 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 
 func (c *Client) getFuncMap() template.FuncMap {
 	return template.FuncMap{
-		// returns the username the logged in.
-		"username": func() string { u, _ := c.getUserPass(); return u },
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
@@ -200,7 +198,8 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 	}
 }
 
-// getUserPass turns the UIPassword config value into a usernam and password.
+/*
+// getUserPass turns the UIPassword config value into a username and password.
 // "password." => user:admin, pass:password.
 // ":password." => user:admin, pass::password.
 // "joe:password." => user:joe, pass:password.
@@ -219,13 +218,18 @@ func (c *Client) getUserPass() (string, string) {
 
 	return username, password
 }
-
+*/
 func (c *Client) setUserPass(username, password string) error {
 	c.Lock()
 	defer c.Unlock()
 
 	current := c.Config.UIPassword
-	c.Config.UIPassword = username + ":" + password
+
+	err := c.Config.UIPassword.Set(username + ":" + password)
+	if err != nil {
+		c.Config.UIPassword = current
+		return err
+	}
 
 	if err := c.saveNewConfig(c.Config); err != nil {
 		c.Config.UIPassword = current

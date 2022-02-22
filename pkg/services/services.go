@@ -140,7 +140,6 @@ func (c *Config) runServiceChecker() {
 			c.Debugf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
 			c.runCheck(event.Service, true)
-
 		case event := <-c.triggerChan:
 			c.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(c.checks), cap(c.checks))
 			c.runChecks(true)
