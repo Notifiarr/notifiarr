@@ -1,20 +1,20 @@
-                    <div class="row">
-                        <div class="col-md-10 col-md-offset-1">
-                            <h1 class="text-center text-bold mt-4x">Login</h1>
-                            <div class="well row pt-2x pb-3x bk-brown brdr">
-                                {{- if .Msg}}
-                                <div class="col-md-6 col-md-offset-3 alert alert-danger" style="text-align: center;">{{.Msg}}</div>
-                                {{- end}}
-                                <div class="col-md-8 col-md-offset-2">
-                                    <form method="post">
-                                        <label for="" class="text-uppercase text-sm">Username</label>
-                                        <input type="text" placeholder="username" name="name" class="form-control mb" required>
-                                        <label for="" class="text-uppercase text-sm">Password</label>
-                                        <input type="password" placeholder="Password" name="password" class="form-control mb" required>
-                                        <button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
-                                    </form>
+                                <div class="row">
+                                    <div class="col-md-10 col-md-offset-1">
+                                        <h1 class="text-center text-bold mt-4x">Login</h1>
+                                        <div class="well row pt-2x pb-3x bk-brown brdr">
+                                            {{- if .Msg}}
+                                            <div class="col-md-6 col-md-offset-3 alert alert-danger" style="text-align: center;">{{.Msg}}</div>
+                                            {{- end}}
+                                            <div class="col-md-8 col-md-offset-2">
+                                                <form method="post">
+                                                    <label for="" class="text-uppercase text-sm">Username</label>
+                                                    <input type="text" placeholder="username" name="name" class="form-control mb" required>
+                                                    <label for="" class="text-uppercase text-sm">Password</label>
+                                                    <input type="password" placeholder="Password" name="password" class="form-control mb" required>
+                                                    <button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
 {{- /* end of header (leave this comment) */ -}}

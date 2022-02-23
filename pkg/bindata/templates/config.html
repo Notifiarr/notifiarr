@@ -1,444 +1,444 @@
-                    <h1><i class="fas fa-cogs"></i> Configuration</h1>
-                    <div class="table-responsive">
-                        <table style="width:100%;" class="table table-striped table-bordered configtable">
-                            <thead>
-                                <tr>
-                                    <th><b>Setting</b></th>
-                                    <th><b>Current Value</b></th>
-                                    <th style="min-width:320px;"><b>New Value</b></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="text-center no-filter">
-                                    <td style="display:none;"></td><!-- this makes datatables work -->
-                                    <td style="display:none;"></td>
-                                    <td colspan="3">
-                                        <h2 class="mb-3">General</h2>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="API key from your Notifiarr.com account, required for security validation. This must be an 'All' key!" class="help-icon far fa-question-circle"></i>
-                                        API Key
-                                    </td>
-                                    <td>
-                                        {{.Config.APIKey}}
-                                        {{- if locked (printf "%s_API_KEY" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input class="client-parameter" data-group="config" data-label="API Key" type="text" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}" style="width:100%;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="This application uses the Notifiarr.com API key for incoming authentication. That's not safe if you want a third party to authenticate to this app. You can use this section to add extra API keys. Whatever you want. Separate them with newlines or spaces." class="help-icon far fa-question-circle"></i>
-                                        Extra Keys
-                                    </td>
-                                    <td>
-                                        {{range $s := .Config.ExKeys}}{{$s}}<br>{{end}}
-                                        {{- if locked (printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <textarea id="ExKeys" class="client-parameter" data-group="config" data-label="Extra Keys" data-original="{{range $s := .Config.ExKeys}}{{$s}} {{end}}" style="width: 100%;">{{range $s := .Config.ExKeys}}{{$s}} {{end}}</textarea>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="This is the IP and port the app will listen on. 0.0.0.0 means all IPs, and you should use that in almost all cases! Change the port if the default 5454 does not work for you. Example: 0.0.0.0:5454" class="help-icon far fa-question-circle"></i>
-                                        Bind Address
-                                    </td>
-                                    <td>
-                                        {{.Config.BindAddr}}
-                                        {{- if locked (printf "%s_BIND_ADDR" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input class="client-parameter" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}" style="width:100%;">
-                                    </td>
-                                </tr>
-                            {{- if eq .Version.os "windows" }}
-                                <tr>
-                                    <td>
-                                        <i title="This is how often the app will check for updates. When one is found it will be installed automatically." class="help-icon far fa-question-circle"></i>
-                                        Auto Update
-                                    </td>
-                                    <td>
-                                        {{.Config.AutoUpdate}}
-                                        {{- if locked (printf "%s_AUTO_UPDATE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <select class="client-parameter" data-group="config" data-label="Auto Update" id="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
-                                            <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="">Disabled</option>
-                                            <option {{if eq .Config.AutoUpdate "daily"}}selected {{end}}value="daily">Enabled (daily)</option>
-                                            {{- if not (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "daily")) }}
-                                            <option selected value="{{.Config.AutoUpdate}}">{{.Config.AutoUpdate}} (custom)</option>
-                                            {{- end}}
-                                        </select>
-                                    </td>
-                                </tr>
-                            {{- end }}
-                                <tr>
-                                    <td>
-                                        <i title="Only choose Development when asked, your Notifiarr account must have dev access for this to work." class="help-icon far fa-question-circle"></i>
-                                        Mode
-                                    </td>
-                                    <td>
-                                        {{.Config.Mode}}
-                                        {{- if locked (printf "%s_MODE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <select class="client-parameter" data-group="config" data-label="Client Mode" id="Mode" data-original="{{.Config.Mode}}">
-                                            <option {{if eq .Config.Mode "development"}}selected {{end}}value="development">Development</option>
-                                            <option {{if eq .Config.Mode "production" }}selected {{end}}value="production">Production</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="This application serves HTTP on / by default. You can change that by typing in something else here. Example: /notifiarr/" class="help-icon far fa-question-circle"></i>
-                                        URL Base
-                                    </td>
-                                    <td>
-                                        {{.Config.URLBase}}
-                                        {{- if locked (printf "%s_URLBASE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="URLBase" class="client-parameter" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or X-Forwarded-For). Separate with spaces or new lines." class="help-icon far fa-question-circle"></i>
-                                        Upstreams
-                                    </td>
-                                    <td>
-                                        {{range $s := .Config.Upstreams}}{{$s}}<br>{{end}}
-                                        {{- if locked (printf "%s_UPTREAMS_0" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <textarea id="Upstreams" class="client-parameter" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}" style="width: 100%;">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications. Spreads out CPU usage and lowers memory footprint." class="help-icon far fa-question-circle"></i>
-                                        Parallel Threads
-                                    </td>
-                                    <td>
-                                        {{if .Config.Serial}}Disabled{{else}}Enabled{{end}}
-                                        {{- if locked (printf "%s_SERIAL" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <select class="client-parameter" data-group="config" data-label="Serial" id="Serial" data-original="{{.Config.Serial}}">
-                                            <option {{if .Config.Serial}}selected {{end}}value="true">Disabled</option>
-                                            <option {{if not .Config.Serial}}selected {{end}}value="false">Enabled</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures. Default is 4. Setting 0 will take default of 4." class="help-icon far fa-question-circle"></i>
-                                        Retries
-                                    </td>
-                                    <td>
-                                        {{.Config.Retries}}
-                                        {{- if locked (printf "%s_RETRIES" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="Retries" class="client-parameter" data-group="config" data-label="Retries" data-original="{{.Config.Retries}}" value="{{.Config.Retries}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="This is the timeout for requests to Notifiarr.com, and any other timeout that may be missing (global). Exampes: 10s, 1m, 1m15s" class="help-icon far fa-question-circle"></i>
-                                        Timeout
-                                    </td>
-                                    <td>
-                                        {{.Config.Timeout}}
-                                        {{- if locked (printf "%s_TIMEOUT" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="Timeout" class="client-parameter" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td style="display:none;"></td>
-                                    <td style="display:none;"></td>
-                                    <td colspan="3">
-                                        <h2 class="mb-3">SSL</h2>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="This is the path to the SSL certificate key file. This is a secret! See Certificate File help for more info." class="help-icon far fa-question-circle"></i>
-                                        Cert Key File Path
-                                    </td>
-                                    <td>
-                                        {{.Config.SSLKeyFile}}
-                                        {{- if locked (printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="SSLKeyFile" class="client-parameter" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="This application can serve HTTPS. Enable that by specifying a certificate file path and key file path. The certificate file should have the full CA chain inclued." class="help-icon far fa-question-circle"></i>
-                                        Cert File Path
-                                    </td>
-                                    <td>
-                                        {{.Config.SSLCrtFile}}
-                                        {{- if locked (printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="SSLCrtFile" class="client-parameter" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td style="display:none;"></td>
-                                    <td style="display:none;"></td>
-                                    <td colspan="3">
-                                        <h2 class="mb-3">Services</h2>
-                                        <a href="#services" onClick="swapNavigationTemplate('services')" style="margin-top:-20px;float:right;">Service Checks</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Disable or enable monitoring all network and services checks right here." class="help-icon far fa-question-circle"></i>
-                                        Run Checks
-                                    </td>
-                                    <td>
-                                        {{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}
-                                        {{- if locked (printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <select class="client-parameter" data-group="config" data-label="Run Checks" id="Services.Disabled" data-original="{{.Config.Services.Disabled}}">
-                                            <option {{if .Config.Services.Disabled}}selected {{end}}value="true">Disabled</option>
-                                            <option {{if not .Config.Services.Disabled}}selected {{end}}value="false">Enabled</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this. This controls how many checks may run at once." class="help-icon far fa-question-circle"></i>
-                                        Parallel Checks
-                                    </td>
-                                    <td>
-                                        {{.Config.Services.Parallel}}
-                                        {{- if locked (printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                      <select class="client-parameter" data-group="config" data-label="Parallel Checks" id="Services.Parallel" data-original="{{.Config.Services.Parallel}}">
-                                          <option {{if eq .Config.Services.Parallel 1}}selected {{end}}value="1">1</option>
-                                          <option {{if eq .Config.Services.Parallel 2}}selected {{end}}value="2">2</option>
-                                          <option {{if eq .Config.Services.Parallel 3}}selected {{end}}value="3">3</option>
-                                          <option {{if eq .Config.Services.Parallel 4}}selected {{end}}value="4">4</option>
-                                          <option {{if eq .Config.Services.Parallel 5}}selected {{end}}value="5">5</option>
-                                      </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="How often to send service check results to Notifiarr.com. Default: 10m, minimum: 5m." class="help-icon far fa-question-circle"></i>
-                                        Update Interval
-                                    </td>
-                                    <td>
-                                        {{.Config.Services.Interval}}
-                                        {{- if locked (printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td><input type="text" id="Services.Interval" class="client-parameter" data-group="config" data-label="Update Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}" style="width: 100%;"></td>
-                                </tr>
-                                <tr class="text-center">
-                                    <td style="display:none;"></td>
-                                    <td style="display:none;"></td>
-                                    <td colspan="3">
-                                        <h2 class="mb-3">Logging</h2>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Enabling debug logging causes a lot more data to write to the log. Includes payloads to and from Notifiarr.com and starr apps. Use Max Body settings to control payloads sizes." class="help-icon far fa-question-circle"></i>
-                                        Debug Logging
-                                    </td>
-                                    <td>
-                                        {{if .Config.Debug}}Enabled{{else}}Disabled{{end}}
-                                        {{- if locked (printf "%s_DEBUG" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                      <select class="client-parameter" data-group="config" data-label="Debug" id="Debug" data-original="{{.Config.Debug}}">
-                                          <option {{if .Config.Debug}}selected {{end}}value="true">Enabled</option>
-                                          <option {{if not .Config.Debug}}selected {{end}}value="false">Disabled</option>
-                                      </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too." class="help-icon far fa-question-circle"></i>
-                                        Quiet Logging
-                                    </td>
-                                    <td>
-                                        {{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}
-                                        {{- if locked (printf "%s_QUIET" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                      <select class="client-parameter" data-group="config" data-label="Quiet" id="Quiet" data-original="{{.Config.Quiet}}">
-                                          <option {{if .Config.Quiet}}selected {{end}}value="true">Enabled</option>
-                                          <option {{if not .Config.Quiet}}selected {{end}}value="false">Disabled</option>
-                                      </select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Setting a log file path here will make the application write logs to this path. Highly recommended!" class="help-icon far fa-question-circle"></i>
-                                        App Log File
-                                    </td>
-                                    <td>
-                                        {{.Config.LogFile}}
-                                        {{- if locked (printf "%s_LOG_FILE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Setting a log file path here will make the application write the http logs to a dedicated file. The file format is in apachelog. Highly recommended." class="help-icon far fa-question-circle"></i>
-                                        HTTP Logfile
-                                    </td>
-                                    <td>
-                                        {{.Config.HTTPLog}}
-                                        {{- if locked (printf "%s_HTTP_LOG" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="HTTPLog" class="client-parameter" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Setting a log file path here will make the application write service check results to a dedicated file. Recommended if you have a lot of services." class="help-icon far fa-question-circle"></i>
-                                        Services Log File
-                                    </td>
-                                    <td>
-                                        {{.Config.Services.LogFile}}
-                                        {{- if locked (printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="Services.LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="Setting a log file path here will make the application write debug messages to a dedicated log file. Otherwise debug messages write to the main app log." class="help-icon far fa-question-circle"></i>
-                                        Debug Log File
-                                    </td>
-                                    <td>
-                                        {{.Config.LogConfig.DebugLog}}
-                                        {{- if locked (printf "%s_DEBUG_LOG" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="LogConfig.DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                            {{- if not (eq .Version.os "windows") }}
-                                <tr>
-                                    <td>
-                                        <i title="This is the unix file mode used when writing new log files. Recommended values in order of openness: 0600, 0640, 0644" class="help-icon far fa-question-circle"></i>
-                                        Log File Unix Mode
-                                    </td>
-                                    <td>
-                                        {{.Config.FileMode}}
-                                        {{- if locked (printf "%s_FILE_MODE" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="FileMode" class="client-parameter" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                            {{ end }}
-                                <tr>
-                                    <td>
-                                        <i title="When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com. Recommend 1000-5000." class="help-icon far fa-question-circle"></i>
-                                        Max Body Size
-                                    </td>
-                                    <td>
-                                        {{.Config.MaxBody}}
-                                        {{- if locked (printf "%s_MAX_BODY" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td><input type="text" id="MaxBody" class="client-parameter" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}" style="width: 100%;"></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation. Recommend 5-25 MB." class="help-icon far fa-question-circle"></i>
-                                        Log File Size (MB)
-                                    </td>
-                                    <td>
-                                        {{.Config.LogFileMb}}
-                                        {{- if locked (printf "%s_LOG_FILE_MB" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td><input type="text" id="LogFileMb" class="client-parameter" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}" style="width: 100%;"></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i title="When this setting is 0 or 1, log file rotation is disabled. Setting this to a higher value will rotate all log files, and keep this many of each on disk. Controls all log files." class="help-icon far fa-question-circle"></i>
-                                        Log File Count
-                                    </td>
-                                    <td>
-                                        {{.Config.LogFiles}}
-                                        {{- if locked (printf "%s_LOG_FILES" .Flags.EnvPrefix)}}
-                                        <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                        {{- end}}
-                                    </td>
-                                    <td>
-                                        <input type="text" id="LogFiles" class="client-parameter" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}" style="width: 100%;">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                <h1><i class="fas fa-cogs"></i> Configuration</h1>
+                                <div class="table-responsive">
+                                    <table style="width:100%;" class="table table-striped table-bordered configtable">
+                                        <thead>
+                                            <tr>
+                                                <th><b>Setting</b></th>
+                                                <th><b>Current Value</b></th>
+                                                <th style="min-width:320px;"><b>New Value</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-center no-filter">
+                                                <td style="display:none;"></td><!-- this makes datatables work -->
+                                                <td style="display:none;"></td>
+                                                <td colspan="3">
+                                                    <h2 class="mb-3">General</h2>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="API key from your Notifiarr.com account, required for security validation. This must be an 'All' key!" class="help-icon far fa-question-circle"></i>
+                                                    API Key
+                                                </td>
+                                                <td>
+                                                    {{.Config.APIKey}}
+                                                    {{- if locked (printf "%s_API_KEY" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input class="client-parameter" data-group="config" data-label="API Key" type="text" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}" style="width:100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="This application uses the Notifiarr.com API key for incoming authentication. That's not safe if you want a third party to authenticate to this app. You can use this section to add extra API keys. Whatever you want. Separate them with newlines or spaces." class="help-icon far fa-question-circle"></i>
+                                                    Extra Keys
+                                                </td>
+                                                <td>
+                                                    {{range $s := .Config.ExKeys}}{{$s}}<br>{{end}}
+                                                    {{- if locked (printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <textarea id="ExKeys" class="client-parameter" data-group="config" data-label="Extra Keys" data-original="{{range $s := .Config.ExKeys}}{{$s}} {{end}}" style="width: 100%;">{{range $s := .Config.ExKeys}}{{$s}} {{end}}</textarea>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="This is the IP and port the app will listen on. 0.0.0.0 means all IPs, and you should use that in almost all cases! Change the port if the default 5454 does not work for you. Example: 0.0.0.0:5454" class="help-icon far fa-question-circle"></i>
+                                                    Bind Address
+                                                </td>
+                                                <td>
+                                                    {{.Config.BindAddr}}
+                                                    {{- if locked (printf "%s_BIND_ADDR" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input class="client-parameter" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}" style="width:100%;">
+                                                </td>
+                                            </tr>
+                                        {{- if eq .Version.os "windows" }}
+                                            <tr>
+                                                <td>
+                                                    <i title="This is how often the app will check for updates. When one is found it will be installed automatically." class="help-icon far fa-question-circle"></i>
+                                                    Auto Update
+                                                </td>
+                                                <td>
+                                                    {{.Config.AutoUpdate}}
+                                                    {{- if locked (printf "%s_AUTO_UPDATE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <select class="client-parameter" data-group="config" data-label="Auto Update" id="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
+                                                        <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="">Disabled</option>
+                                                        <option {{if eq .Config.AutoUpdate "daily"}}selected {{end}}value="daily">Enabled (daily)</option>
+                                                        {{- if not (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "daily")) }}
+                                                        <option selected value="{{.Config.AutoUpdate}}">{{.Config.AutoUpdate}} (custom)</option>
+                                                        {{- end}}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        {{- end }}
+                                            <tr>
+                                                <td>
+                                                    <i title="Only choose Development when asked, your Notifiarr account must have dev access for this to work." class="help-icon far fa-question-circle"></i>
+                                                    Mode
+                                                </td>
+                                                <td>
+                                                    {{.Config.Mode}}
+                                                    {{- if locked (printf "%s_MODE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <select class="client-parameter" data-group="config" data-label="Client Mode" id="Mode" data-original="{{.Config.Mode}}">
+                                                        <option {{if eq .Config.Mode "development"}}selected {{end}}value="development">Development</option>
+                                                        <option {{if eq .Config.Mode "production" }}selected {{end}}value="production">Production</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="This application serves HTTP on / by default. You can change that by typing in something else here. Example: /notifiarr/" class="help-icon far fa-question-circle"></i>
+                                                    URL Base
+                                                </td>
+                                                <td>
+                                                    {{.Config.URLBase}}
+                                                    {{- if locked (printf "%s_URLBASE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="URLBase" class="client-parameter" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or X-Forwarded-For). Separate with spaces or new lines." class="help-icon far fa-question-circle"></i>
+                                                    Upstreams
+                                                </td>
+                                                <td>
+                                                    {{range $s := .Config.Upstreams}}{{$s}}<br>{{end}}
+                                                    {{- if locked (printf "%s_UPTREAMS_0" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <textarea id="Upstreams" class="client-parameter" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}" style="width: 100%;">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications. Spreads out CPU usage and lowers memory footprint." class="help-icon far fa-question-circle"></i>
+                                                    Parallel Threads
+                                                </td>
+                                                <td>
+                                                    {{if .Config.Serial}}Disabled{{else}}Enabled{{end}}
+                                                    {{- if locked (printf "%s_SERIAL" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <select class="client-parameter" data-group="config" data-label="Serial" id="Serial" data-original="{{.Config.Serial}}">
+                                                        <option {{if .Config.Serial}}selected {{end}}value="true">Disabled</option>
+                                                        <option {{if not .Config.Serial}}selected {{end}}value="false">Enabled</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures. Default is 4. Setting 0 will take default of 4." class="help-icon far fa-question-circle"></i>
+                                                    Retries
+                                                </td>
+                                                <td>
+                                                    {{.Config.Retries}}
+                                                    {{- if locked (printf "%s_RETRIES" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="Retries" class="client-parameter" data-group="config" data-label="Retries" data-original="{{.Config.Retries}}" value="{{.Config.Retries}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="This is the timeout for requests to Notifiarr.com, and any other timeout that may be missing (global). Exampes: 10s, 1m, 1m15s" class="help-icon far fa-question-circle"></i>
+                                                    Timeout
+                                                </td>
+                                                <td>
+                                                    {{.Config.Timeout}}
+                                                    {{- if locked (printf "%s_TIMEOUT" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="Timeout" class="client-parameter" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr class="text-center">
+                                                <td style="display:none;"></td>
+                                                <td style="display:none;"></td>
+                                                <td colspan="3">
+                                                    <h2 class="mb-3">SSL</h2>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="This is the path to the SSL certificate key file. This is a secret! See Certificate File help for more info." class="help-icon far fa-question-circle"></i>
+                                                    Cert Key File Path
+                                                </td>
+                                                <td>
+                                                    {{.Config.SSLKeyFile}}
+                                                    {{- if locked (printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="SSLKeyFile" class="client-parameter" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="This application can serve HTTPS. Enable that by specifying a certificate file path and key file path. The certificate file should have the full CA chain inclued." class="help-icon far fa-question-circle"></i>
+                                                    Cert File Path
+                                                </td>
+                                                <td>
+                                                    {{.Config.SSLCrtFile}}
+                                                    {{- if locked (printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="SSLCrtFile" class="client-parameter" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr class="text-center">
+                                                <td style="display:none;"></td>
+                                                <td style="display:none;"></td>
+                                                <td colspan="3">
+                                                    <h2 class="mb-3">Services</h2>
+                                                    <a href="#services" onClick="swapNavigationTemplate('services')" style="margin-top:-20px;float:right;">Service Checks</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Disable or enable monitoring all network and services checks right here." class="help-icon far fa-question-circle"></i>
+                                                    Run Checks
+                                                </td>
+                                                <td>
+                                                    {{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}
+                                                    {{- if locked (printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <select class="client-parameter" data-group="config" data-label="Run Checks" id="Services.Disabled" data-original="{{.Config.Services.Disabled}}">
+                                                        <option {{if .Config.Services.Disabled}}selected {{end}}value="true">Disabled</option>
+                                                        <option {{if not .Config.Services.Disabled}}selected {{end}}value="false">Enabled</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this. This controls how many checks may run at once." class="help-icon far fa-question-circle"></i>
+                                                    Parallel Checks
+                                                </td>
+                                                <td>
+                                                    {{.Config.Services.Parallel}}
+                                                    {{- if locked (printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                  <select class="client-parameter" data-group="config" data-label="Parallel Checks" id="Services.Parallel" data-original="{{.Config.Services.Parallel}}">
+                                                      <option {{if eq .Config.Services.Parallel 1}}selected {{end}}value="1">1</option>
+                                                      <option {{if eq .Config.Services.Parallel 2}}selected {{end}}value="2">2</option>
+                                                      <option {{if eq .Config.Services.Parallel 3}}selected {{end}}value="3">3</option>
+                                                      <option {{if eq .Config.Services.Parallel 4}}selected {{end}}value="4">4</option>
+                                                      <option {{if eq .Config.Services.Parallel 5}}selected {{end}}value="5">5</option>
+                                                  </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="How often to send service check results to Notifiarr.com. Default: 10m, minimum: 5m." class="help-icon far fa-question-circle"></i>
+                                                    Update Interval
+                                                </td>
+                                                <td>
+                                                    {{.Config.Services.Interval}}
+                                                    {{- if locked (printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td><input type="text" id="Services.Interval" class="client-parameter" data-group="config" data-label="Update Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}" style="width: 100%;"></td>
+                                            </tr>
+                                            <tr class="text-center">
+                                                <td style="display:none;"></td>
+                                                <td style="display:none;"></td>
+                                                <td colspan="3">
+                                                    <h2 class="mb-3">Logging</h2>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Enabling debug logging causes a lot more data to write to the log. Includes payloads to and from Notifiarr.com and starr apps. Use Max Body settings to control payloads sizes." class="help-icon far fa-question-circle"></i>
+                                                    Debug Logging
+                                                </td>
+                                                <td>
+                                                    {{if .Config.Debug}}Enabled{{else}}Disabled{{end}}
+                                                    {{- if locked (printf "%s_DEBUG" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                  <select class="client-parameter" data-group="config" data-label="Debug" id="Debug" data-original="{{.Config.Debug}}">
+                                                      <option {{if .Config.Debug}}selected {{end}}value="true">Enabled</option>
+                                                      <option {{if not .Config.Debug}}selected {{end}}value="false">Disabled</option>
+                                                  </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too." class="help-icon far fa-question-circle"></i>
+                                                    Quiet Logging
+                                                </td>
+                                                <td>
+                                                    {{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}
+                                                    {{- if locked (printf "%s_QUIET" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                  <select class="client-parameter" data-group="config" data-label="Quiet" id="Quiet" data-original="{{.Config.Quiet}}">
+                                                      <option {{if .Config.Quiet}}selected {{end}}value="true">Enabled</option>
+                                                      <option {{if not .Config.Quiet}}selected {{end}}value="false">Disabled</option>
+                                                  </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Setting a log file path here will make the application write logs to this path. Highly recommended!" class="help-icon far fa-question-circle"></i>
+                                                    App Log File
+                                                </td>
+                                                <td>
+                                                    {{.Config.LogFile}}
+                                                    {{- if locked (printf "%s_LOG_FILE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Setting a log file path here will make the application write the http logs to a dedicated file. The file format is in apachelog. Highly recommended." class="help-icon far fa-question-circle"></i>
+                                                    HTTP Logfile
+                                                </td>
+                                                <td>
+                                                    {{.Config.HTTPLog}}
+                                                    {{- if locked (printf "%s_HTTP_LOG" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="HTTPLog" class="client-parameter" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Setting a log file path here will make the application write service check results to a dedicated file. Recommended if you have a lot of services." class="help-icon far fa-question-circle"></i>
+                                                    Services Log File
+                                                </td>
+                                                <td>
+                                                    {{.Config.Services.LogFile}}
+                                                    {{- if locked (printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="Services.LogFile" class="client-parameter" data-group="config" data-label="Log File" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="Setting a log file path here will make the application write debug messages to a dedicated log file. Otherwise debug messages write to the main app log." class="help-icon far fa-question-circle"></i>
+                                                    Debug Log File
+                                                </td>
+                                                <td>
+                                                    {{.Config.LogConfig.DebugLog}}
+                                                    {{- if locked (printf "%s_DEBUG_LOG" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="LogConfig.DebugLog" class="client-parameter" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                        {{- if not (eq .Version.os "windows") }}
+                                            <tr>
+                                                <td>
+                                                    <i title="This is the unix file mode used when writing new log files. Recommended values in order of openness: 0600, 0640, 0644" class="help-icon far fa-question-circle"></i>
+                                                    Log File Unix Mode
+                                                </td>
+                                                <td>
+                                                    {{.Config.FileMode}}
+                                                    {{- if locked (printf "%s_FILE_MODE" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="FileMode" class="client-parameter" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                        {{ end }}
+                                            <tr>
+                                                <td>
+                                                    <i title="When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com. Recommend 1000-5000." class="help-icon far fa-question-circle"></i>
+                                                    Max Body Size
+                                                </td>
+                                                <td>
+                                                    {{.Config.MaxBody}}
+                                                    {{- if locked (printf "%s_MAX_BODY" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td><input type="text" id="MaxBody" class="client-parameter" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}" style="width: 100%;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation. Recommend 5-25 MB." class="help-icon far fa-question-circle"></i>
+                                                    Log File Size (MB)
+                                                </td>
+                                                <td>
+                                                    {{.Config.LogFileMb}}
+                                                    {{- if locked (printf "%s_LOG_FILE_MB" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td><input type="text" id="LogFileMb" class="client-parameter" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}" style="width: 100%;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <i title="When this setting is 0 or 1, log file rotation is disabled. Setting this to a higher value will rotate all log files, and keep this many of each on disk. Controls all log files." class="help-icon far fa-question-circle"></i>
+                                                    Log File Count
+                                                </td>
+                                                <td>
+                                                    {{.Config.LogFiles}}
+                                                    {{- if locked (printf "%s_LOG_FILES" .Flags.EnvPrefix)}}
+                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    {{- end}}
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="LogFiles" class="client-parameter" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}" style="width: 100%;">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 {{- /* end of config (leave this comment) */ -}}
