@@ -817,10 +817,6 @@ div .file-content .line-number {
     padding:0 .3em 0 .7em;
 }
 
-.scroll-bar {
-    max-height: 86vh;
-}
-
 .scroll-bar-sm {
     max-height: 75vh;
 }

@@ -71,7 +71,7 @@ function setScreenSizeVars()
 }
 // ---------------------------------------------------------------------------------------------
 
-function loadConfigTable(table) {
+function loadConfigTable(table) { // this expects 3 columns.
     table.DataTable({
         "autoWidth": true,
         "scrollX": true,
@@ -87,8 +87,7 @@ function loadConfigTable(table) {
             { "searchable": true },
             { "searchable": true },
             { "searchable": false }
-        ],
-        "oLanguage": {"sSearch": "Filter Settings:",}
+        ]
     });
 }
 

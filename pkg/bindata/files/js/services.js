@@ -53,8 +53,8 @@ function addServiceCheck()
      //-- DO NOT RELY ON 'index' FOR DIRECT IMPLEMENTATION, USE IT TO SORT AND RE-INDEX DURING THE SAVE
     const index = $('.services-Checks').length;
     const instance = index+1;
-    const row = '<tr class="services-Checks" id="services-Checks-'+ index +'">'+
-        '<td style="font-size: 22px;"><span id="checksIndexLabel'+ index +'">'+ instance +'</span>'+
+    const row = '<tr class="bk-success services-Checks" id="services-Checks-'+ index +'">'+
+        '<td style="font-size: 22px;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'</span>'+
         '<div class="services-Checks-deletebutton" style="float: right;">'+
         '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
         '</div>'+
@@ -71,12 +71,10 @@ function addServiceCheck()
         '<td>'+
             '<input type="text" placeholder="200, 302, 404, 500, etc" title="Enter allowed HTTP return codes. Separate with commas." id="Service.'+ index +'.Expect" data-index="'+ index +'" data-app="checks" class="client-parameter serviceHTTPParam" data-group="services" data-label="Check '+ instance +' Expect" data-original="" style="width: 100%;display:none;">'+
             '<input disabled type="text" data-index="'+ index +'" data-app="checks" placeholder="unused" class="client-parameter serviceTCPParam" data-group="services" data-original="" style="width: 100%;display:none;">'+
-            '<center>'+
-                '<input type="checkbox" onChange="checkExpectChange($(this));" title="Check this box to send alerts when a matched process restarts." data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamRestart" style="width:3%;">'+
-                '<input type="checkbox" onChange="checkExpectChange($(this));" title="Check this box to send alerts when a matched process is found running. Uncommon, and not usable with other options." data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamRunning" style="width:3%;">'+
-                '<input type="number" onChange="checkExpectChange($(this));" title="Minimum number of proesses allowed to run." placeholder="Min" data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamMin" value="0" style="width:42%;">'+
-                '<input type="number" onChange="checkExpectChange($(this));" title="Maximm number of process allowed to run." placeholder="Max" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMax" value="0" style="width:42%;">'+
-            '</center>'+
+            '<input type="checkbox" onChange="checkExpectChange($(this));" title="Check this box to send alerts when a matched process restarts." data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamRestart" style="margin-right:4px;">'+
+            '<input type="checkbox" onChange="checkExpectChange($(this));" title="Check this box to send alerts when a matched process is found running. Uncommon, and not usable with other options." data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamRunning" style="margin-right:4px;">'+
+            '<input type="number" onChange="checkExpectChange($(this));" title="Minimum number of proesses allowed to run." placeholder="Min" data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamMin" value="0" style="margin-right:3px;width:35%;">'+
+            '<input type="number" onChange="checkExpectChange($(this));" title="Maximm number of process allowed to run." placeholder="Max" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMax" value="0" style="width:35%;">'+
         '</td>'+
         '<td><input type="text" id="Service.'+ index +'.Interval" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Interval" data-original="5m" value="5m" style="width: 100%;"></td>'+
         '<td><input type="text" id="Service.'+ index +'.Timeout" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m" style="width: 100%;"></td>'+
