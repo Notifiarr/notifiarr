@@ -77,6 +77,7 @@ function loadConfigTable(table) { // this expects 3 columns.
         "scrollX": true,
         "sort": false,
         "responsive": true,
+        'scrollY': '79vh',
         "paging": false,
         "bInfo": false, // info line at bottom
         "fnDrawCallback":function() {
