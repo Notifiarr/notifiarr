@@ -89,16 +89,15 @@ func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoMBID)
 	}
 
-	app := getLidarr(req)
 	// Check for existing album.
-	m, err := app.GetAlbumContext(req.Context(), payload.ForeignAlbumID)
+	m, err := getLidarr(req).GetAlbumContext(req.Context(), payload.ForeignAlbumID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, lidarrData(m[0])
 	}
 
-	album, err := app.AddAlbumContext(req.Context(), &payload)
+	album, err := getLidarr(req).AddAlbumContext(req.Context(), &payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding album: %w", err)
 	}

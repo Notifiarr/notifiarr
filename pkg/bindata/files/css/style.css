@@ -21,18 +21,21 @@ html,body {
     min-height: 100%;
     position: relative;
 }
-.page-body {
+.page-body, .ts-sidebar-menu {
     /* footer height */
     padding-bottom: 25px;
 }
+
 .page-footer {
     height: 25px;
     width: 100%;
     position: fixed;
     bottom: 0;
+    left:0;
+    right:0;
     background: #2c3136;
-    padding-right: 20px;
-    z-index: 3;
+    z-index: 10;
+    text-align: center;
 }
 @media only screen and (min-width: 480px) {
   html {
@@ -560,7 +563,7 @@ li {
 .brand {
   background: #3e454c;
   position: relative;
-  z-index: 3;
+  z-index: 2;
   position: fixed;
   width: 100%;
   top: 0;
@@ -658,7 +661,7 @@ li {
   transition: max-height 0.3s;
   overflow: hidden;
   position: fixed;
-  z-index: 2;
+  z-index: 9;
   width: 100%;
   bottom: 0;
   top: 60px;
@@ -823,9 +826,16 @@ div .file-content .line-number {
 }
 
 .nav-button {
-    font-size: 1.2em;
+    font-size: 1.6em;
     float: right;
     margin-top: 22px;
-    margin-right: 15px;
+    margin-right: 20px;
     cursor: pointer;
+}
+
+.dropdown-menu {
+    width: 92%;
+    height: auto;
+    max-height: 60vh;
+    overflow-x: hidden;
 }

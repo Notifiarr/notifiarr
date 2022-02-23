@@ -7,23 +7,24 @@
             <div class="page-body">
                 <div class="brand clearfix" style="z-index:100;">
                     <a class="nav-link" href="#landing" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
-                        <h4 class="pull-left text-white text-uppercase" style="margin:20px 0px 0px 20px">
-                            <img src="{{files}}/images/logo/notifiarr.png" style="height:30px;">&nbsp; Notifiarr Client
+                        <h4 class="text-uppercase text-white" style="margin:10px 0px 0px 10px">
+                            <img src="{{files}}/images/logo/notifiarr.png" style="height:47px;">
+                            <span style="" class="mobile-hide">Notifiarr Client</span>
                         </h4>
                     </a>
-                    <span class="menu-btn"><i class="fa fa-bars"></i></span>
-                    <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
                     {{- if .Username }}
                     <a class="nav-button text-danger fas fa-power-off" title="Shut down application (quit)." onClick="shutDownApp();"></a>
                     <a class="nav-button text-success fas fa-recycle" title="Reload application configuraton and refresh." onClick="reloadConfig();"></a>
                     {{- end}}
+                    <span class="menu-btn pull-left" style="font-size:1.3em;"><i class="fa fa-bars"> <span class="pending-change-container" style="display:none;"><i class="fas text-danger fa-exclamation-circle" title="Unsaved Changes!" style="display:none;"></i></span></i></span>
+                    <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
                 </div>
                 <div class="ts-main-content">
                     <nav class="ts-sidebar">
                         <ul class="ts-sidebar-menu">
                         {{- if .Username }}
                             <div class="dropdown"><!-- this is lame -->
-                                <button class="btn btn-default dropdown-toggle" style="padding-left:0px;width:99%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <button class="btn btn-default dropdown-toggle" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
                                 </button>
                                 <ul style="width:92%;" class="dropdown-menu bk-brown" aria-labelledby="user menu">
@@ -31,6 +32,21 @@
                                     <li role="separator" class="divider"></li>
                                     <li><a href="/logout">Logout</a></li>
                                 </ul>
+                            </div>
+                            <div class="tablet-hide desktop-hide">
+                                <br>
+                                <div class="pending-change-container" style="display: none;">
+                                    <div align="center">
+                                        <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
+                                            Save <span class="pending-change-counter">0</span> Changes &amp; Reload
+                                        </button>
+                                    </div>
+                                    <div style="margin-left: 1em; margin-top: 1em;">
+                                        List of Pending Changes:<br>
+                                        <div style="margin-left: 1em;" class="pending-change-list"></div>
+                                    </div>
+                                    <hr>
+                                </div>
                             </div>
                         {{ end }}
                             <li class="ts-label" style="text-align: center;">Settings</li>
@@ -80,16 +96,18 @@
                             <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
                         {{- end }}
                         </ul>
-                        <div id="pending-change-container" style="display: none;">
-                            <hr>
-                            <div align="center">
-                                <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
-                                    Save <span id="pending-change-counter">0</span> Changes &amp; Reload
-                                </button>
-                            </div>
-                            <div style="margin-left: 1em; margin-top: 1em;">
-                                List of Pending Changes:<br>
-                                <div style="margin-left: 1em;" id="pending-change-list"></div>
+                        <div class="mobile-hide">
+                            <div class="pending-change-container" style="display: none;">
+                                <hr>
+                                <div align="center">
+                                    <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
+                                        Save <span id="pending-change-counter">0</span> Changes &amp; Reload
+                                    </button>
+                                </div>
+                                <div style="margin-left: 1em; margin-top: 1em;">
+                                    List of Pending Changes:<br>
+                                    <div style="margin-left: 1em;" class="pending-change-list"></div>
+                                </div>
                             </div>
                         </div>
                     </nav>

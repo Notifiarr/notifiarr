@@ -3,20 +3,20 @@
                 </div> <!-- index :: ts-main-content -->
             </div> <!-- index :: page-body -->
             <div class="page-footer">
-                <div class="text-center">
-                    <a href="https://Notifiarr.com">Notifiarr.com</a> &nbsp;•&nbsp;
-                    <a href="https://Notifiarr.wiki">Wiki</a> &nbsp;•&nbsp;
-                    <a href="https://Notifiarr.com/discord">Support</a> &nbsp;•&nbsp;
-                    <i class="far fa-copyright"></i> 2020-{{now.Format "2006"}}
-                    <a href="https://golift.io/">Go Lift</a> &nbsp;•&nbsp;
-                    <a href="https://golift.io/notifiarr/blob/main/LICENSE">MIT license</a>
-                    {{- if or .ClientInfo.IsPatron}}
+                <span class="mobile-hide"><a href="https://Notifiarr.com">Notifiarr.com</a> &nbsp;•&nbsp;</span>
+                <a href="https://Notifiarr.wiki">Wiki</a> &nbsp;•&nbsp;
+                <a href="https://Notifiarr.com/discord">Support</a> &nbsp;•&nbsp;
+                <i style="font-size:0.87em;" class="far fa-copyright"></i> <span class="mobile-hide">2020-</span>{{now.Format "2006"}}
+                <a href="https://golift.io/">Go Lift</a> &nbsp;•&nbsp;
+                <a href="https://golift.io/notifiarr/blob/main/LICENSE">MIT license</a>
+                <span class="mobile-hide">
+                {{- if or .ClientInfo.IsPatron}}
                     &nbsp;•&nbsp; Patron
-                    {{- end}}
-                    {{- if or .ClientInfo.IsSub}}
+                {{- end}}
+                {{- if or .ClientInfo.IsSub}}
                     &nbsp;•&nbsp; Subscriber
-                    {{- end}}
-                </div>
+                {{- end}}
+                </span>
             </div>
         </div> <!-- index :: page-container -->
     </body>

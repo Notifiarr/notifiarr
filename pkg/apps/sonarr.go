@@ -90,16 +90,15 @@ func sonarrAddSeries(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTVDB)
 	}
 
-	app := getSonarr(req)
 	// Check for existing series.
-	m, err := app.GetSeriesContext(req.Context(), payload.TvdbID)
+	m, err := getSonarr(req).GetSeriesContext(req.Context(), payload.TvdbID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, sonarrData(m[0])
 	}
 
-	series, err := app.AddSeriesContext(req.Context(), &payload)
+	series, err := getSonarr(req).AddSeriesContext(req.Context(), &payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
 	}

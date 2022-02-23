@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"expvar"
 	"fmt"
 	"net/http"
 	"path"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -57,6 +59,7 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.Handle(path.Join(base, "/shutdown"), c.checkAuthorized(c.handleShutdown)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/reload"), c.checkAuthorized(c.handleReload)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/reconfig"), c.checkAuthorized(c.handleConfigPost)).Methods("POST")
+		c.Config.Router.Handle(path.Join(base, "/debug/vars"), c.checkAuthorized(expvar.Handler().ServeHTTP)).Methods("GET")
 		c.Config.Router.Handle(path.Join(c.Config.URLBase, "/ws"),
 			c.checkAuthorized(c.handleWebSockets)).Methods("GET").Queries("source", "{source}", "fileId", "{fileId}")
 	}
@@ -144,6 +147,21 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 		// save into a request header for the logger.
 		r.Header.Set("X-Redacted-URI", uri)
 		next.ServeHTTP(w, r)
+	})
+}
+
+func (c *Client) countRequest(next http.Handler) http.Handler {
+	exp := exp.GetMap("httpRequests")
+
+	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
+		if strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")) {
+			exp.Add("api", 1)
+		} else {
+			exp.Add("other", 1)
+		}
+
+		exp.Add("total", 1)
+		next.ServeHTTP(response, req)
 	})
 }
 

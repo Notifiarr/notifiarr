@@ -1,7 +1,13 @@
+let smScreen        = false;
+const smScreenWidth = 700;
+let mdScreen        = false;
+const mdScreenWidth = 1300;
+
 $(document).ready((function()
 {
     jsLoader();
     setTooltips();
+    setScreenSizeVars();
 
     $(document).bind('change keyup mouseup', '.client-parameter', function(){
         findPendingChanges();
@@ -24,8 +30,67 @@ $(document).ready((function()
         $.each($('.servicetable'), function() {
             loadServiceTable($(this));
         });
+        $.each($('.configtable'), function() {
+            loadConfigTable($(this));
+        });
     }, 500);
+
+    $( window ).resize(function() {
+      setScreenSizeVars();
+    });
+    setScreenSizeVars();
+
+    $(function(){
+        // Self-executing recursive animation.
+        (function pulse(){
+            $('.fa-exclamation-circle').delay(200).fadeOut('slow').fadeIn('slow',pulse);
+        })();
+    });
 }));
+
+function hideSmallElements()
+{
+    $('.mobile-hide, .tablet-hide, .desktop-hide').show();
+
+    if (smScreen) {
+        $('.mobile-hide').hide();
+    }
+    if (mdScreen) {
+        $('.tablet-hide').hide();
+    }
+    if (!mdScreen && !smScreen) {
+        $('.desktop-hide').hide();
+    }
+}
+
+function setScreenSizeVars()
+{
+    smScreen = window.matchMedia('only screen and (max-width: ' + smScreenWidth + 'px)').matches;
+    mdScreen = window.matchMedia('only screen and (max-width: ' + mdScreenWidth + 'px) and (min-width: ' + smScreenWidth + 'px)').matches;
+    hideSmallElements();
+}
+// ---------------------------------------------------------------------------------------------
+
+function loadConfigTable(table) {
+    table.DataTable({
+        "autoWidth": true,
+        "scrollX": true,
+        "sort": false,
+        "responsive": true,
+        "paging": false,
+        "bInfo": false, // info line at bottom
+        "fnDrawCallback":function() {
+            // fix the header column on window resize.
+            this.api().columns.adjust();
+        },
+        "columns": [
+            { "searchable": true },
+            { "searchable": true },
+            { "searchable": false }
+        ],
+        "oLanguage": {"sSearch": "Filter Settings:",}
+    });
+}
 
 function loadDataTable(table) {
     table.DataTable({
@@ -36,6 +101,7 @@ function loadDataTable(table) {
         'paging': false,
         "autoWidth": true,
         "sScrollY": "0px",
+        "scrollX": true,
         "oLanguage": {
             "sSearch": "Filter File List:",
             "sSearchPlaceholder": "filename.."
@@ -63,9 +129,9 @@ function loadServiceTable(table) {
         'scrollY': '80vh',
         "sScrollY": "0px",
         'scrollCollapse': true,
-        "oLanguage": {
-            "sSearch": "Filter Services:"
-        },
+        "oLanguage": {"sSearch": "Filter Services:"},
+        "responsive": true,
+        "scrollX": true,
         "columns": [
             null,
             { "orderData":  [2]   },
@@ -84,7 +150,6 @@ function loadServiceTable(table) {
         }
     });
 }
-
 // ---------------------------------------------------------------------------------------------
 
 function jsLoader()
@@ -175,9 +240,9 @@ function setTooltips()
 
 function findPendingChanges()
 {
-    $('#pending-change-container').hide();
-    $('#pending-change-list').html('');
-    $('#pending-change-counter').html('0');
+    $('.pending-change-container').hide();
+    $('.pending-change-list').html('');
+    $('.pending-change-counter').html('0');
 
     let group;
     let label;
@@ -201,9 +266,9 @@ function findPendingChanges()
     });
 
     if (changes) {
-        $('#pending-change-list').html(changes);
-        $('#pending-change-counter').html(counter);
-        $('#pending-change-container').show();
+        $('.pending-change-list').html(changes);
+        $('.pending-change-counter').html(counter);
+        $('.pending-change-container').show();
     }
 }
 // ---------------------------------------------------------------------------------------------
@@ -224,7 +289,7 @@ function savePendingChanges()
         url: 'reconfig',
         data: fields,
         success: function (data){
-            $('#pending-change-container').remove();          // remove save button.
+            $('.pending-change-container').remove();          // remove save button.
             setTimeout(function(){location.reload();}, 5000); // reload window in 5 seconds.
             toast('Config Saved', 'Wait 5 seconds; reloading the new configuration...', 'success');
         },

@@ -18,7 +18,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/gorilla/mux"
+	"github.com/miolini/datacounter"
 	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
@@ -27,6 +29,8 @@ import (
 	"golift.io/starr/readarr"
 	"golift.io/starr/sonarr"
 )
+
+var apiHits = exp.GetMap("apiHits") //nolint:gochecknoglobals
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
@@ -106,11 +110,21 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code    = http.StatusUnprocessableEntity
 			id, _   = strconv.Atoi(mux.Vars(r)["id"])
 			start   = time.Now()
-			post, _ = ioutil.ReadAll(r.Body) // swallowing this error could suck...
+			buf     bytes.Buffer
+			tee     = io.TeeReader(r.Body, &buf) // must read tee first.
+			post, _ = ioutil.ReadAll(tee)
+			appName = app.String()
 		)
 
-		r.Body.Close() // Reset the body so it can be re-read.
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(post))
+		if appName == "" {
+			appName = "noApp"
+		}
+
+		apiHits.Add(appName+"bytesRcvd", int64(len(post)))
+		apiHits.Add(appName+"count", 1)
+		apiHits.Add("requests", 1)
+
+		r.Body.Close() // we just read this into a buffer.
 
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
@@ -150,8 +164,9 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			a.DebugLog.Printf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, s)
 		}
 
+		wrote := a.Respond(w, code, msg)
+		apiHits.Add(appName+"bytesSent", wrote)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
-		a.Respond(w, code, msg)
 	}
 }
 
@@ -231,14 +246,15 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 	return nil
 }
 
-// Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) { //nolint:varnamelen
+// Respond sends a standard response to our caller. JSON encoded blobs. Returns size of data sent.
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 { //nolint:varnamelen
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
 		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
 		w.Header().Set("Location", msg.(string))
 		w.WriteHeader(stat)
+		apiHits.Add("codes:"+http.StatusText(stat), 1)
 
-		return
+		return 0
 	}
 
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
@@ -248,36 +264,45 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) { //nol
 		msg = m.Error()
 	}
 
+	apiHits.Add("codes:"+http.StatusText(stat), 1)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
-	json := json.NewEncoder(w)
+	counter := datacounter.NewResponseWriterCounter(w)
+	json := json.NewEncoder(counter)
 	json.SetEscapeHTML(false)
 
 	err := json.Encode(map[string]interface{}{"status": statusTxt, "message": msg})
 	if err != nil {
 		a.ErrorLog.Printf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
+
+	return int64(counter.Count())
 }
 
 /* Every API call runs one of these methods to find the interface for the respective app. */
 
 func getLidarr(r *http.Request) *lidarr.Lidarr {
+	apiHits.Add("LidarrReqsFromApi", 1)
 	return r.Context().Value(starr.Lidarr).(*LidarrConfig).Lidarr
 }
 
 //nolint:deadcode,unused // will be used when we add http handlers for prowlarr.
 func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
+	apiHits.Add("ProwlarrReqsFromApi", 1)
 	return r.Context().Value(starr.Prowlarr).(*ProwlarrConfig).Prowlarr
 }
 
 func getRadarr(r *http.Request) *radarr.Radarr {
+	apiHits.Add("RadarrReqsFromApi", 1)
 	return r.Context().Value(starr.Radarr).(*RadarrConfig).Radarr
 }
 
 func getReadarr(r *http.Request) *readarr.Readarr {
+	apiHits.Add("ReadarrReqsFromApi", 1)
 	return r.Context().Value(starr.Readarr).(*ReadarrConfig).Readarr
 }
 
 func getSonarr(r *http.Request) *sonarr.Sonarr {
+	apiHits.Add("SonarrReqsFromApi", 1)
 	return r.Context().Value(starr.Sonarr).(*SonarrConfig).Sonarr
 }

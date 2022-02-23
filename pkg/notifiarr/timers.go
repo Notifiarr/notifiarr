@@ -4,9 +4,13 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"golift.io/cnfg"
 )
+
+//nolint:gochecknoglobals
+var timerMap = exp.GetMap("triggers").Init()
 
 // hard coded timers.
 const (
@@ -178,12 +182,14 @@ func (c *Config) stopTimerLoop(actions []*action) {
 
 /* Helpers. */
 
-// exec runs a trigger. This is ab astraction method used in a bunch of places.
+// exec runs a trigger. This is abastraction method used in a bunch of places.
 func (t *Triggers) exec(event EventType, name TriggerName) {
 	trig := t.get(name)
 	if t.stop == nil || trig == nil || trig.C == nil {
 		return
 	}
+
+	timerMap.Add(string(event)+":"+string(name), 1)
 
 	trig.C <- event
 }

@@ -24,6 +24,7 @@ func (c *Client) StartWebServer() {
 	// Create a request router.
 	c.Config.Router = mux.NewRouter()
 	c.Config.Router.Use(c.fixForwardedFor)
+	c.Config.Router.Use(c.countRequest)
 	// Make a multiplexer because websockets can't use apache log.
 	smx := http.NewServeMux()
 	smx.Handle(path.Join(c.Config.URLBase, "/ws"), c.Config.Router)
