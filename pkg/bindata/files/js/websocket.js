@@ -70,8 +70,12 @@ function newWebsocket(ctl, source, fileID)
             tailLines = 1;
         }
 
+        let line = $('<div/>').text(incoming.data).html();
+        if (!line) {
+            line = "&nbsp;";
+        }
         if (sort == "tails") {
-            box.append('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
+            box.append('<div class="lineContent"><span class="line-number">'+ lineCounter.toString().padStart(4, ' ') +'</span>'+ line +'</div>');
             // Truncate box to N lines.
             $.each($('#'+ source +'FileContainer > div > div'), function(counter) {
                 if (counter >= tailLines) {
@@ -83,7 +87,7 @@ function newWebsocket(ctl, source, fileID)
                 box.scrollTop(box.prop("scrollHeight"));
             }
         } else {
-            box.prepend('<div class="lineContent"><span class="line-number">'+ lineCounter +'</span>'+ incoming.data +'</div>');
+            box.prepend('<div class="lineContent"><span class="line-number">'+ lineCounter.toString().padStart(4, ' ') +'</span>'+ line +'</div>');
             // Truncate box to N lines. Not fully tested yet.
             $.each($('#'+ source +'FileContainer > div > div'), function(counter) {
                 if (counter >= tailLines) {

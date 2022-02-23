@@ -399,10 +399,10 @@ $(patsubst %,%.darwin.so,$(PLUGINS)):
 	GOOS=darwin go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.darwin.so,%,$@)
 
 # Run code tests and lint.
-test: lint
+test: generate lint
 	# Testing.
 	go test -race -covermode=atomic ./...
-lint:
+lint: generate
 	# Checking lint.
 	$(shell go env GOPATH)/bin/golangci-lint version
 	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint --timeout=3m run $(GOLANGCI_LINT_ARGS)
