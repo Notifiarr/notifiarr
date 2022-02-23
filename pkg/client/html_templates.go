@@ -205,27 +205,6 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 	}
 }
 
-/*
-// getUserPass turns the UIPassword config value into a username and password.
-// "password." => user:admin, pass:password.
-// ":password." => user:admin, pass::password.
-// "joe:password." => user:joe, pass:password.
-func (c *Client) getUserPass() (string, string) {
-	c.RLock()
-	defer c.RUnlock()
-
-	username, password := defaultUsername, c.Config.UIPassword
-	if spl := strings.SplitN(password, ":", 2); len(spl) == 2 { //nolint:gomnd
-		password = spl[1]
-
-		if spl[0] != "" {
-			username = spl[0]
-		}
-	}
-
-	return username, password
-}
-*/
 func (c *Client) setUserPass(username, password string) error {
 	c.Lock()
 	defer c.Unlock()
@@ -235,7 +214,7 @@ func (c *Client) setUserPass(username, password string) error {
 	err := c.Config.UIPassword.Set(username + ":" + password)
 	if err != nil {
 		c.Config.UIPassword = current
-		return err
+		return fmt.Errorf("saving username and password: %w", err)
 	}
 
 	if err := c.saveNewConfig(c.Config); err != nil {
