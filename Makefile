@@ -414,11 +414,11 @@ lint: generate
 
 mockgen: $(shell go env GOPATH)/bin/mockgen
 $(shell go env GOPATH)/bin/mockgen:
-	cd /tmp ; go get github.com/golang/mock/mockgen ; go install github.com/golang/mock/mockgen
+	cd /tmp ; go install github.com/golang/mock/mockgen@latest
 
 bindata: $(shell go env GOPATH)/bin/go-bindata
 $(shell go env GOPATH)/bin/go-bindata:
-	cd /tmp ; go get -u github.com/go-bindata/go-bindata/... ; go install github.com/go-bindata/go-bindata
+	cd /tmp ; go install github.com/go-bindata/go-bindata@latest
 
 generate: mockgen bindata pkg/bindata/bindata.go
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
