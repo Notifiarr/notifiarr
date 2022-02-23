@@ -30,22 +30,23 @@
                                 </div>
                                 <div class="col-sm-12 col-md-12">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered bk-dark">
+                                        <table class="table table-bordered bk-dark servicetable" style="width:100%">
+                                            <tr><!-- this is not in thead so datatables works -->
+                                                <td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td>
+                                                <td colspan="7" style="text-align:center;" class="mobile-hide">
+                                                    <div style="float: left;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
+                                                    <h3 style="margin-bottom:-45px">Check Configuration</h3>
+                                                    <div style="float: right;">
+                                                        <button id="services-Checks-addbutton" onclick="addServiceCheck()" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="7" class="tablet-hide desktop-hide">
+                                                    <button onclick="addServiceCheck()" type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h3 style="margin-left:5px;display:inline;">Check Configuration</h3>
+                                                    <img src="{{files}}/images/golift.png" style="float:right;height:50px;">
+                                                </td>
+                                            </tr>
                                             <thead>
-                                                <tr>
-                                                    <td colspan="7" style="text-align:center;" class="mobile-hide">
-                                                        <div style="float: left;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
-                                                        <h3 style="margin-bottom:-45px">Check Configuration</h3>
-                                                        <div style="float: right;">
-                                                            <button id="services-Checks-addbutton" onclick="addServiceCheck()" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                                        </div>
-                                                    </td>
-                                                    <td colspan="7" class="tablet-hide desktop-hide">
-                                                        <button onclick="addServiceCheck()" type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                                        <h3 style="margin-left:5px;display:inline;">Check Configuration</h3>
-                                                        <img src="{{files}}/images/golift.png" style="float:right;height:50px;">
-                                                    </td>
-                                                </tr>
                                                 <tr>
                                                     <th class="text-center tablet-hide mobile-hide" style="min-width:80px;">#</th>
                                                     <th class="text-center desktop-hide">#</th>
@@ -59,8 +60,10 @@
                                             </thead>
                                             <tbody id="services-Checks-container">
                                             {{- range $index, $svc := .Config.Service}}
-                                                <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
                                                 <tr class="services-Checks" id="services-Checks-{{$index}}">
+                                                    <td style="display:none;">
+                                                        <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
+                                                    </td>
                                                     <td style="font-size: 22px;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
                                                         <div class="services-Checks-deletebutton" style="float: right;">
                                                             <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
@@ -129,7 +132,10 @@
                                                     </td>
                                                 </tr>
                                             {{- end}}
-                                                <tr id="services-Checks-none" style="display: none;"><td colspan="7">No Checks instances configured.</td></tr>
+                                                <tr id="services-Checks-none" style="display: none;">
+                                                    <td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td>
+                                                    <td colspan="7">No Checks instances configured.</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>

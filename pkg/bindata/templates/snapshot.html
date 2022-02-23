@@ -42,7 +42,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                <i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                <i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                 {{- end}}
                                                     <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -50,7 +50,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_HOST" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Snapshot.MySQL.{{$index}}.Host" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -58,7 +58,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_USER" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Snapshot.MySQL.{{$index}}.User" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -66,7 +66,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -75,7 +75,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -83,7 +83,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
                                                 </tr></table>

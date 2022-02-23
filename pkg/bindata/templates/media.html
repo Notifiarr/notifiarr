@@ -32,7 +32,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_PLEX_URL" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Plex.URL" class="client-parameter" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -40,7 +40,7 @@
                                             <td colspan="2">
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Plex.Token" class="client-parameter" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -48,7 +48,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Plex.Timeout" class="client-parameter" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}" value="{{.Config.Plex.Timeout}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -79,7 +79,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_TAUTULLI_NAME" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Apps.Tautulli.Name" class="client-parameter" data-group="media" data-label="Tautulli Name" data-original="{{.Config.Apps.Tautulli.Name}}" value="{{.Config.Apps.Tautulli.Name}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -87,7 +87,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_TAUTULLI_URL" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Apps.Tautulli.URL" class="client-parameter" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -95,7 +95,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Apps.Tautulli.APIKey" class="client-parameter" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -103,7 +103,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Apps.Tautulli.Interval" class="client-parameter" data-group="media" data-label="Tautulli Interval" data-original="{{.Config.Apps.Tautulli.Interval}}" value="{{.Config.Apps.Tautulli.Interval}}" style="width: 100%;"></td>
                                                 </tr></table>
@@ -111,7 +111,7 @@
                                             <td>
                                                 <table width="100%"><tr>
                                                 {{- if locked (printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                 {{- end}}
                                                     <td><input type="text" id="Apps.Tautulli.Timeout" class="client-parameter" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}" value="{{.Config.Apps.Tautulli.Timeout}}" style="width: 100%;"></td>
                                                 </tr></table>

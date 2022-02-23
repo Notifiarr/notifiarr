@@ -24,7 +24,7 @@
                                                 <td>
                                                     {{.Config.APIKey}}
                                                     {{- if locked (printf "%s_API_KEY" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -39,7 +39,7 @@
                                                 <td>
                                                     {{range $s := .Config.ExKeys}}{{$s}}<br>{{end}}
                                                     {{- if locked (printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -54,7 +54,7 @@
                                                 <td>
                                                     {{.Config.BindAddr}}
                                                     {{- if locked (printf "%s_BIND_ADDR" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -70,7 +70,7 @@
                                                 <td>
                                                     {{.Config.AutoUpdate}}
                                                     {{- if locked (printf "%s_AUTO_UPDATE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -92,7 +92,7 @@
                                                 <td>
                                                     {{.Config.Mode}}
                                                     {{- if locked (printf "%s_MODE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -110,7 +110,7 @@
                                                 <td>
                                                     {{.Config.URLBase}}
                                                     {{- if locked (printf "%s_URLBASE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -125,7 +125,7 @@
                                                 <td>
                                                     {{range $s := .Config.Upstreams}}{{$s}}<br>{{end}}
                                                     {{- if locked (printf "%s_UPTREAMS_0" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -140,7 +140,7 @@
                                                 <td>
                                                     {{if .Config.Serial}}Disabled{{else}}Enabled{{end}}
                                                     {{- if locked (printf "%s_SERIAL" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -158,7 +158,7 @@
                                                 <td>
                                                     {{.Config.Retries}}
                                                     {{- if locked (printf "%s_RETRIES" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -173,7 +173,7 @@
                                                 <td>
                                                     {{.Config.Timeout}}
                                                     {{- if locked (printf "%s_TIMEOUT" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -195,7 +195,7 @@
                                                 <td>
                                                     {{.Config.SSLKeyFile}}
                                                     {{- if locked (printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -210,7 +210,7 @@
                                                 <td>
                                                     {{.Config.SSLCrtFile}}
                                                     {{- if locked (printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -233,7 +233,7 @@
                                                 <td>
                                                     {{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}
                                                     {{- if locked (printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -251,7 +251,7 @@
                                                 <td>
                                                     {{.Config.Services.Parallel}}
                                                     {{- if locked (printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -272,7 +272,7 @@
                                                 <td>
                                                     {{.Config.Services.Interval}}
                                                     {{- if locked (printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td><input type="text" id="Services.Interval" class="client-parameter" data-group="config" data-label="Update Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}" style="width: 100%;"></td>
@@ -292,7 +292,7 @@
                                                 <td>
                                                     {{if .Config.Debug}}Enabled{{else}}Disabled{{end}}
                                                     {{- if locked (printf "%s_DEBUG" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -310,7 +310,7 @@
                                                 <td>
                                                     {{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}
                                                     {{- if locked (printf "%s_QUIET" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -328,7 +328,7 @@
                                                 <td>
                                                     {{.Config.LogFile}}
                                                     {{- if locked (printf "%s_LOG_FILE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -343,7 +343,7 @@
                                                 <td>
                                                     {{.Config.HTTPLog}}
                                                     {{- if locked (printf "%s_HTTP_LOG" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -358,7 +358,7 @@
                                                 <td>
                                                     {{.Config.Services.LogFile}}
                                                     {{- if locked (printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -373,7 +373,7 @@
                                                 <td>
                                                     {{.Config.LogConfig.DebugLog}}
                                                     {{- if locked (printf "%s_DEBUG_LOG" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -389,7 +389,7 @@
                                                 <td>
                                                     {{.Config.FileMode}}
                                                     {{- if locked (printf "%s_FILE_MODE" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
@@ -405,7 +405,7 @@
                                                 <td>
                                                     {{.Config.MaxBody}}
                                                     {{- if locked (printf "%s_MAX_BODY" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td><input type="text" id="MaxBody" class="client-parameter" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}" style="width: 100%;"></td>
@@ -418,7 +418,7 @@
                                                 <td>
                                                     {{.Config.LogFileMb}}
                                                     {{- if locked (printf "%s_LOG_FILE_MB" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td><input type="text" id="LogFileMb" class="client-parameter" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}" style="width: 100%;"></td>
@@ -431,7 +431,7 @@
                                                 <td>
                                                     {{.Config.LogFiles}}
                                                     {{- if locked (printf "%s_LOG_FILES" .Flags.EnvPrefix)}}
-                                                    <i style="float:right; font-size:20px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                    <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>

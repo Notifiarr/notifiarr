@@ -27,6 +27,9 @@ $(document).ready((function()
         $.each($('.filetable'), function() {
             loadDataTable($(this));
         });
+        $.each($('.monitortable'), function() {
+            loadMonitorTable($(this));
+        });
         $.each($('.servicetable'), function() {
             loadServiceTable($(this));
         });
@@ -92,6 +95,31 @@ function loadConfigTable(table) { // this expects 3 columns.
     });
 }
 
+// data tables doesn't work on the Services table because it's all a form.
+// Need custom methods
+function loadServiceTable(table) {
+    table.DataTable({
+        "autoWidth": true,
+        "scrollX": true,
+        'scrollCollapse': true,
+        "sort": true,
+        "responsive": true,
+        'scrollY': '79vh',
+        "paging": false,
+        "columnDefs": [
+            { "type": "html-input", "targets": [1,1,3,4] }
+        ],
+        "fnDrawCallback":function() {
+            // fix the header column on window resize.
+            this.api().columns.adjust();
+        }
+    });
+    $.fn.dataTableExt.ofnSearch['html-input'] = function(value) {
+        alert($(value).find('input').val());
+        return $(value).find('input').val();
+    };
+}
+
 function loadDataTable(table) {
     table.DataTable({
         'order': [[(parseInt(table.attr('data-sortIndex')) ?? 0), (table.attr('data-sortDirection') ?? 'desc')]],
@@ -120,7 +148,7 @@ function loadDataTable(table) {
     });
 }
 
-function loadServiceTable(table) {
+function loadMonitorTable(table) {
     table.DataTable({
         'order': [[1,'desc'], [0, 'asc']],
         'paging': true,
