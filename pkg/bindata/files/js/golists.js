@@ -4,9 +4,10 @@
 function removeInstance(name, index)
 {
     // service table has to be handled specially.
-    serviceTable.row($('#'+ name +'-'+ index)).remove().draw()
+    serviceTable.row($('#'+ name +'-'+ index)).remove();
     $('#'+ name +'-'+ index).fadeOut(1000);
     setTimeout(function() {
+        serviceTable.draw();
         $('#'+ name +'-'+ index).remove();
         // if all instances are deleted, show the "no instances" item.
         if (!$('.'+ name).length) {

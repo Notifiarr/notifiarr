@@ -27,9 +27,8 @@ serviceTable = $('.servicetable').DataTable({
         "sInfoFiltered": "(filtered from _MAX_ total service checks)"
     },
     "columnDefs": [
-        { "type": "span-input", "targets": [1] },
-        { "type": "html-input", "targets": [2,3,4,5,6,7] },
-        { "type": "html", "targets": [0] }
+        { "type": "span-input", "targets": [0] },
+        { "type": "html-input", "targets": [1,2,3,4,5,6] },
     ],
     "fnDrawCallback":function() {
         // fix the header column on window resize.
