@@ -90,7 +90,7 @@
                                             </td>
                                         </tr>
                                     {{- end}}
-                                        <tr id="snapshot-MySQL-none" style="display: none;"><td colspan="8">No MySQL instances configured.</td></tr>
+                                        <tr id="snapshot-MySQL-none"{{if .Config.Snapshot.MySQL}} style="display: none;"{{end}}><td colspan="8">No MySQL instances configured.</td></tr>
 
                                     </tbody>
                                 </table>

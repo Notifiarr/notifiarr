@@ -89,7 +89,7 @@
                                             </td>
                                         </tr>
                                     {{- end}}
-                                        <tr id="starr-Lidarr-none" style="display: none;"><td colspan="8">No Lidarr instances configured.</td></tr>
+                                        <tr id="starr-Lidarr-none"{{if .Config.Apps.Lidarr}} style="display: none;"{{end}}><td colspan="8">No Lidarr instances configured.</td></tr>
                                     </tbody>
                                       <thead>
                                           <tr><td colspan="8" style="text-align:center;">
@@ -177,7 +177,7 @@
                                               </td>
                                           </tr>
                                       {{- end}}
-                                          <tr id="starr-Prowlarr-none" style="display: none;"><td colspan="8">No Prowlarr instances configured.</td></tr>
+                                          <tr id="starr-Prowlarr-none"{{if .Config.Apps.Prowlarr}} style="display: none;"{{end}}><td colspan="8">No Prowlarr instances configured.</td></tr>
                                       </tbody>
                                       <thead>
                                           <tr><td colspan="8" style="text-align:center;">
@@ -265,7 +265,7 @@
                                               </td>
                                           </tr>
                                       {{- end}}
-                                          <tr id="starr-Radarr-none" style="display: none;"><td colspan="8">No Radarr instances configured.</td></tr>
+                                          <tr id="starr-Radarr-none"{{if .Config.Apps.Radarr}} style="display: none;"{{end}}><td colspan="8">No Radarr instances configured.</td></tr>
                                       </tbody>
                                       <thead>
                                           <tr><td colspan="8" style="text-align:center;"><div style="float: left;">
@@ -353,7 +353,7 @@
                                               </td>
                                           </tr>
                                       {{- end}}
-                                          <tr id="starr-Readarr-none" style="display: none;"><td colspan="8">No Readarr instances configured.</td></tr>
+                                          <tr id="starr-Readarr-none"{{if .Config.Apps.Readarr}} style="display: none;"{{end}}><td colspan="8">No Readarr instances configured.</td></tr>
                                       </tbody>
                                       <thead>
                                           <tr><td colspan="8" style="text-align:center;">
@@ -441,7 +441,7 @@
                                               </td>
                                           </tr>
                                       {{- end}}
-                                          <tr id="starr-Sonarr-none" style="display: none;"><td colspan="8">No Sonarr instances configured.</td></tr>
+                                          <tr id="starr-Sonarr-none"{{if .Config.Apps.Sonarr}} style="display: none;"{{end}}><td colspan="8">No Sonarr instances configured.</td></tr>
                                       </tbody>
                                 </table></div><!-- table-responsive -->
 {{- /* end of starr (leave this comment) */ -}}
