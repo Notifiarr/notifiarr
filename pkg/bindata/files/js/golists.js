@@ -3,21 +3,27 @@
 // Works for Snapshot and Download Clients too.
 function removeInstance(name, index)
 {
-    $('#'+ name +'-'+ index).remove();
-    // redo tooltips since some got nuked.
-    setTooltips();
-    // if all instances are deleted, show the "no instances" item.
-    if (!$('.'+ name).length) {
-        $('#'+ name +'-none').show();
-    }
-    // mark this instance as deleted (to bring up save changes button).
-    $('.'+ name + index +'-deleted').val(true);
+    // service table has to be handled specially.
+    serviceTable.row($('#'+ name +'-'+ index)).remove().draw()
+    $('#'+ name +'-'+ index).fadeOut(1000);
+    setTimeout(function() {
+        $('#'+ name +'-'+ index).remove();
+        // if all instances are deleted, show the "no instances" item.
+        if (!$('.'+ name).length) {
+            $('#'+ name +'-none').show();
+        }
+        // mark this instance as deleted (to bring up save changes button).
+        $('.'+ name + index +'-deleted').val(true);
 
-    //-- FIX THE INDEXING
-    reindexList(name.split('-')[0]);
+        //-- FIX THE INDEXING
+        reindexList(name.split('-')[0]);
 
-    // bring up the save changes button.
-    findPendingChanges();
+        // bring up the save changes button.
+        findPendingChanges();
+
+        // redo tooltips since some got nuked.
+        setTooltips();
+    },1000);
 }
 
 // The Go app only accepts indexes on lists starting at 0 with no gaps.

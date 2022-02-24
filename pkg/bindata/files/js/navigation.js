@@ -43,9 +43,10 @@ function refreshPage(template, notice = true)
             $('#template-'+ template).find('.filetable').each(function() {
                 loadDataTable($(this));
             });
-            $('#template-'+ template).find('.servicetable').each(function() {
-                loadServiceTable($(this));
+            $('#template-'+ template).find('.monitortable').each(function() {
+                loadMonitorTable($(this));
             });
+
         },
         error: function (request, status, error) {
             if (error == "") {

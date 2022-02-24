@@ -37,26 +37,6 @@ serviceTable = $('.servicetable').DataTable({
     }
 });
 
-function removeDataRow(name, index)
-{
-    serviceTable.row($('#'+ name +'-'+ index)).remove().draw()
-    //$('#'+ name +'-'+ index).remove()
-    // redo tooltips since some got nuked.
-    setTooltips();
-    // if all instances are deleted, show the "no instances" item.
-    if (!$('.'+ name).length) {
-        $('#'+ name +'-none').show();
-    }
-    // mark this instance as deleted (to bring up save changes button).
-    $('.'+ name + index +'-deleted').val(true);
-
-    //-- FIX THE INDEXING
-    reindexList(name.split('-')[0]);
-
-    // bring up the save changes button.
-    findPendingChanges();
-}
-
 // showProcessList displays/shows a hidden page(div) and fills it with the current process list.
 function showProcessList()
 {
@@ -115,7 +95,7 @@ function addServiceCheck()
     const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
         '<td style="display:none;"></td><td style="font-size: 22px;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'</span>'+
           '<div class="services-Checks-deletebutton" style="float: right;">'+
-            '<button onclick="removeDataRow(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
+            '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
           '</div>'+
         '</td>'+
         '<td><input type="text" id="Service.'+ index +'.Name" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Name" data-original="" value="Service'+ instance +'" style="width: 100%;"></td>'+

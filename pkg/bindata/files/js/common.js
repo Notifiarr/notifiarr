@@ -11,10 +11,6 @@ $(document).ready((function()
     setTooltips();
     setScreenSizeVars();
 
-    $(document).bind('change keyup mouseup', '.client-parameter', function(){
-        findPendingChanges();
-    });
-
     // ----- Navbar
     $('.nav-link').click((function() {
         $('nav.ts-sidebar').toggleClass('menu-open', false);
@@ -43,6 +39,10 @@ $(document).ready((function()
         ]
     });
 
+    $(document).bind('change keyup mouseup', '.client-parameter', function(){
+        findPendingChanges();
+    });
+
     //-- GIVE THE TABLE(S) TIME TO LOAD
     setTimeout(function() {
         $.each($('.filetable'), function() {
@@ -58,13 +58,13 @@ $(document).ready((function()
     });
     setScreenSizeVars();
 
-    $(function(){
-        // Self-executing recursive animation.
-        (function pulse(){
-            $('.fa-exclamation-circle').delay(200).fadeOut('slow').fadeIn('slow',pulse);
-        })();
-    });
+    pulseExclamation();
 }));
+
+// Recursive animation.
+function pulseExclamation(){
+    $('.fa-exclamation-circle').delay(200).fadeOut('slow').fadeIn('slow', pulseExclamation);
+}
 
 function hideSmallElements()
 {
@@ -181,7 +181,7 @@ function ajax(url, method, type)
 
 function setTooltips()
 {
-    $('[class*="balloon-tooltip"]').hide();
+    $('[class*="balloon-tooltip"]').fadeOut(100);
 
     $('a, div, i, img, input, span, td, button').balloon({
         position: 'bottom',
@@ -247,8 +247,7 @@ function findPendingChanges()
     let id;
     let changes = '';
     let counter = 0;
-
-    dope = function() {
+    let dope = function() {
         id          = $(this).attr('id');
         label       = $(this).attr('data-label');
         group       = $(this).attr('data-group');
@@ -267,9 +266,12 @@ function findPendingChanges()
     }
 
     $.each($('.client-parameter'), dope);
-    $(serviceTable.rows({search: 'removed'}).nodes()).find('.client-parameter').each(dope);
-    $(configTable.rows({search: 'removed'}).nodes()).find('.client-parameter').each(dope);
-
+    if (serviceTable) {
+        serviceTable.rows({search: 'removed'}).nodes().to$().find('.client-parameter').each(dope);
+    }
+    if (configTable) {
+        configTable.rows({search: 'removed'}).nodes().to$().find('.client-parameter').each(dope);
+    }
 
     if (changes) {
         $('.pending-change-list').html(changes);
