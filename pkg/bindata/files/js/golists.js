@@ -68,7 +68,7 @@ function addInstance(section, app)
     const prefix = $('#'+ section +'-'+ app +'-addbutton').data('prefix');  // storage location like Apps or Snapshot.
     const names = $('#'+ section +'-'+ app +'-addbutton').data('names'); // list of thinges like "Name" and "URL"
     // This just sets the first few lines of the row. The more-dynamic bits get added below, in a for loop.
-    let row = '<tr class="'+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
+    let row = '<tr class="newRow bk-success '+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
                 '   <td style="font-size: 22px;"><span id="'+ app +'IndexLabel'+ (instance-1) +'">'+instance+"</span>"+
                 '       <div class="'+ section +'-'+ app +'-deletebutton" style="float: right;">'+
                 '           <button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +

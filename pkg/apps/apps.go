@@ -116,15 +116,12 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			appName = app.String()
 		)
 
+		r.Body.Close()              // we just read this into a buffer.
+		r.Body = io.NopCloser(&buf) // someone else gets to read it now.
+
 		if appName == "" {
 			appName = "noApp"
 		}
-
-		apiHits.Add(appName+"bytesRcvd", int64(len(post)))
-		apiHits.Add(appName+"count", 1)
-		apiHits.Add("requests", 1)
-
-		r.Body.Close() // we just read this into a buffer.
 
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
@@ -166,6 +163,9 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 
 		wrote := a.Respond(w, code, msg)
 		apiHits.Add(appName+"bytesSent", wrote)
+		apiHits.Add(appName+"bytesRcvd", int64(len(post)))
+		apiHits.Add(appName+"count", 1)
+		apiHits.Add("requests", 1)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 	}
 }

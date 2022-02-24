@@ -30,14 +30,14 @@
                                 </div>
                                 <div class="col-sm-12 col-md-12">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered bk-dark servicetable" style="width:100%">
-                                            <tr><!-- this is not in thead so datatables works -->
+                                        <table  class="table table-bordered table-responsive bk-dark" style="width:100%">
+                                            <tr>
                                                 <td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td>
                                                 <td colspan="7" style="text-align:center;" class="mobile-hide">
                                                     <div style="float: left;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
                                                     <h3 style="margin-bottom:-45px">Check Configuration</h3>
                                                     <div style="float: right;">
-                                                        <button id="services-Checks-addbutton" onclick="addServiceCheck()" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="services-Checks-addbutton" onclick="addServiceCheck();" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
@@ -46,6 +46,8 @@
                                                     <img src="{{files}}/images/golift.png" style="float:right;height:50px;">
                                                 </td>
                                             </tr>
+                                        </table>
+                                        <table class="table table-bordered bk-dark servicetable" style="width:100%">
                                             <thead>
                                                 <tr>
                                                     <th class="text-center tablet-hide mobile-hide" style="min-width:80px;">#</th>
@@ -64,9 +66,9 @@
                                                     <td style="display:none;">
                                                         <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
                                                     </td>
-                                                    <td style="font-size: 22px;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
+                                                    <td style="font-size: 22px;"><span id="checksIndexLabel{{$index}}" class="indexLabel mobile-hide tablet-hide">{{instance $index}}</span>
                                                         <div class="services-Checks-deletebutton" style="float: right;">
-                                                            <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                                            <button onclick="removeDataRow('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -132,10 +134,6 @@
                                                     </td>
                                                 </tr>
                                             {{- end}}
-                                                <tr id="services-Checks-none" style="display: none;">
-                                                    <td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td><td style="display:none;"></td>
-                                                    <td colspan="7">No Checks instances configured.</td>
-                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>

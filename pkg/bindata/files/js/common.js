@@ -2,6 +2,8 @@ let smScreen        = false;
 const smScreenWidth = 700;
 let mdScreen        = false;
 const mdScreenWidth = 1300;
+var configTable     = null;
+var serviceTable    = null;
 
 $(document).ready((function()
 {
@@ -22,6 +24,25 @@ $(document).ready((function()
         $('nav.ts-sidebar').toggleClass('menu-open');
     }));
 
+    configTable = $('.configtable').DataTable({
+        "autoWidth": true,
+        "scrollX": true,
+        "sort": false,
+        "responsive": true,
+        'scrollY': '79vh',
+        "paging": false,
+        "bInfo": false, // info line at bottom
+        "fnDrawCallback":function() {
+            // fix the header column on window resize.
+            this.api().columns.adjust();
+        },
+        "columns": [
+            { "searchable": true },
+            { "searchable": true },
+            { "searchable": false }
+        ]
+    });
+
     //-- GIVE THE TABLE(S) TIME TO LOAD
     setTimeout(function() {
         $.each($('.filetable'), function() {
@@ -29,12 +50,6 @@ $(document).ready((function()
         });
         $.each($('.monitortable'), function() {
             loadMonitorTable($(this));
-        });
-        $.each($('.servicetable'), function() {
-            loadServiceTable($(this));
-        });
-        $.each($('.configtable'), function() {
-            loadConfigTable($(this));
         });
     }, 500);
 
@@ -73,52 +88,6 @@ function setScreenSizeVars()
     hideSmallElements();
 }
 // ---------------------------------------------------------------------------------------------
-
-function loadConfigTable(table) { // this expects 3 columns.
-    table.DataTable({
-        "autoWidth": true,
-        "scrollX": true,
-        "sort": false,
-        "responsive": true,
-        'scrollY': '79vh',
-        "paging": false,
-        "bInfo": false, // info line at bottom
-        "fnDrawCallback":function() {
-            // fix the header column on window resize.
-            this.api().columns.adjust();
-        },
-        "columns": [
-            { "searchable": true },
-            { "searchable": true },
-            { "searchable": false }
-        ]
-    });
-}
-
-// data tables doesn't work on the Services table because it's all a form.
-// Need custom methods
-function loadServiceTable(table) {
-    table.DataTable({
-        "autoWidth": true,
-        "scrollX": true,
-        'scrollCollapse': true,
-        "sort": true,
-        "responsive": true,
-        'scrollY': '79vh',
-        "paging": false,
-        "columnDefs": [
-            { "type": "html-input", "targets": [1,1,3,4] }
-        ],
-        "fnDrawCallback":function() {
-            // fix the header column on window resize.
-            this.api().columns.adjust();
-        }
-    });
-    $.fn.dataTableExt.ofnSearch['html-input'] = function(value) {
-        alert($(value).find('input').val());
-        return $(value).find('input').val();
-    };
-}
 
 function loadDataTable(table) {
     table.DataTable({
@@ -279,18 +248,28 @@ function findPendingChanges()
     let changes = '';
     let counter = 0;
 
-    $.each($('.client-parameter'), function() {
+    dope = function() {
         id          = $(this).attr('id');
         label       = $(this).attr('data-label');
         group       = $(this).attr('data-group');
         original    = $(this).attr('data-original');
         current     = $(this).val();
+        col         = $(this).parents('td');
+        row         = col.parents('tr');
 
         if (original != current) {
+            col.addClass(row.hasClass('newRow')?'':'bk-warning');
             counter++;
             changes += titleCaseWord(group) +': '+ label +'<br>';
+        } else {
+            col.removeClass(row.hasClass('newRow')?'':'bk-warning');
         }
-    });
+    }
+
+    $.each($('.client-parameter'), dope);
+    $(serviceTable.rows({search: 'removed'}).nodes()).find('.client-parameter').each(dope);
+    $(configTable.rows({search: 'removed'}).nodes()).find('.client-parameter').each(dope);
+
 
     if (changes) {
         $('.pending-change-list').html(changes);
@@ -303,13 +282,16 @@ function findPendingChanges()
 function savePendingChanges()
 {
     let fields = '';
-
-    $.each($('.client-parameter'), function() {
+    let dope = function() {
         const id = $(this).attr('id')
         if (id !== undefined) {
             fields += '&'+ $(this).attr('id') +'='+ $(this).val();
         }
-    });
+    };
+
+    $(serviceTable.rows({search: 'removed'}).nodes()).find('.client-parameter').each(dope);
+    $(configTable.rows({search: 'removed'}).nodes()).find('.client-parameter').each(dope);
+    $.each($('.client-parameter'), dope);
 
     $.ajax({
         type: 'POST',

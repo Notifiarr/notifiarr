@@ -1,3 +1,62 @@
+$.fn.dataTableExt.ofnSearch['html-input'] = function(value) {
+    if ($(value).find('input').length != 0) {
+        return $(value).find('input').val();
+    }
+    if ($(value).find('select').length != 0) {
+        return $(value).find('select').val();
+    }
+    return "";
+};
+
+$.fn.dataTableExt.ofnSearch['span-input'] = function(value) {
+    return $(value).text();
+};
+
+serviceTable = $('.servicetable').DataTable({
+    "autoWidth": true,
+    "scrollX": true,
+    'scrollCollapse': true,
+    "sort": false,
+    "responsive": true,
+    'scrollY': '79vh',
+    "paging": false,
+    "oLanguage": {
+        "sInfo": "Showing _START_ to _END_ of _TOTAL_ service checks.",
+        "sZeroRecords": "No matching service chcks found.",
+        "sInfoEmpty": "Showing 0 to 0 of 0 service checks.",
+        "sInfoFiltered": "(filtered from _MAX_ total service checks)"
+    },
+    "columnDefs": [
+        { "type": "span-input", "targets": [1] },
+        { "type": "html-input", "targets": [2,3,4,5,6,7] },
+        { "type": "html", "targets": [0] }
+    ],
+    "fnDrawCallback":function() {
+        // fix the header column on window resize.
+        this.api().columns.adjust();
+    }
+});
+
+function removeDataRow(name, index)
+{
+    serviceTable.row($('#'+ name +'-'+ index)).remove().draw()
+    //$('#'+ name +'-'+ index).remove()
+    // redo tooltips since some got nuked.
+    setTooltips();
+    // if all instances are deleted, show the "no instances" item.
+    if (!$('.'+ name).length) {
+        $('#'+ name +'-none').show();
+    }
+    // mark this instance as deleted (to bring up save changes button).
+    $('.'+ name + index +'-deleted').val(true);
+
+    //-- FIX THE INDEXING
+    reindexList(name.split('-')[0]);
+
+    // bring up the save changes button.
+    findPendingChanges();
+}
+
 // showProcessList displays/shows a hidden page(div) and fills it with the current process list.
 function showProcessList()
 {
@@ -51,13 +110,13 @@ function servicesAction(action, refresh, refreshDelay = 0) {
 function addServiceCheck()
 {
      //-- DO NOT RELY ON 'index' FOR DIRECT IMPLEMENTATION, USE IT TO SORT AND RE-INDEX DURING THE SAVE
-    const index = $('.services-Checks').length;
+    const index = serviceTable.rows().count();
     const instance = index+1;
-    const row = '<tr class="bk-success services-Checks" id="services-Checks-'+ index +'">'+
-        '<td style="font-size: 22px;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'</span>'+
-        '<div class="services-Checks-deletebutton" style="float: right;">'+
-        '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
-        '</div>'+
+    const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
+        '<td style="display:none;"></td><td style="font-size: 22px;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'</span>'+
+          '<div class="services-Checks-deletebutton" style="float: right;">'+
+            '<button onclick="removeDataRow(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
+          '</div>'+
         '</td>'+
         '<td><input type="text" id="Service.'+ index +'.Name" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Name" data-original="" value="Service'+ instance +'" style="width: 100%;"></td>'+
         '<td>'+
@@ -80,7 +139,7 @@ function addServiceCheck()
         '<td><input type="text" id="Service.'+ index +'.Timeout" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m" style="width: 100%;"></td>'+
         '</tr>';
 
-    $('#services-Checks-container').append(row);
+    serviceTable.row.add($(row)).draw();
 
     // redo tooltips since some got added.
     setTooltips();
