@@ -29,7 +29,7 @@
                                     </p>
                                 </div>
                                 <div class="col-sm-12 col-md-12">
-                                    <div class="table-responsiv">
+                                    <div class="table-responsive">
                                         <table  class="table table-bordered table-responsive bk-dark" style="width:100%">
                                             <tr>
                                                 <td style="text-align:center;" class="mobile-hide">
@@ -61,7 +61,7 @@
                                             <tbody id="services-Checks-container">
                                             {{- range $index, $svc := .Config.Service}}
                                                 <tr class="services-Checks" id="services-Checks-{{$index}}">
-                                                    <td style="font-size: 22px;white-space: nowrap;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
+                                                    <td class="text-center" style="font-size: 22px;white-space: nowrap;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
                                                         <span class="services-Checks-deletebutton">
                                                             <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                                         </span>

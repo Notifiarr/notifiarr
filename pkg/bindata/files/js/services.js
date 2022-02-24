@@ -92,10 +92,10 @@ function addServiceCheck()
     const index = serviceTable.rows().count();
     const instance = index+1;
     const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
-        '<td style="display:none;"></td><td style="font-size: 22px;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'</span>'+
-          '<div class="services-Checks-deletebutton" style="float: right;">'+
+        '<td class="text-center" style="font-size: 22px;white-space: nowrap;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'</span>'+
+          '<span class="services-Checks-deletebutton">'+
             '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
-          '</div>'+
+          '</span>'+
         '</td>'+
         '<td><input type="text" id="Service.'+ index +'.Name" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Name" data-original="" value="Service'+ instance +'" style="width: 100%;"></td>'+
         '<td>'+
