@@ -1,7 +1,7 @@
 let smScreen        = false;
 const smScreenWidth = 700;
 let mdScreen        = false;
-const mdScreenWidth = 1300;
+const mdScreenWidth = 1080;
 var configTable     = null;
 var serviceTable    = null;
 
@@ -12,13 +12,13 @@ $(document).ready((function()
     setScreenSizeVars();
 
     // ----- Navbar
-    $('.nav-link').click((function() {
+    $('.nav-link').click(function() {
         $('nav.ts-sidebar').toggleClass('menu-open', false);
-    }));
+    });
 
-    $(".menu-btn").click((function() {
+    $(".menu-btn").click(function() {
         $('nav.ts-sidebar').toggleClass('menu-open');
-    }));
+    });
 
     configTable = $('.configtable').DataTable({
         "autoWidth": true,

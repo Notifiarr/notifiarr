@@ -108,6 +108,8 @@ require github.com/gorilla/securecookie v1.1.1
 require github.com/fsnotify/fsnotify v1.5.1
 
 require (
+	github.com/felixge/httpsnoop v1.0.1 // indirect
+	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/miolini/datacounter v1.0.2 // indirect

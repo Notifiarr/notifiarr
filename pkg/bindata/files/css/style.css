@@ -39,7 +39,7 @@ html,body {
 }
 @media only screen and (min-width: 480px) {
   html {
-    font-size: 17px;
+    font-size: 14px;
   }
 }
 @media only screen and (min-width: 768px) {
@@ -47,7 +47,7 @@ html,body {
     font-size: 14px;
   }
 }
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-width: 1080px) {
   p {
     font-size: 1em;
     margin-bottom: 1.8em;
@@ -575,7 +575,7 @@ li {
   display: block;
   width: 200px;
 }
-@media only screen and (min-width: 992px) {
+@media only screen and (min-width: 1080px) {
   .brand .logo {
     width: 250px;
   }
@@ -591,11 +591,13 @@ li {
   color: #fff;
   padding: 20px 20px;
 }
-@media only screen and (min-width: 992px) {
+
+@media only screen and (min-width: 1080px) {
   .brand .menu-btn {
     display: none;
   }
 }
+
 .brand .ts-profile-nav {
   float: right;
   display: none;
@@ -640,7 +642,7 @@ li {
   visibility: visible;
   opacity: 1;
 }
-@media only screen and (min-width: 992px) {
+@media only screen and (min-width: 1080px) {
   .brand .ts-profile-nav {
     display: block;
   }
@@ -677,12 +679,7 @@ li {
   padding: 10px 15px;
   color: #fff;
 }
-@media only screen and (min-width: 992px) {
-  .ts-sidebar .ts-profile-nav {
-    display: none;
-  }
-}
-@media only screen and (min-width: 992px) {
+@media only screen and (min-width: 1080px) {
   .ts-sidebar {
     max-height: 100%;
     bottom: 0;
@@ -745,13 +742,18 @@ li {
   padding-top: 15px;
   margin-top: 60px;
 }
-@media only screen and (min-width: 992px) {
+@media only screen and (min-width: 1080px) {
   .ts-main-content .ts-sidebar {
     width: 250px;
     float: left;
   }
   .ts-main-content .content-wrapper {
     margin-left: 250px;
+  }
+}
+@media only screen and (min-width: 992px) {
+  .ts-sidebar .ts-profile-nav {
+    display: none;
   }
 }
 

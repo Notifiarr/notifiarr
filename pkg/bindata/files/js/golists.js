@@ -76,12 +76,12 @@ function addInstance(section, app)
     const names = $('#'+ section +'-'+ app +'-addbutton').data('names'); // list of thinges like "Name" and "URL"
     // This just sets the first few lines of the row. The more-dynamic bits get added below, in a for loop.
     let row = '<tr class="newRow bk-success '+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
-                '   <td style="font-size: 22px;"><span id="'+ app +'IndexLabel'+ (instance-1) +'">'+instance+"</span>"+
-                '       <div class="'+ section +'-'+ app +'-deletebutton" style="float: right;">'+
+                '   <td style="font-size: 22px;white-space:nowrap;"><span id="'+ app +'IndexLabel'+ (instance-1) +'">'+instance+"</span>"+
+                '       <span class="'+ section +'-'+ app +'-deletebutton">'+
                 '           <button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +
                             ')" type="button" title="Delete this instance of '+ app +'.'+
                             '" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
-                '       </div>'+
+                '       </span>'+
                 '   </td>';
 
     // Timeout and Interval must have valid go durations, or the parser errors.

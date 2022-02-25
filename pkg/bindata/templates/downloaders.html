@@ -1,224 +1,247 @@
                                 <h1><i class="fas fa-cart-arrow-down"></i> Download Apps</h1>
                                 <p>Adding and enabling these downloader applications makes them show up in the <b>Dashboard Integration</b> on Notifiarr.com.</p>
-                                <table class="table bk-dark table-bordered">
-                                    <thead>
-                                        <tr><td colspan="7" style="text-align:center;">
-                                            <div style="float: left;"><img src="{{files}}/images/logo/qbittorrent.png" style="height:50px;"></div>
-                                            <h2 class="mb-3" style="margin-bottom:-45px">Qbittorrent</h2>
-                                            <div style="float: right;">
-                                                <button id="downloader-Qbit-addbutton" onclick="addInstance('downloader', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                        </td></tr>
-                                        <tr>
-                                            <td>Instance</td>
-                                            <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                            <td>URL</td>
-                                            <td>User</td>
-                                            <td>Pass</td>
-                                            <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                            <td style="width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="downloader-Qbit-container">
-                                    {{- range $index, $app := .Config.Apps.Qbit}}
-                                        <input disabled style="display: none;" class="client-parameter downloader-Qbit{{$index}}-deleted" data-group="downloader" data-label="Qbit {{instance $index}} Deleted" data-original="false" value="false">
-                                        <tr class="downloader-Qbit" id="downloader-Qbit-{{$index}}">
-                                            <td style="font-size: 22px;"><span id="QbitIndexLabel{{$index}}">{{instance $index}}</span>
-                                                <div class="downloader-Qbit-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Qbit) (instance $index)}} display: none;{{end}}">
-                                                    <button onclick="removeInstance('downloader-Qbit', {{$index}})" type="button" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Name" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Qbit.{{$index}}.URL" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Qbit.{{$index}}.User" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                        </tr>
-                                    {{- end}}
-                                        <tr id="downloader-Qbit-none" {{if .Config.Apps.Qbit}} style="display: none;"{{end}}><td colspan="7">No Qbittorrent instances configured.</td></tr>
-                                    </tbody>
-                                    <thead>
-                                        <tr><td colspan="7" style="text-align:center;">
-                                            <div style="float: left;"><img src="{{files}}/images/logo/deluge.png" style="height:50px;">
-                                            </div><h2 class="mb-3" style="margin-bottom:-45px">Deluge</h2>
-                                            <div style="float: right;">
-                                                <button id="downloader-Deluge-addbutton" onclick="addInstance('downloader', 'Deluge')" data-prefix="Apps" data-names='["Name","","Config.URL","Config.Password","Interval","Timeout"]' type="button" title="Add another instance of Deluge." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                        </td></tr>
-                                        <tr>
-                                            <td>Instance</td>
-                                            <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                            <td colspan="2">URL</td>
-                                            <td>Pass</td>
-                                            <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                            <td style="width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="downloader-Deluge-container">
-                                    {{- range $index, $app := .Config.Apps.Deluge}}
-                                        <input disabled style="display: none;" class="client-parameter downloader-Deluge{{$index}}-deleted" data-group="downloader" data-label="Deluge {{instance $index}} Deleted" data-original="false" value="false">
-                                        <tr class="downloader-Deluge" id="downloader-Deluge-{{$index}}">
-                                            <td style="font-size: 22px;"><span id="DelugeIndexLabel{{$index}}">{{instance $index}}</span>
-                                                <div class="downloader-Deluge-deletebutton" style="float: right;{{if ne (len $.Config.Apps.Deluge) (instance $index)}} display: none;{{end}}">
-                                                    <button onclick="removeInstance('downloader-Deluge', {{$index}})" type="button" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Name" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td colspan="2">
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Config.URL" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Pass" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Interval" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                        </tr>
-                                    {{- end}}
-                                        <tr id="downloader-Deluge-none" {{if .Config.Apps.Deluge}} style="display: none;"{{end}}><td colspan="7">No Deluge instances configured.</td></tr>
-                                    </tbody>
-                                    <thead>
-                                        <tr><td colspan="7" style="text-align:center;">
-                                            <div style="float: left;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
-                                            <h2 class="mb-3" style="margin-bottom:-45px">SabNZB</h2>
-                                            <div style="float: right;">
-                                                <button id="downloader-SabNZB-addbutton" onclick="addInstance('downloader','SabNZB')" data-prefix="Apps" data-names='["Name","", "URL","APIKey","Interval","Timeout"]' type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                            </div>
-                                        </td></tr>
-                                        <tr>
-                                            <td>Instance</td>
-                                            <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                            <td colspan="2">URL</td>
-                                            <td>API Key</td>
-                                            <td style="width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                            <td style="width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="downloader-SabNZB-container">
-                                    {{- range $index, $app := .Config.Apps.SabNZB}}
-                                        <input disabled style="display: none;" class="client-parameter downloader-SabNZB{{$index}}-deleted" data-group="downloader" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
-                                        <tr class="downloader-SabNZB" id="downloader-SabNZB-{{$index}}">
-                                            <td style="font-size: 22px;"><span id="SabNZBIndexLabel{{$index}}">{{instance $index}}</span>
-                                                <div class="downloader-SabNZB-deletebutton" style="float: right;{{if ne (len $.Config.Apps.SabNZB) (instance $index)}} display: none;{{end}}">
-                                                    <button onclick="removeInstance('downloader-SabNZB', {{$index}})" type="button" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td colspan="2">
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                            <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}
-                                                    <td><input type="text" id="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
-                                                </tr></table>
-                                            </td>
-                                        </tr>
-                                    {{- end}}
-                                        <tr id="downloader-SabNZB-none"{{if .Config.Apps.SabNZB}} style="display: none;"{{end}}><td colspan="7">No SabNZB instances configured.</td></tr>
-                                    </tbody>
-                                </table>
+                                <div class="table-responsive">
+                                    <table class="table bk-dark table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <td colspan="7" class="mobile-hide text-center">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/qbittorrent.png" style="height:50px;"></div>
+                                                    <h2 class="mb-3" style="margin-bottom:-45px">qBittorrent</h2>
+                                                    <div style="float: right;">
+                                                        <button id="downloader-Qbit-addbutton" onclick="addInstance('downloader', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="7" class="tablet-hide desktop-hide">
+                                                    <button id="downloader-Qbit-addbutton" onclick="addInstance('downloader', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 class="mb-3" style="margin-left:5px;display:inline;">qBittorrent</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/logo/qbittorrent.png" style="height:50px;"></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center" style="width:20px;min-width:20px;">#</td>
+                                                <td style="min-width:130px;">Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
+                                                <td style="min-width:190px;">URL</td>
+                                                <td style="min-width:80px;">Username</td>
+                                                <td style="min-width:170px;">Password</td>
+                                                <td style="min-width:90px;width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
+                                                <td style="min-width:90px;width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="downloader-Qbit-container">
+                                        {{- range $index, $app := .Config.Apps.Qbit}}
+                                            <input disabled style="display: none;" class="client-parameter downloader-Qbit{{$index}}-deleted" data-group="downloader" data-label="Qbit {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="downloader-Qbit" id="downloader-Qbit-{{$index}}">
+                                                <td style="font-size:22px;white-space:nowrap;"><span id="QbitIndexLabel{{$index}}">{{instance $index}}</span>
+                                                    <span class="downloader-Qbit-deletebutton" style="{{if ne (len $.Config.Apps.Qbit) (instance $index)}} display: none;{{end}}">
+                                                        <button onclick="removeInstance('downloader-Qbit', {{$index}})" type="button" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Name" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.URL" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.User" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="downloader" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                            </tr>
+                                        {{- end}}
+                                            <tr id="downloader-Qbit-none" {{if .Config.Apps.Qbit}} style="display: none;"{{end}}><td colspan="7">No Qbittorrent instances configured.</td></tr>
+                                        </tbody>
+                                        <thead>
+                                            <tr>
+                                                <td colspan="7" class="text-center mobile-hide">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/deluge.png" style="height:50px;">
+                                                    </div><h2 class="mb-3" style="margin-bottom:-45px">Deluge</h2>
+                                                    <div style="float: right;">
+                                                        <button id="downloader-Deluge-addbutton" onclick="addInstance('downloader', 'Deluge')" data-prefix="Apps" data-names='["Name","","Config.URL","Config.Password","Interval","Timeout"]' type="button" title="Add another instance of Deluge." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="7" class="tablet-hide desktop-hide">
+                                                    <button id="downloader-Deluge-addbutton" onclick="addInstance('downloader', 'Deluge')" data-prefix="Apps" data-names='["Name","","Config.URL","Config.Password","Interval","Timeout"]' type="button" title="Add another instance of Deluge." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 class="mb-3" style="margin-left:5px;display:inline;">Deluge</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/logo/deluge.png" style="height:50px;"></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">#</td>
+                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
+                                                <td colspan="2">URL</td>
+                                                <td>Password</td>
+                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
+                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="downloader-Deluge-container">
+                                        {{- range $index, $app := .Config.Apps.Deluge}}
+                                            <input disabled style="display: none;" class="client-parameter downloader-Deluge{{$index}}-deleted" data-group="downloader" data-label="Deluge {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="downloader-Deluge" id="downloader-Deluge-{{$index}}">
+                                                <td style="font-size:22px;white-space:nowrap;"><span id="DelugeIndexLabel{{$index}}">{{instance $index}}</span>
+                                                    <span class="downloader-Deluge-deletebutton" style="{{if ne (len $.Config.Apps.Deluge) (instance $index)}} display: none;{{end}}">
+                                                        <button onclick="removeInstance('downloader-Deluge', {{$index}})" type="button" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Name" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td colspan="2">
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Config.URL" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Pass" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Interval" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="downloader" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                            </tr>
+                                        {{- end}}
+                                            <tr id="downloader-Deluge-none" {{if .Config.Apps.Deluge}} style="display: none;"{{end}}><td colspan="7">No Deluge instances configured.</td></tr>
+                                        </tbody>
+                                        <thead>
+                                            <tr>
+                                                <td colspan="7" class="text-center mobile-hide">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
+                                                    <h2 class="mb-3" style="margin-bottom:-45px">SabNZB</h2>
+                                                    <div style="float: right;">
+                                                        <button id="downloader-SabNZB-addbutton" onclick="addInstance('downloader','SabNZB')" data-prefix="Apps" data-names='["Name","", "URL","APIKey","Interval","Timeout"]' type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="7" class="tablet-hide desktop-hide">
+                                                    <button id="downloader-SabNZB-addbutton" onclick="addInstance('downloader','SabNZB')" data-prefix="Apps" data-names='["Name","", "URL","APIKey","Interval","Timeout"]' type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 class="mb-3" style="margin-left:5px;display:inline;">SabNZB</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center">#</td>
+                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
+                                                <td colspan="2">URL</td>
+                                                <td>API Key</td>
+                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
+                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="downloader-SabNZB-container">
+                                        {{- range $index, $app := .Config.Apps.SabNZB}}
+                                            <input disabled style="display: none;" class="client-parameter downloader-SabNZB{{$index}}-deleted" data-group="downloader" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="downloader-SabNZB" id="downloader-SabNZB-{{$index}}">
+                                                <td style="font-size:22px;white-space:nowrap;"><span id="SabNZBIndexLabel{{$index}}">{{instance $index}}</span>
+                                                    <span class="downloader-SabNZB-deletebutton" style="{{if ne (len $.Config.Apps.SabNZB) (instance $index)}} display: none;{{end}}">
+                                                        <button onclick="removeInstance('downloader-SabNZB', {{$index}})" type="button" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td colspan="2">
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                                <td>
+                                                    <table width="100%"><tr>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
+                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- end}}
+                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="downloader" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                                    </tr></table>
+                                                </td>
+                                            </tr>
+                                        {{- end}}
+                                            <tr id="downloader-SabNZB-none"{{if .Config.Apps.SabNZB}} style="display: none;"{{end}}><td colspan="7">No SabNZB instances configured.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 {{- /* end of dwnload clients (leave this comment) */ -}}

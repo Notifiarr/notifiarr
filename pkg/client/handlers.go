@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
@@ -25,25 +26,35 @@ func (c *Client) httpHandlers() {
 	base := path.Join("/", c.Config.URLBase)
 
 	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
-	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", http.HandlerFunc(c.slash)).Methods("GET")
-	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", http.HandlerFunc(c.loginHandler)).Methods("POST")
+	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", handlers.MethodHandler{
+		"GET":  http.HandlerFunc(c.slash),
+		"POST": http.HandlerFunc(c.loginHandler),
+	})
 
 	if !strings.EqualFold(base, "/") {
 		// Handle the same URLs as above on the different base URL too.
 		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
-		c.Config.Router.Handle(base, http.HandlerFunc(c.slash)).Methods("GET") // "hi" page on /urlbase
-		c.Config.Router.Handle(base, http.HandlerFunc(c.loginHandler)).Methods("POST")
+		c.Config.Router.Handle(base, handlers.MethodHandler{
+			"GET":  http.HandlerFunc(c.slash),
+			"POST": http.HandlerFunc(c.loginHandler),
+		})
 	}
 
 	//nolint:lll
 	if c.Config.UIPassword != "" {
 		c.Config.Router.PathPrefix(path.Join(base, "/files/")).
-			Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
-		c.Config.Router.HandleFunc(path.Join(base, "/login"), c.loginHandler).Methods("GET", "POST")
-		c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("POST", "GET")
-		c.Config.Router.HandleFunc(path.Join(base, "/profile"), c.handleProfilePost).Methods("POST")
-		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}"), c.handleGUITrigger).Methods("GET")
-		c.Config.Router.HandleFunc(path.Join(base, "/trigger/{action}/{content}"), c.handleGUITrigger).Methods("GET")
+			Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), handlers.MethodHandler{"GET": http.HandlerFunc(c.handleStaticAssets)}))
+		c.Config.Router.Handle(path.Join(base, "/login"), handlers.MethodHandler{
+			"GET":  http.HandlerFunc(c.loginHandler),
+			"POST": http.HandlerFunc(c.loginHandler),
+		})
+		c.Config.Router.Handle(path.Join(base, "/logout"), handlers.MethodHandler{
+			"GET":  http.HandlerFunc(c.logoutHandler),
+			"POST": http.HandlerFunc(c.logoutHandler),
+		})
+		c.Config.Router.Handle(path.Join(base, "/profile"), handlers.MethodHandler{"POST": c.checkAuthorized(c.handleProfilePost)})
+		c.Config.Router.Handle(path.Join(base, "/trigger/{action}"), c.checkAuthorized(c.handleGUITrigger)).Methods("GET")
+		c.Config.Router.Handle(path.Join(base, "/trigger/{action}/{content}"), c.checkAuthorized(c.handleGUITrigger)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/ps"), c.checkAuthorized(c.handleProcessList)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/template/{template}"), c.checkAuthorized(c.getTemplatePageHandler)).Methods("GET")
 		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}/{skip}"), c.checkAuthorized(c.getFileHandler)).Methods("GET").Queries("sort", "{sort}")
@@ -61,7 +72,8 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.Handle(path.Join(base, "/reconfig"), c.checkAuthorized(c.handleConfigPost)).Methods("POST")
 		c.Config.Router.Handle(path.Join(base, "/debug/vars"), c.checkAuthorized(expvar.Handler().ServeHTTP)).Methods("GET")
 		c.Config.Router.Handle(path.Join(c.Config.URLBase, "/ws"),
-			c.checkAuthorized(c.handleWebSockets)).Methods("GET").Queries("source", "{source}", "fileId", "{fileId}")
+			handlers.MethodHandler{"GET": c.checkAuthorized(c.handleWebSockets)}).
+			Queries("source", "{source}", "fileId", "{fileId}")
 	}
 
 	// 404 (or redirect to base path) everything else
@@ -234,7 +246,7 @@ func (c *Client) runTrigger(trigger, content string) (int, string) { //nolint:cy
 		return http.StatusOK, strings.Title(content) + " backups check initiated."
 	case "reload":
 		c.sighup <- &update.Signal{Text: "reload http triggered"}
-		return http.StatusBadRequest, "Application reload initiated."
+		return http.StatusOK, "Application reload initiated."
 	case "notification":
 		if content != "" {
 			ui.Notify("Notification: %s", content) //nolint:errcheck

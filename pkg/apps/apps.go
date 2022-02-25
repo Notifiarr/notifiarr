@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/miolini/datacounter"
 	"golift.io/cnfg"
@@ -96,8 +97,13 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 	}
 
 	uri = path.Join(a.URLBase, "api", app.Lower(), id, uri)
+	handler := handlers.MethodHandler{}
 
-	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
+	for _, meth := range method {
+		handler[meth] = a.handleAPI(app, api)
+	}
+
+	return a.Router.Handle(uri, a.CheckAPIKey(handler))
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
