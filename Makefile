@@ -70,7 +70,7 @@ VERSION_LDFLAGS:= -X \"$(VERSION_PATH).Branch=$(BRANCH) ($(COMMIT))\" \
 
 # Makefile targets follow.
 
-all: clean generate build
+all: clean build
 
 ####################
 ##### Releases #####
@@ -137,59 +137,59 @@ $(shell go env GOPATH)/bin/rsrc:
 ##### Binaries #####
 ####################
 
-build: generate $(BINARY)
-$(BINARY): main.go
+build: $(BINARY)
+$(BINARY): generate main.go
 	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-linux: generate $(BINARY).amd64.linux
-$(BINARY).amd64.linux: main.go
+linux: $(BINARY).amd64.linux
+$(BINARY).amd64.linux: generate main.go
 	# Building linux 64-bit x86 binary.
 	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-linux386: generate $(BINARY).i386.linux
-$(BINARY).i386.linux: main.go
+linux386: $(BINARY).i386.linux
+$(BINARY).i386.linux: generate main.go
 	# Building linux 32-bit x86 binary.
 	GOOS=linux GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 arm: arm64 armhf
 
-arm64: generate $(BINARY).arm64.linux
-$(BINARY).arm64.linux: main.go
+arm64: $(BINARY).arm64.linux
+$(BINARY).arm64.linux: generate main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-armhf: generate $(BINARY).armhf.linux
-$(BINARY).armhf.linux: main.go
+armhf: $(BINARY).armhf.linux
+$(BINARY).armhf.linux: generate main.go
 	# Building linux 32-bit ARM binary.
 	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-macos: generate $(BINARY).amd64.macos
-$(BINARY).amd64.macos: main.go
+macos: $(BINARY).amd64.macos
+$(BINARY).amd64.macos: generate main.go
 	# Building darwin 64-bit x86 binary.
 	GOOS=darwin GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-freebsd: generate $(BINARY).amd64.freebsd
-$(BINARY).amd64.freebsd: main.go
+freebsd: $(BINARY).amd64.freebsd
+$(BINARY).amd64.freebsd: generate main.go
 	GOOS=freebsd GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-freebsd386: generate $(BINARY).i386.freebsd
-$(BINARY).i386.freebsd: main.go
+freebsd386: $(BINARY).i386.freebsd
+$(BINARY).i386.freebsd: generate main.go
 	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@ || true
 
-freebsdarm: generate $(BINARY).armhf.freebsd
-$(BINARY).armhf.freebsd: main.go
+freebsdarm: $(BINARY).armhf.freebsd
+$(BINARY).armhf.freebsd: generate main.go
 	GOOS=freebsd GOARCH=arm go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-exe: generate $(BINARY).amd64.exe
+exe: $(BINARY).amd64.exe
 windows: $(BINARY).amd64.exe
-$(BINARY).amd64.exe: rsrc.syso main.go
+$(BINARY).amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
 	GOOS=windows GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
@@ -399,7 +399,7 @@ $(patsubst %,%.darwin.so,$(PLUGINS)):
 	GOOS=darwin go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.darwin.so,%,$@)
 
 # Run code tests and lint.
-test: generate lint
+test: lint
 	# Testing.
 	go test -race -covermode=atomic ./...
 lint: generate
@@ -420,7 +420,8 @@ bindata: $(shell go env GOPATH)/bin/go-bindata
 $(shell go env GOPATH)/bin/go-bindata:
 	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
-generate: mockgen bindata pkg/bindata/bindata.go
+#generate: mockgen bindata pkg/bindata/bindata.go
+generate: bindata pkg/bindata/bindata.go
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./...
@@ -429,7 +430,7 @@ pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/
 ##### Docker #####
 ##################
 
-docker: generate
+docker:
 	docker build -f init/docker/Dockerfile \
 		--no-cache --pull \
 		--build-arg "BUILD_DATE=$(DATE)" \
