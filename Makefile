@@ -424,8 +424,9 @@ generate: mockgen bindata pkg/bindata/bindata.go
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./...
+	ls pkg/bindata/
 	pwd
-	ls $(shell go env GOPATH)/bin
+	head -n 10 pkg/bindata/bindata.go
 
 ##################
 ##### Docker #####
