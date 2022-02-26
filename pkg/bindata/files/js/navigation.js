@@ -46,6 +46,9 @@ function refreshPage(template, notice = true)
             $('#template-'+ template).find('.monitortable').each(function() {
                 loadMonitorTable($(this));
             });
+            $('#template-'+ template).find('.configtable').each(function() {
+                loadConfigTable($(this));
+            });
 
         },
         error: function (request, status, error) {

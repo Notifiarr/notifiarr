@@ -273,7 +273,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError {
-				exp.NotifiarrCom.Add(req.Method+"s", 1)
+				exp.NotifiarrCom.Add(req.Method+" Requests", 1)
 				exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
 
 				return resp, nil

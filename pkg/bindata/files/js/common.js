@@ -20,24 +20,7 @@ $(document).ready((function()
         $('nav.ts-sidebar').toggleClass('menu-open');
     });
 
-    configTable = $('.configtable').DataTable({
-        "autoWidth": true,
-        "scrollX": true,
-        "sort": false,
-        "responsive": true,
-        'scrollY': '79vh',
-        "paging": false,
-        "bInfo": false, // info line at bottom
-        "fnDrawCallback":function() {
-            // fix the header column on window resize.
-            this.api().columns.adjust();
-        },
-        "columns": [
-            { "searchable": true },
-            { "searchable": true },
-            { "searchable": false }
-        ]
-    });
+    configTable = loadConfigTable($('.configtable'));
 
     $(document).bind('change keyup mouseup', '.client-parameter', function(){
         findPendingChanges();
@@ -60,6 +43,27 @@ $(document).ready((function()
 
     pulseExclamation();
 }));
+
+function loadConfigTable(table) {
+    table.DataTable({
+        "autoWidth": true,
+        "scrollX": true,
+        "sort": false,
+        "responsive": true,
+        'scrollY': '79vh',
+        "paging": false,
+        "bInfo": false, // info line at bottom
+        "fnDrawCallback":function() {
+            // fix the header column on window resize.
+            this.api().columns.adjust();
+        },
+        "columns": [
+            { "searchable": true },
+            { "searchable": true },
+            { "searchable": false }
+        ]
+    });
+}
 
 // Recursive animation.
 function pulseExclamation(){
