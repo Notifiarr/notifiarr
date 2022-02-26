@@ -1,4 +1,6 @@
 # Powered by Application Builder: https://github.com/golift/application-builder
+env:
+  - MAKEBUILD=deb
 jobs:
   include:
   - if: tag IS present
@@ -6,11 +8,19 @@ jobs:
     osx_image: xcode12
     language: go
     go: 1.17.x
-  - os: linux
+  - if: tag IS NOT present
+    os: linux
     dist: bionic
     services: docker
     language: go
     go: 1.17.x
+  - if: tag IS present
+    os: linux
+    dist: bionic
+    services: docker
+    language: go
+    go: 1.17.x
+    env: MAKEBUILD=release
 git:
   depth: false
 addons:
@@ -34,6 +44,7 @@ install:
   - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.43.0
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm install 2.6.0; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do gem install --no-document fpm -v 1.11.0; fi
+  - make generate
 before_script:
   # Create your own deploy key, tar it, and encrypt the file to make this work. Optionally add a bitly_token file to the archive.
   - openssl aes-256-cbc -K $encrypted_772fc4772f04_key -iv $encrypted_772fc4772f04_iv -in .secret_files.tar.enc -out .secret_files.tar -d
@@ -41,10 +52,7 @@ before_script:
   - gpg --import gpg.signing.key
   - rm -f gpg.signing.key .secret_files.tar
   - source settings.sh
-  - make generate
-  - ls pkg/bindata
 script:
-  - ls pkg/bindata
   # Test Go.
   - make test
   # Test Docker. Docker rate limits and breaks my builds.
@@ -52,7 +60,7 @@ script:
   # Test built docker image.
   - #if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY,? v.*$VERSION"; fi
   # Build everything
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make release; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make $MAKEBUILD; fi
   # Build mac binary or image.
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make dmg; fi
   # Test homebrew (with make install).

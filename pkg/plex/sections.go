@@ -158,7 +158,8 @@ func (s *Server) GetPlexSectionKey(keyPath string) (*LibrarySection, error) {
 	}
 
 	if err := json.Unmarshal(data, &v); err != nil {
-		return nil, fmt.Errorf("unmarshaling library section from %s: %w; Payload data that failed: %s", s.URL+keyPath, err, string(data))
+		return nil, fmt.Errorf("unmarshaling library section from %s: %w; failed payload: %s",
+			s.URL+keyPath, err, string(data))
 	}
 
 	return v.MediaContainer, nil
