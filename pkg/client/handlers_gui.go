@@ -329,7 +329,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 }
 
 func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
-	code, data := c.runTrigger(mux.Vars(request)["action"], mux.Vars(request)["content"])
+	code, data := c.runTrigger(notifiarr.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
 	http.Error(response, data, code)
 }
 

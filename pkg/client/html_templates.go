@@ -15,6 +15,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
@@ -81,6 +82,7 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 
 func (c *Client) getFuncMap() template.FuncMap {
 	return template.FuncMap{
+		"join": strings.Join,
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
@@ -166,6 +168,7 @@ type templateData struct {
 	LogFiles    *logs.LogFileInfos    `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos    `json:"configFileInfo"`
 	ClientInfo  *notifiarr.ClientInfo `json:"clientInfo"`
+	Expvar      exp.AllData           `json:"expvar"`
 }
 
 func (c *Client) renderTemplate(response io.Writer, req *http.Request,
@@ -199,6 +202,7 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 			"arch":      runtime.GOARCH,
 			"binary":    binary,
 		},
+		Expvar: exp.GetAllData(),
 	})
 	if err != nil {
 		c.Errorf("Sending HTTP Response: %v", err)

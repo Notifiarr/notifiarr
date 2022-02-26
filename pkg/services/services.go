@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
@@ -43,6 +44,12 @@ func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 		if err := services[idx].Validate(); err != nil {
 			return nil, err
 		}
+
+		exp.ServiceChecks.Add(check.Name+"&&Total", 0)
+		exp.ServiceChecks.Add(check.Name+"&&"+StateUnknown.String(), 0)
+		exp.ServiceChecks.Add(check.Name+"&&"+StateOK.String(), 0)
+		exp.ServiceChecks.Add(check.Name+"&&"+StateWarning.String(), 0)
+		exp.ServiceChecks.Add(check.Name+"&&"+StateCritical.String(), 0)
 
 		// Add this validated service to our service map.
 		c.services[services[idx].Name] = services[idx]

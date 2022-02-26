@@ -1,3 +1,65 @@
                                 <h1><i class="fas fa-chart-line"></i> Application Metrics</h1>
-                                <p>This page will soon contain application metric data that does not currently exist.</p>
+                                <p>
+                                    The counters on this page reset when the application exits.
+                                    <a href="#metrics" onclick="refreshPage('metrics')">Refresh Page</a>.
+                                </p>
+                                <hr>
+                                <h3>Incoming API Requests</h3>
+                                <div class="col-md-12 mb">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered">
+                                            {{- range $key, $count := .Expvar.APIHits }}
+                                            <tr><td>{{ $key }}</td><td style="width:100px;">{{ $count }}</td></tr>
+                                            {{- end }}
+                                            {{- if not .Expvar.APIHits }}
+                                            <tr><td colspan="2">No API Requests yet.</td></tr>
+                                            {{- end }}
+                                        </table>
+                                    </div>
+                                </div>
+                                <h3>Incoming HTTP Requests</h3>
+                                <div class="col-md-12 mb">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered">
+                                            {{- range $key, $count := .Expvar.HTTPRequests }}
+                                            <tr><td>{{ $key }}</td><td style="width:100px;">{{ $count }}</td></tr>
+                                            {{- end }}
+                                            {{- if not .Expvar.HTTPRequests }}
+                                            <tr><td colspan="2">No HTTP Requests yet.</td></tr>
+                                            {{- end }}
+                                        </table>
+                                    </div>
+                                </div>
+                                <h3>Outbound Requests to Notifiarr.com</h3>
+                                <div class="col-md-12 mb">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered">
+                                            {{- range $key, $count := .Expvar.NotifiarrCom }}
+                                            <tr><td>{{ $key }}</td><td style="width:100px;">{{ $count }}</td></tr>
+                                            {{- end }}
+                                        </table>
+                                    </div>
+                                </div>
+                                <h3>Triggers and Timers Executed</h3>
+                                {{- range $source, $sub := .Expvar.TimerEvents }}
+                                    <div class="col-md-12 col-sm-12 col-lg-6">
+                                        <h5>{{ $source }}</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered">
+                                                {{- range $key, $count := $sub }}
+                                                <tr><td>{{ $key }}</td><td style="width:100px;">{{ $count }}</td></tr>
+                                                {{- end }}
+                                            </table>
+                                        </div>
+                                    </div>
+                                {{- end }}
+                                {{- if not .Expvar.TimerEvents }}
+                                    <div class="col-md-12 col-sm-12 col-lg-6">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered">
+                                                <tr><td>No timers nor triggers executed yet.</td></tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                {{- end }}
 {{- /* end of metrics (leave this comment) */ -}}

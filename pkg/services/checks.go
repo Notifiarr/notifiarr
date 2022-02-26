@@ -15,8 +15,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
 
-var checksMap = exp.GetMap("serviceChecks").Init() //nolint:gochecknoglobals
-
 type result struct {
 	output string
 	state  CheckState
@@ -88,9 +86,9 @@ func (s *Service) check() bool {
 
 // Return true if the service state changed.
 func (s *Service) update(res *result) bool {
-	checksMap.Add(s.Name+"&&Total", 1)
-	checksMap.Add(s.Name+"&&"+res.state.String(), 1)
-	checksMap.Add("totalChecksRun", 1)
+	exp.ServiceChecks.Add(s.Name+"&&Total", 1)
+	exp.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
+	//	exp.ServiceChecks.Add("Total Checks Run", 1)
 
 	if s.svc.LastCheck = time.Now().Round(time.Microsecond); s.svc.Since.IsZero() {
 		s.svc.Since = s.svc.LastCheck

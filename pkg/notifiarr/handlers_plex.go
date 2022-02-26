@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
@@ -86,9 +87,11 @@ type plexIncomingWebhook struct {
 
 // PlexHandler handles an incoming webhook from Plex.
 func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:cyclop,varnamelen
+	exp.APIHits.Add("Plex Webhook", 1)
+
 	start := time.Now()
 
-	if err := r.ParseMultipartForm(mnd.KB100); err != nil {
+	if err := r.ParseMultipartForm(mnd.Megabyte); err != nil {
 		c.Errorf("Parsing Multipart Form (plex): %v", err)
 		c.Apps.Respond(w, http.StatusBadRequest, "form parse error")
 

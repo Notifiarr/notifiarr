@@ -163,16 +163,16 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 }
 
 func (c *Client) countRequest(next http.Handler) http.Handler {
-	exp := exp.GetMap("httpRequests")
-
 	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
-		if strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")) {
-			exp.Add("api", 1)
+		if strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")) ||
+			strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "plex")) ||
+			strings.HasPrefix(req.RequestURI, "/plex") {
+			exp.HTTPRequests.Add("/api and /plex Requests", 1)
 		} else {
-			exp.Add("other", 1)
+			exp.HTTPRequests.Add("Non /api Requests", 1)
 		}
 
-		exp.Add("total", 1)
+		exp.HTTPRequests.Add("Total Requests", 1)
 		next.ServeHTTP(response, req)
 	})
 }
@@ -193,10 +193,10 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 }
 
 func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
-	return c.runTrigger(mux.Vars(r)["trigger"], mux.Vars(r)["content"])
+	return c.runTrigger(notifiarr.EventAPI, mux.Vars(r)["trigger"], mux.Vars(r)["content"])
 }
 
-func (c *Client) runTrigger(trigger, content string) (int, string) { //nolint:cyclop,funlen
+func (c *Client) runTrigger(source notifiarr.EventType, trigger, content string) (int, string) { //nolint:cyclop,funlen
 	if content != "" {
 		c.Debugf("Incoming API Trigger: %s (%s)", trigger, content)
 	} else {
@@ -205,40 +205,40 @@ func (c *Client) runTrigger(trigger, content string) (int, string) { //nolint:cy
 
 	switch trigger {
 	case "cfsync":
-		c.website.Trigger.SyncCF(notifiarr.EventAPI)
+		c.website.Trigger.SyncCF(source)
 		return http.StatusOK, "TRaSH Custom Formats and Release Profile Sync initiated."
 	case "services":
-		c.Config.Services.RunChecks(notifiarr.EventAPI)
+		c.Config.Services.RunChecks(source)
 		return http.StatusOK, "All service checks rescheduled for immediate exeution."
 	case "sessions":
 		if !c.Config.Plex.Configured() {
 			return http.StatusNotImplemented, "Plex Sessions are not enabled."
 		}
 
-		c.website.Trigger.SendPlexSessions(notifiarr.EventAPI)
+		c.website.Trigger.SendPlexSessions(source)
 
 		return http.StatusOK, "Plex sessions triggered."
 	case "stuckitems":
-		c.website.Trigger.SendStuckQueueItems(notifiarr.EventAPI)
+		c.website.Trigger.SendStuckQueueItems(source)
 		return http.StatusOK, "Stuck Queue Items triggered."
 	case "dashboard":
-		c.website.Trigger.SendDashboardState(notifiarr.EventAPI)
+		c.website.Trigger.SendDashboardState(source)
 		return http.StatusOK, "Dashboard states triggered."
 	case "snapshot":
-		c.website.Trigger.SendSnapshot(notifiarr.EventAPI)
+		c.website.Trigger.SendSnapshot(source)
 		return http.StatusOK, "System Snapshot triggered."
 	case "gaps":
-		c.website.Trigger.SendGaps(notifiarr.EventAPI)
+		c.website.Trigger.SendGaps(source)
 		return http.StatusOK, "Radarr Collections Gaps initiated."
 	case "corrupt":
-		err := c.website.Trigger.Corruption(notifiarr.EventAPI, starr.App(strings.Title(content)))
+		err := c.website.Trigger.Corruption(source, starr.App(strings.Title(content)))
 		if err != nil {
 			return http.StatusBadRequest, "Corruption trigger failed: " + err.Error()
 		}
 
 		return http.StatusOK, strings.Title(content) + " corruption checks initiated."
 	case "backup":
-		err := c.website.Trigger.Backup(notifiarr.EventAPI, starr.App(strings.Title(content)))
+		err := c.website.Trigger.Backup(source, starr.App(strings.Title(content)))
 		if err != nil {
 			return http.StatusBadRequest, "Backup trigger failed: " + err.Error()
 		}

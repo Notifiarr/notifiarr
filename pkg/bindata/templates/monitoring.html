@@ -37,7 +37,7 @@
                                                 {{- range .Config.Services.GetResults }}
                                                     <tr class="bk-{{if eq .State 0}}success{{else if eq .State 1}}warning{{else if eq .State 2}}danger{{else}}brand{{end}}">
                                                         <td><span class="text-bold" title="{{.Check}}">{{.Name}}</span> <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo-alt"></a></td>
-                                                        <td title="{{.State.Value}}">{{.State}}</td>
+                                                        <td title="{{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}, {{- end }}">{{.State}}</td>
                                                         <td style="display:none;">{{.State.Value}}</td>
                                                         <td title="{{.Expect}}">{{.Type}}</td>
                                                         <td title="{{.Time}}">{{since .Time}}</td>
@@ -48,6 +48,7 @@
                                                 {{- end}}
                                                 </tbody>
                                             </table>
+
                                         </div>
                                     </div>
                                 </div>

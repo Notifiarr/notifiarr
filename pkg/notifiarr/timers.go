@@ -9,9 +9,6 @@ import (
 	"golift.io/cnfg"
 )
 
-//nolint:gochecknoglobals
-var timerMap = exp.GetMap("triggers").Init()
-
 // hard coded timers.
 const (
 	// How often to check starr apps for stuck items.
@@ -189,7 +186,7 @@ func (t *Triggers) exec(event EventType, name TriggerName) {
 		return
 	}
 
-	timerMap.Add(string(event)+":"+string(name), 1)
+	exp.TimerEvents.Add(string(event)+"&&"+string(name), 1)
 
 	trig.C <- event
 }

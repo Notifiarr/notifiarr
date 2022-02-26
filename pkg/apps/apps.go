@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/miolini/datacounter"
 	"golift.io/cnfg"
@@ -30,8 +29,6 @@ import (
 	"golift.io/starr/readarr"
 	"golift.io/starr/sonarr"
 )
-
-var apiHits = exp.GetMap("apiHits") //nolint:gochecknoglobals
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
@@ -97,13 +94,8 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 	}
 
 	uri = path.Join(a.URLBase, "api", app.Lower(), id, uri)
-	handler := handlers.MethodHandler{}
 
-	for _, meth := range method {
-		handler[meth] = a.handleAPI(app, api)
-	}
-
-	return a.Router.Handle(uri, a.CheckAPIKey(handler))
+	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
@@ -168,10 +160,10 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		}
 
 		wrote := a.Respond(w, code, msg)
-		apiHits.Add(appName+"bytesSent", wrote)
-		apiHits.Add(appName+"bytesRcvd", int64(len(post)))
-		apiHits.Add(appName+"count", 1)
-		apiHits.Add("requests", 1)
+		exp.APIHits.Add(appName+" Bytes Sent", wrote)
+		exp.APIHits.Add(appName+" Bytes Received", int64(len(post)))
+		exp.APIHits.Add(appName+" Count", 1)
+		exp.APIHits.Add("Total", 1)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 	}
 }
@@ -254,23 +246,23 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 
 // Respond sends a standard response to our caller. JSON encoded blobs. Returns size of data sent.
 func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 { //nolint:varnamelen
+	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
 		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
 		w.Header().Set("Location", msg.(string))
 		w.WriteHeader(stat)
-		apiHits.Add("codes:"+http.StatusText(stat), 1)
+		exp.APIHits.Add(statusTxt, 1)
 
 		return 0
 	}
-
-	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
 	if m, ok := msg.(error); ok {
 		a.ErrorLog.Printf("Request failed. Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
-	apiHits.Add("codes:"+http.StatusText(stat), 1)
+	exp.APIHits.Add(statusTxt, 1)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
 	counter := datacounter.NewResponseWriterCounter(w)
@@ -288,27 +280,27 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 /* Every API call runs one of these methods to find the interface for the respective app. */
 
 func getLidarr(r *http.Request) *lidarr.Lidarr {
-	apiHits.Add("LidarrReqsFromApi", 1)
+	exp.APIHits.Add("Lidarr Requests Relayed", 1)
 	return r.Context().Value(starr.Lidarr).(*LidarrConfig).Lidarr
 }
 
 //nolint:deadcode,unused // will be used when we add http handlers for prowlarr.
 func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
-	apiHits.Add("ProwlarrReqsFromApi", 1)
+	exp.APIHits.Add("Prowlarr Requests Relayed", 1)
 	return r.Context().Value(starr.Prowlarr).(*ProwlarrConfig).Prowlarr
 }
 
 func getRadarr(r *http.Request) *radarr.Radarr {
-	apiHits.Add("RadarrReqsFromApi", 1)
+	exp.APIHits.Add("Radarr Requests Relayed", 1)
 	return r.Context().Value(starr.Radarr).(*RadarrConfig).Radarr
 }
 
 func getReadarr(r *http.Request) *readarr.Readarr {
-	apiHits.Add("ReadarrReqsFromApi", 1)
+	exp.APIHits.Add("Readarr Requests Relayed", 1)
 	return r.Context().Value(starr.Readarr).(*ReadarrConfig).Readarr
 }
 
 func getSonarr(r *http.Request) *sonarr.Sonarr {
-	apiHits.Add("SonarrReqsFromApi", 1)
+	exp.APIHits.Add("Sonarr Requests Relayed", 1)
 	return r.Context().Value(starr.Sonarr).(*SonarrConfig).Sonarr
 }

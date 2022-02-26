@@ -20,9 +20,6 @@ import (
 	"github.com/miolini/datacounter"
 )
 
-//nolint:gochecknoglobals
-var websiteMap = exp.GetMap("notifiarr.com").Init()
-
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
 	Retries int
@@ -201,7 +198,7 @@ func unmarshalResponse(method, url string, code int, body io.ReadCloser) (*Respo
 
 	counter := datacounter.NewReaderCounter(body)
 	defer func() {
-		websiteMap.Add(method+"BytesRcvd", int64(counter.Count()))
+		exp.NotifiarrCom.Add(method+"BytesRcvd", int64(counter.Count()))
 	}()
 
 	err := json.NewDecoder(counter).Decode(&r)
@@ -276,8 +273,8 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError {
-				websiteMap.Add(req.Method+"s", 1)
-				websiteMap.Add(req.Method+"BytesSent", resp.Request.ContentLength)
+				exp.NotifiarrCom.Add(req.Method+"s", 1)
+				exp.NotifiarrCom.Add(req.Method+"BytesSent", resp.Request.ContentLength)
 
 				return resp, nil
 			}
@@ -285,10 +282,10 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 			// resp.StatusCode is 500 or higher, make that en error.
 			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                         // do not defer, because we're in a loop.
-			websiteMap.Add(req.Method+"Retries", 1)
-			websiteMap.Add(req.Method+"s", 1)
-			websiteMap.Add(req.Method+"BytesSent", resp.Request.ContentLength)
-			websiteMap.Add(req.Method+"BytesRcvd", size)
+			exp.NotifiarrCom.Add(req.Method+"Retries", 1)
+			exp.NotifiarrCom.Add(req.Method+"s", 1)
+			exp.NotifiarrCom.Add(req.Method+"BytesSent", resp.Request.ContentLength)
+			exp.NotifiarrCom.Add(req.Method+"BytesRcvd", size)
 			// shoehorn a non-200 error into the empty http error.
 			err = fmt.Errorf("%w: %s: %d bytes, %s", ErrNon200, req.URL, size, resp.Status)
 		}
