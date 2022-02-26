@@ -21,7 +21,7 @@ WORKDIR /${BINARY}
 
 RUN apt update && \
     apt install -y upx && \
-    CGO_ENABLED=0 make ${BINARY}.${ARCH}.${OS} && \
+    CGO_ENABLED=0 make clean ${BINARY}.${ARCH}.${OS} && \
     curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$ARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
     ln -sf /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.5

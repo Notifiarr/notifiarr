@@ -125,17 +125,19 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 	// This allows watching a dynamic amount of channels and tickers.
 	for {
 		index, val, _ := reflect.Select(cases)
-
 		action := actions[index]
-		if action.Fn == nil && action.SFn == nil { // stop channel has no Functions
-			return // called by c.Stop(), calls c.stopTimerLoop().
-		}
 
 		var event EventType
 		if _, ok := val.Interface().(time.Time); ok {
 			event = EventCron
 		} else if event, ok = val.Interface().(EventType); !ok {
 			event = "unknown"
+		}
+
+		exp.TimerEvents.Add(string(event)+"&&"+string(action.Name), 1)
+
+		if action.Fn == nil && action.SFn == nil { // stop channel has no Functions
+			return // called by c.Stop(), calls c.stopTimerLoop().
 		}
 
 		if event == EventUser && action.Name != "" {
@@ -185,8 +187,6 @@ func (t *Triggers) exec(event EventType, name TriggerName) {
 	if t.stop == nil || trig == nil || trig.C == nil {
 		return
 	}
-
-	exp.TimerEvents.Add(string(event)+"&&"+string(name), 1)
 
 	trig.C <- event
 }
