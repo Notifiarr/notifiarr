@@ -10,59 +10,59 @@ import (
 
 // Session is a Plex json struct.
 type Session struct {
-	User                 User        `json:"User"`
-	Player               Player      `json:"Player"`
-	TranscodeSession     Transcode   `json:"TranscodeSession"`
-	Added                int64       `json:"addedAt"`
-	Art                  string      `json:"art"`
-	AudienceRating       float64     `json:"audienceRating"`
-	AudienceRatingImg    string      `json:"audienceRatingImage"`
-	ContentRating        string      `json:"contentRating"`
-	Duration             float64     `json:"duration"`
-	GUID                 string      `json:"guid"`
-	GrandparentArt       string      `json:"grandparentArt"`
-	GrandparentGUID      string      `json:"grandparentGuid"`
-	GrandparentKey       string      `json:"grandparentKey"`
-	GrandparentRatingKey string      `json:"grandparentRatingKey"`
-	GrandparentTheme     string      `json:"grandparentTheme"`
-	GrandparentThumb     string      `json:"grandparentThumb"`
-	GrandparentTitle     string      `json:"grandparentTitle"`
-	Index                int         `json:"index"`
-	Key                  string      `json:"key"`
-	LastViewed           int64       `json:"lastViewedAt"`
-	LibrarySectionID     string      `json:"librarySectionID"`
-	LibrarySectionKey    string      `json:"librarySectionKey"`
-	LibrarySectionTitle  string      `json:"librarySectionTitle"`
-	OriginallyAvailable  string      `json:"originallyAvailableAt"`
-	ParentGUID           string      `json:"parentGuid"`
-	ParentIndex          int         `json:"parentIndex"`
-	ParentKey            string      `json:"parentKey"`
-	ParentRatingKey      string      `json:"parentRatingKey"`
-	ParentThumb          string      `json:"parentThumb"`
-	ParentTitle          string      `json:"parentTitle"`
-	PrimaryExtraKey      string      `json:"primaryExtraKey"`
-	ExternalRating       interface{} `json:"Rating,omitempty"` // bullshit.
-	Rating               float64     `json:"rating"`
-	RatingImage          string      `json:"ratingImage"`
-	RatingKey            string      `json:"ratingKey"`
-	SessionKey           string      `json:"sessionKey"`
-	Studio               string      `json:"studio"`
-	Summary              string      `json:"summary"`
-	Thumb                string      `json:"thumb"`
-	Title                string      `json:"title"`
-	TitleSort            string      `json:"titleSort"`
-	Type                 string      `json:"type"`
-	Updated              int64       `json:"updatedAt"`
-	ViewCount            int64       `json:"viewCount"`
-	ViewOffset           float64     `json:"viewOffset"`
-	Year                 int64       `json:"year"`
+	User                 User      `json:"User"`
+	Player               Player    `json:"Player"`
+	TranscodeSession     Transcode `json:"TranscodeSession"`
+	Added                int64     `json:"addedAt"`
+	Art                  string    `json:"art"`
+	AudienceRating       float64   `json:"audienceRating"`
+	AudienceRatingImg    string    `json:"audienceRatingImage"`
+	ContentRating        string    `json:"contentRating"`
+	Duration             float64   `json:"duration"`
+	GUID                 string    `json:"guid"`
+	GrandparentArt       string    `json:"grandparentArt"`
+	GrandparentGUID      string    `json:"grandparentGuid"`
+	GrandparentKey       string    `json:"grandparentKey"`
+	GrandparentRatingKey string    `json:"grandparentRatingKey"`
+	GrandparentTheme     string    `json:"grandparentTheme"`
+	GrandparentThumb     string    `json:"grandparentThumb"`
+	GrandparentTitle     string    `json:"grandparentTitle"`
+	Index                int       `json:"index"`
+	Key                  string    `json:"key"`
+	LastViewed           int64     `json:"lastViewedAt"`
+	LibrarySectionID     string    `json:"librarySectionID"`
+	LibrarySectionKey    string    `json:"librarySectionKey"`
+	LibrarySectionTitle  string    `json:"librarySectionTitle"`
+	OriginallyAvailable  string    `json:"originallyAvailableAt"`
+	ParentGUID           string    `json:"parentGuid"`
+	ParentIndex          int       `json:"parentIndex"`
+	ParentKey            string    `json:"parentKey"`
+	ParentRatingKey      string    `json:"parentRatingKey"`
+	ParentThumb          string    `json:"parentThumb"`
+	ParentTitle          string    `json:"parentTitle"`
+	PrimaryExtraKey      string    `json:"primaryExtraKey"`
+	Rating               float64   `json:"rating"`
+	RatingImage          string    `json:"ratingImage"`
+	RatingKey            string    `json:"ratingKey"`
+	SessionKey           string    `json:"sessionKey"`
+	Studio               string    `json:"studio"`
+	Summary              string    `json:"summary"`
+	Thumb                string    `json:"thumb"`
+	Title                string    `json:"title"`
+	TitleSort            string    `json:"titleSort"`
+	Type                 string    `json:"type"`
+	Updated              int64     `json:"updatedAt"`
+	ViewCount            int64     `json:"viewCount"`
+	ViewOffset           float64   `json:"viewOffset"`
+	Year                 int64     `json:"year"`
 	Session              struct {
 		Bandwidth int64  `json:"bandwidth"`
 		ID        string `json:"id"`
 		Location  string `json:"location"`
 	} `json:"Session"`
-	GuID  []*GUID  `json:"Guid,omitempty"`
-	Media []*Media `json:"Media,omitempty"`
+	GuID           []*GUID   `json:"Guid,omitempty"`
+	Media          []*Media  `json:"Media,omitempty"`
+	ExternalRating []*Rating `json:"Rating,omitempty"`
 	/* Notifiarr does not need these. :shrug:
 	Country  []*Country  `json:"Country"`
 	Director []*Director `json:"Director"`
@@ -79,6 +79,13 @@ type User struct {
 	ID    string `json:"id"`
 	Thumb string `json:"thumb"`
 	Title string `json:"title"`
+}
+
+// Rating is part of Plex metadata.
+type Rating struct {
+	Image string  `json:"image"`
+	Value float64 `json:"value"`
+	Type  string  `json:"type"`
 }
 
 // Player is part of a Plex Session.

@@ -112,19 +112,20 @@ type LibrarySection struct {
 				} `json:"Stream"`
 			} `json:"Part"`
 		} `json:"Media"`
-		TitleSort           string  `json:"titleSort,omitempty"`
-		ViewOffset          int     `json:"viewOffset,omitempty"`
-		LastViewedAt        int     `json:"lastViewedAt,omitempty"`
-		ParentYear          int     `json:"parentYear,omitempty"`
-		Studio              string  `json:"studio,omitempty"`
-		AudienceRating      float64 `json:"audienceRating,omitempty"`
-		ViewCount           int     `json:"viewCount,omitempty"`
-		Tagline             string  `json:"tagline,omitempty"`
-		AudienceRatingImage string  `json:"audienceRatingImage,omitempty"`
-		ChapterSource       string  `json:"chapterSource,omitempty"`
-		PrimaryExtraKey     string  `json:"primaryExtraKey,omitempty"`
-		RatingImage         string  `json:"ratingImage,omitempty"`
-		GuID                []*GUID `json:"Guid,omitempty"`
+		TitleSort           string    `json:"titleSort,omitempty"`
+		ViewOffset          int       `json:"viewOffset,omitempty"`
+		LastViewedAt        int       `json:"lastViewedAt,omitempty"`
+		ParentYear          int       `json:"parentYear,omitempty"`
+		Studio              string    `json:"studio,omitempty"`
+		AudienceRating      float64   `json:"audienceRating,omitempty"`
+		ViewCount           int       `json:"viewCount,omitempty"`
+		Tagline             string    `json:"tagline,omitempty"`
+		AudienceRatingImage string    `json:"audienceRatingImage,omitempty"`
+		ChapterSource       string    `json:"chapterSource,omitempty"`
+		PrimaryExtraKey     string    `json:"primaryExtraKey,omitempty"`
+		RatingImage         string    `json:"ratingImage,omitempty"`
+		GuID                []*GUID   `json:"Guid,omitempty"`
+		ExternalRating      []*Rating `json:"Rating,omitempty"`
 		/* These do not work as-is.
 		Country             []*Country  `json:"Country"`
 		Director            []*Director `json:"Director"`
@@ -157,7 +158,7 @@ func (s *Server) GetPlexSectionKey(keyPath string) (*LibrarySection, error) {
 	}
 
 	if err := json.Unmarshal(data, &v); err != nil {
-		return nil, fmt.Errorf("unmarshaling library section from %s: %w", s.URL+keyPath, err)
+		return nil, fmt.Errorf("unmarshaling library section from %s: %w; Payload data that failed: %s", s.URL+keyPath, err, string(data))
 	}
 
 	return v.MediaContainer, nil

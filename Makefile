@@ -418,14 +418,12 @@ $(shell go env GOPATH)/bin/mockgen:
 
 bindata: $(shell go env GOPATH)/bin/go-bindata
 $(shell go env GOPATH)/bin/go-bindata:
-	cd /tmp ; go install github.com/go-bindata/go-bindata/...@latest
+	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
 generate: mockgen bindata pkg/bindata/bindata.go
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./...
-	grep MustAssetString pkg/bindata/bindata.go
-	grep package pkg/bindata/bindata.go
 
 ##################
 ##### Docker #####
