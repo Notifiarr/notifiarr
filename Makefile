@@ -424,10 +424,8 @@ generate: mockgen bindata pkg/bindata/bindata.go
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./...
-	ls pkg/bindata/
-	pwd
-	find . -name bindata.go
-	head -n 10 pkg/bindata/bindata.go
+	grep MustAssetString pkg/bindata/bindata.go
+	grep package pkg/bindata/bindata.go
 
 ##################
 ##### Docker #####
