@@ -165,11 +165,11 @@ function triggerFileLoad(caller)
             success: function (data){
                 // These are slow when there's a lot of lines.
                 ctl.find('.line-number').remove();
-                ctl.find('.file-content .cl').after('\n').remove();
+                ctl.find('.file-content br').after('\n').remove();
                 if (sort == "tails") {
-                    ctl.find('.file-content').prepend(data);
+                    ctl.find('.file-content').prepend($('<div/>').text(data).html());
                 } else {
-                    ctl.find('.file-content').append(data);
+                    ctl.find('.file-content').append($('<div/>').text(data).html());
                 }
 
                 const gotLines = data.split(/\n/).length-1;

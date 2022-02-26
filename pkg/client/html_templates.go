@@ -82,7 +82,6 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 
 func (c *Client) getFuncMap() template.FuncMap {
 	return template.FuncMap{
-		"join": strings.Join,
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
@@ -368,15 +367,20 @@ func readFileHead(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 		}
 
 		if char[0] == 10 { // nolint:gomnd
-			found++ // we found a line
+			found++ // we have a line
+
+			if found <= skip {
+				// skip writing new lines until we get to our first line.
+				continue
+			}
 		}
 
-		if skip == 0 || found > skip {
+		if found >= skip {
 			output.WriteByte(char[0])
 		}
 
 		if found >= count+skip || // we found enough lines.
-			location >= fileSize-1 { // beginning of file.
+			location >= fileSize-1 { // end of file.
 			return output.Bytes(), nil
 		}
 	}
