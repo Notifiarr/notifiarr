@@ -1,14 +1,14 @@
 {{- /* This is imported by configfiles and logfiles, but may not need to be now that I decided how 'refresh page' works. */}}
-                            {{- range $file := . }}
-                                <table class="table table-bordered table-responsive fileinfo-table" style="display:none;table-layout: fixed;" id="fileinfo-{{$file.ID}}" data-url="{{base}}/ws" data-name="{{$file.Name}}" data-id="{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
-                                    <tr><th style="width:15%;">Path</th><td style="word-wrap:break-word;">{{$file.Path}}</td></tr>
-                                {{- if and $file.Mode (ne $file.Mode.String "")}}
-                                    <tr><th>Mode</th><td>{{$file.Mode}}</td></tr>
-                                    <tr><th>Owner</th><td>{{$file.User}}</td></tr>
-                                {{- end}}
-                                    <tr><th>Size</th><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
-                                    <tr><th>Date</th><td>{{$file.Time}}</td></tr>
-                                    <tr><th>Used</th><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively used (possibly written to)."></i></td></tr>
-                                </table>
-                            {{- end -}}
+                                        {{- range $file := . }}
+                                            <table class="table table-bordered fileinfo-table" style="display:none;table-layout:fixed;" id="fileinfo-{{$file.ID}}" data-url="{{base}}/ws" data-name="{{$file.Name}}" data-id="{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
+                                                <tr><th style="width:15%;">Path</th><td style="word-wrap:break-word;">{{$file.Path}}</td></tr>
+                                            {{- if and $file.Mode (ne $file.Mode.String "")}}
+                                                <tr><th>Mode</th><td>{{$file.Mode}}</td></tr>
+                                                <tr><th>Owner</th><td>{{$file.User}}</td></tr>
+                                            {{- end}}
+                                                <tr><th>Size</th><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
+                                                <tr><th>Date</th><td>{{$file.Time}}</td></tr>
+                                                <tr><th>Used</th><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively used (possibly written to)."></i></td></tr>
+                                            </table>
+                                        {{- end -}}
 {{- /* end of filetablelist (leave this comment) */ -}}

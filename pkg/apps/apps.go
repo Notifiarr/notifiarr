@@ -125,10 +125,6 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		r.Body.Close()              // we just read this into a buffer.
 		r.Body = io.NopCloser(&buf) // someone else gets to read it now.
 
-		if appName == "" {
-			appName = "noApp"
-		}
-
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
 		// Make sure the id is within range of the available service.
@@ -167,6 +163,10 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			a.DebugLog.Printf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, s)
 		}
 
+		if appName == "" {
+			appName = "noApp"
+		}
+
 		wrote := a.Respond(w, code, msg)
 		apiHits.Add(appName+"bytesSent", wrote)
 		apiHits.Add(appName+"bytesRcvd", int64(len(post)))
@@ -177,15 +177,15 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 }
 
 // CheckAPIKey drops a 403 if the API key doesn't match, otherwise run next handler.
-func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+func (a *Apps) CheckAPIKey(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		if _, ok := a.keys[r.Header.Get("X-API-Key")]; !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
 		next.ServeHTTP(w, r)
-	})
+	}
 }
 
 // InitHandlers activates all our handlers. This is part of the web server init.

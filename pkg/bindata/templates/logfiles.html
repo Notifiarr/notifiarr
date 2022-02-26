@@ -59,7 +59,9 @@
                                     </div>
                                     <div class="col-md-12 col-lg-5 fileTablesList" style="display:none;">
                                         <h3>Selected File Info</h3>
-                                        {{- template "filetablelist.html" .LogFiles.List }}
+                                        <div class="table-responsive">
+                                            {{- template "filetablelist.html" .LogFiles.List }}
+                                        </div>
                                     </div>
                                   </div>
                                   <div class="mt row">
