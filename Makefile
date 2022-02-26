@@ -426,6 +426,7 @@ pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/
 	go generate ./...
 	ls pkg/bindata/
 	pwd
+	find . -name bindata.go
 	head -n 10 pkg/bindata/bindata.go
 
 ##################
