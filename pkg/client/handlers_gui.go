@@ -210,10 +210,7 @@ func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
 }
 
 func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
-	defer func() {
-		go c.reloadConfiguration(notifiarr.EventGUI, "GUI Requested")
-	}()
-
+	defer c.triggerConfigReload(notifiarr.EventGUI, "GUI Requested")
 	http.Error(response, "OK", http.StatusOK)
 }
 
@@ -369,9 +366,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// reload.
-	defer func() {
-		go c.reloadConfiguration(notifiarr.EventGUI, "GUI Requested")
-	}()
+	defer c.triggerConfigReload(notifiarr.EventGUI, "GUI Requested")
 
 	// respond.
 	_, err = response.Write([]byte("Config Saved. Reloading in 5 seconds..."))

@@ -9,6 +9,7 @@ import (
 var mainMap = expvar.NewMap("notifiarr").Init()
 
 var (
+	LogFiles      = GetMap("Log File Information").Init()
 	APIHits       = GetMap("Incoming API Requests").Init()
 	HTTPRequests  = GetMap("Incoming HTTP Requests").Init()
 	TimerEvents   = GetMap("Triggers and Timers Executed").Init()
@@ -17,6 +18,7 @@ var (
 )
 
 type AllData struct {
+	LogFiles      map[string]string
 	APIHits       map[string]string
 	HTTPRequests  map[string]string
 	TimerEvents   map[string]map[string]string
@@ -26,6 +28,7 @@ type AllData struct {
 
 func GetAllData() AllData {
 	return AllData{
+		LogFiles:      GetKeys(LogFiles),
 		APIHits:       GetKeys(APIHits),
 		HTTPRequests:  GetKeys(HTTPRequests),
 		TimerEvents:   GetSplitKeys(TimerEvents),

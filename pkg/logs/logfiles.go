@@ -2,6 +2,7 @@ package logs
 
 import (
 	"encoding/base64"
+	"expvar"
 	"io"
 	"io/fs"
 	"io/ioutil"
@@ -12,10 +13,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/miolini/datacounter"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
+)
+
+//nolint:gochecknoglobals
+var (
+	stdout  = logCounter(os.Stdout.Name(), os.Stdout)
+	discard = logCounter("/dev/null", ioutil.Discard)
 )
 
 // setDefaultLogPaths makes sure a GUI app has log files defined.
@@ -76,14 +85,14 @@ func (l *Logger) openLogFile() {
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !l.LogConfig.Quiet && l.LogConfig.LogFile != "":
 		l.app = rotatorr.NewMust(rotate)
-		l.InfoLog.SetOutput(io.MultiWriter(l.app, os.Stdout))
+		l.InfoLog.SetOutput(io.MultiWriter(logCounter(l.LogConfig.LogFile, l.app), stdout))
 	case !l.LogConfig.Quiet && l.LogConfig.LogFile == "":
-		l.InfoLog.SetOutput(os.Stdout)
+		l.InfoLog.SetOutput(stdout)
 	case l.LogConfig.LogFile == "":
-		l.InfoLog.SetOutput(ioutil.Discard) // default is "nothing"
+		l.InfoLog.SetOutput(discard) // default is "nothing"
 	default:
 		l.app = rotatorr.NewMust(rotate)
-		l.InfoLog.SetOutput(l.app)
+		l.InfoLog.SetOutput(logCounter(l.LogConfig.LogFile, l.app))
 	}
 
 	// Don't forget errors log, and do standard logger too.
@@ -96,10 +105,9 @@ func (l *Logger) openLogFile() {
 	l.postLogRotate("", "")
 }
 
-func (l *Logger) postLogRotate(_, newFile string) {
-	if newFile != "" {
-		go l.Printf("Rotated log file to: %s", newFile)
-	}
+// This is only for the main log. To deal with stderr.
+func (l *Logger) postLogRotate(fileName, newFile string) {
+	l.postRotateCounter(fileName, newFile)
 
 	if l.app != nil && l.app.File != nil {
 		redirectStderr(l.app.File) // Log panics.
@@ -125,39 +133,45 @@ func (l *Logger) openDebugLog() {
 	}
 
 	rotateDebug := &rotatorr.Config{
-		Filepath: l.LogConfig.DebugLog,                                 // log file name.
-		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
-		FileMode: l.LogConfig.FileMode.Mode(),                          // set file mode.
-		Rotatorr: &timerotator.Layout{FileCount: l.LogConfig.LogFiles}, // number of files to keep.
+		Filepath: l.LogConfig.DebugLog,                        // log file name.
+		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: l.LogConfig.FileMode.Mode(),                 // set file mode.
+		Rotatorr: &timerotator.Layout{
+			FileCount:  l.LogConfig.LogFiles, // number of files to keep.
+			PostRotate: l.postRotateCounter,
+		},
 	}
 	l.debug = rotatorr.NewMust(rotateDebug)
 
 	if l.LogConfig.Quiet {
-		l.DebugLog.SetOutput(l.debug)
+		l.DebugLog.SetOutput(logCounter(l.LogConfig.DebugLog, l.debug))
 	} else {
-		l.DebugLog.SetOutput(io.MultiWriter(l.debug, os.Stdout))
+		l.DebugLog.SetOutput(io.MultiWriter(logCounter(l.LogConfig.DebugLog, l.debug), stdout))
 	}
 }
 
 func (l *Logger) openHTTPLog() {
 	rotateHTTP := &rotatorr.Config{
-		Filepath: l.LogConfig.HTTPLog,                                  // log file name.
-		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
-		FileMode: l.LogConfig.FileMode.Mode(),                          // set file mode.
-		Rotatorr: &timerotator.Layout{FileCount: l.LogConfig.LogFiles}, // number of files to keep.
+		Filepath: l.LogConfig.HTTPLog,                         // log file name.
+		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: l.LogConfig.FileMode.Mode(),                 // set file mode.
+		Rotatorr: &timerotator.Layout{
+			FileCount:  l.LogConfig.LogFiles, // number of files to keep.
+			PostRotate: l.postRotateCounter,
+		},
 	}
 
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !l.LogConfig.Quiet && l.LogConfig.HTTPLog != "":
 		l.web = rotatorr.NewMust(rotateHTTP)
-		l.HTTPLog.SetOutput(io.MultiWriter(l.web, os.Stdout))
+		l.HTTPLog.SetOutput(io.MultiWriter(logCounter(l.LogConfig.HTTPLog, l.web), stdout))
 	case !l.LogConfig.Quiet && l.LogConfig.HTTPLog == "":
-		l.HTTPLog.SetOutput(os.Stdout)
+		l.HTTPLog.SetOutput(stdout)
 	case l.LogConfig.HTTPLog == "":
-		l.HTTPLog.SetOutput(ioutil.Discard) // default is "nothing"
+		l.HTTPLog.SetOutput(discard) // default is "nothing"
 	default:
 		l.web = rotatorr.NewMust(rotateHTTP)
-		l.HTTPLog.SetOutput(l.web)
+		l.HTTPLog.SetOutput(logCounter(l.LogConfig.HTTPLog, l.web))
 	}
 }
 
@@ -281,4 +295,12 @@ func map2list(input map[string]struct{}) []string {
 	}
 
 	return output
+}
+
+func logCounter(filename string, writer io.Writer) io.Writer {
+	counter := datacounter.NewWriterCounter(writer)
+
+	exp.LogFiles.Set("Bytes Written: "+filename, expvar.Func(func() interface{} { return counter.Count() }))
+
+	return counter
 }

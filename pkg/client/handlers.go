@@ -244,10 +244,7 @@ func (c *Client) runTrigger(source notifiarr.EventType, trigger, content string)
 
 		return http.StatusOK, strings.Title(content) + " backups check initiated."
 	case "reload":
-		defer func() {
-			go c.reloadConfiguration(notifiarr.EventAPI, "HTTP Triggered Reload")
-		}()
-
+		defer c.triggerConfigReload(notifiarr.EventAPI, "HTTP Triggered Reload")
 		return http.StatusOK, "Application reload initiated."
 	case "notification":
 		if content != "" {

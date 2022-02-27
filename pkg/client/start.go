@@ -35,12 +35,18 @@ type Client struct {
 	server  *http.Server
 	sigkil  chan os.Signal
 	sighup  chan os.Signal
+	reload  chan customReload
 	website *notifiarr.Config
 	cookies *securecookie.SecureCookie
 	templat *template.Template
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" as of its creation.
 	sync.RWMutex
+}
+
+type customReload struct {
+	event notifiarr.EventType
+	msg   string
 }
 
 // Errors returned by this package.
@@ -55,6 +61,7 @@ func newDefaults() *Client {
 	return &Client{
 		sigkil: make(chan os.Signal, 1),
 		sighup: make(chan os.Signal, 1),
+		reload: make(chan customReload, 1),
 		Logger: logger,
 		Config: configfile.NewConfig(logger),
 		Flags: &configfile.Flags{
@@ -272,6 +279,10 @@ func (c *Client) configureServicesPlex() {
 	}
 }
 
+func (c *Client) triggerConfigReload(event notifiarr.EventType, source string) {
+	c.reload <- customReload{event: event, msg: source}
+}
+
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
 	c.StartWebServer()
@@ -280,6 +291,10 @@ func (c *Client) Exit() error {
 	// For non-GUI systems, this is where the main go routine stops (and waits).
 	for {
 		select {
+		case data := <-c.reload:
+			if err := c.reloadConfiguration(data.event, data.msg); err != nil {
+				return err
+			}
 		case sigc := <-c.sigkil:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
 			return c.exit()

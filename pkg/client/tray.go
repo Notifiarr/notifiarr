@@ -275,10 +275,7 @@ func (c *Client) watchKillerChannels() {
 		case <-menu["debug_panic"].ClickedCh:
 			c.menuPanic()
 		case <-menu["load"].ClickedCh:
-			if err := c.reloadConfiguration(notifiarr.EventUser, "User Requested"); err != nil {
-				c.Errorf("Need help? %s\n=====> Exiting! Reloading Configuration: %v", mnd.HelpLink, err)
-				os.Exit(1) //nolint:gocritic // exit now since config is bad and everything is disabled.
-			}
+			c.triggerConfigReload(notifiarr.EventUser, "User Requested")
 		}
 	}
 }

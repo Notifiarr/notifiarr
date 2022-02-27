@@ -8,12 +8,11 @@ package logs
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 	"runtime/debug"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
@@ -71,10 +70,10 @@ type LogConfig struct {
 // New returns a new Logger with debug off and sends everything to stdout.
 func New() *Logger {
 	return &Logger{
-		DebugLog:  log.New(ioutil.Discard, "[DEBUG] ", log.LstdFlags),
-		InfoLog:   log.New(os.Stdout, "[INFO] ", log.LstdFlags),
-		ErrorLog:  log.New(os.Stdout, "[ERROR] ", log.LstdFlags),
-		HTTPLog:   log.New(os.Stdout, "", log.LstdFlags),
+		DebugLog:  log.New(discard, "[DEBUG] ", log.LstdFlags),
+		InfoLog:   log.New(stdout, "[INFO] ", log.LstdFlags),
+		ErrorLog:  log.New(stdout, "[ERROR] ", log.LstdFlags),
+		HTTPLog:   log.New(stdout, "", log.LstdFlags),
 		LogConfig: &LogConfig{},
 	}
 }
@@ -94,7 +93,7 @@ func (l *Logger) SetupLogging(config *LogConfig) {
 func (l *Logger) Rotate() (errors []error) {
 	if l.custom != nil {
 		if _, err := l.custom.Rotate(); err != nil {
-			return []error{fmt.Errorf("rotating cCustom Log: %w", err)}
+			return []error{fmt.Errorf("rotating Custom Log: %w", err)}
 		}
 	}
 
@@ -215,10 +214,10 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 func CustomLog(filePath, logName string) *Logger {
 	if filePath == "" || logName == "" {
 		return &Logger{
-			DebugLog: log.New(ioutil.Discard, "", 0),
-			InfoLog:  log.New(ioutil.Discard, "", 0),
-			ErrorLog: log.New(ioutil.Discard, "", 0),
-			HTTPLog:  log.New(ioutil.Discard, "", 0),
+			DebugLog: log.New(discard, "", 0),
+			InfoLog:  log.New(discard, "", 0),
+			ErrorLog: log.New(discard, "", 0),
+			HTTPLog:  log.New(discard, "", 0),
 		}
 	}
 
@@ -230,18 +229,32 @@ func CustomLog(filePath, logName string) *Logger {
 		filePath = f
 	}
 
+	logger := &Logger{}
 	customLog[logName] = rotatorr.NewMust(&rotatorr.Config{
-		Filepath: filePath,                                 // log file name.
-		FileSize: int64(logFileMb) * mnd.Megabyte,          // mnd.Megabytes
-		FileMode: fileMode,                                 // set file mode.
-		Rotatorr: &timerotator.Layout{FileCount: logFiles}, // number of files to keep.
+		Filepath: filePath,                        // log file name.
+		FileSize: int64(logFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: fileMode,                        // set file mode.
+		Rotatorr: &timerotator.Layout{
+			FileCount:  logFiles, // number of files to keep.
+			PostRotate: logger.postRotateCounter,
+		},
 	})
+	logs := logCounter(filePath, customLog[logName])
+	logger.DebugLog = log.New(logs, "[DEBUG] ", log.LstdFlags)
+	logger.InfoLog = log.New(logs, "[INFO] ", log.LstdFlags)
+	logger.ErrorLog = log.New(logs, "[ERROR] ", log.LstdFlags)
+	logger.HTTPLog = log.New(logs, "[HTTP] ", log.LstdFlags)
+	logger.custom = customLog[logName]
 
-	return &Logger{
-		custom:   customLog[logName],
-		DebugLog: log.New(customLog[logName], "[DEBUG] ", log.LstdFlags),
-		InfoLog:  log.New(customLog[logName], "[INFO] ", log.LstdFlags),
-		ErrorLog: log.New(customLog[logName], "[ERROR] ", log.LstdFlags),
-		HTTPLog:  log.New(customLog[logName], "[HTTP] ", log.LstdFlags),
+	return logger
+}
+
+func (l *Logger) postRotateCounter(fileName, newFile string) {
+	if fileName != "" {
+		exp.LogFiles.Add("Rotated: "+fileName, 1)
+	}
+
+	if newFile != "" && l != nil {
+		go l.Printf("Rotated log file to: %s", newFile)
 	}
 }

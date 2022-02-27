@@ -45,7 +45,7 @@ $(document).ready((function()
 }));
 
 function loadConfigTable(table) {
-    table.DataTable({
+    return table.DataTable({
         "autoWidth": true,
         "scrollX": true,
         "sort": false,
