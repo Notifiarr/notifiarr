@@ -174,7 +174,7 @@ type templateData struct {
 
 func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 	templateName, msg string) {
-	clientInfo, _ := c.website.GetClientInfo(notifiarr.EventUser)
+	clientInfo, _ := c.website.GetClientInfo()
 	if clientInfo == nil {
 		clientInfo = &notifiarr.ClientInfo{}
 	}

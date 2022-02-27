@@ -109,7 +109,7 @@ func (c *Client) start() error { //nolint:cyclop
 		return err
 	}
 
-	clientInfo := c.configureServices(notifiarr.EventStart)
+	clientInfo := c.configureServices()
 
 	if newCon {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
@@ -155,8 +155,8 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 }
 
 // Load configuration from the website.
-func (c *Client) loadSiteConfig(source notifiarr.EventType) *notifiarr.ClientInfo {
-	clientInfo, err := c.website.GetClientInfo(source)
+func (c *Client) loadSiteConfig() *notifiarr.ClientInfo {
+	clientInfo, err := c.website.GetClientInfo()
 	if err != nil || clientInfo == nil {
 		c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
 		return nil
@@ -238,8 +238,8 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices(source notifiarr.EventType) *notifiarr.ClientInfo {
-	clientInfo := c.loadSiteConfig(source)
+func (c *Client) configureServices() *notifiarr.ClientInfo {
+	clientInfo := c.loadSiteConfig()
 	c.configureServicesPlex()
 	c.website.Sighup = c.sighup
 	c.Config.Snapshot.Validate()
@@ -338,7 +338,7 @@ func (c *Client) reloadConfiguration(event notifiarr.EventType, source string) e
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.setupMenus(c.configureServices(event))
+	c.setupMenus(c.configureServices())
 
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 

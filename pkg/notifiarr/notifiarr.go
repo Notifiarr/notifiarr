@@ -126,7 +126,7 @@ func (c *Config) Start() {
 	c.makeBackupTriggers()
 	c.setPlexTimers()
 
-	if _, err := c.GetClientInfo(EventStart); err == nil { // only run this if we have clientinfo
+	if _, err := c.GetClientInfo(); err == nil { // only run this if we have clientinfo
 		c.setClientInfoTimerTriggers() // sync, gaps, dashboard, custom
 	}
 
