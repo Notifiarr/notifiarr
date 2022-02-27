@@ -184,7 +184,12 @@ func (c *Config) setPlexTimers() {
 		c.Printf("==> Plex Completed Items Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%%",
 			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
 		c.Trigger.add( // this has no name, which keeps it from logging _every minute_
-			&action{SFn: c.checkPlexFinishedItems, T: time.NewTicker(time.Minute + 179*time.Millisecond)})
+			&action{
+				Name: "Checking Plex for completed sessions.",
+				Hide: true, // do not log this one.
+				SFn:  c.checkPlexFinishedItems,
+				T:    time.NewTicker(time.Minute + 179*time.Millisecond),
+			})
 	}
 }
 

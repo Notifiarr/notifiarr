@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/hako/durafmt"
@@ -16,7 +17,7 @@ import (
 )
 
 func (c *Client) checkReloadSignal(sigc os.Signal) error {
-	return c.reloadConfiguration("Caught Signal: " + sigc.String())
+	return c.reloadConfiguration(notifiarr.EventSignal, "Caught Signal: "+sigc.String())
 }
 
 func (c *Client) setSignals() {

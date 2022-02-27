@@ -22,6 +22,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
+	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/version"
 )
 
@@ -168,6 +169,7 @@ type templateData struct {
 	ConfigFiles *logs.LogFileInfos    `json:"configFileInfo"`
 	ClientInfo  *notifiarr.ClientInfo `json:"clientInfo"`
 	Expvar      exp.AllData           `json:"expvar"`
+	HostInfo    *host.InfoStat        `json:"hostInfo"`
 }
 
 func (c *Client) renderTemplate(response io.Writer, req *http.Request,
@@ -201,7 +203,8 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 			"arch":      runtime.GOARCH,
 			"binary":    binary,
 		},
-		Expvar: exp.GetAllData(),
+		Expvar:   exp.GetAllData(),
+		HostInfo: c.website.HostInfoNoError(),
 	})
 	if err != nil {
 		c.Errorf("Sending HTTP Response: %v", err)

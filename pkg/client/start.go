@@ -312,10 +312,10 @@ func (c *Client) exit() error {
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
-func (c *Client) reloadConfiguration(source string) error {
-	c.Print("==> Reloading Configuration: " + source)
+func (c *Client) reloadConfiguration(event notifiarr.EventType, source string) error {
+	c.Printf("==> Reloading Configuration (%s): %s", event, source)
 	c.closeDynamicTimerMenus()
-	c.website.Stop(notifiarr.EventReload)
+	c.website.Stop(event)
 	c.Config.Services.Stop()
 
 	err := c.StopWebServer()
@@ -338,7 +338,7 @@ func (c *Client) reloadConfiguration(source string) error {
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.setupMenus(c.configureServices(notifiarr.EventReload))
+	c.setupMenus(c.configureServices(event))
 
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 

@@ -211,7 +211,7 @@ func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
 
 func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
 	defer func() {
-		c.sighup <- &update.Signal{Text: "reload gui triggered"}
+		go c.reloadConfiguration(notifiarr.EventGUI, "GUI Requested")
 	}()
 
 	http.Error(response, "OK", http.StatusOK)
@@ -370,7 +370,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 	// reload.
 	defer func() {
-		c.sighup <- &update.Signal{Text: "reload gui triggered"}
+		go c.reloadConfiguration(notifiarr.EventGUI, "GUI Requested")
 	}()
 
 	// respond.

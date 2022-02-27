@@ -96,13 +96,42 @@
                                              </td>
                                          </tr>
                                          <tr>
-                                             <td>Operating System</td>
-                                             <td>{{.Version.os}}</td>
+                                             <td>Hostname</td>
+                                             <td>{{.HostInfo.Hostname}}</td>
                                              <td style="display:none;"></td>
                                          </tr>
                                          <tr>
-                                             <td>Architecture</td>
-                                             <td>{{.Version.arch}}</td>
+                                             <td>Unique ID</td>
+                                             <td>{{.HostInfo.HostID}}</td>
+                                             <td style="display:none;"></td>
+                                         </tr>
+                                         <tr>
+                                             <td>Hostname</td>
+                                             <td>{{.HostInfo.Hostname}}</td>
+                                             <td style="display:none;"></td>
+                                         </tr>
+                                         <tr>
+                                             <td>Platform</td>
+                                             <td>{{.HostInfo.Platform}} {{.HostInfo.PlatformVersion}} ({{.HostInfo.KernelArch}})</td>
+                                             <td style="display:none;"></td>
+                                         </tr>
+                                         {{- if .HostInfo.KernelVersion}}
+                                         <tr>
+                                             <td>Kernel Version</td>
+                                             <td>{{.HostInfo.KernelVersion}}</td>
+                                             <td style="display:none;"></td>
+                                         </tr>
+                                         {{- end }}
+                                         {{- if .HostInfo.VirtualizationSystem}}
+                                         <tr>
+                                             <td>Virtualization System</td>
+                                             <td>{{.HostInfo.VirtualizationSystem}}</td>
+                                             <td style="display:none;"></td>
+                                         </tr>
+                                         {{- end }}
+                                         <tr>
+                                             <td>Operating System</td>
+                                             <td>{{.Version.os}} ({{.Version.arch}}}</td>
                                              <td style="display:none;"></td>
                                          </tr>
                                          <tr class="text-center">

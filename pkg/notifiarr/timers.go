@@ -32,7 +32,7 @@ const (
 	TrigPlexSessions   TriggerName = "Gathering and sending Plex Sessions."
 	TrigStuckItems     TriggerName = "Checking app queues and sending stuck items."
 	TrigPollSite       TriggerName = "Polling Notifiarr for new settings."
-	TrigStop           TriggerName = "Stop Channel is used for reloads and must not have a function."
+	TrigStop           TriggerName = "Stopping all triggers and timers (reload)."
 )
 
 // timerConfig defines a custom GET timer from the website.
@@ -53,6 +53,7 @@ type action struct {
 	SFn  func(map[string]struct{}) // this is just for plex sessions.
 	C    chan EventType            // if provided, T is optional
 	T    *time.Ticker              // if provided, C is optional.
+	Hide bool                      // prevent logging.
 }
 
 // Run fires a custom cron timer (GET).
@@ -146,7 +147,7 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 			}
 		}
 
-		if action.Name != "" {
+		if action.Name != "" && !action.Hide {
 			c.Printf("[%s requested] %s", event, action.Name)
 		}
 

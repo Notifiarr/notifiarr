@@ -25,7 +25,7 @@ const (
 	EventMovie   EventType = "movie"
 	EventEpisode EventType = "episode"
 	EventPoll    EventType = "poll"
-	EventReload  EventType = "reload"
+	EventSignal  EventType = "signal"
 )
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.

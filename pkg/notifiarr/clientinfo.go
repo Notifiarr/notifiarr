@@ -14,7 +14,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/shirou/gopsutil/v3/host"
-	"github.com/shirou/gopsutil/v3/process"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -169,16 +168,10 @@ func (c *Config) HostInfoNoError() *host.InfoStat {
 		return nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	procs, _ := process.ProcessesWithContext(ctx)
-
 	return &host.InfoStat{
 		Hostname:             c.extras.hostInfo.Hostname,
 		Uptime:               uint64(time.Now().Unix()) - c.extras.hostInfo.BootTime,
 		BootTime:             c.extras.hostInfo.BootTime,
-		Procs:                uint64(len(procs)),
 		OS:                   c.extras.hostInfo.OS,
 		Platform:             c.extras.hostInfo.Platform,
 		PlatformFamily:       c.extras.hostInfo.PlatformFamily,

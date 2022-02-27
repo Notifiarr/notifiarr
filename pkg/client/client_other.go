@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
 
 // If you need more fake methods, add them.
@@ -34,7 +36,7 @@ func (c *Client) checkReloadSignal(sigc os.Signal) error {
 			c.Errorf("Writing Config File: %v", err)
 		}
 	} else {
-		return c.reloadConfiguration("Caught Signal: " + sigc.String())
+		return c.reloadConfiguration(notifiarr.EventSignal, "Caught Signal: "+sigc.String())
 	}
 
 	return nil

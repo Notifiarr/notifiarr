@@ -13,7 +13,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
-	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -245,7 +244,10 @@ func (c *Client) runTrigger(source notifiarr.EventType, trigger, content string)
 
 		return http.StatusOK, strings.Title(content) + " backups check initiated."
 	case "reload":
-		c.sighup <- &update.Signal{Text: "reload http triggered"}
+		defer func() {
+			go c.reloadConfiguration(notifiarr.EventAPI, "HTTP Triggered Reload")
+		}()
+
 		return http.StatusOK, "Application reload initiated."
 	case "notification":
 		if content != "" {
