@@ -163,12 +163,10 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 
 func (c *Client) countRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
-		if strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")) ||
-			strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "plex")) ||
-			strings.HasPrefix(req.RequestURI, "/plex") {
-			exp.HTTPRequests.Add("/api and /plex Requests", 1)
+		if strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")) {
+			exp.HTTPRequests.Add("/api Requests", 1)
 		} else {
-			exp.HTTPRequests.Add("Non /api Requests", 1)
+			exp.HTTPRequests.Add("Non-/api Requests", 1)
 		}
 
 		exp.HTTPRequests.Add("Total Requests", 1)

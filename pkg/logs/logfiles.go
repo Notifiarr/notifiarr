@@ -15,8 +15,8 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/miolini/datacounter"
 	homedir "github.com/mitchellh/go-homedir"
+	"golift.io/datacounter"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
 )
@@ -300,7 +300,9 @@ func map2list(input map[string]struct{}) []string {
 func logCounter(filename string, writer io.Writer) io.Writer {
 	counter := datacounter.NewWriterCounter(writer)
 
-	exp.LogFiles.Set("Bytes Written: "+filename, expvar.Func(func() interface{} { return counter.Count() }))
+	exp.LogFiles.Set("Bytes Written: "+filename, expvar.Func(
+		func() interface{} { return int64(counter.Count()) },
+	))
 
 	return counter
 }

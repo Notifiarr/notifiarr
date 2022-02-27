@@ -65,6 +65,8 @@ func (a *Apps) setupLidarr(timeout time.Duration) error {
 
 func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.Lidarr = lidarr.New(r.Config)
+	r.Lidarr.APIer = &starrAPI{api: r.Lidarr.APIer, app: starr.Lidarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

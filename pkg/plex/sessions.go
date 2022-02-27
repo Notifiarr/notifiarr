@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"net/url"
 )
 
 // Sessions is the config input data.
@@ -63,34 +62,16 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 		return nil, ErrNoURLToken
 	}
 
+	params := make(url.Values)
+	params.Add("sessionId", sessionID)
+	params.Add("reason", reason)
+
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+"/status/sessions/terminate", nil)
+	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions/terminate", params)
 	if err != nil {
-		return nil, fmt.Errorf("creating http request: %w", err)
-	}
-
-	req.Header.Set("X-Plex-Token", s.Token)
-
-	q := req.URL.Query()
-	q.Add("sessionId", sessionID)
-	q.Add("reason", reason)
-	req.URL.RawQuery = q.Encode()
-
-	resp, err := s.getClient().Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("making http request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return body, fmt.Errorf("reading http response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return body, ErrBadStatus
+		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
 
 	return body, nil
@@ -99,12 +80,4 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 // KillSession kills a Plex session.
 func (s *Server) KillSession(sessionID, reason string) ([]byte, error) {
 	return s.KillSessionWithContext(context.Background(), sessionID, reason)
-}
-
-func (s *Server) getClient() *http.Client {
-	if s.client == nil {
-		s.client = &http.Client{}
-	}
-
-	return s.client
 }

@@ -44,10 +44,10 @@ func (a *Apps) sonarrHandlers() {
 
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
+	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
 	starrConfig
 	*starr.Config
-	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
-	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupSonarr(timeout time.Duration) error {
@@ -66,6 +66,8 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 
 func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.Sonarr = sonarr.New(r.Config)
+	r.Sonarr.APIer = &starrAPI{api: r.Config, app: starr.Sonarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

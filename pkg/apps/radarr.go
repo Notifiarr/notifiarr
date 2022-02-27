@@ -66,6 +66,8 @@ func (a *Apps) setupRadarr(timeout time.Duration) error {
 
 func (r *RadarrConfig) setup(timeout time.Duration) {
 	r.Radarr = radarr.New(r.Config)
+	r.Radarr.APIer = &starrAPI{api: r.Radarr.APIer, app: starr.Radarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

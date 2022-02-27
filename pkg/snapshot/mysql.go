@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	_ "github.com/go-sql-driver/mysql" //nolint:gci // We use mysql driver, this is how it's loaded.
 	"golift.io/cnfg"
@@ -122,10 +123,14 @@ func getMySQL(ctx context.Context, mysql *MySQLConfig) (MySQLProcesses, MySQLSta
 }
 
 func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, error) {
+	exp.Apps.Add("MySQL&&Process List Queries", 1)
+
 	rows, err := dbase.QueryContext(ctx, "SHOW FULL PROCESSLIST")
 	if err != nil {
+		exp.Apps.Add("MySQL&&Errors", 1)
 		return nil, fmt.Errorf("getting processes: %w", err)
 	} else if err = rows.Err(); err != nil {
+		exp.Apps.Add("MySQL&&Errors", 1)
 		return nil, fmt.Errorf("getting processes rows: %w", err)
 	}
 	defer rows.Close()
@@ -134,10 +139,10 @@ func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, e
 
 	for rows.Next() {
 		var p MySQLProcess
-
 		// for each row, scan the result into our tag composite object
 		err := rows.Scan(&p.ID, &p.User, &p.Host, &p.DB, &p.Cmd, &p.Time, &p.State, &p.Info)
 		if err != nil {
+			exp.Apps.Add("MySQL&&Errors", 1)
 			return nil, fmt.Errorf("scanning process rows: %w", err)
 		}
 
@@ -173,10 +178,14 @@ func scanMySQLStatus(ctx context.Context, dbase *sql.DB) (MySQLStatus, error) {
 	)
 
 	for _, name := range likes {
+		exp.Apps.Add("MySQL&&Global Status Queries", 1)
+
 		rows, err := dbase.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'")
 		if err != nil {
+			exp.Apps.Add("MySQL&&Errors", 1)
 			return nil, fmt.Errorf("getting global status: %w", err)
 		} else if err = rows.Err(); err != nil {
+			exp.Apps.Add("MySQL&&Errors", 1)
 			return nil, fmt.Errorf("getting global status rows: %w", err)
 		}
 
@@ -184,6 +193,7 @@ func scanMySQLStatus(ctx context.Context, dbase *sql.DB) (MySQLStatus, error) {
 			var vname, value string
 
 			if err := rows.Scan(&vname, &value); err != nil {
+				exp.Apps.Add("MySQL&&Errors", 1)
 				return nil, fmt.Errorf("scanning global status rows: %w", err)
 			}
 

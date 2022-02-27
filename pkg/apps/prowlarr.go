@@ -37,6 +37,8 @@ func (a *Apps) setupProwlarr(timeout time.Duration) error {
 
 func (r *ProwlarrConfig) setup(timeout time.Duration) {
 	r.Prowlarr = prowlarr.New(r.Config)
+	r.Prowlarr.APIer = &starrAPI{api: r.Prowlarr.APIer, app: starr.Prowlarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

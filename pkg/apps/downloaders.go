@@ -49,7 +49,8 @@ func (a *Apps) setupDeluge(timeout time.Duration) error {
 }
 
 func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
-	d.Deluge, err = deluge.NewNoAuth(d.Config)
+	_, d.Deluge, err = deluge.NewNoAuth(d.Config)
+
 	if err != nil {
 		return fmt.Errorf("deluge setup failed: %w", err)
 	}

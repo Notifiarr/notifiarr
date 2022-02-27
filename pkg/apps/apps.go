@@ -20,8 +20,8 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/gorilla/mux"
-	"github.com/miolini/datacounter"
 	"golift.io/cnfg"
+	"golift.io/datacounter"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/prowlarr"
@@ -156,13 +156,13 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		}
 
 		if appName == "" {
-			appName = "noApp"
+			appName = "Non-App"
 		}
 
 		wrote := a.Respond(w, code, msg)
 		exp.APIHits.Add(appName+" Bytes Sent", wrote)
 		exp.APIHits.Add(appName+" Bytes Received", int64(len(post)))
-		exp.APIHits.Add(appName+" Count", 1)
+		exp.APIHits.Add(appName+" Requests", 1)
 		exp.APIHits.Add("Total", 1)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 	}
@@ -280,27 +280,22 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 /* Every API call runs one of these methods to find the interface for the respective app. */
 
 func getLidarr(r *http.Request) *lidarr.Lidarr {
-	exp.APIHits.Add("Lidarr Requests Relayed", 1)
 	return r.Context().Value(starr.Lidarr).(*LidarrConfig).Lidarr
 }
 
 //nolint:deadcode,unused // will be used when we add http handlers for prowlarr.
 func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
-	exp.APIHits.Add("Prowlarr Requests Relayed", 1)
 	return r.Context().Value(starr.Prowlarr).(*ProwlarrConfig).Prowlarr
 }
 
 func getRadarr(r *http.Request) *radarr.Radarr {
-	exp.APIHits.Add("Radarr Requests Relayed", 1)
 	return r.Context().Value(starr.Radarr).(*RadarrConfig).Radarr
 }
 
 func getReadarr(r *http.Request) *readarr.Readarr {
-	exp.APIHits.Add("Readarr Requests Relayed", 1)
 	return r.Context().Value(starr.Readarr).(*ReadarrConfig).Readarr
 }
 
 func getSonarr(r *http.Request) *sonarr.Sonarr {
-	exp.APIHits.Add("Sonarr Requests Relayed", 1)
 	return r.Context().Value(starr.Sonarr).(*SonarrConfig).Sonarr
 }

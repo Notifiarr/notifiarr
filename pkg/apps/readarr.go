@@ -59,6 +59,8 @@ func (a *Apps) setupReadarr(timeout time.Duration) error {
 
 func (r *ReadarrConfig) setup(timeout time.Duration) {
 	r.Readarr = readarr.New(r.Config)
+	r.Readarr.APIer = &starrAPI{api: r.Readarr.APIer, app: starr.Readarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}

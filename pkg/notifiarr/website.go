@@ -17,7 +17,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
-	"github.com/miolini/datacounter"
+	"golift.io/datacounter"
 )
 
 // httpClient is our custom http client to wrap Do and provide retries.
@@ -282,7 +282,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 			// resp.StatusCode is 500 or higher, make that en error.
 			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                         // do not defer, because we're in a loop.
-			exp.NotifiarrCom.Add("Requests Retried", 1)
+			exp.NotifiarrCom.Add(req.Method+" Retries", 1)
 			exp.NotifiarrCom.Add(req.Method+" Requests", 1)
 			exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
 			exp.NotifiarrCom.Add(req.Method+" Bytes Received", size)

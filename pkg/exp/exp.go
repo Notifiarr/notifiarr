@@ -14,7 +14,8 @@ var (
 	HTTPRequests  = GetMap("Incoming HTTP Requests").Init()
 	TimerEvents   = GetMap("Triggers and Timers Executed").Init()
 	NotifiarrCom  = GetMap("Outbound Requests to Notifiarr.com").Init()
-	ServiceChecks = GetMap("Service Check Responses").Init() //nolint:gochecknoglobals
+	ServiceChecks = GetMap("Service Check Responses").Init()
+	Apps          = GetMap("Starr App Requests").Init()
 )
 
 type AllData struct {
@@ -24,6 +25,7 @@ type AllData struct {
 	TimerEvents   map[string]map[string]string
 	NotifiarrCom  map[string]string
 	ServiceChecks map[string]map[string]string
+	Apps          map[string]map[string]string
 }
 
 func GetAllData() AllData {
@@ -34,6 +36,7 @@ func GetAllData() AllData {
 		TimerEvents:   GetSplitKeys(TimerEvents),
 		NotifiarrCom:  GetKeys(NotifiarrCom),
 		ServiceChecks: GetSplitKeys(ServiceChecks),
+		Apps:          GetSplitKeys(Apps),
 	}
 }
 
