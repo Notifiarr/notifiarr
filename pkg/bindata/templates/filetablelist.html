@@ -6,7 +6,7 @@
                                                 <tr><th>Mode</th><td>{{$file.Mode}}</td></tr>
                                                 <tr><th>Owner</th><td>{{$file.User}}</td></tr>
                                             {{- end}}
-                                                <tr><th>Size</th><td>{{$file.Size}} B ({{megabyte $file.Size}} Mb)</td></tr>
+                                                <tr><th>Size</th><td>{{$file.Size}} B ({{megabyte $file.Size}})</td></tr>
                                                 <tr><th>Date</th><td>{{$file.Time}}</td></tr>
                                                 <tr><th>Used</th><td>{{$file.Used}} <i class="help-icon far fa-question-circle" title="True indicates the file is being actively used (possibly written to)."></i></td></tr>
                                             </table>

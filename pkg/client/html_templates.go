@@ -81,12 +81,23 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 	}
 }
 
-func (c *Client) getFuncMap() template.FuncMap {
+func (c *Client) getFuncMap() template.FuncMap { //nolint:cyclop
 	return template.FuncMap{
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
-		"megabyte": func(size int64) string { return fmt.Sprintf("%.2f", float64(size)/float64(mnd.Megabyte)) },
+		"megabyte": func(size int64) string {
+			switch {
+			case size > mnd.Megabyte*mnd.Kilobyte*1000: // lul
+				return fmt.Sprintf("%.2f Tb (wtf?)", float64(size)/float64(mnd.Megabyte*mnd.Megabyte))
+			case size > mnd.Megabyte*1000:
+				return fmt.Sprintf("%.2f Gb", float64(size)/float64(mnd.Megabyte*mnd.Kilobyte))
+			case size > mnd.Kilobyte*1000:
+				return fmt.Sprintf("%.1f Mb", float64(size)/float64(mnd.Megabyte))
+			default:
+				return fmt.Sprintf("%.1f Kb", float64(size)/float64(mnd.Kilobyte))
+			}
+		},
 		// returns the URL base.
 		"base": func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
 		// returns the files url base.

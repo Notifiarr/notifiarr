@@ -19,13 +19,13 @@ var (
 )
 
 type AllData struct {
-	LogFiles      map[string]string
-	APIHits       map[string]string
-	HTTPRequests  map[string]string
-	TimerEvents   map[string]map[string]string
-	NotifiarrCom  map[string]string
-	ServiceChecks map[string]map[string]string
-	Apps          map[string]map[string]string
+	LogFiles      map[string]interface{}
+	APIHits       map[string]interface{}
+	HTTPRequests  map[string]interface{}
+	TimerEvents   map[string]map[string]interface{}
+	NotifiarrCom  map[string]interface{}
+	ServiceChecks map[string]map[string]interface{}
+	Apps          map[string]map[string]interface{}
 }
 
 func GetAllData() AllData {
@@ -51,19 +51,26 @@ func GetMap(name string) *expvar.Map {
 	return newMap
 }
 
-func GetKeys(mapName *expvar.Map) map[string]string {
-	output := make(map[string]string)
+func GetKeys(mapName *expvar.Map) map[string]interface{} {
+	output := make(map[string]interface{})
 
-	mapName.Do(func(kv expvar.KeyValue) {
-		output[kv.Key] = kv.Value.String()
+	mapName.Do(func(keyval expvar.KeyValue) {
+		switch v := keyval.Value.(type) {
+		case *expvar.Int:
+			output[keyval.Key] = v.Value()
+		case expvar.Func:
+			output[keyval.Key], _ = v.Value().(int64)
+		default:
+			output[keyval.Key] = keyval.Value
+		}
 	})
 
 	return output
 }
 
 //nolint:gomnd
-func GetSplitKeys(mapName *expvar.Map) map[string]map[string]string {
-	output := make(map[string]map[string]string)
+func GetSplitKeys(mapName *expvar.Map) map[string]map[string]interface{} {
+	output := make(map[string]map[string]interface{})
 
 	mapName.Do(func(keyval expvar.KeyValue) {
 		keys := strings.SplitN(keyval.Key, "&&", 2)
@@ -72,10 +79,17 @@ func GetSplitKeys(mapName *expvar.Map) map[string]map[string]string {
 		}
 
 		if output[keys[0]] == nil {
-			output[keys[0]] = make(map[string]string)
+			output[keys[0]] = make(map[string]interface{})
 		}
 
-		output[keys[0]][keys[1]] = keyval.Value.String()
+		switch v := keyval.Value.(type) {
+		case *expvar.Int:
+			output[keys[0]][keys[1]] = v.Value()
+		case *expvar.Func:
+			output[keys[0]][keys[1]], _ = v.Value().(int64)
+		default:
+			output[keys[0]][keys[1]] = keyval.Value
+		}
 	})
 
 	return output

@@ -6,7 +6,7 @@
                                             <thead>
                                                 <tr>
                                                     <td>
-                                                        <b>Files</b> ({{megabyte .ConfigFiles.Size}} Mb)
+                                                        <b>Files</b> ({{megabyte .ConfigFiles.Size}})
                                                         <div style="float: right;">
                                                             <span class="fileListDirInfo" data-dirdata="{{len .ConfigFiles.Dirs}} dir{{if ne (len .ConfigFiles.Dirs) 1}}s{{end}}">
                                                                 {{len .ConfigFiles.List}} file{{if ne (len .ConfigFiles.List) 1}}s{{end}} in {{len .ConfigFiles.Dirs}} dir{{if ne (len .ConfigFiles.Dirs) 1}}s{{end}}&nbsp;
@@ -29,7 +29,7 @@
                                                 {{- range $file := .ConfigFiles.List }}
                                                 <tr id="fileRow{{$file.ID}}" class="fileRow">
                                                     <td style="cursor: pointer;" onclick="fileSelectorChange($(this),{{ $file.ID }})">{{ $file.Name }}</td>
-                                                    <td data-sort="{{$file.Size}}">{{megabyte $file.Size}} Mb</td>
+                                                    <td data-sort="{{$file.Size}}">{{megabyte $file.Size}}</td>
                                                     <td data-sort="{{$file.Time}}">{{since $file.Time}}</td>
                                                     <td>
                                                         <a href="downloadFile/config/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download config file."></a>

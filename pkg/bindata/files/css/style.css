@@ -589,7 +589,7 @@ li {
 }
 
 /* The following stanzas make div column contents align correctly while responsive. */
-@media (min-width: 1200px) {
+@media (min-width: 1200px) { /* lg */
   .row .col-lg-3:nth-child(4n+1) {
     clear: left;
   }
@@ -600,7 +600,18 @@ li {
     clear: left;
   }
 }
-@media (min-width: 750px) and (max-width: 1199px) {
+@media (min-width: 992px) and (max-width: 1199px)  { /* md */
+  .row .col-lg-3:nth-child(4n+1) {
+    clear: left;
+  }
+  .row .col-lg-4:nth-child(3n+1) {
+    clear: left;
+  }
+  .row .col-lg-6:nth-child(2n+1) {
+    clear: left;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) { /* sm, xs */
   .row .col-lg-6:nth-child(2n+1) {
     clear: left;
   }
