@@ -19,12 +19,14 @@ var ErrNoServer = fmt.Errorf("the web server is not running, cannot stop it")
 // StartWebServer starts the web server.
 func (c *Client) StartWebServer() {
 	// Create an apache-style logger.
-	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %u %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" ` +
+	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %{X-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" ` +
 		`"%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	// Create a request router.
 	c.Config.Router = mux.NewRouter()
 	c.Config.Router.Use(c.fixForwardedFor)
 	c.Config.Router.Use(c.countRequest)
+	c.Config.Router.Use(c.addUsernameHeader)
+
 	// Make a multiplexer because websockets can't use apache log.
 	smx := http.NewServeMux()
 	smx.Handle(path.Join(c.Config.URLBase, "/ws"), c.Config.Router)

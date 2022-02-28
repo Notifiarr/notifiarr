@@ -28,11 +28,11 @@ const (
 
 // Trigger Types.
 const (
-	TrigLidarrCorrupt   TriggerName = "Checking Lidarr instances for database backup corruption."
-	TrigProwlarrCorrupt TriggerName = "Checking Prowlarr instances for database backup corruption."
-	TrigRadarrCorrupt   TriggerName = "Checking Radarr instances for database backup corruption."
-	TrigReadarrCorrupt  TriggerName = "Checking Readarr instances for database backup corruption."
-	TrigSonarrCorrupt   TriggerName = "Checking Sonarr instances for database backup corruption."
+	TrigLidarrCorrupt   TriggerName = "Checking Lidarr for database backup corruption."
+	TrigProwlarrCorrupt TriggerName = "Checking Prowlarr for database backup corruption."
+	TrigRadarrCorrupt   TriggerName = "Checking Radarr for database backup corruption."
+	TrigReadarrCorrupt  TriggerName = "Checking Readarr for database backup corruption."
+	TrigSonarrCorrupt   TriggerName = "Checking Sonarr for database backup corruption."
 )
 
 // Errors returned by this package.

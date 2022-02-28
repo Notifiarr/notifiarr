@@ -131,8 +131,7 @@ function loadMonitorTable(table) {
         "scrollX": true,
         "columns": [
             null,
-            { "orderData":  [2]   },
-            { "searchable": false },
+            null,
             // do not search duration columns.
             { "searchable": false },
             { "searchable": false },

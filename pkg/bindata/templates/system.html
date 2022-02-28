@@ -3,13 +3,10 @@
                                  {{else if eq .Version.os "freebsd"}}<i class="fab fa-freebsd"></i>&nbsp;&nbsp;
                                  {{else if eq .Version.os "darwin"}}<i class="fab fa-apple"></i>&nbsp;&nbsp;
                                  {{else}}<i class="fas fa-microchip"></i>&nbsp;&nbsp;{{end}} System</h1>
-                                <p>
-                                    <a href="#system" onClick="refreshPage('system');">Refresh Page</a><br>
-                                </p>
                                 <table class="table table-striped table-bordered configtable" style="width:100%">
                                     <thead style="display:none;">
                                         <tr><td></td><td></td><td></td></tr>
-                                    </thead><!-- three columns to work with our dataTable function -->
+                                    </thead><!-- ^^^ three columns to work with our dataTable function -->
                                     <tbody>
                                         <tr class="text-center">
                                             <td style="display:none;"></td>
@@ -61,7 +58,10 @@
                                          </tr>
                                          <tr>
                                              <td>Uptime</td>
-                                             <td>{{since .Version.started}}</td>
+                                             <td>
+                                                 {{since .Version.started}} &nbsp;
+                                                 <a title="Refresh Page" href="#system" class="fas fa-sync" onClick="refreshPage('system');"></a>
+                                             </td>
                                              <td style="display:none;"></td>
                                          </tr>
                                          <tr class="text-center">

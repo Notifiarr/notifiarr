@@ -25,7 +25,6 @@
                                                     <tr>
                                                         <th style="min-width:100px;">Name</th>
                                                         <th style="min-width:50px;">State</th>
-                                                        <th style="display:none;">State Integer</th>
                                                         <th style="min-width:50px;">Type</th>
                                                         <th style="min-width:70px;">Last <i class="help-icon far fa-question-circle" title="How long ago this service was checked."></i></th>
                                                         <th style="min-width:70px;">Since <i class="help-icon far fa-question-circle" title="How long the service has been in this state."></i></th>
@@ -37,8 +36,7 @@
                                                 {{- range .Config.Services.GetResults }}
                                                     <tr class="bk-{{if eq .State 0}}success{{else if eq .State 1}}warning{{else if eq .State 2}}danger{{else}}brand{{end}}">
                                                         <td><span class="text-bold" title="{{.Check}}">{{.Name}}</span> <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo-alt"></a></td>
-                                                        <td title="{{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}, {{- end }}">{{.State}}</td>
-                                                        <td style="display:none;">{{.State.Value}}</td>
+                                                        <td data-sort="{{.State.Value}}" title="{{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}, {{- end }}">{{.State}}</td>
                                                         <td title="{{.Expect}}">{{.Type}}</td>
                                                         <td title="{{.Time}}">{{since .Time}}</td>
                                                         <td title="{{.Since}}">{{since .Since}}</td>
@@ -48,7 +46,6 @@
                                                 {{- end}}
                                                 </tbody>
                                             </table>
-
                                         </div>
                                     </div>
                                 </div>

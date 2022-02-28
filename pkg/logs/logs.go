@@ -163,6 +163,8 @@ func (l *Logger) CapturePanic() {
 
 // Debug writes log lines... to stdout and/or a file.
 func (l *Logger) Debug(v ...interface{}) {
+	exp.LogFiles.Add("Debug Lines", 1)
+
 	err := l.DebugLog.Output(callDepth, fmt.Sprintln(v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
@@ -171,6 +173,8 @@ func (l *Logger) Debug(v ...interface{}) {
 
 // Debugf writes log lines... to stdout and/or a file.
 func (l *Logger) Debugf(msg string, v ...interface{}) {
+	exp.LogFiles.Add("Debug Lines", 1)
+
 	err := l.DebugLog.Output(callDepth, fmt.Sprintf(msg, v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
@@ -179,6 +183,8 @@ func (l *Logger) Debugf(msg string, v ...interface{}) {
 
 // Print writes log lines... to stdout and/or a file.
 func (l *Logger) Print(v ...interface{}) {
+	exp.LogFiles.Add("Info Lines", 1)
+
 	err := l.InfoLog.Output(callDepth, fmt.Sprintln(v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
@@ -187,6 +193,8 @@ func (l *Logger) Print(v ...interface{}) {
 
 // Printf writes log lines... to stdout and/or a file.
 func (l *Logger) Printf(msg string, v ...interface{}) {
+	exp.LogFiles.Add("Info Lines", 1)
+
 	err := l.InfoLog.Output(callDepth, fmt.Sprintf(msg, v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
@@ -195,6 +203,8 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 
 // Error writes log lines... to stdout and/or a file.
 func (l *Logger) Error(v ...interface{}) {
+	exp.LogFiles.Add("Error Lines", 1)
+
 	err := l.ErrorLog.Output(callDepth, fmt.Sprintln(v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
@@ -203,6 +213,8 @@ func (l *Logger) Error(v ...interface{}) {
 
 // Errorf writes log lines... to stdout and/or a file.
 func (l *Logger) Errorf(msg string, v ...interface{}) {
+	exp.LogFiles.Add("Error Lines", 1)
+
 	err := l.ErrorLog.Output(callDepth, fmt.Sprintf(msg, v...))
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo

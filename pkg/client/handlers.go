@@ -161,6 +161,15 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 	})
 }
 
+func (c *Client) addUsernameHeader(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
+		if username := c.getUserName(req); username != "" {
+			req.Header.Set("X-Username", username)
+		}
+		next.ServeHTTP(response, req)
+	})
+}
+
 func (c *Client) countRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
 		if strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")) {

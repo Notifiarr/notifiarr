@@ -300,6 +300,10 @@ func map2list(input map[string]struct{}) []string {
 func logCounter(filename string, writer io.Writer) io.Writer {
 	counter := datacounter.NewWriterCounter(writer)
 
+	exp.LogFiles.Set("Lines Written: "+filename, expvar.Func(
+		func() interface{} { return int64(counter.Writes()) },
+	))
+
 	exp.LogFiles.Set("Bytes Written: "+filename, expvar.Func(
 		func() interface{} { return int64(counter.Count()) },
 	))

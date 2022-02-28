@@ -27,7 +27,7 @@ type TriggerName string
 const (
 	TrigSnapshot       TriggerName = "Gathering and sending System Snapshot."
 	TrigDashboard      TriggerName = "Initiating State Collection for Dashboard."
-	TrigCFSync         TriggerName = "Starting Custom Formats and Quality Profiles Sync for Radarr and Sonarr."
+	TrigCFSync         TriggerName = "Starting Radarr CF and Sonarr QP TRaSH sync."
 	TrigCollectionGaps TriggerName = "Sending Radarr Collection Gaps."
 	TrigPlexSessions   TriggerName = "Gathering and sending Plex Sessions."
 	TrigStuckItems     TriggerName = "Checking app queues and sending stuck items."

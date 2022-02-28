@@ -18,6 +18,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
@@ -97,6 +98,7 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		c.indexPage(response, request, "Invalid Password Length")
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
 		c.setSession(providedUsername, response)
+		exp.HTTPRequests.Add("GUI Logins", 1)
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	default: // Start over.
 		c.indexPage(response, request, "Invalid Password")
@@ -135,17 +137,20 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 	}
 
 	id := mux.Vars(req)["id"]
+
 	for _, fileInfo := range fileInfos.List {
 		if fileInfo.ID != id {
 			continue
 		}
 
+		user := c.getUserName(req)
+
 		if err := os.Remove(fileInfo.Path); err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
-			c.Errorf("[gui requested] Deleting file: %v", err)
+			c.Errorf("[gui '%s' requested] Deleting file: %v", user, err)
 		}
 
-		c.Printf("[gui requested] Deleted file: %s", fileInfo.Path)
+		c.Printf("[gui '%s' requested] Deleted file: %s", user, fileInfo.Path)
 
 		if _, err := response.Write([]byte("ok")); err != nil {
 			c.Errorf("Writing HTTP Response: %v", err)
@@ -197,6 +202,8 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 
+		c.Printf("[gui '%s' requested] Downloaded file: %s", c.getUserName(req), fileInfo.Path)
+
 		return
 	}
 }
@@ -218,11 +225,11 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":
 		c.Config.Services.Stop()
-		c.Printf("[gui requested] Service Checks Stopped")
+		c.Printf("[gui '%s' requested] Service Checks Stopped", c.getUserName(req))
 		http.Error(response, "Service Checks Stopped", http.StatusOK)
 	case "start":
 		c.Config.Services.Start()
-		c.Printf("[gui requested] Service Checks Started")
+		c.Printf("[gui '%s' requested] Service Checks Started", c.getUserName(req))
 		http.Error(response, "Service Checks Started", http.StatusOK)
 	default:
 		http.Error(response, "invalid action: "+action, http.StatusBadRequest)
@@ -236,7 +243,7 @@ func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Req
 		return
 	}
 
-	c.Printf("[gui requested] Check Service: %s", svc)
+	c.Printf("[gui '%s' requested] Check Service: %s", c.getUserName(req), svc)
 	http.Error(response, "Service Check Initiated", http.StatusOK)
 }
 
@@ -312,17 +319,15 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	}
 
 	if err := c.setUserPass(username, newPassw); err != nil {
-		c.Errorf("[gui requested] Saving Config: %v", err)
+		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
+	c.Printf("[gui '%s' requested] Updated primary username and password, new username: %s", currUser, username)
 	c.setSession(username, response)
-
-	if _, err := response.Write([]byte("New username and/or password saved.")); err != nil {
-		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
-	}
+	http.Error(response, "New username and/or password saved.", http.StatusOK)
 }
 
 func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
@@ -335,15 +340,16 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 	if ps, err := getProcessList(); err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 	} else if _, err = ps.WriteTo(response); err != nil {
-		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
+		c.Errorf("[gui '%s' requested] Writing HTTP Response: %v", c.getUserName(request), err)
 	}
 }
 
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
+	user := c.getUserName(request)
 	// copy running config,
 	config, err := c.Config.CopyConfig()
 	if err != nil {
-		c.Errorf("[gui requested] Copying Config (GUI request): %v", err)
+		c.Errorf("[gui '%s' requested] Copying Config (GUI request): %v", user, err)
 		http.Error(response, "Error copying internal configuration (this is a bug): "+
 			err.Error(), http.StatusInternalServerError)
 
@@ -352,14 +358,14 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 	// update config.
 	if err = c.mergeAndValidateNewConfig(config, request); err != nil {
-		c.Errorf("[gui requested] Validating POSTed Config: %v", err)
+		c.Errorf("[gui '%s' requested] Validating POSTed Config: %v", user, err)
 		http.Error(response, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
 	if err := c.saveNewConfig(config); err != nil {
-		c.Errorf("[gui requested] Saving Config: %v", err)
+		c.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
 		return
@@ -369,10 +375,8 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	defer c.triggerConfigReload(notifiarr.EventGUI, "GUI Requested")
 
 	// respond.
-	_, err = response.Write([]byte("Config Saved. Reloading in 5 seconds..."))
-	if err != nil {
-		c.Errorf("[gui requested] Writing HTTP Response: %v", err)
-	}
+	c.Printf("[gui '%s' requested] Updated Configuration.", user)
+	http.Error(response, "Config Saved. Reloading in 5 seconds...", http.StatusOK)
 }
 
 // saveNewConfig takes a fully built (copy) of config data, and saves it as the config file.

@@ -11,7 +11,7 @@
                                                             <span class="fileListDirInfo" data-dirdata="{{len .ConfigFiles.Dirs}} dir{{if ne (len .ConfigFiles.Dirs) 1}}s{{end}}">
                                                                 {{len .ConfigFiles.List}} file{{if ne (len .ConfigFiles.List) 1}}s{{end}} in {{len .ConfigFiles.Dirs}} dir{{if ne (len .ConfigFiles.Dirs) 1}}s{{end}}&nbsp;
                                                             </span>
-                                                            <i class="fas fa-sync" style="cursor: pointer; margin-right: 5px;" title="Refresh list" onclick="refreshPage('configfiles')"></i>
+                                                            <a href="#configfiles" class="fas fa-sync" title="Refresh list" onclick="destroyWebsocket('config');refreshPage('configfiles')"></a>
                                                         </div>
                                                     </td>
                                                     <td><b>Size</b></td>
