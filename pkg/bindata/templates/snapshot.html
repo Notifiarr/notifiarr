@@ -17,11 +17,11 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/mysql.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">MySQL</h2>
                                                     <div style="float: right;">
-                                                        <button id="snapshot-MySQL-addbutton" onclick="addInstance('snapshot', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of MySQL." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of MySQL." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
-                                                    <button id="snapshot-MySQL-addbutton" onclick="addInstance('snapshot', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of MySQL." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of MySQL." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">MySQL</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/mysql.png" style="height:50px;"></div>
                                                 </td>
@@ -36,13 +36,13 @@
                                                 <td style="min-width:90px;width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
                                             </tr>
                                         </thead>
-                                        <tbody id="snapshot-MySQL-container">
+                                        <tbody id="snaps-MySQL-container">
                                         {{- range $index, $app := .Config.Snapshot.MySQL}}
-                                            <input disabled style="display: none;" class="client-parameter snapshot-MySQL{{$index}}-deleted" data-group="snapshot" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="snapshot-MySQL" id="snapshot-MySQL-{{$index}}">
+                                            <input disabled style="display: none;" class="client-parameter snaps-MySQL{{$index}}-deleted" data-group="snaps" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="snaps-MySQL" id="snaps-MySQL-{{$index}}">
                                                 <td style="font-size:22px;white-space:nowrap;"><span id="MySQLIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="snapshot-MySQL-deletebutton">
-                                                        <button onclick="removeInstance('snapshot-MySQL', {{$index}})" type="button" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                                    <span class="snaps-MySQL-deletebutton">
+                                                        <button onclick="removeInstance('snaps-MySQL', {{$index}})" type="button" title="Delete this instance of MySQL" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                                     </span>
                                                 </td>
                                                 <td>
@@ -50,7 +50,7 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_NAME" $.Flags.EnvPrefix $index) }}
                                                     <i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
+                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Name"  data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
                                                     </tr></table>
                                                 </td>
                                                 <td>
@@ -58,7 +58,7 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_HOST" $.Flags.EnvPrefix $index) }}
                                                         <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                     {{- end}}
-                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Host" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
+                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Host" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width: 100%;"></td>
                                                     </tr></table>
                                                 </td>
                                                 <td>
@@ -66,7 +66,7 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_USER" $.Flags.EnvPrefix $index) }}
                                                         <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                     {{- end}}
-                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.User" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
+                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.User" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
                                                     </tr></table>
                                                 </td>
                                                 <td>
@@ -74,7 +74,7 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index) }}
                                                         <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                     {{- end}}
-                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
+                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
                                                     </tr></table>
 
                                                 </td>
@@ -83,7 +83,7 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                                         <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                     {{- end}}
-                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
+                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
                                                     </tr></table>
                                                 </td>
                                                 <td>
@@ -91,12 +91,12 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                                         <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
                                                     {{- end}}
-                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snapshot" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
+                                                        <td><input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
                                                     </tr></table>
                                                 </td>
                                             </tr>
                                         {{- end}}
-                                            <tr id="snapshot-MySQL-none"{{if .Config.Snapshot.MySQL}} style="display: none;"{{end}}><td colspan="8">No MySQL instances configured.</td></tr>
+                                            <tr id="snaps-MySQL-none"{{if .Config.Snapshot.MySQL}} style="display: none;"{{end}}><td colspan="8">No MySQL instances configured.</td></tr>
 
                                         </tbody>
                                     </table>

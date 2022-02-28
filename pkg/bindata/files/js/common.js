@@ -1,15 +1,19 @@
-let smScreen        = false;
-const smScreenWidth = 700;
-let mdScreen        = false;
-const mdScreenWidth = 1080;
-var configTable     = null;
-var serviceTable    = null;
+// These pixel widths match bootstrap 3, and allow us to easily control elements with classes.
+let smScreen        = false; // bootstrap: xs
+const smScreenWidth = 767;   // larger than this is a tablet; this or smaller is mobile.
+let mdScreen        = false; // bootstrap: sm, md
+const mdScreenWidth = 1199;  // larger than this is a desktop; this or smaller is a tablet.
+
+// Set these DataTables globally so they can be controlled from various functions.
+var configTable  = null;
+var serviceTable = null;
 
 $(document).ready((function()
 {
     jsLoader();
     setTooltips();
     setScreenSizeVars();
+    pulseExclamation();
 
     // ----- Navbar
     $('.nav-link').click(function() {
@@ -26,22 +30,15 @@ $(document).ready((function()
         findPendingChanges();
     });
 
-    //-- GIVE THE TABLE(S) TIME TO LOAD
+    //-- GIVE THE TABLE(S) TIME TO LOAD (but not much)
     setTimeout(function() {
-        $.each($('.filetable'), function() {
-            loadDataTable($(this));
-        });
-        $.each($('.monitortable'), function() {
-            loadMonitorTable($(this));
-        });
-    }, 500);
+        loadDataTable($('.filetable'));
+        loadMonitorTable($('.monitortable'));
+    }, 200);
 
     $( window ).resize(function() {
       setScreenSizeVars();
     });
-    setScreenSizeVars();
-
-    pulseExclamation();
 }));
 
 function loadConfigTable(table) {
@@ -72,15 +69,15 @@ function pulseExclamation(){
 
 function hideSmallElements()
 {
-    $('.mobile-hide, .tablet-hide, .desktop-hide').show();
+    $('.mobile-hide, .tablet-hide, .desktop-hide').show(); // somethings gets hidden.
 
-    if (smScreen) {
+    if (smScreen) {               // bootstrap: xs
         $('.mobile-hide').hide();
     }
-    if (mdScreen) {
+    if (mdScreen) {               // bootstrap: sm, md
         $('.tablet-hide').hide();
     }
-    if (!mdScreen && !smScreen) {
+    if (!mdScreen && !smScreen) { // bootstrap: lg
         $('.desktop-hide').hide();
     }
 }
@@ -88,7 +85,7 @@ function hideSmallElements()
 function setScreenSizeVars()
 {
     smScreen = window.matchMedia('only screen and (max-width: ' + smScreenWidth + 'px)').matches;
-    mdScreen = window.matchMedia('only screen and (max-width: ' + mdScreenWidth + 'px) and (min-width: ' + smScreenWidth + 'px)').matches;
+    mdScreen = window.matchMedia('only screen and (max-width: ' + mdScreenWidth + 'px) and (min-width: ' + (smScreenWidth+1) + 'px)').matches;
     hideSmallElements();
 }
 // ---------------------------------------------------------------------------------------------

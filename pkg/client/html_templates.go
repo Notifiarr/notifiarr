@@ -160,16 +160,16 @@ func (c *Client) ParseGUITemplates() (err error) {
 }
 
 type templateData struct {
-	Config      *configfile.Config    `json:"config"`
-	Flags       *configfile.Flags     `json:"flags"`
-	Username    string                `json:"username"`
-	Msg         string                `json:"msg,omitempty"`
-	Version     map[string]string     `json:"version"`
-	LogFiles    *logs.LogFileInfos    `json:"logFileInfo"`
-	ConfigFiles *logs.LogFileInfos    `json:"configFileInfo"`
-	ClientInfo  *notifiarr.ClientInfo `json:"clientInfo"`
-	Expvar      exp.AllData           `json:"expvar"`
-	HostInfo    *host.InfoStat        `json:"hostInfo"`
+	Config      *configfile.Config     `json:"config"`
+	Flags       *configfile.Flags      `json:"flags"`
+	Username    string                 `json:"username"`
+	Msg         string                 `json:"msg,omitempty"`
+	Version     map[string]interface{} `json:"version"`
+	LogFiles    *logs.LogFileInfos     `json:"logFileInfo"`
+	ConfigFiles *logs.LogFileInfos     `json:"configFileInfo"`
+	ClientInfo  *notifiarr.ClientInfo  `json:"clientInfo"`
+	Expvar      exp.AllData            `json:"expvar"`
+	HostInfo    *host.InfoStat         `json:"hostInfo"`
 }
 
 func (c *Client) renderTemplate(response io.Writer, req *http.Request,
@@ -189,9 +189,8 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 		LogFiles:    c.Logger.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
 		ClientInfo:  clientInfo,
-		Version: map[string]string{
-			"started":   version.Started.Round(time.Second).String(),
-			"uptime":    time.Since(version.Started).Round(time.Second).String(),
+		Version: map[string]interface{}{
+			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),
 			"version":   version.Version,
 			"revision":  version.Revision,

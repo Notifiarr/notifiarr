@@ -42,12 +42,12 @@ html,body {
     font-size: 14px;
   }
 }
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 750px) {
   html {
     font-size: 14px;
   }
 }
-@media only screen and (min-width: 1080px) {
+@media only screen and (min-width: 1200px) {
   p {
     font-size: 1em;
     margin-bottom: 1.8em;
@@ -568,18 +568,8 @@ li {
   width: 100%;
   top: 0;
 }
-.brand .logo {
-  box-sizing: border-box;
-  padding: 20px;
-  float: left;
-  display: block;
-  width: 200px;
-}
-@media only screen and (min-width: 1080px) {
-  .brand .logo {
-    width: 250px;
-  }
-}
+
+
 .brand .logo img {
   height: 20px;
 }
@@ -592,11 +582,36 @@ li {
   padding: 20px 20px;
 }
 
-@media only screen and (min-width: 1080px) {
+@media only screen and (min-width: 1200px) {
   .brand .menu-btn {
     display: none;
   }
 }
+
+/* The following stanzas make div column contents align correctly while responsive. */
+@media (min-width: 1200px) {
+  .row .col-lg-3:nth-child(4n+1) {
+    clear: left;
+  }
+  .row .col-lg-4:nth-child(3n+1) {
+    clear: left;
+  }
+  .row .col-lg-6:nth-child(2n+1) {
+    clear: left;
+  }
+}
+@media (min-width: 750px) and (max-width: 1199px) {
+  .row .col-lg-6:nth-child(2n+1) {
+    clear: left;
+  }
+  .row .col-md-6:nth-child(2n+1) {
+    clear: left;
+  }
+  .row .col-sm-6:nth-child(2n+1) {
+    clear: left;
+  }
+}
+
 
 .brand .ts-profile-nav {
   float: right;
@@ -642,7 +657,7 @@ li {
   visibility: visible;
   opacity: 1;
 }
-@media only screen and (min-width: 1080px) {
+@media only screen and (min-width: 1200px) {
   .brand .ts-profile-nav {
     display: block;
   }
@@ -679,7 +694,7 @@ li {
   padding: 10px 15px;
   color: #fff;
 }
-@media only screen and (min-width: 1080px) {
+@media only screen and (min-width: 1200px) {
   .ts-sidebar {
     max-height: 100%;
     bottom: 0;
@@ -742,13 +757,13 @@ li {
   padding-top: 15px;
   margin-top: 60px;
 }
-@media only screen and (min-width: 1080px) {
+@media only screen and (min-width: 1200px) {
   .ts-main-content .ts-sidebar {
-    width: 250px;
+    width: 200px;
     float: left;
   }
   .ts-main-content .content-wrapper {
-    margin-left: 250px;
+    margin-left: 200px;
   }
 }
 @media only screen and (min-width: 992px) {

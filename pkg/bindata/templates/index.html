@@ -12,8 +12,11 @@
                             <span style="" class="mobile-hide">Notifiarr Client</span>
                         </h4>
                     </a>
+                    <span style="margin:0;font-size:0.8em;float:right;" class="tablet-hide desktop-hide"><i class="fas fa-mobile-alt"></i></span>
+                    <span style="margin:0;font-size:0.8em;float:right;" class="mobile-hide desktop-hide"><i class="fas fa-tablet-alt"></i></span>
+                    <span style="margin:0;font-size:0.8em;float:right;" class="mobile-hide tablet-hide"><i class="fas fa-desktop"></i></span>
                     {{- if .Username }}
-                    <a class="nav-button text-danger fas fa-power-off" title="Shut down application (quit)." onClick="shutDownApp();"></a>
+                    <a class="nav-button text-danger fas fa-power-off" title="Shut down application (quit)." onClick="shutDownApp();" style="margin-right:0;"></a>
                     <a class="nav-button text-success fas fa-recycle" title="Reload application configuraton and refresh." onClick="reloadConfig();"></a>
                     {{- end}}
                     <span class="menu-btn pull-left" style="font-size:1.3em;"><i class="fa fa-bars"> <span class="pending-change-container" style="display:none;"><i class="fas text-danger fa-exclamation-circle" title="Unsaved Changes!" style="display:none;"></i></span></i></span>
@@ -33,19 +36,19 @@
                                     <li><a href="/logout">Logout</a></li>
                                 </ul>
                             </div>
-                            <div class="tablet-hide desktop-hide">
+                            <div class="desktop-hide">
                                 <br>
                                 <div class="pending-change-container" style="display: none;">
+                                    <hr>
                                     <div align="center">
                                         <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
-                                            Save <span class="pending-change-counter">0</span> Changes &amp; Reload
+                                            Save &amp; Reload
                                         </button>
                                     </div>
-                                    <div style="margin-left: 1em; margin-top: 1em;">
-                                        List of Pending Changes:<br>
+                                    <div style="margin-left: 1em; margin-top: 0.8em;">
+                                        <span class="pending-change-counter text-bold text-warning">0</span> Pending Changes!<br>
                                         <div style="margin-left: 1em;" class="pending-change-list"></div>
                                     </div>
-                                    <hr>
                                 </div>
                             </div>
                         {{- end }}
@@ -63,23 +66,23 @@
                                 <a class="nav-div-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <i class="nav-icon fas fa-fire-extinguisher" style="margin-left:0;"></i><span style="padding-left:15px;">Triggers &nbsp; &nbsp;<span class="caret"></span></span>
                                 </a>
-                                <ul style="width:92%;" class="dropdown-menu bk-dark" aria-labelledby="triggers menu">
+                                <ul style="width:95%;" class="dropdown-menu bk-dark" aria-labelledby="triggers menu">
                                     <li><a class="nav-link text-grey" href="#triggers" onClick="swapNavigationTemplate('triggers')">- Open Triggers Page -</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('cfsync')">Sync Custom Formats</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('snapshot')">Send System Snapshot</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('stuckitems')">Stuck Queue Items Check</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('dashboard')">Send Dashboard States</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('sessions')">Send Plex Sessions</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/lidarr')">Check Lidarr for Corruption</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/prowlarr')">Check Prowlarr for Corruption</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/radarr')">Check Radarr for Corruption</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/readarr')">Check Readarr for Corruption</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/sonarr')">Check Sonarr for Corruption</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/lidarr')">Check Lidarr Backups</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/prowlarr')">Check Prowlarr Backups</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/radarr')">Check Radarr Backups</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/readarr')">Check Readarr Backups</a></li>
-                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/sonarr')">Check Sonarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('cfsync')">Custom Formats</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('snapshot')">System Snapshot</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('stuckitems')">Stuck Items</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('dashboard')">Dashboard States</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('sessions')">Plex Sessions</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/lidarr')">Lidarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/prowlarr')">Prowlarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/radarr')">Radarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/readarr')">Readarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/sonarr')">Sonarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/lidarr')">Lidarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/prowlarr')">Prowlarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/radarr')">Radarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/readarr')">Readarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/sonarr')">Sonarr Backups</a></li>
                                 </ul>
                             </div>
                             <li><i class="nav-icon fas fa-temperature-high"></i><a class="nav-link" href="#monitoring" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
@@ -96,17 +99,17 @@
                             <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
                         {{- end }}
                         </ul>
-                        <div class="mobile-hide">
+                        <div class="tablet-hide mobile-hide">
                             <div class="pending-change-container" style="display: none;">
                                 <hr>
                                 <div align="center">
                                     <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
-                                        Save <span class="pending-change-counter">0</span> Changes &amp; Reload
+                                        Save &amp; Reload
                                     </button>
                                 </div>
-                                <div style="margin-left: 1em; margin-top: 1em;">
-                                    List of Pending Changes:<br>
-                                    <div style="margin-left: 1em;" class="pending-change-list"></div>
+                                <div style="margin-left: 0.4em; margin-top: 0.8em;">
+                                    <span class="pending-change-counter text-bold text-warning">0</span> Pending Changes!<br>
+                                    <div style="margin-left: 0.2em;" class="pending-change-list"></div>
                                 </div>
                             </div>
                         </div>

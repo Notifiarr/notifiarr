@@ -249,12 +249,14 @@ func GetURLInto(app string, timeout time.Duration, url string, params url.Values
 
 	resp, err := (&http.Client{Timeout: timeout}).Do(req)
 	if err != nil {
+		exp.Apps.Add(app+"&&GET Errors", 1)
 		return fmt.Errorf("making request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		exp.Apps.Add(app+"&&GET Errors", 1)
 		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
 	}
 
