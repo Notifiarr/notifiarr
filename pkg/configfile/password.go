@@ -13,11 +13,16 @@ type CryptPass string
 const (
 	cryptedPassPfx  = "!!cryptd!!"
 	defaultUsername = "admin"
+	webauth         = "webauth"
 )
 
 func (c *Config) setupPassword() error {
 	pass := string(c.UIPassword)
 	if pass == "" {
+		return nil
+	}
+
+	if pass == webauth {
 		return nil
 	}
 
@@ -39,6 +44,11 @@ func (p *CryptPass) Set(pass string) error {
 		return nil
 	}
 
+	if pass == webauth {
+		*p = webauth
+		return nil
+	}
+
 	if pass == "" {
 		*p = ""
 	}
@@ -53,10 +63,18 @@ func (p *CryptPass) Set(pass string) error {
 	return nil
 }
 
+func (p CryptPass) Webauth() bool {
+	return p == webauth
+}
+
 // Valid checks if a password is valid.
 func (p CryptPass) Valid(pass string) bool {
-	hash := []byte(strings.TrimPrefix(string(p), cryptedPassPfx))
-	return bcrypt.CompareHashAndPassword(hash, []byte(pass)) == nil
+	if !p.Webauth() {
+		hash := []byte(strings.TrimPrefix(string(p), cryptedPassPfx))
+		return bcrypt.CompareHashAndPassword(hash, []byte(pass)) == nil
+	}
+
+	return false
 }
 
 // IsCrypted checks if a password string is already encrypted.

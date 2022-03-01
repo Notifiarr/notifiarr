@@ -1,4 +1,7 @@
                                 <h1><i class="fa fa-user"></i> User Profile</h1>
+                            {{- if .Webauth }}
+                                <p>Profile editing is disabled when webauth is enabled.</p>
+                            {{- else }}
                                 <p>You must enter your current password to save changes.</p>
                                 <table class="table bk-dark table-bordered">
                                     <thead>
@@ -36,4 +39,5 @@
                                     </tbody>
                                 </table>
                                 <button onclick="saveProfileChanges()" class="btn btn-primary">Save Changes</button>
+                            {{- end}}
 {{- /* end of profile (leave this comment) */ -}}

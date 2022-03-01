@@ -35,17 +35,16 @@ const (
 )
 
 // userNameValue is used a context value key.
-type userNameValue string
+type userNameValue int
 
-const (
-	userNameStr userNameValue = "username"
-)
+// nolint:gochecknoglobals // used as context value key.
+var userNameStr interface{} = userNameValue(1)
 
 func (c *Client) checkAuthorized(next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-		userName := c.getUserName(request)
+		userName, dyanmic := c.getUserName(request)
 		if userName != "" {
-			ctx := context.WithValue(request.Context(), userNameStr, userName)
+			ctx := context.WithValue(request.Context(), userNameStr, []interface{}{userName, dyanmic})
 			next.ServeHTTP(response, request.WithContext(ctx))
 		} else {
 			http.Redirect(response, request, path.Join(c.Config.URLBase, "login"), http.StatusFound)
@@ -53,22 +52,32 @@ func (c *Client) checkAuthorized(next http.HandlerFunc) http.Handler {
 	})
 }
 
-func (c *Client) getUserName(request *http.Request) string {
+// getUserName returns the username and a bool if it's dynamic (not the one from the config file).
+func (c *Client) getUserName(request *http.Request) (string, bool) {
 	if userName := request.Context().Value(userNameStr); userName != nil {
-		return userName.(string)
+		u, _ := userName.([]interface{})
+		return u[0].(string), u[1].(bool)
+	}
+
+	if userName := request.Header.Get("x-webauth-user"); userName != "" {
+		// If the upstream is allowed and gave us a username header, use it.
+		ip := strings.Trim(request.RemoteAddr[:strings.LastIndex(request.RemoteAddr, ":")], "[]")
+		if c.Config.Allow.Contains(ip) {
+			return userName, true
+		}
 	}
 
 	cookie, err := request.Cookie("session")
 	if err != nil {
-		return ""
+		return "", false
 	}
 
 	cookieValue := make(map[string]string)
 	if err = c.cookies.Decode("session", cookie.Value, &cookieValue); err != nil {
-		return ""
+		return "", false
 	}
 
-	return cookieValue["username"]
+	return cookieValue["username"], false
 }
 
 func (c *Client) setSession(userName string, response http.ResponseWriter) {
@@ -89,11 +98,16 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 }
 
 func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
-	switch providedUsername := request.FormValue("name"); {
-	case c.getUserName(request) != "": // already logged in.
+	loggedinUsername, _ := c.getUserName(request)
+	providedUsername := request.FormValue("name")
+
+	switch {
+	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method == http.MethodGet: // dont handle login without POST
 		c.indexPage(response, request, "")
+	case c.Config.UIPassword.Webauth():
+		c.indexPage(response, request, "Logins Disabled")
 	case len(request.FormValue("password")) < minPasswordLen:
 		c.indexPage(response, request, "Invalid Password Length")
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
@@ -143,7 +157,7 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 			continue
 		}
 
-		user := c.getUserName(req)
+		user, _ := c.getUserName(req)
 
 		if err := os.Remove(fileInfo.Path); err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
@@ -202,7 +216,8 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 
-		c.Printf("[gui '%s' requested] Downloaded file: %s", c.getUserName(req), fileInfo.Path)
+		user, _ := c.getUserName(req)
+		c.Printf("[gui '%s' requested] Downloaded file: %s", user, fileInfo.Path)
 
 		return
 	}
@@ -222,14 +237,16 @@ func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
 }
 
 func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http.Request) {
+	user, _ := c.getUserName(req)
+
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":
 		c.Config.Services.Stop()
-		c.Printf("[gui '%s' requested] Service Checks Stopped", c.getUserName(req))
+		c.Printf("[gui '%s' requested] Service Checks Stopped", user)
 		http.Error(response, "Service Checks Stopped", http.StatusOK)
 	case "start":
 		c.Config.Services.Start()
-		c.Printf("[gui '%s' requested] Service Checks Started", c.getUserName(req))
+		c.Printf("[gui '%s' requested] Service Checks Started", user)
 		http.Error(response, "Service Checks Started", http.StatusOK)
 	default:
 		http.Error(response, "invalid action: "+action, http.StatusBadRequest)
@@ -243,7 +260,8 @@ func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Req
 		return
 	}
 
-	c.Printf("[gui '%s' requested] Check Service: %s", c.getUserName(req), svc)
+	user, _ := c.getUserName(req)
+	c.Printf("[gui '%s' requested] Check Service: %s", user, svc)
 	http.Error(response, "Service Check Initiated", http.StatusOK)
 }
 
@@ -289,7 +307,12 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	currUser := c.getUserName(request)
+	currUser, dynamic := c.getUserName(request)
+	if dynamic {
+		http.Error(response, "Dynamic accounts cannot make profile changes.", http.StatusBadRequest)
+		return
+	}
+
 	currPass := request.PostFormValue("Password")
 
 	if !c.checkUserPass(currUser, currPass) {
@@ -340,12 +363,13 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 	if ps, err := getProcessList(); err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 	} else if _, err = ps.WriteTo(response); err != nil {
-		c.Errorf("[gui '%s' requested] Writing HTTP Response: %v", c.getUserName(request), err)
+		user, _ := c.getUserName(request)
+		c.Errorf("[gui '%s' requested] Writing HTTP Response: %v", user, err)
 	}
 }
 
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
-	user := c.getUserName(request)
+	user, _ := c.getUserName(request)
 	// copy running config,
 	config, err := c.Config.CopyConfig()
 	if err != nil {
@@ -465,7 +489,8 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, msg string) {
 	response.Header().Add("content-type", "text/html")
 
-	if request.Method != http.MethodGet {
+	user, _ := c.getUserName(request)
+	if request.Method != http.MethodGet || (user == "" && c.Config.UIPassword.Webauth()) {
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 

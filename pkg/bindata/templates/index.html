@@ -26,6 +26,11 @@
                     <nav class="ts-sidebar">
                         <ul class="ts-sidebar-menu">
                         {{- if .Username }}
+                            {{- if .Dynamic }}
+                            <div class="btn btn-default" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px">
+                                <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<i style="font-size:9px" class="fas fa-lock"></i>
+                            </div>
+                            {{- else }}
                             <div class="dropdown"><!-- this is lame -->
                                 <button class="btn btn-default dropdown-toggle" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
@@ -33,9 +38,10 @@
                                 <ul style="width:92%;" class="dropdown-menu bk-brown" aria-labelledby="user menu">
                                     <li><a class="nav-link" href="#profile" onclick="swapNavigationTemplate('profile')">Profile</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="/logout">Logout</a></li>
+                                    <li><a href="logout">Logout</a></li>
                                 </ul>
                             </div>
+                            {{- end }}
                             <div class="desktop-hide">
                                 <br>
                                 <div class="pending-change-container" style="display: none;">
@@ -51,9 +57,7 @@
                                     </div>
                                 </div>
                             </div>
-                        {{- end }}
                             <li class="ts-label" style="text-align: center;">Settings</li>
-                        {{- if .Username }}
                             <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" href="#config" onclick="swapNavigationTemplate('config')">Configuration</a></li>
                             <li><i class="nav-icon fas fa-star"></i><a class="nav-link" href="#starr" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
                             <li><i class="nav-icon fas fa-cart-arrow-down"></i><a href="#downloaders" class="nav-link" onclick="swapNavigationTemplate('downloaders')">Download Apps</a></li>
@@ -95,7 +99,8 @@
                                 {{- else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
                                 {{- else}}<i class="nav-icon fas fa-microchip"></i>
                                 {{- end}}<a class="nav-link" href="#system" onclick="swapNavigationTemplate('system')">System</a></li>
-                        {{- else }}<!-- nav bar for logged out user (nothing). -->
+                        {{- else if not .Webauth }}<!-- nav bar for logged out user (nothing). -->
+                            <li class="ts-label" style="text-align: center;">Navigation</li>
                             <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
                         {{- end }}
                         </ul>

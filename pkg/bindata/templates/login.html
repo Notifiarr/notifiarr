@@ -1,6 +1,9 @@
                                 <div class="row">
                                     <div class="col-md-10 col-md-offset-1">
                                         <h1 class="text-center text-bold mt-4x">Login</h1>
+                                        {{- if .Webauth }}
+                                        <div class="col-md-6 col-md-offset-3 alert alert-danger" style="text-align: center;">Logins Disabled</div>
+                                        {{- else }}
                                         <div class="well row pt-2x pb-3x bk-brown brdr">
                                             {{- if .Msg}}
                                             <div class="col-md-6 col-md-offset-3 alert alert-danger" style="text-align: center;">{{.Msg}}</div>
@@ -15,6 +18,7 @@
                                                 </form>
                                             </div>
                                         </div>
+                                        {{- end }}
                                     </div>
                                 </div>
 {{- /* end of header (leave this comment) */ -}}

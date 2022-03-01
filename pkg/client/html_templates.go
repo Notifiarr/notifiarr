@@ -174,6 +174,8 @@ type templateData struct {
 	Config      *configfile.Config     `json:"config"`
 	Flags       *configfile.Flags      `json:"flags"`
 	Username    string                 `json:"username"`
+	Dynamic     bool                   `json:"dynamic"`
+	Webauth     bool                   `json:"webauth"`
 	Msg         string                 `json:"msg,omitempty"`
 	Version     map[string]interface{} `json:"version"`
 	LogFiles    *logs.LogFileInfos     `json:"logFileInfo"`
@@ -191,11 +193,14 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 	}
 
 	binary, _ := os.Executable()
+	userName, dynamic := c.getUserName(req)
 
 	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
 		Flags:       c.Flags,
-		Username:    c.getUserName(req),
+		Username:    userName,
+		Dynamic:     dynamic,
+		Webauth:     c.Config.UIPassword.Webauth(),
 		Msg:         msg,
 		LogFiles:    c.Logger.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
