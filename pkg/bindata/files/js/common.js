@@ -38,6 +38,8 @@ $(document).ready((function()
 
     $( window ).resize(function() {
       setScreenSizeVars();
+      serviceTable.columns.adjust();
+      configTable.columns.adjust();
     });
 }));
 
@@ -70,7 +72,6 @@ function pulseExclamation(){
 function hideSmallElements()
 {
     $('.mobile-hide, .tablet-hide, .desktop-hide').show(); // somethings gets hidden.
-
     if (smScreen) {               // bootstrap: xs
         $('.mobile-hide').hide();
     }
@@ -287,7 +288,7 @@ function savePendingChanges()
     let dope = function() {
         const id = $(this).attr('id')
         if (id !== undefined) {
-            fields += '&'+ $(this).attr('id') +'='+ $(this).val();
+            fields += '&' + $(this).serialize();
         }
     };
 
@@ -322,7 +323,7 @@ function saveProfileChanges()
     $.each($('.profile-parameter'), function() {
         const id = $(this).attr('id')
         if (id !== undefined) {
-            fields += '&'+ $(this).attr('id') +'='+ $(this).val();
+            fields += '&' + $(this).serialize();
         }
     });
 

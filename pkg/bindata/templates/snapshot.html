@@ -49,26 +49,26 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_NAME" $.Flags.EnvPrefix $index) }}
                                                     <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Name"  data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_NAME" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Name" name="Snapshot.MySQL.{{$index}}.Name"  data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_NAME" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_HOST" $.Flags.EnvPrefix $index) }}
                                                     <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Host" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_HOST" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Host" name="Snapshot.MySQL.{{$index}}.Host" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_HOST" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_USER" $.Flags.EnvPrefix $index) }}
                                                     <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.User" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_USER" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.User" name="Snapshot.MySQL.{{$index}}.User" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_USER" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
                                                   <form>
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index) }}
                                                     <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                    <input type="password" id="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <input type="password" id="Snapshot.MySQL.{{$index}}.Pass" name="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width:{{if (locked (printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                     <i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>
                                                   </form>
                                                 </td>
@@ -76,13 +76,13 @@
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
                                                     <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width:{{if (locked (printf "%d_INTERVAL%d_INTERVAL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Interval" name="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width:{{if (locked (printf "%d_INTERVAL%d_INTERVAL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
                                                     {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
                                                     <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width:{{if (locked (printf "%d_INTERVAL%d_TIMEOUT" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" name="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter" data-group="snaps" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width:{{if (locked (printf "%d_INTERVAL%d_TIMEOUT" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                             </tr>
                                         {{- end}}

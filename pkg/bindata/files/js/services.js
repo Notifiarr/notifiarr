@@ -14,6 +14,9 @@ $.fn.dataTableExt.ofnSearch['span-input'] = function(value) {
 
 serviceTable = $('.servicetable').DataTable({
     "autoWidth": false,
+    "fixedHeader": {
+        headerOffset: 50
+    },
     "scrollX": true,
     'scrollCollapse': true,
     "sort": false,
@@ -30,8 +33,7 @@ serviceTable = $('.servicetable').DataTable({
         { "type": "span-input", "targets": [0] },
         { "type": "html-input", "targets": [1,2,3,4,5,6] },
     ],
-    "fnDrawCallback":function() {
-        // fix the header column on window resize.
+    "fnDrawCallback": function() {
         this.api().columns.adjust();
     },
     "columns": [

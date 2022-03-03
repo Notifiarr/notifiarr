@@ -866,8 +866,8 @@ div .file-content .line-number {
 
 .password-input {
     margin-top:7px;
-    margin-left:-20px;
-    position:absolute;
+    margin-left:-23px;
+    position:relative;
     font-size:13px;
     cursor:pointer;
     color:#000000;
