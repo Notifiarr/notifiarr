@@ -863,3 +863,12 @@ div .file-content .line-number {
     max-height: 60vh;
     overflow-x: hidden;
 }
+
+.password-input {
+    margin-top:7px;
+    margin-left:-20px;
+    position:absolute;
+    font-size:13px;
+    cursor:pointer;
+    color:#000000;
+}

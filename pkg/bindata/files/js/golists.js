@@ -90,6 +90,9 @@ function addInstance(section, app)
     for (const name of names) {
         let nameval = ""
         let nameori = ""
+        let extra = ""
+        let itype = "text"
+
         // Blank items in the name list add a colspan to the next item.
         if (name == "") {
             colspan++;
@@ -97,6 +100,15 @@ function addInstance(section, app)
         }
 
         switch (name) {
+            case "Config.Password":
+            case "Config.Pass":
+            case "Config.APIKey":
+            case "Pass":
+            case "Password":
+            case "APIKey":
+                extra = '<i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>';
+                itype = "password";
+                break;
             case "Config.Interval":
             case "Interval":
                 nameval = "5m";
@@ -115,9 +127,9 @@ function addInstance(section, app)
              break;
         }
 
-        row +=  '<td colspan="'+ colspan +'"><input type="text" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +
+        row +=  '<td colspan="'+ colspan +'"><input type="'+ itype +'" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +
         '" data-app="'+ app +'" data-index="'+ index +'" class="client-parameter" data-group="'+ section +'" data-label="'+ app +' '+
-         instance +' '+name+'" data-original="'+ nameori +'" value="'+ nameval +'" style="width: 100%;"></td>';
+         instance +' '+name+'" data-original="'+ nameori +'" value="'+ nameval +'" style="width: 100%;">'+ extra +'</td>';
          colspan = 1;
     }
 

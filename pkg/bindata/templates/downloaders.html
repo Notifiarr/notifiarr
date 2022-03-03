@@ -19,12 +19,12 @@
                                             </tr>
                                             <tr>
                                                 <td class="text-center" style="width:20px;min-width:20px;">#</td>
-                                                <td style="min-width:130px;">Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
+                                                <td style="min-width:130px;">Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i>
                                                 <td style="min-width:190px;">URL</td>
                                                 <td style="min-width:80px;">Username</td>
                                                 <td style="min-width:170px;">Password</td>
-                                                <td style="min-width:90px;width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td style="min-width:90px;width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td style="min-width:90px;width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i>
+                                                <td style="min-width:90px;width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i>
                                             </tr>
                                         </thead>
                                         <tbody id="download-Qbit-container">
@@ -37,52 +37,43 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if (locked (printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index))}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Name" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Qbit.{{$index}}.Name" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width:{{if (locked (printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.URL" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Qbit.{{$index}}.URL" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width:{{if (locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index)}}
+                                                    <i cstyle="width:10px;" lass="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.User" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Qbit.{{$index}}.User" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}" style="width:{{if (locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                  <form>
+                                                    {{- if locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="password" id="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}" style="width:{{if (locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>
+                                                  </form>
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width:{{if (locked (printf "%s_QBIT_%dINTERVAL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width:{{if (locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                             </tr>
                                         {{- end}}
@@ -105,11 +96,11 @@
                                             </tr>
                                             <tr>
                                                 <td class="text-center">#</td>
-                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
+                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i>
                                                 <td colspan="2">URL</td>
                                                 <td>Password</td>
-                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i>
+                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i>
                                             </tr>
                                         </thead>
                                         <tbody id="download-Deluge-container">
@@ -122,44 +113,37 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Name" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Deluge.{{$index}}.Name" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width:{{if (locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td colspan="2">
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Config.URL" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Deluge.{{$index}}.Config.URL" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width:{{if (locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                  <form>
+                                                    {{- if locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Pass" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="password" id="Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Pass" data-original="{{$app.Password}}" value="{{$app.Password}}" style="width:{{if (locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>
+                                                  </form>
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Interval" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Deluge.{{$index}}.Interval" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width:{{if (locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width:{{if (locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                             </tr>
                                         {{- end}}
@@ -182,11 +166,11 @@
                                             </tr>
                                             <tr>
                                                 <td class="text-center">#</td>
-                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
+                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i>
                                                 <td colspan="2">URL</td>
                                                 <td>API Key</td>
-                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i>
+                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i>
                                             </tr>
                                         </thead>
                                         <tbody id="download-SabNZB-container">
@@ -199,44 +183,37 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}" style="width:{{if (locked (printf "%s_SabNZB_%d_NAME" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td colspan="2">
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" style="width:{{if (locked (printf "%s_SabNZB_%d_URL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                  <form>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} APIKey" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="password" id="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} APIKey" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}" style="width:{{if (locked (printf "%s_SabNZB_%d_API_KEY" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}99%{{end}};">
+                                                    <i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>
+                                                  </form>
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}" style="width:{{if (locked (printf "%s_SabNZB_%d_INTERVAL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                                 <td>
-                                                    <table width="100%"><tr>
-                                                    {{- if locked (printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                        <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                    {{- if locked (printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
+                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
-                                                        <td><input type="text" id="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width: 100%;"></td>
-                                                    </tr></table>
+                                                    <input type="text" id="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}" style="width:{{if (locked (printf "%s_SabNZB_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                 </td>
                                             </tr>
                                         {{- end}}

@@ -27,7 +27,7 @@ checkHashForNavPage();
 function refreshPage(template, notice = true)
 {
     $.ajax({
-        url: 'template/'+ template,
+        url: URLBase+'template/'+ template,
         async: false,
         success: function (data){
             if (notice) {
@@ -66,7 +66,7 @@ function shutDownApp()
 {
     if (confirm('Really shut down application?')) {
         $.ajax({
-            url: 'shutdown',
+            url: URLBase+'shutdown',
             async: false,
             success: function (data){
                 toast('Shuting Down', 'Application Shutdown Initiated', 'success', 15000);
@@ -86,7 +86,7 @@ function shutDownApp()
 function reloadConfig()
 {
     $.ajax({
-        url: 'reload',
+        url: URLBase+'reload',
         success: function (data){
             setTimeout(function(){location.reload();}, 5000); // reload window in 5 seconds.
             toast('Reloading', 'Application Reload Initiated', 'success');

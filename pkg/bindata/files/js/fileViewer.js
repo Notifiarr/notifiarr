@@ -60,7 +60,7 @@ function fileSelectorChange(caller, fileID)
     ctl.find('.fileLinesAdd').prop('disabled', false);
 
     $.ajax({
-        url: 'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
+        url: URLBase+'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
         success: function (data){
             ctl.find('.file-content').text(data);
             const gotLines = ctl.find('.file-content').html().split(/\n/).length-1;
@@ -99,7 +99,7 @@ function triggerFileAction(caller, action, source, fileID)
         $(location).attr("href", "downloadFile/"+ source +"/"+ fileID);
     } else if (action == "delete") {
         $.ajax({
-            url: 'deleteFile/'+ source +'/'+ fileID,
+            url: URLBase+'deleteFile/'+ source +'/'+ fileID,
 
             success: function (data){
                 let files = ' files';
@@ -161,7 +161,7 @@ function triggerFileLoad(caller)
         ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
 
         $.ajax({
-            url: 'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/'+ offSetCount + '?sort='+sort,
+            url: URLBase+'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/'+ offSetCount + '?sort='+sort,
             success: function (data){
                 // These are slow when there's a lot of lines.
                 ctl.find('.line-number').remove();
@@ -198,7 +198,7 @@ function triggerFileLoad(caller)
         // start a spinner because this might take a few seconds.
         ctl.find('.file-content').html('<i class="fas fa-cog fa-spin fa-2x"></i> Loading up to '+lineCount+' lines from file '+ filename +'...');
         $.ajax({
-            url: 'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
+            url: URLBase+'getFile/'+ source +'/'+ fileID +'/'+ lineCount +'/0' + '?sort='+sort,
             success: function (data){
                 ctl.find('.file-small-msg').html('<i class="fas fa-cog fa-spin"></i> Still Loading...');
                 ctl.find('.file-content').text(data);

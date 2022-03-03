@@ -40,7 +40,7 @@ type userNameValue int
 // nolint:gochecknoglobals // used as context value key.
 var userNameStr interface{} = userNameValue(1)
 
-func (c *Client) checkAuthorized(next http.HandlerFunc) http.Handler {
+func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 		userName, dyanmic := c.getUserName(request)
 		if userName != "" {

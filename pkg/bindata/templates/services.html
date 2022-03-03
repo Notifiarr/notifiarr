@@ -3,7 +3,8 @@
                                     <p>The Notifiarr client application is capable of monitoring services via HTTP checks,
                                        TCP port checks or process running (and not running) checks. Use the form at the bottom
                                        of this page to configure service checks. <b>The client service checks work with the Notifiarr.com
-                                       Nework Integration.</b></p>
+                                       Nework Integration.</b>
+                                   </p>
                                     <p>
                                        Disable and Enable service checks on the <a href="#config" onClick="swapNavigationTemplate('config')">Configuration page</a>.
                                        View running service check inforation on the <a href="#monitoring" onClick="swapNavigationTemplate('monitoring')">Monitoring page</a>.
@@ -25,12 +26,11 @@
                                     <p>The TCP Port check type allows you to monitor a TCP port's connectivity.
                                         This check type does not take any special arguments and does not use the expect value.
                                         Simply provide a host (or IP) and port in the format <code>host:port</code>, example: <code>127.0.0.1:22</code>
-                                    <p>
                                     </p>
                                 </div>
                                 <div class="col-sm-12 col-md-12">
                                     <div class="table-responsive">
-                                        <table  class="table table-bordered table-responsive bk-dark" style="width:100%">
+                                        <table class="table table-bordered table-responsive bk-dark" style="width:100%">
                                             <tr>
                                                 <td style="text-align:center;" class="mobile-hide">
                                                     <div style="float: left;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
@@ -46,87 +46,76 @@
                                                 </td>
                                             </tr>
                                         </table>
+                                        </div>
+                                        <div class="table-responsive">
+
                                         <table class="table table-bordered bk-dark servicetable" style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th class="text-center" style="width:30px;">#</th>
+                                                    <th style="min-width:30px;width:30px;">#</th>
                                                     <th style="min-width:120px;">Name</th>
                                                     <th style="min-width:115px;">Type</th>
                                                     <th style="min-width:170px;">Check Value</th>
                                                     <th style="min-width:150px;">Expect</th>
                                                     <th style="min-width:90px;width:90px;">Interval <i class="help-icon far fa-question-circle" title="This interval value controls how often the service is checked."></i></th>
-                                                    <th style="width:70px">Timeout</th>
+                                                    <th style="min-width:70px;width:70px">Timeout</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="services-Checks-container">
                                             {{- range $index, $svc := .Config.Service}}
+                                                <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
                                                 <tr class="services-Checks" id="services-Checks-{{$index}}">
                                                     <td class="text-center" style="font-size: 22px;white-space: nowrap;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
                                                         <span class="services-Checks-deletebutton">
                                                             <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                                         </span>
-                                                        <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
                                                     </td>
                                                     <td>
-                                                        <table style="width:100%;"><tr>
                                                         {{- if locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                            <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                         {{- end}}
-                                                            <td><input type="text" id="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}" style="width: 100%;"></td>
-                                                        </tr></table>
+                                                        <input type="text" id="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}" style="width:{{if (locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                     </td>
                                                     <td>
-                                                        <table style="width:100%;"><tr>
                                                         {{- if locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index) }}
-                                                            <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                         {{- end}}
-                                                            <td>
-                                                                <select id="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}" style="width: 100%;">
-                                                                    <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
-                                                                    <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
-                                                                    <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
-                                                                </select>
-                                                            </td>
-                                                        </tr></table>
+                                                        <select id="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}" style="width:{{if (locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                            <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
+                                                            <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
+                                                            <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
+                                                        </select>
                                                     </td>
                                                     <td>
-                                                        <table style="width:100%;"><tr>
                                                         {{- if locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index) }}
-                                                            <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                         {{- end}}
-                                                            <td><input type="text" id="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}" style="width: 100%;"></td>
-                                                        </tr></table>
+                                                        <input type="text" id="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}" style="width:{{if (locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                     </td>
                                                     <td>
-                                                        <table style="width:100%;"><tr>
-                                                        {{- if locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index) }}
-                                                            <td><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                        {{- if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index)) }}
+                                                        <i style="width:15px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                         {{- end}}
-                                                            <td>
-                                                                <input type="text" placeholder="200, 302, 404, 500, etc" title="Enter allowed HTTP return codes. Separate with commas." id="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks" class="client-parameter serviceHTTPParam" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="width: 100%;{{if ne $svc.Type "http"}}display:none;{{end}}">
-                                                                <input disabled type="text" data-index="{{$index}}" data-app="checks" placeholder="unused" class="serviceTCPParam" style="width: 100%;{{if ne $svc.Type "tcp"}}display:none;{{end}}">
-                                                                <input type="checkbox" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Restart" title="Check this box to send alerts when a matched process restarts." data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamRestart" style="{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "restart"}} checked{{end}}{{if contains $svc.Expect "running"}} disabled{{end}}>
-                                                                <input type="checkbox" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Running" title="Check this box to send alerts when a matched process is found running. Uncommon, and not usable with other options." data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamRunning" style="{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} checked{{end}}>
-                                                                <input type="number" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Min" title="Minimum number of processes allowed to run." placeholder="Min" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMin" value="{{min $svc.Expect}}" style="width:35%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
-                                                                <input type="number" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Max" title="Maximum number of processes allowed to run." placeholder="Max" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}" style="width:35%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
-                                                            </td>
-                                                        </tr></table>
+                                                        <span style="width:{{if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index))}}calc(100% - 20px){{else}}100%{{end}};">
+                                                            <input type="text" placeholder="200, 302, 404, 500, etc" title="Enter allowed HTTP return codes. Separate with commas." id="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks" class="client-parameter serviceHTTPParam" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="width:{{if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index))}}calc(100% - 20px){{else}}100%{{end}};{{if ne $svc.Type "http"}}display:none;{{end}}">
+                                                            <input disabled type="text" data-index="{{$index}}" data-app="checks" placeholder="unused" class="serviceTCPParam" style="width:{{if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index))}}calc(100% - 20px){{else}}100%{{end}};{{if ne $svc.Type "tcp"}}display:none;{{end}}">
+                                                            <input type="checkbox" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Restart" title="Check this box to send alerts when a matched process restarts." data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamRestart" style="{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "restart"}} checked{{end}}{{if contains $svc.Expect "running"}} disabled{{end}}>
+                                                            <input type="checkbox" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Running" title="Check this box to send alerts when a matched process is found running. Uncommon, and not usable with other options." data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamRunning" style="{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} checked{{end}}>
+                                                            <input type="number" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Min" title="Minimum number of processes allowed to run." placeholder="Min" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMin" value="{{min $svc.Expect}}" style="width:calc(49% - 27px);{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
+                                                            <input type="number" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Max" title="Maximum number of processes allowed to run." placeholder="Max" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}" style="width:calc(49% - 27px);{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
+                                                        </span>
                                                     </td>
                                                     <td>
-                                                        <table style="width:100%;"><tr>
                                                         {{- if locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                            <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                         {{- end}}
-                                                            <td><input type="text" id="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}" style="width: 100%;"></td>
-                                                        </tr></table>
+                                                        <input type="text" id="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}" style="width:{{if (locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                     </td>
                                                     <td>
-                                                        <table style="width:100%;"><tr>
                                                         {{- if locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                            <td style="width:10px;"><i class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                         {{- end}}
-                                                            <td><input type="text" id="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}" style="width: 100%;"></td>
-                                                        </tr></table>
+                                                        <input type="text" id="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}" style="width:{{if (locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
                                                     </td>
                                                 </tr>
                                             {{- end}}

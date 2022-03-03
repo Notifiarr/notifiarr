@@ -13,7 +13,7 @@ $.fn.dataTableExt.ofnSearch['span-input'] = function(value) {
 };
 
 serviceTable = $('.servicetable').DataTable({
-    "autoWidth": true,
+    "autoWidth": false,
     "scrollX": true,
     'scrollCollapse': true,
     "sort": false,
@@ -33,7 +33,16 @@ serviceTable = $('.servicetable').DataTable({
     "fnDrawCallback":function() {
         // fix the header column on window resize.
         this.api().columns.adjust();
-    }
+    },
+    "columns": [
+        { "width": "30px" },
+        null,
+        null,
+        null,
+        null,
+        { "width": "90px" },
+        { "width": "70px" }
+    ]
 });
 
 // showProcessList displays/shows a hidden page(div) and fills it with the current process list.
@@ -44,7 +53,7 @@ function showProcessList()
     $('#process-list-content').html('<h4><i class="fas fa-cog fa-spin"></i> Loading process list...</h4>');
 
     $.ajax({
-        url: 'ps',
+        url: URLBase+'ps',
         success: function (data){
             const lineCount = data.split(/\n/).length-1; // do not count last newline.
             $('#process-list-msg').html("Displaying "+lineCount+" running processes. Updated: "+ new Date().toLocaleTimeString());
@@ -66,7 +75,7 @@ function showProcessList()
 // servicesAction can be used to toggle service checks or initiate service checks.
 function servicesAction(action, refresh, refreshDelay = 0) {
     $.ajax({
-        url: 'services/'+action,
+        url: URLBase+'services/'+action,
         success: function (data){
             setTimeout(function() {
                 refreshPage(refresh, false);
@@ -92,7 +101,7 @@ function addServiceCheck()
     const index = serviceTable.rows().count();
     const instance = index+1;
     const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
-        '<td class="text-center" style="font-size: 22px;white-space: nowrap;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'</span>'+
+        '<td class="text-center" style="font-size: 22px;white-space: nowrap;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'&nbsp;</span>'+
           '<span class="services-Checks-deletebutton">'+
             '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
           '</span>'+
@@ -111,8 +120,8 @@ function addServiceCheck()
             '<input disabled type="text" data-index="'+ index +'" data-app="checks" placeholder="unused" class="client-parameter serviceTCPParam" data-group="services" data-original="" style="width: 100%;display:none;">'+
             '<input type="checkbox" onChange="checkExpectChange($(this));" title="Check this box to send alerts when a matched process restarts." data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamRestart" style="margin-right:4px;">'+
             '<input type="checkbox" onChange="checkExpectChange($(this));" title="Check this box to send alerts when a matched process is found running. Uncommon, and not usable with other options." data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamRunning" style="margin-right:4px;">'+
-            '<input type="number" onChange="checkExpectChange($(this));" title="Minimum number of proesses allowed to run." placeholder="Min" data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamMin" value="0" style="margin-right:3px;width:35%;">'+
-            '<input type="number" onChange="checkExpectChange($(this));" title="Maximm number of process allowed to run." placeholder="Max" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMax" value="0" style="width:35%;">'+
+            '<input type="number" onChange="checkExpectChange($(this));" title="Minimum number of proesses allowed to run." placeholder="Min" data-index="'+ index +'" data-app="checks" class="serviceProcessParam serviceProcessParamMin" value="0" style="margin-right:3px;width:calc(49% - 27px);">'+
+            '<input type="number" onChange="checkExpectChange($(this));" title="Maximm number of process allowed to run." placeholder="Max" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMax" value="0" style="width:calc(49% - 27px);">'+
         '</td>'+
         '<td><input type="text" id="Service.'+ index +'.Interval" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Interval" data-original="5m" value="5m" style="width: 100%;"></td>'+
         '<td><input type="text" id="Service.'+ index +'.Timeout" data-app="checks" data-index="'+ index +'" class="client-parameter" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m" style="width: 100%;"></td>'+

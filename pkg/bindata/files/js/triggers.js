@@ -4,7 +4,7 @@ function triggerAction(action)
 {
     $.ajax({
         type: 'GET',
-        url: 'trigger/'+action,
+        url: URLBase+'trigger/'+action,
         success: function (data){
             toast('Trigger Sent', data, 'success');
         },

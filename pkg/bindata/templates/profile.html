@@ -1,6 +1,6 @@
                                 <h1><i class="fa fa-user"></i> User Profile</h1>
-                            {{- if .Webauth }}
-                                <p>Profile editing is disabled when webauth is enabled.</p>
+                            {{- if .Dynamic }}
+                                <p>Profile editing is disabled for dynamic users.</p>
                             {{- else }}
                                 <p>You must enter your current password to save changes.</p>
                                 <table class="table bk-dark table-bordered">
@@ -16,24 +16,23 @@
                                             <td>Username</td>
                                             <td id="current-username">{{.Username}}</td>
                                             <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
-                                                {{- end}}   <!-- the below element is in its own form to avoid browser auto complete -->
-                                                    <td><form><input type="text" id="NewUsername" value="{{.Username}}" class="profile-parameter" style="width: 100%;"></form></td>
-                                                </tr></table>
+                                                <form>
+                                                {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
+                                                    <i class="help-icon fas fa-lock" style="width:10px;" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                {{- end}}
+                                                    <input type="text" id="NewUsername" value="{{.Username}}" class="profile-parameter" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                </form><!-- in its own form to avoid browser auto complete -->
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Password</td>
                                             <td><input placeholder="enter current password" type="password" id="Password" class="profile-parameter" style="width: 100%;"></td>
                                             <td>
-                                                <table width="100%"><tr>
-                                                {{- if locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix)}}
-                                                    <td style="width:10px;"><i class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></td>
+                                                {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
+                                                <i class="help-icon fas fa-lock" style="width:10px;" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                 {{- end}}
-                                                    <td><input placeholder="must be least 16+ chars" type="password" autocomplete="new-password" id="NewPassword" class="profile-parameter" style="width: 100%;"></td>
-                                                </tr></table>
+                                                <input placeholder="must be least 16+ chars" type="password" autocomplete="new-password" id="NewPassword" class="profile-parameter" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                <i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>
                                             </td>
                                         </tr>
                                     </tbody>

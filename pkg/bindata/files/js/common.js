@@ -155,7 +155,7 @@ function jsLoader()
     const files     = ['navigation', 'golists', 'fileViewer', 'services', 'triggers', 'websocket'];
 
     for (const file of files) {
-        path        = 'files/js/' + file + '.js';
+        path        = URLBase+'files/js/' + file + '.js';
         script      = document.createElement('script');
         script.src  = path;
         document.head.appendChild(script);
@@ -297,7 +297,7 @@ function savePendingChanges()
 
     $.ajax({
         type: 'POST',
-        url: 'reconfig',
+        url: URLBase+'reconfig',
         data: fields,
         success: function (data){
             $('.pending-change-container').remove();          // remove save button.
@@ -328,7 +328,7 @@ function saveProfileChanges()
 
     $.ajax({
         type: 'POST',
-        url: 'profile',
+        url: URLBase+'profile',
         data: fields,
         success: function (data){
             $('#current-username').html($('#NewUsername').val()); // update the html username.
@@ -370,5 +370,14 @@ function toast(title, message, type, duration=5000)
 function titleCaseWord(word)
 {
     return word.charAt(0).toUpperCase() + word.slice(1);
+}
+// -------------------------------------------------------------------------------------------
+// click the eye to make the password appear.
+function togglePassword(eye)
+{
+    const input = eye.parent().find('input');
+    const curr = $(input).attr('type')
+    $(input).attr('type', curr == 'text' ? 'password' : 'text');
+    eye.toggleClass('fa-eye').toggleClass('fa-eye-slash');
 }
 // -------------------------------------------------------------------------------------------

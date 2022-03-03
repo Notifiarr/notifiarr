@@ -13,7 +13,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
@@ -21,62 +20,56 @@ import (
 // httpHandlers initializes GUI HTTP routes.
 func (c *Client) httpHandlers() {
 	c.httpAPIHandlers() // Init API handlers up front.
+	// 404 (or redirect to base path) everything else
+	defer func() {
+		c.Config.Router.PathPrefix("/").HandlerFunc(c.notFound)
+	}()
 
 	base := path.Join("/", c.Config.URLBase)
 
-	c.Config.Router.Handle("/favicon.ico", http.HandlerFunc(c.favIcon))
-	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", handlers.MethodHandler{
-		"GET":  http.HandlerFunc(c.slash),
-		"POST": http.HandlerFunc(c.loginHandler),
-	})
+	c.Config.Router.HandleFunc("/favicon.ico", c.favIcon)
+	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.slash).Methods("GET")
+	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.loginHandler).Methods("POST")
 
 	if !strings.EqualFold(base, "/") {
 		// Handle the same URLs as above on the different base URL too.
-		c.Config.Router.Handle(path.Join(base, "favicon.ico"), http.HandlerFunc(c.favIcon))
-		c.Config.Router.Handle(base, handlers.MethodHandler{
-			"GET":  http.HandlerFunc(c.slash),
-			"POST": http.HandlerFunc(c.loginHandler),
-		})
+		c.Config.Router.HandleFunc(path.Join(base, "favicon.ico"), c.favIcon)
+		c.Config.Router.HandleFunc(base, c.slash).Methods("GET")
+		c.Config.Router.HandleFunc(base, c.loginHandler).Methods("POST")
 	}
 
-	//nolint:lll
-	if c.Config.UIPassword != "" {
-		c.Config.Router.PathPrefix(path.Join(base, "/files/")).
-			Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), handlers.MethodHandler{"GET": http.HandlerFunc(c.handleStaticAssets)}))
-		c.Config.Router.Handle(path.Join(base, "/login"), handlers.MethodHandler{
-			"GET":  http.HandlerFunc(c.loginHandler),
-			"POST": http.HandlerFunc(c.loginHandler),
-		})
-		c.Config.Router.Handle(path.Join(base, "/logout"), handlers.MethodHandler{
-			"GET":  http.HandlerFunc(c.logoutHandler),
-			"POST": http.HandlerFunc(c.logoutHandler),
-		})
-		c.Config.Router.Handle(path.Join(base, "/profile"), handlers.MethodHandler{"POST": c.checkAuthorized(c.handleProfilePost)})
-		c.Config.Router.Handle(path.Join(base, "/trigger/{action}"), c.checkAuthorized(c.handleGUITrigger)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/trigger/{action}/{content}"), c.checkAuthorized(c.handleGUITrigger)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/ps"), c.checkAuthorized(c.handleProcessList)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/template/{template}"), c.checkAuthorized(c.getTemplatePageHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}/{skip}"), c.checkAuthorized(c.getFileHandler)).Methods("GET").Queries("sort", "{sort}")
-		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}"), c.checkAuthorized(c.getFileHandler)).Methods("GET").Queries("sort", "{sort}")
-		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}"), c.checkAuthorized(c.getFileHandler)).Methods("GET").Queries("sort", "{sort}")
-		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}/{skip}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}/{lines}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/getFile/{source}/{id}"), c.checkAuthorized(c.getFileHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/downloadFile/{source}/{id}"), c.checkAuthorized(c.getFileDownloadHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/deleteFile/{source}/{id}"), c.checkAuthorized(c.getFileDeleteHandler)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/services/{action:stop|start}"), c.checkAuthorized(c.handleServicesStopStart)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/services/check/{service}"), c.checkAuthorized(c.handleServicesCheck)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/shutdown"), c.checkAuthorized(c.handleShutdown)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/reload"), c.checkAuthorized(c.handleReload)).Methods("GET")
-		c.Config.Router.Handle(path.Join(base, "/reconfig"), c.checkAuthorized(c.handleConfigPost)).Methods("POST")
-		c.Config.Router.Handle(path.Join(base, "/debug/vars"), c.checkAuthorized(expvar.Handler().ServeHTTP)).Methods("GET")
-		c.Config.Router.Handle(path.Join(c.Config.URLBase, "/ws"),
-			handlers.MethodHandler{"GET": c.checkAuthorized(c.handleWebSockets)}).
-			Queries("source", "{source}", "fileId", "{fileId}")
+	if c.Config.UIPassword == "" {
+		return
 	}
 
-	// 404 (or redirect to base path) everything else
-	c.Config.Router.PathPrefix("/").Handler(http.HandlerFunc(c.notFound))
+	c.Config.Router.PathPrefix(path.Join(base, "/files/")).
+		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
+	c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("GET", "POST")
+
+	// gui is used for authorized paths.
+	gui := c.Config.Router.PathPrefix(base).Subrouter()
+	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
+	gui.Handle("/debug/vars", expvar.Handler()).Methods("GET")
+	gui.HandleFunc("/deleteFile/{source}/{id}", c.getFileDeleteHandler).Methods("GET")
+	gui.HandleFunc("/downloadFile/{source}/{id}", c.getFileDownloadHandler).Methods("GET")
+	gui.HandleFunc("/getFile/{source}/{id}/{lines}/{skip}", c.getFileHandler).Methods("GET").Queries("sort", "{sort}")
+	gui.HandleFunc("/getFile/{source}/{id}/{lines}/{skip}", c.getFileHandler).Methods("GET")
+	gui.HandleFunc("/getFile/{source}/{id}/{lines}", c.getFileHandler).Methods("GET").Queries("sort", "{sort}")
+	gui.HandleFunc("/getFile/{source}/{id}/{lines}", c.getFileHandler).Methods("GET")
+	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET").Queries("sort", "{sort}")
+	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET")
+	gui.HandleFunc("/profile", c.handleProfilePost).Methods("POST")
+	gui.HandleFunc("/ps", c.handleProcessList).Methods("GET")
+	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
+	gui.HandleFunc("/reload", c.handleReload).Methods("GET")
+	gui.HandleFunc("/services/check/{service}", c.handleServicesCheck).Methods("GET")
+	gui.HandleFunc("/services/{action:stop|start}", c.handleServicesStopStart).Methods("GET")
+	gui.HandleFunc("/shutdown", c.handleShutdown).Methods("GET")
+	gui.HandleFunc("/template/{template}", c.getTemplatePageHandler).Methods("GET")
+	gui.HandleFunc("/trigger/{action}/{content}", c.handleGUITrigger).Methods("GET")
+	gui.HandleFunc("/trigger/{action}", c.handleGUITrigger).Methods("GET")
+	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
+	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }
 
 // httpAPIHandlers initializes API routes.
@@ -93,15 +86,13 @@ func (c *Client) httpAPIHandlers() {
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:[0-9a-z-]+}")
 
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
-		c.Config.Router.Handle("/plex",
-			http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
-		c.Config.Router.Handle("/",
-			http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
+		c.Config.Router.HandleFunc("/plex", c.website.PlexHandler).Methods("POST").Queries("token", tokens)
+		c.Config.Router.HandleFunc("/", c.website.PlexHandler).Methods("POST").Queries("token", tokens)
 
 		if c.Config.URLBase != "/" {
 			// Allow plex to use the base url too.
-			c.Config.Router.Handle(path.Join(c.Config.URLBase, "plex"),
-				http.HandlerFunc(c.website.PlexHandler)).Methods("POST").Queries("token", tokens)
+			c.Config.Router.HandleFunc(path.Join(c.Config.URLBase, "plex"), c.website.PlexHandler).
+				Methods("POST").Queries("token", tokens)
 		}
 	}
 }

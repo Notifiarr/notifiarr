@@ -22,13 +22,14 @@
                                                     API Key
                                                 </td>
                                                 <td>
-                                                    {{.Config.APIKey}}
+                                                    &lt;redacted&gt; {{/* .Config.APIKey */}}
                                                     {{- if locked (printf "%s_API_KEY" .Flags.EnvPrefix)}}
                                                     <i style="float:right; font-size:20px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                     {{- end}}
                                                 </td>
                                                 <td>
-                                                    <input class="client-parameter" data-group="config" data-label="API Key" type="text" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}" style="width:100%;">
+                                                    <input class="client-parameter" data-group="config" data-label="API Key" type="password" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}" style="width:99%;">
+                                                    <i class="fas fa-eye-slash password-input" onClick="togglePassword('#APIKey', $(this));"></i>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -119,7 +120,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <i title="If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or X-Forwarded-For). Separate with spaces or new lines." class="help-icon far fa-question-circle"></i>
+                                                    <i title="If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or x-forwarded-for). It also allows x-webauth-user headers for proxy authentication. Separate with spaces or new lines." class="help-icon far fa-question-circle"></i>
                                                     Upstreams
                                                 </td>
                                                 <td>
