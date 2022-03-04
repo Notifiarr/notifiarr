@@ -26,28 +26,44 @@
                                         {{- if .Config.Plex}}
                                             <tr>
                                                 <td>
-                                                    <input disabled type="text" id="Plex.Name" name="Plex.Name" class="client-parameter" data-group="media" data-label="Plex Name" data-original="{{.Config.Plex.Name}}" value="{{.Config.Plex.Name}}" style="width: 100%;">
+                                                    <input readonly type="text" id="Plex.Name" name="Plex.Name" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Name" data-original="{{.Config.Plex.Name}}" value="{{.Config.Plex.Name}}" style="width: 100%;">
                                                 </td>
                                                 <td>
-                                                    {{- if locked (printf "%s_PLEX_URL" .Flags.EnvPrefix)}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="text" id="Plex.URL" name="Plex.URL" class="client-parameter" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}" style="width:{{if locked (printf "%s_PLEX_URL" .Flags.EnvPrefix)}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_PLEX_URL" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="text" id="Plex.URL" name="Plex.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                                 <td colspan="2">
-                                                  <form>
-                                                    {{- if (locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix))}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="password" id="Plex.Token" name="Plex.Token" class="client-parameter" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}" style="width:{{if (locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
-                                                    <i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>
-                                                  </form>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix)}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="password" id="Plex.Token" name="Plex.Token" data-app="Plex" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Plex.Token', $(this).find('i'));"><i class="fas fa-low-vision password-input"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                                 <td>
-                                                    {{- if locked (printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix)}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="text" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}" value="{{.Config.Plex.Timeout}}" style="width:{{if locked (printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix)}}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="text" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}" value="{{.Config.Plex.Timeout}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         {{- else}}
@@ -71,37 +87,65 @@
                                         {{- if .Config.Apps.Tautulli}}
                                             <tr>
                                                 <td>
-                                                    {{- if locked (printf "%s_TAUTULLI_NAME" .Flags.EnvPrefix)}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="text" id="Apps.Tautulli.Name" name="Apps.Tautulli.Name" class="client-parameter" data-group="media" data-label="Tautulli Name" data-original="{{.Config.Apps.Tautulli.Name}}" value="{{.Config.Apps.Tautulli.Name}}" style="width:{{if locked (printf "%s_TAUTULLI_NAME" .Flags.EnvPrefix)}}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if locked (printf "%s_TAUTULLI_NAME" .Flags.EnvPrefix)}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Tautulli.Name" name="Apps.Tautulli.Name" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Name" data-original="{{.Config.Apps.Tautulli.Name}}" value="{{.Config.Apps.Tautulli.Name}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                                 <td>
-                                                    {{- if locked (printf "%s_TAUTULLI_URL" .Flags.EnvPrefix)}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="text" id="Apps.Tautulli.URL" name="Apps.Tautulli.URL" class="client-parameter" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}" style="width:{{if locked (printf "%s_TAUTULLI_URL" .Flags.EnvPrefix)}}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if locked (printf "%s_TAUTULLI_URL" .Flags.EnvPrefix)}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Tautulli.URL" name="Apps.Tautulli.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                                 <td>
-                                                  <form>
-                                                    {{- if locked (printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix)}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="password" id="Apps.Tautulli.APIKey" name="Apps.Tautulli.APIKey" class="client-parameter" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}" style="width:{{if locked (printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix)}}}calc(100% - 15px){{else}}100%{{end}};">
-                                                    <i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>
-                                                  </form>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if locked (printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix)}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="password" id="Apps.Tautulli.APIKey" name="Apps.Tautulli.APIKey" data-app="Tautulli" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Tautulli.APIKey', $(this).find('i'));"><i class="fas fa-low-vision password-input"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                                 <td>
-                                                    {{- if locked (printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix)}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="text" id="Apps.Tautulli.Interval" name="Apps.Tautulli.Interval" class="client-parameter" data-group="media" data-label="Tautulli Interval" data-original="{{.Config.Apps.Tautulli.Interval}}" value="{{.Config.Apps.Tautulli.Interval}}" style="width:{{if locked (printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix)}}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if locked (printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix)}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Tautulli.Interval" name="Apps.Tautulli.Interval" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Interval" data-original="{{.Config.Apps.Tautulli.Interval}}" value="{{.Config.Apps.Tautulli.Interval}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                                 <td>
-                                                    {{- if locked (printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix)}}
-                                                    <i style="width:10px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                    {{- end}}
-                                                    <input type="text" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}" value="{{.Config.Apps.Tautulli.Timeout}}" style="width:{{if locked (printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix)}}}calc(100% - 15px){{else}}100%{{end}};">
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if locked (printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix)}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}" value="{{.Config.Apps.Tautulli.Timeout}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         {{- else}}

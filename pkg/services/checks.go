@@ -139,11 +139,13 @@ func (s *Service) checkHTTP() *result {
 		return res
 	}
 
-	if strconv.Itoa(resp.StatusCode) == s.Expect {
-		res.state = StateOK
-		res.output = resp.Status
+	for _, code := range strings.Split(s.Expect, ",") {
+		if strconv.Itoa(resp.StatusCode) == strings.TrimSpace(code) {
+			res.state = StateOK
+			res.output = resp.Status
 
-		return res
+			return res
+		}
 	}
 
 	bodyStr := string(body)

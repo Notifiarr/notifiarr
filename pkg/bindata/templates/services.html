@@ -46,82 +46,176 @@
                                                 </td>
                                             </tr>
                                         </table>
-                                        </div>
-                                        <div class="table-responsive">
-
-                                        <table class="table table-bordered bk-dark servicetable" style="width:100%">
-                                            <thead>
-                                                <tr>
-                                                    <th style="min-width:30px;width:30px;">#</th>
-                                                    <th style="min-width:120px;">Name</th>
-                                                    <th style="min-width:115px;">Type</th>
-                                                    <th style="min-width:170px;">Check Value</th>
-                                                    <th style="min-width:150px;">Expect</th>
-                                                    <th style="min-width:90px;width:90px;">Interval <i class="help-icon far fa-question-circle" title="This interval value controls how often the service is checked."></i></th>
-                                                    <th style="min-width:70px;width:70px">Timeout</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="services-Checks-container">
-                                            {{- range $index, $svc := .Config.Service}}
-                                                <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
-                                                <tr class="services-Checks" id="services-Checks-{{$index}}">
-                                                    <td class="text-center" style="font-size: 22px;white-space: nowrap;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
-                                                        <span class="services-Checks-deletebutton">
-                                                            <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        {{- if locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                        {{- end}}
-                                                        <input type="text" id="Service.{{$index}}.Name" name="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}" style="width:{{if (locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
-                                                    </td>
-                                                    <td>
-                                                        {{- if locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index) }}
-                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                        {{- end}}
-                                                        <select id="Service.{{$index}}.Type" name="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}" style="width:{{if (locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
-                                                            <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
-                                                            <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
-                                                            <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        {{- if locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index) }}
-                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                        {{- end}}
-                                                        <input type="text" id="Service.{{$index}}.Value" name="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}" style="width:{{if (locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
-                                                    </td>
-                                                    <td>
-                                                        {{- if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index)) }}
-                                                        <i style="width:15px;" class="help-icon fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                        {{- end}}
-                                                        <span style="width:{{if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index))}}calc(100% - 20px){{else}}100%{{end}};">
-                                                            <input type="text" placeholder="200, 302, 404, 500, etc" title="Enter allowed HTTP return codes. Separate with commas." id="Service.{{$index}}.Expect" name="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks" class="client-parameter serviceHTTPParam" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="width:{{if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index))}}calc(100% - 20px){{else}}100%{{end}};{{if ne $svc.Type "http"}}display:none;{{end}}">
-                                                            <input disabled type="text" data-index="{{$index}}" data-app="checks" placeholder="unused" class="serviceTCPParam" style="width:{{if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index))}}calc(100% - 20px){{else}}100%{{end}};{{if ne $svc.Type "tcp"}}display:none;{{end}}">
-                                                            <input type="checkbox" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Restart" title="Check this box to send alerts when a matched process restarts." data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamRestart" style="{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "restart"}} checked{{end}}{{if contains $svc.Expect "running"}} disabled{{end}}>
-                                                            <input type="checkbox" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Running" title="Check this box to send alerts when a matched process is found running. Uncommon, and not usable with other options." data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamRunning" style="{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} checked{{end}}>
-                                                            <input type="number" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Min" title="Minimum number of processes allowed to run." placeholder="Min" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMin" value="{{min $svc.Expect}}" style="width:calc(49% - 27px);{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
-                                                            <input type="number" onChange="checkExpectChange($(this));" id="Service.{{$index}}.Expect.Max" title="Maximum number of processes allowed to run." placeholder="Max" data-index="{{$index}}" data-app="checks" class="serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}" style="width:calc(49% - 27px);{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        {{- if locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                        {{- end}}
-                                                        <input type="text" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}" style="width:{{if (locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
-                                                    </td>
-                                                    <td>
-                                                        {{- if locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                        <i style="width:10px;" class="help-icon far fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
-                                                        {{- end}}
-                                                        <input type="text" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}" style="width:{{if (locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}calc(100% - 15px){{else}}100%{{end}};">
-                                                    </td>
-                                                </tr>
-                                            {{- end}}
-                                            </tbody>
-                                        </table>
                                     </div>
+                                    <form class="form-inline">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered bk-dark servicetable" style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="min-width:30px;width:30px;">#</th>
+                                                        <th style="min-width:120px;">Name</th>
+                                                        <th style="min-width:108px;">Type</th>
+                                                        <th style="min-width:170px;">Check Value</th>
+                                                        <th style="min-width:210px;">Expect</th>
+                                                        <th style="min-width:90px;width:90px;">Interval <i class="help-icon far fa-question-circle" title="This interval value controls how often the service is checked."></i></th>
+                                                        <th style="min-width:70px;width:70px">Timeout</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="services-Checks-container">
+                                                {{- range $index, $svc := .Config.Service}}
+                                                    <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
+                                                    <tr class="services-Checks" id="services-Checks-{{$index}}">
+                                                        <td class="text-center" style="font-size: 22px;white-space: nowrap;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
+                                                            <span class="services-Checks-deletebutton">
+                                                                <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-group" style="width:100%">
+                                                                <div class="input-group" style="width:100%">
+                                                                    <input type="text" id="Service.{{$index}}.Name" name="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}">
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    {{- end}}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-group" style="width:100%">
+                                                                <div class="input-group" style="width:100%">
+                                                                    <select id="Service.{{$index}}.Type" name="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}">
+                                                                        <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
+                                                                        <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
+                                                                        <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
+                                                                    </select>
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    {{- end}}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-group" style="width:100%">
+                                                                <div class="input-group" style="width:100%">
+                                                                    <input type="text" id="Service.{{$index}}.Value" name="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}">
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    {{- end}}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-group" style="width:100%">
+                                                                <div class="input-group" style="width:100%">
+                                                                    <input id="Service.{{$index}}.Expect" name="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm serviceProcessParamExpect" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="display:none;">
+                                                                    <select id="Service.{{$index}}.Expect.StatusCode" onChange="checkExpectChange($(this));" data-index="{{$index}}" data-app="checks" style="{{if ne $svc.Type "http"}}display:none;{{end}}" class="form-control input-sm serviceHTTPParam">
+                                                                        <option value="100"{{if and (eq $svc.Type "http") (contains $svc.Expect "100")}} selected{{end}}>100: Continue</option>
+                                                                        <option value="101"{{if and (eq $svc.Type "http") (contains $svc.Expect "101")}} selected{{end}}>101: SwitchingProtocols</option>
+                                                                        <option value="102"{{if and (eq $svc.Type "http") (contains $svc.Expect "102")}} selected{{end}}>102: Processing</option>
+                                                                        <option value="103"{{if and (eq $svc.Type "http") (contains $svc.Expect "103")}} selected{{end}}>103: EarlyHints</option>
+                                                                        <option value="200"{{if or (ne $svc.Type "http") (contains $svc.Expect "200")}} selected{{end}}>200: OK</option>
+                                                                        <option value="201"{{if and (eq $svc.Type "http") (contains $svc.Expect "201")}} selected{{end}}>201: Created</option>
+                                                                        <option value="202"{{if and (eq $svc.Type "http") (contains $svc.Expect "202")}} selected{{end}}>202: Accepted</option>
+                                                                        <option value="203"{{if and (eq $svc.Type "http") (contains $svc.Expect "203")}} selected{{end}}>203: NonAuthoritativeInfo</option>
+                                                                        <option value="204"{{if and (eq $svc.Type "http") (contains $svc.Expect "204")}} selected{{end}}>204: NoContent</option>
+                                                                        <option value="205"{{if and (eq $svc.Type "http") (contains $svc.Expect "205")}} selected{{end}}>205: ResetContent</option>
+                                                                        <option value="206"{{if and (eq $svc.Type "http") (contains $svc.Expect "206")}} selected{{end}}>206: PartialContent</option>
+                                                                        <option value="207"{{if and (eq $svc.Type "http") (contains $svc.Expect "207")}} selected{{end}}>207: MultiStatus</option>
+                                                                        <option value="208"{{if and (eq $svc.Type "http") (contains $svc.Expect "208")}} selected{{end}}>208: AlreadyReported</option>
+                                                                        <option value="226"{{if and (eq $svc.Type "http") (contains $svc.Expect "226")}} selected{{end}}>226: IMUsed</option>
+                                                                        <option value="300"{{if and (eq $svc.Type "http") (contains $svc.Expect "300")}} selected{{end}}>300: MultipleChoices</option>
+                                                                        <option value="301"{{if and (eq $svc.Type "http") (contains $svc.Expect "301")}} selected{{end}}>301: MovedPermanently</option>
+                                                                        <option value="302"{{if and (eq $svc.Type "http") (contains $svc.Expect "302")}} selected{{end}}>302: Found</option>
+                                                                        <option value="303"{{if and (eq $svc.Type "http") (contains $svc.Expect "303")}} selected{{end}}>303: SeeOther</option>
+                                                                        <option value="304"{{if and (eq $svc.Type "http") (contains $svc.Expect "304")}} selected{{end}}>304: NotModified</option>
+                                                                        <option value="305"{{if and (eq $svc.Type "http") (contains $svc.Expect "305")}} selected{{end}}>305: UseProxy</option>
+                                                                        <option value="307"{{if and (eq $svc.Type "http") (contains $svc.Expect "307")}} selected{{end}}>307: TemporaryRedirect</option>
+                                                                        <option value="308"{{if and (eq $svc.Type "http") (contains $svc.Expect "308")}} selected{{end}}>308: PermanentRedirect</option>
+                                                                        <option value="400"{{if and (eq $svc.Type "http") (contains $svc.Expect "400")}} selected{{end}}>400: BadRequest</option>
+                                                                        <option value="401"{{if and (eq $svc.Type "http") (contains $svc.Expect "401")}} selected{{end}}>401: Unauthorized</option>
+                                                                        <option value="402"{{if and (eq $svc.Type "http") (contains $svc.Expect "402")}} selected{{end}}>402: PaymentRequired</option>
+                                                                        <option value="403"{{if and (eq $svc.Type "http") (contains $svc.Expect "403")}} selected{{end}}>403: Forbidden</option>
+                                                                        <option value="404"{{if and (eq $svc.Type "http") (contains $svc.Expect "404")}} selected{{end}}>404: NotFound</option>
+                                                                        <option value="405"{{if and (eq $svc.Type "http") (contains $svc.Expect "405")}} selected{{end}}>405: MethodNotAllowed</option>
+                                                                        <option value="406"{{if and (eq $svc.Type "http") (contains $svc.Expect "406")}} selected{{end}}>406: NotAcceptable</option>
+                                                                        <option value="407"{{if and (eq $svc.Type "http") (contains $svc.Expect "407")}} selected{{end}}>407: ProxyAuthRequired</option>
+                                                                        <option value="408"{{if and (eq $svc.Type "http") (contains $svc.Expect "408")}} selected{{end}}>408: RequestTimeout</option>
+                                                                        <option value="409"{{if and (eq $svc.Type "http") (contains $svc.Expect "409")}} selected{{end}}>409: Conflict</option>
+                                                                        <option value="410"{{if and (eq $svc.Type "http") (contains $svc.Expect "410")}} selected{{end}}>410: Gone</option>
+                                                                        <option value="411"{{if and (eq $svc.Type "http") (contains $svc.Expect "411")}} selected{{end}}>411: LengthRequired</option>
+                                                                        <option value="412"{{if and (eq $svc.Type "http") (contains $svc.Expect "412")}} selected{{end}}>412: PreconditionFailed</option>
+                                                                        <option value="413"{{if and (eq $svc.Type "http") (contains $svc.Expect "413")}} selected{{end}}>413: RequestEntityTooLarge</option>
+                                                                        <option value="414"{{if and (eq $svc.Type "http") (contains $svc.Expect "414")}} selected{{end}}>414: RequestURITooLong</option>
+                                                                        <option value="415"{{if and (eq $svc.Type "http") (contains $svc.Expect "415")}} selected{{end}}>415: UnsupportedMediaType</option>
+                                                                        <option value="416"{{if and (eq $svc.Type "http") (contains $svc.Expect "415")}} selected{{end}}>416: RequestedRangeNotSatisfiable</option>
+                                                                        <option value="417"{{if and (eq $svc.Type "http") (contains $svc.Expect "417")}} selected{{end}}>417: ExpectationFailed</option>
+                                                                        <option value="418"{{if and (eq $svc.Type "http") (contains $svc.Expect "418")}} selected{{end}}>418: Teapot</option>
+                                                                        <option value="421"{{if and (eq $svc.Type "http") (contains $svc.Expect "421")}} selected{{end}}>421: MisdirectedRequest</option>
+                                                                        <option value="422"{{if and (eq $svc.Type "http") (contains $svc.Expect "422")}} selected{{end}}>422: UnprocessableEntity</option>
+                                                                        <option value="423"{{if and (eq $svc.Type "http") (contains $svc.Expect "423")}} selected{{end}}>423: Locked</option>
+                                                                        <option value="424"{{if and (eq $svc.Type "http") (contains $svc.Expect "424")}} selected{{end}}>424: FailedDependency</option>
+                                                                        <option value="425"{{if and (eq $svc.Type "http") (contains $svc.Expect "425")}} selected{{end}}>425: TooEarly</option>
+                                                                        <option value="426"{{if and (eq $svc.Type "http") (contains $svc.Expect "426")}} selected{{end}}>426: UpgradeRequired</option>
+                                                                        <option value="428"{{if and (eq $svc.Type "http") (contains $svc.Expect "428")}} selected{{end}}>428: PreconditionRequired</option>
+                                                                        <option value="429"{{if and (eq $svc.Type "http") (contains $svc.Expect "429")}} selected{{end}}>429: TooManyRequests</option>
+                                                                        <option value="431"{{if and (eq $svc.Type "http") (contains $svc.Expect "431")}} selected{{end}}>431: RequestHeaderFieldsTooLarge</option>
+                                                                        <option value="451"{{if and (eq $svc.Type "http") (contains $svc.Expect "451")}} selected{{end}}>451: UnavailableForLegalReasons</option>
+                                                                        <option value="500"{{if and (eq $svc.Type "http") (contains $svc.Expect "500")}} selected{{end}}>500: InternalServerError</option>
+                                                                        <option value="501"{{if and (eq $svc.Type "http") (contains $svc.Expect "501")}} selected{{end}}>501: NotImplemented</option>
+                                                                        <option value="502"{{if and (eq $svc.Type "http") (contains $svc.Expect "502")}} selected{{end}}>502: BadGateway</option>
+                                                                        <option value="503"{{if and (eq $svc.Type "http") (contains $svc.Expect "503")}} selected{{end}}>503: ServiceUnavailable</option>
+                                                                        <option value="504"{{if and (eq $svc.Type "http") (contains $svc.Expect "504")}} selected{{end}}>504: GatewayTimeout</option>
+                                                                        <option value="505"{{if and (eq $svc.Type "http") (contains $svc.Expect "505")}} selected{{end}}>505: HTTPVersionNotSupported</option>
+                                                                        <option value="506"{{if and (eq $svc.Type "http") (contains $svc.Expect "506")}} selected{{end}}>506: VariantAlsoNegotiates</option>
+                                                                        <option value="507"{{if and (eq $svc.Type "http") (contains $svc.Expect "507")}} selected{{end}}>507: InsufficientStorage</option>
+                                                                        <option value="508"{{if and (eq $svc.Type "http") (contains $svc.Expect "508")}} selected{{end}}>508: LoopDetected</option>
+                                                                        <option value="510"{{if and (eq $svc.Type "http") (contains $svc.Expect "510")}} selected{{end}}>510: NotExtended</option>
+                                                                        <option value="511"{{if and (eq $svc.Type "http") (contains $svc.Expect "511")}} selected{{end}}>511: NetworkAuthenticationRequired</option>
+                                                                    </select>
+                                                                    <select onChange="checkExpectChange($(this));" style="width:40%;{{if ne $svc.Type "process"}}display:none;{{end}}" class="form-control input-sm serviceProcessParam serviceProcessParamSelector">
+                                                                        <option value="">None</option>
+                                                                        <option value="restart" title="Select this to send alerts when a matched process restarts."{{if contains $svc.Expect "restart"}} selected{{end}}>
+                                                                            Restarts
+                                                                        </option>
+                                                                        <option value="running" title="Select this to send alerts when a matched process is found running. Uncommon, and not usable with other options."{{if contains $svc.Expect "running"}} selected{{end}}>
+                                                                            Running
+                                                                        </option>
+                                                                    </select>
+                                                                    <input type="number" min="0" onChange="checkExpectChange($(this));" title="Minimum number of processes allowed to run." class="form-control input-sm serviceProcessParam serviceProcessParamMin" value="{{min $svc.Expect}}" style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
+                                                                    <input type="number" min="0" onChange="checkExpectChange($(this));" title="Maximum number of processes allowed to run." class="form-control input-sm serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}" style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
+                                                                    <input disabled type="text" data-app="checks" value="unused" class="form-control input-sm serviceTCPParam" style="{{if ne $svc.Type "tcp"}}display:none;{{end}}">
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    {{- end}}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-group" style="width:100%">
+                                                                <div class="input-group" style="width:100%">
+                                                                    <input type="text" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}">
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    {{- end}}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td{{if (locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }} style="width:85px;min-width:85px;"{{end}}>
+                                                            <div class="form-group" style="width:100%">
+                                                                <div class="input-group" style="width:100%">
+                                                                    <input type="text" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}">
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    {{- end}}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                {{- end}}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </form>
                                 </div>
                                 <div class="col-lg-10 col-md-12 col-sm-12 mb">
                                     <h3>Notes</h3>

@@ -106,7 +106,7 @@ function addInstance(section, app)
             case "Pass":
             case "Password":
             case "APIKey":
-                extra = '<i class="fas fa-eye-slash password-input" onClick="togglePassword($(this));"></i>';
+                extra = '<div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword(\''+ prefix +'.'+ app +'.'+ index +'.'+ name + '\', $(this).find(\'i\'));"><i class="fas fa-low-vision password-input"></i></div>';
                 itype = "password";
                 break;
             case "Config.Interval":
@@ -127,10 +127,14 @@ function addInstance(section, app)
              break;
         }
 
-        row +=  '<td colspan="'+ colspan +'"><input type="'+ itype +'" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +
-        '" data-app="'+ app +'" data-index="'+ index +'" class="client-parameter" data-group="'+ section +'" data-label="'+ app +' '+
-         instance +' '+name+'" data-original="'+ nameori +'" value="'+ nameval +'" style="width: 100%;">'+ extra +'</td>';
-         colspan = 1;
+
+
+        row += '<td colspan="'+ colspan +'"><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
+        row += '<input type="'+ itype +'" name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name + 
+        '" data-app="'+ app +'" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="'+ section +'" data-label="'+ app +' '+
+         instance +' '+name+'" data-original="'+ nameori +'" value="'+ nameval +'">'+ extra;
+        row += '</div></div></form></td>';
+        colspan = 1;
     }
 
     // Add this new data row to our table.

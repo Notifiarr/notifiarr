@@ -374,11 +374,10 @@ function titleCaseWord(word)
 }
 // -------------------------------------------------------------------------------------------
 // click the eye to make the password appear.
-function togglePassword(eye)
+function togglePassword(input, eye)
 {
-    const input = eye.parent().find('input');
-    const curr = $(input).attr('type')
-    $(input).attr('type', curr == 'text' ? 'password' : 'text');
-    eye.toggleClass('fa-eye').toggleClass('fa-eye-slash');
+    const curr = $('[id="'+input+'"]').attr('type')
+    $('[id="'+input+'"]').attr('type', curr == 'text' ? 'password' : 'text');
+    eye.toggleClass('fa-eye').toggleClass('fa-low-vision');
 }
 // -------------------------------------------------------------------------------------------
