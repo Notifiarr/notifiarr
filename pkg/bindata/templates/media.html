@@ -47,8 +47,8 @@
                                                                 {{- if locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix)}}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" id="Plex.Token" name="Plex.Token" data-app="Plex" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}">
-                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Plex.Token', $(this).find('i'));"><i class="fas fa-low-vision password-input"></i></div>
+                                                                <input type="password" autocomplete="off" id="Plex.Token" name="search-Plex.Token" data-app="Plex" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Plex.Token', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -117,8 +117,8 @@
                                                                 {{- if locked (printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix)}}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" id="Apps.Tautulli.APIKey" name="Apps.Tautulli.APIKey" data-app="Tautulli" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}">
-                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Tautulli.APIKey', $(this).find('i'));"><i class="fas fa-low-vision password-input"></i></div>
+                                                                <input type="password" autocomplete="off" id="Apps.Tautulli.APIKey" name="search-Apps.Tautulli.APIKey" data-app="Tautulli" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Tautulli.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
                                                     </form>

@@ -88,8 +88,8 @@
                                                                 {{- if locked (printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" id="Snapshot.MySQL.{{$index}}.Pass" name="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
-                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Snapshot.MySQL.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision password-input"></i></div>
+                                                                <input type="password" autocomplete="off" id="Snapshot.MySQL.{{$index}}.Pass" name="search-Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Snapshot.MySQL.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
                                                     </form>

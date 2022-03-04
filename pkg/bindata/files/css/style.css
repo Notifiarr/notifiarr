@@ -864,7 +864,7 @@ div .file-content .line-number {
     overflow-x: hidden;
 }
 
-.password-input {
+.secret-input {
     font-size:13px;
     cursor:pointer;
     color:#000000;

@@ -28,8 +28,8 @@
                                                     <td>
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('APIKey', $(this).find('i'));"><i class="fas fa-low-vision password-input"></i></div>
-                                                                <input class="client-parameter form-control input-sm" data-group="config" data-label="API Key" type="password" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}" style="width:99%;">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                                <input class="client-parameter form-control input-sm" data-group="config" data-label="API Key" type="password" autocomplete="off" name="search-APIKey" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}">
                                                                 {{- if not (locked (printf "%s_API_KEY" .Flags.EnvPrefix))}}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
