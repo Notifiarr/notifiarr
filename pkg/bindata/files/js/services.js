@@ -118,7 +118,7 @@ function addServiceCheck()
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<select id="Service.'+ index +'.Type" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" onChange="checkTypeChange($(this));" data-group="services" data-label="Check '+ instance +' Type" value="http" data-original="">'+
+                '<select id="Service.'+ index +'.Type" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm serviceTypeSelect" onChange="checkTypeChange($(this));" data-group="services" data-label="Check '+ instance +' Type" value="http" data-original="">'+
                     '<option value="process">Process</option>'+
                     '<option value="http" selected>HTTP</option>'+
                     '<option value="tcp">TCP Port</option>'+
@@ -254,16 +254,18 @@ function checkTypeChange(from)
     ctl.find('.serviceTCPParam').hide();
 
     switch (from.val()) {
-    case "process":
-        checkExpectChange(ctl.find('.serviceProcessParam').show());
-        break;
-    case "http":
-        checkExpectChange(ctl.find('.serviceHTTPParam').show());
-        break;
-    case "tcp":
-        checkExpectChange(ctl.find('.serviceTCPParam').show());
-        break;
+        case "process":
+            checkExpectChange(ctl.find('.serviceProcessParam').show());
+            break;
+        case "http":
+            checkExpectChange(ctl.find('.serviceHTTPParam').show());
+            break;
+        case "tcp":
+            checkExpectChange(ctl.find('.serviceTCPParam').show());
+            break;
     }
+
+    toggleServiceTypeSelects();
 }
 
 // This fires when an expect value (for process type) is changed.
