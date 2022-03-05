@@ -435,6 +435,7 @@ func (c *Client) saveNewConfig(config *configfile.Config) error {
 var configPostDecoder = schema.NewDecoder() //nolint:gochecknoglobals
 
 func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *http.Request) error {
+	// This turns text fields into a []string (extra keys and upstreams use this).
 	configPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
 		return reflect.ValueOf(strings.Fields(input))
 	})

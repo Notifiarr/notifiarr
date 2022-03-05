@@ -111,14 +111,14 @@ function addServiceCheck()
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<input type="text" id="Service.'+ index +'.Name" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Name" data-original="" value="Service'+ instance +'">'+
+                '<input type="text" id="Service.'+ index +'.Name" name="Service.'+ index +'.Name" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Name" data-original="" value="Service'+ instance +'">'+
             '</div>'+
         '</div>'+
     '</td>'+
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<select id="Service.'+ index +'.Type" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm serviceTypeSelect" onChange="checkTypeChange($(this));" data-group="services" data-label="Check '+ instance +' Type" value="http" data-original="">'+
+                '<select id="Service.'+ index +'.Type" name="Service.'+ index +'.Type" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm serviceTypeSelect" onChange="checkTypeChange($(this));" data-group="services" data-label="Check '+ instance +' Type" value="http" data-original="">'+
                     '<option value="process">Process</option>'+
                     '<option value="http" selected>HTTP</option>'+
                     '<option value="tcp">TCP Port</option>'+
@@ -129,7 +129,7 @@ function addServiceCheck()
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<input type="text" id="Service.'+ index +'.Value" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Value" data-original="">'+
+                '<input type="text" id="Service.'+ index +'.Value" name="Service.'+ index +'.Value" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Value" data-original="">'+
             '</div>'+
         '</div>'+
     '</td>'+
@@ -137,7 +137,7 @@ function addServiceCheck()
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
                 '<input id="Service.'+ index +'.Expect" name="Service.'+ index +'.Expect" data-index="'+ index +'" data-app="checks" class="client-parameter serviceProcessParamExpect" data-group="services" data-label="Check '+ instance +' Expect" value="200" data-original="200" style="display:none;">'+
-                '<select id="Service.'+ index +'.Expect.StatusCode" onChange="checkExpectChange($(this));" value="200" data-index="'+ index +'" data-app="checks" class="form-control input-sm serviceHTTPParam">'+
+                '<select multiple id="Service.'+ index +'.Expect.StatusCode" name="Service.'+ index +'.Expect.StatusCode" onChange="checkExpectChange($(this));" value="200" data-index="'+ index +'" data-app="checks" class="form-control input-sm serviceHTTPParam">'+
                     '<option value="100">100: Continue</option>'+
                     '<option value="101">101: SwitchingProtocols</option>'+
                     '<option value="102">102: Processing</option>'+
@@ -219,23 +219,32 @@ function addServiceCheck()
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<input type="text" id="Service.'+ index +'.Interval" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Interval" data-original="5m" value="5m">'+
+                '<input type="text" id="Service.'+ index +'.Interval" name="Service.'+ index +'.Interval" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Interval" data-original="5m" value="5m">'+
             '</div>'+
         '</div>'+
     '</td>'+
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<input type="text" id="Service.'+ index +'.Timeout" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m">'+
+                '<input type="text" id="Service.'+ index +'.Timeout" name="Service.'+ index +'.Timeout" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m">'+
             '</div>'+
         '</div>'+
     '</td>'+
 '</tr>';
 
+    // Add the new row through servicetable.
     serviceTable.row.add($(row)).draw();
 
     // redo tooltips since some got added.
     setTooltips();
+
+    // setup the select2 selector for the http status codes.
+    $('[id="Service.'+ index +'.Expect.StatusCode"]').select2({
+        placeholder: 'HTTP Status Codes..',
+        templateSelection: function(state) {
+            return state.id ? state.id : state.text
+        },
+    });
 
     // hide the "no instances" item that displays if no instances are configured.
     $('#services-Checks-none').hide();
@@ -276,19 +285,18 @@ function checkExpectChange(from)
     const ctl = from.closest('.services-Checks'); // just this cell.
     const run = ctl.find('.serviceProcessParamSelector').val() == 'running';
 
-    if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.    
+    if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.
         ctl.find('.serviceProcessParamExpect').val(from.val().join());
-
     } else if (from.hasClass('serviceTCPParam')) { // it's a "tcp" check.
         ctl.find('.serviceProcessParamExpect').val('');
-    } else if (run) { // it's a "process" check.
+    } else if (run) { // it's a "process" check in "running" mode.
         // The "running" checkbox does not allow any other arguments, so deal with that here.
         // Copy "running" into real value that is POSTed.
         ctl.find('.serviceProcessParamExpect').val('running');
         // Disable incompatible options.
         ctl.find('.serviceProcessParamMin').prop('disabled', true);
         ctl.find('.serviceProcessParamMax').prop('disabled', true);
-    } else {
+    } else { // it's a process check not in "running" node.
         const min = ctl.find('.serviceProcessParamMin').val();
         const max = ctl.find('.serviceProcessParamMax').val();
         const res = ctl.find('.serviceProcessParamSelector').val() == 'restart';

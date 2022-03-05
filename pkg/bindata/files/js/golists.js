@@ -130,8 +130,10 @@ function addInstance(section, app)
 
 
         row += '<td colspan="'+ colspan +'"><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
-        row += '<input type="'+ itype +'" name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" id="'+ prefix +'.'+ app +'.'+ index +'.'+ name + 
-        '" data-app="'+ app +'" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="'+ section +'" data-label="'+ app +' '+
+        row += '<input type="'+ itype +'" name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
+        'id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
+        'name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
+        'data-app="'+ app +'" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="'+ section +'" data-label="'+ app +' '+
          instance +' '+name+'" data-original="'+ nameori +'" value="'+ nameval +'">'+ extra;
         row += '</div></div></form></td>';
         colspan = 1;

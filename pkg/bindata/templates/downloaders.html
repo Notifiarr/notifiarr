@@ -32,7 +32,7 @@
                                             <input disabled style="display: none;" class="client-parameter download-Qbit{{$index}}-deleted" data-group="download" data-label="Qbit {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="download-Qbit" id="download-Qbit-{{$index}}">
                                                 <td style="font-size:22px;white-space:nowrap;"><span id="QbitIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="download-Qbit-deletebutton" style="{{if ne (len $.Config.Apps.Qbit) (instance $index)}} display: none;{{end}}">
+                                                    <span class="download-Qbit-deletebutton">
                                                         <button onclick="removeInstance('download-Qbit', {{$index}})" type="button" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                                     </span>
                                                 </td>
@@ -142,7 +142,7 @@
                                             <input disabled style="display: none;" class="client-parameter download-Deluge{{$index}}-deleted" data-group="download" data-label="Deluge {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="download-Deluge" id="download-Deluge-{{$index}}">
                                                 <td style="font-size:22px;white-space:nowrap;"><span id="DelugeIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="download-Deluge-deletebutton" style="{{if ne (len $.Config.Apps.Deluge) (instance $index)}} display: none;{{end}}">
+                                                    <span class="download-Deluge-deletebutton">
                                                         <button onclick="removeInstance('download-Deluge', {{$index}})" type="button" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                                     </span>
                                                 </td>
@@ -240,7 +240,7 @@
                                             <input disabled style="display: none;" class="client-parameter download-SabNZB{{$index}}-deleted" data-group="download" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="download-SabNZB" id="download-SabNZB-{{$index}}">
                                                 <td style="font-size:22px;white-space:nowrap;"><span id="SabNZBIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="download-SabNZB-deletebutton" style="{{if ne (len $.Config.Apps.SabNZB) (instance $index)}} display: none;{{end}}">
+                                                    <span class="download-SabNZB-deletebutton">
                                                         <button onclick="removeInstance('download-SabNZB', {{$index}})" type="button" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
                                                     </span>
                                                 </td>
