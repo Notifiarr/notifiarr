@@ -83,7 +83,7 @@
                                                         <td>
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
-                                                                    <select id="Service.{{$index}}.Type" name="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}">
+                                                                    <select id="Service.{{$index}}.Type" name="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter form-control input-sm serviceTypeSelect" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}">
                                                                         <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
                                                                         <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
                                                                         <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
@@ -108,7 +108,7 @@
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
                                                                     <input id="Service.{{$index}}.Expect" name="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm serviceProcessParamExpect" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="display:none;">
-                                                                    <select id="Service.{{$index}}.Expect.StatusCode" onChange="checkExpectChange($(this));" data-index="{{$index}}" data-app="checks" style="{{if ne $svc.Type "http"}}display:none;{{end}}" class="form-control input-sm serviceHTTPParam">
+                                                                    <select multiple id="Service.{{$index}}.Expect.StatusCode" onChange="checkExpectChange($(this));" data-index="{{$index}}" data-app="checks" style="{{if ne $svc.Type "http"}}display:none;{{end}}" class="form-control input-sm serviceHTTPParam">
                                                                         <option value="100"{{if and (eq $svc.Type "http") (contains $svc.Expect "100")}} selected{{end}}>100: Continue</option>
                                                                         <option value="101"{{if and (eq $svc.Type "http") (contains $svc.Expect "101")}} selected{{end}}>101: SwitchingProtocols</option>
                                                                         <option value="102"{{if and (eq $svc.Type "http") (contains $svc.Expect "102")}} selected{{end}}>102: Processing</option>

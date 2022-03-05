@@ -36,12 +36,28 @@ $(document).ready((function()
         loadMonitorTable($('.monitortable'));
     }, 200);
 
-    $( window ).resize(function() {
+    $(window).resize(function() {
       setScreenSizeVars();
       serviceTable.columns.adjust();
       configTable.columns.adjust();
     });
+
+    $('.serviceHTTPParam').select2({
+        placeholder: 'Select codes'
+    });
+    toggleServiceTypeSelects();
 }));
+
+function toggleServiceTypeSelects() {
+    $('.select2').hide();
+
+    $.each($('.serviceTypeSelect'), function(){
+        if ($(this).val() == 'http') {
+            $(this).closest('td').next().next().find('.select2').show();
+        }
+    });
+}
+// ---------------------------------------------------------------------------------------------
 
 function loadConfigTable(table) {
     return table.DataTable({
@@ -63,11 +79,13 @@ function loadConfigTable(table) {
         ]
     });
 }
+// ---------------------------------------------------------------------------------------------
 
 // Recursive animation.
-function pulseExclamation(){
+function pulseExclamation() {
     $('.fa-exclamation-circle').delay(200).fadeOut('slow').fadeIn('slow', pulseExclamation);
 }
+// ---------------------------------------------------------------------------------------------
 
 function hideSmallElements()
 {
@@ -82,6 +100,7 @@ function hideSmallElements()
         $('.desktop-hide').hide();
     }
 }
+// ---------------------------------------------------------------------------------------------
 
 function setScreenSizeVars()
 {
