@@ -29,10 +29,13 @@ func (c *Client) httpHandlers() {
 
 	c.Config.Router.HandleFunc("/favicon.ico", c.favIcon).Methods("GET")
 	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.slash).Methods("GET")
+	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.loginHandler).Methods("POST")
+
 	// Handle the same URLs as above on the different base URL too.
 	if !strings.EqualFold(base, "/") {
 		c.Config.Router.HandleFunc(path.Join(base, "favicon.ico"), c.favIcon).Methods("GET")
 		c.Config.Router.HandleFunc(base, c.slash).Methods("GET")
+		c.Config.Router.HandleFunc(base, c.loginHandler).Methods("POST")
 	}
 
 	if c.Config.UIPassword == "" {

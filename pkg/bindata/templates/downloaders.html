@@ -79,7 +79,7 @@
                                                                 {{- if locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Qbit.{{$index}}.Pass" name="search-Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Qbit.{{$index}}.Pass" name="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Qbit.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -177,7 +177,7 @@
                                                                 {{- if (locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index)) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Deluge.{{$index}}.Config.Password" name="search-Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Deluge.{{$index}}.Config.Password" name="Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Deluge.{{$index}}.Config.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -275,7 +275,7 @@
                                                                 {{- if locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.SabNZB.{{$index}}.APIKey" name="search-Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} APIKey" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <input type="password" autocomplete="off" id="Apps.SabNZB.{{$index}}.APIKey" name="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} APIKey" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.SabNZB.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>

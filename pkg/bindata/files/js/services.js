@@ -276,8 +276,9 @@ function checkExpectChange(from)
     const ctl = from.closest('.services-Checks'); // just this cell.
     const run = ctl.find('.serviceProcessParamSelector').val() == 'running';
 
-    if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.
-        ctl.find('.serviceProcessParamExpect').val(from.find(":selected").val());
+    if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.    
+        ctl.find('.serviceProcessParamExpect').val(from.val().join());
+
     } else if (from.hasClass('serviceTCPParam')) { // it's a "tcp" check.
         ctl.find('.serviceProcessParamExpect').val('');
     } else if (run) { // it's a "process" check.

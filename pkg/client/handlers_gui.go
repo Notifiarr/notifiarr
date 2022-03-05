@@ -47,7 +47,7 @@ func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 			ctx := context.WithValue(request.Context(), userNameStr, []interface{}{userName, dyanmic})
 			next.ServeHTTP(response, request.WithContext(ctx))
 		} else {
-			http.Redirect(response, request, path.Join(c.Config.URLBase, "login"), http.StatusFound)
+			http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 		}
 	})
 }

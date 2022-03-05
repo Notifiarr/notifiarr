@@ -43,10 +43,14 @@ $(document).ready((function()
     });
 
     $('.serviceHTTPParam').select2({
-        placeholder: 'Select codes'
+        placeholder: 'HTTP Status Codes..',
+        templateSelection: function(state) {
+            return state.id ? state.id : state.text
+        },
     });
     toggleServiceTypeSelects();
 }));
+
 
 function toggleServiceTypeSelects() {
     $('.select2').hide();

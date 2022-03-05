@@ -68,7 +68,7 @@
                                                                 {{- if (locked (printf "%s_LIDARR_%d_API_KEY" $.Flags.EnvPrefix $index))}}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.APIKey" name="search-Apps.Lidarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.APIKey" name="Apps.Lidarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -93,7 +93,7 @@
                                                                 {{- if locked (printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.Password" name="search-Apps.Lidarr.{{$index}}.Password" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.Password" name="Apps.Lidarr.{{$index}}.Password" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -193,7 +193,7 @@
                                                                 {{- if locked (printf "%s_PROWLARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.APIKey" name="search-Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.APIKey" name="Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -218,7 +218,7 @@
                                                                 {{- if locked (printf "%s_PROWLARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.Password" name="search-Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.Password" name="Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -318,7 +318,7 @@
                                                                 {{- if locked (printf "%s_RADARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.APIKey" name="search-Apps.Radarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.APIKey" name="Apps.Radarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -344,7 +344,7 @@
                                                                     {{- if locked (printf "%s_RADARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                                                     <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
-                                                                    <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.Password" name="search-Apps.Radarr.{{$index}}.Password" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                    <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.Password" name="Apps.Radarr.{{$index}}.Password" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                     <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                                 </div>
                                                             </div>
@@ -445,7 +445,7 @@
                                                                 {{- if locked (printf "%s_READARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                                                 <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.APIKey" name="search-Apps.Readarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.APIKey" name="Apps.Readarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -470,7 +470,7 @@
                                                                 {{- if locked (printf "%s_READARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                                                 <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.Password" name="search-Apps.Readarr.{{$index}}.Password" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.Password" name="Apps.Readarr.{{$index}}.Password" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -570,7 +570,7 @@
                                                                 {{- if locked (printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
                                                                 <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.APIKey" name="search-Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.APIKey" name="Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
@@ -595,7 +595,7 @@
                                                                 {{- if locked (printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
                                                                 <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.Password" name="search-Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.Password" name="Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
