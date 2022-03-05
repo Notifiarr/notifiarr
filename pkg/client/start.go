@@ -39,6 +39,7 @@ type Client struct {
 	website *notifiarr.Config
 	cookies *securecookie.SecureCookie
 	templat *template.Template
+	webauth bool
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" as of its creation.
 	sync.RWMutex

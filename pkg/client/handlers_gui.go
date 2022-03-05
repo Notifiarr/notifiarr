@@ -106,7 +106,7 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method == http.MethodGet: // dont handle login without POST
 		c.indexPage(response, request, "")
-	case c.Config.UIPassword.Webauth():
+	case c.webauth:
 		c.indexPage(response, request, "Logins Disabled")
 	case len(request.FormValue("password")) < minPasswordLen:
 		c.indexPage(response, request, "Invalid Password Length")
@@ -491,7 +491,7 @@ func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, 
 	response.Header().Add("content-type", "text/html")
 
 	user, _ := c.getUserName(request)
-	if request.Method != http.MethodGet || (user == "" && c.Config.UIPassword.Webauth()) {
+	if request.Method != http.MethodGet || (user == "" && c.webauth) {
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 
