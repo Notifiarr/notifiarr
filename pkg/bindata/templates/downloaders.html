@@ -41,7 +41,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.Name" name="Apps.Qbit.{{$index}}.Name" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -53,7 +53,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.URL" name="Apps.Qbit.{{$index}}.URL" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -65,7 +65,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.User" name="Apps.Qbit.{{$index}}.User" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}">
                                                             </div>
@@ -77,7 +77,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Qbit.{{$index}}.Pass" name="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Qbit.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -90,7 +90,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.Interval" name="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -102,7 +102,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -151,7 +151,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Name" name="Apps.Deluge.{{$index}}.Name" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -163,7 +163,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Config.URL" name="Apps.Deluge.{{$index}}.Config.URL" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -175,7 +175,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Deluge.{{$index}}.Config.Password" name="Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Deluge.{{$index}}.Config.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -188,7 +188,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Interval" name="Apps.Deluge.{{$index}}.Interval" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -200,7 +200,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Timeout" name="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -249,7 +249,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.Name" name="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -261,7 +261,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.URL" name="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -273,7 +273,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.SabNZB.{{$index}}.APIKey" name="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} APIKey" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.SabNZB.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -286,7 +286,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.Interval" name="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -298,7 +298,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.Timeout" name="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>

@@ -822,7 +822,7 @@ li {
 }
 
 .help-icon {
-    cursor: help;
+    cursor: pointer;
 }
 
 div .file-content {

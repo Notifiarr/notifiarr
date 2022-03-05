@@ -284,15 +284,15 @@ function checkExpectChange(from)
 {
     const ctl = from.closest('.services-Checks'); // just this cell.
     const run = ctl.find('.serviceProcessParamSelector').val() == 'running';
-
+    const expect = ctl.find('.serviceProcessParamExpect')
     if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.
-        ctl.find('.serviceProcessParamExpect').val(from.val().join());
+        expect.val(from.val().join());
     } else if (from.hasClass('serviceTCPParam')) { // it's a "tcp" check.
-        ctl.find('.serviceProcessParamExpect').val('');
+        expect.val('');
     } else if (run) { // it's a "process" check in "running" mode.
         // The "running" checkbox does not allow any other arguments, so deal with that here.
         // Copy "running" into real value that is POSTed.
-        ctl.find('.serviceProcessParamExpect').val('running');
+        expect.val('running');
         // Disable incompatible options.
         ctl.find('.serviceProcessParamMin').prop('disabled', true);
         ctl.find('.serviceProcessParamMax').prop('disabled', true);
@@ -301,7 +301,7 @@ function checkExpectChange(from)
         const max = ctl.find('.serviceProcessParamMax').val();
         const res = ctl.find('.serviceProcessParamSelector').val() == 'restart';
         // Copy the concatenated string (from three sources) into the real value.
-        ctl.find('.serviceProcessParamExpect').val('count:'+ min +':'+ max + (res ? ',restart' : ''));
+        expect.val('count:'+ min +':'+ max + (res ? ',restart' : ''));
         // Enable all values.
         ctl.find('.serviceProcessParamMin').prop('disabled', false);
         ctl.find('.serviceProcessParamMax').prop('disabled', false);

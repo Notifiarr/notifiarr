@@ -217,6 +217,8 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 			"os":        runtime.GOOS,
 			"arch":      runtime.GOARCH,
 			"binary":    binary,
+			"environ":   environ(),
+			"docker":    mnd.IsDocker,
 		},
 		Expvar:   exp.GetAllData(),
 		HostInfo: c.website.HostInfoNoError(),
@@ -224,6 +226,18 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 	if err != nil {
 		c.Errorf("Sending HTTP Response: %v", err)
 	}
+}
+
+func environ() map[string]string {
+	out := make(map[string]string)
+
+	for _, v := range os.Environ() {
+		if s := strings.SplitN(v, "=", 2); len(s) == 2 && s[0] != "" { //nolint:gomnd
+			out[s[0]] = s[1]
+		}
+	}
+
+	return out
 }
 
 func (c *Client) setUserPass(username, password string) error {

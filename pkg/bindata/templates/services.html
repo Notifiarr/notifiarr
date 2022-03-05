@@ -75,7 +75,7 @@
                                                                 <div class="input-group" style="width:100%">
                                                                     <input type="text" id="Service.{{$index}}.Name" name="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
                                                                 </div>
                                                             </div>
@@ -89,7 +89,7 @@
                                                                         <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
                                                                     </select>
                                                                     {{- if (locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
                                                                 </div>
                                                             </div>
@@ -99,7 +99,7 @@
                                                                 <div class="input-group" style="width:100%">
                                                                     <input type="text" id="Service.{{$index}}.Value" name="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
                                                                 </div>
                                                             </div>
@@ -185,7 +185,7 @@
                                                                     <input type="number" min="0" onChange="checkExpectChange($(this));" title="Maximum number of processes allowed to run." class="form-control input-sm serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}" style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
                                                                     <input disabled type="text" data-app="checks" value="unused" class="form-control input-sm serviceTCPParam" style="{{if ne $svc.Type "tcp"}}display:none;{{end}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
                                                                 </div>
                                                             </div>
@@ -195,7 +195,7 @@
                                                                 <div class="input-group" style="width:100%">
                                                                     <input type="text" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
                                                                 </div>
                                                             </div>
@@ -205,7 +205,7 @@
                                                                 <div class="input-group" style="width:100%">
                                                                     <input type="text" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
                                                                 </div>
                                                             </div>

@@ -8,7 +8,7 @@ const mdScreenWidth = 1199;  // larger than this is a desktop; this or smaller i
 var configTable  = null;
 var serviceTable = null;
 
-$(document).ready((function()
+$(document).ready(function()
 {
     jsLoader();
     setTooltips();
@@ -49,7 +49,7 @@ $(document).ready((function()
         },
     });
     toggleServiceTypeSelects();
-}));
+});
 
 
 function toggleServiceTypeSelects() {
@@ -404,3 +404,30 @@ function togglePassword(input, eye)
     eye.toggleClass('fa-eye').toggleClass('fa-low-vision');
 }
 // -------------------------------------------------------------------------------------------
+// Makes a dialog box, kinda like a tooltip, but more forceful.
+function dialog(where, side)
+{
+    const otherside = (side == 'left' ? 'right' : 'left');
+    $('<div>' + where.siblings('.dialogText').html() + '</div>').dialog({
+        title: where.siblings('.dialogTitle').html(),
+        modal: true,
+        position: { my: side+' middle', at: otherside+' top', of: where},
+        width: 400,
+        resizable: false,
+        show: {
+            effect: 'fade',
+            duration: 200
+        },
+        hide: {
+            effect: 'fade',
+            duration: 200
+        },
+        open: function(event, ui)  {
+            // close the modal when clicked outside, good for 'tooltips', not forms.
+            $('.ui-widget-overlay').bind('click', function () { $(this).siblings('.ui-dialog').find('.ui-dialog-content').dialog('close'); });
+         },
+        close: function (event, ui) {
+            $(this).dialog('destroy').remove();
+        }
+    });
+}

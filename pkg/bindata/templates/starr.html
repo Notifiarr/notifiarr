@@ -42,7 +42,7 @@
                                                          <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Name" name="Apps.Lidarr.{{$index}}.Name" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -54,7 +54,7 @@
                                                          <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_URL" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.URL" name="Apps.Lidarr.{{$index}}.URL" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -66,7 +66,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_API_KEY" $.Flags.EnvPrefix $index))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.APIKey" name="Apps.Lidarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -79,7 +79,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Username" name="Apps.Lidarr.{{$index}}.Username" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -91,7 +91,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.Password" name="Apps.Lidarr.{{$index}}.Password" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -104,7 +104,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Interval" name="Apps.Lidarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -116,7 +116,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Timeout" name="Apps.Lidarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -167,7 +167,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_PROWLARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Name" name="Apps.Prowlarr.{{$index}}.Name" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -179,7 +179,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_PROWLARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.URL" name="Apps.Prowlarr.{{$index}}.URL" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -191,7 +191,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_PROWLARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.APIKey" name="Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -204,7 +204,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_PROWLARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Username" name="Apps.Prowlarr.{{$index}}.Username" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -216,7 +216,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_PROWLARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.Password" name="Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -229,7 +229,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_PROWLARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Interval" name="Apps.Prowlarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -241,7 +241,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_PROWLARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Timeout" name="Apps.Prowlarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -292,7 +292,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_RADARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Name" name="Apps.Radarr.{{$index}}.Name" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -304,7 +304,7 @@
                                                       <div class="form-group" style="width:100%">
                                                               <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_RADARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.URL" name="Apps.Radarr.{{$index}}.URL" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -316,7 +316,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_RADARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.APIKey" name="Apps.Radarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -329,7 +329,7 @@
                                                         <div class="form-group" style="width:100%">
                                                               <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_RADARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Username" name="Apps.Radarr.{{$index}}.Username" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -342,7 +342,7 @@
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
                                                                     {{- if locked (printf "%s_RADARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                     {{- end}}
                                                                     <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.Password" name="Apps.Radarr.{{$index}}.Password" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                     <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -356,7 +356,7 @@
                                                         <div class="form-group" style="width:100%">
                                                               <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_RADARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Interval" name="Apps.Radarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -368,7 +368,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_RADARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Timeout" name="Apps.Radarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -419,7 +419,7 @@
                                                         <div class="form-group" style="width:100%">
                                                               <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_READARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Name" name="Apps.Readarr.{{$index}}.Name" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -431,7 +431,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_READARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.URL" name="Apps.Readarr.{{$index}}.URL" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -443,7 +443,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_READARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.APIKey" name="Apps.Readarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -456,7 +456,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_READARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Username" name="Apps.Readarr.{{$index}}.Username" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -468,7 +468,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_READARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.Password" name="Apps.Readarr.{{$index}}.Password" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -481,7 +481,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_READARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Interval" name="Apps.Readarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -493,7 +493,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_READARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Timeout" name="Apps.Readarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -544,7 +544,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Name" name="Apps.Sonarr.{{$index}}.Name" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -556,7 +556,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.URL" name="Apps.Sonarr.{{$index}}.URL" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -568,7 +568,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.APIKey" name="Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -581,7 +581,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Username" name="Apps.Sonarr.{{$index}}.Username" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -593,7 +593,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-lock" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.Password" name="Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -606,7 +606,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Interval" name="Apps.Sonarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -618,7 +618,7 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if locked (printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-lock text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Timeout" name="Apps.Sonarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
