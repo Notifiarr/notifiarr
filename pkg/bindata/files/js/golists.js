@@ -106,7 +106,7 @@ function addInstance(section, app)
             case "Pass":
             case "Password":
             case "APIKey":
-                extra = '<div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword(\''+ prefix +'.'+ app +'.'+ index +'.'+ name + '\', $(this).find(\'i\'));"><i class="fas fa-low-vision password-input"></i></div>';
+                extra = '<div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword(\''+ prefix +'.'+ app +'.'+ index +'.'+ name + '\', $(this).find(\'i\'));"><i class="fas fa-low-vision secret-input"></i></div>';
                 itype = "password";
                 break;
             case "Config.Interval":
