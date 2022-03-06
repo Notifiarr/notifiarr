@@ -8,53 +8,99 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/lidarr.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">Lidarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="starr-Lidarr-addbutton" onclick="addInstance('starr', 'Lidarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Lidarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Lidarr-addbutton" onclick="addInstance('starr', 'Lidarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="starr-Lidarr-addbutton" onclick="addInstance('starr', 'Lidarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Lidarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button id="starr-Lidarr-addbutton" onclick="addInstance('starr', 'Lidarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Lidarr</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/lidarr.png" style="height:50px;"></div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td style="min-width:40px;width:40px;" class="text-center">#</td>
-                                                <td style="min-width:120px;">Name <i class="far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                                <td style="min-width:180px;">URL <i class="far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
-                                                <td style="min-width:200px;">API Key</td>
-                                                <td style="min-width:100px;">Username <i class="far fa-question-circle" title="Username is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td style="min-width:155px;">Password <i class="far fa-question-circle" title="Password is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td style="width:90px;min-width:90px;">Interval <i class="far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td style="width:90px;min-width:90px;">Timeout <i class="far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td style="width:70px;min-width:70px;" class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td style="min-width:120px;">
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td style="min-width:180px;">
+                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
+                                                <td style="min-width:180px;">API Key</td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Username</span>
+                                                </td>
+                                                <td style="min-width:155px;">
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Password</span>
+                                                </td>
+                                                <td style="width:90px;min-width:90px;">
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td style="width:90px;min-width:90px;">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="starr-Lidarr-container">
                                         {{- range $index, $app := .Config.Apps.Lidarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Lidarr{{$index}}-deleted" data-group="starr" data-label="Lidarr {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="starr-Lidarr" id="starr-Lidarr-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="LidarrIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="starr-Lidarr-deletebutton" style="float: right;">
-                                                        <button onclick="removeInstance('starr-Lidarr', {{$index}})" type="button" title="Delete this instance of Lidarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="LidarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('starr-Lidarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                          <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Name" name="Apps.Lidarr.{{$index}}.Name" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
                                                         </div>
-                                                        </form>
+                                                    </form>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                          <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_URL" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.URL" name="Apps.Lidarr.{{$index}}.URL" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -66,7 +112,13 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_API_KEY" $.Flags.EnvPrefix $index))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.APIKey" name="Apps.Lidarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -79,7 +131,13 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_LIDARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Username" name="Apps.Lidarr.{{$index}}.Username" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -90,8 +148,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.Password" name="Apps.Lidarr.{{$index}}.Password" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -103,8 +167,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Interval" name="Apps.Lidarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -115,8 +185,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.Timeout" name="Apps.Lidarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -133,41 +209,81 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/prowlarr.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">Prowlarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Prowlarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Prowlarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Prowlarr</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/prowlarr.png" style="height:50px;"></div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-center">#</td>
-                                                <td>Name <i class="far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                                <td>URL <i class="far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
+                                                <td style="width:70px;min-width:70px;" class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.<</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
                                                 <td>API Key</td>
-                                                <td>Username <i class="far fa-question-circle" title="Username is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Password <i class="far fa-question-circle" title="Password is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Interval <i class="far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td>Timeout <i class="far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Username</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Password</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="starr-Prowlarr-container">
-                                        {{- range $index, $app := .Config.Apps.Prowlarr}}
+                                            {{- range $index, $app := .Config.Apps.Prowlarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Prowlarr{{$index}}-deleted" data-group="starr" data-label="Prowlarr {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="starr-Prowlarr" id="starr-Prowlarr-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="ProwlarrIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="starr-Prowlarr-deletebutton">
-                                                        <button onclick="removeInstance('starr-Prowlarr', {{$index}})" type="button" title="Delete this instance of Prowlarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="ProwlarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('starr-Prowlarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PROWLARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PROWLARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Name" name="Apps.Prowlarr.{{$index}}.Name" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -178,8 +294,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PROWLARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PROWLARR_%d_URL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.URL" name="Apps.Prowlarr.{{$index}}.URL" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -190,8 +312,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PROWLARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PROWLARR_%d_API_KEY" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.APIKey" name="Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -203,8 +331,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PROWLARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PROWLARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Username" name="Apps.Prowlarr.{{$index}}.Username" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -215,8 +349,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PROWLARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PROWLARR_%d_PASSWORD" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Prowlarr.{{$index}}.Password" name="Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -228,8 +368,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PROWLARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PROWLARR_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Interval" name="Apps.Prowlarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -240,8 +386,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PROWLARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PROWLARR_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Prowlarr.{{$index}}.Timeout" name="Apps.Prowlarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -249,7 +401,7 @@
                                                     </form>
                                                 </td>
                                             </tr>
-                                      {{- end}}
+                                            {{- end}}
                                             <tr id="starr-Prowlarr-none"{{if .Config.Apps.Prowlarr}} style="display: none;"{{end}}><td colspan="8">No Prowlarr instances configured.</td></tr>
                                         </tbody>
                                         <thead>
@@ -258,41 +410,81 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/radarr.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">Radarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Radarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Radarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Radarr</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/radarr.png" style="height:50px;"></div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-center">#</td>
-                                                <td>Name <i class="far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                                <td>URL <i class="far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
+                                                <td style="width:70px;min-width:70px;" class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.<</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
                                                 <td>API Key</td>
-                                                <td>Username <i class="far fa-question-circle" title="Username is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Password <i class="far fa-question-circle" title="Password is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Interval <i class="far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td>Timeout <i class="far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Username</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Password</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
+                                                <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                <span class="dialogTitle">Timeout</span>
+                                            </td>
                                             </tr>
                                         </thead>
                                         <tbody id="starr-Radarr-container">
                                             {{- range $index, $app := .Config.Apps.Radarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Radarr{{$index}}-deleted" data-group="starr" data-label="Radarr {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="starr-Radarr" id="starr-Radarr-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="RadarrIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="starr-Radarr-deletebutton">
-                                                        <button onclick="removeInstance('starr-Radarr', {{$index}})" type="button" title="Delete this instance of Radarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="RadarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('starr-Radarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_RADARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_RADARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Name" name="Apps.Radarr.{{$index}}.Name" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -303,8 +495,14 @@
                                                     <form class="form-inline">
                                                       <div class="form-group" style="width:100%">
                                                               <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_RADARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_RADARR_%d_URL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.URL" name="Apps.Radarr.{{$index}}.URL" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -315,8 +513,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_RADARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_RADARR_%d_API_KEY" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.APIKey" name="Apps.Radarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -328,8 +532,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                               <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_RADARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_RADARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Username" name="Apps.Radarr.{{$index}}.Username" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -341,8 +551,14 @@
                                                         <form class="form-inline">
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
-                                                                    {{- if locked (printf "%s_RADARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    {{- if (locked (printf "%s_RADARR_%d_PASSWORD" $.Flags.EnvPrefix $index) )}}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                        <div style="display:none;" class="dialogText">
+                                                                            An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                        </div>
+                                                                        <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                        <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
+                                                                    </div>
                                                                     {{- end}}
                                                                     <input type="password" autocomplete="off" id="Apps.Radarr.{{$index}}.Password" name="Apps.Radarr.{{$index}}.Password" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                     <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -355,8 +571,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                               <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_RADARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_RADARR_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Interval" name="Apps.Radarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -367,8 +589,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_RADARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_RADARR_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Radarr.{{$index}}.Timeout" name="Apps.Radarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -385,41 +613,81 @@
                                                     <img src="{{files}}/images/logo/readarr.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">Readarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="starr-Readarr-addbutton" onclick="addInstance('starr', 'Readarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Readarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Readarr-addbutton" onclick="addInstance('starr', 'Readarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="starr-Readarr-addbutton" onclick="addInstance('starr', 'Readarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Readarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button id="starr-Readarr-addbutton" onclick="addInstance('starr', 'Readarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Readarr</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/readarr.png" style="height:50px;"></div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-center">#</td>
-                                                <td>Name <i class="far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                                <td>URL <i class="far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
+                                                <td style="width:70px;min-width:70px;" class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.<</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
                                                 <td>API Key</td>
-                                                <td>Username <i class="far fa-question-circle" title="Username is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Password <i class="far fa-question-circle" title="Password is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Interval <i class="far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td>Timeout <i class="far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Username</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Password</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="starr-Readarr-container">
                                             {{- range $index, $app := .Config.Apps.Readarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Readarr{{$index}}-deleted" data-group="starr" data-label="Readarr {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="starr-Readarr" id="starr-Readarr-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="ReadarrIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="starr-Readarr-deletebutton">
-                                                        <button onclick="removeInstance('starr-Readarr', {{$index}})" type="button" title="Delete this instance of Readarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="ReadarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('starr-Readarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
-                                                              <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_READARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_READARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Name" name="Apps.Readarr.{{$index}}.Name" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -430,8 +698,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_READARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_READARR_%d_URL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.URL" name="Apps.Readarr.{{$index}}.URL" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -442,8 +716,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_READARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                {{- if (locked (printf "%s_READARR_%d_API_KEY" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.APIKey" name="Apps.Readarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -455,8 +735,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_READARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_READARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Username" name="Apps.Readarr.{{$index}}.Username" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -467,8 +753,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_READARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                {{- if (locked (printf "%s_READARR_%d_PASSWORD" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Readarr.{{$index}}.Password" name="Apps.Readarr.{{$index}}.Password" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -480,8 +772,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_READARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_READARR_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Interval" name="Apps.Readarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -492,8 +790,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_READARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_READARR_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Timeout" name="Apps.Readarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -510,41 +814,81 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/sonarr.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">Sonarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="starr-Sonarr-addbutton" onclick="addInstance('starr', 'Sonarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Sonarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Sonarr-addbutton" onclick="addInstance('starr', 'Sonarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="starr-Sonarr-addbutton" onclick="addInstance('starr', 'Sonarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" title="Add another instance of Sonarr" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button id="starr-Sonarr-addbutton" onclick="addInstance('starr', 'Sonarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Sonarr</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/sonarr.png" style="height:50px;"></div>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-center">#</td>
-                                                <td>Name <i class="far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                                <td>URL <i class="far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
+                                                <td style="width:70px;min-width:70px;" class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.<</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
                                                 <td>API Key</td>
-                                                <td>Username <i class="far fa-question-circle" title="Username is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Password <i class="far fa-question-circle" title="Password is required when auth is enabled and Backup/Corruption checks are enabled."></i></td>
-                                                <td>Interval <i class="far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td>Timeout <i class="far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i></td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Username</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Password</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="starr-Sonarr-container">
                                             {{- range $index, $app := .Config.Apps.Sonarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Sonarr{{$index}}-deleted" data-group="starr" data-label="Sonarr {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="starr-Sonarr" id="starr-Sonarr-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="SonarrIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="starr-Sonarr-deletebutton">
-                                                        <button onclick="removeInstance('starr-Sonarr', {{$index}})" type="button" title="Delete this instance of Sonarr" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="SonarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('starr-Sonarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Name" name="Apps.Sonarr.{{$index}}.Name" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -555,8 +899,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.URL" name="Apps.Sonarr.{{$index}}.URL" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -567,8 +917,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                {{- if (locked (printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.APIKey" name="Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -580,8 +936,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Username" name="Apps.Sonarr.{{$index}}.Username" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
@@ -592,8 +954,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index) }}
-                                                                <i style="width:5%;" class="fas fa-outdent" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i>
+                                                                {{- if (locked (printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.Password" name="Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -605,8 +973,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Interval" name="Apps.Sonarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -617,8 +991,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Timeout" name="Apps.Sonarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>

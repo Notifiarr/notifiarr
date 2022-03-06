@@ -52,12 +52,24 @@
                                             <table class="table table-bordered bk-dark servicetable" style="width:100%">
                                                 <thead>
                                                     <tr>
-                                                        <th style="min-width:30px;width:30px;">#</th>
+                                                        <th style="width:70px;min-width:70px;" class="text-center">
+                                                            <div style="display:none;" class="dialogText">
+                                                                The <span class="text-danger">red</span> button deletes the service check.<br>
+                                                                The <span class="text-success">green</span> button runs the service check.<br>
+                                                                The <span class="text-primary">blue</span> button adds a new service check.
+                                                            </div>
+                                                            <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">Actions</span>
+                                                        </th>
                                                         <th style="min-width:120px;">Name</th>
                                                         <th style="min-width:108px;">Type</th>
                                                         <th style="min-width:170px;">Check Value</th>
                                                         <th style="min-width:210px;">Expect</th>
-                                                        <th style="min-width:90px;width:90px;">Interval <i class="help-icon far fa-question-circle" title="This interval value controls how often the service is checked."></i></th>
+                                                        <th style="min-width:90px;width:90px;">
+                                                            <div style="display:none;" class="dialogText">This interval value controls how often the service is checked.</div>
+                                                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">Interval </span>
+                                                        </th>
                                                         <th style="min-width:70px;width:70px">Timeout</th>
                                                     </tr>
                                                 </thead>
@@ -65,42 +77,62 @@
                                                 {{- range $index, $svc := .Config.Service}}
                                                     <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
                                                     <tr class="services-Checks" id="services-Checks-{{$index}}">
-                                                        <td class="text-center" style="font-size: 22px;white-space: nowrap;"><span id="checksIndexLabel{{$index}}" class="mobile-hide tablet-hide">{{instance $index}}</span>
-                                                            <span class="services-Checks-deletebutton">
-                                                                <button onclick="removeInstance('services-Checks', {{$index}})" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                            </span>
+                                                        <td style="white-space:nowrap;">
+                                                            <div class="btn-group" role="group" style="display:flex;">
+                                                                <button id="checksIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                                <button onclick="removeInstance('services-Checks', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                                <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                            </div>
                                                         </td>
                                                         <td>
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
-                                                                    <input type="text" id="Service.{{$index}}.Name" name="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                        <div style="display:none;" class="dialogText">
+                                                                            An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                        </div>
+                                                                        <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                        <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                    </div>
                                                                     {{- end}}
+                                                                    <input type="text" id="Service.{{$index}}.Name" name="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{$svc.Name}}" value="{{$svc.Name}}">
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                        <div style="display:none;" class="dialogText">
+                                                                            An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                        </div>
+                                                                        <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                        <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index}}</span>
+                                                                    </div>
+                                                                    {{- end}}
                                                                     <select id="Service.{{$index}}.Type" name="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter form-control input-sm serviceTypeSelect" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}">
                                                                         <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
                                                                         <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
                                                                         <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
                                                                     </select>
-                                                                    {{- if (locked (printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
-                                                                    {{- end}}
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
-                                                                    <input type="text" id="Service.{{$index}}.Value" name="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                        <div style="display:none;" class="dialogText">
+                                                                            An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                        </div>
+                                                                        <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                        <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index}}</span>
+                                                                    </div>
                                                                     {{- end}}
+                                                                    <input type="text" id="Service.{{$index}}.Value" name="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{$svc.Value}}" value="{{$svc.Value}}">
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -108,6 +140,15 @@
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
                                                                     <input id="Service.{{$index}}.Expect" name="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm serviceProcessParamExpect" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="display:none;">
+                                                                    {{- if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index)) }}
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                        <div style="display:none;" class="dialogText">
+                                                                            An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                        </div>
+                                                                        <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                        <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index}}</span>
+                                                                    </div>
+                                                                    {{- end}}
                                                                     <select multiple id="Service.{{$index}}.Expect.StatusCode" onChange="checkExpectChange($(this));" data-index="{{$index}}" data-app="checks" style="width:100%;{{if ne $svc.Type "http"}}display:none;{{end}}" class="form-control input-sm serviceHTTPParam">
                                                                         <option value="100"{{if and (eq $svc.Type "http") (contains $svc.Expect "100")}} selected{{end}}>100: Continue</option>
                                                                         <option value="101"{{if and (eq $svc.Type "http") (contains $svc.Expect "101")}} selected{{end}}>101: SwitchingProtocols</option>
@@ -184,29 +225,38 @@
                                                                     <input type="number" min="0" onChange="checkExpectChange($(this));" title="Minimum number of processes allowed to run." class="form-control input-sm serviceProcessParam serviceProcessParamMin" value="{{min $svc.Expect}}" style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
                                                                     <input type="number" min="0" onChange="checkExpectChange($(this));" title="Maximum number of processes allowed to run." class="form-control input-sm serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}" style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
                                                                     <input disabled type="text" data-app="checks" value="unused" class="form-control input-sm serviceTCPParam" style="{{if ne $svc.Type "tcp"}}display:none;{{end}}">
-                                                                    {{- if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
-                                                                    {{- end}}
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
-                                                                    <input type="text" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                        <div style="display:none;" class="dialogText">
+                                                                            An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                        </div>
+                                                                        <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                        <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                    </div>
                                                                     {{- end}}
+                                                                    <input type="text" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}">
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td{{if (locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }} style="width:85px;min-width:85px;"{{end}}>
                                                             <div class="form-group" style="width:100%">
                                                                 <div class="input-group" style="width:100%">
-                                                                    <input type="text" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}">
                                                                     {{- if (locked (printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
-                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                    <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                        <div style="display:none;" class="dialogText">
+                                                                            An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                        </div>
+                                                                        <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                        <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                    </div>
                                                                     {{- end}}
+                                                                    <input type="text" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}">
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -219,7 +269,7 @@
                                 </div>
                                 <div class="col-lg-10 col-md-12 col-sm-12 mb">
                                     <h3>Notes</h3>
-                                    <li><i class="help-icon far fa-question-circle" title="If you wish to monitor an application configured on another page, just give it a name. Giving any app a name enables service checks."></i> Do not add starr, media, snapshot, or downloader apps here.</li>
-                                    <li><i class="help-icon far fa-question-circle" title="Make sure you provide a unique name for each service check."></i> Service Checks must have non-empty unique names.</li>
+                                    <li><i class="fas fa-star"></i> Service Checks must have non-empty unique names.</li>
+                                    <li><i class="fas fa-star"></i> Do not add starr, media, snapshot, or downloader apps here (except Plex). If you wish to monitor an application configured on another page, just give it a name. Giving any app a name enables service checks.</li>
                                 </div>
 {{- /* end of services (leave this comment) */ -}}

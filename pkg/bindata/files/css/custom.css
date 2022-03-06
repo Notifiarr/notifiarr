@@ -81,3 +81,7 @@ a sup {
     background: #585c64 !important;
     color: #ffffff !important;
 }
+
+.secret-input {
+    color:#000000;
+}

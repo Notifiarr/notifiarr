@@ -74,15 +74,15 @@ function addInstance(section, app)
     const instance = index+1;
     const prefix = $('#'+ section +'-'+ app +'-addbutton').data('prefix');  // storage location like Apps or Snapshot.
     const names = $('#'+ section +'-'+ app +'-addbutton').data('names'); // list of thinges like "Name" and "URL"
-    // This just sets the first few lines of the row. The more-dynamic bits get added below, in a for loop.
+    // This just sets the first few lines of the row (the action buttons). The more-dynamic bits get added below, in a for loop.
     let row = '<tr class="newRow bk-success '+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
-                '   <td style="font-size: 22px;white-space:nowrap;"><span id="'+ app +'IndexLabel'+ (instance-1) +'">'+instance+"</span>"+
-                '       <span class="'+ section +'-'+ app +'-deletebutton">'+
-                '           <button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +
-                            ')" type="button" title="Delete this instance of '+ app +'.'+
-                            '" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
-                '       </span>'+
-                '   </td>';
+    '<td style="white-space:nowrap;">'+
+        '<div class="btn-group" role="group" style="display:flex;">'+
+            '<button id="'+ app +'IndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
+            '<button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>'+
+            '<button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>'+
+        '</div>'+
+    '</td>';
 
     // Timeout and Interval must have valid go durations, or the parser errors.
     // Host or URL are set with a value, and without an original value to make the save button appear.
@@ -127,8 +127,6 @@ function addInstance(section, app)
              break;
         }
 
-
-
         row += '<td colspan="'+ colspan +'"><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
         row += '<input type="'+ itype +'" name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
         'id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
@@ -141,9 +139,6 @@ function addInstance(section, app)
 
     // Add this new data row to our table.
     $('#'+ section +'-'+ app +'-container').append(row);
-
-    // Redo tooltips since some got added.
-    setTooltips();
 
     // Hide the "no instances" item that displays when no instances are configured.
     $('#'+ section +'-'+ app +'-none').hide();

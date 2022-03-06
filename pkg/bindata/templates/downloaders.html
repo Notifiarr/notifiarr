@@ -18,30 +18,58 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-center" style="width:20px;min-width:20px;">#</td>
-                                                <td style="min-width:130px;">Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i>
+                                                <td class="text-center" style="width:90px;min-width:90px;">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td style="min-width:130px;">
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
                                                 <td style="min-width:190px;">URL</td>
                                                 <td style="min-width:80px;">Username</td>
                                                 <td style="min-width:170px;">Password</td>
-                                                <td style="min-width:90px;width:90px">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i>
-                                                <td style="min-width:90px;width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i>
+                                                <td style="min-width:90px;width:90px">
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td style="min-width:90px;width:90px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="download-Qbit-container">
                                         {{- range $index, $app := .Config.Apps.Qbit}}
                                             <input disabled style="display: none;" class="client-parameter download-Qbit{{$index}}-deleted" data-group="download" data-label="Qbit {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="download-Qbit" id="download-Qbit-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="QbitIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="download-Qbit-deletebutton">
-                                                        <button onclick="removeInstance('download-Qbit', {{$index}})" type="button" title="Delete this instance of Qbit" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="QbitIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('download-Qbit', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.Name" name="Apps.Qbit.{{$index}}.Name" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -52,8 +80,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.URL" name="Apps.Qbit.{{$index}}.URL" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -64,8 +98,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_USER" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.User" name="Apps.Qbit.{{$index}}.User" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}">
                                                             </div>
@@ -76,8 +116,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_PASS" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Qbit.{{$index}}.Pass" name="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Qbit.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -89,8 +135,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.Interval" name="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -101,8 +153,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -129,29 +187,57 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-center">#</td>
-                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i>
+                                                <td class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
                                                 <td colspan="2">URL</td>
                                                 <td>Password</td>
-                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i>
-                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="download-Deluge-container">
                                         {{- range $index, $app := .Config.Apps.Deluge}}
                                             <input disabled style="display: none;" class="client-parameter download-Deluge{{$index}}-deleted" data-group="download" data-label="Deluge {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="download-Deluge" id="download-Deluge-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="DelugeIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="download-Deluge-deletebutton">
-                                                        <button onclick="removeInstance('download-Deluge', {{$index}})" type="button" title="Delete this instance of Deluge" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="DelugeIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('download-Deluge', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_DELUGE_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Name" name="Apps.Deluge.{{$index}}.Name" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -162,8 +248,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_DELUGE_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Config.URL" name="Apps.Deluge.{{$index}}.Config.URL" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -175,7 +267,13 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_DELUGE_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Deluge.{{$index}}.Config.Password" name="Apps.Deluge.{{$index}}.Config.Password" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Deluge.{{$index}}.Config.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -187,8 +285,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_DELUGE_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Interval" name="Apps.Deluge.{{$index}}.Interval" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -199,8 +303,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Deluge.{{$index}}.Timeout" name="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
@@ -227,29 +337,57 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-center">#</td>
-                                                <td>Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i>
+                                                <td class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
                                                 <td colspan="2">URL</td>
                                                 <td>API Key</td>
-                                                <td>Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i>
-                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to this application may elapse."></i>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="download-SabNZB-container">
                                         {{- range $index, $app := .Config.Apps.SabNZB}}
                                             <input disabled style="display: none;" class="client-parameter download-SabNZB{{$index}}-deleted" data-group="download" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="download-SabNZB" id="download-SabNZB-{{$index}}">
-                                                <td style="font-size:22px;white-space:nowrap;"><span id="SabNZBIndexLabel{{$index}}">{{instance $index}}</span>
-                                                    <span class="download-SabNZB-deletebutton">
-                                                        <button onclick="removeInstance('download-SabNZB', {{$index}})" type="button" title="Delete this instance of SabNZB" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>
-                                                    </span>
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button id="SabNZBIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onclick="removeInstance('download-SabNZB', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.Name" name="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
@@ -260,8 +398,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.URL" name="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
@@ -272,8 +416,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.SabNZB.{{$index}}.APIKey" name="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} APIKey" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.SabNZB.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -285,8 +435,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.Interval" name="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
                                                             </div>
@@ -297,8 +453,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.SabNZB.{{$index}}.Timeout" name="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>

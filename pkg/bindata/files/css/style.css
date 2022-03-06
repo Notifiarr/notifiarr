@@ -624,6 +624,8 @@ li {
 }
 
 
+
+
 .brand .ts-profile-nav {
   float: right;
   display: none;
@@ -867,5 +869,22 @@ div .file-content .line-number {
 .secret-input {
     font-size:13px;
     cursor:pointer;
-    color:#000000;
+}
+
+/* Make modal dialog box responsive to screen width. */
+@media only screen and (max-width: 700px) {
+    .modal-body {
+        width: calc(100vw - 70px) !important;
+    }
+}
+@media only screen and (min-width: 700px) {
+    .modal-body {
+        width: 630px !important;
+    }
+}
+
+.instanceLabel {
+    font-size:20px;
+    width:35px;
+    pointer-events:none;
 }

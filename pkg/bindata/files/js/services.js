@@ -103,10 +103,12 @@ function addServiceCheck()
     const index = serviceTable.rows().count();
     const instance = index+1;
     const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
-    '<td class="text-center" style="font-size: 22px;white-space: nowrap;"><span '+ (smScreen || mdScreen ? 'style="display:none;" ' : '') +'id="checksIndexLabel'+ index +'" class="mobile-hide tablet-hide">'+ instance +'&nbsp;</span>'+
-        '<span class="services-Checks-deletebutton">'+
-            '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" title="Delete this Service Check" class="delete-item-button btn btn-danger btn-sm"><i class="fa fa-minus"></i></button>'+
-        '</span>'+
+    '<td style="white-space:nowrap;">'+
+        '<div class="btn-group" role="group" style="display:flex;">'+
+            '<button id="checksIndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
+            '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>'+
+            '<button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>'+
+        '</div>'+
     '</td>'+
     '<td>'+
         '<div class="form-group" style="width:100%">'+
@@ -203,10 +205,10 @@ function addServiceCheck()
                 '</select>'+
                 '<select onChange="checkExpectChange($(this));" style="width:40%;display:none;" class="form-control input-sm serviceProcessParam serviceProcessParamSelector" value="restart">'+
                     '<option value="">None</option>'+
-                    '<option value="restart" title="Select this to send alerts when a matched process restarts." selected>'+
+                    '<option value="restart" selected>'+
                         'Restarts'+
                     '</option>'+
-                    '<option value="running" title="Select this to send alerts when a matched process is found running. Uncommon, and not usable with other options.">'+
+                    '<option value="running">'+
                         'Running'+
                     '</option>'+
                 '</select>'+
@@ -234,9 +236,6 @@ function addServiceCheck()
 
     // Add the new row through servicetable.
     serviceTable.row.add($(row)).draw();
-
-    // redo tooltips since some got added.
-    setTooltips();
 
     // setup the select2 selector for the http status codes.
     $('[id="Service.'+ index +'.Expect.StatusCode"]').select2({
@@ -282,18 +281,19 @@ function checkTypeChange(from)
 // into the "real" value, so it can be POSTed properly (it's a string).
 function checkExpectChange(from)
 {
-    const ctl = from.closest('.services-Checks'); // just this cell.
+    const ctl = from.closest('.services-Checks'); // just this row.
     const run = ctl.find('.serviceProcessParamSelector').val() == 'running';
     const expect = ctl.find('.serviceProcessParamExpect')
+
     if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.
+        // Copy comma-concatenated values into real 'expect' value.
         expect.val(from.val().join());
     } else if (from.hasClass('serviceTCPParam')) { // it's a "tcp" check.
         expect.val('');
     } else if (run) { // it's a "process" check in "running" mode.
-        // The "running" checkbox does not allow any other arguments, so deal with that here.
-        // Copy "running" into real value that is POSTed.
+        // Copy "running" into real 'expect' value that is POSTed.
         expect.val('running');
-        // Disable incompatible options.
+        // Disable 'running'-incompatible options.
         ctl.find('.serviceProcessParamMin').prop('disabled', true);
         ctl.find('.serviceProcessParamMax').prop('disabled', true);
     } else { // it's a process check not in "running" node.

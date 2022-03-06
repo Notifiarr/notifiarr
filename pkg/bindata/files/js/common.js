@@ -10,6 +10,10 @@ var serviceTable = null;
 
 $(document).ready(function()
 {
+    // https://thedesignspace.net/jquery-dialog-missing-x-from-close-button/
+    var bootstrapButton = $.fn.button.noConflict()
+    $.fn.bootstrapBtn = bootstrapButton;
+
     jsLoader();
     setTooltips();
     setScreenSizeVars();
@@ -203,11 +207,11 @@ function ajax(url, method, type)
 
 // -------------------------------------------------------------------------------------------
 
-function setTooltips()
+function setTooltips(start = document)
 {
     $('[class*="balloon-tooltip"]').fadeOut(100);
 
-    $('a, div, i, img, input, span, td, button').balloon({
+    $(start).find('a, div, i, img, input, span, td, button').balloon({
         position: 'bottom',
         classname: 'balloon-tooltip',
         css: {
@@ -411,16 +415,17 @@ function dialog(where, side)
     $('<div>' + where.siblings('.dialogText').html() + '</div>').dialog({
         title: where.siblings('.dialogTitle').html(),
         modal: true,
-        position: { my: side+' middle', at: otherside+' top', of: where},
-        width: 400,
+        height: 'auto',
+        position: { my: side+' top', at: otherside+' bottom', of: where},
         resizable: false,
+        dialogClass: 'modal-body', // customized widths.
         show: {
             effect: 'fade',
-            duration: 200
+            duration: 150
         },
         hide: {
             effect: 'fade',
-            duration: 200
+            duration: 150
         },
         open: function(event, ui)  {
             // close the modal when clicked outside, good for 'tooltips', not forms.
