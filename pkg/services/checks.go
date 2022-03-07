@@ -68,24 +68,42 @@ func (s *Service) Validate() error { //nolint:cyclop
 	return nil
 }
 
-func (s *Service) check() bool {
-	// check this service.
+// CheckOnly runs a service check and returns the result immediately.
+// It is not otherwise stored anywhere.
+func (s *Service) CheckOnly() *CheckResult {
+	res := s.checkNow()
+
+	return &CheckResult{
+		Output: res.output,
+		State:  res.state,
+	}
+}
+
+func (s *Service) checkNow() (res *result) {
 	switch s.Type {
 	case CheckHTTP:
-		return s.update(s.checkHTTP())
+		return s.checkHTTP()
 	case CheckTCP:
-		return s.update(s.checkTCP())
+		return s.checkTCP()
 	case CheckPING:
-		return s.update(s.checkPING())
+		return s.checkPING()
 	case CheckPROC:
-		return s.update(s.checkProccess())
+		return s.checkProccess()
 	default:
-		return false
+		return nil
 	}
+}
+
+func (s *Service) check() bool {
+	return s.update(s.checkNow())
 }
 
 // Return true if the service state changed.
 func (s *Service) update(res *result) bool {
+	if res == nil {
+		return false
+	}
+
 	exp.ServiceChecks.Add(s.Name+"&&Total", 1)
 	exp.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
 	//	exp.ServiceChecks.Add("Total Checks Run", 1)

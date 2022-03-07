@@ -307,3 +307,38 @@ function checkExpectChange(from)
         ctl.find('.serviceProcessParamMax').prop('disabled', false);
     }
 }
+
+
+function testService(from, index)
+{
+    const ctl = from.closest('.services-Checks');
+    const checkType = titleCaseWord($('[id="Service.'+index+'.Type"]').val())
+
+    from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
+    let fields = '';
+    ctl.find('.client-parameter').each(function() {
+        const id = $(this).attr('id')
+        if (id !== undefined) {
+            fields += '&' + $(this).serialize();
+        }
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: URLBase+'checkInstance/'+checkType+"/"+index,
+        data: fields,
+        success: function (data){
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
+            toast(checkType+' Check Successful', data, 'success');
+        },
+        error: function (response, status, error) {
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
+            if (status === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast(checkType+' Check Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
+}

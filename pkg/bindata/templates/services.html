@@ -81,7 +81,7 @@
                                                             <div class="btn-group" role="group" style="display:flex;">
                                                                 <button onclick="removeInstance('services-Checks', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
                                                                 <button id="checksIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                                                                <button type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                                <button onClick="testService($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
                                                             </div>
                                                         </td>
                                                         <td>
