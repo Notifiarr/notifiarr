@@ -68,6 +68,7 @@ func (c *Client) httpHandlers() {
 	gui.HandleFunc("/template/{template}", c.getTemplatePageHandler).Methods("GET")
 	gui.HandleFunc("/trigger/{action}/{content}", c.handleGUITrigger).Methods("GET")
 	gui.HandleFunc("/trigger/{action}", c.handleGUITrigger).Methods("GET")
+	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }

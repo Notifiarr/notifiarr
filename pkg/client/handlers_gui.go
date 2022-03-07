@@ -353,6 +353,19 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	http.Error(response, "New username and/or password saved.", http.StatusOK)
 }
 
+func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http.Request) {
+	configPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
+		return reflect.ValueOf(strings.Fields(input))
+	})
+
+	if err := request.ParseForm(); err != nil {
+		http.Error(response, "Parsing form data failed: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	testInstance(response, request)
+}
+
 func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
 	code, data := c.runTrigger(notifiarr.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
 	http.Error(response, data, code)

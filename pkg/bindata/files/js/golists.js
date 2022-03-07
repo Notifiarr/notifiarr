@@ -24,6 +24,37 @@ function removeInstance(name, index)
     },1000);
 }
 
+function testInstance(from, instanceType, index)
+{
+    from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
+    let fields = '';
+    from.closest('tr').find('.client-parameter').each(function() {
+        const id = $(this).attr('id')
+        if (id !== undefined) {
+            fields += '&' + $(this).serialize();
+        }
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: URLBase+'checkInstance/'+instanceType+"/"+index,
+        data: fields,
+        success: function (data){
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
+            toast(instanceType+' Check Successful', data, 'success');
+        },
+        error: function (response, status, error) {
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
+            if (status === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast(instanceType+' Check Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
+}
+
 // The Go app only accepts indexes on lists starting at 0 with no gaps.
 // It looks better on screen to see incremental numbers.
 // This procedure fixes the numbering on each row when an item is deleted.

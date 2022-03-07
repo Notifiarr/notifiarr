@@ -37,7 +37,11 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">URL</span>
                                                 </td>
-                                                <td style="min-width:180px;">API Key</td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
                                                 <td style="min-width:100px;">
                                                     <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -66,9 +70,9 @@
                                             <tr class="starr-Lidarr" id="starr-Lidarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
-                                                        <button id="LidarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
                                                         <button onclick="removeInstance('starr-Lidarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
-                                                        <button type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
+                                                        <button id="LidarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Lidarr', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -238,7 +242,11 @@
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">URL</span>
                                                 </td>
-                                                <td>API Key</td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
                                                 <td>
                                                     <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -267,9 +275,9 @@
                                             <tr class="starr-Prowlarr" id="starr-Prowlarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
-                                                        <button id="ProwlarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
                                                         <button onclick="removeInstance('starr-Prowlarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
-                                                        <button type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
+                                                        <button id="ProwlarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Prowlarr', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -439,7 +447,11 @@
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">URL</span>
                                                 </td>
-                                                <td>API Key</td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
                                                 <td>
                                                     <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -456,10 +468,10 @@
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
                                                 <td>
-                                                <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
-                                                <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                <span class="dialogTitle">Timeout</span>
-                                            </td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody id="starr-Radarr-container">
@@ -468,9 +480,9 @@
                                             <tr class="starr-Radarr" id="starr-Radarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
-                                                        <button id="RadarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
                                                         <button onclick="removeInstance('starr-Radarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
-                                                        <button type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
+                                                        <button id="RadarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Radarr', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -642,7 +654,11 @@
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">URL</span>
                                                 </td>
-                                                <td>API Key</td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
                                                 <td>
                                                     <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -671,9 +687,9 @@
                                             <tr class="starr-Readarr" id="starr-Readarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
-                                                        <button id="ReadarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
                                                         <button onclick="removeInstance('starr-Readarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
-                                                        <button type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
+                                                        <button id="ReadarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Readarr', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -843,7 +859,11 @@
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">URL</span>
                                                 </td>
-                                                <td>API Key</td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
                                                 <td>
                                                     <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -872,9 +892,9 @@
                                             <tr class="starr-Sonarr" id="starr-Sonarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
-                                                        <button id="SonarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
                                                         <button onclick="removeInstance('starr-Sonarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
-                                                        <button type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
+                                                        <button id="SonarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Sonarr', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>
