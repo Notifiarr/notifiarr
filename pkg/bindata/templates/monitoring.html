@@ -26,9 +26,21 @@
                                                         <th style="min-width:100px;">Name</th>
                                                         <th style="min-width:50px;">State</th>
                                                         <th style="min-width:50px;">Type</th>
-                                                        <th style="min-width:70px;">Last <i class="help-icon far fa-question-circle" title="How long ago this service was checked."></i></th>
-                                                        <th style="min-width:70px;">Since <i class="help-icon far fa-question-circle" title="How long the service has been in this state."></i></th>
-                                                        <th style="min-width:90px;">Interval <i class="help-icon far fa-question-circle" title="How often this service is checked."></i></th>
+                                                        <th style="min-width:70px;">
+                                                            <div style="display:none;" class="dialogText">How long ago this service was checked.</div>
+                                                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">Last </span>
+                                                        </th>
+                                                        <th style="min-width:70px;">
+                                                            <div style="display:none;" class="dialogText">How long the service has been in this state.</div>
+                                                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">Since </span>
+                                                        </th>
+                                                        <th style="min-width:90px;">
+                                                            <div style="display:none;" class="dialogText">How often this service is checked.</div>
+                                                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">Interval </span>
+                                                        </th>
                                                         <th style="min-width:150px;">Output</th>
                                                     </tr>
                                                 </thead>

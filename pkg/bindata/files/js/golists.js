@@ -21,9 +21,6 @@ function removeInstance(name, index)
 
         // bring up the save changes button.
         findPendingChanges();
-
-        // redo tooltips since some got nuked.
-        setTooltips();
     },1000);
 }
 

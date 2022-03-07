@@ -7,19 +7,35 @@
                                 <div style="table-responsive">
                                     <table class="table bk-dark table-bordered">
                                         <thead>
-                                            <tr><td colspan="6" style="text-align:center;">
-                                                <div style="float: left;"><img src="{{files}}/images/logo/plex.png" style="height:50px;"></div>
-                                                <h2 class="mb-3" style="margin-bottom:-45px">Plex</h2>
-                                            </td></tr>
                                             <tr>
-                                                <td style="min-width:160px;">Application Name&nbsp; <i class="help-icon fas fa-user-lock" title="The name for Plex comes from Plex and cannot be changed here. There is no automatic way to add a service check to Plex. If you want service checks, add one for it in Service Checks."></i></td>
-                                                <td style="min-width:180px;">Application URL <i class="help-icon far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
-                                                <td colspan="2">Application Token
-                                                    <a target="_new" href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/">
-                                                        <i class="help-icon far fa-question-circle" title="Click this ? icon to find directions for how to locate your Plex token."></i>
-                                                    </a>
+                                                <td colspan="6" style="text-align:center;">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/plex.png" style="height:50px;"></div>
+                                                    <h2 class="mb-3" style="margin-bottom:-45px">Plex</h2>
                                                 </td>
-                                                <td style="min-width:90px;width:90px">Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to Plex may elapse."></i></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="min-width:160px;">
+                                                    <div style="display:none;" class="dialogText">The name for Plex comes from Plex and cannot be changed here. There is no automatic way to add a service check to Plex. If you want service checks, add one for it in Service Checks.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-user-lock"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td style="min-width:180px;">
+                                                    <div style="display:none;" class="dialogText">If your application has a Base URL, include it.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
+                                                <td colspan="2">
+                                                    <div style="display:none;" class="dialogText">
+                                                        You may find directions for locating your Plex token at this <a target="_new" href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/">Plex Article</a>.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Plex Token</span>
+                                                </td>
+                                                <td style="min-width:90px;width:90px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to Plex may elapse.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -33,7 +49,13 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_PLEX_URL" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_URL" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Plex.URL" name="Plex.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}">
                                                             </div>
@@ -44,8 +66,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_PLEX_TOKEN" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_TOKEN" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Plex.Token" name="Plex.Token" data-app="Plex" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Plex.Token', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -58,7 +86,13 @@
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}" value="{{.Config.Plex.Timeout}}">
                                                             </div>
@@ -76,11 +110,31 @@
                                                 <h2 class="mb-3" style="margin-bottom:-45px">Tautulli</h2>
                                             </td></tr>
                                             <tr>
-                                                <td>Application Name <i class="help-icon far fa-question-circle" title="Adding a name to any application enables service checks for the instance."></i></td>
-                                                <td>Application URL <i class="help-icon far fa-question-circle" title="If your application has a Base URL, include it."></i></td>
-                                                <td style="min-width:150px;">API Key <i class="help-icon far fa-question-circle" title="Get this from Tautulli Settings."></i></td>
-                                                <td style="min-width:85px;width:85px;">Interval <i class="help-icon far fa-question-circle" title="Service checks are enabled when a name is added. This controls how often to check."></i></td>
-                                                <td>Timeout <i class="help-icon far fa-question-circle" title="This controls the maximum duration a request to Tautulli may elapse."></i></td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">If your application has a Base URL, include it.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
+                                                <td style="min-width:150px;">
+                                                    <div style="display:none;" class="dialogText">Get this from Tautulli Settings.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
+                                                <td style="min-width:85px;width:85px;">
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to Tautulli may elapse.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -90,8 +144,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_TAUTULLI_NAME" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_TAUTULLI_NAME" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_NAME" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Tautulli.Name" name="Apps.Tautulli.Name" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Name" data-original="{{.Config.Apps.Tautulli.Name}}" value="{{.Config.Apps.Tautulli.Name}}">
                                                             </div>
@@ -102,8 +162,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_TAUTULLI_URL" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_TAUTULLI_URL" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_URL" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Tautulli.URL" name="Apps.Tautulli.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}">
                                                             </div>
@@ -114,8 +180,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_API_KEY" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="password" autocomplete="off" id="Apps.Tautulli.APIKey" name="Apps.Tautulli.APIKey" data-app="Tautulli" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli API Key" data-original="{{.Config.Apps.Tautulli.APIKey}}" value="{{.Config.Apps.Tautulli.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Tautulli.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
@@ -127,8 +199,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Tautulli.Interval" name="Apps.Tautulli.Interval" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Interval" data-original="{{.Config.Apps.Tautulli.Interval}}" value="{{.Config.Apps.Tautulli.Interval}}">
                                                             </div>
@@ -139,8 +217,14 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm"><i class="fas fa-outdent text-warning" title="An environment variable exists for this value. Your new value will write to the config file, but the application will not use it."></i></div>
+                                                                {{- if (locked (printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix}}</span>
+                                                                </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}" value="{{.Config.Apps.Tautulli.Timeout}}">
                                                             </div>

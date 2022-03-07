@@ -1,20 +1,98 @@
                                 <h1><i class="fas fa-fire-extinguisher"></i> Triggers</h1>
                                 <p>Triggers are usually for troubleshooting. Use these to make the client do things that are normally on a cron timer.</p>
-                                <table class="table table-striped">
-                                    <tr><td><a href="#triggers" onClick="triggerAction('cfsync')">Sync Custom Formats</a></td><td>Syncs TRaSH custom formats and release profiles to Radarr and Sonarr.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('snapshot')">Send System Snapshot</a></td><td>Sends a system snapshot.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('stuckitems')">Stuck Queue Items Check</a></td><td>Checks all your apps for stuck items and sends them if they exist.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('dashboard')">Send Dashboard States</a></td><td>Collects dashboard data from all your apps and sends it.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('sessions')">Send Plex Sessions</a></td><td>Collects active plex sessions and sends them if any exist.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('corrupt/lidarr')">Check Lidarr for Corruption</a></td><td>Checks all Lidarr instances' database backups for corruption and sends an update.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('corrupt/prowlarr')">Check Prowlarr for Corruption</a></td><td>Checks all Prowlarr instances' database backups for corruption and sends an update.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('corrupt/radarr')">Check Radarr for Corruption</a></td><td>Checks all Radarr instances' database backups for corruption and sends an update.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('corrupt/readarr')">Check Readarr for Corruption</a></td><td>Checks all Readarr instances' database backups for corruption and sends an update.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('corrupt/sonarr')">Check Sonarr for Corruption</a></td><td>Checks all Sonarr instances' database backups for corruption and sends an update.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('backup/lidarr')">Check Lidarr Backups</a></td><td>Grabs all Lidarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('backup/prowlarr')">Check Prowlarr Backups</a></td><td>Grabs all Prowlarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('backup/radarr')">Check Radarr Backups</a></td><td>Grabs all Radarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('backup/readarr')">Check Readarr Backups</a></td><td>Grabs all Readarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td></tr>
-                                    <tr><td><a href="#triggers" onClick="triggerAction('backup/sonarr')">Check Sonarr Backups</a></td><td>Grabs all Sonarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td></tr>
-                                </table>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <tr><td>Runs</td><td>Action &nbsp; <a title="Refresh Page" href="#triggers" class="fas fa-sync" onClick="refreshPage('triggers');"></a></td><td>Description</td></tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Starting Radarr CF and Sonarr QP TRaSH sync."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('cfsync')">Sync Custom Formats</a></td><td>Syncs TRaSH custom formats and release profiles to Radarr and Sonarr.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Gathering and sending System Snapshot."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('snapshot')">Send System Snapshot</a></td><td>Sends a system snapshot.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Checking app queues and sending stuck items."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('stuckitems')">Stuck Queue Items Check</a></td><td>Checks all your apps for stuck items and sends them if they exist.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Initiating State Collection for Dashboard."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('dashboard')">Send Dashboard States</a></td><td>Collects dashboard data from all your apps and sends it.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Gathering and sending Plex Sessions."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('sessions')">Send Plex Sessions</a></td><td>Collects active plex sessions and sends them if any exist.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Checking Lidarr for database backup corruption."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('corrupt/lidarr')">Check Lidarr for Corruption</a></td><td>Checks all Lidarr instances' database backups for corruption and sends an update.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Checking Prowlarr for database backup corruption."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('corrupt/prowlarr')">Check Prowlarr for Corruption</a></td><td>Checks all Prowlarr instances' database backups for corruption and sends an update.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Checking Radarr for database backup corruption."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('corrupt/radarr')">Check Radarr for Corruption</a></td><td>Checks all Radarr instances' database backups for corruption and sends an update.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Checking Readarr for database backup corruption."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('corrupt/readarr')">Check Readarr for Corruption</a></td><td>Checks all Readarr instances' database backups for corruption and sends an update.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Checking Sonarr for database backup corruption."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('corrupt/sonarr')">Check Sonarr for Corruption</a></td><td>Checks all Sonarr instances' database backups for corruption and sends an update.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Sending Lidarr Backup File List to Notifiarr."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('backup/lidarr')">Check Lidarr Backups</a></td><td>Grabs all Lidarr instances' database backup info and sends an update. If there's a new backup a notification appears.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Sending Prowlarr Backup File List to Notifiarr."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('backup/prowlarr')">Check Prowlarr Backups</a></td><td>Grabs all Prowlarr instances' database backup info and sends an update. If there's a new backup a notification appears.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Sending Radarr Backup File List to Notifiarr."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('backup/radarr')">Check Radarr Backups</a></td><td>Grabs all Radarr instances' database backup info and sends an update. If there's a new backup a notification appears.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Sending Readarr Backup File List to Notifiarr."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('backup/readarr')">Check Readarr Backups</a></td><td>Grabs all Readarr instances' database backup info and sends an update. If there's a new backup a notification appears.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Sending Sonarr Backup File List to Notifiarr."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('backup/sonarr')">Check Sonarr Backups</a></td><td>Grabs all Sonarr instances' database backup info and sends an update. If there's a new backup a notification appears.
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
 {{- /* end of monitoring (leave this comment) */ -}}

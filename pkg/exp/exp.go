@@ -13,6 +13,7 @@ var (
 	APIHits       = GetMap("Incoming API Requests").Init()
 	HTTPRequests  = GetMap("Incoming HTTP Requests").Init()
 	TimerEvents   = GetMap("Triggers and Timers Executed").Init()
+	TimerCounts   = GetMap("Triggers and Timers Counters").Init()
 	NotifiarrCom  = GetMap("Outbound Requests to Notifiarr.com").Init()
 	ServiceChecks = GetMap("Service Check Responses").Init()
 	Apps          = GetMap("Starr App Requests").Init()
@@ -23,6 +24,7 @@ type AllData struct {
 	APIHits       map[string]interface{}
 	HTTPRequests  map[string]interface{}
 	TimerEvents   map[string]map[string]interface{}
+	TimerCounts   map[string]interface{}
 	NotifiarrCom  map[string]interface{}
 	ServiceChecks map[string]map[string]interface{}
 	Apps          map[string]map[string]interface{}
@@ -34,6 +36,7 @@ func GetAllData() AllData {
 		APIHits:       GetKeys(APIHits),
 		HTTPRequests:  GetKeys(HTTPRequests),
 		TimerEvents:   GetSplitKeys(TimerEvents),
+		TimerCounts:   GetKeys(TimerCounts),
 		NotifiarrCom:  GetKeys(NotifiarrCom),
 		ServiceChecks: GetSplitKeys(ServiceChecks),
 		Apps:          GetSplitKeys(Apps),

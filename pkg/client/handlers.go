@@ -163,14 +163,20 @@ func (c *Client) addUsernameHeader(next http.Handler) http.Handler {
 
 func (c *Client) countRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
-		if strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")) {
+		exp.HTTPRequests.Add("Total Requests", 1)
+
+		switch {
+		case strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")):
 			exp.HTTPRequests.Add("/api Requests", 1)
-		} else {
+		case strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "ws")):
+			exp.HTTPRequests.Add("Websocket Requests", 1)
+		default:
 			exp.HTTPRequests.Add("Non-/api Requests", 1)
 		}
 
-		exp.HTTPRequests.Add("Total Requests", 1)
-		next.ServeHTTP(response, req)
+		wrap := &responseWrapper{ResponseWriter: response, statusCode: http.StatusOK}
+		next.ServeHTTP(wrap, req)
+		exp.HTTPRequests.Add(fmt.Sprintf("Response %d %s", wrap.statusCode, http.StatusText(wrap.statusCode)), 1)
 	})
 }
 

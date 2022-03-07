@@ -3,7 +3,7 @@
                                     <p>The Notifiarr client application is capable of monitoring services via HTTP checks,
                                        TCP port checks or process running (and not running) checks. Use the form at the bottom
                                        of this page to configure service checks. <b>The client service checks work with the Notifiarr.com
-                                       Nework Integration.</b>
+                                       Network Integration.</b>
                                    </p>
                                     <p>
                                        Disable and Enable service checks on the <a href="#config" onClick="swapNavigationTemplate('config')">Configuration page</a>.
@@ -36,11 +36,11 @@
                                                     <div style="float: left;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
                                                     <h3 style="margin-bottom:-45px">Check Configuration</h3>
                                                     <div style="float: right;">
-                                                        <button id="services-Checks-addbutton" onclick="addServiceCheck();" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="services-Checks-addbutton" onclick="addServiceCheck();" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td class="tablet-hide desktop-hide">
-                                                    <button onclick="addServiceCheck()" type="button" title="Add another Service Check." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button onclick="addServiceCheck()" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h3 style="margin-left:5px;display:inline;">Check Configuration</h3>
                                                     <img src="{{files}}/images/golift.png" style="float:right;height:50px;">
                                                 </td>
@@ -79,9 +79,9 @@
                                                     <tr class="services-Checks" id="services-Checks-{{$index}}">
                                                         <td style="white-space:nowrap;">
                                                             <div class="btn-group" role="group" style="display:flex;">
+                                                                <button onclick="removeInstance('services-Checks', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
                                                                 <button id="checksIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                                                                <button onclick="removeInstance('services-Checks', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
-                                                                <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                                <button type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
                                                             </div>
                                                         </td>
                                                         <td>
@@ -215,10 +215,10 @@
                                                                     </select>
                                                                     <select onChange="checkExpectChange($(this));" style="width:40%;{{if ne $svc.Type "process"}}display:none;{{end}}" class="form-control input-sm serviceProcessParam serviceProcessParamSelector">
                                                                         <option value="">None</option>
-                                                                        <option value="restart" title="Select this to send alerts when a matched process restarts."{{if contains $svc.Expect "restart"}} selected{{end}}>
+                                                                        <option value="restart"{{if contains $svc.Expect "restart"}} selected{{end}}>
                                                                             Restarts
                                                                         </option>
-                                                                        <option value="running" title="Select this to send alerts when a matched process is found running. Uncommon, and not usable with other options."{{if contains $svc.Expect "running"}} selected{{end}}>
+                                                                        <option value="running"{{if contains $svc.Expect "running"}} selected{{end}}>
                                                                             Running
                                                                         </option>
                                                                     </select>

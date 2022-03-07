@@ -73,10 +73,10 @@
                                             <input disabled style="display: none;" class="client-parameter snaps-MySQL{{$index}}-deleted" data-group="snaps" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="snaps-MySQL" id="snaps-MySQL-{{$index}}">
                                                 <td style="white-space:nowrap;">
-                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                    <div class="btn-group" role="group" style="display:flex;font-size:18px;">
+                                                        <button onclick="removeInstance('snaps-MySQL', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-minus"></i></button>
                                                         <button id="MySQLIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                                                        <button onclick="removeInstance('snaps-MySQL', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>
-                                                        <button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>
+                                                        <button type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>

@@ -136,6 +136,7 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 		}
 
 		exp.TimerEvents.Add(string(event)+"&&"+string(action.Name), 1)
+		exp.TimerCounts.Add(string(action.Name), 1)
 
 		if action.Fn == nil && action.SFn == nil { // stop channel has no Functions
 			return // called by c.Stop(), calls c.stopTimerLoop().

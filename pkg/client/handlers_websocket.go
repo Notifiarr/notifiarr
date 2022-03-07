@@ -102,6 +102,11 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 	for {
 		select {
 		case line := <-fileTail.Lines:
+			if line == nil {
+				c.Debugf("file lines return empty, dropping websocket (did the file rotate?)")
+				return
+			}
+
 			if line.Num == 1 {
 				continue // first line is never complete.
 			}

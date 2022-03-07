@@ -156,14 +156,6 @@ a:hover {
 .bk-brown {
   background: #241b1b;
 }
-.bk-img {
-  position: relative;
-  width: 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-image: url(../../img/login-bg.jpg);
-}
 .bk-fixed {
   background-attachment: fixed;
 }
