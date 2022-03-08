@@ -49,10 +49,11 @@ func (c *Client) handleAptHook() error {
 			fallthrough
 		default: /* debug /**/
 			// fmt.Println("hook line", line)
-		}
+		} //nolint:wsl
 	}
 
 	resp, err := c.website.SendData(notifiarr.PkgRoute.Path("apt"), output, true)
+	//nolint:forbidigo
 	if err != nil {
 		fmt.Printf("ERROR Sending Notification to Notifiarr.com: %v %s\n", err, resp)
 	} else {
