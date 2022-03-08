@@ -106,9 +106,9 @@ function addInstance(section, app)
     let row = '<tr class="newRow bk-success '+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
     '<td style="white-space:nowrap;">'+
         '<div class="btn-group" role="group" style="display:flex;">'+
+            '<button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>'+
             '<button id="'+ app +'IndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
-            '<button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>'+
-            '<button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>'+
+            '<button onClick="testInstance($(this), \'MySQL\', \''+index+'\')" type="button" style="font-size:18px;" class="btn btn-success btn-sm"><i class="fas fa-check-double"></i></button>'+
         '</div>'+
     '</td>';
 

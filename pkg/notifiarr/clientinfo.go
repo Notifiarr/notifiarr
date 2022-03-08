@@ -24,6 +24,7 @@ type ClientInfo struct {
 		WelcomeMSG string `json:"welcome"`
 		Subscriber bool   `json:"subscriber"`
 		Patron     bool   `json:"patron"`
+		DevAllowed bool   `json:"devAllowed"`
 	} `json:"user"`
 	Actions struct {
 		Poll      bool             `json:"poll"`

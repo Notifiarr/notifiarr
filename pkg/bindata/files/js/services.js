@@ -105,9 +105,9 @@ function addServiceCheck()
     const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
     '<td style="white-space:nowrap;">'+
         '<div class="btn-group" role="group" style="display:flex;">'+
+            '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>'+
             '<button id="checksIndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
-            '<button onclick="removeInstance(\'services-Checks\', '+ index +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="width:35px;"><i class="fa fa-minus"></i></button>'+
-            '<button type="button" class="btn btn-success btn-sm"><i class="fas fa-cubes"></i></button>'+
+            '<button onClick="testService($(this), \''+index+'\')" type="button" style="font-size:18px;" class="btn btn-success btn-sm"><i class="fas fa-check-double"></i></button>'+
         '</div>'+
     '</td>'+
     '<td>'+

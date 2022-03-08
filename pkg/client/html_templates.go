@@ -19,6 +19,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
@@ -86,16 +87,27 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:cyclop
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
-		"megabyte": func(size int64) string {
+		"megabyte": func(size interface{}) string {
+			val := int64(0)
+
+			switch valtype := size.(type) {
+			case int64:
+				val = valtype
+			case uint64:
+				val = int64(valtype)
+			case int:
+				val = int64(valtype)
+			}
+
 			switch {
-			case size > mnd.Megabyte*mnd.Kilobyte*1000: // lul
-				return fmt.Sprintf("%.2f Tb (wtf?)", float64(size)/float64(mnd.Megabyte*mnd.Megabyte))
-			case size > mnd.Megabyte*1000:
-				return fmt.Sprintf("%.2f Gb", float64(size)/float64(mnd.Megabyte*mnd.Kilobyte))
-			case size > mnd.Kilobyte*1000:
-				return fmt.Sprintf("%.1f Mb", float64(size)/float64(mnd.Megabyte))
+			case val > mnd.Megabyte*mnd.Kilobyte*1000: // lul
+				return fmt.Sprintf("%.2f Tb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte))
+			case val > mnd.Megabyte*1000:
+				return fmt.Sprintf("%.2f Gb", float64(val)/float64(mnd.Megabyte*mnd.Kilobyte))
+			case val > mnd.Kilobyte*1000:
+				return fmt.Sprintf("%.1f Mb", float64(val)/float64(mnd.Megabyte))
 			default:
-				return fmt.Sprintf("%.1f Kb", float64(size)/float64(mnd.Kilobyte))
+				return fmt.Sprintf("%.1f Kb", float64(val)/float64(mnd.Kilobyte))
 			}
 		},
 		// returns the URL base.
@@ -171,18 +183,19 @@ func (c *Client) ParseGUITemplates() (err error) {
 }
 
 type templateData struct {
-	Config      *configfile.Config     `json:"config"`
-	Flags       *configfile.Flags      `json:"flags"`
-	Username    string                 `json:"username"`
-	Dynamic     bool                   `json:"dynamic"`
-	Webauth     bool                   `json:"webauth"`
-	Msg         string                 `json:"msg,omitempty"`
-	Version     map[string]interface{} `json:"version"`
-	LogFiles    *logs.LogFileInfos     `json:"logFileInfo"`
-	ConfigFiles *logs.LogFileInfos     `json:"configFileInfo"`
-	ClientInfo  *notifiarr.ClientInfo  `json:"clientInfo"`
-	Expvar      exp.AllData            `json:"expvar"`
-	HostInfo    *host.InfoStat         `json:"hostInfo"`
+	Config      *configfile.Config             `json:"config"`
+	Flags       *configfile.Flags              `json:"flags"`
+	Username    string                         `json:"username"`
+	Dynamic     bool                           `json:"dynamic"`
+	Webauth     bool                           `json:"webauth"`
+	Msg         string                         `json:"msg,omitempty"`
+	Version     map[string]interface{}         `json:"version"`
+	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
+	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
+	ClientInfo  *notifiarr.ClientInfo          `json:"clientInfo"`
+	Expvar      exp.AllData                    `json:"expvar"`
+	HostInfo    *host.InfoStat                 `json:"hostInfo"`
+	Disks       map[string]*snapshot.Partition `json:"disks"`
 }
 
 func (c *Client) renderTemplate(response io.Writer, req *http.Request,
@@ -205,6 +218,7 @@ func (c *Client) renderTemplate(response io.Writer, req *http.Request,
 		LogFiles:    c.Logger.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
 		ClientInfo:  clientInfo,
+		Disks:       c.getDisks(),
 		Version: map[string]interface{}{
 			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),
@@ -426,4 +440,27 @@ func revBytes(output bytes.Buffer) []byte {
 	}
 
 	return data
+}
+
+func (c *Client) getDisks() map[string]*snapshot.Partition {
+	output := make(map[string]*snapshot.Partition)
+	snapcnfg := &snapshot.Config{
+		Plugins:   &snapshot.Plugins{},
+		DiskUsage: true,
+		AllDrives: true,
+		ZFSPools:  c.Config.Snapshot.ZFSPools,
+		UseSudo:   c.Config.Snapshot.UseSudo,
+		//		Raid:      c.Config.Snapshot.Raid,
+	}
+	snapshot, _, _ := snapcnfg.GetSnapshot()
+
+	for k, v := range snapshot.DiskUsage {
+		output[k] = v
+	}
+
+	for k, v := range snapshot.ZFSPool {
+		output[k] = v
+	}
+
+	return output
 }
