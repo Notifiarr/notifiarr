@@ -82,34 +82,12 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 	}
 }
 
-func (c *Client) getFuncMap() template.FuncMap { //nolint:cyclop
+func (c *Client) getFuncMap() template.FuncMap {
 	return template.FuncMap{
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
-		"megabyte": func(size interface{}) string {
-			val := int64(0)
-
-			switch valtype := size.(type) {
-			case int64:
-				val = valtype
-			case uint64:
-				val = int64(valtype)
-			case int:
-				val = int64(valtype)
-			}
-
-			switch {
-			case val > mnd.Megabyte*mnd.Kilobyte*1000: // lul
-				return fmt.Sprintf("%.2f Tb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte))
-			case val > mnd.Megabyte*1000:
-				return fmt.Sprintf("%.2f Gb", float64(val)/float64(mnd.Megabyte*mnd.Kilobyte))
-			case val > mnd.Kilobyte*1000:
-				return fmt.Sprintf("%.1f Mb", float64(val)/float64(mnd.Megabyte))
-			default:
-				return fmt.Sprintf("%.1f Kb", float64(val)/float64(mnd.Kilobyte))
-			}
-		},
+		"megabyte": megabyte,
 		// returns the URL base.
 		"base": func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
 		// returns the files url base.
@@ -119,22 +97,7 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:cyclop
 		// returns true if the environment variable has a value.
 		"locked":   func(env string) bool { return os.Getenv(env) != "" },
 		"contains": strings.Contains,
-		"since": func(t time.Time) string {
-			if t.IsZero() {
-				return "N/A"
-			}
-
-			return strings.ReplaceAll(durafmt.Parse(time.Since(t).Round(time.Second)).
-				LimitFirstN(3). //nolint:gomnd
-				Format(durafmt.Units{
-					Year:   durafmt.Unit{Singular: "y", Plural: "y"},
-					Week:   durafmt.Unit{Singular: "w", Plural: "w"},
-					Day:    durafmt.Unit{Singular: "d", Plural: "d"},
-					Hour:   durafmt.Unit{Singular: "h", Plural: "h"},
-					Minute: durafmt.Unit{Singular: "m", Plural: "m"},
-					Second: durafmt.Unit{Singular: "s", Plural: "s"},
-				}), " ", "")
-		},
+		"since":    since,
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
 				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {
@@ -152,6 +115,47 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:cyclop
 			return "0"
 		},
 	}
+}
+
+func megabyte(size interface{}) string {
+	val := int64(0)
+
+	switch valtype := size.(type) {
+	case int64:
+		val = valtype
+	case uint64:
+		val = int64(valtype)
+	case int:
+		val = int64(valtype)
+	}
+
+	switch {
+	case val > mnd.Megabyte*mnd.Kilobyte*1000: // lul
+		return fmt.Sprintf("%.2f Tb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte))
+	case val > mnd.Megabyte*1000:
+		return fmt.Sprintf("%.2f Gb", float64(val)/float64(mnd.Megabyte*mnd.Kilobyte))
+	case val > mnd.Kilobyte*1000:
+		return fmt.Sprintf("%.1f Mb", float64(val)/float64(mnd.Megabyte))
+	default:
+		return fmt.Sprintf("%.1f Kb", float64(val)/float64(mnd.Kilobyte))
+	}
+}
+
+func since(t time.Time) string {
+	if t.IsZero() {
+		return "N/A"
+	}
+
+	return strings.ReplaceAll(durafmt.Parse(time.Since(t).Round(time.Second)).
+		LimitFirstN(3). //nolint:gomnd
+		Format(durafmt.Units{
+			Year:   durafmt.Unit{Singular: "y", Plural: "y"},
+			Week:   durafmt.Unit{Singular: "w", Plural: "w"},
+			Day:    durafmt.Unit{Singular: "d", Plural: "d"},
+			Hour:   durafmt.Unit{Singular: "h", Plural: "h"},
+			Minute: durafmt.Unit{Singular: "m", Plural: "m"},
+			Second: durafmt.Unit{Singular: "s", Plural: "s"},
+		}), " ", "")
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.

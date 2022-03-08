@@ -22,7 +22,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-func testInstance(response http.ResponseWriter, request *http.Request) {
+func testInstance(response http.ResponseWriter, request *http.Request) { //nolint:funlen,cyclop
 	config := configfile.Config{}
 	if err := configPostDecoder.Decode(&config, request.PostForm); err != nil {
 		http.Error(response, "Decoding POST data into Go data structure failed: "+err.Error(), http.StatusBadRequest)

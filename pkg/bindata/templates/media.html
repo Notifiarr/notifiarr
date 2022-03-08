@@ -8,12 +8,13 @@
                                     <table class="table bk-dark table-bordered">
                                         <thead>
                                             <tr>
-                                                <td colspan="6" style="text-align:center;">
+                                                <td colspan="7" style="text-align:center;">
                                                     <div style="float: left;"><img src="{{files}}/images/logo/plex.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">Plex</h2>
                                                 </td>
                                             </tr>
                                             <tr>
+                                                <td style="width:30px;" class="text-center"><i class="fab fa-grunt"></i></td>
                                                 <td style="min-width:160px;">
                                                     <div style="display:none;" class="dialogText">The name for Plex comes from Plex and cannot be changed here. There is no automatic way to add a service check to Plex. If you want service checks, add one for it in Service Checks.</div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon fas fa-user-lock"></a>
@@ -41,6 +42,11 @@
                                         <tbody>
                                         {{- if .Config.Plex}}
                                             <tr>
+                                                <td>
+                                                    <div class="btn-group" role="group" style="display:flex;font-size:18px;">
+                                                        <button onClick="testInstance($(this), 'Plex', '1')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <input readonly type="text" id="Plex.Name" name="Plex.Name" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Name" data-original="{{.Config.Plex.Name}}" value="{{.Config.Plex.Name}}" style="width: 100%;">
                                                 </td>
@@ -101,15 +107,16 @@
                                                 </td>
                                             </tr>
                                         {{- else}}
-                                                <tr><td colspan="6">No Plex instance configured.</td></tr>
+                                                <tr><td colspan="7">No Plex instance configured.</td></tr>
                                         {{- end}}
                                         </tbody>
                                         <thead>
-                                            <tr><td colspan="6" style="text-align:center;">
+                                            <tr><td colspan="7" style="text-align:center;">
                                                 <div style="float: left;"><img src="{{files}}/images/logo/tautulli.png" style="height:50px;"></div>
                                                 <h2 class="mb-3" style="margin-bottom:-45px">Tautulli</h2>
                                             </td></tr>
                                             <tr>
+                                                <td class="text-center"><i class="far fa-snowman"></i></td>
                                                 <td>
                                                     <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -140,6 +147,11 @@
                                         <tbody>
                                         {{- if .Config.Apps.Tautulli}}
                                             <tr>
+                                                <td>
+                                                    <div class="btn-group" role="group" style="display:flex;font-size:18px;">
+                                                        <button onClick="testInstance($(this), 'Tautulli', '1')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
@@ -233,7 +245,7 @@
                                                 </td>
                                             </tr>
                                         {{- else}}
-                                            <tr><td colspan="6">No Tautulli instance configured.</td></tr>
+                                            <tr><td colspan="7">No Tautulli instance configured.</td></tr>
                                         {{- end}}
                                         </tbody>
                                     </table>
