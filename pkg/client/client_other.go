@@ -52,7 +52,7 @@ func (c *Client) handleAptHook() error {
 		}
 	}
 
-	resp, err := c.website.SendData(notifiarr.TestRoute.Path("apt"), output, true)
+	resp, err := c.website.SendData(notifiarr.PkgRoute.Path("apt"), output, true)
 	if err != nil {
 		fmt.Printf("ERROR Sending Notification to Notifiarr.com: %v %s\n", err, resp)
 	} else {
