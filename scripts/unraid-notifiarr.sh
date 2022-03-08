@@ -21,7 +21,7 @@ NOTIFIARR_API_KEY="abcdef12345"
 SCRIPTNAME=Notifiarr
 LOG="/var/log/notify_${SCRIPTNAME%.*}"
 ## Don't change this.
-URL="https://dev.notifiarr.com/api/v1/notification/packageManager?event=unraid"
+URL="https://notifiarr.com/api/v1/notification/packageManager?event=unraid"
 ## Sometimes CloudFlare has an error, mitigate with retries.
 RETRIES=4
 
@@ -34,12 +34,13 @@ RETRIES=4
 UPTIME=$(cut -d. -f1 /proc/uptime)
 LOADAV=$(uptime | cut -d: -f5)
 KERNEL=$(uname -s -r)
-DOCKER=$(docker ps -q 2>&1 | wc -l)
-STOPED=$(docker ps -aq 2>&1 | wc -l)
-STOPED=$(echo "${STOPED} ${DOCKER}" | awk '{printf($1-$2)}')
+RUNNING=$(docker ps -q 2>&1 | wc -l)
+STOPED=$(echo "$(docker ps -aq 2>&1 | wc -l) ${RUNNING}" | awk '{printf($1-$2)}')
 UNRAIDVER=$(head -n1 /etc/issue | grep -o '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?$')
-MEMTOTAL=$(grep MemTotal /proc/meminfo | awk '{printf($2/1024)}')
-MEMAVAIL=$(grep MemAvailable /proc/meminfo | awk '{printf($2/1024)}')
+MEMTOTAL=$(grep MemTotal /proc/meminfo | awk '{printf($2)}')
+MEMAVAIL=$(grep MemAvailable /proc/meminfo | awk '{printf($2)}')
+CPUPERC=$(top -b -n2 -p 1 | fgrep "Cpu(s)" | tail -1 | \
+  awk -F'id,' -v prefix="$prefix" '{ split($1, vs, ","); v=vs[length(vs)]; sub("%", "", v); printf "%s%.1f", prefix, 100 - v }')
 
 POST=$(cat <<EOF
   {
@@ -50,8 +51,9 @@ POST=$(cat <<EOF
     "content": "${CONTENT}",
     "extra": {
       "uptime":   ${UPTIME},
-      "running":  ${DOCKER},
+      "running":  ${RUNNING},
       "stopped":  ${STOPED},
+      "cpu":      ${CPUPERC},
       "load":     "${LOADAV}",
       "kernel":   "${KERNEL}",
       "version":  "${UNRAIDVER}",
