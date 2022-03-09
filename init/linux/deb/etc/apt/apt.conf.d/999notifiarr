@@ -1,0 +1,4 @@
+// Part of notifiarr package. Sends notices to notifiarr.com.
+// Disable in /etc/notifiarr/notifiarr.conf.
+DPkg::Pre-Install-Pkgs {"/usr/bin/notifiarr --apthook";};
+DPkg::Tools::Options::/usr/bin/notifiarr::Version "2";

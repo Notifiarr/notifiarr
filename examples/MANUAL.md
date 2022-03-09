@@ -47,6 +47,11 @@ OPTIONS
         making an http request. Example: --header "X-Plex-Token: absdefg123jklm"
         May be provided more than once to add multiple headers.
 
+    --apthook
+        This should only be used on Linux for dpkg pre-install-pkg hooks.
+        This reads from stdin from dpkg, and sends it off to notifiarr.com.
+        Will not work on any OS except Linux; only designed for Debian OSes.
+
     -v, --version
         Display version and exit.
 

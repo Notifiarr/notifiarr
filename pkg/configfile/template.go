@@ -43,13 +43,16 @@ extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
 ## This is used to receive Plex webhooks and Media Request commands.
 ##
 bind_addr = "{{.BindAddr}}"
-{{if or (eq os "windows") (force)}}
+
+{{- if or (eq os "windows") (force)}}
+
 ## This application can update itself on Windows systems.
 ## Set this to "daily" to check GitHub every day for updates.
 ## You may also set it to a Go duration like "12h" or "72h".
 ## THIS ONLY WORKS ON WINDOWS
 {{if .AutoUpdate}}auto_update = "{{.AutoUpdate}}"{{else}}auto_update = "off"{{end}}
-{{end}}
+{{- end}}
+
 ## Quiet makes the app not log anything to output.
 ## Recommend setting log files if you make the app quiet.
 ## This is always true on Windows and macOS app.
@@ -105,6 +108,15 @@ file_mode = "{{.FileMode.String}}"
 ##
 timeout = "{{.Timeout}}"
 
+{{- if or (eq os "linux") (force)}}
+
+## This application can integrate with apt on Debian-based OSes.
+## Set apt to true to enable this integration. A true setting causes
+## notifiarr to relay apt package install/update hooks to notifiarr.com.
+##
+apt = "{{.EnableApt}}"
+{{- end}}
+
 ## Setting serial to true makes the app use fewer threads when polling apps.
 ## This spreads CPU usage out and uses a bit less memory.
 serial = {{.Serial}}
@@ -113,7 +125,6 @@ serial = {{.Serial}}
 ## Sometimes cloudflare returns a 521, and this mitigates those problems.
 ## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
 retries = {{.Retries}}
-
 
 ##################
 # Starr Settings #

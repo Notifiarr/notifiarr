@@ -22,6 +22,7 @@
 /*.upx
 /*.app
 *.sha256
+/*.service
 /vendor
 .DS_Store
 *~
