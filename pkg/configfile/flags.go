@@ -16,6 +16,7 @@ type Flags struct {
 	*flag.FlagSet `json:"-"`
 	VerReq        bool     `json:"verReq"`
 	Restart       bool     `json:"restart"`
+	AptHook       bool     `json:"aptHook"`
 	Updated       bool     `json:"updated"`
 	PSlist        bool     `json:"pslist"`
 	Write         string   `json:"wrte"`
@@ -40,6 +41,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
 	f.StringVarP(&f.Assets, "assets", "a", "", "Provide path to custom web assets: static files and templates")
+	f.BoolVar(&f.AptHook, "apthook", false, "Process a payload from a dpkg Pre-Install-Pkgs hook.")
 
 	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.Restart, "restart", false, "This is used by auto-update, do not call it.")

@@ -1,12 +1,23 @@
 package client
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
+
+/*
+func (c *Client) handleAptHook() error {
+	return fmt.Errorf("this feature is not supported on this platform") //nolint:goerr113
+}
+*/
+
+func (c *Client) handleAptHook() error {
+	return fmt.Errorf("this feature is not supported on this platform") //nolint:goerr113
+}
 
 func (c *Client) printUpdateMessage() {}
 

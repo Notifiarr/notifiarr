@@ -95,34 +95,44 @@ retries = 0
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
+##
+## NOTE: The url should match what you see in your address bar locally
 
 #[[lidarr]]
 #name     = "" # Set a name to enable checks of your service.
-#url      = "http://lidarr:8989/"
+#url      = "http://lidarr:8989"
 #api_key  = ""
 
 
 #[[prowlarr]]
 #name     = "" # Set a name to enable checks of your service.
-#url      = "http://prowlarr:9696/"
+#url      = "http://prowlarr:9696"
 #api_key  = ""
 
 
 #[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
+<<<<<<< HEAD
 #url       = "http://127.0.0.1:7878/"
+=======
+#url       = "http://127.0.0.1:7878"
+>>>>>>> origin/main
 #api_key   = ""
 
 
 #[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
+<<<<<<< HEAD
 #url       = "http://127.0.0.1:8787/"
+=======
+#url       = "http://127.0.0.1:8787"
+>>>>>>> origin/main
 #api_key   = ""
 
 
 #[[sonarr]]
 #name      = ""  # Set a name to enable checks of your service.
-#url       = "http://sonarr:8989/"
+#url       = "http://sonarr:8989"
 #api_key   = ""
 
 
@@ -130,20 +140,20 @@ retries = 0
 
 #[[deluge]]
 #name     = ""  # Set a name to enable checks of your service.
-#url      = "http://deluge:8112/"
+#url      = "http://deluge:8112"
 #password = ""
 
 
 #[[qbit]]
 #name     = ""  # Set a name to enable checks of your service.
-#url      = "http://qbit:8080/"
+#url      = "http://qbit:8080"
 #user     = ""
 #pass     = ""
 
 
 #[[sabnzbd]]
 #name     = ""  # Set a name to enable checks of this application.
-#url      = "http://sabnzbd:8080/"
+#url      = "http://sabnzbd:8080"
 #api_key  = ""
 
 

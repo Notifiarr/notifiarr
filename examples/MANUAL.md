@@ -53,6 +53,11 @@ OPTIONS
         static assets from the /files path and templates contains customized
         HTML templates for the GUI web routes. This is a developer feature.
 
+    --apthook
+        This should only be used on Linux for dpkg pre-install-pkg hooks.
+        This reads from stdin from dpkg, and sends it off to notifiarr.com.
+        Will not work on any OS except Linux; only designed for Debian OSes.
+
     -v, --version
         Display version and exit.
 
