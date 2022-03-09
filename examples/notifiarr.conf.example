@@ -112,21 +112,13 @@ retries = 0
 
 #[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
-<<<<<<< HEAD
 #url       = "http://127.0.0.1:7878/"
-=======
-#url       = "http://127.0.0.1:7878"
->>>>>>> origin/main
 #api_key   = ""
 
 
 #[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
-<<<<<<< HEAD
 #url       = "http://127.0.0.1:8787/"
-=======
-#url       = "http://127.0.0.1:8787"
->>>>>>> origin/main
 #api_key   = ""
 
 

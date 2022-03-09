@@ -71,7 +71,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <textarea id="ExKeys" class="client-parameter form-control input-sm" data-group="config" data-label="Extra Keys" data-original="{{range $s := .Config.ExKeys}}{{$s}} {{end}}">{{range $s := .Config.ExKeys}}{{$s}} {{end}}</textarea>
+                                                                <textarea id="ExKeys" name="ExKeys" class="client-parameter form-control input-sm" data-group="config" data-label="Extra Keys" data-original="{{range $s := .Config.ExKeys}}{{$s}} {{end}}">{{range $s := .Config.ExKeys}}{{$s}} {{end}}</textarea>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -100,7 +100,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_BIND_ADDR" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input class="client-parameter form-control input-sm" data-group="config" data-label="Bind Address" type="text" id="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}">
+                                                                <input class="client-parameter form-control input-sm" data-group="config" data-label="Bind Address" type="text" id="BindAddr" name="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -130,7 +130,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_AUTO_UPDATE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Auto Update" id="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Auto Update" id="AutoUpdate" name="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
                                                                     <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="">Disabled</option>
                                                                     <option {{if eq .Config.AutoUpdate "daily"}}selected {{end}}value="daily">Enabled (daily)</option>
                                                                     {{- if (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "daily")) }}
@@ -174,7 +174,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_MODE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Client Mode" id="Mode" data-original="{{.Config.Mode}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Client Mode" id="Mode" name="Mode" data-original="{{.Config.Mode}}">
                                                                     <option {{if eq .Config.Mode "production" }}selected {{end}}value="production">Production</option>
                                                                     <option {{if not .ClientInfo.User.DevAllowed}}disabled {{else if eq .Config.Mode "development"}}selected {{end}}value="development">Development</option>
                                                                 </select>
@@ -206,7 +206,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_URLBASE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="URLBase" class="client-parameter form-control input-sm" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}">
+                                                                <input type="text" id="URLBase" name="URLBase" class="client-parameter form-control input-sm" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -235,7 +235,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UPTREAMS_0" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <textarea id="Upstreams" class="client-parameter form-control input-sm" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
+                                                                <textarea id="Upstreams" name="Upstreams" class="client-parameter form-control input-sm" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -265,7 +265,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERIAL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Serial" id="Serial" data-original="{{.Config.Serial}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Serial" id="Serial" name="Serial" data-original="{{.Config.Serial}}">
                                                                     <option {{if .Config.Serial}}selected {{end}}value="true">Disabled</option>
                                                                     <option {{if not .Config.Serial}}selected {{end}}value="false">Enabled</option>
                                                                 </select>
@@ -297,11 +297,49 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_RETRIES" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Retries" class="client-parameter form-control input-sm" data-group="config" data-label="Retries" data-original="{{.Config.Retries}}" value="{{.Config.Retries}}">
+                                                                <input type="text" id="Retries" name="Retries" class="client-parameter form-control input-sm" data-group="config" data-label="Retries" data-original="{{.Config.Retries}}" value="{{.Config.Retries}}">
                                                             </div>
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                {{- if (eq .Version.os "linux") }}
+                                                <tr>
+                                                    <td>
+                                                        <div style="display:none;" class="dialogText">
+                                                            The notifiarr Debian (and Ubuntu) package includes an APT integration.
+                                                            This integration invokes every time an <span class="text-warning">apt</span> command is executed.
+                                                            To enable it, set this field to Enabled, and then <b>enable the Package Manager integration on Notifiarr.com.</b>
+                                                            This feature does not require the client to be running; it only requires the client deb package to be installed.
+                                                            This does not work on RHEL or non-Debian Linux.<br>
+                                                            <b>Current Value</b>: <i>{{if .Config.EnableApt}}Enabled{{else}}Disabled{{end}}</i>
+                                                        </div>
+                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                        <span class="dialogTitle">APT Hook</span>
+                                                    </td>
+                                                    <td class="mobile-hide">
+                                                        {{if .Config.EnableApt}}Enabled{{else}}Disabled{{end}}
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_APT" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_APT" .Flags.EnvPrefix}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="APT Hook" id="EnableApt" name="EnableApt" data-original="{{.Config.EnableApt}}">
+                                                                    <option {{if .Config.EnableApt}}selected {{end}}value="true">Enabled</option>
+                                                                    <option {{if not .Config.EnableApt}}selected {{end}}value="false">Disabled</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {{- end }}
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
@@ -326,7 +364,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Timeout" class="client-parameter form-control input-sm" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}">
+                                                                <input type="text" name="Timeout" id="Timeout" class="client-parameter form-control input-sm" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -362,7 +400,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="SSLKeyFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}">
+                                                                <input type="text" name="SSLKeyFile" id="SSLKeyFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -391,7 +429,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="SSLCrtFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}">
+                                                                <input type="text" name="SSLCrtFile" id="SSLCrtFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -428,7 +466,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Run Checks" id="Services.Disabled" data-original="{{.Config.Services.Disabled}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Run Checks" id="Services.Disabled" name="Services.Disabled" data-original="{{.Config.Services.Disabled}}">
                                                                     <option {{if .Config.Services.Disabled}}selected {{end}}value="true">Disabled</option>
                                                                     <option {{if not .Config.Services.Disabled}}selected {{end}}value="false">Enabled</option>
                                                                 </select>
@@ -460,7 +498,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Parallel Checks" id="Services.Parallel" data-original="{{.Config.Services.Parallel}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Parallel Checks" name="Services.Parallel" id="Services.Parallel" data-original="{{.Config.Services.Parallel}}">
                                                                     <option {{if eq .Config.Services.Parallel 1}}selected {{end}}value="1">1</option>
                                                                     <option {{if eq .Config.Services.Parallel 2}}selected {{end}}value="2">2</option>
                                                                     <option {{if eq .Config.Services.Parallel 3}}selected {{end}}value="3">3</option>
@@ -495,7 +533,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Services.Interval" class="client-parameter form-control input-sm" data-group="config" data-label="Update Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}">
+                                                                <input type="text" id="Services.Interval" name="Services.Interval" class="client-parameter form-control input-sm" data-group="config" data-label="Update Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -531,7 +569,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_DEBUG" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Debug" id="Debug" data-original="{{.Config.Debug}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Debug" id="Debug" name="Debug" data-original="{{.Config.Debug}}">
                                                                     <option {{if .Config.Debug}}selected {{end}}value="true">Enabled</option>
                                                                     <option {{if not .Config.Debug}}selected {{end}}value="false">Disabled</option>
                                                                 </select>
@@ -563,7 +601,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_QUIET" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Quiet" id="Quiet" data-original="{{.Config.Quiet}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Quiet" id="Quiet" name="Quiet" data-original="{{.Config.Quiet}}">
                                                                     <option {{if .Config.Quiet}}selected {{end}}value="true">Enabled</option>
                                                                     <option {{if not .Config.Quiet}}selected {{end}}value="false">Disabled</option>
                                                                 </select>
@@ -595,7 +633,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}">
+                                                                <input type="text" id="LogFile" name="LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -624,7 +662,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_HTTP_LOG" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="HTTPLog" class="client-parameter form-control input-sm" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}">
+                                                                <input type="text" name="HTTPLog" id="HTTPLog" class="client-parameter form-control input-sm" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -653,7 +691,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Services.LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Service Log" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}">
+                                                                <input type="text" id="Services.LogFile" name="Services.LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Service Log" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -682,7 +720,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_DEBUG_LOG" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="LogConfig.DebugLog" class="client-parameter form-control input-sm" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}">
+                                                                <input type="text" id="LogConfig.DebugLog" name="LogConfig.DebugLog" class="client-parameter form-control input-sm" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -712,7 +750,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_FILE_MODE" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="FileMode" class="client-parameter form-control input-sm" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}">
+                                                                <input type="text" id="FileMode" name="FileMode" class="client-parameter form-control input-sm" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -742,7 +780,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_MAX_BODY" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="MaxBody" class="client-parameter form-control input-sm" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}">
+                                                                <input type="text" name="MaxBody" id="MaxBody" class="client-parameter form-control input-sm" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -771,7 +809,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILE_MB" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="LogFileMb" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}">
+                                                                <input type="text" name="LogFileMb" id="LogFileMb" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -800,7 +838,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILES" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="LogFiles" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}">
+                                                                <input type="text" name="LogFiles" id="LogFiles" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}">
                                                             </div>
                                                         </div>
                                                     </td>
