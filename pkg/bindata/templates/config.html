@@ -20,7 +20,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            API key from your Notifiarr.com account, required for security validation. This must be an 'All' key!<br>
+                                                            API key from your Notifiarr.com account, required for security validation.<br>
+                                                            This must be an <span class="text-warning">All</span> key!<br>
                                                             <!-- b>Current Value</b>: <i>{{ .Config.APIKey }}</i -->
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -50,14 +51,22 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            This application uses the Notifiarr.com API key for incoming authentication. That's not safe if you want a third party to authenticate to this app. You can use this section to add extra API keys. Whatever you want. Separate them with newlines or spaces.<br>
-                                                            <b>Current Values</b>:<br>{{range $i, $s := .Config.ExKeys}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
+                                                            This application uses the Notifiarr.com API key (set above) for incoming authentication.
+                                                            It's not safe to give that key to any other website, person, or third party service.
+                                                            This is because that key is <i>also</i> used for authentication to the Notifiarr.com API.
+                                                            If you want third parties to authenticate to this application's API, you should create
+                                                            custom keys for each integration. As of March 8, 2022, there are no existing integrations,
+                                                            so this is for future use. You can use this section to add extra API keys.
+                                                            Whatever you want. Separate them with newlines or spaces.<br>
+                                                            <b>Current Values</b>:<br>
+                                                            {{- range $i, $s := .Config.ExKeys}}<i>{{instance $i}}</i>: <b>{{$s}}</b><br>{{end}}
+                                                            {{- if not .Config.ExKeys}}<i>нет значения, ноль</i>{{end}}{{/* "no value, null" */}}
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                         <span class="dialogTitle">Extra Keys</span>
                                                     </td>
                                                     <td class="mobile-hide">
-                                                        {{range $i, $s := .Config.ExKeys}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
+                                                        {{range $i, $s := .Config.ExKeys}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}{{if not .Config.ExKeys}}<i>no value, null</i>{{end}}
                                                     </td>
                                                     <td>
                                                         <div class="form-group" style="width:100%">
@@ -79,7 +88,10 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            This is the IP and port the app will listen on. 0.0.0.0 means all IPs, and you should use that in almost all cases! Change the port if the default 5454 does not work for you. Example: 0.0.0.0:5454<br>
+                                                            This is the IP and port the app will listen on.
+                                                            <span class="text-warning">0.0.0.0</span> means all IPs, and you should use that in almost all cases!
+                                                            Change the port if the default 5454 does not work for you.<br>
+                                                            <b>Example</b>: <i class="text-warning">0.0.0.0:5454</i><br>
                                                             <b>Current Value</b>: <i>{{ .Config.BindAddr }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -109,7 +121,9 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            This is how often the app will check for updates. When one is found it will be installed automatically.<br>
+                                                            This is how often the application will check for updates.
+                                                            When one is found it will be installed automatically.
+                                                            This only works on Windows.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.AutoUpdate }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -145,7 +159,7 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Only choose Development when asked, your Notifiarr account must have dev access for this to work.<br>
+                                                            Only choose Development when asked, your Notifiarr account must have dev-access to be able to use Development mode.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.Mode }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -185,7 +199,9 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            This application serves HTTP on / by default. You can change that by typing in something else here. Example: /notifiarr/<br>
+                                                            This application serves HTTP on <span class="text-warning">/</span> by default.
+                                                            You can change that by typing in something else here.<br>
+                                                            <b>Example</b>: <i class="text-warning">/notifiarr/</i><br>
                                                             <b>Current Value</b>: <i>{{ .Config.URLBase }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -214,14 +230,18 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks. This controls which IP is written to the web server log file (requestor or x-forwarded-for). It also allows x-webauth-user headers for proxy authentication. Separate with spaces or new lines.<br>
-                                                            <b>Current Values</b>:<br>{{range $i, $s := .Config.Upstreams}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
+                                                            If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you sould add that proxy IP here. You can also specify full networks.
+                                                            This controls which IP is written to the web server log file (requestor or <span class="text-warning">x-forwarded-for</span> header).
+                                                            It also allows the <span class="text-warning">x-webauth-user</span> header for proxy authentication. Separate with spaces or new lines.<br>
+                                                            <b>Current Values</b>:<br>
+                                                            {{- range $i, $s := .Config.Upstreams}}<i>{{instance $i}}</i>: <b>{{$s}}</b><br>{{end}}
+                                                            {{- if not .Config.Upstreams}}<i>нет значения, ноль</i>{{end}}{{/* "no value, null" */}}
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                         <span class="dialogTitle">Upstreams</span>
                                                     </td>
                                                     <td class="mobile-hide">
-                                                        {{range $i, $s := .Config.Upstreams}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
+                                                        {{range $i, $s := .Config.Upstreams}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}{{if not .Config.Upstreams}}<i>no value, null</i>{{end}}
                                                     </td>
                                                     <td>
                                                         <div class="form-group" style="width:100%">
@@ -243,7 +263,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications. Spreads out CPU usage and lowers memory footprint.<br>
+                                                            Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications.
+                                                            Spreads out CPU usage and lowers memory footprint.<br>
                                                             <b>Current Value</b>: <i>{{if .Config.Serial}}Disabled{{else}}Enabled{{end}}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -276,7 +297,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures. Default is 4. Setting 0 will take default of 4.<br>
+                                                            Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures.<br>
+                                                            <b>Default</b>: <i>4</i> (<i>setting 0 uses default of 4</i>)<br>
                                                             <b>Current Value</b>: <i>{{ .Config.Retries }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -306,7 +328,7 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            The notifiarr Debian (and Ubuntu) package includes an APT integration.
+                                                            The Notifiarr Debian (and Ubuntu) packages include an APT integration.
                                                             This integration invokes every time an <span class="text-warning">apt</span> command is executed.
                                                             To enable it, set this field to Enabled, and then <b>enable the Package Manager integration on Notifiarr.com.</b>
                                                             This feature does not require the client to be running; it only requires the client deb package to be installed.
@@ -343,7 +365,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            This is the timeout for requests to Notifiarr.com, and any other timeout that may be missing (global). Exampes: 10s, 1m, 1m15s<br>
+                                                            This is the timeout for requests to Notifiarr.com, and any other timeout that may be missing (global).
+                                                            Exampes: 10s, 1m, 1m15s<br>
                                                             <b>Current Value</b>: <i>{{ .Config.Timeout }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -408,7 +431,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            This application can serve HTTPS. Enable that by specifying a certificate file path and key file path. The certificate file should have the full CA chain inclued.<br>
+                                                            This application can serve HTTPS. Enable that by specifying a certificate file path and key file path.
+                                                            The certificate file should have the full CA chain inclued.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.SSLCrtFile }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -477,7 +501,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this. This controls how many checks may run at once.<br>
+                                                            Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this.
+                                                            This controls how many checks may run at once.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.Services.Parallel }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -512,7 +537,9 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            How often to send service check results to Notifiarr.com. Default: 10m, minimum: 5m.<br>
+                                                            How often to send service check results to Notifiarr.com.<br>
+                                                            <b>Default</b>: <i>10m</i><br>
+                                                            <b>Minimum</b>: <i>5m</i><br>
                                                             <b>Current Value</b>: <i>{{ .Config.Services.Interval }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -548,7 +575,9 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Enabling debug logging causes a lot more data to write to the log. Includes payloads to and from Notifiarr.com and starr apps. Use Max Body settings to control payloads sizes.<br>
+                                                            Enabling debug logging causes a lot more data to write to the log.
+                                                            Includes payloads to and from Notifiarr.com and starr apps.
+                                                            Use Max Body settings to control payloads sizes.<br>
                                                             <b>Current Value</b>: <i>{{if .Config.Debug}}Enabled{{else}}Disabled{{end}}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -612,7 +641,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write logs to this path. Highly recommended!<br>
+                                                            Setting a log file path here will make the application write logs to this path.<br>
+                                                            Highly recommended!<br>
                                                             <b>Current Value</b>: <i>{{ .Config.LogFile }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -641,7 +671,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write the http logs to a dedicated file. The file format is in apachelog. Highly recommended.<br>
+                                                            Setting a log file path here will make the application write the http logs to a dedicated file.
+                                                            The file format is in apachelog. Highly recommended.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.HTTPLog }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -670,7 +701,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write service check results to a dedicated file. Recommended if you have a lot of services.<br>
+                                                            Setting a log file path here will make the application write service check results to a dedicated file.
+                                                            Recommended if you have a lot of services.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.Services.LogFile }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -699,7 +731,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write debug messages to a dedicated log file. Otherwise debug messages write to the main app log.<br>
+                                                            Setting a log file path here will make the application write debug messages to a dedicated log file.
+                                                            Otherwise debug messages write to the main application log.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.LogConfig.DebugLog }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -759,7 +792,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com. Recommend 1000-5000.<br>
+                                                            When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com.<br>
+                                                            <b>Recommend</b>: <i>1000-5000</i><br>
                                                             <b>Current Value</b>: <i>{{ .Config.MaxBody }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -788,7 +822,8 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation. Recommend 5-25 MB.<br>
+                                                            When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation.<br>
+                                                            <b>Recommend</b>: <i>5</i><br>
                                                             <b>Current Value</b>: <i>{{ .Config.LogFileMb }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -817,7 +852,10 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            When this setting is 0 or 1, log file rotation is disabled. Setting this to a higher value will rotate all log files, and keep this many of each on disk. Controls all log files.<br>
+                                                            When this setting is 0 or 1, log file rotation is disabled.
+                                                            Setting this to a higher value will rotate all log files, and keep this many of each on disk.
+                                                            Controls all log files.<br>
+                                                            <b>Recommend</b>: <i>5</i><br>
                                                             <b>Current Value</b>: <i>{{ .Config.LogFiles }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
