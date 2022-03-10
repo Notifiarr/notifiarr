@@ -1,0 +1,64 @@
+                                <h1><i class="fa fa-user"></i> User Profile</h1>
+                            {{- if .Dynamic }}
+                                <p>Profile editing is disabled for dynamic users.</p>
+                            {{- else }}
+                                <p>You must enter your current password to save changes.</p>
+                                <table class="table bk-dark table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <td><b>Setting</b></td>
+                                            <td><b>Current Value</b></td>
+                                            <td><b>New Value</b></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Username</td>
+                                            <td id="current-username">{{.Username}}</td>
+                                            <td>
+                                                <form class="form-inline">
+                                                    <div class="form-group" style="width:100%">
+                                                        <div class="input-group" style="width:100%">
+                                                            {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
+                                                            <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                <div style="display:none;" class="dialogText">
+                                                                    An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                </div>
+                                                                <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UI_PASSWORD" .Flags.EnvPrefix}}</span>
+                                                            </div>
+                                                            {{- end}}
+                                                            <input type="text" id="NewUsername" name="NewUsername" value="{{.Username}}" class="profile-parameter form-control input-sm" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                        </div>
+                                                    </div>
+                                                </form><!-- in its own form to avoid browser auto complete -->
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Password</td>
+                                            <td><input placeholder="enter current password" type="password" id="Password" name="Password" class="profile-parameter form-control input-sm" style="width: 100%;"></td>
+                                            <td>
+                                                <form class="form-inline">
+                                                    <div class="form-group" style="width:100%">
+                                                        <div class="input-group" style="width:100%">
+                                                            {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UI_PASSWORD" .Flags.EnvPrefix}}</span>
+                                                                </div>
+                                                            {{- end}}
+                                                            <input placeholder="16 character minimum" type="password" autocomplete="new-password" id="NewPassword" name="NewPassword" class="profile-parameter form-control input-sm" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                            <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('NewPassword', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <button onclick="saveProfileChanges()" class="btn btn-primary">Save Changes</button>
+                            {{- end}}
+{{- /* end of profile (leave this comment) */ -}}

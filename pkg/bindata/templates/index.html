@@ -1,0 +1,176 @@
+{{- if not .Config.UIPassword -}}
+    <p>notifiarr: <strong>working</strong></p>
+{{- else}}
+{{- template "header.html" . }}
+    <body>
+        <div class="page-container">
+            <div class="page-body">
+                <div class="brand clearfix" style="z-index:100;">
+                    <a class="nav-link" href="#landing" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
+                        <h4 class="text-uppercase text-white" style="margin:10px 0px 0px 10px">
+                            <img src="{{files}}/images/logo/notifiarr.png" style="height:47px;">
+                            <span class="mobile-hide">Notifiarr Client</span>
+                        </h4>
+                    </a>
+                    <span style="margin:0;font-size:0.8em;float:right;" class="tablet-hide desktop-hide"><i class="fas fa-mobile-alt"></i></span>
+                    <span style="margin:0;font-size:0.8em;float:right;" class="mobile-hide desktop-hide"><i class="fas fa-tablet-alt"></i></span>
+                    <span style="margin:0;font-size:0.8em;float:right;" class="mobile-hide tablet-hide"><i class="fas fa-desktop"></i></span>
+                    {{- if .Username }}
+                    <a class="nav-button text-danger fas fa-power-off" title="Shut down application (quit)." onClick="shutDownApp();" style="margin-right:0;"></a>
+                    <a class="nav-button text-success fas fa-recycle" title="Reload application configuraton and refresh." onClick="reloadConfig();"></a>
+                    {{- end}}
+                    <span class="menu-btn pull-left" style="font-size:1.3em;"><i class="fa fa-bars"> <span class="pending-change-container" style="display:none;"><i class="fas text-danger fa-exclamation-circle" title="Unsaved Changes!" style="display:none;"></i></span></i></span>
+                    <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
+                </div>
+
+                <div class="ts-main-content">
+                    <nav class="ts-sidebar">
+                        <ul class="ts-sidebar-menu">
+                        {{- if .Username }}
+                            {{- if .Dynamic }}
+                            <div class="btn btn-default" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px">
+                                <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<i style="font-size:9px" class="fas fa-lock"></i>
+                            </div>
+                            {{- else }}
+                            <div class="dropdown"><!-- this is lame -->
+                                <button class="btn btn-default dropdown-toggle" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
+                                </button>
+                                <ul style="width:92%;" class="dropdown-menu bk-brown" aria-labelledby="user menu">
+                                    <li><a class="nav-link" href="#profile" onclick="swapNavigationTemplate('profile')">Profile</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="logout">Logout</a></li>
+                                </ul>
+                            </div>
+                            {{- end }}
+                            <div class="desktop-hide">
+                                <br>
+                                <div class="pending-change-container" style="display: none;">
+                                    <hr>
+                                    <div align="center">
+                                        <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
+                                            Save &amp; Reload
+                                        </button>
+                                    </div>
+                                    <div style="margin-left: 1em; margin-top: 0.8em;">
+                                        <span class="pending-change-counter text-bold text-warning">0</span> Pending Changes!<br>
+                                        <div style="margin-left: 1em;" class="pending-change-list"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <li class="ts-label" style="text-align: center;">Settings</li>
+                            <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" href="#config" onclick="swapNavigationTemplate('config')">Configuration</a></li>
+                            <li><i class="nav-icon fas fa-star"></i><a class="nav-link" href="#starr" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
+                            <li><i class="nav-icon fas fa-cart-arrow-down"></i><a href="#downloaders" class="nav-link" onclick="swapNavigationTemplate('downloaders')">Download Apps</a></li>
+                            <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" href="#media" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
+                            <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" href="#snapshot" onclick="swapNavigationTemplate('snapshot')">Snapshot Apps</a></li>
+                            <li><i class="nav-icon fas fa-network-wired"></i><a class="nav-link" href="#services" onclick="swapNavigationTemplate('services')">Service Checks</a></li>
+                            <hr>
+                            <li class="ts-label" style="text-align: center;">Insights</li>
+                            <div class="dropdown">
+                                <a class="nav-div-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <i class="nav-icon fas fa-fire-extinguisher" style="margin-left:0;"></i><span style="padding-left:15px;">Triggers &nbsp; &nbsp;<span class="caret"></span></span>
+                                </a>
+                                <ul style="width:95%;" class="dropdown-menu bk-dark" aria-labelledby="triggers menu">
+                                    <li><a class="nav-link text-grey" href="#triggers" onClick="swapNavigationTemplate('triggers')">- Open Triggers Page -</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('cfsync')">Custom Formats</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('snapshot')">System Snapshot</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('stuckitems')">Stuck Items</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('dashboard')">Dashboard States</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('sessions')">Plex Sessions</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/lidarr')">Lidarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/prowlarr')">Prowlarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/radarr')">Radarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/readarr')">Readarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('corrupt/sonarr')">Sonarr Corruption</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/lidarr')">Lidarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/prowlarr')">Prowlarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/radarr')">Radarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/readarr')">Readarr Backups</a></li>
+                                    <li><a class="nav-link text-grey" onClick="triggerAction('backup/sonarr')">Sonarr Backups</a></li>
+                                </ul>
+                            </div>
+                            <li><i class="nav-icon fas fa-temperature-high"></i><a class="nav-link" href="#monitoring" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
+                            <li><i class="nav-icon fas fa-chart-line"></i><a class="nav-link" href="#metrics" onclick="swapNavigationTemplate('metrics')">Metrics</a></li>
+                            <li><i class="nav-icon fas fa-file-medical-alt"></i><a class="nav-link" href="#logfiles" onclick="swapNavigationTemplate('logfiles')">Log Files</a></li>
+                            <li><i class="nav-icon fas fa-file-export"></i><a class="nav-link" href="#configfiles" onclick="swapNavigationTemplate('configfiles')">Config Files</a></li>
+                            <li>{{if eq .Version.os "windows"}}<i class="nav-icon fab fa-windows"></i>
+                                {{- else if eq .Version.os "linux"}}<i class="nav-icon fab fa-linux"></i>
+                                {{- else if eq .Version.os "freebsd"}}<i class="nav-icon fab fa-freebsd"></i>
+                                {{- else if eq .Version.os "darwin"}}<i class="nav-icon fab fa-apple"></i>
+                                {{- else}}<i class="nav-icon fas fa-microchip"></i>
+                                {{- end}}<a class="nav-link" href="#system" onclick="swapNavigationTemplate('system')">System</a></li>
+                        {{- else if not .Webauth }}<!-- nav bar for logged out user (nothing). -->
+                            <li class="ts-label" style="text-align: center;">Navigation</li>
+                            <li><i class="nav-icon fas fa-user"></i><a class="nav-link" href="#">Login</a></li>
+                        {{- end }}
+                        </ul>
+                        <div class="tablet-hide mobile-hide">
+                            <div class="pending-change-container" style="display: none;">
+                                <hr>
+                                <div align="center">
+                                    <button type="button" style="font-size: 16px; width: 85%;" class="btn btn-primary" onclick="savePendingChanges()" id="save-btn">
+                                        Save &amp; Reload
+                                    </button>
+                                </div>
+                                <div style="margin-left: 0.4em; margin-top: 0.8em;">
+                                    <span class="pending-change-counter text-bold text-warning">0</span> Pending Changes!<br>
+                                    <div style="margin-left: 0.2em;" class="pending-change-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    <div class="content-wrapper">
+                        <div class="container-fluid">
+{{- if .Username }}
+                            <div class="navigation-item" id="template-landing">
+{{ template "landing.html"  .}}
+                            </div>
+                            <!-- Load everything hidden, and switch divs with the Nav-menu above. -->
+                            <div class="navigation-item" id="template-profile" style="display: none;">
+{{ template "profile.html"  .}}
+                            </div>
+                            <div class="navigation-item" id="template-config" style="display: none;">
+{{ template "config.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-services" style="display: none;">
+{{ template "services.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-system" style="display: none;">
+{{ template "system.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-starr" style="display: none;">
+{{ template "starr.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-downloaders" style="display: none;">
+{{ template "downloaders.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-media" style="display: none;">
+{{ template "media.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-triggers" style="display: none;">
+{{ template "triggers.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-monitoring" style="display: none;">
+{{ template "monitoring.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-metrics" style="display: none;">
+{{ template "metrics.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-logfiles" style="display: none;">
+{{ template "logfiles.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-configfiles" style="display: none;">
+{{ template "configfiles.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-snapshot" style="display: none;">
+{{ template "snapshot.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-processlist" style="display: none;">
+{{ template "processlist.html" . }}
+                            </div>
+{{- else }}       {{- /* if .Username */}}
+{{ template "login.html" . }}
+{{- end}}         {{- /* if .Username */}}
+{{ template "footer.html" . }}
+{{- end -}}       {{- /* if .Config.UIPassword */}}

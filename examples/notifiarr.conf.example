@@ -1,10 +1,16 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.2.7   @ 220602T1004 #
+# Created by Notifiarr v0.2.7   @ 220103T0842 #
 ###############################################
 
-# This API key must be copied from your notifiarr.com account.
+## This API key must be copied from your notifiarr.com account.
 api_key = "api-key-from-notifiarr.com"
+
+## Setting a UI password enables the human accessible web GUI. Must be at least 16 characters.
+## The default username is admin; change it by setting ui_password to "username:password"
+## Set to "webauth" to disable the login form and use only proxy authentication. See upstreams, below.
+## Your proxy auth must pass x-webauth-user header if you set this to "webauth".
+ui_password = ""
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
 ## You may use "127.0.0.1:5454" to listen only on localhost; good if using a local proxy.
@@ -25,12 +31,20 @@ auto_update = "off"
 ##
 quiet = false
 
+## Debug prints more data and json payloads. This increases application memory usage.
+debug = false
+max_body = 0 # maximum body size for debug logs. 0 = no limit.
+
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
 ## Change it to /somethingelse/api by setting urlbase to "/somethingelse"
 ##
 urlbase = "/"
 
-## Allowed upstream networks. The networks here are allowed to send x-forwarded-for.
+## Allowed upstream networks. Networks here are allowed to send two special headers:
+## (1) x-forwarded-for (2) x-webauth-user
+## The first header sets the IPs in logs.
+## The second header allows an auth proxy to set a logged-in username. Be careful.
+##
 ## Set this to your reverse proxy server's IP or network. If you leave off the mask,
 ## then /32 or /128 is assumed depending on IP version. Empty by default. Example:
 ##
@@ -67,6 +81,7 @@ serial = false
 
 ## Retries controls how many times to retry requests to notifiarr.com.
 ## Sometimes cloudflare returns a 521, and this mitigates those problems.
+## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
 retries = 0
 
 
@@ -97,13 +112,13 @@ retries = 0
 
 #[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
-#url       = "http://127.0.0.1:7878"
+#url       = "http://127.0.0.1:7878/"
 #api_key   = ""
 
 
 #[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
-#url       = "http://127.0.0.1:8787"
+#url       = "http://127.0.0.1:8787/"
 #api_key   = ""
 
 
@@ -141,7 +156,7 @@ retries = 0
 ## Find your token: https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ##
 #[plex]
-#url     = "http://localhost:32400" # Your plex URL
+#url     = "http://localhost:32400/" # Your plex URL
 #token   = "" # your plex token; get this from a web inspector
 
 #####################
@@ -153,7 +168,7 @@ retries = 0
 
 #[tautulli]
 #  name    = "" # only set a name to enable service checks.
-#  url     = "http://localhost:8181" # Your Tautulli URL
+#  url     = "http://localhost:8181/" # Your Tautulli URL
 #  api_key = "" # your tautulli api key; get this from settings
 
 ##################
@@ -194,7 +209,7 @@ retries = 0
 #[[service]]
 #  name     = "MyServer"          # name must be unique
 #  type     = "http"              # type can be "http" or "tcp"
-#  check    = 'http://127.0.0.1'  # url for 'http', host/IP:port for 'tcp'
+#  check    = 'http://127.0.0.1/'  # url for 'http', host/IP:port for 'tcp'
 #  expect   = "200"               # return code to expect (for http only)
 #  timeout  = "10s"               # how long to wait for tcp or http checks.
 #  interval = "5m"                # how often to check this service.

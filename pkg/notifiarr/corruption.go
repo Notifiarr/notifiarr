@@ -28,11 +28,11 @@ const (
 
 // Trigger Types.
 const (
-	TrigLidarrCorrupt   TriggerName = "Checking Lidarr instances for database backup corruption."
-	TrigProwlarrCorrupt TriggerName = "Checking Prowlarr instances for database backup corruption."
-	TrigRadarrCorrupt   TriggerName = "Checking Radarr instances for database backup corruption."
-	TrigReadarrCorrupt  TriggerName = "Checking Readarr instances for database backup corruption."
-	TrigSonarrCorrupt   TriggerName = "Checking Sonarr instances for database backup corruption."
+	TrigLidarrCorrupt   TriggerName = "Checking Lidarr for database backup corruption."
+	TrigProwlarrCorrupt TriggerName = "Checking Prowlarr for database backup corruption."
+	TrigRadarrCorrupt   TriggerName = "Checking Radarr for database backup corruption."
+	TrigReadarrCorrupt  TriggerName = "Checking Readarr for database backup corruption."
+	TrigSonarrCorrupt   TriggerName = "Checking Sonarr for database backup corruption."
 )
 
 // Errors returned by this package.
@@ -133,7 +133,7 @@ func (c *Config) sendLidarrCorruption(event EventType) {
 			last:  app.Corrupt,
 			name:  starr.Lidarr,
 			int:   i + 1,
-			app:   app,
+			app:   app.Lidarr,
 			cName: app.Name,
 		})
 	}
@@ -146,7 +146,7 @@ func (c *Config) sendProwlarrCorruption(event EventType) {
 			last:  app.Corrupt,
 			name:  starr.Prowlarr,
 			int:   i + 1,
-			app:   app,
+			app:   app.Prowlarr,
 			cName: app.Name,
 		})
 	}
@@ -159,7 +159,7 @@ func (c *Config) sendRadarrCorruption(event EventType) {
 			last:  app.Corrupt,
 			name:  starr.Radarr,
 			int:   i + 1,
-			app:   app,
+			app:   app.Radarr,
 			cName: app.Name,
 		})
 	}
@@ -172,7 +172,7 @@ func (c *Config) sendReadarrCorruption(event EventType) {
 			last:  app.Corrupt,
 			name:  starr.Readarr,
 			int:   i + 1,
-			app:   app,
+			app:   app.Readarr,
 			cName: app.Name,
 		})
 	}
@@ -185,7 +185,7 @@ func (c *Config) sendSonarrCorruption(event EventType) {
 			last:  app.Corrupt,
 			name:  starr.Sonarr,
 			int:   i + 1,
-			app:   app,
+			app:   app.Sonarr,
 			cName: app.Name,
 		})
 	}

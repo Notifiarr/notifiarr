@@ -12,9 +12,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"golift.io/cnfg"
 )
 
@@ -22,7 +24,7 @@ import (
 // Without a URL or Token, nothing works and this package is unused.
 type Server struct {
 	Timeout    cnfg.Duration `toml:"timeout" json:"timeout" xml:"timeout"`
-	Interval   cnfg.Duration `toml:"interval" json:"interval" xml:"interval"`
+	Interval   cnfg.Duration `toml:"-" json:"interval" xml:"-"`
 	URL        string        `toml:"url" json:"url" xml:"url"`
 	Token      string        `toml:"token" json:"token" xml:"token"`
 	AccountMap string        `toml:"-" json:"accountMap" xml:"-"`
@@ -98,33 +100,44 @@ func (s *Server) Validate() { //nolint:cyclop
 	}
 }
 
-func (s *Server) getPlexURL(ctx context.Context, url string, headers map[string]string) ([]byte, error) {
+func (s *Server) getPlexURL(ctx context.Context, url string, params url.Values) ([]byte, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("creating http request: %w", err)
 	}
 
+	req.URL.RawQuery = params.Encode()
 	req.Header.Set("X-Plex-Token", s.Token)
 	req.Header.Set("Accept", "application/json")
-
-	for k, v := range headers {
-		req.Header.Set(k, v)
-	}
+	exp.Apps.Add("Plex&&GET Requests", 1)
 
 	resp, err := s.getClient().Do(req)
 	if err != nil {
+		exp.Apps.Add("Plex&&GET Errors", 1)
 		return nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		exp.Apps.Add("Plex&&GET Errors", 1)
 		return nil, fmt.Errorf("reading http response: %w", err)
 	}
 
+	exp.Apps.Add("Plex&&Bytes Received", int64(len(body)))
+
 	if resp.StatusCode != http.StatusOK {
+		exp.Apps.Add("Plex&&GET Errors", 1)
 		return body, ErrBadStatus
 	}
 
 	return body, nil
+}
+
+func (s *Server) getClient() *http.Client {
+	if s.client == nil {
+		s.client = &http.Client{}
+	}
+
+	return s.client
 }

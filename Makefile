@@ -70,7 +70,7 @@ VERSION_LDFLAGS:= -X \"$(VERSION_PATH).Branch=$(BRANCH) ($(COMMIT))\" \
 
 # Makefile targets follow.
 
-all: clean generate build
+all: clean build
 
 ####################
 ##### Releases #####
@@ -100,7 +100,7 @@ clean:
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
-	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service
+	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go
 	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
 
 ####################
@@ -138,18 +138,18 @@ $(shell go env GOPATH)/bin/rsrc:
 ####################
 
 build: $(BINARY)
-$(BINARY): main.go
+$(BINARY): generate main.go
 	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux: $(BINARY).amd64.linux
-$(BINARY).amd64.linux: main.go
+$(BINARY).amd64.linux: generate main.go
 	# Building linux 64-bit x86 binary.
 	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux386: $(BINARY).i386.linux
-$(BINARY).i386.linux: main.go
+$(BINARY).i386.linux: generate main.go
 	# Building linux 32-bit x86 binary.
 	GOOS=linux GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
@@ -157,39 +157,39 @@ $(BINARY).i386.linux: main.go
 arm: arm64 armhf
 
 arm64: $(BINARY).arm64.linux
-$(BINARY).arm64.linux: main.go
+$(BINARY).arm64.linux: generate main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 armhf: $(BINARY).armhf.linux
-$(BINARY).armhf.linux: main.go
+$(BINARY).armhf.linux: generate main.go
 	# Building linux 32-bit ARM binary.
 	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 macos: $(BINARY).amd64.macos
-$(BINARY).amd64.macos: main.go
+$(BINARY).amd64.macos: generate main.go
 	# Building darwin 64-bit x86 binary.
 	GOOS=darwin GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 freebsd: $(BINARY).amd64.freebsd
-$(BINARY).amd64.freebsd: main.go
+$(BINARY).amd64.freebsd: generate main.go
 	GOOS=freebsd GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 freebsd386: $(BINARY).i386.freebsd
-$(BINARY).i386.freebsd: main.go
+$(BINARY).i386.freebsd: generate main.go
 	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@ || true
 
 freebsdarm: $(BINARY).armhf.freebsd
-$(BINARY).armhf.freebsd: main.go
+$(BINARY).armhf.freebsd: generate main.go
 	GOOS=freebsd GOARCH=arm go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 exe: $(BINARY).amd64.exe
 windows: $(BINARY).amd64.exe
-$(BINARY).amd64.exe: rsrc.syso main.go
+$(BINARY).amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
 	GOOS=windows GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
@@ -436,7 +436,7 @@ $(patsubst %,%.darwin.so,$(PLUGINS)):
 test: lint
 	# Testing.
 	go test -race -covermode=atomic ./...
-lint:
+lint: generate
 	# Checking lint.
 	$(shell go env GOPATH)/bin/golangci-lint version
 	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint --timeout=3m run $(GOLANGCI_LINT_ARGS)
@@ -448,13 +448,16 @@ lint:
 
 mockgen: $(shell go env GOPATH)/bin/mockgen
 $(shell go env GOPATH)/bin/mockgen:
-	cd /tmp ; go get github.com/golang/mock/mockgen ; go install github.com/golang/mock/mockgen
+	cd /tmp ; go install github.com/golang/mock/mockgen@latest
 
 bindata: $(shell go env GOPATH)/bin/go-bindata
 $(shell go env GOPATH)/bin/go-bindata:
-	cd /tmp ; go get -u github.com/go-bindata/go-bindata/... ; go install github.com/go-bindata/go-bindata
+	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
-generate: mockgen bindata
+#generate: mockgen bindata pkg/bindata/bindata.go
+generate: bindata pkg/bindata/bindata.go
+pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
+	find pkg -name .DS\* -delete
 	go generate ./...
 
 ##################

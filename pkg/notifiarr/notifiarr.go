@@ -44,19 +44,18 @@ const (
 
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
-	Apps     *apps.Apps       // has API key
-	Plex     *plex.Server     // plex sessions
-	Snap     *snapshot.Config // system snapshot data
-	Services *ServiceConfig
-	Serial   bool
-	Retries  int
-	BaseURL  string
-	Timeout  cnfg.Duration
-	Trigger  Triggers
-	MaxBody  int
-	Sighup   chan os.Signal
-
-	*logs.Logger // log file writer
+	Apps         *apps.Apps       `json:"apps"`      // has API key
+	Plex         *plex.Server     `json:"plex"`      // plex sessions
+	Snap         *snapshot.Config `json:"snapshots"` // system snapshot data
+	Services     *ServiceConfig   `json:"services"`
+	Serial       bool             `json:"serial"`
+	Retries      int              `json:"retries"`
+	BaseURL      string           `json:"-"`
+	Timeout      cnfg.Duration    `json:"timeout"`
+	Trigger      Triggers         `json:"-"`
+	MaxBody      int              `json:"maxBody"`
+	Sighup       chan os.Signal   `json:"-"`
+	*logs.Logger `json:"-"`       // log file writer
 	extras
 }
 
@@ -127,7 +126,7 @@ func (c *Config) Start() {
 	c.makeBackupTriggers()
 	c.setPlexTimers()
 
-	if _, err := c.GetClientInfo(EventStart); err == nil { // only run this if we have clientinfo
+	if _, err := c.GetClientInfo(); err == nil { // only run this if we have clientinfo
 		c.setClientInfoTimerTriggers() // sync, gaps, dashboard, custom
 	}
 
@@ -185,7 +184,12 @@ func (c *Config) setPlexTimers() {
 		c.Printf("==> Plex Completed Items Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%%",
 			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
 		c.Trigger.add( // this has no name, which keeps it from logging _every minute_
-			&action{SFn: c.checkPlexFinishedItems, T: time.NewTicker(time.Minute + 179*time.Millisecond)})
+			&action{
+				Name: "Checking Plex for completed sessions.",
+				Hide: true, // do not log this one.
+				SFn:  c.checkPlexFinishedItems,
+				T:    time.NewTicker(time.Minute + 179*time.Millisecond),
+			})
 	}
 }
 

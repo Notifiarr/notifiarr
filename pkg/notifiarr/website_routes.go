@@ -17,6 +17,7 @@ type EventType string
 // These are all our known event types.
 const (
 	EventCron    EventType = "cron"
+	EventGUI     EventType = "gui"
 	EventUser    EventType = "user"
 	EventAPI     EventType = "api"
 	EventHook    EventType = "webhook"
@@ -24,7 +25,7 @@ const (
 	EventMovie   EventType = "movie"
 	EventEpisode EventType = "episode"
 	EventPoll    EventType = "poll"
-	EventReload  EventType = "reload"
+	EventSignal  EventType = "signal"
 )
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.

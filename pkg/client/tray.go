@@ -181,6 +181,7 @@ func (c *Client) makeMoreChannels() {
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
 	menu["debug_panic"] = debug.AddSubMenuItem("Application Panic", "cause an application panic (crash)")
 	menu["update"] = systray.AddMenuItem("Update", "check GitHub for updated version")
+	menu["gui"] = systray.AddMenuItem("Open WebUI", "open the web page for this Notifiarr client")
 	menu["sub"] = systray.AddMenuItem("Subscribe", "subscribe for premium features")
 	menu["exit"] = systray.AddMenuItem("Quit", "exit "+c.Flags.Name())
 }
@@ -275,10 +276,7 @@ func (c *Client) watchKillerChannels() {
 		case <-menu["debug_panic"].ClickedCh:
 			c.menuPanic()
 		case <-menu["load"].ClickedCh:
-			if err := c.reloadConfiguration("User Requested"); err != nil {
-				c.Errorf("Need help? %s\n=====> Exiting! Reloading Configuration: %v", mnd.HelpLink, err)
-				os.Exit(1) //nolint:gocritic // exit now since config is bad and everything is disabled.
-			}
+			c.triggerConfigReload(notifiarr.EventUser, "User Requested")
 		}
 	}
 }
@@ -365,6 +363,8 @@ func (c *Client) watchLogsChannels() {
 			c.rotateLogs()
 		case <-menu["update"].ClickedCh:
 			go c.checkForUpdate()
+		case <-menu["gui"].ClickedCh:
+			c.openGUI()
 		}
 	}
 }

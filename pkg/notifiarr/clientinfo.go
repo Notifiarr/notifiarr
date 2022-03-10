@@ -14,7 +14,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/shirou/gopsutil/v3/host"
-	"github.com/shirou/gopsutil/v3/process"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -25,6 +24,7 @@ type ClientInfo struct {
 		WelcomeMSG string `json:"welcome"`
 		Subscriber bool   `json:"subscriber"`
 		Patron     bool   `json:"patron"`
+		DevAllowed bool   `json:"devAllowed"`
 	} `json:"user"`
 	Actions struct {
 		Poll      bool             `json:"poll"`
@@ -89,7 +89,7 @@ func (c *ClientInfo) IsPatron() bool {
 }
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
-func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
+func (c *Config) GetClientInfo() (*ClientInfo, error) {
 	c.extras.ciMutex.Lock()
 	defer c.extras.ciMutex.Unlock()
 
@@ -97,7 +97,7 @@ func (c *Config) GetClientInfo(event EventType) (*ClientInfo, error) {
 		return c.extras.clientInfo, nil
 	}
 
-	body, err := c.SendData(ClientRoute.Path(event), c.Info(), true)
+	body, err := c.SendData(ClientRoute.Path("reload"), c.Info(), true)
 	if err != nil {
 		return nil, fmt.Errorf("sending client info: %w", err)
 	}
@@ -169,16 +169,10 @@ func (c *Config) HostInfoNoError() *host.InfoStat {
 		return nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	procs, _ := process.ProcessesWithContext(ctx)
-
 	return &host.InfoStat{
 		Hostname:             c.extras.hostInfo.Hostname,
 		Uptime:               uint64(time.Now().Unix()) - c.extras.hostInfo.BootTime,
 		BootTime:             c.extras.hostInfo.BootTime,
-		Procs:                uint64(len(procs)),
 		OS:                   c.extras.hostInfo.OS,
 		Platform:             c.extras.hostInfo.Platform,
 		PlatformFamily:       c.extras.hostInfo.PlatformFamily,

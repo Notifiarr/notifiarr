@@ -47,6 +47,12 @@ OPTIONS
         making an http request. Example: --header "X-Plex-Token: absdefg123jklm"
         May be provided more than once to add multiple headers.
 
+    -a, --assets <folder/path>
+        Use this flag to pass in a custom HTTP assets folder. This folder must
+        contain a files/ folder and a templates/ folder. Files are served as
+        static assets from the /files path and templates contains customized
+        HTML templates for the GUI web routes. This is a developer feature.
+
     --apthook
         This should only be used on Linux for dpkg pre-install-pkg hooks.
         This reads from stdin from dpkg, and sends it off to notifiarr.com.

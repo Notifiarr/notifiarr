@@ -33,10 +33,15 @@ const tmpl = `###############################################
 # Created by Notifiarr {{version}} #
 ###############################################
 
-# This API key must be copied from your notifiarr.com account.
+## This API key must be copied from your notifiarr.com account.
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}{{if .ExKeys}}
-
 extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
+
+## Setting a UI password enables the human accessible web GUI. Must be at least 16 characters.
+## The default username is admin; change it by setting ui_password to "username:password"
+## Set to "webauth" to disable the login form and use only proxy authentication. See upstreams, below.
+## Your proxy auth must pass x-webauth-user header if you set this to "webauth".
+ui_password = "{{.UIPassword}}"
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
 ## You may use "127.0.0.1:5454" to listen only on localhost; good if using a local proxy.
@@ -58,21 +63,27 @@ bind_addr = "{{.BindAddr}}"
 ## This is always true on Windows and macOS app.
 ## Log files are automatically written on those platforms.
 ##
-quiet = {{.Quiet}}{{if .Debug}}
+quiet = {{.Quiet}}
 
 ## Debug prints more data and json payloads. This increases application memory usage.
-debug = true
-max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}{{if and .Mode (ne .Mode "production")}}
+debug = {{.Debug}}
+max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
+{{- if and .Mode (ne .Mode "production")}}
 
 ## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
-mode  = "{{.Mode}}"{{end}}
+mode  = "{{.Mode}}"
+{{end}}
 
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
 ## Change it to /somethingelse/api by setting urlbase to "/somethingelse"
 ##
 urlbase = "{{.URLBase}}"
 
-## Allowed upstream networks. The networks here are allowed to send x-forwarded-for.
+## Allowed upstream networks. Networks here are allowed to send two special headers:
+## (1) x-forwarded-for (2) x-webauth-user
+## The first header sets the IPs in logs.
+## The second header allows an auth proxy to set a logged-in username. Be careful.
+##
 ## Set this to your reverse proxy server's IP or network. If you leave off the mask,
 ## then /32 or /128 is assumed depending on IP version. Empty by default. Example:
 ##
@@ -190,7 +201,7 @@ retries = {{.Retries}}
 {{end}}
 {{else}}#[[radarr]]
 #name      = "" # Set a name to enable checks of your service.
-#url       = "http://127.0.0.1:7878/radarr"
+#url       = "http://127.0.0.1:7878/"
 #api_key   = ""
 
 
@@ -209,7 +220,7 @@ retries = {{.Retries}}
 {{end}}
 {{else}}#[[readarr]]
 #name      = "" # Set a name to enable checks of your service.
-#url       = "http://127.0.0.1:8787/readarr"
+#url       = "http://127.0.0.1:8787/"
 #api_key   = ""
 
 
@@ -293,7 +304,7 @@ retries = {{.Retries}}
   token   = "{{.Plex.Token}}"   # your plex token; get this from a web inspector
   timeout = "{{.Plex.Timeout}}"  # how long to wait for HTTP responses
 {{- else}}#[plex]
-#url     = "http://localhost:32400" # Your plex URL
+#url     = "http://localhost:32400/" # Your plex URL
 #token   = "" # your plex token; get this from a web inspector
 {{- end }}
 
@@ -307,13 +318,13 @@ retries = {{.Retries}}
 [tautulli]
   name     = "{{.Tautulli.Name}}" # only set a name to enable service checks.
   url      = "{{.Tautulli.URL}}" # Your Tautulli URL
-  api_key  = "{{.Tautulli.APIKey}}" # your plex token; get this from a web inspector
+  api_key  = "{{.Tautulli.APIKey}}" # your tautulli api key; get this from settings
   timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
   interval = "{{.Tautulli.Interval}}" # how often to send service checks
 {{- else}}
 #[tautulli]
 #  name    = "" # only set a name to enable service checks.
-#  url     = "http://localhost:8181" # Your Tautulli URL
+#  url     = "http://localhost:8181/" # Your Tautulli URL
 #  api_key = "" # your tautulli api key; get this from settings
 {{- end }}
 
@@ -364,7 +375,7 @@ retries = {{.Retries}}
 #[[service]]
 #  name     = "MyServer"          # name must be unique
 #  type     = "http"              # type can be "http" or "tcp"
-#  check    = 'http://127.0.0.1'  # url for 'http', host/IP:port for 'tcp'
+#  check    = 'http://127.0.0.1/'  # url for 'http', host/IP:port for 'tcp'
 #  expect   = "200"               # return code to expect (for http only)
 #  timeout  = "10s"               # how long to wait for tcp or http checks.
 #  interval = "5m"                # how often to check this service.

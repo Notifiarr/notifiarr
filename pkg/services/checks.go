@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 )
 
 type result struct {
@@ -17,8 +20,14 @@ type result struct {
 	state  CheckState
 }
 
-func (s *Service) validate() error { //nolint:cyclop
-	s.state = StateUnknown
+// triggerCheck is used to signal the check of one service.
+type triggerCheck struct {
+	Source  notifiarr.EventType
+	Service *Service
+}
+
+func (s *Service) Validate() error { //nolint:cyclop
+	s.svc.State = StateUnknown
 
 	if s.Name == "" {
 		return fmt.Errorf("%s: %w", s.Value, ErrNoName)
@@ -59,39 +68,61 @@ func (s *Service) validate() error { //nolint:cyclop
 	return nil
 }
 
-func (s *Service) check() bool {
-	// check this service.
+// CheckOnly runs a service check and returns the result immediately.
+// It is not otherwise stored anywhere.
+func (s *Service) CheckOnly() *CheckResult {
+	res := s.checkNow()
+
+	return &CheckResult{
+		Output: res.output,
+		State:  res.state,
+	}
+}
+
+func (s *Service) checkNow() (res *result) {
 	switch s.Type {
 	case CheckHTTP:
-		return s.update(s.checkHTTP())
+		return s.checkHTTP()
 	case CheckTCP:
-		return s.update(s.checkTCP())
+		return s.checkTCP()
 	case CheckPING:
-		return s.update(s.checkPING())
+		return s.checkPING()
 	case CheckPROC:
-		return s.update(s.checkProccess())
+		return s.checkProccess()
 	default:
-		return false
+		return nil
 	}
+}
+
+func (s *Service) check() bool {
+	return s.update(s.checkNow())
 }
 
 // Return true if the service state changed.
 func (s *Service) update(res *result) bool {
-	if s.lastCheck = time.Now().Round(time.Microsecond); s.since.IsZero() {
-		s.since = s.lastCheck
-	}
-
-	s.output = res.output
-
-	if s.state == res.state {
-		s.log.Printf("Service Checked: %s, state: %s for %v, output: %s",
-			s.Name, s.state, time.Since(s.since).Round(time.Second), s.output)
+	if res == nil {
 		return false
 	}
 
-	s.log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.state, res.state, s.output)
-	s.since = s.lastCheck
-	s.state = res.state
+	exp.ServiceChecks.Add(s.Name+"&&Total", 1)
+	exp.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
+	//	exp.ServiceChecks.Add("Total Checks Run", 1)
+
+	if s.svc.LastCheck = time.Now().Round(time.Microsecond); s.svc.Since.IsZero() {
+		s.svc.Since = s.svc.LastCheck
+	}
+
+	s.svc.Output = res.output
+
+	if s.svc.State == res.state {
+		s.svc.log.Printf("Service Checked: %s, state: %s for %v, output: %s",
+			s.Name, s.svc.State, time.Since(s.svc.Since).Round(time.Second), s.svc.Output)
+		return false
+	}
+
+	s.svc.log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.svc.State, res.state, s.svc.Output)
+	s.svc.Since = s.svc.LastCheck
+	s.svc.State = res.state
 
 	return true
 }
@@ -126,11 +157,13 @@ func (s *Service) checkHTTP() *result {
 		return res
 	}
 
-	if strconv.Itoa(resp.StatusCode) == s.Expect {
-		res.state = StateOK
-		res.output = resp.Status
+	for _, code := range strings.Split(s.Expect, ",") {
+		if strconv.Itoa(resp.StatusCode) == strings.TrimSpace(code) {
+			res.state = StateOK
+			res.output = resp.Status
 
-		return res
+			return res
+		}
 	}
 
 	bodyStr := string(body)

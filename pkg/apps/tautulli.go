@@ -30,7 +30,7 @@ func (t *TautulliConfig) GetUsers() (*TautulliUsers, error) {
 
 	var users TautulliUsers
 
-	err := GetURLInto(t.Timeout.Duration, t.URL+"/api/v2", params, &users)
+	err := GetURLInto("Tautulli", t.Timeout.Duration, t.URL+"/api/v2", params, &users)
 	if err != nil {
 		return nil, err
 	}

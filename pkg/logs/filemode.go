@@ -33,6 +33,11 @@ func (f *FileMode) UnmarshalText(text []byte) error {
 	return nil
 }
 
+// MarshalText satisfies an encoder.TextMarshaler interface.
+func (f FileMode) MarshalText() ([]byte, error) {
+	return []byte(f.String()), nil
+}
+
 // String creates a unix-octal version of a file mode.
 func (f FileMode) String() string {
 	return fmt.Sprintf("%04o", f)

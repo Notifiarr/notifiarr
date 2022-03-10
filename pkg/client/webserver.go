@@ -1,13 +1,17 @@
 package client
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/gorilla/mux"
 	apachelog "github.com/lestrrat-go/apache-logformat"
 )
@@ -17,14 +21,26 @@ var ErrNoServer = fmt.Errorf("the web server is not running, cannot stop it")
 
 // StartWebServer starts the web server.
 func (c *Client) StartWebServer() {
-	// Create an apache-style logger.
-	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %u %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" ` +
-		`"%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	c.Lock()
+	defer c.Unlock()
+
+	// nolint:lll // Create an apache-style logger.
+	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %{X-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	// Create a request router.
-	c.Config.Apps.Router = mux.NewRouter()
+	c.Config.Router = mux.NewRouter()
+	c.Config.Router.Use(c.fixForwardedFor)
+	c.Config.Router.Use(c.countRequest)
+	c.Config.Router.Use(c.addUsernameHeader)
+	c.webauth = c.Config.UIPassword.Webauth() // this needs to be locked since password can be changed without reloading.
+
+	// Make a multiplexer because websockets can't use apache log.
+	smx := http.NewServeMux()
+	smx.Handle(path.Join(c.Config.URLBase, "/ws"), c.Config.Router)
+	smx.Handle("/", c.stripSecrets(apache.Wrap(c.Config.Router, c.Logger.HTTPLog.Writer())))
+
 	// Create a server.
 	c.server = &http.Server{ // nolint: exhaustivestruct
-		Handler:           c.stripSecrets(apache.Wrap(c.fixForwardedFor(c.Config.Apps.Router), c.Logger.HTTPLog.Writer())),
+		Handler:           smx,
 		Addr:              c.Config.BindAddr,
 		IdleTimeout:       time.Minute,
 		WriteTimeout:      c.Config.Timeout.Duration,
@@ -84,4 +100,44 @@ func (c *Client) StopWebServer() error {
 	}
 
 	return nil
+}
+
+/* Wrap all incoming http calls, so we can stuff counters into expvar. */
+
+var (
+	_ = http.ResponseWriter(&responseWrapper{})
+	_ = net.Conn(&netConnWrapper{})
+)
+
+type responseWrapper struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+type netConnWrapper struct {
+	net.Conn
+}
+
+func (r *responseWrapper) WriteHeader(statusCode int) {
+	r.statusCode = statusCode
+	r.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (r *responseWrapper) Write(b []byte) (int, error) {
+	exp.HTTPRequests.Add("Response Bytes", int64(len(b)))
+	return r.ResponseWriter.Write(b) //nolint:wrapcheck
+}
+
+func (r *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	conn, buf, err := r.ResponseWriter.(http.Hijacker).Hijack()
+	if err != nil {
+		return conn, buf, err //nolint:wrapcheck
+	}
+
+	return &netConnWrapper{conn}, buf, nil
+}
+
+func (n *netConnWrapper) Write(b []byte) (int, error) {
+	exp.HTTPRequests.Add("Response Bytes", int64(len(b)))
+	return n.Conn.Write(b) //nolint:wrapcheck
 }

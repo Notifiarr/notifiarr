@@ -11,7 +11,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
@@ -45,14 +44,10 @@ func (a *Apps) sonarrHandlers() {
 
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup"`
+	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
+	starrConfig
 	*starr.Config
-	*sonarr.Sonarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupSonarr(timeout time.Duration) error {
@@ -62,7 +57,7 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 		}
 
 		a.Sonarr[idx].Debugf = a.DebugLog.Printf
-		a.Sonarr[idx].Errorf = a.ErrorLog.Printf
+		a.Sonarr[idx].errorf = a.ErrorLog.Printf
 		a.Sonarr[idx].setup(timeout)
 	}
 
@@ -71,6 +66,8 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 
 func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.Sonarr = sonarr.New(r.Config)
+	r.Sonarr.APIer = &starrAPI{api: r.Config, app: starr.Sonarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}
@@ -78,9 +75,9 @@ func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Sonarr Path: %v", err)
+		r.errorf("Checking Sonarr Path: %v", err)
 	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Sonarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Sonarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }
@@ -95,16 +92,15 @@ func sonarrAddSeries(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTVDB)
 	}
 
-	app := getSonarr(req)
 	// Check for existing series.
-	m, err := app.GetSeriesContext(req.Context(), payload.TvdbID)
+	m, err := getSonarr(req).GetSeriesContext(req.Context(), payload.TvdbID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, sonarrData(m[0])
 	}
 
-	series, err := app.AddSeriesContext(req.Context(), &payload)
+	series, err := getSonarr(req).AddSeriesContext(req.Context(), &payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
 	}
@@ -122,6 +118,7 @@ func sonarrData(series *sonarr.Series) map[string]interface{} {
 		"id":        series.ID,
 		"hasFile":   hasFile,
 		"monitored": series.Monitored,
+		"tags":      series.Tags,
 	}
 }
 

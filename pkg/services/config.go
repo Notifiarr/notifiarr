@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -33,19 +34,21 @@ var (
 
 // Config for this Services plugin comes from a config file.
 type Config struct {
-	Interval     cnfg.Duration     `toml:"interval" xml:"interval"`
-	Parallel     uint              `toml:"parallel" xml:"parallel"`
-	Disabled     bool              `toml:"disabled" xml:"disabled"`
-	LogFile      string            `toml:"log_file" xml:"log_file"`
-	Apps         *apps.Apps        `toml:"-"`
-	Notifiarr    *notifiarr.Config `toml:"-"`
-	Plugins      *snapshot.Plugins `toml:"-"`
+	Interval     cnfg.Duration     `toml:"interval" xml:"interval" json:"interval"`
+	Parallel     uint              `toml:"parallel" xml:"parallel" json:"parallel"`
+	Disabled     bool              `toml:"disabled" xml:"disabled" json:"disabled"`
+	LogFile      string            `toml:"log_file" xml:"log_file" json:"logFile"`
+	Apps         *apps.Apps        `toml:"-" json:"-"`
+	Notifiarr    *notifiarr.Config `toml:"-" json:"-"`
+	Plugins      *snapshot.Plugins `toml:"-" json:"-"`
 	*logs.Logger `json:"-"`        // log file writer
 	services     map[string]*Service
 	checks       chan *Service
 	done         chan bool
 	stopChan     chan struct{}
 	triggerChan  chan notifiarr.EventType
+	checkChan    chan triggerCheck
+	stopLock     sync.Mutex
 }
 
 // CheckType locks us into a few specific types of checks.
@@ -80,27 +83,34 @@ type Results struct {
 
 // CheckResult represents the status of a service.
 type CheckResult struct {
-	Name     string     `json:"name"`   // "Radarr"
-	State    CheckState `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
-	Output   string     `json:"output"` // metadata message
-	Type     CheckType  `json:"type"`   // http, tcp, ping
-	Time     time.Time  `json:"time"`   // when it was checked, rounded to Microseconds
-	Since    time.Time  `json:"since"`  // how long it has been in this state, rounded to Microseconds
-	Interval float64    `json:"interval"`
+	Name        string        `json:"name"`   // "Radarr"
+	State       CheckState    `json:"state"`  // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
+	Output      string        `json:"output"` // metadata message
+	Type        CheckType     `json:"type"`   // http, tcp, ping
+	Time        time.Time     `json:"time"`   // when it was checked, rounded to Microseconds
+	Since       time.Time     `json:"since"`  // how long it has been in this state, rounded to Microseconds
+	Interval    float64       `json:"interval"`
+	Check       string        `json:"-"`
+	Expect      string        `json:"-"`
+	IntervalDur time.Duration `json:"-"`
 }
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name      string        `toml:"name" xml:"name"`         // Radarr
-	Type      CheckType     `toml:"type" xml:"type"`         // http
-	Value     string        `toml:"check" xml:"check"`       // http://some.url
-	Expect    string        `toml:"expect" xml:"expect"`     // 200
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout"`   // 10s
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"` // 1m
+	Name     string        `toml:"name" xml:"name" json:"name"`             // Radarr
+	Type     CheckType     `toml:"type" xml:"type" json:"type"`             // http
+	Value    string        `toml:"check" xml:"check" json:"value"`          // http://some.url
+	Expect   string        `toml:"expect" xml:"expect" json:"expect"`       // 200
+	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`    // 10s
+	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"` // 1m
+	svc      service
+}
+
+type service struct {
+	Output    string     `json:"output"`
+	State     CheckState `json:"state"`
+	Since     time.Time  `json:"since"`
+	LastCheck time.Time  `json:"lastCheck"`
 	log       *logs.Logger
-	output    string
-	state     CheckState
-	since     time.Time
-	lastCheck time.Time
 	proc      *procExpect // only used for process checks.
 }

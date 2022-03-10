@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/cnfg"
 )
@@ -201,7 +202,7 @@ func (s *SabNZBConfig) GetHistory() (*History, error) {
 		History *History `json:"history"`
 	}
 
-	err := GetURLInto(s.Timeout.Duration, s.URL+"/api", params, &h)
+	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &h)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +225,7 @@ func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 		Queue *Queue `json:"queue"`
 	}
 
-	err := GetURLInto(s.Timeout.Duration, s.URL+"/api", params, &q)
+	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &q)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +234,7 @@ func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func GetURLInto(timeout time.Duration, url string, params url.Values, into interface{}) error {
+func GetURLInto(app string, timeout time.Duration, url string, params url.Values, into interface{}) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -242,18 +243,24 @@ func GetURLInto(timeout time.Duration, url string, params url.Values, into inter
 		return fmt.Errorf("creating request: %w", err)
 	}
 
+	exp.Apps.Add(app+"&&GET Requests", 1)
+
 	req.URL.RawQuery = params.Encode()
 
 	resp, err := (&http.Client{Timeout: timeout}).Do(req)
 	if err != nil {
+		exp.Apps.Add(app+"&&GET Errors", 1)
 		return fmt.Errorf("making request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		exp.Apps.Add(app+"&&GET Errors", 1)
 		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
 	}
+
+	exp.Apps.Add(app+"&&Bytes Received", int64(len(body)))
 
 	if err := json.Unmarshal(body, into); err != nil {
 		return fmt.Errorf("decoding response (%s): %w: %s", resp.Status, err, string(body))

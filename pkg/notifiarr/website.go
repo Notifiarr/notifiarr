@@ -14,8 +14,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"golift.io/datacounter"
 )
 
 // httpClient is our custom http client to wrap Do and provide retries.
@@ -126,26 +128,27 @@ func (c *Config) GetData(url string) (*Response, error) {
 
 	start := time.Now()
 
+	// body gets closed in unmarshalResponse.
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("making http request: %w", err)
 	}
-	defer resp.Body.Close()
 
 	if !c.LogConfig.Debug {
-		return unmarshalResponse(url, resp.StatusCode, resp.Body)
+		return unmarshalResponse(http.MethodGet, url, resp.StatusCode, io.NopCloser(resp.Body))
 	}
+	defer resp.Body.Close()
 
 	var buf bytes.Buffer
 	// copy the body into a buffer we can pass into json.Decode().
 	tee := io.TeeReader(resp.Body, &buf) // must read tee first.
-	defer c.debughttplog(resp, url, start, "", tee)
+	defer c.debughttplog(resp, url, start, "", &buf)
 
 	if err != nil {
 		return nil, fmt.Errorf("reading http response body: %w", err)
 	}
 
-	return unmarshalResponse(url, resp.StatusCode, &buf)
+	return unmarshalResponse(http.MethodGet, url, resp.StatusCode, io.NopCloser(tee))
 }
 
 // SendData sends raw data to a notifiarr URL as JSON.
@@ -183,15 +186,22 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 	if err != nil {
 		return nil, err
 	}
-	defer body.Close()
 
-	return unmarshalResponse(c.BaseURL+uri, code, body)
+	return unmarshalResponse(http.MethodPost, c.BaseURL+uri, code, body)
 }
 
 // unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
-func unmarshalResponse(url string, code int, body io.Reader) (*Response, error) {
+func unmarshalResponse(method, url string, code int, body io.ReadCloser) (*Response, error) {
+	defer body.Close()
+
 	var r Response
-	err := json.NewDecoder(body).Decode(&r)
+
+	counter := datacounter.NewReaderCounter(body)
+	defer func() {
+		exp.NotifiarrCom.Add(method+" Bytes Received", int64(counter.Count()))
+	}()
+
+	err := json.NewDecoder(counter).Decode(&r)
 
 	if code < http.StatusOK || code > http.StatusIMUsed {
 		if err != nil {
@@ -263,12 +273,19 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError {
+				exp.NotifiarrCom.Add(req.Method+" Requests", 1)
+				exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
+
 				return resp, nil
 			}
 
 			// resp.StatusCode is 500 or higher, make that en error.
 			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                         // do not defer, because we're in a loop.
+			exp.NotifiarrCom.Add(req.Method+" Retries", 1)
+			exp.NotifiarrCom.Add(req.Method+" Requests", 1)
+			exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
+			exp.NotifiarrCom.Add(req.Method+" Bytes Received", size)
 			// shoehorn a non-200 error into the empty http error.
 			err = fmt.Errorf("%w: %s: %d bytes, %s", ErrNon200, req.URL, size, resp.Status)
 		}
@@ -353,7 +370,7 @@ func (c *Config) SetValuesContext(ctx context.Context, values map[string][]byte)
 		return fmt.Errorf("inalid response (%d): %w", code, err)
 	}
 
-	_, err = unmarshalResponse(c.BaseURL+ClientRoute.Path("getStates"), code, body)
+	_, err = unmarshalResponse(http.MethodPost, c.BaseURL+ClientRoute.Path("getStates"), code, body)
 
 	return err
 }
@@ -383,7 +400,7 @@ func (c *Config) DelValueContext(ctx context.Context, keys ...string) error {
 		return fmt.Errorf("inalid response (%d): %w", code, err)
 	}
 
-	_, err = unmarshalResponse(c.BaseURL+ClientRoute.Path("setStates"), code, body)
+	_, err = unmarshalResponse(http.MethodPost, c.BaseURL+ClientRoute.Path("setStates"), code, body)
 	if err != nil {
 		return err
 	}
@@ -411,7 +428,7 @@ func (c *Config) GetValueContext(ctx context.Context, keys ...string) (map[strin
 		return nil, fmt.Errorf("inalid response (%d): %w", code, err)
 	}
 
-	resp, err := unmarshalResponse(c.BaseURL+ClientRoute.Path("getStates"), code, body)
+	resp, err := unmarshalResponse(http.MethodPost, c.BaseURL+ClientRoute.Path("getStates"), code, body)
 	if err != nil {
 		return nil, err
 	}

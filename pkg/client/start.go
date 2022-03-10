@@ -9,9 +9,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
@@ -20,6 +22,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
+	"github.com/gorilla/securecookie"
 	flag "github.com/spf13/pflag"
 	"golift.io/version"
 )
@@ -32,7 +35,19 @@ type Client struct {
 	server  *http.Server
 	sigkil  chan os.Signal
 	sighup  chan os.Signal
+	reload  chan customReload
 	website *notifiarr.Config
+	cookies *securecookie.SecureCookie
+	templat *template.Template
+	webauth bool
+	// this locks anything that may be updated while running.
+	// at least "UIPassword" as of its creation.
+	sync.RWMutex
+}
+
+type customReload struct {
+	event notifiarr.EventType
+	msg   string
 }
 
 // Errors returned by this package.
@@ -40,13 +55,14 @@ var (
 	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file, OR with environment variable")
 )
 
-// NewDefaults returns a new Client pointer with default settings.
-func NewDefaults() *Client {
+// newDefaults returns a new Client pointer with default settings.
+func newDefaults() *Client {
 	logger := logs.New() // This persists throughout the app.
 
 	return &Client{
 		sigkil: make(chan os.Signal, 1),
 		sighup: make(chan os.Signal, 1),
+		reload: make(chan customReload, 1),
 		Logger: logger,
 		Config: configfile.NewConfig(logger),
 		Flags: &configfile.Flags{
@@ -54,12 +70,13 @@ func NewDefaults() *Client {
 			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
 			EnvPrefix:  mnd.DefaultEnvPrefix,
 		},
+		cookies: securecookie.New(securecookie.GenerateRandomKey(mnd.Bits64), securecookie.GenerateRandomKey(mnd.Bits32)),
 	}
 }
 
 // Start runs the app.
 func Start() error {
-	config := NewDefaults()
+	config := newDefaults()
 	config.Flags.ParseArgs(os.Args[1:])
 
 	switch {
@@ -97,7 +114,12 @@ func (c *Client) start() error { //nolint:cyclop
 		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
-	clientInfo := c.configureServices(notifiarr.EventStart)
+
+	if err := c.loadAssetsTemplates(); err != nil {
+		return err
+	}
+
+	clientInfo := c.configureServices()
 
 	if newCon {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
@@ -143,8 +165,8 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 }
 
 // Load configuration from the website.
-func (c *Client) loadSiteConfig(source notifiarr.EventType) *notifiarr.ClientInfo {
-	clientInfo, err := c.website.GetClientInfo(source)
+func (c *Client) loadSiteConfig() *notifiarr.ClientInfo {
+	clientInfo, err := c.website.GetClientInfo()
 	if err != nil || clientInfo == nil {
 		c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
 		return nil
@@ -226,8 +248,8 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices(source notifiarr.EventType) *notifiarr.ClientInfo {
-	clientInfo := c.loadSiteConfig(source)
+func (c *Client) configureServices() *notifiarr.ClientInfo {
+	clientInfo := c.loadSiteConfig()
 	c.configureServicesPlex()
 	c.website.Sighup = c.sighup
 	c.Config.Snapshot.Validate()
@@ -260,6 +282,10 @@ func (c *Client) configureServicesPlex() {
 	}
 }
 
+func (c *Client) triggerConfigReload(event notifiarr.EventType, source string) {
+	c.reload <- customReload{event: event, msg: source}
+}
+
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
 	c.StartWebServer()
@@ -268,6 +294,10 @@ func (c *Client) Exit() error {
 	// For non-GUI systems, this is where the main go routine stops (and waits).
 	for {
 		select {
+		case data := <-c.reload:
+			if err := c.reloadConfiguration(data.event, data.msg); err != nil {
+				return err
+			}
 		case sigc := <-c.sigkil:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
 			return c.exit()
@@ -300,10 +330,10 @@ func (c *Client) exit() error {
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
-func (c *Client) reloadConfiguration(source string) error {
-	c.Print("==> Reloading Configuration: " + source)
+func (c *Client) reloadConfiguration(event notifiarr.EventType, source string) error {
+	c.Printf("==> Reloading Configuration (%s): %s", event, source)
 	c.closeDynamicTimerMenus()
-	c.website.Stop(notifiarr.EventReload)
+	c.website.Stop(event)
 	c.Config.Services.Stop()
 
 	err := c.StopWebServer()
@@ -324,7 +354,8 @@ func (c *Client) reloadConfiguration(source string) error {
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.setupMenus(c.configureServices(notifiarr.EventReload))
+	c.setupMenus(c.configureServices())
+
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {

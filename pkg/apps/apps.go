@@ -18,7 +18,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/gorilla/mux"
+	"golift.io/cnfg"
+	"golift.io/datacounter"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/prowlarr"
@@ -44,7 +47,15 @@ type Apps struct {
 	Router   *mux.Router         `json:"-" toml:"-" xml:"-" yaml:"-"`
 	ErrorLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
 	DebugLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
-	keys     map[string]struct{} // for fast key lookup.
+	keys     map[string]struct{} `toml:"-"` // for fast key lookup.
+}
+
+type starrConfig struct {
+	Name      string        `toml:"name" xml:"name" json:"name"`
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	StuckItem bool          `toml:"stuck_items" xml:"stuck_items" json:"stuckItems"`
+	Corrupt   string        `toml:"corrupt" xml:"corrupt" json:"corrupt"`
+	Backup    string        `toml:"backup" xml:"backup" json:"backup"`
 }
 
 // Errors sent to client web requests.
@@ -89,7 +100,7 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
-func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop
+func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop,funlen,gocognit
 	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		var (
 			msg     interface{}
@@ -97,11 +108,14 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code    = http.StatusUnprocessableEntity
 			id, _   = strconv.Atoi(mux.Vars(r)["id"])
 			start   = time.Now()
-			post, _ = ioutil.ReadAll(r.Body) // swallowing this error could suck...
+			buf     bytes.Buffer
+			tee     = io.TeeReader(r.Body, &buf) // must read tee first.
+			post, _ = ioutil.ReadAll(tee)
+			appName = app.String()
 		)
 
-		r.Body.Close() // Reset the body so it can be re-read.
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(post))
+		r.Body.Close()              // we just read this into a buffer.
+		r.Body = io.NopCloser(&buf) // someone else gets to read it now.
 
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch id--; {
@@ -141,21 +155,29 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			a.DebugLog.Printf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, s)
 		}
 
+		if appName == "" {
+			appName = "Non-App"
+		}
+
+		wrote := a.Respond(w, code, msg)
+		exp.APIHits.Add(appName+" Bytes Sent", wrote)
+		exp.APIHits.Add(appName+" Bytes Received", int64(len(post)))
+		exp.APIHits.Add(appName+" Requests", 1)
+		exp.APIHits.Add("Total", 1)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
-		a.Respond(w, code, msg)
 	}
 }
 
 // CheckAPIKey drops a 403 if the API key doesn't match, otherwise run next handler.
-func (a *Apps) CheckAPIKey(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+func (a *Apps) CheckAPIKey(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		if _, ok := a.keys[r.Header.Get("X-API-Key")]; !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
 		next.ServeHTTP(w, r)
-	})
+	}
 }
 
 // InitHandlers activates all our handlers. This is part of the web server init.
@@ -222,32 +244,37 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 	return nil
 }
 
-// Respond sends a standard response to our caller. JSON encoded blobs.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) { //nolint:varnamelen
+// Respond sends a standard response to our caller. JSON encoded blobs. Returns size of data sent.
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 { //nolint:varnamelen
+	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
+
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
 		stat == http.StatusPermanentRedirect || stat == http.StatusTemporaryRedirect {
 		w.Header().Set("Location", msg.(string))
 		w.WriteHeader(stat)
+		exp.APIHits.Add(statusTxt, 1)
 
-		return
+		return 0
 	}
-
-	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
 	if m, ok := msg.(error); ok {
 		a.ErrorLog.Printf("Request failed. Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
+	exp.APIHits.Add(statusTxt, 1)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
-	json := json.NewEncoder(w)
+	counter := datacounter.NewResponseWriterCounter(w)
+	json := json.NewEncoder(counter)
 	json.SetEscapeHTML(false)
 
 	err := json.Encode(map[string]interface{}{"status": statusTxt, "message": msg})
 	if err != nil {
 		a.ErrorLog.Printf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
+
+	return int64(counter.Count())
 }
 
 /* Every API call runs one of these methods to find the interface for the respective app. */

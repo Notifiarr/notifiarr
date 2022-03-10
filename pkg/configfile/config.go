@@ -7,11 +7,15 @@
 package configfile
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -35,6 +39,7 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
+	UIPassword CryptPass           `json:"uiPassword" toml:"ui_password" xml:"ui_password" yaml:"uiPassword"`
 	BindAddr   string              `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
 	SSLCrtFile string              `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
 	SSLKeyFile string              `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
@@ -81,6 +86,30 @@ func NewConfig(logger *logs.Logger) *Config {
 	}
 }
 
+// CopyConfig returns a copy of the configuration data.
+// Useful for writing a config file with different values than what's running.
+func (c *Config) CopyConfig() (*Config, error) {
+	var newConfig Config
+
+	buf := bytes.Buffer{}
+	if err := Template.Execute(&buf, c); err != nil {
+		return nil, fmt.Errorf("encoding config into toml for copying (this is a bug!): %w", err)
+	}
+
+	dec := toml.NewDecoder(&buf)
+	if _, err := dec.Decode(&newConfig); err != nil {
+		var parseErr toml.ParseError
+		if errors.As(err, &parseErr) {
+			return nil, fmt.Errorf("decoding config from toml for copying (this is a bug!): %w: %s",
+				err, parseErr.ErrorWithUsage())
+		}
+
+		return nil, fmt.Errorf("decoding config from toml for copying: %w", err)
+	}
+
+	return &newConfig, nil
+}
+
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 // You should only run this after getting a config with NewConfig().
@@ -104,6 +133,10 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 	err := c.Apps.Setup(c.Timeout.Duration)
 	if err != nil {
 		return nil, fmt.Errorf("setting up app: %w", err)
+	}
+
+	if err := c.setupPassword(); err != nil {
+		return nil, err
 	}
 
 	c.Services.Apps = c.Apps
@@ -137,7 +170,7 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 
 func (c *Config) setup() {
 	c.Mode = c.Services.Notifiarr.Setup(c.Mode)
-	c.URLBase = path.Join("/", c.URLBase)
+	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
 
 	if c.Timeout.Duration == 0 {

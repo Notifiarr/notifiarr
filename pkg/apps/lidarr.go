@@ -11,7 +11,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
 )
@@ -42,20 +41,12 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/command/search/{albumid:[0-9]+}", lidarrTriggerSearchAlbum, "GET")
 }
 
-type starrConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup"`
-}
-
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
 	starrConfig
 	*starr.Config
-	*lidarr.Lidarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	*lidarr.Lidarr `toml:"-" xml:"-" json:"-"`
+	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupLidarr(timeout time.Duration) error {
@@ -65,7 +56,7 @@ func (a *Apps) setupLidarr(timeout time.Duration) error {
 		}
 
 		a.Lidarr[idx].Debugf = a.DebugLog.Printf
-		a.Lidarr[idx].Errorf = a.ErrorLog.Printf
+		a.Lidarr[idx].errorf = a.ErrorLog.Printf
 		a.Lidarr[idx].setup(timeout)
 	}
 
@@ -74,6 +65,8 @@ func (a *Apps) setupLidarr(timeout time.Duration) error {
 
 func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.Lidarr = lidarr.New(r.Config)
+	r.Lidarr.APIer = &starrAPI{api: r.Lidarr.APIer, app: starr.Lidarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}
@@ -81,9 +74,9 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Lidarr Path: %v", err)
+		r.errorf("Checking Lidarr Path: %v", err)
 	} else if u := strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Lidarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Lidarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }
@@ -98,16 +91,15 @@ func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoMBID)
 	}
 
-	app := getLidarr(req)
 	// Check for existing album.
-	m, err := app.GetAlbumContext(req.Context(), payload.ForeignAlbumID)
+	m, err := getLidarr(req).GetAlbumContext(req.Context(), payload.ForeignAlbumID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking album: %w", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, lidarrData(m[0])
 	}
 
-	album, err := app.AddAlbumContext(req.Context(), &payload)
+	album, err := getLidarr(req).AddAlbumContext(req.Context(), &payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding album: %w", err)
 	}
@@ -136,6 +128,7 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 		"id":        album.ID,
 		"hasFile":   hasFile,
 		"monitored": album.Monitored,
+		"tags":      album.Artist.Tags,
 	}
 }
 

@@ -72,7 +72,7 @@ func (s *Snapshot) GetLocalData(ctx context.Context) (errs []error) {
 		s.System.Username = u.Username
 	}
 
-	if err := s.GetUsers(ctx); err != nil {
+	if err := s.GetUsers(ctx); err != nil && !errors.Is(err, os.ErrNotExist) {
 		errs = append(errs, err)
 	}
 

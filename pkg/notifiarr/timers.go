@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"golift.io/cnfg"
 )
@@ -26,12 +27,12 @@ type TriggerName string
 const (
 	TrigSnapshot       TriggerName = "Gathering and sending System Snapshot."
 	TrigDashboard      TriggerName = "Initiating State Collection for Dashboard."
-	TrigCFSync         TriggerName = "Starting Custom Formats and Quality Profiles Sync for Radarr and Sonarr."
+	TrigCFSync         TriggerName = "Starting Radarr CF and Sonarr QP TRaSH sync."
 	TrigCollectionGaps TriggerName = "Sending Radarr Collection Gaps."
 	TrigPlexSessions   TriggerName = "Gathering and sending Plex Sessions."
 	TrigStuckItems     TriggerName = "Checking app queues and sending stuck items."
 	TrigPollSite       TriggerName = "Polling Notifiarr for new settings."
-	TrigStop           TriggerName = "Stop Channel is used for reloads and must not have a function."
+	TrigStop           TriggerName = "Stopping all triggers and timers (reload)."
 )
 
 // timerConfig defines a custom GET timer from the website.
@@ -52,6 +53,7 @@ type action struct {
 	SFn  func(map[string]struct{}) // this is just for plex sessions.
 	C    chan EventType            // if provided, T is optional
 	T    *time.Ticker              // if provided, C is optional.
+	Hide bool                      // prevent logging.
 }
 
 // Run fires a custom cron timer (GET).
@@ -124,11 +126,7 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 	// This allows watching a dynamic amount of channels and tickers.
 	for {
 		index, val, _ := reflect.Select(cases)
-
 		action := actions[index]
-		if action.Fn == nil && action.SFn == nil { // stop channel has no Functions
-			return // called by c.Stop(), calls c.stopTimerLoop().
-		}
 
 		var event EventType
 		if _, ok := val.Interface().(time.Time); ok {
@@ -137,13 +135,20 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 			event = "unknown"
 		}
 
+		exp.TimerEvents.Add(string(event)+"&&"+string(action.Name), 1)
+		exp.TimerCounts.Add(string(action.Name), 1)
+
+		if action.Fn == nil && action.SFn == nil { // stop channel has no Functions
+			return // called by c.Stop(), calls c.stopTimerLoop().
+		}
+
 		if event == EventUser && action.Name != "" {
 			if err := ui.Notify(string(action.Name)); err != nil {
 				c.Errorf("Displaying toast notification: %v", err)
 			}
 		}
 
-		if action.Name != "" {
+		if action.Name != "" && !action.Hide {
 			c.Printf("[%s requested] %s", event, action.Name)
 		}
 
@@ -178,7 +183,7 @@ func (c *Config) stopTimerLoop(actions []*action) {
 
 /* Helpers. */
 
-// exec runs a trigger. This is ab astraction method used in a bunch of places.
+// exec runs a trigger. This is abastraction method used in a bunch of places.
 func (t *Triggers) exec(event EventType, name TriggerName) {
 	trig := t.get(name)
 	if t.stop == nil || trig == nil || trig.C == nil {

@@ -10,7 +10,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/readarr"
 )
@@ -38,14 +37,10 @@ func (a *Apps) readarrHandlers() {
 
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup"`
+	starrConfig
 	*starr.Config
-	*readarr.Readarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	*readarr.Readarr `toml:"-" xml:"-" json:"-"`
+	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupReadarr(timeout time.Duration) error {
@@ -55,7 +50,7 @@ func (a *Apps) setupReadarr(timeout time.Duration) error {
 		}
 
 		a.Readarr[idx].Debugf = a.DebugLog.Printf
-		a.Readarr[idx].Errorf = a.ErrorLog.Printf
+		a.Readarr[idx].errorf = a.ErrorLog.Printf
 		a.Readarr[idx].setup(timeout)
 	}
 
@@ -64,6 +59,8 @@ func (a *Apps) setupReadarr(timeout time.Duration) error {
 
 func (r *ReadarrConfig) setup(timeout time.Duration) {
 	r.Readarr = readarr.New(r.Config)
+	r.Readarr.APIer = &starrAPI{api: r.Readarr.APIer, app: starr.Readarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}
@@ -71,9 +68,9 @@ func (r *ReadarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Readarr Path: %v", err)
+		r.errorf("Checking Readarr Path: %v", err)
 	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Readarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Readarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }
@@ -91,9 +88,8 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
 	}
 
-	app := getReadarr(req)
 	// Check for existing book.
-	m, err := app.GetBookContext(req.Context(), payload.Editions[0].ForeignEditionID)
+	m, err := getReadarr(req).GetBookContext(req.Context(), payload.Editions[0].ForeignEditionID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
 	} else if len(m) > 0 {
@@ -101,7 +97,7 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 	}
 
 	// Add book using payload.
-	book, err := app.AddBookContext(req.Context(), payload)
+	book, err := getReadarr(req).AddBookContext(req.Context(), payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding book: %w", err)
 	}
@@ -130,6 +126,7 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 		"id":        book.ID,
 		"hasFile":   hasFile,
 		"monitored": book.Monitored,
+		"tags":      book.Author.Tags,
 	}
 }
 

@@ -1,16 +1,30 @@
 package logs
 
 import (
+	"encoding/base64"
+	"expvar"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
+	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	homedir "github.com/mitchellh/go-homedir"
+	"golift.io/datacounter"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
+)
+
+//nolint:gochecknoglobals
+var (
+	stdout  = logCounter(os.Stdout.Name(), os.Stdout)
+	discard = logCounter("/dev/null", ioutil.Discard)
 )
 
 // setDefaultLogPaths makes sure a GUI app has log files defined.
@@ -71,14 +85,14 @@ func (l *Logger) openLogFile() {
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !l.LogConfig.Quiet && l.LogConfig.LogFile != "":
 		l.app = rotatorr.NewMust(rotate)
-		l.InfoLog.SetOutput(io.MultiWriter(l.app, os.Stdout))
+		l.InfoLog.SetOutput(io.MultiWriter(logCounter(l.LogConfig.LogFile, l.app), stdout))
 	case !l.LogConfig.Quiet && l.LogConfig.LogFile == "":
-		l.InfoLog.SetOutput(os.Stdout)
+		l.InfoLog.SetOutput(stdout)
 	case l.LogConfig.LogFile == "":
-		l.InfoLog.SetOutput(ioutil.Discard) // default is "nothing"
+		l.InfoLog.SetOutput(discard) // default is "nothing"
 	default:
 		l.app = rotatorr.NewMust(rotate)
-		l.InfoLog.SetOutput(l.app)
+		l.InfoLog.SetOutput(logCounter(l.LogConfig.LogFile, l.app))
 	}
 
 	// Don't forget errors log, and do standard logger too.
@@ -91,10 +105,9 @@ func (l *Logger) openLogFile() {
 	l.postLogRotate("", "")
 }
 
-func (l *Logger) postLogRotate(_, newFile string) {
-	if newFile != "" {
-		go l.Printf("Rotated log file to: %s", newFile)
-	}
+// This is only for the main log. To deal with stderr.
+func (l *Logger) postLogRotate(fileName, newFile string) {
+	l.postRotateCounter(fileName, newFile)
 
 	if l.app != nil && l.app.File != nil {
 		redirectStderr(l.app.File) // Log panics.
@@ -120,38 +133,180 @@ func (l *Logger) openDebugLog() {
 	}
 
 	rotateDebug := &rotatorr.Config{
-		Filepath: l.LogConfig.DebugLog,                                 // log file name.
-		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
-		FileMode: l.LogConfig.FileMode.Mode(),                          // set file mode.
-		Rotatorr: &timerotator.Layout{FileCount: l.LogConfig.LogFiles}, // number of files to keep.
+		Filepath: l.LogConfig.DebugLog,                        // log file name.
+		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: l.LogConfig.FileMode.Mode(),                 // set file mode.
+		Rotatorr: &timerotator.Layout{
+			FileCount:  l.LogConfig.LogFiles, // number of files to keep.
+			PostRotate: l.postRotateCounter,
+		},
 	}
 	l.debug = rotatorr.NewMust(rotateDebug)
 
 	if l.LogConfig.Quiet {
-		l.DebugLog.SetOutput(l.debug)
+		l.DebugLog.SetOutput(logCounter(l.LogConfig.DebugLog, l.debug))
 	} else {
-		l.DebugLog.SetOutput(io.MultiWriter(l.debug, os.Stdout))
+		l.DebugLog.SetOutput(io.MultiWriter(logCounter(l.LogConfig.DebugLog, l.debug), stdout))
 	}
 }
 
 func (l *Logger) openHTTPLog() {
 	rotateHTTP := &rotatorr.Config{
-		Filepath: l.LogConfig.HTTPLog,                                  // log file name.
-		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte,          // mnd.Megabytes
-		FileMode: l.LogConfig.FileMode.Mode(),                          // set file mode.
-		Rotatorr: &timerotator.Layout{FileCount: l.LogConfig.LogFiles}, // number of files to keep.
+		Filepath: l.LogConfig.HTTPLog,                         // log file name.
+		FileSize: int64(l.LogConfig.LogFileMb) * mnd.Megabyte, // mnd.Megabytes
+		FileMode: l.LogConfig.FileMode.Mode(),                 // set file mode.
+		Rotatorr: &timerotator.Layout{
+			FileCount:  l.LogConfig.LogFiles, // number of files to keep.
+			PostRotate: l.postRotateCounter,
+		},
 	}
 
 	switch { // only use MultiWriter if we have > 1 writer.
 	case !l.LogConfig.Quiet && l.LogConfig.HTTPLog != "":
 		l.web = rotatorr.NewMust(rotateHTTP)
-		l.HTTPLog.SetOutput(io.MultiWriter(l.web, os.Stdout))
+		l.HTTPLog.SetOutput(io.MultiWriter(logCounter(l.LogConfig.HTTPLog, l.web), stdout))
 	case !l.LogConfig.Quiet && l.LogConfig.HTTPLog == "":
-		l.HTTPLog.SetOutput(os.Stdout)
+		l.HTTPLog.SetOutput(stdout)
 	case l.LogConfig.HTTPLog == "":
-		l.HTTPLog.SetOutput(ioutil.Discard) // default is "nothing"
+		l.HTTPLog.SetOutput(discard) // default is "nothing"
 	default:
 		l.web = rotatorr.NewMust(rotateHTTP)
-		l.HTTPLog.SetOutput(l.web)
+		l.HTTPLog.SetOutput(logCounter(l.LogConfig.HTTPLog, l.web))
 	}
+}
+
+// LogFileInfos holds metadata about files.
+type LogFileInfos struct {
+	Dirs []string
+	Size int64
+	List []*LogFileInfo
+}
+
+// LogFileInfo is returned by GetAllLogFilePaths.
+type LogFileInfo struct {
+	ID   string
+	Name string
+	Path string
+	Size int64
+	Time time.Time
+	Mode fs.FileMode
+	Used bool
+	User string
+}
+
+// GetAllLogFilePaths searches the disk for log file names.
+func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
+	logFiles := []string{
+		l.LogConfig.LogFile,
+		l.LogConfig.HTTPLog,
+		l.LogConfig.DebugLog,
+	}
+
+	for cust := range customLog {
+		if name := customLog[cust].File.Name(); name != "" {
+			logFiles = append(logFiles, name)
+		}
+	}
+
+	return GetFilePaths(logFiles...)
+}
+
+// GetFilePaths is a helper function that returns data about similar files in
+// a folder with the provided file(s). This is useful to find "all the log files"
+// or "all the .conf files" in a folder. Simply pass in 1 or more file paths, and
+// any files in the same folder with the same extension will be returned.
+func GetFilePaths(files ...string) *LogFileInfos { //nolint:cyclop
+	contain := make(map[string]struct{})
+	dirs := make(map[string]struct{})
+
+	for _, logFilePath := range files {
+		dirExpanded, err := homedir.Expand(logFilePath)
+		if err != nil {
+			dirExpanded = logFilePath
+		}
+
+		ext := filepath.Ext(logFilePath)
+		if ext == "" {
+			continue
+		}
+
+		files, err := filepath.Glob(filepath.Join(filepath.Dir(dirExpanded), "*"+ext))
+		if err != nil {
+			continue
+		}
+
+		for _, filePath := range files {
+			contain[filePath] = struct{}{}
+			dirs[filepath.Dir(filePath)] = struct{}{}
+		}
+	}
+
+	output := &LogFileInfos{List: []*LogFileInfo{}, Dirs: map2list(dirs)}
+
+	for filePath := range contain {
+		fileInfo, err := os.Stat(filePath)
+		if err != nil || fileInfo.IsDir() {
+			continue
+		}
+
+		used := false
+
+		for _, name := range files {
+			if name == filePath {
+				used = true
+			}
+		}
+		// fileDate := strings.TrimPrefix(strings.TrimSuffix(filePath, ".log"), strings.TrimSuffix(logFilePath, ".log"))
+		// parsedDate, _ := time.Parse(timerotator.FormatDefault, fileDate)
+		output.List = append(output.List, &LogFileInfo{
+			ID:   strings.TrimRight(base64.StdEncoding.EncodeToString([]byte(filePath)), "="),
+			Name: fileInfo.Name(),
+			Path: filePath,
+			Size: fileInfo.Size(),
+			Time: fileInfo.ModTime().Round(time.Second),
+			Mode: fileInfo.Mode(),
+			Used: used,
+			User: getFileOwner(fileInfo),
+		})
+		output.Size += fileInfo.Size()
+	}
+
+	sort.Sort(output)
+
+	return output
+}
+
+func (l *LogFileInfos) Len() int {
+	return len(l.List)
+}
+
+func (l *LogFileInfos) Swap(i, j int) {
+	l.List[i], l.List[j] = l.List[j], l.List[i]
+}
+
+func (l *LogFileInfos) Less(i, j int) bool {
+	return l.List[i].Time.After(l.List[j].Time)
+}
+
+func map2list(input map[string]struct{}) []string {
+	output := []string{}
+	for name := range input {
+		output = append(output, name)
+	}
+
+	return output
+}
+
+func logCounter(filename string, writer io.Writer) io.Writer {
+	counter := datacounter.NewWriterCounter(writer)
+
+	exp.LogFiles.Set("Lines Written: "+filename, expvar.Func(
+		func() interface{} { return int64(counter.Writes()) },
+	))
+
+	exp.LogFiles.Set("Bytes Written: "+filename, expvar.Func(
+		func() interface{} { return int64(counter.Count()) },
+	))
+
+	return counter
 }

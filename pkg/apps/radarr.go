@@ -10,7 +10,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/radarr"
 )
@@ -45,14 +44,10 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup"`
+	starrConfig
 	*starr.Config
-	*radarr.Radarr
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-"`
+	*radarr.Radarr `toml:"-" xml:"-" json:"-"`
+	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupRadarr(timeout time.Duration) error {
@@ -62,7 +57,7 @@ func (a *Apps) setupRadarr(timeout time.Duration) error {
 		}
 
 		a.Radarr[idx].Debugf = a.DebugLog.Printf
-		a.Radarr[idx].Errorf = a.ErrorLog.Printf
+		a.Radarr[idx].errorf = a.ErrorLog.Printf
 		a.Radarr[idx].setup(timeout)
 	}
 
@@ -71,6 +66,8 @@ func (a *Apps) setupRadarr(timeout time.Duration) error {
 
 func (r *RadarrConfig) setup(timeout time.Duration) {
 	r.Radarr = radarr.New(r.Config)
+	r.Radarr.APIer = &starrAPI{api: r.Radarr.APIer, app: starr.Radarr.String()}
+
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
 	}
@@ -78,9 +75,9 @@ func (r *RadarrConfig) setup(timeout time.Duration) {
 	r.URL = strings.TrimRight(r.URL, "/")
 
 	if u, err := r.GetURL(); err != nil {
-		r.Errorf("Checking Radarr Path: %v", err)
+		r.errorf("Checking Radarr Path: %v", err)
 	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.Errorf("Radarr URL fixed: %s -> %s (continuing)", r.URL, u)
+		r.errorf("Radarr URL fixed: %s -> %s (continuing)", r.URL, u)
 		r.URL = u
 	}
 }
@@ -95,9 +92,8 @@ func radarrAddMovie(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTMDB)
 	}
 
-	app := getRadarr(req)
 	// Check for existing movie.
-	m, err := app.GetMovieContext(req.Context(), payload.TmdbID)
+	m, err := getRadarr(req).GetMovieContext(req.Context(), payload.TmdbID)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
@@ -114,7 +110,7 @@ func radarrAddMovie(req *http.Request) (int, interface{}) {
 	}
 
 	// Add movie using fixed payload.
-	movie, err := app.AddMovieContext(req.Context(), &payload)
+	movie, err := getRadarr(req).AddMovieContext(req.Context(), &payload)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding movie: %w", err)
 	}
@@ -127,6 +123,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 		"id":        movie.ID,
 		"hasFile":   movie.HasFile,
 		"monitored": movie.Monitored,
+		"tags":      movie.Tags,
 	}
 }
 

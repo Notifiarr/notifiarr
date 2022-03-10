@@ -13,18 +13,19 @@ import (
 
 // Flags are our CLI input flags.
 type Flags struct {
-	*flag.FlagSet
-	VerReq     bool
-	Restart    bool
-	AptHook    bool `json:"aptHook"`
-	Updated    bool
-	PSlist     bool
-	Write      string
-	Curl       string
-	ConfigFile string
-	ExtraConf  []string
-	EnvPrefix  string
-	Headers    []string
+	*flag.FlagSet `json:"-"`
+	VerReq        bool     `json:"verReq"`
+	Restart       bool     `json:"restart"`
+	AptHook       bool     `json:"aptHook"`
+	Updated       bool     `json:"updated"`
+	PSlist        bool     `json:"pslist"`
+	Write         string   `json:"wrte"`
+	Curl          string   `json:"curl"`
+	ConfigFile    string   `json:"configFile"`
+	ExtraConf     []string `json:"extraConf"`
+	EnvPrefix     string   `json:"envPrefix"`
+	Headers       []string `json:"headers"`
+	Assets        string   `json:"staticDif"`
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
@@ -39,6 +40,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
+	f.StringVarP(&f.Assets, "assets", "a", "", "Provide path to custom web assets: static files and templates")
 	f.BoolVar(&f.AptHook, "apthook", false, "Process a payload from a dpkg Pre-Install-Pkgs hook.")
 
 	if runtime.GOOS == mnd.Windows {

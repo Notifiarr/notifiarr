@@ -10,7 +10,7 @@ import (
 )
 
 // SystrayIcon is the icon in the system tray or task bar.
-const SystrayIcon = "files/favicon.png"
+const SystrayIcon = "files/images/favicon.png"
 
 // HasGUI returns false on Linux, true on Windows and optional on macOS.
 func HasGUI() bool {
