@@ -147,7 +147,10 @@
                                                                 <select class="client-parameter form-control input-sm" data-group="config" data-label="Auto Update" id="AutoUpdate" name="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
                                                                     <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="">Disabled</option>
                                                                     <option {{if eq .Config.AutoUpdate "daily"}}selected {{end}}value="daily">Enabled (daily)</option>
-                                                                    {{- if (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "daily")) }}
+                                                                    <option {{if eq .Config.AutoUpdate "12h"}}selected {{end}}value="12h">Enabled (12 hours)</option>
+                                                                    <option {{if eq .Config.AutoUpdate "6h"}}selected {{end}}value="6h">Enabled (6 hours)</option>
+                                                                    <option {{if eq .Config.AutoUpdate "3h"}}selected {{end}}value="3h">Enabled (3 hours)</option>
+                                                                    {{- if not (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "daily") (eq .Config.AutoUpdate "12h") (eq .Config.AutoUpdate "6h") (eq .Config.AutoUpdate "3h")) }}
                                                                     <option selected value="{{.Config.AutoUpdate}}">{{.Config.AutoUpdate}} (custom)</option>
                                                                     {{- end}}
                                                                 </select>
@@ -319,7 +322,19 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_RETRIES" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Retries" name="Retries" class="client-parameter form-control input-sm" data-group="config" data-label="Retries" data-original="{{.Config.Retries}}" value="{{.Config.Retries}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Retries" name="Retries" id="Retries" data-original="{{.Config.Retries}}">
+                                                                    <option {{if eq .Config.Retries 1}}selected {{end}}value="1">1</option>
+                                                                    <option {{if eq .Config.Retries 2}}selected {{end}}value="2">2</option>
+                                                                    <option {{if eq .Config.Retries 3}}selected {{end}}value="3">3</option>
+                                                                    <option {{if eq .Config.Retries 4}}selected {{end}}value="4">4</option>
+                                                                    <option {{if eq .Config.Retries 5}}selected {{end}}value="5">5</option>
+                                                                    <option {{if eq .Config.Retries 6}}selected {{end}}value="6">6</option>
+                                                                    <option {{if eq .Config.Retries 7}}selected {{end}}value="7">7</option>
+                                                                    <option {{if eq .Config.Retries 8}}selected {{end}}value="8">8</option>
+                                                                    <option {{if eq .Config.Retries 9}}selected {{end}}value="9">9</option>
+                                                                    <option {{if eq .Config.Retries 10}}selected {{end}}value="10">10</option>
+                                                                    <option {{if eq .Config.Retries 11}}selected {{end}}value="11">11</option>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -365,8 +380,7 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            This is the timeout for requests to Notifiarr.com, and any other timeout that may be missing (global).
-                                                            Exampes: 10s, 1m, 1m15s<br>
+                                                            This is the timeout for requests to Notifiarr.com, and any other timeout that may be missing (global).<br>
                                                             <b>Current Value</b>: <i>{{ .Config.Timeout }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
@@ -387,7 +401,16 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" name="Timeout" id="Timeout" class="client-parameter form-control input-sm" data-group="config" data-label="Global Timeout" data-original="{{.Config.Timeout}}" value="{{.Config.Timeout}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Timeout" id="Timeout" name="Timeout" data-original="{{.Config.Timeout}}">
+                                                                    <option {{if eq .Config.Timeout.String "15s"}}selected {{end}}value="15s">15 seconds</option>
+                                                                    <option {{if eq .Config.Timeout.String "30s"}}selected {{end}}value="30s">30 seconds</option>
+                                                                    <option {{if eq .Config.Timeout.String "1m"}}selected {{end}}value="1m">1 minute</option>
+                                                                    <option {{if eq .Config.Timeout.String "1m30s"}}selected {{end}}value="1m30s">90 seconds</option>
+                                                                    <option {{if eq .Config.Timeout.String "2m"}}selected {{end}}value="2m">2 minutes</option>
+                                                                    {{- if not (or (eq .Config.Timeout.String "15s") (eq .Config.Timeout.String "30s") (eq .Config.Timeout.String "1m") (eq .Config.Timeout.String "1m30s") (eq .Config.Timeout.String "2m")) }}
+                                                                    <option selected value="{{.Config.Timeout}}">{{.Config.Timeout}} (custom)</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -560,7 +583,22 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Services.Interval" name="Services.Interval" class="client-parameter form-control input-sm" data-group="config" data-label="Update Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}">
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Update Interval" id="Services.Interval" name="Services.Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}">
+                                                                    <option {{if eq .Config.Services.Interval.String "5m"}}selected {{end}}value="5m">5 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "6m"}}selected {{end}}value="6m">6 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "7m"}}selected {{end}}value="7m">7 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "8m"}}selected {{end}}value="8m">8 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "9m"}}selected {{end}}value="9m">9 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "10m"}}selected {{end}}value="10m">10 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "15m"}}selected {{end}}value="15m">15 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "20m"}}selected {{end}}value="20m">20 minutes</option>
+                                                                    <option {{if eq .Config.Services.Interval.String "30m"}}selected {{end}}value="30m">30 minutes</option>
+                                                                    {{- if not (or (eq .Config.Services.Interval.String "5m") (eq .Config.Services.Interval.String "6m") (eq .Config.Services.Interval.String "7m")
+                                                                    (eq .Config.Services.Interval.String "8m") (eq .Config.Services.Interval.String "9m") (eq .Config.Services.Interval.String "10m")
+                                                                    (eq .Config.Services.Interval.String "15m") (eq .Config.Services.Interval.String "20m") (eq .Config.Services.Interval.String "30m")) }}
+                                                                    <option selected value="{{.Config.Services.Interval}}">{{.Config.Services.Interval}} (custom)</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -814,7 +852,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_MAX_BODY" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" name="MaxBody" id="MaxBody" class="client-parameter form-control input-sm" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}">
+                                                                <input type="number" min="500" max="50000" name="MaxBody" id="MaxBody" class="client-parameter form-control input-sm" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -844,7 +882,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILE_MB" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" name="LogFileMb" id="LogFileMb" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}">
+                                                                <input type="number" min="1" max="999" name="LogFileMb" id="LogFileMb" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -876,7 +914,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILES" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" name="LogFiles" id="LogFiles" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}">
+                                                                <input type="number" min="0" max="999" name="LogFiles" id="LogFiles" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}">
                                                             </div>
                                                         </div>
                                                     </td>
