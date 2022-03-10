@@ -181,6 +181,7 @@ func (c *Client) makeMoreChannels() {
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
 	menu["debug_panic"] = debug.AddSubMenuItem("Application Panic", "cause an application panic (crash)")
 	menu["update"] = systray.AddMenuItem("Update", "check GitHub for updated version")
+	menu["gui"] = systray.AddMenuItem("Open WebUI", "open the web page for this Notifiarr client")
 	menu["sub"] = systray.AddMenuItem("Subscribe", "subscribe for premium features")
 	menu["exit"] = systray.AddMenuItem("Quit", "exit "+c.Flags.Name())
 }
@@ -362,6 +363,8 @@ func (c *Client) watchLogsChannels() {
 			c.rotateLogs()
 		case <-menu["update"].ClickedCh:
 			go c.checkForUpdate()
+		case <-menu["gui"].ClickedCh:
+			c.openGUI()
 		}
 	}
 }

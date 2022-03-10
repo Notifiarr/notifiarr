@@ -6,6 +6,7 @@ package client
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -171,4 +172,15 @@ func (c *Client) menuPanic() {
 
 	defer c.Printf("User Requested Application Panic, good bye.")
 	panic("user requested panic")
+}
+
+func (c *Client) openGUI() {
+	uri := "http://127.0.0.1"
+	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
+		uri = "https://127.0.0.1"
+	}
+
+	// This always has a colon, or the app will not start.
+	port := strings.Split(c.Config.BindAddr, ":")[1]
+	go ui.OpenURL(uri + ":" + port + c.Config.URLBase) //nolint:errcheck
 }
