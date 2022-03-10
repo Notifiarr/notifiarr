@@ -9,6 +9,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
@@ -87,13 +88,14 @@ type State struct {
 
 // States is our compiled states for the dashboard.
 type States struct {
-	Lidarr  []*State `json:"lidarr"`
-	Radarr  []*State `json:"radarr"`
-	Readarr []*State `json:"readarr"`
-	Sonarr  []*State `json:"sonarr"`
-	Qbit    []*State `json:"qbit"`
-	Deluge  []*State `json:"deluge"`
-	SabNZB  []*State `json:"sabnzbd"`
+	Lidarr  []*State       `json:"lidarr"`
+	Radarr  []*State       `json:"radarr"`
+	Readarr []*State       `json:"readarr"`
+	Sonarr  []*State       `json:"sonarr"`
+	Qbit    []*State       `json:"qbit"`
+	Deluge  []*State       `json:"deluge"`
+	SabNZB  []*State       `json:"sabnzbd"`
+	Plex    *plex.Sessions `json:"plexSessions"`
 }
 
 // SendDashboardState sends the current states for the dashboard.
@@ -126,6 +128,8 @@ func (c *Config) sendDashboardState(event EventType) {
 
 // getStatesSerial grabs data for each app serially.
 func (c *Config) getStatesSerial() *States {
+	sessions, _ := c.GetSessions(false)
+
 	return &States{
 		Deluge:  c.getDelugeStates(),
 		Lidarr:  c.getLidarrStates(),
@@ -134,6 +138,7 @@ func (c *Config) getStatesSerial() *States {
 		Readarr: c.getReadarrStates(),
 		Sonarr:  c.getSonarrStates(),
 		SabNZB:  c.getSabNZBStates(),
+		Plex:    sessions,
 	}
 }
 
@@ -143,7 +148,7 @@ func (c *Config) getStatesParallel() *States {
 
 	var wg sync.WaitGroup
 
-	wg.Add(7) //nolint:gomnd // we are polling 7 apps.
+	wg.Add(8) //nolint:gomnd // we are polling 8 apps.
 
 	go func() {
 		defer c.CapturePanic()
@@ -178,6 +183,11 @@ func (c *Config) getStatesParallel() *States {
 	go func() {
 		defer c.CapturePanic()
 		states.SabNZB = c.getSabNZBStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		defer c.CapturePanic()
+		states.Plex, _ = c.GetSessions(false)
 		wg.Done() //nolint:wsl
 	}()
 	wg.Wait()
