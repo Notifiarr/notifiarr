@@ -10,7 +10,7 @@ NOTIFIARR_API_KEY="abcdef12345"
 # * Set System Notifications to Enabled.
 # * Enable an interval for all notifications you want, and put a checkmark next to Agents for each.
 # * If you use the Auto Updater, go into those Settings and Set Notifications to Yes.
-# Setup Notifiarr.com: (IMPORtANT)
+# Setup Notifiarr.com: (IMPORTANT)
 # * Enable the Package Manager integration on the Integration Setup page under Manage Integrations.
 # * Pick a channel in the same place.
 ############
@@ -58,7 +58,8 @@ POST=$(cat <<EOF
       "kernel":   "${KERNEL}",
       "version":  "${UNRAIDVER}",
       "memTotal": "${MEMTOTAL}",
-      "memAvail": "${MEMAVAIL}"
+      "memAvail": "${MEMAVAIL}",
+      "hostname": "${HOSTNAME}"
     }
   }
 EOF
