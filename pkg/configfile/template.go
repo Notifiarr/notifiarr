@@ -125,7 +125,7 @@ timeout = "{{.Timeout}}"
 ## Set apt to true to enable this integration. A true setting causes
 ## notifiarr to relay apt package install/update hooks to notifiarr.com.
 ##
-apt = "{{.EnableApt}}"
+apt = {{.EnableApt}}
 {{- end}}
 
 ## Setting serial to true makes the app use fewer threads when polling apps.
