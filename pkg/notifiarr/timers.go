@@ -43,8 +43,7 @@ type timerConfig struct {
 	URI      string        `json:"endpoint"` // endpoint for the URI.
 	Desc     string        `json:"description"`
 	ch       chan EventType
-	getdata  func(string) (*Response, error)
-	errorf   func(string, ...interface{})
+	c        *Config
 }
 
 type action struct {
@@ -67,14 +66,14 @@ func (t *timerConfig) Run(event EventType) {
 
 // run responds to the channel that the timer fired into.
 func (t *timerConfig) run(event EventType) {
-	if _, err := t.getdata(t.URI); err != nil {
-		t.errorf("[%s requested] Custom Timer Request for %s failed: %v", event, t.URI, err)
+	if _, err := t.c.SendData(t.URI, []byte("cronthingy"), true); err != nil {
+		t.c.Errorf("[%s requested] Custom Timer Request for %s failed: %v", event, t.URI, err)
 	}
 }
 
 // setup makes sure a timer has info to do it's job and log results.
 func (t *timerConfig) setup(c *Config) {
-	t.URI, t.errorf, t.getdata = c.BaseURL+"/"+t.URI, c.Errorf, c.GetData
+	t.URI, t.c = c.BaseURL+"/"+t.URI, c
 	t.ch = make(chan EventType, 1)
 }
 

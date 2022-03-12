@@ -115,6 +115,7 @@ func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	return snap
 }
 
+/*
 func (c *Config) GetData(url string) (*Response, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
@@ -150,6 +151,7 @@ func (c *Config) GetData(url string) (*Response, error) {
 
 	return unmarshalResponse(http.MethodGet, url, resp.StatusCode, io.NopCloser(tee))
 }
+*/
 
 // SendData sends raw data to a notifiarr URL as JSON.
 func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response, error) {
