@@ -189,18 +189,18 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 		return nil, err
 	}
 
-	return unmarshalResponse(http.MethodPost, c.BaseURL+uri, code, body)
+	return unmarshalResponse(c.BaseURL+uri, code, body)
 }
 
 // unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
-func unmarshalResponse(method, url string, code int, body io.ReadCloser) (*Response, error) {
+func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, error) {
 	defer body.Close()
 
 	var r Response
 
 	counter := datacounter.NewReaderCounter(body)
 	defer func() {
-		exp.NotifiarrCom.Add(method+" Bytes Received", int64(counter.Count()))
+		exp.NotifiarrCom.Add("POST Bytes Received", int64(counter.Count()))
 	}()
 
 	err := json.NewDecoder(counter).Decode(&r)
@@ -372,7 +372,7 @@ func (c *Config) SetValuesContext(ctx context.Context, values map[string][]byte)
 		return fmt.Errorf("inalid response (%d): %w", code, err)
 	}
 
-	_, err = unmarshalResponse(http.MethodPost, c.BaseURL+ClientRoute.Path("getStates"), code, body)
+	_, err = unmarshalResponse(c.BaseURL+ClientRoute.Path("getStates"), code, body)
 
 	return err
 }
@@ -402,7 +402,7 @@ func (c *Config) DelValueContext(ctx context.Context, keys ...string) error {
 		return fmt.Errorf("inalid response (%d): %w", code, err)
 	}
 
-	_, err = unmarshalResponse(http.MethodPost, c.BaseURL+ClientRoute.Path("setStates"), code, body)
+	_, err = unmarshalResponse(c.BaseURL+ClientRoute.Path("setStates"), code, body)
 	if err != nil {
 		return err
 	}
@@ -430,7 +430,7 @@ func (c *Config) GetValueContext(ctx context.Context, keys ...string) (map[strin
 		return nil, fmt.Errorf("inalid response (%d): %w", code, err)
 	}
 
-	resp, err := unmarshalResponse(http.MethodPost, c.BaseURL+ClientRoute.Path("getStates"), code, body)
+	resp, err := unmarshalResponse(c.BaseURL+ClientRoute.Path("getStates"), code, body)
 	if err != nil {
 		return nil, err
 	}
