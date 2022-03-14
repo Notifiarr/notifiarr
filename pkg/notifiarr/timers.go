@@ -66,15 +66,10 @@ func (t *timerConfig) Run(event EventType) {
 
 // run responds to the channel that the timer fired into.
 func (t *timerConfig) run(event EventType) {
-	if _, err := t.c.SendData(t.URI, []byte("cronthingy"), true); err != nil {
+	payload := struct{ Cron string }{Cron: "thingy"}
+	if _, err := t.c.SendData(t.URI, payload, true); err != nil {
 		t.c.Errorf("[%s requested] Custom Timer Request for %s failed: %v", event, t.URI, err)
 	}
-}
-
-// setup makes sure a timer has info to do it's job and log results.
-func (t *timerConfig) setup(c *Config) {
-	t.URI, t.c = c.BaseURL+"/"+t.URI, c
-	t.ch = make(chan EventType, 1)
 }
 
 // runTimers converts all the tickers and triggers into []reflect.SelectCase.

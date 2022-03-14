@@ -229,7 +229,8 @@ func (c *Config) makeCustomClientInfoTimerTriggers() {
 	}
 
 	for _, custom := range c.clientInfo.Actions.Custom {
-		custom.setup(c)
+		custom.c, custom.ch = c, make(chan EventType, 1)
+		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 
 		var ticker *time.Ticker
 
@@ -241,7 +242,7 @@ func (c *Config) makeCustomClientInfoTimerTriggers() {
 		}
 
 		c.Trigger.add(&action{
-			Name: TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s' GET %s", custom.Name, custom.URI)),
+			Name: TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s' POST %s", custom.Name, custom.URI)),
 			Fn:   custom.run,
 			C:    custom.ch,
 			T:    ticker,
