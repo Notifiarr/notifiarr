@@ -177,7 +177,7 @@ $(BINARY).amd64.macos: generate main.go
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 $(BINARY).arm64.macos: generate main.go
 	# Building darwin 64-bit arm binary.
-	GOOS=darwin GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 freebsd: $(BINARY).amd64.freebsd
