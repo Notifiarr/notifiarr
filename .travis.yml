@@ -3,9 +3,8 @@ env:
   - MAKEBUILD=deb
 jobs:
   include:
-  - if: tag IS present
-    os: osx
-    osx_image: xcode12
+  - os: osx
+    osx_image: xcode13.2
     language: go
     go: 1.17.x
   - if: tag IS NOT present

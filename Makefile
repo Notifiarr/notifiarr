@@ -87,21 +87,23 @@ release: clean linux_packages freebsd_packages windows
 	# Generating File Hashes
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
-# DMG only makes a DMG file is MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
+# DMG only makes a DMG file if MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
 dmg: clean macapp
 	mkdir -p release
-	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
+	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).amd64.dmg -srcfolder $(MACAPP).amd64.app -ov
+	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).arm64.dmg -srcfolder $(MACAPP).arm64.app -ov
 	[ "$(MACAPP)" != "" ] || mv $(BINARY).*.macos release/
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
+
 
 # Delete all build assets.
 clean:
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
-	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).app.zip
+	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).*.app.zip
 	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go
-	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).app
+	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).*.app
 
 ####################
 ##### Sidecars #####
@@ -168,10 +170,14 @@ $(BINARY).armhf.linux: generate main.go
 	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-macos: $(BINARY).amd64.macos
+macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
 $(BINARY).amd64.macos: generate main.go
 	# Building darwin 64-bit x86 binary.
 	GOOS=darwin GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
+$(BINARY).arm64.macos: generate main.go
+	# Building darwin 64-bit arm binary.
+	GOOS=darwin GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 freebsd: $(BINARY).amd64.freebsd
@@ -202,11 +208,15 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
-macapp: $(MACAPP).app
-$(MACAPP).app: macos
+macapp: $(MACAPP).arm64.app $(MACAPP).amd64.app
+$(MACAPP).amd64.app: macos
 	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
 	[ -z "$(MACAPP)" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
-	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
+	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).amd64.app
+$(MACAPP).arm64.app: macos
+	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
+	[ -z "$(MACAPP)" ] || cp $(BINARY).arm64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
+	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).arm64.app
 
 aur: PKGBUILD SRCINFO $(BINARY).aur.install
 	mkdir -p $@
