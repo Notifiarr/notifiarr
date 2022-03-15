@@ -26,7 +26,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
-	"golift.io/cnfg/cnfgfile"
+	"golift.io/cnfgfile"
 )
 
 // Return prefixes from FindAndReturn.
