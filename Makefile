@@ -173,11 +173,11 @@ $(BINARY).armhf.linux: generate main.go
 macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
 $(BINARY).amd64.macos: generate main.go
 	# Building darwin 64-bit x86 binary.
-	GOOS=darwin GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 $(BINARY).arm64.macos: generate main.go
 	# Building darwin 64-bit arm binary.
-	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	#GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	# https://github.com/upx/upx/issues/446
 	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
