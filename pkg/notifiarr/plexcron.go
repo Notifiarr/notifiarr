@@ -33,6 +33,10 @@ func (t *Triggers) SendPlexSessions(event EventType) {
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
 func (c *Config) sendPlexSessions(event EventType) {
+	if !c.Plex.Configured() {
+		return
+	}
+
 	c.collectSessions(event, nil)
 }
 
@@ -60,7 +64,7 @@ func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
 // Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
 // Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
 func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
-	if c.Trigger.sess == nil || !c.Plex.Configured() {
+	if c.Trigger.sess == nil {
 		return nil, ErrNoChannel
 	}
 
