@@ -60,7 +60,7 @@ func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
 // Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
 // Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
 func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
-	if c.Trigger.sess == nil {
+	if c.Trigger.sess == nil || !c.Plex.Configured() {
 		return nil, ErrNoChannel
 	}
 
