@@ -110,15 +110,15 @@ func (c *Client) start() error { //nolint:cyclop
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
+	c.Printf("%s v%s-%s Starting! [PID: %v] %v",
+		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
+	c.Printf("==> %s", msg)
 
 	// Make sure each app has a sane timeout.
 	if err = c.Config.Apps.Setup(c.Config.Timeout.Duration); err != nil {
 		return fmt.Errorf("setting up app: %w", err)
 	}
 
-	c.Printf("%s v%s-%s Starting! [PID: %v] %v",
-		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
-	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
 
 	if err := c.loadAssetsTemplates(); err != nil {
