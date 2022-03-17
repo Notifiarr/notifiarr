@@ -103,7 +103,7 @@ clean:
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).*.app.zip
 	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go
-	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).*.app
+	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).*.app $(MACAPP).app
 
 ####################
 ##### Sidecars #####
@@ -162,7 +162,8 @@ arm64: $(BINARY).arm64.linux
 $(BINARY).arm64.linux: generate main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
+	# https://github.com/upx/upx/issues/351#issuecomment-599116973
+	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 armhf: $(BINARY).armhf.linux
 $(BINARY).armhf.linux: generate main.go
@@ -210,11 +211,11 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
 macapp: $(MACAPP).arm64.app $(MACAPP).amd64.app
-$(MACAPP).amd64.app: macos
+$(MACAPP).amd64.app: $(BINARY).amd64.macos
 	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
 	[ -z "$(MACAPP)" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).amd64.app
-$(MACAPP).arm64.app: macos
+$(MACAPP).arm64.app: $(BINARY).arm64.macos
 	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
 	[ -z "$(MACAPP)" ] || cp $(BINARY).arm64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).arm64.app

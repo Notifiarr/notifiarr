@@ -33,6 +33,10 @@ func (t *Triggers) SendPlexSessions(event EventType) {
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
 func (c *Config) sendPlexSessions(event EventType) {
+	if !c.Plex.Configured() {
+		return
+	}
+
 	c.collectSessions(event, nil)
 }
 

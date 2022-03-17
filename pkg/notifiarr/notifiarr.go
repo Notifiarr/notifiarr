@@ -113,13 +113,16 @@ func (c *Config) Start() {
 		panic("notifiarr timers cannot run more than once")
 	}
 
-	c.Trigger.sess = make(chan time.Time, 1)
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
 
+	if c.Plex.Configured() {
+		c.Trigger.sess = make(chan time.Time, 1)
+		go c.runSessionHolder()
+	}
+
 	// Order is important here.
-	go c.runSessionHolder()
 	c.logSnapshotStartup()
 	c.makeBaseTriggers()
 	c.makeCorruptionTriggers()
@@ -262,6 +265,8 @@ func (c *Config) Stop(event EventType) {
 	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.stop.C <- event
 	// Closes the Plex session holder.
-	defer close(c.Trigger.sess)
-	c.Trigger.sess = nil
+	if c.Trigger.sess != nil {
+		defer close(c.Trigger.sess)
+		c.Trigger.sess = nil
+	}
 }

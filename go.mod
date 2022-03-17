@@ -5,8 +5,8 @@ go 1.17
 // home grown goodness.
 require (
 	golift.io/cnfg v0.2.0
-	golift.io/deluge v0.9.4-0.20220227105649-ad9ba0f3a138
-	golift.io/qbit v0.0.0-20220227110129-6f84c5d5fe6f
+	golift.io/deluge v0.9.4-0.20220317021225-51ab09943349
+	golift.io/qbit v0.0.0-20220317021235-151a7d2d428e
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
 	golift.io/starr v0.14.1-0.20220227102118-e029bb583eec
 	golift.io/version v0.0.2
@@ -63,9 +63,9 @@ require (
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
-	golang.org/x/mod v0.5.1
+	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5
+	golang.org/x/sys v0.0.0-20220315194320-039c03cc5b86
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	howett.net/plist v1.0.0 // indirect
@@ -89,7 +89,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/tools v0.1.9 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.35.24 // indirect
@@ -98,7 +98,7 @@ require (
 	modernc.org/mathutil v1.4.1 // indirect
 	modernc.org/memory v1.0.6 // indirect
 	modernc.org/opt v0.1.1 // indirect
-	modernc.org/sqlite v1.15.1
+	modernc.org/sqlite v1.15.2
 	modernc.org/strutil v1.1.1 // indirect
 	modernc.org/token v1.0.0 // indirect
 )
@@ -111,7 +111,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/nxadm/tail v1.4.8
-	golang.org/x/crypto v0.0.0-20220314234724-5d542ad81a58
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
 	golift.io/datacounter v1.0.3
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )

@@ -8,13 +8,13 @@ jobs:
     osx_image: xcode13.2
     language: go
     go: 1.17.x
-  - if: tag IS NOT present
+  - if: tag IS NOT present AND branch != unstable
     os: linux
     dist: bionic
     services: docker
     language: go
     go: 1.17.x
-  - if: tag IS present
+  - if: tag IS present OR branch = unstable
     os: linux
     dist: bionic
     services: docker
