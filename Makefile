@@ -215,10 +215,12 @@ $(MACAPP).amd64.app: $(BINARY).amd64.macos
 	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
 	[ -z "$(MACAPP)" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).amd64.app
+	[ -z "$(MACAPP)" ] || cp -rp init/macos/binaries/amd64/* $(MACAPP).amd64.app/Contents/MacOS/
 $(MACAPP).arm64.app: $(BINARY).arm64.macos
 	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
 	[ -z "$(MACAPP)" ] || cp $(BINARY).arm64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).arm64.app
+	[ -z "$(MACAPP)" ] || cp -rp init/macos/binaries/arm64/* $(MACAPP).arm64.app/Contents/MacOS/
 
 aur: PKGBUILD SRCINFO $(BINARY).aur.install
 	mkdir -p $@
