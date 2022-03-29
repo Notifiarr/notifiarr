@@ -129,12 +129,6 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 		return nil, fmt.Errorf("environment variables: %w", err)
 	}
 
-	// Make sure each app has a sane timeout.
-	err := c.Apps.Setup(c.Timeout.Duration)
-	if err != nil {
-		return nil, fmt.Errorf("setting up app: %w", err)
-	}
-
 	if err := c.setupPassword(); err != nil {
 		return nil, err
 	}
