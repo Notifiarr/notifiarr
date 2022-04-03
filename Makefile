@@ -88,7 +88,7 @@ release: clean linux_packages freebsd_packages windows
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
 # DMG only makes a DMG file if MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
-dmg: clean macapp
+dmg: clean $(MACAPP).app
 	mkdir -p release
 	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
 	[ "$(MACAPP)" != "" ] || mv $(BINARY).*.macos release/
@@ -176,10 +176,10 @@ $(BINARY).universal.macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
 	lipo -create -output $@ $(BINARY).amd64.macos $(BINARY).arm64.macos
 $(BINARY).amd64.macos: generate main.go
 	# Building darwin 64-bit x86 binary.
-	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 $(BINARY).arm64.macos: generate main.go
 	# Building darwin 64-bit arm binary.
-	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 
 freebsd: $(BINARY).amd64.freebsd
@@ -211,7 +211,7 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
 macapp: $(MACAPP).app
-$(MACAPP).app: macos
+$(MACAPP).app: $(BINARY).universal.macos
 	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
 	[ -z "$(MACAPP)" ] || cp $(BINARY).universal.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
