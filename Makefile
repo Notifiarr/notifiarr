@@ -88,10 +88,9 @@ release: clean linux_packages freebsd_packages windows
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
 # DMG only makes a DMG file if MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
-dmg: clean macapp
+dmg: clean $(MACAPP).app
 	mkdir -p release
-	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).amd64.dmg -srcfolder $(MACAPP).amd64.app -ov
-	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).arm64.dmg -srcfolder $(MACAPP).arm64.app -ov
+	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
 	[ "$(MACAPP)" != "" ] || mv $(BINARY).*.macos release/
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
@@ -171,16 +170,17 @@ $(BINARY).armhf.linux: generate main.go
 	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
-macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
+macos: $(BINARY).universal.macos
+$(BINARY).universal.macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
+	# Building darwin 64-bit universal binary.
+	lipo -create -output $@ $(BINARY).amd64.macos $(BINARY).arm64.macos
 $(BINARY).amd64.macos: generate main.go
 	# Building darwin 64-bit x86 binary.
-	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 $(BINARY).arm64.macos: generate main.go
 	# Building darwin 64-bit arm binary.
-	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	# https://github.com/upx/upx/issues/446
-	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+
 
 freebsd: $(BINARY).amd64.freebsd
 $(BINARY).amd64.freebsd: generate main.go
@@ -210,15 +210,11 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
-macapp: $(MACAPP).arm64.app $(MACAPP).amd64.app
-$(MACAPP).amd64.app: $(BINARY).amd64.macos
+macapp: $(MACAPP).app
+$(MACAPP).app: $(BINARY).universal.macos
 	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
-	[ -z "$(MACAPP)" ] || cp $(BINARY).amd64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
-	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).amd64.app
-$(MACAPP).arm64.app: $(BINARY).arm64.macos
-	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
-	[ -z "$(MACAPP)" ] || cp $(BINARY).arm64.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
-	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).arm64.app
+	[ -z "$(MACAPP)" ] || cp $(BINARY).universal.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
+	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 
 aur: PKGBUILD SRCINFO $(BINARY).aur.install
 	mkdir -p $@

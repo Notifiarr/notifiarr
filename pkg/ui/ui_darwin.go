@@ -33,15 +33,14 @@ func Notify(msg string, vars ...interface{}) error {
 		return nil
 	}
 
-	app, err := exec.LookPath("terminal-notifier")
+	// This finds terminal-notifier inside Notifiarr.app, or in the PATH (homebrew).
+	app, err := osext.ExecutableFolder()
 	if err != nil {
-		if folder, err := osext.ExecutableFolder(); err == nil {
-			app = filepath.Join(folder, app)
-		}
-	}
-
-	if _, err := os.Stat(app); err != nil {
-		return fmt.Errorf("cannot find terminal-notifier: %w", err)
+		return fmt.Errorf("cannot find application running directory: %w", err)
+	} else if filepath.Base(app) == "MacOS" {
+		app = filepath.Join(filepath.Dir(app), "Resources", "terminal-notifier.app", "Contents", "MacOS", "terminal-notifier")
+	} else if app, err = exec.LookPath("terminal-notifier"); err != nil {
+		return fmt.Errorf("cannot locate terminal-notifier: %w", err)
 	}
 
 	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "com.notifiarr.client")

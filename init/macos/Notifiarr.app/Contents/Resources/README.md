@@ -1,0 +1,1 @@
+terminal-notifier is version 2.0.0, **universal binary**
