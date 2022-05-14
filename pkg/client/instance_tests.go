@@ -69,7 +69,7 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 		}
 	// Snapshots.
 	case "MySQL":
-		if len(config.Snapshot.Plugins.MySQL) > index {
+		if config.Snapshot != nil && config.Snapshot.Plugins != nil && len(config.Snapshot.Plugins.MySQL) > index {
 			reply, code = testMySQL(request.Context(), config.Snapshot.Plugins.MySQL[index])
 		}
 		// Services.
