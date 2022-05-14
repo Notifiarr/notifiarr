@@ -179,6 +179,12 @@ func (c *Config) setup() {
 
 	if c.Plex.Configured() {
 		c.Plex.Validate()
+	} else if c.Plex == nil {
+		c.Plex = &plex.Server{}
+	}
+
+	if c.Tautulli == nil {
+		c.Tautulli = &apps.TautulliConfig{}
 	}
 }
 
