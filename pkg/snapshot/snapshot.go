@@ -118,9 +118,7 @@ func (c *Config) Validate() {
 		c.Timeout.Duration = maximumTimeout
 	}
 
-	if c.Interval.Duration == 0 {
-		return
-	} else if c.Interval.Duration < minimumInterval {
+	if c.Interval.Duration != 0 && c.Interval.Duration < minimumInterval {
 		c.Interval.Duration = minimumInterval
 	}
 

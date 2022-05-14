@@ -1,10 +1,6 @@
 package notifiarr
 
 func (c *Config) logSnapshotStartup() {
-	if c.Snap.Interval.Duration < 1 {
-		return
-	}
-
 	var ex string
 
 	for key, val := range map[string]bool{
@@ -27,6 +23,11 @@ func (c *Config) logSnapshotStartup() {
 		}
 
 		ex += key
+	}
+
+	if c.Snap.Interval.Duration == 0 {
+		c.Printf("==> System Snapshot Collection Disabled, timeout: %v, configured: %s", c.Snap.Timeout, ex)
+		return
 	}
 
 	c.Printf("==> System Snapshot Collection Started, interval: %v, timeout: %v, enabled: %s",
