@@ -108,7 +108,7 @@ function addInstance(section, app)
         '<div class="btn-group" role="group" style="display:flex;">'+
             '<button onclick="removeInstance(\''+ section +'-'+ app +'\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>'+
             '<button id="'+ app +'IndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
-            '<button onClick="testInstance($(this), \'MySQL\', \''+index+'\')" type="button" style="font-size:18px;" class="btn btn-success btn-sm"><i class="fas fa-check-double"></i></button>'+
+            '<button onClick="testInstance($(this), \''+app+'\', \''+index+'\')" type="button" style="font-size:18px;" class="btn btn-success btn-sm"><i class="fas fa-check-double"></i></button>'+
         '</div>'+
     '</td>';
 
