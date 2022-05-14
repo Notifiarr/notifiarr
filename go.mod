@@ -5,6 +5,7 @@ go 1.17
 // home grown goodness.
 require (
 	golift.io/cnfg v0.2.0
+	golift.io/cnfgfile v0.0.0-20220228094812-5864a2124d02
 	golift.io/deluge v0.9.4-0.20220317021225-51ab09943349
 	golift.io/qbit v0.0.0-20220317021235-151a7d2d428e
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
@@ -116,4 +117,3 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 
-require golift.io/cnfgfile v0.0.0-20220228094812-5864a2124d02
