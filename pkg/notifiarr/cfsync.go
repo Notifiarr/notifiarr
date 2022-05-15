@@ -296,20 +296,20 @@ func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byt
 	for idx, profile := range reply.ReleaseProfiles {
 		newID, existingID := profile.ID, profile.ID
 
-		if err := app.UpdateReleaseProfile(profile); err != nil {
+		if _, err := app.UpdateReleaseProfile(profile); err != nil {
 			profile.ID = 0
 
 			c.Debugf("Error Updating release profile [%d/%d] (attempting to ADD %d): %v",
 				idx+1, len(reply.ReleaseProfiles), existingID, err)
 
-			newAddID, err2 := app.AddReleaseProfile(profile)
+			newProfile, err2 := app.AddReleaseProfile(profile)
 			if err2 != nil {
 				c.Errorf("Ensuring release profile [%d/%d] %d: (update) %v, (add) %v",
 					idx+1, len(reply.ReleaseProfiles), existingID, err, err2)
 				continue
 			}
 
-			newID = newAddID
+			newID = newProfile.ID
 		}
 
 		maps.RP = append(maps.RP, idMap{profile.Name, existingID, newID})
@@ -318,20 +318,20 @@ func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byt
 	for idx, profile := range reply.QualityProfiles {
 		newID, existingID := profile.ID, profile.ID
 
-		if err := app.UpdateQualityProfile(profile); err != nil {
+		if _, err := app.UpdateQualityProfile(profile); err != nil {
 			profile.ID = 0
 
 			c.Debugf("Error Updating quality format [%d/%d] (attempting to ADD %d): %v",
 				idx+1, len(reply.QualityProfiles), existingID, err)
 
-			newAddID, err2 := app.AddQualityProfile(profile)
+			newProfile, err2 := app.AddQualityProfile(profile)
 			if err2 != nil {
 				c.Errorf("Ensuring quality format [%d/%d] %d: (update) %v, (add) %v",
 					idx+1, len(reply.QualityProfiles), existingID, err, err2)
 				continue
 			}
 
-			newID = newAddID
+			newID = newProfile.ID
 		}
 
 		maps.QP = append(maps.QP, idMap{profile.Name, existingID, newID})
