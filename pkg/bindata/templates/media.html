@@ -4,7 +4,7 @@
                                     <li style="list-style: disc;">The Tautulli integration is used to provide a Plex username to custom name mapping in notifications.</li>
                                     <li style="list-style: disc;"><b>To disable Plex or Tautulli, simply remove the URL for the application.</b> The client only supports one of each.</li>
                                 </p>
-                                <div style="table-responsive">
+                                <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
                                         <thead>
                                             <tr>
@@ -40,7 +40,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        {{- if .Config.Plex}}
                                             <tr>
                                                 <td>
                                                     <div class="btn-group" role="group" style="display:flex;font-size:18px;">
@@ -106,9 +105,6 @@
                                                     </form>
                                                 </td>
                                             </tr>
-                                        {{- else}}
-                                                <tr><td colspan="7">No Plex instance configured.</td></tr>
-                                        {{- end}}
                                         </tbody>
                                         <thead>
                                             <tr><td colspan="7" style="text-align:center;">
@@ -145,7 +141,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        {{- if .Config.Apps.Tautulli}}
                                             <tr>
                                                 <td>
                                                     <div class="btn-group" role="group" style="display:flex;font-size:18px;">
@@ -244,9 +239,6 @@
                                                     </form>
                                                 </td>
                                             </tr>
-                                        {{- else}}
-                                            <tr><td colspan="7">No Tautulli instance configured.</td></tr>
-                                        {{- end}}
                                         </tbody>
                                     </table>
                                 </div>

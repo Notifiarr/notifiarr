@@ -290,7 +290,7 @@ func (s *SabNZBDate) UnmarshalJSON(b []byte) (err error) {
 		return nil
 	}
 
-	s.Time, err = time.Parse("15:04 Mon 02 Oct 2006", s.String+" "+strconv.Itoa(time.Now().Year()))
+	s.Time, err = time.Parse("15:04 Mon 02 Jan 2006", s.String+" "+strconv.Itoa(time.Now().Year()))
 	if err != nil {
 		return fmt.Errorf("invalid time: %w", err)
 	}

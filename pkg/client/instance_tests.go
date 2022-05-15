@@ -22,7 +22,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-func testInstance(response http.ResponseWriter, request *http.Request) { //nolint:funlen,cyclop
+func testInstance(response http.ResponseWriter, request *http.Request) { //nolint:funlen,cyclop,gocognit
 	config := configfile.Config{}
 	if err := configPostDecoder.Decode(&config, request.PostForm); err != nil {
 		http.Error(response, "Decoding POST data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
@@ -69,7 +69,7 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 		}
 	// Snapshots.
 	case "MySQL":
-		if len(config.Snapshot.Plugins.MySQL) > index {
+		if config.Snapshot != nil && config.Snapshot.Plugins != nil && len(config.Snapshot.Plugins.MySQL) > index {
 			reply, code = testMySQL(request.Context(), config.Snapshot.Plugins.MySQL[index])
 		}
 		// Services.

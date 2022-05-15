@@ -114,18 +114,16 @@ func (c *Client) start() error { //nolint:cyclop
 		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
 	c.Printf("==> %s", msg)
 
-	// Make sure each app has a sane timeout.
-	if err = c.Config.Apps.Setup(c.Config.Timeout.Duration); err != nil {
-		return fmt.Errorf("setting up app: %w", err)
-	}
-
 	c.printUpdateMessage()
 
 	if err := c.loadAssetsTemplates(); err != nil {
 		return err
 	}
 
-	clientInfo := c.configureServices()
+	clientInfo, err := c.configureServices()
+	if err != nil {
+		return err
+	}
 
 	if newCon {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
@@ -254,7 +252,7 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices() *notifiarr.ClientInfo {
+func (c *Client) configureServices() (*notifiarr.ClientInfo, error) {
 	clientInfo := c.loadSiteConfig()
 	c.configureServicesPlex()
 	c.website.Sighup = c.sighup
@@ -269,7 +267,12 @@ func (c *Client) configureServices() *notifiarr.ClientInfo {
 	/**/
 	c.Config.Services.Start()
 
-	return clientInfo
+	// Make sure each app has a sane timeout.
+	if err := c.Config.Apps.Setup(c.Config.Timeout.Duration); err != nil {
+		return clientInfo, fmt.Errorf("setting up app: %w", err)
+	}
+
+	return clientInfo, nil
 }
 
 func (c *Client) configureServicesPlex() {
@@ -360,8 +363,13 @@ func (c *Client) reloadConfiguration(event notifiarr.EventType, source string) e
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.setupMenus(c.configureServices())
 
+	clientInfo, err := c.configureServices()
+	if err != nil {
+		return err
+	}
+
+	c.setupMenus(clientInfo)
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {

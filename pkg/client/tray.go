@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"runtime"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
@@ -177,6 +178,11 @@ func (c *Client) makeMoreChannels() {
 	menu["mode"] = debug.AddSubMenuItem("Mode: "+strings.Title(c.Config.Mode), "toggle application mode")
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
+	menu["console"] = debug.AddSubMenuItem("Console", "toggle the console window")
+
+	if runtime.GOOS != mnd.Windows {
+		menu["console"].Hide()
+	}
 
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
 	menu["debug_panic"] = debug.AddSubMenuItem("Application Panic", "cause an application panic (crash)")
@@ -305,7 +311,7 @@ func (c *Client) watchGuiChannels() {
 	}
 }
 
-// nolint:errcheck
+// nolint:errcheck,cyclop
 func (c *Client) watchConfigChannels() {
 	for {
 		select {
@@ -316,6 +322,14 @@ func (c *Client) watchConfigChannels() {
 			c.Print("user requested] Editing Config File:", c.Flags.ConfigFile)
 		case <-menu["write"].ClickedCh:
 			go c.writeConfigFile()
+		case <-menu["console"].ClickedCh:
+			if menu["console"].Checked() {
+				menu["console"].Uncheck()
+				ui.HideConsoleWindow()
+			} else {
+				menu["console"].Check()
+				ui.ShowConsoleWindow()
+			}
 		case <-menu["mode"].ClickedCh:
 			if c.Config.Mode == notifiarr.ModeDev {
 				c.Config.Mode = c.website.Setup(notifiarr.ModeProd)
