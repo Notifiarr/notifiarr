@@ -443,14 +443,14 @@ func sonarrSetTag(req *http.Request) (int, interface{}) {
 }
 
 func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
-	var series sonarr.Series
+	var series sonarr.AddSeriesInput
 
 	err := json.NewDecoder(req.Body).Decode(&series)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getSonarr(req).UpdateSeriesContext(req.Context(), series.ID, &series)
+	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating series: %w", err)
 	}
