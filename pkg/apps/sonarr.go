@@ -66,7 +66,7 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 
 func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.Sonarr = sonarr.New(r.Config)
-	r.Sonarr.APIer = &starrAPI{api: r.Config, app: starr.Sonarr.String()}
+	r.Sonarr.APIer = &starrAPI{api: r.Sonarr.APIer, app: starr.Sonarr.String()}
 
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout
@@ -288,7 +288,7 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getSonarr(req).UpdateQualityProfileContext(req.Context(), &profile)
+	_, err = getSonarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -339,7 +339,7 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getSonarr(req).UpdateReleaseProfileContext(req.Context(), &profile)
+	_, err = getSonarr(req).UpdateReleaseProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -425,32 +425,32 @@ func sonarrGetTags(req *http.Request) (int, interface{}) {
 func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getSonarr(req).UpdateTagContext(req.Context(), id, mux.Vars(req)["label"])
+	tag, err := getSonarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
 
-	return http.StatusOK, tagID
+	return http.StatusOK, tag.ID
 }
 
 func sonarrSetTag(req *http.Request) (int, interface{}) {
-	tagID, err := getSonarr(req).AddTagContext(req.Context(), mux.Vars(req)["label"])
+	tag, err := getSonarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
 
-	return http.StatusOK, tagID
+	return http.StatusOK, tag.ID
 }
 
 func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
-	var series sonarr.Series
+	var series sonarr.AddSeriesInput
 
 	err := json.NewDecoder(req.Body).Decode(&series)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getSonarr(req).UpdateSeriesContext(req.Context(), series.ID, &series)
+	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating series: %w", err)
 	}

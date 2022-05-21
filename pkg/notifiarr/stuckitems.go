@@ -141,6 +141,11 @@ func (c *Config) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
 			continue
 		}
 
+		if app.Lidarr == nil {
+			c.Errorf("Getting Lidarr Queue (%d): Lidarr config is nil? This is probably a bug.", instance)
+			continue
+		}
+
 		start := time.Now()
 
 		queue, err := app.GetQueue(getItemsMax, getItemsMax)
@@ -179,6 +184,11 @@ func (c *Config) getFinishedItemsRadarr() ItemList { //nolint:cyclop
 		instance := idx + 1
 
 		if !app.StuckItem {
+			continue
+		}
+
+		if app.Radarr == nil {
+			c.Errorf("Getting Radarr Queue (%d): Radarr config is nil? This is probably a bug.", instance)
 			continue
 		}
 
@@ -225,6 +235,11 @@ func (c *Config) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
 			continue
 		}
 
+		if app.Readarr == nil {
+			c.Errorf("Getting Readarr Queue (%d): Readarr config is nil? This is probably a bug.", instance)
+			continue
+		}
+
 		start := time.Now()
 
 		queue, err := app.GetQueue(getItemsMax, getItemsMax)
@@ -263,6 +278,11 @@ func (c *Config) getFinishedItemsSonarr() ItemList { //nolint:cyclop
 		instance := idx + 1
 
 		if !app.StuckItem {
+			continue
+		}
+
+		if app.Sonarr == nil {
+			c.Errorf("Getting Sonarr Queue (%d): Sonarr config is nil? This is probably a bug.", instance)
 			continue
 		}
 

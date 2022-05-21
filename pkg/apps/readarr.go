@@ -330,21 +330,21 @@ func readarrGetTags(req *http.Request) (int, interface{}) {
 func readarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getReadarr(req).UpdateTagContext(req.Context(), id, mux.Vars(req)["label"])
+	tag, err := getReadarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
 
-	return http.StatusOK, tagID
+	return http.StatusOK, tag.ID
 }
 
 func readarrSetTag(req *http.Request) (int, interface{}) {
-	tagID, err := getReadarr(req).AddTagContext(req.Context(), mux.Vars(req)["label"])
+	tag, err := getReadarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
 
-	return http.StatusOK, tagID
+	return http.StatusOK, tag.ID
 }
 
 func readarrUpdateBook(req *http.Request) (int, interface{}) {

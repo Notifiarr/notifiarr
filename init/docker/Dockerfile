@@ -3,32 +3,28 @@
 # https://github.com/golift/application-builder
 #
 
-ARG ARCH=amd64
-ARG OS=linux
 ARG BUILD_DATE=0
 ARG COMMIT=0
 ARG VERSION=unknown
 ARG BINARY=application-builder
 
 FROM golang:1-buster as builder
-ARG ARCH
-ARG OS
+ARG TARGETOS
 ARG BINARY
+ARG TARGETARCH
 
 RUN mkdir -p $GOPATH/pkg/mod $GOPATH/bin $GOPATH/src /${BINARY}
 COPY . /${BINARY}
 WORKDIR /${BINARY}
 
-RUN apt update && \
-    apt install -y upx && \
-    CGO_ENABLED=0 make clean ${BINARY}.${ARCH}.${OS} && \
-    curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$ARCH.tgz && \
+RUN CGO_ENABLED=0 make clean ${BINARY}.${TARGETARCH}.${TARGETOS} && \
+    curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
     ln -sf /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.5
 
 FROM scratch
-ARG ARCH
-ARG OS
+ARG TARGETOS
+ARG TARGETARCH
 ARG BUILD_DATE
 ARG COMMIT
 ARG VERSION
@@ -50,11 +46,11 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.source="${SOURCE_URL}" \
       org.opencontainers.image.vendor="${VENDOR}" \
       org.opencontainers.image.authors="${AUTHOR}" \
-      org.opencontainers.image.architecture="${OS} ${ARCH}" \
+      org.opencontainers.image.architecture="${TARGETOS} ${TARGETARCH}" \
       org.opencontainers.image.licenses="${LICENSE}" \
       org.opencontainers.image.version="${VERSION}"
 
-COPY --from=builder /${BINARY}/${BINARY}.${ARCH}.${OS} /image
+COPY --from=builder /${BINARY}/${BINARY}.${TARGETARCH}.${TARGETOS} /image
 
 # Make sure we have an ssl cert chain and timezone data.
 COPY --from=builder /etc/ssl /etc/ssl
