@@ -9,7 +9,7 @@ require (
 	golift.io/deluge v0.9.4-0.20220317021225-51ab09943349
 	golift.io/qbit v0.0.0-20220317021235-151a7d2d428e
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
-	golift.io/starr v0.14.1-0.20220227102118-e029bb583eec
+	golift.io/starr v0.14.1-0.20220517052405-2529a7c6ece7
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.1.1
 )
@@ -118,8 +118,11 @@ require (
 )
 
 require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/testify v1.7.1 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
 )
