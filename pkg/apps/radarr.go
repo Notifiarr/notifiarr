@@ -319,21 +319,21 @@ func radarrGetTags(req *http.Request) (int, interface{}) {
 func radarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
-	tagID, err := getRadarr(req).UpdateTagContext(req.Context(), id, mux.Vars(req)["label"])
+	tag, err := getRadarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
 	}
 
-	return http.StatusOK, tagID
+	return http.StatusOK, tag.ID
 }
 
 func radarrSetTag(req *http.Request) (int, interface{}) {
-	tagID, err := getRadarr(req).AddTagContext(req.Context(), mux.Vars(req)["label"])
+	tag, err := getRadarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
 	}
 
-	return http.StatusOK, tagID
+	return http.StatusOK, tag.ID
 }
 
 func radarrUpdateMovie(req *http.Request) (int, interface{}) {
