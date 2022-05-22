@@ -174,3 +174,58 @@ function addInstance(section, app)
     // Bring up the save changes button.
     findPendingChanges();
 }
+
+function addWatchFiles()
+{
+    const index = $('.files-WatchFiles').length;
+    const instance = index+1;
+    const names = $('#files-WatchFiles-addbutton').data('names'); // list of thinges like "Name" and "URL"
+    // This just sets the first few lines of the row (the action buttons). The more-dynamic bits get added below, in a for loop.
+    let row = '<tr class="newRow bk-success files-WatchFiles" id="files-WatchFiles-'+ instance +'">'+
+    '<td style="white-space:nowrap;">'+
+        '<div class="btn-group" role="group" style="display:flex;">'+
+            '<button onclick="removeInstance(\'files-WatchFiles\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>'+
+            '<button id="filesIndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
+        '</div>'+
+    '</td>';
+
+    // Timeout and Interval must have valid go durations, or the parser errors.
+    // Host or URL are set with a value, and without an original value to make the save button appear.
+    for (const name of names) {
+        let nameval = ""
+        if (name == "Path") {
+            nameval = "/some/path";
+        }
+
+        row += '<td><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
+
+        switch (name) {
+             case "Poll":
+             case "Pipe":
+             case "MustExist":
+                 row += '<select id="WatchFiles.'+ index +'.'+ name +'" name="WatchFiles.'+ index +'.'+ name +'" data-index="'+ index +'" data-app="WatchFiles" '+
+                    'class="client-parameter form-control input-sm" data-group="files" data-label="Files '+ instance +' '+ name +'" data-original="false" value="false">'+
+                    '<option value="true">Enabled</option>'+
+                    '<option selected value="false">Disabled</option></select>';
+                break;
+             default:
+                row += '<input type="text" name="WatchFiles.'+ index +'.'+ name +'" '+
+                    'id="WatchFiles.'+ index +'.'+ name +'" '+
+                    'name="WatchFiles.'+ index +'.'+ name +'" '+
+                    'data-app="WatchFiles" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="files" data-label="Files '+
+                    instance +' '+name+'" data-original="" value="'+ nameval +'">';
+                break;
+        }
+
+        row += '</div></div></form></td>';
+    }
+
+    // Add this new data row to our table.
+    $('#files-WatchFiles-container').append(row);
+
+    // Hide the "no instances" item that displays when no instances are configured.
+    $('#files-WatchFiles-none').hide();
+
+    // Bring up the save changes button.
+    findPendingChanges();
+}

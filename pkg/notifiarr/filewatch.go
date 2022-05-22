@@ -13,7 +13,7 @@ type WatchFile struct {
 	//	Cooldown  cnfg.Duration `json:"cooldown" toml:"cooldown" xml:"cooldown" yaml:"cooldown"`
 	Path      string `json:"path" toml:"path" xml:"path" yaml:"path"`
 	Match     string `json:"match" toml:"match" xml:"match" yaml:"match"`
-	Regexp    string `json:"regexp" toml:"regexp" xml:"regexp" yaml:"regexp"`
+	Regexp    string `json:"regex" toml:"regex" xml:"regex" yaml:"regex"`
 	Poll      bool   `json:"poll" toml:"poll" xml:"poll" yaml:"poll"`
 	Pipe      bool   `json:"pipe" toml:"pipe" xml:"pipe" yaml:"pipe"`
 	MustExist bool   `json:"mustExist" toml:"must_exist" xml:"must_exist" yaml:"mustExist"`

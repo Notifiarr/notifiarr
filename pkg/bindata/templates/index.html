@@ -64,6 +64,7 @@
                             <li><i class="nav-icon fas fa-cart-arrow-down"></i><a href="#downloaders" class="nav-link" onclick="swapNavigationTemplate('downloaders')">Download Apps</a></li>
                             <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" href="#media" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
                             <li><i class="nav-icon fas fa-tablets"></i><a class="nav-link" href="#snapshot" onclick="swapNavigationTemplate('snapshot')">Snapshot Apps</a></li>
+                            <li><i class="nav-icon fas fa-binoculars"></i><a class="nav-link" href="#filewatcher" onclick="swapNavigationTemplate('filewatcher')">File Watcher</a></li>
                             <li><i class="nav-icon fas fa-network-wired"></i><a class="nav-link" href="#services" onclick="swapNavigationTemplate('services')">Service Checks</a></li>
                             <hr>
                             <li class="ts-label" style="text-align: center;">Insights</li>
@@ -162,6 +163,9 @@
                             </div>
                             <div class="navigation-item" id="template-configfiles" style="display: none;">
 {{ template "configfiles.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-filewatcher" style="display: none;">
+{{ template "filewatcher.html" . }}
                             </div>
                             <div class="navigation-item" id="template-snapshot" style="display: none;">
 {{ template "snapshot.html" . }}

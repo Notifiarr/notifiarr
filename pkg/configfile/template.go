@@ -398,4 +398,32 @@ retries = {{.Retries}}
   timeout  = "{{.Timeout}}"
   interval = "{{.Interval}}"
 {{end}}{{end}}
+
+
+######################
+# File & Log Watcher #
+######################
+
+## Tail a log file, string or regex match lines, and send notifications.
+## Example:
+
+#[[watch_file]]
+#  path = "/var/log/system.log"
+#  match = "error"
+#  regexp = "[Ee]rror"
+#  poll = false
+#  pipe = false
+#  must_exist = false
+{{if .WatchFiles}}
+## Configured Watch Files:
+{{- range $item := .WatchFiles}}
+
+[[watch_file]]
+  path  = "{{$item.Path}}"{{if $item.Match}}
+  match = "{{$item.Match}}"{{end}}{{if $item.Regexp}}
+  regex = "{{$item.Regexp}}"{{end}}{{if $item.Poll}}
+  poll  = true{{end}}{{if $item.Pipe}}
+  pipe  = true{{end}}{{if $item.MustExist}}
+  must_exist = true{{end}}{{end}}
+{{end}}
 `
