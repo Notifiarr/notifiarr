@@ -39,22 +39,23 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
-	UIPassword CryptPass           `json:"uiPassword" toml:"ui_password" xml:"ui_password" yaml:"uiPassword"`
-	BindAddr   string              `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
-	SSLCrtFile string              `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
-	SSLKeyFile string              `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
-	AutoUpdate string              `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
-	MaxBody    int                 `json:"maxBody" toml:"max_body" xml:"max_body" yaml:"maxBody"`
-	Mode       string              `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
-	Upstreams  []string            `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
-	Timeout    cnfg.Duration       `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Serial     bool                `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
-	Retries    int                 `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
-	Plex       *plex.Server        `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
-	Snapshot   *snapshot.Config    `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
-	Services   *services.Config    `json:"services" toml:"services" xml:"services" yaml:"services"`
-	Service    []*services.Service `json:"service" toml:"service" xml:"service" yaml:"service"`
-	EnableApt  bool                `json:"apt" toml:"apt" xml:"apt" yaml:"apt"`
+	UIPassword CryptPass              `json:"uiPassword" toml:"ui_password" xml:"ui_password" yaml:"uiPassword"`
+	BindAddr   string                 `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
+	SSLCrtFile string                 `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
+	SSLKeyFile string                 `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
+	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
+	MaxBody    int                    `json:"maxBody" toml:"max_body" xml:"max_body" yaml:"maxBody"`
+	Mode       string                 `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
+	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
+	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	Serial     bool                   `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
+	Retries    int                    `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
+	Plex       *plex.Server           `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
+	Snapshot   *snapshot.Config       `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
+	Services   *services.Config       `json:"services" toml:"services" xml:"services" yaml:"services"`
+	Service    []*services.Service    `json:"service" toml:"service" xml:"service" yaml:"service"`
+	EnableApt  bool                   `json:"apt" toml:"apt" xml:"apt" yaml:"apt"`
+	WatchFiles []*notifiarr.WatchFile `json:"watchFiles" toml:"watch_file" xml:"watch_file" yaml:"watchFiles"`
 	*logs.LogConfig
 	*apps.Apps
 	Allow AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
@@ -146,16 +147,17 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Notifiarr = &notifiarr.Config{
-		Apps:     c.Apps,
-		Plex:     c.Plex,
-		Snap:     c.Snapshot,
-		Logger:   c.Services.Logger,
-		BaseURL:  notifiarr.BaseURL,
-		Timeout:  c.Timeout,
-		MaxBody:  c.MaxBody,
-		Retries:  c.Retries,
-		Serial:   c.Serial,
-		Services: svcs,
+		Apps:       c.Apps,
+		Plex:       c.Plex,
+		Snap:       c.Snapshot,
+		Logger:     c.Services.Logger,
+		BaseURL:    notifiarr.BaseURL,
+		Timeout:    c.Timeout,
+		MaxBody:    c.MaxBody,
+		Retries:    c.Retries,
+		Serial:     c.Serial,
+		Services:   svcs,
+		WatchFiles: c.WatchFiles,
 	}
 	c.setup()
 

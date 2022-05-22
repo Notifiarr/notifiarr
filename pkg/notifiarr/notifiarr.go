@@ -48,6 +48,7 @@ type Config struct {
 	Plex         *plex.Server     `json:"plex"`      // plex sessions
 	Snap         *snapshot.Config `json:"snapshots"` // system snapshot data
 	Services     *ServiceConfig   `json:"services"`
+	WatchFiles   []*WatchFile     `json:"watchFiles"`
 	Serial       bool             `json:"serial"`
 	Retries      int              `json:"retries"`
 	BaseURL      string           `json:"-"`
@@ -135,6 +136,7 @@ func (c *Config) Start() {
 
 	c.makeCustomClientInfoTimerTriggers()
 	c.runTimers()
+	c.runFileWatcher()
 }
 
 func (c *Config) makeBaseTriggers() {
