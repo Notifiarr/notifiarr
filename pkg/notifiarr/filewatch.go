@@ -12,13 +12,14 @@ import (
 type WatchFile struct {
 	//	Cooldown  cnfg.Duration `json:"cooldown" toml:"cooldown" xml:"cooldown" yaml:"cooldown"`
 	Path      string `json:"path" toml:"path" xml:"path" yaml:"path"`
-	Match     string `json:"match" toml:"match" xml:"match" yaml:"match"`
 	Regexp    string `json:"regex" toml:"regex" xml:"regex" yaml:"regex"`
+	Skip      string `json:"skip" toml:"skip" xml:"skip" yaml:"skip"`
 	Poll      bool   `json:"poll" toml:"poll" xml:"poll" yaml:"poll"`
 	Pipe      bool   `json:"pipe" toml:"pipe" xml:"pipe" yaml:"pipe"`
 	MustExist bool   `json:"mustExist" toml:"must_exist" xml:"must_exist" yaml:"mustExist"`
 	LogMatch  bool   `json:"logMatch" toml:"log_match" xml:"log_match" yaml:"logMatch"`
 	re        *regexp.Regexp
+	skip      *regexp.Regexp
 	tail      *tail.Tail
 }
 
@@ -37,19 +38,16 @@ func (c *Config) runFileWatcher() {
 	)
 
 	for _, item := range c.WatchFiles {
-		if item.Regexp != "" {
-			item.re, err = regexp.Compile(item.Regexp)
-			if err != nil {
-				if item.Match == "" {
-					c.Errorf("Regexp compile failed, not watching file %s: %v", item.Path, err)
-					continue
-				}
-
-				c.Errorf("Regexp compile failed, watching file with match-only %s: %v", item.Path, err)
-			}
-		} else if item.Match == "" {
-			c.Errorf("Watch File has no regexp or string match. Ignored: %s", item.Path)
+		if item.Regexp == "" {
+			c.Errorf("Watch File has no regexp match. Ignored: %s", item.Path)
 			continue
+		} else if item.re, err = regexp.Compile(item.Regexp); err != nil {
+			c.Errorf("Regexp compile failed, not watching file %s: %v", item.Path, err)
+			continue
+		}
+
+		if item.skip, err = regexp.Compile(item.Skip); err != nil {
+			c.Errorf("Skip Regexp compile failed for %s: %v", item.Path, err)
 		}
 
 		item.tail, err = tail.TailFile(item.Path, tail.Config{
@@ -81,7 +79,7 @@ func (c *Config) collectFileTails(tails []*WatchFile) {
 	for idx, item := range tails {
 		cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)}
 
-		c.Printf("==> Watching: %s (regexp: '%s' match: '%s')", item.Path, item.Regexp, item.Match)
+		c.Printf("==> Watching: %s (regexp: '%s' skip: '%s')", item.Path, item.Regexp, item.Skip)
 	}
 
 	defer c.Printf("==> All file watchers stopped.")
@@ -113,30 +111,26 @@ func (c *Config) collectFileTails(tails []*WatchFile) {
 // checkMatch runs when a watched file has a new line written.
 // If a match is found a notification is sent.
 func (c *Config) checkMatch(line tail.Line, tail *WatchFile) {
-	var (
-		match = &Match{File: tail.Path}
-		event EventType
-	)
-
-	switch {
-	default:
-		return
-	case tail.Match != "" && strings.Contains(line.Text, tail.Match):
-		event = EventFileMa
-		match.Line = strings.TrimSpace(line.Text)
-		match.Matches = tail.Match
-	case tail.re != nil && tail.re.MatchString(line.Text):
-		match.Matches = tail.Regexp
-		match.Line = strings.TrimSpace(line.Text)
-		event = EventFileRe
+	if tail.re == nil || !tail.re.MatchString(line.Text) {
+		return // no match
 	}
 
-	if resp, err := c.SendData(LogLineRoute.Path(event), match, true); err != nil {
+	if tail.skip != nil && tail.skip.MatchString(line.Text) {
+		return // skip matches
+	}
+
+	match := &Match{
+		File:    tail.Path,
+		Line:    strings.TrimSpace(line.Text),
+		Matches: tail.Regexp,
+	}
+
+	if resp, err := c.SendData(LogLineRoute.Path(EventFile), match, true); err != nil {
 		c.Errorf("[%s requested] Sending Watched-File Line Match to Notifiarr: %s: %s => %s",
-			event, tail.Path, line.Text, err)
+			EventFile, tail.Path, line.Text, err)
 	} else if tail.LogMatch {
 		c.Printf("[%s requested] Sent Watched-File Line Match to Notifiarr: %s: %s => %s",
-			event, tail.Path, line.Text, resp)
+			EventFile, tail.Path, line.Text, resp)
 	}
 }
 

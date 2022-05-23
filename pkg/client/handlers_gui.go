@@ -12,6 +12,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -378,6 +379,21 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 	} else if _, err = ps.WriteTo(response); err != nil {
 		user, _ := c.getUserName(request)
 		c.Errorf("[gui '%s' requested] Writing HTTP Response: %v", user, err)
+	}
+}
+
+// handleRegexTest tests a regular expression.
+func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Request) {
+	regex := request.PostFormValue("regexTestRegex")
+	line := request.PostFormValue("regexTestLine")
+
+	switch re, err := regexp.Compile(regex); {
+	case err != nil:
+		http.Error(response, "Regex Parse Failed: "+err.Error(), http.StatusNotAcceptable)
+	case re.MatchString(line):
+		http.Error(response, "Regular Expression matches!", http.StatusOK)
+	default:
+		http.Error(response, "Regular Expression does not match!", http.StatusBadRequest)
 	}
 }
 

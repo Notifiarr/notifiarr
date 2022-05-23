@@ -18,3 +18,30 @@ function triggerAction(action)
         }
     });
 }
+
+function testRegex()
+{
+    let fields = '';
+    $.each($('.regex-parameter'), function() {
+        if ($(this).attr('id') !== undefined) {
+            fields += '&' + $(this).serialize();
+        }
+    });
+
+    $.ajax({
+        type: 'POST',
+        data: fields,
+        url: URLBase+'regexTest',
+        success: function (data){
+            toast('Matched!', data, 'success');
+        },
+        error: function (response, status, error) {
+            if (error == "") {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 20000);
+            } else {
+                toast(error, response.responseText, 'error', 15000);
+            }
+        }
+    });
+}

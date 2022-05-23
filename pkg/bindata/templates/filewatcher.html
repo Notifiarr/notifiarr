@@ -1,10 +1,14 @@
                                 <h1><i class="fas fa-binoculars"></i> File Watcher</h1>
                                 <p>
-                                    This application can watch files for lines matching a string and/or regular expression.
+                                    This application can watch (log) files for lines matching a regular expression.
                                     This is similar to <code>tail -f file | grep string</code> and it allows you to send notifications
                                     when, for instance, a log file has a new line written that matches your string or regex.
                                 </p>
-                                <p>You must enable the <b>Log Watcher</b> feature and choose a channel on the Notifiarr website for this to work!</p>
+                                <h4><i class="fas fa-sticky-note"></i> Notes</h4>
+                                <p>
+                                    <li>You must enable the <b>Log Watcher</b> feature and choose a channel on the Notifiarr website for this to work!</li>
+                                    <li>Use <code>(?i)</code> as a prefix to make regular expressions case insensitve.</li>
+                                </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
                                         <thead>
@@ -17,7 +21,7 @@
                                                     </div>
                                                 </td>
                                                 <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="files-WatchFiles-addbutton" onclick="addWatchFiles()" data-names='["Path","Match","Regexp","Poll","Pipe","MustExist","LogMatch"]' data-samplepath="{{if eq .Version.os "windows"}}c:\some\file.log{{else}}/some/file.log{{end}}" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button id="files-WatchFiles-addbutton" onclick="addWatchFiles()" data-names='["Path","Regexp","Skip","Poll","Pipe","MustExist","LogMatch"]' data-samplepath="{{if eq .Version.os "windows"}}c:\some\file.log{{else}}/some/file.log{{end}}" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">WatchFiles</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
                                                 </td>
@@ -37,14 +41,14 @@
                                                     <span class="dialogTitle">File Path</span>
                                                 </td>
                                                 <td style="min-width:120px;">
-                                                    <div style="display:none;" class="dialogText">String to match lines against.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">String Match</span>
-                                                </td>
-                                                <td style="min-width:120px;">
                                                     <div style="display:none;" class="dialogText">Regular expression to match lines against.</div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Regular Expression</span>
+                                                </td>
+                                                <td style="min-width:120px;">
+                                                    <div style="display:none;" class="dialogText">Regular expression used to skip lines that are matched. This negates the matches.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Skip Expression</span>
                                                 </td>
                                                 <td style="min-width:110px;width:110px;">
                                                     <div style="display:none;" class="dialogText">In some cases polling needs to be enabled for this feature to work.</div>
@@ -100,24 +104,6 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "WATCH_FILES_%d_MATCH" $.Flags.EnvPrefix $index))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "WATCH_FILES_%d_MATCH" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="WatchFiles.{{$index}}.Match" name="WatchFiles.{{$index}}.Match" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Match" data-original="{{$app.Match}}" value="{{$app.Match}}">
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "WATCH_FILES_%d_REGEX" $.Flags.EnvPrefix $index) )}}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                                     <div style="display:none;" class="dialogText">
@@ -128,6 +114,24 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="WatchFiles.{{$index}}.Regexp" name="WatchFiles.{{$index}}.Regexp" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Regex" data-original="{{$app.Regexp}}" value="{{$app.Regexp}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "WATCH_FILES_%d_SKIP" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "WATCH_FILES_%d_SKIP" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="WatchFiles.{{$index}}.Skip" name="WatchFiles.{{$index}}.Skip" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Skip" data-original="{{$app.Skip}}" value="{{$app.Skip}}">
                                                             </div>
                                                         </div>
                                                     </form>
@@ -220,6 +224,14 @@
                                         {{- end}}
                                             <tr id="files-WatchFiles-none"{{if .Config.WatchFiles}} style="display: none;"{{end}}><td colspan="8">No file watchers configured.</td></tr>
                                         </tbody>
+                                    </table>
+                                </div>
+                                <h4><i class="fas fa-vial"></i> Regular Expression Tester</h4>
+                                <div class="table-responsive">
+                                    <table class="table bk-dark table-bordered">
+                                        <tr><td style="width:120px;" class="text-center">Expression</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestRegex" name="regexTestRegex" placeholder="(?i)(error|warning|panic)"></td></tr>
+                                        <tr><td class="text-center">Test Line</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestLine" name="regexTestLine" placeholder="2059/01/23 16:20:32 [INFO] Log Line goes here"></td></tr>
+                                        <tr><td><button onClick="testRegex();" class="btn btn-xs btn-success" style="width:100%;"><i class="fas fa-check-double"></i> Test Regex</button></td><td></td></tr>
                                     </table>
                                 </div>
 {{- /* end of filewatcher (leave this comment) */ -}}
