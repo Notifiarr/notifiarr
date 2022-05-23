@@ -424,6 +424,7 @@ retries = {{.Retries}}
   regex = "{{$item.Regexp}}"{{end}}{{if $item.Poll}}
   poll  = true{{end}}{{if $item.Pipe}}
   pipe  = true{{end}}{{if $item.MustExist}}
-  must_exist = true{{end}}{{end}}
+  must_exist = true{{end}}{{if $item.LogMatch}}
+  log_match = true{{end}}{{end}}
 {{end}}
 `

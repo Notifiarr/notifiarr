@@ -476,6 +476,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		config.Apps.SabNZB = nil
 	}
 
+	config.WatchFiles = nil
 	config.Service = nil
 	config.Snapshot.Plugins.MySQL = nil
 

@@ -271,4 +271,6 @@ func (c *Config) Stop(event EventType) {
 		defer close(c.Trigger.sess)
 		c.Trigger.sess = nil
 	}
+
+	c.stopFileWatcher()
 }

@@ -194,7 +194,8 @@ function addWatchFiles()
     for (const name of names) {
         let nameval = ""
         if (name == "Path") {
-            nameval = "/some/path";
+            // On windows the sample path is c:\something.
+            nameval = $('#files-WatchFiles-addbutton').data('samplepath');
         }
 
         row += '<td><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
@@ -203,7 +204,8 @@ function addWatchFiles()
              case "Poll":
              case "Pipe":
              case "MustExist":
-                 row += '<select id="WatchFiles.'+ index +'.'+ name +'" name="WatchFiles.'+ index +'.'+ name +'" data-index="'+ index +'" data-app="WatchFiles" '+
+             case "LogMatch":
+                row += '<select id="WatchFiles.'+ index +'.'+ name +'" name="WatchFiles.'+ index +'.'+ name +'" data-index="'+ index +'" data-app="WatchFiles" '+
                     'class="client-parameter form-control input-sm" data-group="files" data-label="Files '+ instance +' '+ name +'" data-original="false" value="false">'+
                     '<option value="true">Enabled</option>'+
                     '<option selected value="false">Disabled</option></select>';

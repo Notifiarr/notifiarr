@@ -26,6 +26,8 @@ const (
 	EventEpisode EventType = "episode"
 	EventPoll    EventType = "poll"
 	EventSignal  EventType = "signal"
+	EventFileMa  EventType = "fileMatch"
+	EventFileRe  EventType = "fileRegex"
 )
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
@@ -99,6 +101,7 @@ const (
 	BackupRoute  Route = notifiRoute + "/backup"
 	TestRoute    Route = notifiRoute + "/test"
 	PkgRoute     Route = notifiRoute + "/packageManager"
+	LogLineRoute Route = notifiRoute + "/logWatcher"
 )
 
 // Path adds parameters to a route path and turns it into a string.
