@@ -1,13 +1,14 @@
                                 <h1><i class="fas fa-binoculars"></i> File Watcher</h1>
                                 <p>
                                     This application can watch (log) files for lines matching a regular expression.
-                                    This is similar to <code>tail -f file | grep string</code> and it allows you to send notifications
-                                    when, for instance, a log file has a new line written that matches your string or regex.
+                                    This is similar to <code>tail -f file | grep string</code> and allows you to send notifications
+                                    when, for instance, a log file has a new line written that matches a regular expression.
                                 </p>
-                                <h4><i class="fas fa-sticky-note"></i> Notes</h4>
+                                <hr>
                                 <p>
-                                    <li>You must enable the <b>Log Watcher</b> feature and choose a channel on the Notifiarr website for this to work!</li>
-                                    <li>Use <code>(?i)</code> as a prefix to make regular expressions case insensitve.</li>
+                                    <h3><i class="fas fa-comment"></i> Notes</h3>
+                                    <li><i class="fas fa-star"></i> You must enable the <b>Log Watcher</b> feature and choose a channel on the Notifiarr website for this to work!</li>
+                                    <li><i class="fas fa-star"></i> Use <code>(?i)</code> as a prefix to make regular expressions case insensitive.</li>
                                 </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
@@ -226,12 +227,12 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <h4><i class="fas fa-vial"></i> Regular Expression Tester</h4>
+                                <h3><i class="fas fa-vial"></i> Regular Expression Tester</h3>
                                 <div class="table-responsive">
-                                    <table class="table bk-dark table-bordered">
-                                        <tr><td style="width:120px;" class="text-center">Expression</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestRegex" name="regexTestRegex" placeholder="(?i)(error|warning|panic)"></td></tr>
-                                        <tr><td class="text-center">Test Line</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestLine" name="regexTestLine" placeholder="2059/01/23 16:20:32 [INFO] Log Line goes here"></td></tr>
-                                        <tr><td><button onClick="testRegex();" class="btn btn-xs btn-success" style="width:100%;"><i class="fas fa-check-double"></i> Test Regex</button></td><td></td></tr>
+                                    <table class="table bk-dark">
+                                        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Expression</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestRegex" name="regexTestRegex" placeholder="(?i)(error|warning|panic)"></td></tr>
+                                        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Test String</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestLine" name="regexTestLine" placeholder="2059/01/23 16:20:32 [INFO] Log Line goes here"></td></tr>
+                                        <tr><td><button onClick="testRegex();" class="btn btn-sm btn-success" style="width:100%;font-size:14px;"><i class="fas fa-check-double"></i> Test Regex</button></td><td></td></tr>
                                     </table>
                                 </div>
 {{- /* end of filewatcher (leave this comment) */ -}}

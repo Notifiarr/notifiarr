@@ -25,9 +25,9 @@ type WatchFile struct {
 
 // Match is what we send to the website.
 type Match struct {
-	File    string `json:"file"`
-	Matches string `json:"matches"`
-	Line    string `json:"line"`
+	File    string   `json:"file"`
+	Matches []string `json:"matches"`
+	Line    string   `json:"line"`
 }
 
 // runFileWatcher compiles any regexp's and opens a tail -f on provided watch files.
@@ -115,14 +115,14 @@ func (c *Config) checkMatch(line tail.Line, tail *WatchFile) {
 		return // no match
 	}
 
-	if tail.skip != nil && tail.skip.MatchString(line.Text) {
+	if tail.skip != nil && tail.Skip != "" && tail.skip.MatchString(line.Text) {
 		return // skip matches
 	}
 
 	match := &Match{
 		File:    tail.Path,
 		Line:    strings.TrimSpace(line.Text),
-		Matches: tail.Regexp,
+		Matches: tail.re.FindAllString(line.Text, 0),
 	}
 
 	if resp, err := c.SendData(LogLineRoute.Path(EventFile), match, true); err != nil {

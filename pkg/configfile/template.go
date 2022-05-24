@@ -408,23 +408,24 @@ retries = {{.Retries}}
 ## Example:
 
 #[[watch_file]]
-#  path = '/var/log/system.log'
-#  skip = '''error'''
+#  path  = '/var/log/system.log'
+#  skip  = '''error'''
 #  regex = '''[Ee]rror'''
-#  poll = false
-#  pipe = false
+#  poll  = false
+#  pipe  = false
 #  must_exist = false
+#  log_match  = true
 {{if .WatchFiles}}
 ## Configured Watch Files:
-{{- range $item := .WatchFiles}}
+{{- range $item := .WatchFiles}}{{if $item}}
 
 [[watch_file]]
   path  = '{{$item.Path}}'{{if $item.Skip}}
-  skip = '''{{$item.Skip}}'''{{end}}{{if $item.Regexp}}
+  skip  = '''{{$item.Skip}}'''{{end}}{{if $item.Regexp}}
   regex = '''{{$item.Regexp}}'''{{end}}{{if $item.Poll}}
-  poll   = true{{end}}{{if $item.Pipe}}
-  pipe   = true{{end}}{{if $item.MustExist}}
+  poll  = true{{end}}{{if $item.Pipe}}
+  pipe  = true{{end}}{{if $item.MustExist}}
   must_exist = true{{end}}{{if $item.LogMatch}}
   log_match = true{{end}}{{end}}
-{{end}}
+{{end}}{{end}}
 `

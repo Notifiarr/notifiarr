@@ -390,8 +390,10 @@ func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Req
 	switch re, err := regexp.Compile(regex); {
 	case err != nil:
 		http.Error(response, "Regex Parse Failed: "+err.Error(), http.StatusNotAcceptable)
+	case regex == "":
+		http.Error(response, "Regular Expression is blank!", http.StatusBadRequest)
 	case re.MatchString(line):
-		http.Error(response, "Regular Expression matches!", http.StatusOK)
+		http.Error(response, "Regular Expression matches! Found: "+re.FindString(line), http.StatusOK)
 	default:
 		http.Error(response, "Regular Expression does not match!", http.StatusBadRequest)
 	}
