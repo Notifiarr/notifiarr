@@ -122,7 +122,7 @@ func (c *Config) checkMatch(line tail.Line, tail *WatchFile) {
 	match := &Match{
 		File:    tail.Path,
 		Line:    strings.TrimSpace(line.Text),
-		Matches: tail.re.FindAllString(line.Text, 0),
+		Matches: tail.re.FindAllString(line.Text, -1),
 	}
 
 	if resp, err := c.SendData(LogLineRoute.Path(EventFile), match, true); err != nil {

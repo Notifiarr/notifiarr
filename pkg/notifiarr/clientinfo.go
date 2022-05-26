@@ -213,7 +213,9 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 
 	// TrueNAS adds junk to the hostname.
 	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > 17 {
-		hostInfo.Hostname = hostInfo.Hostname[:len(hostInfo.Hostname)-17]
+		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > 2 {
+			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-2], "-")
+		}
 	}
 
 	c.extras.hostInfo = hostInfo
