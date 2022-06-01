@@ -68,6 +68,7 @@ type extras struct {
 	sonarrRP   map[int]*cfMapIDpayload
 	plexTimer  *Timer
 	hostInfo   *host.InfoStat
+	addWatcher chan *WatchFile
 }
 
 // Triggers allow trigger actions in the timer routine.
@@ -264,6 +265,8 @@ func (c *Config) Stop(event EventType) {
 		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
+	c.stopFileWatcher()
+
 	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.stop.C <- event
 	// Closes the Plex session holder.
@@ -271,6 +274,4 @@ func (c *Config) Stop(event EventType) {
 		defer close(c.Trigger.sess)
 		c.Trigger.sess = nil
 	}
-
-	c.stopFileWatcher()
 }

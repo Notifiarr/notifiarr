@@ -17,6 +17,7 @@ var (
 	NotifiarrCom  = GetMap("Outbound Requests to Notifiarr.com").Init()
 	ServiceChecks = GetMap("Service Check Responses").Init()
 	Apps          = GetMap("Starr App Requests").Init()
+	FileWatcher   = GetMap("File Watcher").Init()
 )
 
 type AllData struct {
@@ -28,6 +29,7 @@ type AllData struct {
 	NotifiarrCom  map[string]interface{}
 	ServiceChecks map[string]map[string]interface{}
 	Apps          map[string]map[string]interface{}
+	FileWatcher   map[string]interface{}
 }
 
 func GetAllData() AllData {
@@ -40,6 +42,7 @@ func GetAllData() AllData {
 		NotifiarrCom:  GetKeys(NotifiarrCom),
 		ServiceChecks: GetSplitKeys(ServiceChecks),
 		Apps:          GetSplitKeys(Apps),
+		FileWatcher:   GetKeys(FileWatcher),
 	}
 }
 

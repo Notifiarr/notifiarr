@@ -31,7 +31,10 @@
                                                 <td style="width:90px;min-width:90px;">
                                                     <div style="display:none;" class="dialogText">
                                                         The <span class="text-danger">red</span> button deletes the file watcher.<br>
-                                                        The <span class="text-primary">blue</span> button adds a new file watcher.
+                                                        The <span class="text-primary">blue</span> button adds a new file watcher.<br>
+                                                        <hr>
+                                                        A <span class="text-brand">purple</span> table cell here means the file watcher is running.<br>
+                                                        A <span class="text-danger">red</span> table cell means the file watcher channel is closed, likely due to an error.
                                                     </div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Actions</span>
@@ -77,7 +80,7 @@
                                         {{- range $index, $app := .Config.WatchFiles}}
                                             <input disabled style="display: none;" class="client-parameter files-WatchFiles{{$index}}-deleted" data-group="files" data-label="Files {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="files-WatchFiles" id="files-WatchFiles-{{$index}}">
-                                                <td style="white-space:nowrap;">
+                                                <td style="white-space:nowrap;" class="{{if $app.Active}}bk-brand{{else}}bk-danger{{end}}">
                                                     <div class="btn-group" role="group" style="display:flex;font-size:18px;">
                                                         <button onclick="removeInstance('files-WatchFiles', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-minus"></i></button>
                                                         <button id="WatchFilesIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
