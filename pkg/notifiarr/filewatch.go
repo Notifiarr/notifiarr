@@ -37,37 +37,11 @@ type Match struct {
 
 // runFileWatcher compiles any regexp's and opens a tail -f on provided watch files.
 func (c *Config) runFileWatcher() {
-	var (
-		err        error
-		validTails = []*WatchFile{{Path: "/add watcher channel/"}}
-	)
+	validTails := []*WatchFile{{Path: "/add watcher channel/"}}
 
 	for _, item := range c.WatchFiles {
-		if item.Regexp == "" {
-			c.Errorf("Watch File has no regexp match. Ignored: %s", item.Path)
-			continue
-		} else if item.re, err = regexp.Compile(item.Regexp); err != nil {
-			c.Errorf("Regexp compile failed, not watching file %s: %v", item.Path, err)
-			continue
-		}
-
-		if item.skip, err = regexp.Compile(item.Skip); err != nil {
-			c.Errorf("Skip Regexp compile failed for %s: %v", item.Path, err)
-		}
-
-		item.tail, err = tail.TailFile(item.Path, tail.Config{
-			Follow:    true,
-			ReOpen:    true,
-			MustExist: item.MustExist,
-			Poll:      item.Poll,
-			Pipe:      item.Pipe,
-			Location:  &tail.SeekInfo{Whence: io.SeekEnd},
-			Logger:    c.Logger.InfoLog,
-		})
-		if err != nil {
-			c.Errorf("Unable to watch file %s: %v", item.Path, err)
-			exp.FileWatcher.Add(item.Path+" Errors", 1)
-
+		if err := item.Setup(c.Logger.InfoLog); err != nil {
+			c.Errorf("Unable to watch file %v", err)
 			continue
 		}
 
@@ -115,6 +89,7 @@ func (c *Config) collectFileTails(tails []*WatchFile) {
 	for idx, item := range tails {
 		if idx == 0 { // 0 is skipped (see above), and used as an internal I/O channel
 			cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(c.addWatcher)}
+			continue
 		} else {
 			cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)}
 		}
@@ -189,12 +164,15 @@ func (c *Config) checkLineMatch(line tail.Line, tail *WatchFile) {
 	}
 }
 
-func (c *Config) AddFileWatcher(watchFile *WatchFile) error {
-	if err := watchFile.Setup(c.Logger.InfoLog); err != nil {
+func (c *Config) AddFileWatcher(file *WatchFile) error {
+	if err := file.Setup(c.Logger.InfoLog); err != nil {
 		return err
 	}
 
-	c.addWatcher <- watchFile
+	c.Printf("Watching File: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
+		file.Path, file.Regexp, file.Skip, file.Poll, file.Pipe, file.MustExist, file.LogMatch)
+
+	c.addWatcher <- file
 
 	return nil
 }
