@@ -184,7 +184,7 @@ function addWatchFiles()
     let row = '<tr class="newRow bk-success files-WatchFiles" id="files-WatchFiles-'+ instance +'">'+
     '<td style="white-space:nowrap;">'+
         '<div class="btn-group" role="group" style="display:flex;">'+
-            '<button onclick="removeInstance(\'files-WatchFiles\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>'+
+            '<button onclick="removeInstance(\'files-WatchFiles\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-trash-alt"></i></button>'+
             '<button id="filesIndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
         '</div>'+
     '</td>';
@@ -230,4 +230,59 @@ function addWatchFiles()
 
     // Bring up the save changes button.
     findPendingChanges();
+}
+
+function stopFileWatch(from, index)
+{
+    from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
+
+    $.ajax({
+        type: 'GET',
+        url: URLBase+'stopFileWatch/'+index,
+        success: function (data){
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
+            from.hide();
+            from.siblings('.checkInstanceBtn').show();
+            $('#activeFileCell'+index).toggleClass('bk-brand bk-danger');
+            toast('Watcher Stopped!', data, 'success');
+        },
+        error: function (response, status, error) {
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
+
+            if (status === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Watcher Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
+}
+
+function startFileWatch(from, index)
+{
+    from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-play-circle');
+
+    $.ajax({
+        type: 'GET',
+        url: URLBase+'startFileWatch/'+index,
+        success: function (data){
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-play-circle');
+            from.hide();
+            $('#activeFileCell'+index).toggleClass('bk-brand bk-danger');
+            from.siblings('.checkInstanceBtn').show();
+
+            toast('Watcher Started!', data, 'success');
+        },
+        error: function (response, status, error) {
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-play-circle');
+
+            if (status === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Watcher Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
 }

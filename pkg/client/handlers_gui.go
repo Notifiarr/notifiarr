@@ -382,6 +382,58 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 	}
 }
 
+func (c *Client) handleStartFileWatcher(response http.ResponseWriter, request *http.Request) {
+	idx, err := strconv.Atoi(mux.Vars(request)["index"])
+	if err != nil {
+		http.Error(response, "invalid index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	if idx < 0 || idx >= len(c.website.WatchFiles) {
+		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	watch := c.website.WatchFiles[idx]
+	if watch.Active() {
+		http.Error(response, "Watcher already running! "+watch.Path, http.StatusNotAcceptable)
+		return
+	}
+
+	if err := c.website.AddFileWatcher(watch); err != nil {
+		http.Error(response, "Start Failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Error(response, "Started: "+watch.Path, http.StatusOK)
+}
+
+func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *http.Request) {
+	idx, err := strconv.Atoi(mux.Vars(request)["index"])
+	if err != nil {
+		http.Error(response, "invalid index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	if idx < 0 || idx >= len(c.website.WatchFiles) {
+		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	watch := c.website.WatchFiles[idx]
+	if !watch.Active() {
+		http.Error(response, "Watcher already stopped! "+watch.Path, http.StatusNotAcceptable)
+		return
+	}
+
+	if err := watch.Stop(); err != nil {
+		http.Error(response, "Stop Failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Error(response, "Stopped: "+watch.Path, http.StatusOK)
+}
+
 // handleRegexTest tests a regular expression.
 func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Request) {
 	regex := request.PostFormValue("regexTestRegex")
