@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/nxadm/tail"
@@ -26,6 +28,7 @@ type WatchFile struct {
 	re        *regexp.Regexp
 	skip      *regexp.Regexp
 	tail      *tail.Tail
+	mu        sync.RWMutex
 }
 
 // Match is what we send to the website.
@@ -37,7 +40,7 @@ type Match struct {
 
 // runFileWatcher compiles any regexp's and opens a tail -f on provided watch files.
 func (c *Config) runFileWatcher() {
-	validTails := []*WatchFile{{Path: "/add watcher channel/"}}
+	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/debug ticker/"}}
 
 	for _, item := range c.WatchFiles {
 		if err := item.Setup(c.Logger.InfoLog); err != nil {
@@ -49,7 +52,8 @@ func (c *Config) runFileWatcher() {
 	}
 
 	if len(validTails) != 0 {
-		go c.collectFileTails(validTails)
+		cases, ticker := c.collectFileTails(validTails)
+		go c.tailFiles(cases, validTails, ticker)
 	}
 }
 
@@ -65,13 +69,14 @@ func (w *WatchFile) Setup(logger *log.Logger) error {
 	}
 
 	w.tail, err = tail.TailFile(w.Path, tail.Config{
-		Follow:    true,
-		ReOpen:    true,
-		MustExist: w.MustExist,
-		Poll:      w.Poll,
-		Pipe:      w.Pipe,
-		Location:  &tail.SeekInfo{Whence: io.SeekEnd},
-		Logger:    logger,
+		Follow:        true,
+		ReOpen:        true,
+		MustExist:     w.MustExist,
+		Poll:          w.Poll,
+		Pipe:          w.Pipe,
+		CompleteLines: true,
+		Location:      &tail.SeekInfo{Whence: io.SeekEnd},
+		Logger:        logger,
 	})
 	if err != nil {
 		exp.FileWatcher.Add(w.Path+" Errors", 1)
@@ -82,17 +87,21 @@ func (w *WatchFile) Setup(logger *log.Logger) error {
 }
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
-func (c *Config) collectFileTails(tails []*WatchFile) {
+func (c *Config) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
 	c.extras.addWatcher = make(chan *WatchFile)
+	ticker := time.NewTicker(time.Minute)
 	cases := make([]reflect.SelectCase, len(tails))
 
 	for idx, item := range tails {
 		if idx == 0 { // 0 is skipped (see above), and used as an internal I/O channel
 			cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(c.addWatcher)}
 			continue
-		} else {
-			cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)}
+		} else if idx == 1 {
+			cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(ticker.C)}
+			continue
 		}
+
+		cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)}
 
 		c.Printf("==> Watching: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
 			item.Path, item.Regexp, item.Skip, item.Poll, item.Pipe, item.MustExist, item.LogMatch)
@@ -103,32 +112,49 @@ func (c *Config) collectFileTails(tails []*WatchFile) {
 		}
 	}
 
+	return cases, ticker
+}
+
+func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
 	defer c.Printf("==> All file watchers stopped.")
+	defer ticker.Stop()
 
 	for {
-		switch idx, data, ok := reflect.Select(cases); {
+		idx, data, ok := reflect.Select(cases)
+		if c.LogConfig.Debug {
+			exp.FileWatcher.Add("Selects", 1)
+		}
+
+		switch {
 		case !ok:
-			tails[idx].tail = nil // so we do not try to Stop() it.
-
-			c.Printf("==> No longer watching file (channel closed): %s", tails[idx].Path)
-			// The channel was closed? okay, remove it.
-			tails = append(tails[:idx], tails[idx+1:]...)
-
-			cases = append(cases[:idx], cases[idx+1:]...)
-			if len(cases) < 1 || idx == 0 {
+			if idx == 0 { // main channel closed, bail out.
 				return
 			}
-		case !data.Elem().CanInterface():
+
+			tails[idx].deactivate() // so we do not try to Stop() it.
+			c.Printf("==> No longer watching file (channel closed): %s", tails[idx].Path)
+
+			tails = append(tails[:idx], tails[idx+1:]...) // The channel was closed? okay, remove it.
+
+			cases = append(cases[:idx], cases[idx+1:]...)
+			if len(cases) < 1 {
+				return
+			}
+		case idx == 1:
+			if c.LogConfig.Debug {
+				c.Debugf("File Watcher Ticker ticking.")
+			}
+		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
 			c.Errorf("Got non-addressable file watcher data from %s", tails[idx].Path)
 			exp.FileWatcher.Add(tails[idx].Path+" Errors", 1)
 		case idx == 0:
-			item, _ := data.Elem().Interface().(*WatchFile)
+			item, _ := data.Elem().Addr().Interface().(*WatchFile)
 			tails = append(tails, item)
 			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)})
 		default:
-			line, _ := data.Elem().Interface().(tail.Line)
-			c.checkLineMatch(line, tails[idx])
 			exp.FileWatcher.Add(tails[idx].Path+" Lines", 1)
+			line, _ := data.Elem().Addr().Interface().(*tail.Line)
+			c.checkLineMatch(line, tails[idx])
 			exp.FileWatcher.Add(tails[idx].Path+" Bytes", int64(len(line.Text)+1))
 		}
 	}
@@ -136,8 +162,8 @@ func (c *Config) collectFileTails(tails []*WatchFile) {
 
 // checkLineMatch runs when a watched file has a new line written.
 // If a match is found a notification is sent.
-func (c *Config) checkLineMatch(line tail.Line, tail *WatchFile) {
-	if tail.re == nil || !tail.re.MatchString(line.Text) {
+func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
+	if tail.re == nil || line.Text == "" || !tail.re.MatchString(line.Text) {
 		return // no match
 	}
 
@@ -154,10 +180,14 @@ func (c *Config) checkLineMatch(line tail.Line, tail *WatchFile) {
 		Matches: tail.re.FindAllString(line.Text, -1),
 	}
 
+	// this can be removed before release.
+	c.Debugf("[%s requested] Sending Watched-File Line Match to Notifiarr: %s: %s",
+		EventFile, tail.Path, line.Text)
+
 	if resp, err := c.SendData(LogLineRoute.Path(EventFile), match, true); err != nil {
+		exp.FileWatcher.Add(tail.Path+" Error", 1)
 		c.Errorf("[%s requested] Sending Watched-File Line Match to Notifiarr: %s: %s => %s",
 			EventFile, tail.Path, line.Text, err)
-		exp.FileWatcher.Add(tail.Path+" Error", 1)
 	} else if tail.LogMatch {
 		c.Printf("[%s requested] Sent Watched-File Line Match to Notifiarr: %s: %s => %s",
 			EventFile, tail.Path, line.Text, resp)
@@ -196,7 +226,26 @@ func (c *Config) stopFileWatchers() {
 	}
 }
 
+func (w *WatchFile) deactivate() {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	w.tail = nil
+}
+
 // Active returns true if the tail channel is still open.
 func (w *WatchFile) Active() bool {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
+
 	return w.tail != nil
+}
+
+// Stop stops a file watcher.
+func (w *WatchFile) Stop() error {
+	if err := w.tail.Stop(); err != nil {
+		return fmt.Errorf("stopping watcher: %w", err)
+	}
+
+	return nil
 }
