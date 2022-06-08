@@ -83,7 +83,7 @@ func (w *WatchFile) Setup(logger *log.Logger) error {
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
 func (c *Config) collectFileTails(tails []*WatchFile) {
-	c.addWatcher = make(chan *WatchFile)
+	c.extras.addWatcher = make(chan *WatchFile)
 	cases := make([]reflect.SelectCase, len(tails))
 
 	for idx, item := range tails {
@@ -172,23 +172,27 @@ func (c *Config) AddFileWatcher(file *WatchFile) error {
 	c.Printf("Watching File: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
 		file.Path, file.Regexp, file.Skip, file.Poll, file.Pipe, file.MustExist, file.LogMatch)
 
-	c.addWatcher <- file
+	c.extras.addWatcher <- file
 
 	return nil
 }
 
-func (c *Config) stopFileWatcher() {
-	defer close(c.addWatcher)
-	c.addWatcher = nil
+func (c *Config) StopFileWatcher(file *WatchFile) {
+	if file.tail != nil {
+		c.Debugf("Stopping File Watcher: %s", file.Path)
+
+		if err := file.tail.Stop(); err != nil {
+			c.Errorf("Stopping File Watcher: %s: %v", file.Path, err)
+		}
+	}
+}
+
+func (c *Config) stopFileWatchers() {
+	defer close(c.extras.addWatcher)
+	c.extras.addWatcher = nil
 
 	for _, tail := range c.WatchFiles {
-		if tail.tail != nil {
-			c.Debugf("Stopping File Watcher: %s", tail.Path)
-
-			if err := tail.tail.Stop(); err != nil {
-				c.Errorf("Stopping File Watcher: %s: %v", tail.Path, err)
-			}
-		}
+		c.StopFileWatcher(tail)
 	}
 }
 

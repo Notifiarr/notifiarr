@@ -68,6 +68,7 @@
                                             </table>
                                         </div>
                                     </div>
+                                    {{- if .Config.WatchFiles}}
                                     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                                         <h3>File Watcher</h3>
                                         <div class="table-responsive">
@@ -81,6 +82,7 @@
                                             </table>
                                         </div>
                                     </div>
+                                    {{- end}}
                                 </div>
                                 <hr>
                                 <h3>Application Requests</h3>

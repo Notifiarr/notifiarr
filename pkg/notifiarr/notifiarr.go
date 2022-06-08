@@ -265,7 +265,7 @@ func (c *Config) Stop(event EventType) {
 		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
-	c.stopFileWatcher()
+	c.stopFileWatchers()
 
 	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.stop.C <- event
