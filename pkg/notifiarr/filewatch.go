@@ -16,6 +16,11 @@ import (
 
 var ErrInvalidRegexp = fmt.Errorf("invalid regexp")
 
+const (
+	maxRetries    = 6
+	retryInterval = 10 * time.Second
+)
+
 type WatchFile struct {
 	//	Cooldown  cnfg.Duration `json:"cooldown" toml:"cooldown" xml:"cooldown" yaml:"cooldown"`
 	Path      string `json:"path" toml:"path" xml:"path" yaml:"path"`
@@ -29,6 +34,7 @@ type WatchFile struct {
 	skip      *regexp.Regexp
 	tail      *tail.Tail
 	mu        sync.RWMutex
+	retries   uint
 }
 
 // Match is what we send to the website.
@@ -43,7 +49,7 @@ func (c *Config) runFileWatcher() {
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/debug ticker/"}}
 
 	for _, item := range c.WatchFiles {
-		if err := item.Setup(c.Logger.InfoLog); err != nil {
+		if err := item.setup(c.Logger.InfoLog); err != nil {
 			c.Errorf("Unable to watch file %v", err)
 			continue
 		}
@@ -57,8 +63,10 @@ func (c *Config) runFileWatcher() {
 	}
 }
 
-func (w *WatchFile) Setup(logger *log.Logger) error {
+func (w *WatchFile) setup(logger *log.Logger) error {
 	var err error
+
+	w.retries = maxRetries // so it will not get "restarted" unless it passes validation.
 
 	if w.Regexp == "" {
 		return fmt.Errorf("%w: no regexp match provided, ignored: %s", ErrInvalidRegexp, w.Path)
@@ -83,13 +91,15 @@ func (w *WatchFile) Setup(logger *log.Logger) error {
 		return fmt.Errorf("watching file %s: %w", w.Path, err)
 	}
 
+	w.retries = 0
+
 	return nil
 }
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
 func (c *Config) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
-	c.extras.addWatcher = make(chan *WatchFile)
-	ticker := time.NewTicker(time.Minute)
+	c.extras.addWatcher = make(chan *WatchFile, 1)
+	ticker := time.NewTicker(retryInterval)
 	cases := make([]reflect.SelectCase, len(tails))
 
 	for idx, item := range tails {
@@ -120,21 +130,19 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 	defer c.Printf("==> All file watchers stopped.")
 	defer ticker.Stop()
 
+	var died bool
+
 	for {
-		idx, data, ok := reflect.Select(cases)
-
-		if c.LogConfig.Debug {
-			exp.FileWatcher.Add("Selects", 1)
-		}
-
-		switch {
-		case !ok:
-			if idx == 0 { // main channel closed, bail out.
-				return
+		switch idx, data, running := reflect.Select(cases); {
+		case !running && idx == 0:
+			return // main channel closed, bail out.
+		case !running:
+			if err := tails[idx].deactivate(); err != nil {
+				c.Errorf("No longer watching file (channel closed): %s: %v", tails[idx].Path, err)
+				died = true //nolint:wsl
+			} else {
+				c.Printf("==> No longer watching file (channel closed): %s", tails[idx].Path)
 			}
-
-			tails[idx].deactivate() // so we do not try to Stop() it.
-			c.Printf("==> No longer watching file (channel closed): %s", tails[idx].Path)
 
 			tails = append(tails[:idx], tails[idx+1:]...) // The channel was closed? okay, remove it.
 
@@ -143,9 +151,7 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 				return
 			}
 		case idx == 1:
-			if c.LogConfig.Debug {
-				c.Debugf("File Watcher Ticker ticking.")
-			}
+			died = c.fileWatcherTicker(died)
 		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
 			c.Errorf("Got non-addressable file watcher data from %s", tails[idx].Path)
 			exp.FileWatcher.Add(tails[idx].Path+" Errors", 1)
@@ -161,6 +167,39 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 			exp.FileWatcher.Add(tails[idx].Path+" Bytes", int64(len(line.Text)+1))
 		}
 	}
+}
+
+func (c *Config) fileWatcherTicker(died bool) bool {
+	var stilldead bool
+
+	if c.LogConfig.Debug {
+		c.Debugf("File Watcher Ticker. Dead files: %v", died)
+	}
+
+	if !died {
+		return false
+	}
+
+	for _, item := range c.WatchFiles {
+		if item.Active() || item.retries >= maxRetries {
+			continue
+		}
+
+		item.retries++
+		exp.FileWatcher.Add(item.Path+" Retries", 1)
+
+		c.Debugf("Restarting File Watcher (retries: %d): %s", item.retries, item.Path)
+
+		if err := c.AddFileWatcher(item); err != nil {
+			c.Errorf("Restarting File Watcher (retries: %d): %s: %v", item.retries, item.Path, err)
+			stilldead = true //nolint:wsl
+		} else {
+			item.retries = 0
+			exp.FileWatcher.Add(item.Path+" Restarts", 1)
+		}
+	}
+
+	return stilldead
 }
 
 // checkLineMatch runs when a watched file has a new line written.
@@ -198,7 +237,7 @@ func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
 }
 
 func (c *Config) AddFileWatcher(file *WatchFile) error {
-	if err := file.Setup(c.Logger.InfoLog); err != nil {
+	if err := file.setup(c.Logger.InfoLog); err != nil {
 		return err
 	}
 
@@ -211,10 +250,10 @@ func (c *Config) AddFileWatcher(file *WatchFile) error {
 }
 
 func (c *Config) StopFileWatcher(file *WatchFile) {
-	if file.tail != nil {
+	if file.Active() {
 		c.Debugf("Stopping File Watcher: %s", file.Path)
 
-		if err := file.tail.Stop(); err != nil {
+		if err := file.Stop(); err != nil {
 			c.Errorf("Stopping File Watcher: %s: %v", file.Path, err)
 		}
 	}
@@ -229,11 +268,16 @@ func (c *Config) stopFileWatchers() {
 	}
 }
 
-func (w *WatchFile) deactivate() {
+// this runs when a channel dies from the main go routine loop.
+func (w *WatchFile) deactivate() error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	w.tail = nil
+	defer func() {
+		w.tail = nil
+	}()
+
+	return w.Stop()
 }
 
 // Active returns true if the tail channel is still open.
