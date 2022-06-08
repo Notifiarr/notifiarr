@@ -15,7 +15,6 @@ HBREPO="golift/homebrew-mugs"
 AUREPO="golift/aur"
 MAINT="David Newhall II <captain at golift dot io>"
 DESC="Unified Client for Notifiarr.com"
-GOLANGCI_LINT_ARGS="--enable-all -D exhaustivestruct,nlreturn,interfacer,maligned,scopelint,golint,varnamelen,exhaustruct,nonamedreturns"
 # Example must exist at examples/$CONFIG_FILE.example
 CONFIG_FILE="notifiarr.conf"
 LICENSE="MIT"
@@ -34,7 +33,7 @@ VERSION_PATH="golift.io/version"
 # Used by homebrew and arch linux downloads.
 SOURCE_PATH=https://codeload.github.com/${REPO}/tar.gz/refs/tags/v${VERSION}
 
-export BINARY HBREPO MAINT VENDOR DESC GOLANGCI_LINT_ARGS CONFIG_FILE
+export BINARY HBREPO MAINT VENDOR DESC CONFIG_FILE
 export LICENSE FORMULA SOURCE_URL VERSION_PATH SOURCE_PATH
 
 ### Optional ###

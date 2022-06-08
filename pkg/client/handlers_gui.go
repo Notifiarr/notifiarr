@@ -502,8 +502,7 @@ func (c *Client) saveNewConfig(config *configfile.Config) error {
 	// make config file backup.
 	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
 	if err := configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
-		notexist := os.ErrNotExist
-		if !errors.As(err, &notexist) {
+		if !errors.Is(err, os.ErrNotExist) {
 			return fmt.Errorf("backing up config file: %w", err)
 		}
 	}

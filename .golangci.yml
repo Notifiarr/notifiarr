@@ -1,0 +1,15 @@
+linters:
+  enable-all: true
+  disable:
+    - maligned
+    - scopelint
+    - interfacer
+    - golint
+    - exhaustruct
+    - exhaustivestruct
+    - dupl
+    - nlreturn
+    - nonamedreturns
+    - varnamelen
+run:
+  timeout: 5m
