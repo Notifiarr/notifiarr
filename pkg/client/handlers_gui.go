@@ -57,7 +57,10 @@ func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 func (c *Client) getUserName(request *http.Request) (string, bool) {
 	if userName := request.Context().Value(userNameStr); userName != nil {
 		u, _ := userName.([]interface{})
-		return u[0].(string), u[1].(bool)
+		username, _ := u[0].(string)
+		found, _ := u[1].(bool)
+
+		return username, found
 	}
 
 	if userName := request.Header.Get("x-webauth-user"); userName != "" {
@@ -439,13 +442,13 @@ func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Req
 	regex := request.PostFormValue("regexTestRegex")
 	line := request.PostFormValue("regexTestLine")
 
-	switch re, err := regexp.Compile(regex); {
+	switch reg, err := regexp.Compile(regex); {
 	case err != nil:
 		http.Error(response, "Regex Parse Failed: "+err.Error(), http.StatusNotAcceptable)
 	case regex == "":
 		http.Error(response, "Regular Expression is blank!", http.StatusBadRequest)
-	case re.MatchString(line):
-		http.Error(response, "Regular Expression matches! Found: "+re.FindString(line), http.StatusOK)
+	case reg.MatchString(line):
+		http.Error(response, "Regular Expression matches! Found: "+reg.FindString(line), http.StatusOK)
 	default:
 		http.Error(response, "Regular Expression does not match!", http.StatusBadRequest)
 	}

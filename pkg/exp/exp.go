@@ -48,7 +48,8 @@ func GetAllData() AllData {
 
 func GetMap(name string) *expvar.Map {
 	if p := mainMap.Get(name); p != nil {
-		return p.(*expvar.Map)
+		pp, _ := p.(*expvar.Map)
+		return pp
 	}
 
 	newMap := expvar.NewMap(name)

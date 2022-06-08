@@ -186,7 +186,7 @@ func (c *Config) HostInfoNoError() *host.InfoStat {
 }
 
 // GetHostInfoUID attempts to make a unique machine identifier...
-func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
+func (c *Config) GetHostInfoUID() (*host.InfoStat, error) { //nolint:cyclop
 	if c.extras.hostInfo != nil {
 		return c.HostInfoNoError(), nil
 	}
@@ -212,6 +212,7 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 	}
 
 	// TrueNAS adds junk to the hostname.
+	//nolint:gomnd
 	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > 17 {
 		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > 2 {
 			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-2], "-")

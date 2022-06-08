@@ -81,7 +81,7 @@ func (c *Config) updateStatesOnSite() {
 	values := make(map[string][]byte)
 
 	for _, svc := range c.services {
-		values[valuePrefix+svc.Name], _ = json.Marshal(svc.svc)
+		values[valuePrefix+svc.Name], _ = json.Marshal(svc.svc) // nolint:errchkjson
 	}
 
 	if len(values) == 0 {

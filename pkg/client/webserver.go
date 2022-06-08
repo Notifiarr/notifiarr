@@ -129,7 +129,12 @@ func (r *responseWrapper) Write(b []byte) (int, error) {
 }
 
 func (r *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	conn, buf, err := r.ResponseWriter.(http.Hijacker).Hijack()
+	hijack, ok := r.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, ErrNoServer
+	}
+
+	conn, buf, err := hijack.Hijack()
 	if err != nil {
 		return conn, buf, err //nolint:wrapcheck
 	}

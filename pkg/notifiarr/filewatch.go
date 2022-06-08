@@ -115,12 +115,14 @@ func (c *Config) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *ti
 	return cases, ticker
 }
 
+//nolint:cyclop
 func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
 	defer c.Printf("==> All file watchers stopped.")
 	defer ticker.Stop()
 
 	for {
 		idx, data, ok := reflect.Select(cases)
+
 		if c.LogConfig.Debug {
 			exp.FileWatcher.Add("Selects", 1)
 		}
@@ -153,6 +155,7 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)})
 		default:
 			exp.FileWatcher.Add(tails[idx].Path+" Lines", 1)
+
 			line, _ := data.Elem().Addr().Interface().(*tail.Line)
 			c.checkLineMatch(line, tails[idx])
 			exp.FileWatcher.Add(tails[idx].Path+" Bytes", int64(len(line.Text)+1))

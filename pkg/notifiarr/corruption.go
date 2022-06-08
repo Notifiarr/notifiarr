@@ -246,8 +246,11 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	return backup.Name
 }
 
-func (c *Config) checkBackupFileCorruption(ctx context.Context,
-	input *genericInstance, remotePath string) (*BackupInfo, error) {
+func (c *Config) checkBackupFileCorruption(
+	ctx context.Context,
+	input *genericInstance,
+	remotePath string,
+) (*BackupInfo, error) {
 	// XXX: Set TMPDIR to configure this.
 	folder, err := ioutil.TempDir("", "notifiarr_tmp_dir")
 	if err != nil {
@@ -285,8 +288,11 @@ func (c *Config) checkBackupFileCorruption(ctx context.Context,
 	return nil, ErrNoDBInBackup
 }
 
-func (c *genericInstance) saveBackupFile(ctx context.Context,
-	remotePath, localPath string) (string, error) {
+func (c *genericInstance) saveBackupFile(
+	ctx context.Context,
+	remotePath,
+	localPath string,
+) (string, error) {
 	reader, status, err := c.app.GetBody(ctx, remotePath, nil)
 	if err != nil {
 		return "", fmt.Errorf("getting http response body: %w", err)
@@ -325,8 +331,10 @@ func (c *genericInstance) saveBackupFile(ctx context.Context,
 	return file.Name(), nil
 }
 
-func (c *genericInstance) checkCorruptSQLite(ctx context.Context,
-	filePath string) (*BackupInfo, error) {
+func (c *genericInstance) checkCorruptSQLite(
+	ctx context.Context,
+	filePath string,
+) (*BackupInfo, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("checking db file: %w", err)
@@ -350,8 +358,11 @@ func (c *genericInstance) checkCorruptSQLite(ctx context.Context,
 	return backup, nil
 }
 
-func (c *genericInstance) getSQLLiteRowString(ctx context.Context,
-	conn *sql.DB, sql string) (string, int) {
+func (c *genericInstance) getSQLLiteRowString(
+	ctx context.Context,
+	conn *sql.DB,
+	sql string,
+) (string, int) {
 	text := "<no data returned>"
 	count := 0
 
@@ -376,8 +387,11 @@ func (c *genericInstance) getSQLLiteRowString(ctx context.Context,
 	return text, count
 }
 
-func (c *genericInstance) getSQLLiteRowInt64(ctx context.Context,
-	conn *sql.DB, sql string) int64 {
+func (c *genericInstance) getSQLLiteRowInt64(
+	ctx context.Context,
+	conn *sql.DB,
+	sql string,
+) int64 {
 	rows, err := conn.QueryContext(ctx, sql)
 	if err != nil {
 		return 0

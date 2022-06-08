@@ -202,8 +202,12 @@ type templateData struct {
 	Disks       map[string]*snapshot.Partition `json:"disks"`
 }
 
-func (c *Client) renderTemplate(response io.Writer, req *http.Request,
-	templateName, msg string) {
+func (c *Client) renderTemplate(
+	response io.Writer,
+	req *http.Request,
+	templateName,
+	msg string,
+) {
 	clientInfo, _ := c.website.GetClientInfo()
 	if clientInfo == nil {
 		clientInfo = &notifiarr.ClientInfo{}

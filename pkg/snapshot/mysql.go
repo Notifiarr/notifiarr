@@ -11,7 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	_ "github.com/go-sql-driver/mysql" //nolint:gci // We use mysql driver, this is how it's loaded.
+	_ "github.com/go-sql-driver/mysql" // We use mysql driver, this is how it's loaded.
 	"golift.io/cnfg"
 )
 
@@ -125,7 +125,7 @@ func getMySQL(ctx context.Context, mysql *MySQLConfig) (MySQLProcesses, MySQLSta
 func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, error) {
 	exp.Apps.Add("MySQL&&Process List Queries", 1)
 
-	rows, err := dbase.QueryContext(ctx, "SHOW FULL PROCESSLIST")
+	rows, err := dbase.QueryContext(ctx, "SHOW FULL PROCESSLIST") //nolint:execinquery
 	if err != nil {
 		exp.Apps.Add("MySQL&&Errors", 1)
 		return nil, fmt.Errorf("getting processes: %w", err)
@@ -138,19 +138,19 @@ func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, e
 	var list MySQLProcesses
 
 	for rows.Next() {
-		var p MySQLProcess
+		var pid MySQLProcess
 		// for each row, scan the result into our tag composite object
-		err := rows.Scan(&p.ID, &p.User, &p.Host, &p.DB, &p.Cmd, &p.Time, &p.State, &p.Info)
+		err := rows.Scan(&pid.ID, &pid.User, &pid.Host, &pid.DB, &pid.Cmd, &pid.Time, &pid.State, &pid.Info)
 		if err != nil {
 			exp.Apps.Add("MySQL&&Errors", 1)
 			return nil, fmt.Errorf("scanning process rows: %w", err)
 		}
 
-		if p.Info.Valid {
-			p.Info.String = strings.Join(strings.Fields(p.Info.String), " ")
+		if pid.Info.Valid {
+			pid.Info.String = strings.Join(strings.Fields(pid.Info.String), " ")
 		}
 
-		list = append(list, &p)
+		list = append(list, &pid)
 	}
 
 	return list, nil
@@ -180,7 +180,7 @@ func scanMySQLStatus(ctx context.Context, dbase *sql.DB) (MySQLStatus, error) {
 	for _, name := range likes {
 		exp.Apps.Add("MySQL&&Global Status Queries", 1)
 
-		rows, err := dbase.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'")
+		rows, err := dbase.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'") //nolint:execinquery
 		if err != nil {
 			exp.Apps.Add("MySQL&&Errors", 1)
 			return nil, fmt.Errorf("getting global status: %w", err)

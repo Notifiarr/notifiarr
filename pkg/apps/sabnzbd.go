@@ -198,16 +198,16 @@ func (s *SabNZBConfig) GetHistory() (*History, error) {
 	params.Add("mode", "history")
 	params.Add("apikey", s.APIKey)
 
-	var h struct {
+	var hist struct {
 		History *History `json:"history"`
 	}
 
-	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &h)
+	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &hist)
 	if err != nil {
 		return nil, err
 	}
 
-	return h.History, nil
+	return hist.History, nil
 }
 
 // GetHistory returns the active queued items in SABnzbd.
@@ -221,16 +221,16 @@ func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 	params.Add("mode", "queue")
 	params.Add("apikey", s.APIKey)
 
-	var q struct {
+	var que struct {
 		Queue *Queue `json:"queue"`
 	}
 
-	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &q)
+	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &que)
 	if err != nil {
 		return nil, err
 	}
 
-	return q.Queue, nil
+	return que.Queue, nil
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
