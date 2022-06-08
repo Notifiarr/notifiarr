@@ -57,7 +57,7 @@ type TautulliUser struct {
 	Thumb           string `json:"thumb"`
 	Email           string `json:"email"`
 	ServerToken     string `json:"server_token"`
-	SharedLibraries string `json:"shared_libraries"`
+	SharedLibraries []string `json:"shared_libraries"`
 	FilterAll       string `json:"filter_all"`
 	FilterMovies    string `json:"filter_movies"`
 	FilterTv        string `json:"filter_tv"`
