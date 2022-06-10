@@ -46,7 +46,8 @@ type Match struct {
 
 // runFileWatcher compiles any regexp's and opens a tail -f on provided watch files.
 func (c *Config) runFileWatcher() {
-	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/debug ticker/"}}
+	// two fake tails for internal channels.
+	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
 	for _, item := range c.WatchFiles {
 		if err := item.setup(c.Logger.InfoLog); err != nil {
@@ -251,9 +252,11 @@ func (c *Config) AddFileWatcher(file *WatchFile) error {
 
 func (c *Config) StopFileWatcher(file *WatchFile) {
 	if file.Active() {
+		file.retries = maxRetries // so it will not get "restarted" after manually being stopped.
+
 		c.Debugf("Stopping File Watcher: %s", file.Path)
 
-		if err := file.Stop(); err != nil {
+		if err := file.stop(); err != nil {
 			c.Errorf("Stopping File Watcher: %s: %v", file.Path, err)
 		}
 	}
@@ -270,14 +273,14 @@ func (c *Config) stopFileWatchers() {
 
 // this runs when a channel dies from the main go routine loop.
 func (w *WatchFile) deactivate() error {
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
 	defer func() {
+		w.mu.Lock()
+		defer w.mu.Unlock()
+
 		w.tail = nil
 	}()
 
-	return w.Stop()
+	return w.stop()
 }
 
 // Active returns true if the tail channel is still open.
@@ -288,8 +291,12 @@ func (w *WatchFile) Active() bool {
 	return w.tail != nil
 }
 
-// Stop stops a file watcher.
-func (w *WatchFile) Stop() error {
+// stop stops a file watcher.
+func (w *WatchFile) stop() error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	// defer w.tail.Cleanup()
+
 	if err := w.tail.Stop(); err != nil {
 		return fmt.Errorf("stopping watcher: %w", err)
 	}
