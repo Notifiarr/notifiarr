@@ -18,6 +18,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
@@ -168,6 +169,7 @@ func (c *Config) setup() {
 	c.Mode = c.Services.Notifiarr.Setup(c.Mode)
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
+	share.Setup(c.Services.Notifiarr)
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = mnd.DefaultTimeout

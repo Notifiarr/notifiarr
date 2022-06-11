@@ -50,7 +50,7 @@ func (c *Config) runFileWatcher() {
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
 	for _, item := range c.WatchFiles {
-		if err := item.setup(c.Logger.InfoLog); err != nil {
+		if err := item.setup(c.Logger.GetInfoLog()); err != nil {
 			c.Errorf("Unable to watch file %v", err)
 			continue
 		}
@@ -134,52 +134,57 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 	var died bool
 
 	for {
-		switch idx, data, running := reflect.Select(cases); {
+		idx, data, running := reflect.Select(cases)
+		item := tails[idx]
+
+		switch {
 		case !running && idx == 0:
 			return // main channel closed, bail out.
 		case !running:
-			if err := tails[idx].deactivate(); err != nil {
-				c.Errorf("No longer watching file (channel closed): %s: %v", tails[idx].Path, err)
+			tails = append(tails[:idx], tails[idx+1:]...) // The channel was closed? okay, remove it.
+			cases = append(cases[:idx], cases[idx+1:]...)
+
+			if err := item.deactivate(); err != nil {
+				c.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
+				exp.FileWatcher.Add(item.Path+" Errors", 1)
+
 				died = true //nolint:wsl
 			} else {
-				c.Printf("==> No longer watching file (channel closed): %s", tails[idx].Path)
+				c.Printf("==> No longer watching file (channel closed): %s", item.Path)
 			}
 
-			tails = append(tails[:idx], tails[idx+1:]...) // The channel was closed? okay, remove it.
-
-			cases = append(cases[:idx], cases[idx+1:]...)
 			if len(cases) < 1 {
 				return
 			}
 		case idx == 1:
 			died = c.fileWatcherTicker(died)
 		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
-			c.Errorf("Got non-addressable file watcher data from %s", tails[idx].Path)
-			exp.FileWatcher.Add(tails[idx].Path+" Errors", 1)
+			c.Errorf("Got non-addressable file watcher data from %s", item.Path)
+			exp.FileWatcher.Add(item.Path+" Errors", 1)
 		case idx == 0:
-			item, _ := data.Elem().Addr().Interface().(*WatchFile)
+			item, _ = data.Elem().Addr().Interface().(*WatchFile)
 			tails = append(tails, item)
 			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)})
 		default:
-			exp.FileWatcher.Add(tails[idx].Path+" Lines", 1)
+			exp.FileWatcher.Add(item.Path+" Lines", 1)
 
 			line, _ := data.Elem().Addr().Interface().(*tail.Line)
-			c.checkLineMatch(line, tails[idx])
-			exp.FileWatcher.Add(tails[idx].Path+" Bytes", int64(len(line.Text)+1))
+			c.checkLineMatch(line, item)
+			exp.FileWatcher.Add(item.Path+" Bytes", int64(len(line.Text)+1))
 		}
 	}
 }
 
 func (c *Config) fileWatcherTicker(died bool) bool {
-	var stilldead bool
-
-	if c.LogConfig.Debug {
+	if c.Logger.DebugEnabled() { // remove this.
 		c.Debugf("File Watcher Ticker. Dead files: %v", died)
 	}
 
 	if !died {
 		return false
 	}
+
+	var stilldead bool
 
 	for _, item := range c.WatchFiles {
 		if item.Active() || item.retries >= maxRetries {
@@ -189,11 +194,14 @@ func (c *Config) fileWatcherTicker(died bool) bool {
 		item.retries++
 		exp.FileWatcher.Add(item.Path+" Retries", 1)
 
-		c.Debugf("Restarting File Watcher (retries: %d): %s", item.retries, item.Path)
+		// move this back to debug.
+		c.Printf("Restarting File Watcher (retries: %d): %s", item.retries, item.Path)
 
 		if err := c.AddFileWatcher(item); err != nil {
 			c.Errorf("Restarting File Watcher (retries: %d): %s: %v", item.retries, item.Path, err)
-			stilldead = true //nolint:wsl
+			exp.FileWatcher.Add(item.Path+" Errors", 1)
+
+			stilldead = true
 		} else {
 			item.retries = 0
 			exp.FileWatcher.Add(item.Path+" Restarts", 1)
@@ -225,20 +233,18 @@ func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
 
 	// this can be removed before release.
 	c.Debugf("[%s requested] Sending Watched-File Line Match to Notifiarr: %s: %s",
-		EventFile, tail.Path, line.Text)
-
-	if resp, err := c.SendData(LogLineRoute.Path(EventFile), match, true); err != nil {
-		exp.FileWatcher.Add(tail.Path+" Error", 1)
-		c.Errorf("[%s requested] Sending Watched-File Line Match to Notifiarr: %s: %s => %s",
-			EventFile, tail.Path, line.Text, err)
-	} else if tail.LogMatch {
-		c.Printf("[%s requested] Sent Watched-File Line Match to Notifiarr: %s: %s => %s",
-			EventFile, tail.Path, line.Text, resp)
-	}
+		EventFile, tail.Path, match.Line)
+	c.QueueData(&SendRequest{
+		Route:      LogLineRoute,
+		Event:      EventFile,
+		LogPayload: true,
+		LogMsg:     fmt.Sprintf("Watched-File Line Match: %s: %s", tail.Path, match.Line),
+		Payload:    match,
+	})
 }
 
 func (c *Config) AddFileWatcher(file *WatchFile) error {
-	if err := file.setup(c.Logger.InfoLog); err != nil {
+	if err := file.setup(c.Logger.GetInfoLog()); err != nil {
 		return err
 	}
 
@@ -250,16 +256,20 @@ func (c *Config) AddFileWatcher(file *WatchFile) error {
 	return nil
 }
 
-func (c *Config) StopFileWatcher(file *WatchFile) {
+func (c *Config) StopFileWatcher(file *WatchFile) error {
 	if file.Active() {
 		file.retries = maxRetries // so it will not get "restarted" after manually being stopped.
 
-		c.Debugf("Stopping File Watcher: %s", file.Path)
+		// move this back to debug.
+		c.Printf("Stopping File Watcher: %s", file.Path)
 
 		if err := file.stop(); err != nil {
 			c.Errorf("Stopping File Watcher: %s: %v", file.Path, err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func (c *Config) stopFileWatchers() {
@@ -267,7 +277,7 @@ func (c *Config) stopFileWatchers() {
 	c.extras.addWatcher = nil
 
 	for _, tail := range c.WatchFiles {
-		c.StopFileWatcher(tail)
+		_ = c.StopFileWatcher(tail)
 	}
 }
 
@@ -293,8 +303,8 @@ func (w *WatchFile) Active() bool {
 
 // stop stops a file watcher.
 func (w *WatchFile) stop() error {
-	w.mu.Lock()
-	defer w.mu.Unlock()
+	w.mu.RLock()
+	defer w.mu.RUnlock()
 	// defer w.tail.Cleanup()
 
 	if err := w.tail.Stop(); err != nil {

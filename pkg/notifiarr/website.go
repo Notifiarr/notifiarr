@@ -240,7 +240,7 @@ func (c *Config) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 
-	if !c.LogConfig.Debug { // no debug, just return the body.
+	if !c.Logger.DebugEnabled() { // no debug, just return the body.
 		return resp.StatusCode, resp.Body, nil
 	}
 
@@ -477,4 +477,36 @@ func readBodyForLog(body io.Reader, max int64) string {
 	bodyBytes, _ := ioutil.ReadAll(body)
 
 	return string(bodyBytes)
+}
+
+func (c *Config) watchSendDataChan() {
+	var start time.Time
+
+	for data := range c.extras.sendData {
+		var uri string
+
+		if len(data.Params) > 0 {
+			uri = data.Route.Path(data.Event, data.Params...)
+		} else {
+			uri = data.Route.Path(data.Event)
+		}
+
+		start = time.Now()
+
+		resp, err := c.SendData(uri, data.Payload, data.LogPayload)
+		if data.LogMsg == "" {
+			continue
+		}
+
+		if err != nil {
+			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %w", data.Event, time.Since(start).Round(time.Millisecond), err)
+		} else {
+			c.Printf("[%s requested] Sent (%v): "+data.LogMsg+": %v", data.Event, time.Since(start).Round(time.Millisecond), resp)
+		}
+	}
+}
+
+// QueueData puts a send-data request to notifiarr.com into a channel queue.
+func (c *Config) QueueData(data *SendRequest) {
+	c.extras.sendData <- data
 }

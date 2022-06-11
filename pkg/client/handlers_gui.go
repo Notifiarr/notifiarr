@@ -429,7 +429,7 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 		return
 	}
 
-	if err := watch.Stop(); err != nil {
+	if err := c.website.StopFileWatcher(watch); err != nil {
 		http.Error(response, "Stop Failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

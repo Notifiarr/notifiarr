@@ -104,6 +104,7 @@ require (
 )
 
 require (
+	golang.org/x/text v0.3.7
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/securecookie v1.1.1
@@ -114,7 +115,6 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 
-require golang.org/x/text v0.3.7
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

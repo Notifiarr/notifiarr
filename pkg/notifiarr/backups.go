@@ -177,12 +177,11 @@ func (c *Config) sendBackups(input *genericInstance) {
 		Files: fileList,
 	}
 
-	resp, err := c.SendData(BackupRoute.Path(input.event), send, true)
-	if err != nil {
-		c.Errorf("[%s requested] Sending %s Backup File List to Notifiarr (%d): %v: %s",
-			input.event, input.name, input.int, err, resp)
-	} else {
-		c.Printf("[%s requested] Sent %s Backup File List to Notifiarr (%d): %s",
-			input.event, input.name, input.int, resp)
-	}
+	c.QueueData(&SendRequest{
+		Route:      CorruptRoute,
+		Event:      input.event,
+		LogPayload: true,
+		LogMsg:     fmt.Sprintf("%s Backup File List (%d)", input.name, input.int),
+		Payload:    send,
+	})
 }

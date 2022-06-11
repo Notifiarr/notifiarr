@@ -231,17 +231,14 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	backup.File = latest
 	backup.Date = fileList[0].Time.Round(time.Second)
 
-	if resp, err := c.SendData(CorruptRoute.Path(input.event), backup, true); err != nil {
-		c.Errorf("[%s requested] Sending %s Backup File Corruption Info to Notifiarr (%d): %v: %s: "+
-			"OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d. %s",
-			input.event, input.name, input.int, err, latest, backup.Ver, backup.Integ,
-			backup.Quick, backup.Tables, backup.Size, resp)
-	} else {
-		c.Printf("[%s requested] Checking %s Backup File Corruption (%d): %s: "+
-			"OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d. %s",
-			input.event, input.name, input.int, latest, backup.Ver, backup.Integ,
-			backup.Quick, backup.Tables, backup.Size, resp)
-	}
+	c.QueueData(&SendRequest{
+		Route:      CorruptRoute,
+		Event:      input.event,
+		LogPayload: true,
+		LogMsg: fmt.Sprintf("%s Backup File Corruption Info (%d): %v: %s: OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d",
+			input.name, input.int, err, latest, backup.Ver, backup.Integ, backup.Quick, backup.Tables, backup.Size),
+		Payload: backup,
+	})
 
 	return backup.Name
 }

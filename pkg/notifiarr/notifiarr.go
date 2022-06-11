@@ -8,6 +8,7 @@ package notifiarr
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/shirou/gopsutil/v3/host"
@@ -44,24 +44,24 @@ const (
 
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
-	Apps         *apps.Apps       `json:"apps"`      // has API key
-	Plex         *plex.Server     `json:"plex"`      // plex sessions
-	Snap         *snapshot.Config `json:"snapshots"` // system snapshot data
-	Services     *ServiceConfig   `json:"services"`
-	WatchFiles   []*WatchFile     `json:"watchFiles"`
-	Serial       bool             `json:"serial"`
-	Retries      int              `json:"retries"`
-	BaseURL      string           `json:"-"`
-	Timeout      cnfg.Duration    `json:"timeout"`
-	Trigger      Triggers         `json:"-"`
-	MaxBody      int              `json:"maxBody"`
-	Sighup       chan os.Signal   `json:"-"`
-	*logs.Logger `json:"-"`       // log file writer
+	Apps       *apps.Apps       `json:"apps"`      // has API key
+	Plex       *plex.Server     `json:"plex"`      // plex sessions
+	Snap       *snapshot.Config `json:"snapshots"` // system snapshot data
+	Services   *ServiceConfig   `json:"services"`
+	WatchFiles []*WatchFile     `json:"watchFiles"`
+	Serial     bool             `json:"serial"`
+	Retries    int              `json:"retries"`
+	BaseURL    string           `json:"-"`
+	Timeout    cnfg.Duration    `json:"timeout"`
+	Trigger    Triggers         `json:"-"`
+	MaxBody    int              `json:"maxBody"`
+	Sighup     chan os.Signal   `json:"-"`
+	Logger     `json:"-"`       // log file writer
 	extras
 }
 
 type extras struct {
-	ciMutex    sync.Mutex
+	ciMutex    sync.RWMutex
 	clientInfo *ClientInfo
 	client     *httpClient
 	radarrCF   map[int]*cfMapIDpayload
@@ -69,6 +69,7 @@ type extras struct {
 	plexTimer  *Timer
 	hostInfo   *host.InfoStat
 	addWatcher chan *WatchFile
+	sendData   chan *SendRequest
 }
 
 // Triggers allow trigger actions in the timer routine.
@@ -77,6 +78,21 @@ type Triggers struct {
 	sess  chan time.Time // Return Plex Sessions
 	sessr chan *holder   // Session Return Channel
 	List  []*action      // List of action triggers
+}
+
+// Logger is an interface for our logs package. We use this to avoid an import cycle.
+type Logger interface {
+	Print(v ...interface{})
+	Printf(msg string, v ...interface{})
+	Error(v ...interface{})
+	Errorf(msg string, v ...interface{})
+	Debug(v ...interface{})
+	Debugf(msg string, v ...interface{})
+	GetInfoLog() *log.Logger
+	GetDebugLog() *log.Logger
+	GetErrorLog() *log.Logger
+	DebugEnabled() bool
+	CapturePanic()
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -101,7 +117,7 @@ func (c *Config) Setup(mode string) string {
 	if c.extras.client == nil {
 		c.extras.client = &httpClient{
 			Retries: c.Retries,
-			Logger:  c.ErrorLog,
+			Logger:  c.GetErrorLog(),
 			Client:  &http.Client{},
 		}
 	}
@@ -118,6 +134,9 @@ func (c *Config) Start() {
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
+	c.extras.sendData = make(chan *SendRequest, 20)
+
+	go c.watchSendDataChan()
 
 	if c.Plex.Configured() {
 		c.Trigger.sess = make(chan time.Time, 1)
@@ -266,6 +285,7 @@ func (c *Config) Stop(event EventType) {
 	}
 
 	c.stopFileWatchers()
+	close(c.extras.sendData)
 
 	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.stop.C <- event

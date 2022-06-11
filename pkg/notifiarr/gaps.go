@@ -3,7 +3,6 @@ package notifiarr
 import (
 	"fmt"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"golift.io/cnfg"
 	"golift.io/starr/radarr"
 )
@@ -33,35 +32,24 @@ func (c *Config) sendGaps(event EventType) {
 			continue
 		}
 
-		if resp, err := c.sendInstanceGaps(event, instance, app); err != nil {
-			c.Errorf("[%s requested] Radarr Collection Gaps request for '%d:%s' failed: %v", event, instance, app.URL, err)
-		} else {
-			c.Printf("[%s requested] Sent Collection Gaps to Notifiarr for Radarr: %d:%s. %s",
-				event, instance, app.URL, resp)
+		type radarrGapsPayload struct {
+			Instance int             `json:"instance"`
+			Name     string          `json:"name"`
+			Movies   []*radarr.Movie `json:"movies"`
 		}
-	}
-}
 
-func (c *Config) sendInstanceGaps(event EventType, instance int, app *apps.RadarrConfig) (*Response, error) {
-	type radarrGapsPayload struct {
-		Instance int             `json:"instance"`
-		Name     string          `json:"name"`
-		Movies   []*radarr.Movie `json:"movies"`
-	}
+		movies, err := app.GetMovie(0)
+		if err != nil {
+			c.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v", event, instance, app.URL, err)
+			continue
+		}
 
-	movies, err := app.GetMovie(0)
-	if err != nil {
-		return nil, fmt.Errorf("getting movies: %w", err)
+		c.QueueData(&SendRequest{
+			Route:      DashRoute,
+			Event:      event,
+			LogPayload: true,
+			LogMsg:     fmt.Sprintf("Radarr Collection Gaps (%d:%s)", instance, app.URL),
+			Payload:    &radarrGapsPayload{Movies: movies, Name: app.Name, Instance: instance},
+		})
 	}
-
-	resp, err := c.SendData(GapsRoute.Path(event, "app=radarr"), &radarrGapsPayload{
-		Movies:   movies,
-		Name:     app.Name,
-		Instance: instance,
-	}, false)
-	if err != nil {
-		return nil, fmt.Errorf("sending collection gaps: %w", err)
-	}
-
-	return resp, nil
 }

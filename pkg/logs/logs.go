@@ -13,6 +13,7 @@ import (
 	"runtime/debug"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
@@ -205,7 +206,10 @@ func (l *Logger) Printf(msg string, v ...interface{}) {
 func (l *Logger) Error(v ...interface{}) {
 	exp.LogFiles.Add("Error Lines", 1)
 
-	err := l.ErrorLog.Output(callDepth, fmt.Sprintln(v...))
+	msg := fmt.Sprintln(v...)
+	share.Log(msg)
+
+	err := l.ErrorLog.Output(callDepth, msg)
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
@@ -215,7 +219,10 @@ func (l *Logger) Error(v ...interface{}) {
 func (l *Logger) Errorf(msg string, v ...interface{}) {
 	exp.LogFiles.Add("Error Lines", 1)
 
-	err := l.ErrorLog.Output(callDepth, fmt.Sprintf(msg, v...))
+	msg = fmt.Sprintf(msg, v...)
+	share.Log(msg)
+
+	err := l.ErrorLog.Output(callDepth, msg)
 	if err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
@@ -269,4 +276,20 @@ func (l *Logger) postRotateCounter(fileName, newFile string) {
 	if newFile != "" && l != nil {
 		go l.Printf("Rotated log file to: %s", newFile)
 	}
+}
+
+func (l *Logger) GetInfoLog() *log.Logger {
+	return l.InfoLog
+}
+
+func (l *Logger) GetErrorLog() *log.Logger {
+	return l.ErrorLog
+}
+
+func (l *Logger) GetDebugLog() *log.Logger {
+	return l.DebugLog
+}
+
+func (l *Logger) DebugEnabled() bool {
+	return l.LogConfig.Debug
 }

@@ -88,6 +88,13 @@ func (c *ClientInfo) IsPatron() bool {
 	return c != nil && c.User.Patron
 }
 
+func (c *Config) HaveClientInfo() bool {
+	c.extras.ciMutex.RLock()
+	defer c.extras.ciMutex.RUnlock()
+
+	return c.extras.clientInfo != nil
+}
+
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
 func (c *Config) GetClientInfo() (*ClientInfo, error) {
 	c.extras.ciMutex.Lock()

@@ -36,6 +36,16 @@ type Payload struct {
 	Load *plexIncomingWebhook `json:"payload,omitempty"`
 }
 
+// SendRequest is used when sending data through a channel.
+type SendRequest struct {
+	Route      Route
+	Event      EventType
+	Params     []string    // optional.
+	Payload    interface{} // data to send.
+	LogMsg     string      // if empty, nothing is logged.
+	LogPayload bool        // debug log the sent payload
+}
+
 // Route is used to give us methods on our route paths.
 type Route string
 

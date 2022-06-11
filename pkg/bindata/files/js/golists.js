@@ -45,7 +45,7 @@ function testInstance(from, instanceType, index)
         },
         error: function (response, status, error) {
             from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
-            if (status === undefined) {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
@@ -249,7 +249,7 @@ function stopFileWatch(from, index)
         error: function (response, status, error) {
             from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
 
-            if (status === undefined) {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
@@ -277,7 +277,7 @@ function startFileWatch(from, index)
         error: function (response, status, error) {
             from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-play-circle');
 
-            if (status === undefined) {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {

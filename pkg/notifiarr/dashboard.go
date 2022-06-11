@@ -115,15 +115,13 @@ func (c *Config) sendDashboardState(event EventType) {
 		apps   = time.Since(start).Round(time.Millisecond)
 	)
 
-	resp, err := c.SendData(DashRoute.Path(event), states, true)
-	if err != nil {
-		c.Errorf("[%s requested] Sending Dashboard State Data to Notifiarr (apps:%s total:%s): %v",
-			event, apps, time.Since(start).Round(time.Millisecond), err)
-		return
-	}
-
-	c.Printf("[%s requested] Sent Dashboard State Data to Notifiarr! Elapsed: apps:%s total:%s. %s",
-		event, apps, time.Since(start).Round(time.Millisecond), resp)
+	c.QueueData(&SendRequest{
+		Route:      DashRoute,
+		Event:      event,
+		LogPayload: true,
+		LogMsg:     fmt.Sprintf("Dashboard State (elapsed: %v)", apps),
+		Payload:    states,
+	})
 }
 
 // getStatesSerial grabs data for each app serially.
