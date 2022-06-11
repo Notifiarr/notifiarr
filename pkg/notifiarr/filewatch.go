@@ -147,7 +147,6 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 			if err := item.deactivate(); err != nil {
 				c.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
 				exp.FileWatcher.Add(item.Path+" Errors", 1)
-
 				died = true //nolint:wsl
 			} else {
 				c.Printf("==> No longer watching file (channel closed): %s", item.Path)
@@ -170,7 +169,7 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 
 			line, _ := data.Elem().Addr().Interface().(*tail.Line)
 			c.checkLineMatch(line, item)
-			exp.FileWatcher.Add(item.Path+" Bytes", int64(len(line.Text)+1))
+			exp.FileWatcher.Add(item.Path+" Bytes", int64(len(line.Text)))
 		}
 	}
 }

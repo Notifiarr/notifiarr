@@ -9,7 +9,7 @@ type Website interface {
 }
 
 // Config is setup by the configfile package.
-var config Website
+var config Website //nolint:gochecknoglobals
 
 func Setup(website Website) {
 	config = website

@@ -134,7 +134,7 @@ func (c *Config) Start() {
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
-	c.extras.sendData = make(chan *SendRequest, 20)
+	c.extras.sendData = make(chan *SendRequest, 20) //nolint:gomnd
 
 	go c.watchSendDataChan()
 

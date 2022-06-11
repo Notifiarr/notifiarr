@@ -494,14 +494,17 @@ func (c *Config) watchSendDataChan() {
 		start = time.Now()
 
 		resp, err := c.SendData(uri, data.Payload, data.LogPayload)
+
 		if data.LogMsg == "" {
 			continue
 		}
 
 		if err != nil {
-			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %w", data.Event, time.Since(start).Round(time.Millisecond), err)
+			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %w",
+				data.Event, time.Since(start).Round(time.Millisecond), err)
 		} else {
-			c.Printf("[%s requested] Sent (%v): "+data.LogMsg+": %v", data.Event, time.Since(start).Round(time.Millisecond), resp)
+			c.Printf("[%s requested] Sent (%v): "+data.LogMsg+": %v",
+				data.Event, time.Since(start).Round(time.Millisecond), resp)
 		}
 	}
 }
