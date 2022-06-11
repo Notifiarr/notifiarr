@@ -49,8 +49,8 @@ func (a *Apps) setupReadarr(timeout time.Duration) error {
 			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Readarr[idx].Debugf = a.DebugLog.Printf
-		a.Readarr[idx].errorf = a.ErrorLog.Printf
+		a.Readarr[idx].Debugf = a.Debugf
+		a.Readarr[idx].errorf = a.Errorf
 		a.Readarr[idx].setup(timeout)
 	}
 

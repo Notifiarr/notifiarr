@@ -32,24 +32,27 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey   string              `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
-	ExKeys   []string            `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
-	URLBase  string              `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	Sonarr   []*SonarrConfig     `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr   []*RadarrConfig     `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr   []*LidarrConfig     `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr  []*ReadarrConfig    `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Prowlarr []*ProwlarrConfig   `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
-	Deluge   []*DelugeConfig     `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
-	Qbit     []*QbitConfig       `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
-	SabNZB   []*SabNZBConfig     `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
-	Tautulli *TautulliConfig     `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
-	Router   *mux.Router         `json:"-" toml:"-" xml:"-" yaml:"-"`
-	ErrorLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
-	DebugLog *log.Logger         `json:"-" toml:"-" xml:"-" yaml:"-"`
+	APIKey   string            `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
+	ExKeys   []string          `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
+	URLBase  string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	Sonarr   []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
+	Radarr   []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
+	Lidarr   []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
+	Readarr  []*ReadarrConfig  `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Prowlarr []*ProwlarrConfig `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
+	Deluge   []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
+	Qbit     []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
+	SabNZB   []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
+	Tautulli *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
+	Router   *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
+	Logger   `toml:"-" xml:"-" json:"-"`
 	keys     map[string]struct{} `toml:"-"` // for fast key lookup.
 }
 
+type Logger struct {
+	Errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	Debugf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+}
 type starrConfig struct {
 	Name      string        `toml:"name" xml:"name" json:"name"`
 	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
@@ -152,7 +155,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 
 		if len(post) > 0 {
 			s, _ := json.MarshalIndent(msg, "", " ")
-			a.DebugLog.Printf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, s)
+			a.Debugf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, s)
 		}
 
 		if appName == "" {
@@ -199,12 +202,12 @@ func (a *Apps) InitHandlers() {
 // Setup creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
 func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
-	if a.DebugLog == nil {
-		a.DebugLog = log.New(io.Discard, "", 0)
+	if a.Debugf == nil {
+		a.Debugf = log.New(io.Discard, "", 0).Printf
 	}
 
-	if a.ErrorLog == nil {
-		a.ErrorLog = log.New(io.Discard, "", 0)
+	if a.Errorf == nil {
+		a.Errorf = log.New(io.Discard, "", 0).Printf
 	}
 
 	if err := a.setupLidarr(timeout); err != nil {
@@ -259,7 +262,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 	}
 
 	if m, ok := msg.(error); ok {
-		a.ErrorLog.Printf("Request failed. Status: %s, Message: %v", statusTxt, m)
+		a.Errorf("Request failed. Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
@@ -272,7 +275,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 
 	err := json.Encode(map[string]interface{}{"status": statusTxt, "message": msg})
 	if err != nil {
-		a.ErrorLog.Printf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
+		a.Errorf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
 
 	return int64(counter.Count())

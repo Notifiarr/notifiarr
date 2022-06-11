@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -23,7 +22,7 @@ import (
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
 	Retries int
-	*log.Logger
+	Logger
 	*http.Client
 }
 
@@ -271,7 +270,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
-				h.Printf("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
+				h.Errorf("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError {
@@ -303,7 +302,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		case retry == h.Retries:
 			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			h.Printf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
+			h.Errorf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
@@ -482,6 +481,12 @@ func readBodyForLog(body io.Reader, max int64) string {
 func (c *Config) watchSendDataChan() {
 	var start time.Time
 
+	defer func() {
+		c.extras.oMutex.Lock()
+		defer c.extras.oMutex.Unlock()
+		c.extras.sendData = nil
+	}()
+
 	for data := range c.extras.sendData {
 		var uri string
 
@@ -511,5 +516,10 @@ func (c *Config) watchSendDataChan() {
 
 // QueueData puts a send-data request to notifiarr.com into a channel queue.
 func (c *Config) QueueData(data *SendRequest) {
-	c.extras.sendData <- data
+	c.extras.oMutex.RLock()
+	defer c.extras.oMutex.RUnlock()
+
+	if c.extras.sendData != nil {
+		c.extras.sendData <- data
+	}
 }

@@ -218,16 +218,17 @@ func (c *Config) Stop() {
 		return
 	}
 
-	defer close(c.triggerChan)
-	defer close(c.checkChan)
 	defer close(c.stopChan)
-	defer close(c.checks)
-	defer close(c.done)
+	c.stopChan <- struct{}{}
+	<-c.stopChan
+
+	close(c.triggerChan)
+	close(c.checkChan)
+	close(c.checks)
+	close(c.done)
 
 	c.triggerChan = nil
 	c.checkChan = nil
-	c.stopChan <- struct{}{}
-	<-c.stopChan
 	c.checks = nil
 	c.done = nil
 	c.stopChan = nil

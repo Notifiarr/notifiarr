@@ -11,6 +11,7 @@ import (
 	"log"
 	"path/filepath"
 	"runtime/debug"
+	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
@@ -32,6 +33,7 @@ type Logger struct {
 	debug     *rotatorr.Logger
 	custom    *rotatorr.Logger // must not be set when web/app/debug are set.
 	LogConfig *LogConfig
+	mu        sync.RWMutex
 }
 
 // These are used for custom logs.
@@ -81,6 +83,9 @@ func New() *Logger {
 
 // SetupLogging splits log writers into a file and/or stdout.
 func (l *Logger) SetupLogging(config *LogConfig) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
 	fileMode = config.FileMode.Mode()
 	l.LogConfig = config
 	l.setDefaultLogPaths()
@@ -207,12 +212,11 @@ func (l *Logger) Error(v ...interface{}) {
 	exp.LogFiles.Add("Error Lines", 1)
 
 	msg := fmt.Sprintln(v...)
-	share.Log(msg)
-
-	err := l.ErrorLog.Output(callDepth, msg)
-	if err != nil {
+	if err := l.ErrorLog.Output(callDepth, msg); err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
+
+	share.Log(msg)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
@@ -220,12 +224,11 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 	exp.LogFiles.Add("Error Lines", 1)
 
 	msg = fmt.Sprintf(msg, v...)
-	share.Log(msg)
-
-	err := l.ErrorLog.Output(callDepth, msg)
-	if err != nil {
+	if err := l.ErrorLog.Output(callDepth, msg); err != nil {
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
+
+	share.Log(msg)
 }
 
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
@@ -291,5 +294,8 @@ func (l *Logger) GetDebugLog() *log.Logger {
 }
 
 func (l *Logger) DebugEnabled() bool {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+
 	return l.LogConfig.Debug
 }

@@ -1,7 +1,9 @@
 // Package share is here so we can keep website cruft out of the logs package.
 package share
 
-import "github.com/Notifiarr/notifiarr/pkg/notifiarr"
+import (
+	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+)
 
 type Website interface {
 	QueueData(data *notifiarr.SendRequest)
@@ -22,7 +24,7 @@ func Log(msg string) {
 	}
 
 	config.QueueData(&notifiarr.SendRequest{
-		Payload:    &notifiarr.Match{File: "client_error_log", Line: msg},
+		Payload:    &notifiarr.Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
 		Route:      notifiarr.LogLineRoute,
 		Event:      notifiarr.EventFile,
 		LogPayload: true,

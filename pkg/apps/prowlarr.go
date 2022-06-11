@@ -27,8 +27,8 @@ func (a *Apps) setupProwlarr(timeout time.Duration) error {
 			return fmt.Errorf("%w: missing url: Prowlarr config %d", ErrInvalidApp, i+1)
 		}
 
-		prowl.Debugf = a.DebugLog.Printf
-		prowl.errorf = a.ErrorLog.Printf
+		prowl.Debugf = a.Debugf
+		prowl.errorf = a.Errorf
 		prowl.setup(timeout)
 	}
 

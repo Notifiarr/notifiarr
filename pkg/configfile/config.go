@@ -67,9 +67,11 @@ func NewConfig(logger *logs.Logger) *Config {
 	return &Config{
 		Mode: notifiarr.ModeProd,
 		Apps: &apps.Apps{
-			URLBase:  "/",
-			DebugLog: logger.DebugLog,
-			ErrorLog: logger.ErrorLog,
+			URLBase: "/",
+			Logger: apps.Logger{
+				Debugf: logger.Debugf,
+				Errorf: logger.Errorf,
+			},
 		},
 		Services: &services.Config{
 			Interval: cnfg.Duration{Duration: services.DefaultSendInterval},

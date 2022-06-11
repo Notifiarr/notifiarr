@@ -278,6 +278,21 @@ func (c *Config) stopFileWatchers() {
 	for _, tail := range c.WatchFiles {
 		_ = c.StopFileWatcher(tail)
 	}
+
+	// The following code waits for all the watchers to die before returning.
+	repeat := func() bool {
+		for _, tail := range c.WatchFiles {
+			if tail.Active() {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	for repeat() {
+		time.Sleep(70 * time.Millisecond) // nolint:gomnd
+	}
 }
 
 // this runs when a channel dies from the main go routine loop.

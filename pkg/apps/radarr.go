@@ -56,8 +56,8 @@ func (a *Apps) setupRadarr(timeout time.Duration) error {
 			return fmt.Errorf("%w: missing url: Radarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Radarr[idx].Debugf = a.DebugLog.Printf
-		a.Radarr[idx].errorf = a.ErrorLog.Printf
+		a.Radarr[idx].Debugf = a.Debugf
+		a.Radarr[idx].errorf = a.Errorf
 		a.Radarr[idx].setup(timeout)
 	}
 

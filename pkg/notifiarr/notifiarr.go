@@ -61,6 +61,7 @@ type Config struct {
 }
 
 type extras struct {
+	oMutex     sync.RWMutex
 	ciMutex    sync.RWMutex
 	clientInfo *ClientInfo
 	client     *httpClient
@@ -89,8 +90,6 @@ type Logger interface {
 	Debug(v ...interface{})
 	Debugf(msg string, v ...interface{})
 	GetInfoLog() *log.Logger
-	GetDebugLog() *log.Logger
-	GetErrorLog() *log.Logger
 	DebugEnabled() bool
 	CapturePanic()
 }
@@ -117,7 +116,7 @@ func (c *Config) Setup(mode string) string {
 	if c.extras.client == nil {
 		c.extras.client = &httpClient{
 			Retries: c.Retries,
-			Logger:  c.GetErrorLog(),
+			Logger:  c.Logger,
 			Client:  &http.Client{},
 		}
 	}
@@ -134,7 +133,7 @@ func (c *Config) Start() {
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
-	c.extras.sendData = make(chan *SendRequest, 20) //nolint:gomnd
+	c.extras.sendData = make(chan *SendRequest, 2000) //nolint:gomnd
 
 	go c.watchSendDataChan()
 
@@ -285,7 +284,6 @@ func (c *Config) Stop(event EventType) {
 	}
 
 	c.stopFileWatchers()
-	close(c.extras.sendData)
 
 	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.stop.C <- event
@@ -294,4 +292,9 @@ func (c *Config) Stop(event EventType) {
 		defer close(c.Trigger.sess)
 		c.Trigger.sess = nil
 	}
+
+	c.extras.oMutex.Lock()
+	defer c.extras.oMutex.Unlock()
+
+	close(c.extras.sendData)
 }
