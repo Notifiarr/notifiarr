@@ -122,6 +122,8 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 		index, val, _ := reflect.Select(cases)
 		action := actions[index]
 
+		c.Debugf("Action Start: %v", action.Name)
+
 		var event EventType
 		if _, ok := val.Interface().(time.Time); ok {
 			event = EventCron
@@ -151,6 +153,8 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 		} else {
 			action.SFn(sent)
 		}
+
+		c.Debugf("Action End: %v", action.Name)
 	}
 }
 

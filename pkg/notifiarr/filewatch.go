@@ -175,10 +175,6 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 }
 
 func (c *Config) fileWatcherTicker(died bool) bool {
-	if c.Logger.DebugEnabled() { // remove this.
-		c.Debugf("File Watcher Ticker. Dead files: %v", died)
-	}
-
 	if !died {
 		return false
 	}

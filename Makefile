@@ -141,19 +141,19 @@ $(shell go env GOPATH)/bin/rsrc:
 
 build: $(BINARY)
 $(BINARY): generate main.go
-	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	go build $(BUILD_FLAGS) -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux: $(BINARY).amd64.linux
 $(BINARY).amd64.linux: generate main.go
 	# Building linux 64-bit x86 binary.
-	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux386: $(BINARY).386.linux
 $(BINARY).386.linux: generate main.go
 	# Building linux 32-bit x86 binary.
-	GOOS=linux GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=386 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 arm: arm64 armhf
@@ -161,14 +161,14 @@ arm: arm64 armhf
 arm64: $(BINARY).arm64.linux
 $(BINARY).arm64.linux: generate main.go
 	# Building linux 64-bit ARM binary.
-	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	# https://github.com/upx/upx/issues/351#issuecomment-599116973
 	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 armhf: $(BINARY).arm.linux
 $(BINARY).arm.linux: generate main.go
 	# Building linux 32-bit ARM binary.
-	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=arm GOARM=6 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 macos: $(BINARY).universal.macos
@@ -185,22 +185,22 @@ $(BINARY).arm64.macos: generate main.go
 
 freebsd: $(BINARY).amd64.freebsd
 $(BINARY).amd64.freebsd: generate main.go
-	GOOS=freebsd GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 freebsd386: $(BINARY).i386.freebsd
 $(BINARY).i386.freebsd: generate main.go
-	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@ || true
 
 freebsdarm: $(BINARY).armhf.freebsd
 $(BINARY).armhf.freebsd: generate main.go
-	GOOS=freebsd GOARCH=arm go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=arm go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 exe: $(BINARY).amd64.exe
 windows: $(BINARY).amd64.exe
 $(BINARY).amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
-	GOOS=windows GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
+	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 ####################
