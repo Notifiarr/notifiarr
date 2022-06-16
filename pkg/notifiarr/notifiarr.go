@@ -79,6 +79,7 @@ type Triggers struct {
 	sess  chan time.Time // Return Plex Sessions
 	sessr chan *holder   // Session Return Channel
 	List  []*action      // List of action triggers
+	mu    sync.RWMutex
 }
 
 // Logger is an interface for our logs package. We use this to avoid an import cycle.
@@ -138,8 +139,8 @@ func (c *Config) Start() {
 	go c.watchSendDataChan()
 
 	if c.Plex.Configured() {
-		c.Trigger.sess = make(chan time.Time, 1)
-		go c.runSessionHolder()
+		c.Trigger.createChannels()
+		go c.runSessionHolder() //nolint:wsl
 	}
 
 	// Order is important here.
@@ -156,6 +157,14 @@ func (c *Config) Start() {
 	c.makeCustomClientInfoTimerTriggers()
 	c.runTimers()
 	c.runFileWatcher()
+}
+
+func (t *Triggers) createChannels() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	t.sess = make(chan time.Time, 1)
+	t.sessr = make(chan *holder)
 }
 
 func (c *Config) makeBaseTriggers() {
@@ -287,14 +296,22 @@ func (c *Config) Stop(event EventType) {
 
 	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.stop.C <- event
+
 	// Closes the Plex session holder.
-	if c.Trigger.sess != nil {
-		defer close(c.Trigger.sess)
-		c.Trigger.sess = nil
-	}
+	c.Trigger.ClosePlex()
 
 	c.extras.oMutex.Lock()
 	defer c.extras.oMutex.Unlock()
 
 	close(c.extras.sendData)
+}
+
+// ClosePlex closes the Plex session holder.
+func (t *Triggers) ClosePlex() {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	if t.sess != nil {
+		close(t.sess)
+	}
 }

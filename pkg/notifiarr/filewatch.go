@@ -232,7 +232,7 @@ func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
 	c.QueueData(&SendRequest{
 		Route:      LogLineRoute,
 		Event:      EventFile,
-		LogPayload: true,
+		LogPayload: tail.LogMatch,
 		LogMsg:     fmt.Sprintf("Watched-File Line Match: %s: %s", tail.Path, match.Line),
 		Payload:    match,
 	})

@@ -12,15 +12,14 @@ FROM golang:1-buster as builder
 ARG TARGETOS
 ARG BINARY
 ARG TARGETARCH
-
+ARG BUILD_FLAGS
 RUN mkdir -p $GOPATH/pkg/mod $GOPATH/bin $GOPATH/src /${BINARY}
 COPY . /${BINARY}
 WORKDIR /${BINARY}
 
-RUN CGO_ENABLED=0 make clean ${BINARY}.${TARGETARCH}.${TARGETOS} && \
+RUN CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS} && \
     curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
-    tar -zxf /notifiarr.tgz -C / && \
-    ln -sf /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.5
+    tar -zxf /notifiarr.tgz -C /
 
 FROM scratch
 ARG TARGETOS
@@ -69,7 +68,7 @@ COPY --from=builder /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 /lib
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25 \
   /lib/x86_64-linux-gnu/ld-2.28.so /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread-2.28.so \
   /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm-2.28.so /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libdl.so.2 \
-  /lib/x86_64-linux-gnu/libdl-2.28.so /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc-2.28.so /lib/x86_64-linux-gnu/libncurses.so.5 \
+  /lib/x86_64-linux-gnu/libdl-2.28.so /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc-2.28.so \
   /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.6.1 /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/
 
 ENTRYPOINT [ "/image" ]

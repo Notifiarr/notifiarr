@@ -486,6 +486,7 @@ docker:
 		--build-arg "BINARY=$(BINARY)" \
 		--build-arg "SOURCE_URL=$(SOURCE_URL)" \
 		--build-arg "CONFIG_FILE=$(CONFIG_FILE)" \
+		--build-arg "BUILD_FLAGS=$(BUILD_FLAGS)" \
 		--file init/docker/Dockerfile .
 
 ####################
