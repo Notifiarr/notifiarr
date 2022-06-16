@@ -54,9 +54,9 @@ func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
 	}
 
 	if resp, err := c.sendPlexMeta(event, hook, wait); err != nil {
-		c.Errorf("[%s requested] Sending Plex Sessions%s to Notifiarr: %v", event, msg, err)
+		c.Errorf("[%s requested] Sending Plex Sessions%s to Notifiarr: %v%v", event, msg, err, resp)
 	} else {
-		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar. %s", event, msg, resp)
+		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar.%v", event, msg, resp)
 	}
 }
 

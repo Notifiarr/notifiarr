@@ -190,6 +190,6 @@ func (r *Response) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf("Website took %s and replied with: %s, %s %s",
+	return fmt.Sprintf(" => Website took %s and replied with: %s, %s %s",
 		r.Details.Elapsed, r.Result, r.Details.Response, r.Details.Help)
 }

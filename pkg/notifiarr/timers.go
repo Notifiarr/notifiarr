@@ -67,8 +67,8 @@ func (t *timerConfig) Run(event EventType) {
 // run responds to the channel that the timer fired into.
 func (t *timerConfig) run(event EventType) {
 	payload := struct{ Cron string }{Cron: "thingy"}
-	if _, err := t.c.SendData(t.URI, payload, true); err != nil {
-		t.c.Errorf("[%s requested] Custom Timer Request for %s failed: %v", event, t.URI, err)
+	if resp, err := t.c.SendData(t.URI, payload, true); err != nil {
+		t.c.Errorf("[%s requested] Custom Timer Request for %s failed: %v%v", event, t.URI, err, resp)
 	}
 }
 
