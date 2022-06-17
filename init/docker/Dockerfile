@@ -21,12 +21,12 @@ WORKDIR /${BINARY}
 RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 && \
     curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
-    mkdir -p /tmp/lib_link /tmp/lib/*-linux-gnu* && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
+    mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
     /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
     /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
     /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
     /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 \
-    /lib/*-linux-gnu*/libtinfo.so.5 /tmp/lib/*-linux-gnu* && \
+    /lib/*-linux-gnu*/libtinfo.so.5 /tmp$(ls -d /lib/*-linux-gnu*) && \
     ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
     ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
     ln -s /usr/lib /tmp/lib_link/lib64 && \
@@ -63,6 +63,8 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.licenses="${LICENSE}" \
       org.opencontainers.image.version="${VERSION}"
 
+COPY --from=builder /${BINARY}/${BINARY}.${TARGETARCH}.${TARGETOS} /image
+
 # For megacli.
 COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
 COPY --from=builder /tmp/lib /usr/lib
@@ -71,7 +73,6 @@ COPY --from=builder /tmp/lib_link/ /
 # Make sure we have an ssl cert chain and timezone data.
 COPY --from=builder /etc/ssl /etc/ssl
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-COPY --from=builder /${BINARY}/${BINARY}.${TARGETARCH}.${TARGETOS} /image
 
 ENV TZ=UTC
 
