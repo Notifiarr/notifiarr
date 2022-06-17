@@ -159,15 +159,10 @@ func (c *Config) Start() {
 	c.runFileWatcher()
 }
 
-func (t *Triggers) createChannels() {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	t.sess = make(chan time.Time, 1)
-	t.sessr = make(chan *holder)
-}
-
 func (c *Config) makeBaseTriggers() {
+	c.Trigger.mu.Lock()
+	defer c.Trigger.mu.Unlock()
+
 	c.Trigger.stop = &action{
 		Name: TrigStop,
 		C:    make(chan EventType),
@@ -285,29 +280,49 @@ func (c *Config) makeCustomClientInfoTimerTriggers() {
 
 // Stop all internal cron timers and Triggers.
 func (c *Config) Stop(event EventType) {
+	// This closes runTimerLoop() and fires stopTimerLoop().
+	c.Trigger.closeTriggers(event)
+	// Stops the file and log watchers.
+	c.stopFileWatchers()
+	// Closes the Plex session holder.
+	c.Trigger.closePlex()
+	// Closes the website senddata channel.
+	c.extras.closeDataSender()
+}
+
+func (e *extras) closeDataSender() {
+	e.oMutex.RLock()
+	defer e.oMutex.RUnlock()
+
+	close(e.sendData)
+}
+
+func (t *Triggers) closeTriggers(event EventType) {
 	// Neither of these if statemens should ever fire. That's a bug somewhere else.
-	if c == nil {
+	if t == nil {
 		panic("Config is nil, cannot stop a nil config!!")
-	} else if c.Trigger.stop == nil {
+	}
+
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+
+	if t.stop == nil {
 		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
-	c.stopFileWatchers()
-
-	// This closes runTimerLoop() and fires stopTimerLoop().
-	c.Trigger.stop.C <- event
-
-	// Closes the Plex session holder.
-	c.Trigger.ClosePlex()
-
-	c.extras.oMutex.Lock()
-	defer c.extras.oMutex.Unlock()
-
-	close(c.extras.sendData)
+	t.stop.C <- event
 }
 
-// ClosePlex closes the Plex session holder.
-func (t *Triggers) ClosePlex() {
+func (t *Triggers) createChannels() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	t.sess = make(chan time.Time, 1)
+	t.sessr = make(chan *holder)
+}
+
+// closePlex closes the Plex session holder.
+func (t *Triggers) closePlex() {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 
