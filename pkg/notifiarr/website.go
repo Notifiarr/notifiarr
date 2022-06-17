@@ -154,12 +154,8 @@ func (c *Config) GetData(url string) (*Response, error) {
 
 // SendData sends raw data to a notifiarr URL as JSON.
 func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response, error) {
-	var (
-		post []byte
-		err  error
-	)
-
-	if data, err := json.Marshal(payload); err == nil {
+	data, err := json.Marshal(payload)
+	if err == nil {
 		var torn map[string]interface{}
 		if err := json.Unmarshal(data, &torn); err == nil {
 			if torn["host"], err = c.GetHostInfoUID(); err != nil {
@@ -169,6 +165,8 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 			payload = torn
 		}
 	}
+
+	var post []byte
 
 	if log {
 		post, err = json.MarshalIndent(payload, "", " ")
@@ -193,32 +191,33 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 
 // unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
 func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, error) {
-	defer body.Close()
+	var (
+		buf     bytes.Buffer
+		resp    Response
+		counter = datacounter.NewReaderCounter(body)
+	)
 
-	var r Response
-
-	counter := datacounter.NewReaderCounter(body)
 	defer func() {
+		body.Close()
 		exp.NotifiarrCom.Add("POST Bytes Received", int64(counter.Count()))
 	}()
 
-	err := json.NewDecoder(counter).Decode(&r)
-
+	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
 	if code < http.StatusOK || code > http.StatusIMUsed {
 		if err != nil {
-			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v)",
-				ErrNon200, url, code, http.StatusText(code), err)
+			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v), body: %s",
+				ErrNon200, url, code, http.StatusText(code), err, buf.String())
 		}
 
 		return nil, fmt.Errorf("%w: %s: %d %s, %s: %s",
-			ErrNon200, url, code, http.StatusText(code), r.Result, r.Details.Response)
+			ErrNon200, url, code, http.StatusText(code), resp.Result, resp.Details.Response)
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("converting json response: %w", err)
+		return nil, fmt.Errorf("converting json response: %w, body: %s", err, buf.String())
 	}
 
-	return &r, nil
+	return &resp, nil
 }
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
@@ -505,7 +504,7 @@ func (c *Config) watchSendDataChan() {
 		}
 
 		if err != nil {
-			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %w%v",
+			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %v%v",
 				data.Event, time.Since(start).Round(time.Millisecond), err, resp.String())
 		} else {
 			c.Printf("[%s requested] Sent (%v): "+data.LogMsg+"%v",

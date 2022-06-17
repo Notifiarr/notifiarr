@@ -56,7 +56,7 @@ func (c *Config) sendSnapshot(event EventType) {
 	}
 
 	c.QueueData(&SendRequest{
-		Route:      StuckRoute,
+		Route:      SnapRoute,
 		Event:      event,
 		LogPayload: true,
 		LogMsg:     fmt.Sprintf("System Snapshot (interval: %v)", c.Snap.Interval),
