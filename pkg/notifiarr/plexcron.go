@@ -64,8 +64,8 @@ func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
 // Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
 // Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
 func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
-	c.Trigger.mu.RLock()
-	defer c.Trigger.mu.RUnlock()
+	c.Trigger.psMutex.RLock()
+	defer c.Trigger.psMutex.RUnlock()
 
 	if c.Trigger.sess == nil {
 		return nil, ErrNoChannel
@@ -83,16 +83,7 @@ func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
 }
 
 func (c *Config) runSessionHolder() { //nolint:cyclop
-	defer func() {
-		defer c.CapturePanic()
-
-		c.Trigger.mu.Lock()
-		defer c.Trigger.mu.Unlock()
-
-		close(c.Trigger.sessr)
-		c.Trigger.sessr = nil
-		c.Trigger.sess = nil
-	}()
+	defer c.CapturePanic()
 
 	sessions, err := c.Plex.GetSessions() // err not used until for loop.
 	if sessions != nil {
@@ -126,6 +117,8 @@ func (c *Config) runSessionHolder() { //nolint:cyclop
 
 		c.Trigger.sessr <- &holder{sessions: sessions, error: err}
 	}
+
+	close(c.Trigger.sessr) // indicate we're done.
 }
 
 // plexSessionTracker checks for state changes between the previous session pull

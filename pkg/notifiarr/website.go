@@ -480,12 +480,6 @@ func readBodyForLog(body io.Reader, max int64) string {
 func (c *Config) watchSendDataChan() {
 	var start time.Time
 
-	defer func() {
-		c.extras.oMutex.Lock()
-		defer c.extras.oMutex.Unlock()
-		c.extras.sendData = nil
-	}()
-
 	for data := range c.extras.sendData {
 		var uri string
 
@@ -511,12 +505,14 @@ func (c *Config) watchSendDataChan() {
 				data.Event, time.Since(start).Round(time.Millisecond), resp)
 		}
 	}
+
+	close(c.extras.stopSendData)
 }
 
 // QueueData puts a send-data request to notifiarr.com into a channel queue.
 func (c *Config) QueueData(data *SendRequest) {
-	c.extras.oMutex.RLock()
-	defer c.extras.oMutex.RUnlock()
+	c.extras.sdMutex.RLock()
+	defer c.extras.sdMutex.RUnlock()
 
 	if c.extras.sendData != nil {
 		c.extras.sendData <- data

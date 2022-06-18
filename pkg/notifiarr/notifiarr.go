@@ -61,25 +61,28 @@ type Config struct {
 }
 
 type extras struct {
-	oMutex     sync.RWMutex
-	ciMutex    sync.RWMutex
-	clientInfo *ClientInfo
-	client     *httpClient
-	radarrCF   map[int]*cfMapIDpayload
-	sonarrRP   map[int]*cfMapIDpayload
-	plexTimer  *Timer
-	hostInfo   *host.InfoStat
-	addWatcher chan *WatchFile
-	sendData   chan *SendRequest
+	sdMutex      sync.RWMutex // senddata/queuedata
+	ciMutex      sync.RWMutex // clientinfo
+	awMutex      sync.RWMutex // addwatcher
+	clientInfo   *ClientInfo
+	client       *httpClient
+	radarrCF     map[int]*cfMapIDpayload
+	sonarrRP     map[int]*cfMapIDpayload
+	plexTimer    *Timer
+	hostInfo     *host.InfoStat
+	addWatcher   chan *WatchFile
+	stopWatcher  chan struct{}
+	sendData     chan *SendRequest
+	stopSendData chan struct{}
 }
 
 // Triggers allow trigger actions in the timer routine.
 type Triggers struct {
-	stop  *action        // Triggered by calling Stop()
-	sess  chan time.Time // Return Plex Sessions
-	sessr chan *holder   // Session Return Channel
-	List  []*action      // List of action triggers
-	mu    sync.RWMutex
+	stop    *action        // Triggered by calling Stop()
+	sess    chan time.Time // Return Plex Sessions
+	sessr   chan *holder   // Session Return Channel
+	List    []*action      // List of action triggers
+	psMutex sync.RWMutex   // Locks plex session thread.
 }
 
 // Logger is an interface for our logs package. We use this to avoid an import cycle.
@@ -135,11 +138,13 @@ func (c *Config) Start() {
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
 	c.extras.sendData = make(chan *SendRequest, 2000) //nolint:gomnd
+	c.extras.stopSendData = make(chan struct{})
 
 	go c.watchSendDataChan()
 
 	if c.Plex.Configured() {
-		c.Trigger.createChannels()
+		c.Trigger.sess = make(chan time.Time, 1)
+		c.Trigger.sessr = make(chan *holder)
 		go c.runSessionHolder() //nolint:wsl
 	}
 
@@ -160,9 +165,6 @@ func (c *Config) Start() {
 }
 
 func (c *Config) makeBaseTriggers() {
-	c.Trigger.mu.Lock()
-	defer c.Trigger.mu.Unlock()
-
 	c.Trigger.stop = &action{
 		Name: TrigStop,
 		C:    make(chan EventType),
@@ -283,7 +285,7 @@ func (c *Config) Stop(event EventType) {
 	// This closes runTimerLoop() and fires stopTimerLoop().
 	c.Trigger.closeTriggers(event)
 	// Stops the file and log watchers.
-	c.stopFileWatchers()
+	c.closeFileWatchers()
 	// Closes the Plex session holder.
 	c.Trigger.closePlex()
 	// Closes the website senddata channel.
@@ -291,42 +293,44 @@ func (c *Config) Stop(event EventType) {
 }
 
 func (e *extras) closeDataSender() {
-	e.oMutex.RLock()
-	defer e.oMutex.RUnlock()
+	e.sdMutex.Lock()
+	defer e.sdMutex.Unlock()
 
-	close(e.sendData)
+	if e.sendData != nil {
+		close(e.sendData)
+	}
+
+	<-e.stopSendData // wait for done signal.
+	e.stopSendData = nil
+	e.sendData = nil
 }
 
 func (t *Triggers) closeTriggers(event EventType) {
-	// Neither of these if statemens should ever fire. That's a bug somewhere else.
+	// Neither of these if statements should ever fire. That's a bug somewhere else.
 	if t == nil {
 		panic("Config is nil, cannot stop a nil config!!")
 	}
-
-	t.mu.RLock()
-	defer t.mu.RUnlock()
 
 	if t.stop == nil {
 		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
 	t.stop.C <- event
-}
-
-func (t *Triggers) createChannels() {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	t.sess = make(chan time.Time, 1)
-	t.sessr = make(chan *holder)
+	<-t.stop.C // wait for done signal.
+	t.stop = nil
 }
 
 // closePlex closes the Plex session holder.
 func (t *Triggers) closePlex() {
-	t.mu.RLock()
-	defer t.mu.RUnlock()
+	t.psMutex.Lock()
+	defer t.psMutex.Unlock()
 
-	if t.sess != nil {
-		close(t.sess)
+	if t.sess == nil {
+		return
 	}
+
+	close(t.sess)
+	<-t.sessr // wait for session holder to return
+	t.sessr = nil
+	t.sess = nil
 }

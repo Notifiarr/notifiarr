@@ -164,10 +164,9 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 func (c *Config) stopTimerLoop(actions []*action) {
 	defer c.CapturePanic()
 	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
-	c.Trigger.stop = nil
 
 	for _, action := range actions {
-		if action.C != nil {
+		if action.C != nil && (action.Fn != nil || action.SFn != nil) {
 			close(action.C)
 			action.C = nil
 		}
@@ -177,6 +176,8 @@ func (c *Config) stopTimerLoop(actions []*action) {
 			action.T = nil
 		}
 	}
+
+	close(c.Trigger.stop.C) // signal that we're done.
 }
 
 /* Helpers. */
