@@ -45,6 +45,7 @@ gpg --list-keys 2>/dev/null | grep -q B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
 export WINDOWS_LDFLAGS=""
 export MACAPP="Notifiarr"
 export EXTRA_FPM_FLAGS="--conflicts=discordnotifier-client>0.0.1 --provides=notifiarr --provides=discordnotifier-client"
+export BUILD_FLAGS="-tags osusergo,netgo ${BUILD_FLAGS}"
 
 # Make sure Docker builds work locally.
 # These do not affect automated builds, just allow the docker build scripts to run from a local clone.
