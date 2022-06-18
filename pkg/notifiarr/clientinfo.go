@@ -97,10 +97,7 @@ func (c *Config) HaveClientInfo() bool {
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
 func (c *Config) GetClientInfo() (*ClientInfo, error) {
-	c.extras.ciMutex.Lock()
-	defer c.extras.ciMutex.Unlock()
-
-	if c.extras.clientInfo != nil {
+	if c.HaveClientInfo() {
 		return c.extras.clientInfo, nil
 	}
 
@@ -114,6 +111,8 @@ func (c *Config) GetClientInfo() (*ClientInfo, error) {
 		return &clientInfo, fmt.Errorf("parsing response: %w, %s", err, string(body.Details.Response))
 	}
 
+	c.extras.ciMutex.Lock()
+	defer c.extras.ciMutex.Unlock()
 	// Only set this if there was no error.
 	c.extras.clientInfo = &clientInfo
 

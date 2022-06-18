@@ -100,7 +100,7 @@ func (c *Config) makeCorruptionTriggers() {
 }
 
 func (t *Triggers) Corruption(event EventType, app starr.App) error {
-	switch app { //nolint:exhaustive // we do not need them all here.
+	switch app {
 	default:
 		return fmt.Errorf("%w: %s", ErrInvalidApp, app)
 	case "":

@@ -299,7 +299,7 @@ func (c *Client) printTautulli() {
 	case taut == nil, taut.URL == "":
 		c.Printf(" => Tautulli Config (enables name map): 0 servers")
 	case taut.Name != "":
-		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:s%v check_interval:%s name:%s",
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%v check_interval:%s name:%s",
 			taut.URL, taut.Timeout, taut.Interval, taut.Name)
 	default:
 		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%s", taut.URL, taut.Timeout)

@@ -191,6 +191,8 @@ func (c *Config) setup() {
 
 	if c.Tautulli == nil {
 		c.Tautulli = &apps.TautulliConfig{}
+	} else {
+		c.Tautulli.Setup(c.Timeout.Duration)
 	}
 }
 

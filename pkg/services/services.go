@@ -151,7 +151,11 @@ func (c *Config) loadServiceStates() {
 }
 
 func (c *Config) runServiceChecker() {
-	defer c.CapturePanic()
+	defer func() {
+		defer c.CapturePanic()
+		c.Printf("==> Service Checker Stopped!")
+		c.stopChan <- struct{}{} // signal we're finished.
+	}()
 
 	ticker := &time.Ticker{C: make(<-chan time.Time)}
 	second := &time.Ticker{C: make(<-chan time.Time)}
@@ -174,9 +178,6 @@ func (c *Config) runServiceChecker() {
 				c.checks <- nil
 				<-c.done
 			}
-
-			c.stopChan <- struct{}{}
-			c.Printf("==> Service Checker Stopped!")
 
 			return
 		case <-ticker.C:
@@ -220,7 +221,7 @@ func (c *Config) Stop() {
 
 	defer close(c.stopChan)
 	c.stopChan <- struct{}{}
-	<-c.stopChan
+	<-c.stopChan // wait for all go routines to die off.
 
 	close(c.triggerChan)
 	close(c.checkChan)
