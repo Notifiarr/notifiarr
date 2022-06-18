@@ -149,6 +149,9 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 			tails = append(tails[:idx], tails[idx+1:]...) // The channel was closed? okay, remove it.
 			cases = append(cases[:idx], cases[idx+1:]...)
 
+			// This routines runs the Stop method on the tail.
+			// If that returns an error, it means it died.
+			// If that does not return an error, it means Stop was already called.
 			if err := item.deactivate(); err != nil {
 				c.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
 				exp.FileWatcher.Add(item.Path+" Errors", 1)
@@ -161,7 +164,7 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 				return
 			}
 		case idx == 1:
-			died = c.fileWatcherTicker(len(cases), died)
+			died = c.fileWatcherTicker(died)
 		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
 			c.Errorf("Got non-addressable file watcher data from %s", item.Path)
 			exp.FileWatcher.Add(item.Path+" Errors", 1)
@@ -179,7 +182,7 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 	}
 }
 
-func (c *Config) fileWatcherTicker(cases int, died bool) bool {
+func (c *Config) fileWatcherTicker(died bool) bool {
 	if !died {
 		return false
 	}
@@ -231,9 +234,6 @@ func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		Matches: tail.re.FindAllString(line.Text, -1),
 	}
 
-	// this can be removed before release.
-	c.Debugf("[%s requested] Sending Watched-File Line Match to Notifiarr: %s: %s",
-		EventFile, tail.Path, match.Line)
 	c.QueueData(&SendRequest{
 		Route:      LogLineRoute,
 		Event:      EventFile,
@@ -244,8 +244,8 @@ func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
 }
 
 func (c *Config) AddFileWatcher(file *WatchFile) error {
-	c.awMutex.RLock()
-	defer c.awMutex.RUnlock()
+	c.extras.awMutex.RLock()
+	defer c.extras.awMutex.RUnlock()
 
 	if c.extras.addWatcher == nil {
 		return ErrNoChannel
@@ -278,8 +278,8 @@ func (w *WatchFile) Stop() error {
 }
 
 func (c *Config) closeFileWatchers() {
-	c.awMutex.Lock()
-	defer c.awMutex.Unlock()
+	c.extras.awMutex.Lock()
+	defer c.extras.awMutex.Unlock()
 
 	for _, tail := range c.WatchFiles {
 		if err := tail.Stop(); err != nil {

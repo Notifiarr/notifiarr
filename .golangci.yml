@@ -6,6 +6,7 @@ linters:
     - interfacer
     - golint
     - exhaustruct
+    - exhaustive
     - exhaustivestruct
     - dupl
     - nlreturn
