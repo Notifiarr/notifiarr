@@ -150,7 +150,7 @@ func (c *Config) loadServiceStates() {
 	}
 }
 
-func (c *Config) runServiceChecker() {
+func (c *Config) runServiceChecker() { //nolint:cyclop
 	defer func() {
 		defer c.CapturePanic()
 		c.Printf("==> Service Checker Stopped!")
@@ -192,11 +192,16 @@ func (c *Config) runServiceChecker() {
 
 			if event != "log" {
 				c.SendResults(&Results{What: event, Svcs: c.GetResults()})
-			} else {
-				// nolint:errchkjson
-				data, _ := json.MarshalIndent(&Results{Svcs: c.GetResults(), Interval: c.Interval.Seconds()}, "", " ")
-				c.Debug("Service Checks Payload (log only):", string(data))
+				continue
 			}
+
+			data, err := json.MarshalIndent(&Results{Svcs: c.GetResults(), Interval: c.Interval.Seconds()}, "", " ")
+			if err != nil {
+				c.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
+				continue
+			}
+
+			c.Debug("Service Checks Payload (log only):", string(data))
 		case <-second.C:
 			c.runChecks(false)
 		}

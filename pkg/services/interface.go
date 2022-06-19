@@ -45,11 +45,16 @@ func (c *Config) RunCheck(source notifiarr.EventType, name string) error {
 }
 
 // runCheck runs a service check if it is due. Passing force runs it regardless.
-func (c *Config) runCheck(svc *Service, force bool) {
+func (c *Config) runCheck(svc *Service, force bool) bool {
+	svc.svc.RLock()
+	defer svc.svc.RUnlock()
+
 	if force || svc.svc.LastCheck.Add(svc.Interval.Duration).Before(time.Now()) {
 		c.checks <- svc
-		<-c.done
+		return <-c.done
 	}
+
+	return false
 }
 
 // runChecks runs checks that are due. Passing true, runs them even if they're not due.
@@ -61,10 +66,15 @@ func (c *Config) runChecks(forceAll bool) {
 	count := 0
 
 	for s := range c.services {
-		if forceAll || c.services[s].svc.LastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
-			count++
-			c.checks <- c.services[s]
-		}
+		func() {
+			c.services[s].svc.RLock()
+			defer c.services[s].svc.RUnlock()
+
+			if forceAll || c.services[s].svc.LastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
+				count++
+				c.checks <- c.services[s]
+			}
+		}()
 	}
 
 	somethingChanged := false
@@ -78,10 +88,20 @@ func (c *Config) runChecks(forceAll bool) {
 }
 
 func (c *Config) updateStatesOnSite() {
-	values := make(map[string][]byte)
+	var (
+		err    error
+		values = make(map[string][]byte)
+	)
 
 	for _, svc := range c.services {
-		values[valuePrefix+svc.Name], _ = json.Marshal(svc.svc) // nolint:errchkjson
+		func() {
+			svc.svc.RLock()
+			defer svc.svc.RUnlock()
+
+			if values[valuePrefix+svc.Name], err = json.Marshal(&(svc.svc)); err != nil {
+				c.Errorf("Marshaling Service %s: %v", svc.Name, err)
+			}
+		}()
 	}
 
 	if len(values) == 0 {
@@ -99,22 +119,29 @@ func (c *Config) GetResults() []*CheckResult {
 	count := 0
 
 	for _, svc := range c.services {
-		svcs[count] = &CheckResult{
-			Interval:    svc.Interval.Duration.Seconds(),
-			Name:        svc.Name,
-			State:       svc.svc.State,
-			Output:      svc.svc.Output,
-			Type:        svc.Type,
-			Time:        svc.svc.LastCheck,
-			Since:       svc.svc.Since,
-			Check:       svc.Value,
-			Expect:      svc.Expect,
-			IntervalDur: svc.Interval.Duration,
-		}
+		svcs[count] = svc.copyResults()
 		count++
 	}
 
 	return svcs
+}
+
+func (s *Service) copyResults() *CheckResult {
+	s.svc.RLock()
+	defer s.svc.RUnlock()
+
+	return &CheckResult{
+		Interval:    s.Interval.Duration.Seconds(),
+		Name:        s.Name,
+		State:       s.svc.State,
+		Output:      s.svc.Output,
+		Type:        s.Type,
+		Time:        s.svc.LastCheck,
+		Since:       s.svc.Since,
+		Check:       s.Value,
+		Expect:      s.Expect,
+		IntervalDur: s.Interval.Duration,
+	}
 }
 
 // SendResults sends a set of Results to Notifiarr.
