@@ -17,7 +17,10 @@ var (
 	ErrBSDRestart = fmt.Errorf("process 'restart' check does not work on FreeBSD") // one day.
 )
 
-/* These all run once at startup to fill our check data. The service Lock is acquired before running any of this code. */
+/*
+ * These all run once at startup to fill our check data.
+ * The service Lock is acquired before running any of this code.
+ */
 
 func (s *Service) checkProcValues() error {
 	if s.Value == "" {
