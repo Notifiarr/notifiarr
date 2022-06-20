@@ -1,4 +1,10 @@
-                                <h1><i class="fa fa-user"></i> User Profile</h1>
+                                {{- if .ClientInfo.IsSub}}
+                                <h1><font color="green"><i class="fas fa-user"></i></font> User Profile</h1>
+                                {{- else if .ClientInfo.IsPatron}}
+                                <h1><font color="purple"><i class="fas fa-user"></i></font> User Profile</h1>
+                                {{- else}}
+                                <h1><i class="fas fa-user" style="float:left;font-size:40px"></i> User Profile</h1>
+                                {{- end}}
                             {{- if .Dynamic }}
                                 <p>Profile editing is disabled for dynamic users.</p>
                             {{- else }}
