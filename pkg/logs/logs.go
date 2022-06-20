@@ -87,6 +87,8 @@ func (l *Logger) SetupLogging(config *LogConfig) {
 	defer l.mu.Unlock()
 
 	fileMode = config.FileMode.Mode()
+	logFiles = config.LogFiles
+	logFileMb = config.LogFileMb
 	l.LogConfig = config
 	l.setDefaultLogPaths()
 	l.setLogPaths()
