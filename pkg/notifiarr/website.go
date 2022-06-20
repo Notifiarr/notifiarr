@@ -272,7 +272,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 				h.Errorf("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
 			}
 
-			if resp.StatusCode < http.StatusInternalServerError {
+			if resp.StatusCode < http.StatusInternalServerError && resp.StatusCode != http.StatusBadRequest {
 				exp.NotifiarrCom.Add(req.Method+" Requests", 1)
 				exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
 
@@ -301,7 +301,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		case retry == h.Retries:
 			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			h.Errorf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
+			h.Debugf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
