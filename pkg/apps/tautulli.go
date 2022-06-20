@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (t *TautulliConfig) setup(timeout time.Duration) {
+func (t *TautulliConfig) Setup(timeout time.Duration) {
 	if t == nil {
 		return
 	}
@@ -50,27 +50,27 @@ type TautulliUsers struct {
 // TautulliUser is the user data from the get_users API call.
 //nolint:tagliatelle
 type TautulliUser struct {
-	RowID           int64  `json:"row_id"`
-	UserID          int64  `json:"user_id"`
-	Username        string `json:"username"`
-	FriendlyName    string `json:"friendly_name"`
-	Thumb           string `json:"thumb"`
-	Email           string `json:"email"`
-	ServerToken     string `json:"server_token"`
-	SharedLibraries string `json:"shared_libraries"`
-	FilterAll       string `json:"filter_all"`
-	FilterMovies    string `json:"filter_movies"`
-	FilterTv        string `json:"filter_tv"`
-	FilterMusic     string `json:"filter_music"`
-	FilterPhotos    string `json:"filter_photos"`
-	IsActive        int    `json:"is_active"`     // 1,0 (bool)
-	IsAdmin         int    `json:"is_admin"`      // 1,0 (bool)
-	IsHomeUser      int    `json:"is_home_user"`  // 1,0 (bool)
-	IsAllowSync     int    `json:"is_allow_sync"` // 1,0 (bool)
-	IsRestricted    int    `json:"is_restricted"` // 1,0 (bool)
-	DoNotify        int    `json:"do_notify"`     // 1,0 (bool)
-	KeepHistory     int    `json:"keep_history"`  // 1,0 (bool)
-	AllowGuest      int    `json:"allow_guest"`   // 1,0 (bool)
+	RowID           int64    `json:"row_id"`
+	UserID          int64    `json:"user_id"`
+	Username        string   `json:"username"`
+	FriendlyName    string   `json:"friendly_name"`
+	Thumb           string   `json:"thumb"`
+	Email           string   `json:"email"`
+	ServerToken     string   `json:"server_token"`
+	SharedLibraries []string `json:"shared_libraries"`
+	FilterAll       string   `json:"filter_all"`
+	FilterMovies    string   `json:"filter_movies"`
+	FilterTv        string   `json:"filter_tv"`
+	FilterMusic     string   `json:"filter_music"`
+	FilterPhotos    string   `json:"filter_photos"`
+	IsActive        int      `json:"is_active"`     // 1,0 (bool)
+	IsAdmin         int      `json:"is_admin"`      // 1,0 (bool)
+	IsHomeUser      int      `json:"is_home_user"`  // 1,0 (bool)
+	IsAllowSync     int      `json:"is_allow_sync"` // 1,0 (bool)
+	IsRestricted    int      `json:"is_restricted"` // 1,0 (bool)
+	DoNotify        int      `json:"do_notify"`     // 1,0 (bool)
+	KeepHistory     int      `json:"keep_history"`  // 1,0 (bool)
+	AllowGuest      int      `json:"allow_guest"`   // 1,0 (bool)
 }
 
 // MapEmailName returns a map of email => name for Tautulli users.

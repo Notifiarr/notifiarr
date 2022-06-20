@@ -100,7 +100,7 @@ func (c *Config) makeCorruptionTriggers() {
 }
 
 func (t *Triggers) Corruption(event EventType, app starr.App) error {
-	switch app { //nolint:exhaustive // we do not need them all here.
+	switch app {
 	default:
 		return fmt.Errorf("%w: %s", ErrInvalidApp, app)
 	case "":
@@ -231,23 +231,23 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	backup.File = latest
 	backup.Date = fileList[0].Time.Round(time.Second)
 
-	if resp, err := c.SendData(CorruptRoute.Path(input.event), backup, true); err != nil {
-		c.Errorf("[%s requested] Sending %s Backup File Corruption Info to Notifiarr (%d): %v: %s: "+
-			"OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d. %s",
-			input.event, input.name, input.int, err, latest, backup.Ver, backup.Integ,
-			backup.Quick, backup.Tables, backup.Size, resp)
-	} else {
-		c.Printf("[%s requested] Checking %s Backup File Corruption (%d): %s: "+
-			"OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d. %s",
-			input.event, input.name, input.int, latest, backup.Ver, backup.Integ,
-			backup.Quick, backup.Tables, backup.Size, resp)
-	}
+	c.QueueData(&SendRequest{
+		Route:      CorruptRoute,
+		Event:      input.event,
+		LogPayload: true,
+		LogMsg: fmt.Sprintf("%s Backup File Corruption Info (%d): %v: %s: OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d",
+			input.name, input.int, err, latest, backup.Ver, backup.Integ, backup.Quick, backup.Tables, backup.Size),
+		Payload: backup,
+	})
 
 	return backup.Name
 }
 
-func (c *Config) checkBackupFileCorruption(ctx context.Context,
-	input *genericInstance, remotePath string) (*BackupInfo, error) {
+func (c *Config) checkBackupFileCorruption(
+	ctx context.Context,
+	input *genericInstance,
+	remotePath string,
+) (*BackupInfo, error) {
 	// XXX: Set TMPDIR to configure this.
 	folder, err := ioutil.TempDir("", "notifiarr_tmp_dir")
 	if err != nil {
@@ -285,8 +285,11 @@ func (c *Config) checkBackupFileCorruption(ctx context.Context,
 	return nil, ErrNoDBInBackup
 }
 
-func (c *genericInstance) saveBackupFile(ctx context.Context,
-	remotePath, localPath string) (string, error) {
+func (c *genericInstance) saveBackupFile(
+	ctx context.Context,
+	remotePath,
+	localPath string,
+) (string, error) {
 	reader, status, err := c.app.GetBody(ctx, remotePath, nil)
 	if err != nil {
 		return "", fmt.Errorf("getting http response body: %w", err)
@@ -325,8 +328,10 @@ func (c *genericInstance) saveBackupFile(ctx context.Context,
 	return file.Name(), nil
 }
 
-func (c *genericInstance) checkCorruptSQLite(ctx context.Context,
-	filePath string) (*BackupInfo, error) {
+func (c *genericInstance) checkCorruptSQLite(
+	ctx context.Context,
+	filePath string,
+) (*BackupInfo, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("checking db file: %w", err)
@@ -350,8 +355,11 @@ func (c *genericInstance) checkCorruptSQLite(ctx context.Context,
 	return backup, nil
 }
 
-func (c *genericInstance) getSQLLiteRowString(ctx context.Context,
-	conn *sql.DB, sql string) (string, int) {
+func (c *genericInstance) getSQLLiteRowString(
+	ctx context.Context,
+	conn *sql.DB,
+	sql string,
+) (string, int) {
 	text := "<no data returned>"
 	count := 0
 
@@ -376,8 +384,11 @@ func (c *genericInstance) getSQLLiteRowString(ctx context.Context,
 	return text, count
 }
 
-func (c *genericInstance) getSQLLiteRowInt64(ctx context.Context,
-	conn *sql.DB, sql string) int64 {
+func (c *genericInstance) getSQLLiteRowInt64(
+	ctx context.Context,
+	conn *sql.DB,
+	sql string,
+) int64 {
 	rows, err := conn.QueryContext(ctx, sql)
 	if err != nil {
 		return 0

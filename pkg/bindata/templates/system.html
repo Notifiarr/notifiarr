@@ -28,10 +28,16 @@
                                                 <td>{{.ClientInfo.IsSub}}</td>
                                                 <td style="display:none;"></td>
                                             </tr>
-                                            {{if or .ClientInfo.IsPatron .ClientInfo.IsSub}}
+                                            {{if or .ClientInfo.IsSub}}
                                             <tr>
                                                 <td>Absolute Bad Ass</td>
-                                                <td>you know it</td>
+                                                <td>Yes, yes you are! 💚</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
+                                            {{else if or .ClientInfo.IsPatron}}
+                                            <tr>
+                                                <td>Amazing Soul</td>
+                                                <td>You're so gifted, and we love you! 💛</td>
                                                 <td style="display:none;"></td>
                                             </tr>
                                             {{end}}
@@ -89,6 +95,11 @@
                                                  <td>{{.Version.buildDate}}</td>
                                                  <td style="display:none;"></td>
                                              </tr>
+                                             <tr>
+                                                <td>Go Version</td>
+                                                <td>{{.Version.goVersion}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
                                              <tr class="text-center">
                                                  <td style="display:none;"></td>
                                                  <td style="display:none;"></td>

@@ -189,8 +189,12 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 /*******************************************************/
 
 // readyCommand gets a command ready for output capture.
-func readyCommand(ctx context.Context, useSudo bool, run string, args ...string) (
-	*exec.Cmd, *bufio.Scanner, *sync.WaitGroup, error) {
+func readyCommand(
+	ctx context.Context,
+	useSudo bool,
+	run string,
+	args ...string,
+) (*exec.Cmd, *bufio.Scanner, *sync.WaitGroup, error) {
 	cmdPath, err := exec.LookPath(run)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("%s missing! %w", run, err)

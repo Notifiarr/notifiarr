@@ -45,7 +45,7 @@ function testInstance(from, instanceType, index)
         },
         error: function (response, status, error) {
             from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
-            if (status === undefined) {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
@@ -173,4 +173,116 @@ function addInstance(section, app)
 
     // Bring up the save changes button.
     findPendingChanges();
+}
+
+function addWatchFiles()
+{
+    const index = $('.files-WatchFiles').length;
+    const instance = index+1;
+    const names = $('#files-WatchFiles-addbutton').data('names'); // list of thinges like "Name" and "URL"
+    // This just sets the first few lines of the row (the action buttons). The more-dynamic bits get added below, in a for loop.
+    let row = '<tr class="newRow bk-success files-WatchFiles" id="files-WatchFiles-'+ instance +'">'+
+    '<td style="white-space:nowrap;">'+
+        '<div class="btn-group" role="group" style="display:flex;">'+
+            '<button onclick="removeInstance(\'files-WatchFiles\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-trash-alt"></i></button>'+
+            '<button id="filesIndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
+        '</div>'+
+    '</td>';
+
+    // Timeout and Interval must have valid go durations, or the parser errors.
+    // Host or URL are set with a value, and without an original value to make the save button appear.
+    for (const name of names) {
+        let nameval = ""
+        if (name == "Path") {
+            // On windows the sample path is c:\something.
+            nameval = $('#files-WatchFiles-addbutton').data('samplepath');
+        }
+
+        row += '<td><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
+
+        switch (name) {
+             case "Poll":
+             case "Pipe":
+             case "MustExist":
+             case "LogMatch":
+                row += '<select id="WatchFiles.'+ index +'.'+ name +'" name="WatchFiles.'+ index +'.'+ name +'" data-index="'+ index +'" data-app="WatchFiles" '+
+                    'class="client-parameter form-control input-sm" data-group="files" data-label="Files '+ instance +' '+ name +'" data-original="false" value="false">'+
+                    '<option value="true">Enabled</option>'+
+                    '<option selected value="false">Disabled</option></select>';
+                break;
+             default:
+                row += '<input type="text" name="WatchFiles.'+ index +'.'+ name +'" '+
+                    'id="WatchFiles.'+ index +'.'+ name +'" '+
+                    'name="WatchFiles.'+ index +'.'+ name +'" '+
+                    'data-app="WatchFiles" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="files" data-label="Files '+
+                    instance +' '+name+'" data-original="" value="'+ nameval +'">';
+                break;
+        }
+
+        row += '</div></div></form></td>';
+    }
+
+    // Add this new data row to our table.
+    $('#files-WatchFiles-container').append(row);
+
+    // Hide the "no instances" item that displays when no instances are configured.
+    $('#files-WatchFiles-none').hide();
+
+    // Bring up the save changes button.
+    findPendingChanges();
+}
+
+function stopFileWatch(from, index)
+{
+    from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
+
+    $.ajax({
+        type: 'GET',
+        url: URLBase+'stopFileWatch/'+index,
+        success: function (data){
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
+            from.hide();
+            from.siblings('.checkInstanceBtn').show();
+            $('#activeFileCell'+index).toggleClass('bk-brand bk-danger');
+            toast('Watcher Stopped!', data, 'success');
+        },
+        error: function (response, status, error) {
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
+
+            if (response.responseText === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Watcher Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
+}
+
+function startFileWatch(from, index)
+{
+    from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-play-circle');
+
+    $.ajax({
+        type: 'GET',
+        url: URLBase+'startFileWatch/'+index,
+        success: function (data){
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-play-circle');
+            from.hide();
+            $('#activeFileCell'+index).toggleClass('bk-brand bk-danger');
+            from.siblings('.checkInstanceBtn').show();
+
+            toast('Watcher Started!', data, 'success');
+        },
+        error: function (response, status, error) {
+            from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-play-circle');
+
+            if (response.responseText === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Watcher Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
 }

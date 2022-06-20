@@ -90,8 +90,13 @@ func (a *starrAPI) GetInto(ctx context.Context, path string, params url.Values, 
 	return rcvd, err
 }
 
-func (a *starrAPI) PostInto(ctx context.Context, path string, params url.Values,
-	postBody io.Reader, output interface{}) (int64, error) {
+func (a *starrAPI) PostInto(
+	ctx context.Context,
+	path string,
+	params url.Values,
+	postBody io.Reader,
+	output interface{},
+) (int64, error) {
 	sent := datacounter.NewReaderCounter(postBody)
 
 	rcvd, err := a.api.PostInto(ctx, path, params, sent, output)
@@ -106,8 +111,13 @@ func (a *starrAPI) PostInto(ctx context.Context, path string, params url.Values,
 	return rcvd, err
 }
 
-func (a *starrAPI) PutInto(ctx context.Context, path string, params url.Values,
-	putBody io.Reader, output interface{}) (int64, error) {
+func (a *starrAPI) PutInto(
+	ctx context.Context,
+	path string,
+	params url.Values,
+	putBody io.Reader,
+	output interface{},
+) (int64, error) {
 	sent := datacounter.NewReaderCounter(putBody)
 
 	rcvd, err := a.api.PutInto(ctx, path, params, sent, output)
@@ -153,8 +163,12 @@ func (a *starrAPI) GetBody(ctx context.Context, path string, params url.Values) 
 	}, code, nil
 }
 
-func (a *starrAPI) PostBody(ctx context.Context, path string, params url.Values,
-	postBody io.Reader) (io.ReadCloser, int, error) {
+func (a *starrAPI) PostBody(
+	ctx context.Context,
+	path string,
+	params url.Values,
+	postBody io.Reader,
+) (io.ReadCloser, int, error) {
 	exp.Apps.Add(a.app+"&&POST Requests", 1)
 
 	sent := datacounter.NewReaderCounter(postBody)
@@ -176,8 +190,12 @@ func (a *starrAPI) PostBody(ctx context.Context, path string, params url.Values,
 	}, code, nil
 }
 
-func (a *starrAPI) PutBody(ctx context.Context, path string, params url.Values,
-	putBody io.Reader) (io.ReadCloser, int, error) {
+func (a *starrAPI) PutBody(
+	ctx context.Context,
+	path string,
+	params url.Values,
+	putBody io.Reader,
+) (io.ReadCloser, int, error) {
 	exp.Apps.Add(a.app+"&&PUT Requests", 1)
 
 	sent := datacounter.NewReaderCounter(putBody)

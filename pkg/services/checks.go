@@ -27,6 +27,9 @@ type triggerCheck struct {
 }
 
 func (s *Service) Validate() error { //nolint:cyclop
+	s.svc.Lock()
+	defer s.svc.Unlock()
+
 	s.svc.State = StateUnknown
 
 	if s.Name == "" {
@@ -107,6 +110,9 @@ func (s *Service) update(res *result) bool {
 	exp.ServiceChecks.Add(s.Name+"&&Total", 1)
 	exp.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
 	//	exp.ServiceChecks.Add("Total Checks Run", 1)
+
+	s.svc.Lock()
+	defer s.svc.Unlock()
 
 	if s.svc.LastCheck = time.Now().Round(time.Microsecond); s.svc.Since.IsZero() {
 		s.svc.Since = s.svc.LastCheck

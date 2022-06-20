@@ -54,9 +54,9 @@ func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
 	}
 
 	if resp, err := c.sendPlexMeta(event, hook, wait); err != nil {
-		c.Errorf("[%s requested] Sending Plex Sessions%s to Notifiarr: %v", event, msg, err)
+		c.Errorf("[%s requested] Sending Plex Sessions%s to Notifiarr: %v%v", event, msg, err, resp)
 	} else {
-		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar. %s", event, msg, resp)
+		c.Printf("[%s requested] Plex Sessions%s sent to Notifiar.%v", event, msg, resp)
 	}
 }
 
@@ -64,6 +64,9 @@ func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
 // Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
 // Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
 func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
+	c.Trigger.psMutex.RLock()
+	defer c.Trigger.psMutex.RUnlock()
+
 	if c.Trigger.sess == nil {
 		return nil, ErrNoChannel
 	}
@@ -90,9 +93,6 @@ func (c *Config) runSessionHolder() { //nolint:cyclop
 		}
 	}
 
-	c.Trigger.sessr = make(chan *holder)
-	defer close(c.Trigger.sessr)
-
 	for waitUntil := range c.Trigger.sess {
 		if sessions != nil && err == nil && sessions.Updated.After(waitUntil) {
 			c.Trigger.sessr <- &holder{sessions: sessions}
@@ -117,6 +117,8 @@ func (c *Config) runSessionHolder() { //nolint:cyclop
 
 		c.Trigger.sessr <- &holder{sessions: sessions, error: err}
 	}
+
+	close(c.Trigger.sessr) // indicate we're done.
 }
 
 // plexSessionTracker checks for state changes between the previous session pull

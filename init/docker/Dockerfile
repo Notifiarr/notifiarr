@@ -12,15 +12,28 @@ FROM golang:1-buster as builder
 ARG TARGETOS
 ARG BINARY
 ARG TARGETARCH
-
+ARG BUILD_FLAGS
 RUN mkdir -p $GOPATH/pkg/mod $GOPATH/bin $GOPATH/src /${BINARY}
 COPY . /${BINARY}
 WORKDIR /${BINARY}
 
-RUN CGO_ENABLED=0 make clean ${BINARY}.${TARGETARCH}.${TARGETOS} && \
+# For megacli. All the *'s are to deal with multiarch. :(
+RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 && \
     curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
-    ln -sf /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.5
+    mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
+    /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
+    /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
+    /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
+    /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 \
+    /lib/*-linux-gnu*/libtinfo.so.5 /tmp$(ls -d /lib/*-linux-gnu*) && \
+    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
+    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
+    ln -s /usr/lib /tmp/lib_link/lib64 && \
+    ln -s /usr/lib /tmp/lib_link/lib
+
+# Build the app.
+RUN CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 FROM scratch
 ARG TARGETOS
@@ -52,6 +65,11 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
 
 COPY --from=builder /${BINARY}/${BINARY}.${TARGETARCH}.${TARGETOS} /image
 
+# For megacli.
+COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
+COPY --from=builder /tmp/lib /usr/lib
+COPY --from=builder /tmp/lib_link/ /
+
 # Make sure we have an ssl cert chain and timezone data.
 COPY --from=builder /etc/ssl /etc/ssl
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
@@ -62,14 +80,6 @@ ENV TZ=UTC
 ENV PATH=/
 ENV USER=root
 ENV NOTIFIARR_IN_DOCKER=true
-EXPOSE 5454
-COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
-# All of this is for megacli, and probably doesn't work on i386.
-COPY --from=builder /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 /lib64/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25 \
-  /lib/x86_64-linux-gnu/ld-2.28.so /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread-2.28.so \
-  /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm-2.28.so /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libdl.so.2 \
-  /lib/x86_64-linux-gnu/libdl-2.28.so /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc-2.28.so /lib/x86_64-linux-gnu/libncurses.so.5 \
-  /lib/x86_64-linux-gnu/libncurses.so.6 /lib/x86_64-linux-gnu/libncurses.so.6.1 /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/
 
+EXPOSE 5454
 ENTRYPOINT [ "/image" ]

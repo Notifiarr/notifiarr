@@ -126,10 +126,18 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		fallthrough
 	case strings.EqualFold(v.Event, "media.rate"):
 		fallthrough
+	case strings.EqualFold(v.Event, "library.new"):
+		fallthrough
 	case strings.EqualFold(v.Event, "admin.database.corrupt"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		c.sendPlexWebhook(&v)
+		c.QueueData(&SendRequest{
+			Route:      PlexRoute,
+			Event:      EventHook,
+			LogPayload: true,
+			LogMsg:     fmt.Sprintf("Plex Webhhok: %s '%s' ~> %s", v.Account.Title, v.Event, v.Metadata.Title),
+			Payload:    &Payload{Load: &v, Plex: &plex.Sessions{Name: c.Plex.Name}},
+		})
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "process", http.StatusAccepted)
 	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(c.Plex.Cooldown.Duration):
@@ -149,15 +157,4 @@ func (c *Config) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		c.Printf("Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' ~> %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 	}
-}
-
-// sendPlexWebhook simply relays an incoming "admin" plex webhook to Notifiarr.com.
-func (c *Config) sendPlexWebhook(hook *plexIncomingWebhook) {
-	resp, err := c.SendData(PlexRoute.Path(EventHook), &Payload{Load: hook, Plex: &plex.Sessions{Name: c.Plex.Name}}, true)
-	if err != nil {
-		c.Errorf("Sending Plex Webhook to Notifiarr: %v", err)
-		return
-	}
-
-	c.Printf("Plex ~> Notifiarr: %s '%s' ~> %s. %s", hook.Account.Title, hook.Event, hook.Metadata.Title, resp)
 }

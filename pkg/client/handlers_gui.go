@@ -12,6 +12,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -56,7 +57,10 @@ func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 func (c *Client) getUserName(request *http.Request) (string, bool) {
 	if userName := request.Context().Value(userNameStr); userName != nil {
 		u, _ := userName.([]interface{})
-		return u[0].(string), u[1].(bool)
+		username, _ := u[0].(string)
+		found, _ := u[1].(bool)
+
+		return username, found
 	}
 
 	if userName := request.Header.Get("x-webauth-user"); userName != "" {
@@ -381,6 +385,79 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 	}
 }
 
+func (c *Client) handleStartFileWatcher(response http.ResponseWriter, request *http.Request) {
+	idx, err := strconv.Atoi(mux.Vars(request)["index"])
+	if err != nil {
+		http.Error(response, "invalid index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	if idx < 0 || idx >= len(c.website.WatchFiles) {
+		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	watch := c.website.WatchFiles[idx]
+	if watch.Active() {
+		http.Error(response, "Watcher already running! "+watch.Path, http.StatusNotAcceptable)
+		return
+	}
+
+	if err := c.website.AddFileWatcher(watch); err != nil {
+		http.Error(response, "Start Failed: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Error(response, "Started: "+watch.Path, http.StatusOK)
+}
+
+func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *http.Request) {
+	idx, err := strconv.Atoi(mux.Vars(request)["index"])
+	if err != nil {
+		http.Error(response, "invalid index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	if idx < 0 || idx >= len(c.website.WatchFiles) {
+		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
+		return
+	}
+
+	watch := c.website.WatchFiles[idx]
+	if !watch.Active() {
+		http.Error(response, "Watcher already stopped! "+watch.Path, http.StatusNotAcceptable)
+		return
+	}
+
+	if err := watch.Stop(); err != nil {
+		http.Error(response, "Stop Failed: "+err.Error(), http.StatusInternalServerError)
+
+		user, _ := c.getUserName(request)
+		c.Errorf("[gui '%s' requested] Stopping File Watcher: %v", user, err)
+
+		return
+	}
+
+	http.Error(response, "Stopped: "+watch.Path, http.StatusOK)
+}
+
+// handleRegexTest tests a regular expression.
+func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Request) {
+	regex := request.PostFormValue("regexTestRegex")
+	line := request.PostFormValue("regexTestLine")
+
+	switch reg, err := regexp.Compile(regex); {
+	case err != nil:
+		http.Error(response, "Regex Parse Failed: "+err.Error(), http.StatusNotAcceptable)
+	case regex == "":
+		http.Error(response, "Regular Expression is blank!", http.StatusBadRequest)
+	case reg.MatchString(line):
+		http.Error(response, "Regular Expression matches! Found: "+reg.FindString(line), http.StatusOK)
+	default:
+		http.Error(response, "Regular Expression does not match!", http.StatusBadRequest)
+	}
+}
+
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
 	user, _ := c.getUserName(request)
 	// copy running config,
@@ -429,8 +506,7 @@ func (c *Client) saveNewConfig(config *configfile.Config) error {
 	// make config file backup.
 	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
 	if err := configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
-		notexist := os.ErrNotExist
-		if !errors.As(err, &notexist) {
+		if !errors.Is(err, os.ErrNotExist) {
 			return fmt.Errorf("backing up config file: %w", err)
 		}
 	}
@@ -476,6 +552,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		config.Apps.SabNZB = nil
 	}
 
+	config.WatchFiles = nil
 	config.Service = nil
 	config.Snapshot.Plugins.MySQL = nil
 

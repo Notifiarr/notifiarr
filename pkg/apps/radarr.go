@@ -56,8 +56,8 @@ func (a *Apps) setupRadarr(timeout time.Duration) error {
 			return fmt.Errorf("%w: missing url: Radarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Radarr[idx].Debugf = a.DebugLog.Printf
-		a.Radarr[idx].errorf = a.ErrorLog.Printf
+		a.Radarr[idx].Debugf = a.Debugf
+		a.Radarr[idx].errorf = a.Errorf
 		a.Radarr[idx].setup(timeout)
 	}
 
@@ -398,14 +398,14 @@ func radarrDelExclusions(req *http.Request) (int, interface{}) {
 }
 
 func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
-	var cf radarr.CustomFormat
+	var cusform radarr.CustomFormat
 
-	err := json.NewDecoder(req.Body).Decode(&cf)
+	err := json.NewDecoder(req.Body).Decode(&cusform)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	resp, err := getRadarr(req).AddCustomFormatContext(req.Context(), &cf)
+	resp, err := getRadarr(req).AddCustomFormatContext(req.Context(), &cusform)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding custom format: %w", err)
 	}
@@ -414,23 +414,23 @@ func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
 }
 
 func radarrGetCustomFormats(req *http.Request) (int, interface{}) {
-	cf, err := getRadarr(req).GetCustomFormatsContext(req.Context())
+	cusform, err := getRadarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
 	}
 
-	return http.StatusOK, cf
+	return http.StatusOK, cusform
 }
 
 func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
-	var cf radarr.CustomFormat
-	if err := json.NewDecoder(req.Body).Decode(&cf); err != nil {
+	var cusform radarr.CustomFormat
+	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
 	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
 
-	output, err := getRadarr(req).UpdateCustomFormatContext(req.Context(), &cf, cfID)
+	output, err := getRadarr(req).UpdateCustomFormatContext(req.Context(), &cusform, cfID)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
 	}
@@ -439,23 +439,23 @@ func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 }
 
 func radarrGetImportLists(req *http.Request) (int, interface{}) {
-	il, err := getRadarr(req).GetImportListsContext(req.Context())
+	ilist, err := getRadarr(req).GetImportListsContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting import lists: %w", err)
 	}
 
-	return http.StatusOK, il
+	return http.StatusOK, ilist
 }
 
 func radarrUpdateImportList(req *http.Request) (int, interface{}) {
-	var il radarr.ImportList
-	if err := json.NewDecoder(req.Body).Decode(&il); err != nil {
+	var ilist radarr.ImportList
+	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	il.ID, _ = strconv.ParseInt(mux.Vars(req)["ilid"], mnd.Base10, mnd.Bits64)
+	ilist.ID, _ = strconv.ParseInt(mux.Vars(req)["ilid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getRadarr(req).UpdateImportListContext(req.Context(), &il)
+	output, err := getRadarr(req).UpdateImportListContext(req.Context(), &ilist)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating import list: %w", err)
 	}
@@ -464,12 +464,12 @@ func radarrUpdateImportList(req *http.Request) (int, interface{}) {
 }
 
 func radarrAddImportList(req *http.Request) (int, interface{}) {
-	var il radarr.ImportList
-	if err := json.NewDecoder(req.Body).Decode(&il); err != nil {
+	var ilist radarr.ImportList
+	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	output, err := getRadarr(req).CreateImportListContext(req.Context(), &il)
+	output, err := getRadarr(req).CreateImportListContext(req.Context(), &ilist)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("creating import list: %w", err)
 	}

@@ -56,8 +56,8 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 			return fmt.Errorf("%w: missing url: Sonarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Sonarr[idx].Debugf = a.DebugLog.Printf
-		a.Sonarr[idx].errorf = a.ErrorLog.Printf
+		a.Sonarr[idx].Debugf = a.Debugf
+		a.Sonarr[idx].errorf = a.Errorf
 		a.Sonarr[idx].setup(timeout)
 	}
 

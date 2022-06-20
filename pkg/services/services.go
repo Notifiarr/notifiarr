@@ -150,8 +150,12 @@ func (c *Config) loadServiceStates() {
 	}
 }
 
-func (c *Config) runServiceChecker() {
-	defer c.CapturePanic()
+func (c *Config) runServiceChecker() { //nolint:cyclop
+	defer func() {
+		defer c.CapturePanic()
+		c.Printf("==> Service Checker Stopped!")
+		c.stopChan <- struct{}{} // signal we're finished.
+	}()
 
 	ticker := &time.Ticker{C: make(<-chan time.Time)}
 	second := &time.Ticker{C: make(<-chan time.Time)}
@@ -175,9 +179,6 @@ func (c *Config) runServiceChecker() {
 				<-c.done
 			}
 
-			c.stopChan <- struct{}{}
-			c.Printf("==> Service Checker Stopped!")
-
 			return
 		case <-ticker.C:
 			c.SendResults(&Results{What: notifiarr.EventCron, Svcs: c.GetResults()})
@@ -191,10 +192,16 @@ func (c *Config) runServiceChecker() {
 
 			if event != "log" {
 				c.SendResults(&Results{What: event, Svcs: c.GetResults()})
-			} else {
-				data, _ := json.MarshalIndent(&Results{Svcs: c.GetResults(), Interval: c.Interval.Seconds()}, "", " ")
-				c.Debug("Service Checks Payload (log only):", string(data))
+				continue
 			}
+
+			data, err := json.MarshalIndent(&Results{Svcs: c.GetResults(), Interval: c.Interval.Seconds()}, "", " ")
+			if err != nil {
+				c.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
+				continue
+			}
+
+			c.Debug("Service Checks Payload (log only):", string(data))
 		case <-second.C:
 			c.runChecks(false)
 		}
@@ -217,16 +224,17 @@ func (c *Config) Stop() {
 		return
 	}
 
-	defer close(c.triggerChan)
-	defer close(c.checkChan)
 	defer close(c.stopChan)
-	defer close(c.checks)
-	defer close(c.done)
+	c.stopChan <- struct{}{}
+	<-c.stopChan // wait for all go routines to die off.
+
+	close(c.triggerChan)
+	close(c.checkChan)
+	close(c.checks)
+	close(c.done)
 
 	c.triggerChan = nil
 	c.checkChan = nil
-	c.stopChan <- struct{}{}
-	<-c.stopChan
 	c.checks = nil
 	c.done = nil
 	c.stopChan = nil

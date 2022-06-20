@@ -1,5 +1,7 @@
 package notifiarr
 
+import "fmt"
+
 func (c *Config) logSnapshotStartup() {
 	var ex string
 
@@ -53,10 +55,11 @@ func (c *Config) sendSnapshot(event EventType) {
 		}
 	}
 
-	resp, err := c.SendData(SnapRoute.Path(event), &Payload{Snap: snapshot}, true)
-	if err != nil {
-		c.Errorf("[%s requested] Sending snapshot to Notifiarr: %v", event, err)
-	} else {
-		c.Printf("[%s requested] System Snapshot sent to Notifiarr, cron interval: %s. %s", event, c.Snap.Interval, resp)
-	}
+	c.QueueData(&SendRequest{
+		Route:      SnapRoute,
+		Event:      event,
+		LogPayload: true,
+		LogMsg:     fmt.Sprintf("System Snapshot (interval: %v)", c.Snap.Interval),
+		Payload:    &Payload{Snap: snapshot},
+	})
 }

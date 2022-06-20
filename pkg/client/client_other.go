@@ -55,9 +55,9 @@ func (c *Client) handleAptHook() error {
 	resp, err := c.website.SendData(notifiarr.PkgRoute.Path("apt"), output, true)
 	//nolint:forbidigo
 	if err != nil {
-		fmt.Printf("ERROR Sending Notification to Notifiarr.com: %v %s\n", err, resp)
+		fmt.Printf("ERROR Sending Notification to Notifiarr.com: %v%s\n", err, resp)
 	} else {
-		fmt.Printf("Sent notification to Notifiarr.com; install: %d, remove: %d. %s\n",
+		fmt.Printf("Sent notification to Notifiarr.com; install: %d, remove: %d%s\n",
 			output.Install, output.Remove, resp)
 	}
 

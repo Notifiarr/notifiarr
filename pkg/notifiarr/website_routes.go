@@ -26,6 +26,7 @@ const (
 	EventEpisode EventType = "episode"
 	EventPoll    EventType = "poll"
 	EventSignal  EventType = "signal"
+	EventFile    EventType = "file"
 )
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
@@ -33,6 +34,16 @@ type Payload struct {
 	Plex *plex.Sessions       `json:"plex,omitempty"`
 	Snap *snapshot.Snapshot   `json:"snapshot,omitempty"`
 	Load *plexIncomingWebhook `json:"payload,omitempty"`
+}
+
+// SendRequest is used when sending data through a channel.
+type SendRequest struct {
+	Route      Route
+	Event      EventType
+	Params     []string    // optional.
+	Payload    interface{} // data to send.
+	LogMsg     string      // if empty, nothing is logged.
+	LogPayload bool        // debug log the sent payload
 }
 
 // Route is used to give us methods on our route paths.
@@ -99,6 +110,7 @@ const (
 	BackupRoute  Route = notifiRoute + "/backup"
 	TestRoute    Route = notifiRoute + "/test"
 	PkgRoute     Route = notifiRoute + "/packageManager"
+	LogLineRoute Route = notifiRoute + "/logWatcher"
 )
 
 // Path adds parameters to a route path and turns it into a string.
@@ -178,6 +190,6 @@ func (r *Response) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf("Website took %s and replied with: %s, %s %s",
+	return fmt.Sprintf(" => Website took %s and replied with: %s, %s %s",
 		r.Details.Elapsed, r.Result, r.Details.Response, r.Details.Help)
 }

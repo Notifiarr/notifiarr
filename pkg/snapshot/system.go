@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/user"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/shirou/gopsutil/v3/cpu"
@@ -67,7 +68,7 @@ func (s *Snapshot) getMemoryUsageShared(ctx context.Context) error {
 func (s *Snapshot) GetLocalData(ctx context.Context) (errs []error) {
 	u, err := user.Current()
 	if err != nil {
-		errs = append(errs, fmt.Errorf("getting username: %w", err))
+		s.System.Username = "uid:" + strconv.Itoa(os.Getuid())
 	} else {
 		s.System.Username = u.Username
 	}

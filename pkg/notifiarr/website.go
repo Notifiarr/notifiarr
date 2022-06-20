@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -23,7 +22,7 @@ import (
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
 	Retries int
-	*log.Logger
+	Logger
 	*http.Client
 }
 
@@ -155,12 +154,8 @@ func (c *Config) GetData(url string) (*Response, error) {
 
 // SendData sends raw data to a notifiarr URL as JSON.
 func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response, error) {
-	var (
-		post []byte
-		err  error
-	)
-
-	if data, err := json.Marshal(payload); err == nil {
+	data, err := json.Marshal(payload)
+	if err == nil {
 		var torn map[string]interface{}
 		if err := json.Unmarshal(data, &torn); err == nil {
 			if torn["host"], err = c.GetHostInfoUID(); err != nil {
@@ -170,6 +165,8 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 			payload = torn
 		}
 	}
+
+	var post []byte
 
 	if log {
 		post, err = json.MarshalIndent(payload, "", " ")
@@ -194,32 +191,33 @@ func (c *Config) SendData(uri string, payload interface{}, log bool) (*Response,
 
 // unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
 func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, error) {
-	defer body.Close()
+	var (
+		buf     bytes.Buffer
+		resp    Response
+		counter = datacounter.NewReaderCounter(body)
+	)
 
-	var r Response
-
-	counter := datacounter.NewReaderCounter(body)
 	defer func() {
+		body.Close()
 		exp.NotifiarrCom.Add("POST Bytes Received", int64(counter.Count()))
 	}()
 
-	err := json.NewDecoder(counter).Decode(&r)
-
+	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
 	if code < http.StatusOK || code > http.StatusIMUsed {
 		if err != nil {
-			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v)",
-				ErrNon200, url, code, http.StatusText(code), err)
+			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v), body: %s",
+				ErrNon200, url, code, http.StatusText(code), err, buf.String())
 		}
 
 		return nil, fmt.Errorf("%w: %s: %d %s, %s: %s",
-			ErrNon200, url, code, http.StatusText(code), r.Result, r.Details.Response)
+			ErrNon200, url, code, http.StatusText(code), resp.Result, resp.Details.Response)
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("converting json response: %w", err)
+		return nil, fmt.Errorf("converting json response: %w, body: %s", err, buf.String())
 	}
 
-	return &r, nil
+	return &resp, nil
 }
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
@@ -240,7 +238,7 @@ func (c *Config) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 
-	if !c.LogConfig.Debug { // no debug, just return the body.
+	if !c.Logger.DebugEnabled() { // no debug, just return the body.
 		return resp.StatusCode, resp.Body, nil
 	}
 
@@ -271,7 +269,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
-				h.Printf("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
+				h.Errorf("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError {
@@ -303,7 +301,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		case retry == h.Retries:
 			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			h.Printf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
+			h.Errorf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
@@ -477,4 +475,46 @@ func readBodyForLog(body io.Reader, max int64) string {
 	bodyBytes, _ := ioutil.ReadAll(body)
 
 	return string(bodyBytes)
+}
+
+func (c *Config) watchSendDataChan() {
+	var start time.Time
+
+	for data := range c.extras.sendData {
+		var uri string
+
+		if len(data.Params) > 0 {
+			uri = data.Route.Path(data.Event, data.Params...)
+		} else {
+			uri = data.Route.Path(data.Event)
+		}
+
+		start = time.Now()
+
+		resp, err := c.SendData(uri, data.Payload, data.LogPayload)
+
+		if data.LogMsg == "" {
+			continue
+		}
+
+		if err != nil {
+			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %v%v",
+				data.Event, time.Since(start).Round(time.Millisecond), err, resp.String())
+		} else {
+			c.Printf("[%s requested] Sent (%v): "+data.LogMsg+"%v",
+				data.Event, time.Since(start).Round(time.Millisecond), resp)
+		}
+	}
+
+	close(c.extras.stopSendData)
+}
+
+// QueueData puts a send-data request to notifiarr.com into a channel queue.
+func (c *Config) QueueData(data *SendRequest) {
+	c.extras.sdMutex.RLock()
+	defer c.extras.sdMutex.RUnlock()
+
+	if c.extras.sendData != nil {
+		c.extras.sendData <- data
+	}
 }

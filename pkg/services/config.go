@@ -107,10 +107,11 @@ type Service struct {
 }
 
 type service struct {
-	Output    string     `json:"output"`
-	State     CheckState `json:"state"`
-	Since     time.Time  `json:"since"`
-	LastCheck time.Time  `json:"lastCheck"`
-	log       *logs.Logger
-	proc      *procExpect // only used for process checks.
+	Output       string     `json:"output"`
+	State        CheckState `json:"state"`
+	Since        time.Time  `json:"since"`
+	LastCheck    time.Time  `json:"lastCheck"`
+	log          *logs.Logger
+	proc         *procExpect // only used for process checks.
+	sync.RWMutex `json:"-"`
 }

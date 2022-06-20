@@ -88,12 +88,16 @@ func (c *ClientInfo) IsPatron() bool {
 	return c != nil && c.User.Patron
 }
 
+func (c *Config) HaveClientInfo() bool {
+	c.extras.ciMutex.RLock()
+	defer c.extras.ciMutex.RUnlock()
+
+	return c.extras.clientInfo != nil
+}
+
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
 func (c *Config) GetClientInfo() (*ClientInfo, error) {
-	c.extras.ciMutex.Lock()
-	defer c.extras.ciMutex.Unlock()
-
-	if c.extras.clientInfo != nil {
+	if c.HaveClientInfo() {
 		return c.extras.clientInfo, nil
 	}
 
@@ -107,6 +111,8 @@ func (c *Config) GetClientInfo() (*ClientInfo, error) {
 		return &clientInfo, fmt.Errorf("parsing response: %w, %s", err, string(body.Details.Response))
 	}
 
+	c.extras.ciMutex.Lock()
+	defer c.extras.ciMutex.Unlock()
 	// Only set this if there was no error.
 	c.extras.clientInfo = &clientInfo
 
@@ -186,7 +192,7 @@ func (c *Config) HostInfoNoError() *host.InfoStat {
 }
 
 // GetHostInfoUID attempts to make a unique machine identifier...
-func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
+func (c *Config) GetHostInfoUID() (*host.InfoStat, error) { //nolint:cyclop
 	if c.extras.hostInfo != nil {
 		return c.HostInfoNoError(), nil
 	}
@@ -212,8 +218,11 @@ func (c *Config) GetHostInfoUID() (*host.InfoStat, error) {
 	}
 
 	// TrueNAS adds junk to the hostname.
+	//nolint:gomnd
 	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > 17 {
-		hostInfo.Hostname = hostInfo.Hostname[:len(hostInfo.Hostname)-17]
+		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > 2 {
+			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-2], "-")
+		}
 	}
 
 	c.extras.hostInfo = hostInfo

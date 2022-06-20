@@ -67,8 +67,8 @@ func (t *timerConfig) Run(event EventType) {
 // run responds to the channel that the timer fired into.
 func (t *timerConfig) run(event EventType) {
 	payload := struct{ Cron string }{Cron: "thingy"}
-	if _, err := t.c.SendData(t.URI, payload, true); err != nil {
-		t.c.Errorf("[%s requested] Custom Timer Request for %s failed: %v", event, t.URI, err)
+	if resp, err := t.c.SendData(t.URI, payload, true); err != nil {
+		t.c.Errorf("[%s requested] Custom Timer Request for %s failed: %v%v", event, t.URI, err, resp)
 	}
 }
 
@@ -122,6 +122,8 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 		index, val, _ := reflect.Select(cases)
 		action := actions[index]
 
+		c.Debugf("Action Start: %v", action.Name)
+
 		var event EventType
 		if _, ok := val.Interface().(time.Time); ok {
 			event = EventCron
@@ -151,6 +153,8 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 		} else {
 			action.SFn(sent)
 		}
+
+		c.Debugf("Action End: %v", action.Name)
 	}
 }
 
@@ -160,10 +164,9 @@ func (c *Config) runTimerLoop(actions []*action, cases []reflect.SelectCase) { /
 func (c *Config) stopTimerLoop(actions []*action) {
 	defer c.CapturePanic()
 	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
-	c.Trigger.stop = nil
 
 	for _, action := range actions {
-		if action.C != nil {
+		if action.C != nil && (action.Fn != nil || action.SFn != nil) {
 			close(action.C)
 			action.C = nil
 		}
@@ -173,6 +176,8 @@ func (c *Config) stopTimerLoop(actions []*action) {
 			action.T = nil
 		}
 	}
+
+	close(c.Trigger.stop.C) // signal that we're done.
 }
 
 /* Helpers. */

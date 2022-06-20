@@ -8,6 +8,7 @@ package notifiarr
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/shirou/gopsutil/v3/host"
@@ -44,37 +44,58 @@ const (
 
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
-	Apps         *apps.Apps       `json:"apps"`      // has API key
-	Plex         *plex.Server     `json:"plex"`      // plex sessions
-	Snap         *snapshot.Config `json:"snapshots"` // system snapshot data
-	Services     *ServiceConfig   `json:"services"`
-	Serial       bool             `json:"serial"`
-	Retries      int              `json:"retries"`
-	BaseURL      string           `json:"-"`
-	Timeout      cnfg.Duration    `json:"timeout"`
-	Trigger      Triggers         `json:"-"`
-	MaxBody      int              `json:"maxBody"`
-	Sighup       chan os.Signal   `json:"-"`
-	*logs.Logger `json:"-"`       // log file writer
+	Apps       *apps.Apps       `json:"apps"`      // has API key
+	Plex       *plex.Server     `json:"plex"`      // plex sessions
+	Snap       *snapshot.Config `json:"snapshots"` // system snapshot data
+	Services   *ServiceConfig   `json:"services"`
+	WatchFiles []*WatchFile     `json:"watchFiles"`
+	Serial     bool             `json:"serial"`
+	Retries    int              `json:"retries"`
+	BaseURL    string           `json:"-"`
+	Timeout    cnfg.Duration    `json:"timeout"`
+	Trigger    Triggers         `json:"-"`
+	MaxBody    int              `json:"maxBody"`
+	Sighup     chan os.Signal   `json:"-"`
+	Logger     `json:"-"`       // log file writer
 	extras
 }
 
 type extras struct {
-	ciMutex    sync.Mutex
-	clientInfo *ClientInfo
-	client     *httpClient
-	radarrCF   map[int]*cfMapIDpayload
-	sonarrRP   map[int]*cfMapIDpayload
-	plexTimer  *Timer
-	hostInfo   *host.InfoStat
+	sdMutex      sync.RWMutex // senddata/queuedata
+	ciMutex      sync.RWMutex // clientinfo
+	awMutex      sync.RWMutex // addwatcher
+	clientInfo   *ClientInfo
+	client       *httpClient
+	radarrCF     map[int]*cfMapIDpayload
+	sonarrRP     map[int]*cfMapIDpayload
+	plexTimer    *Timer
+	hostInfo     *host.InfoStat
+	addWatcher   chan *WatchFile
+	stopWatcher  chan struct{}
+	sendData     chan *SendRequest
+	stopSendData chan struct{}
 }
 
 // Triggers allow trigger actions in the timer routine.
 type Triggers struct {
-	stop  *action        // Triggered by calling Stop()
-	sess  chan time.Time // Return Plex Sessions
-	sessr chan *holder   // Session Return Channel
-	List  []*action      // List of action triggers
+	stop    *action        // Triggered by calling Stop()
+	sess    chan time.Time // Return Plex Sessions
+	sessr   chan *holder   // Session Return Channel
+	List    []*action      // List of action triggers
+	psMutex sync.RWMutex   // Locks plex session thread.
+}
+
+// Logger is an interface for our logs package. We use this to avoid an import cycle.
+type Logger interface {
+	Print(v ...interface{})
+	Printf(msg string, v ...interface{})
+	Error(v ...interface{})
+	Errorf(msg string, v ...interface{})
+	Debug(v ...interface{})
+	Debugf(msg string, v ...interface{})
+	GetInfoLog() *log.Logger
+	DebugEnabled() bool
+	CapturePanic()
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -99,7 +120,7 @@ func (c *Config) Setup(mode string) string {
 	if c.extras.client == nil {
 		c.extras.client = &httpClient{
 			Retries: c.Retries,
-			Logger:  c.ErrorLog,
+			Logger:  c.Logger,
 			Client:  &http.Client{},
 		}
 	}
@@ -116,10 +137,15 @@ func (c *Config) Start() {
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
 	c.extras.plexTimer = &Timer{}
+	c.extras.sendData = make(chan *SendRequest, 2000) //nolint:gomnd
+	c.extras.stopSendData = make(chan struct{})
+
+	go c.watchSendDataChan()
 
 	if c.Plex.Configured() {
 		c.Trigger.sess = make(chan time.Time, 1)
-		go c.runSessionHolder()
+		c.Trigger.sessr = make(chan *holder)
+		go c.runSessionHolder() //nolint:wsl
 	}
 
 	// Order is important here.
@@ -135,6 +161,7 @@ func (c *Config) Start() {
 
 	c.makeCustomClientInfoTimerTriggers()
 	c.runTimers()
+	c.runFileWatcher()
 }
 
 func (c *Config) makeBaseTriggers() {
@@ -255,18 +282,55 @@ func (c *Config) makeCustomClientInfoTimerTriggers() {
 
 // Stop all internal cron timers and Triggers.
 func (c *Config) Stop(event EventType) {
-	// Neither of these if statemens should ever fire. That's a bug somewhere else.
-	if c == nil {
+	// This closes runTimerLoop() and fires stopTimerLoop().
+	c.Trigger.closeTriggers(event)
+	// Stops the file and log watchers.
+	c.closeFileWatchers()
+	// Closes the Plex session holder.
+	c.Trigger.closePlex()
+	// Closes the website senddata channel.
+	c.extras.closeDataSender()
+}
+
+func (e *extras) closeDataSender() {
+	e.sdMutex.Lock()
+	defer e.sdMutex.Unlock()
+
+	if e.sendData != nil {
+		close(e.sendData)
+	}
+
+	<-e.stopSendData // wait for done signal.
+	e.stopSendData = nil
+	e.sendData = nil
+}
+
+func (t *Triggers) closeTriggers(event EventType) {
+	// Neither of these if statements should ever fire. That's a bug somewhere else.
+	if t == nil {
 		panic("Config is nil, cannot stop a nil config!!")
-	} else if c.Trigger.stop == nil {
+	}
+
+	if t.stop == nil {
 		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
-	// This closes runTimerLoop() and fires stopTimerLoop().
-	c.Trigger.stop.C <- event
-	// Closes the Plex session holder.
-	if c.Trigger.sess != nil {
-		defer close(c.Trigger.sess)
-		c.Trigger.sess = nil
+	t.stop.C <- event
+	<-t.stop.C // wait for done signal.
+	t.stop = nil
+}
+
+// closePlex closes the Plex session holder.
+func (t *Triggers) closePlex() {
+	t.psMutex.Lock()
+	defer t.psMutex.Unlock()
+
+	if t.sess == nil {
+		return
 	}
+
+	close(t.sess)
+	<-t.sessr // wait for session holder to return
+	t.sessr = nil
+	t.sess = nil
 }

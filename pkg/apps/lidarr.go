@@ -55,8 +55,8 @@ func (a *Apps) setupLidarr(timeout time.Duration) error {
 			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Lidarr[idx].Debugf = a.DebugLog.Printf
-		a.Lidarr[idx].errorf = a.ErrorLog.Printf
+		a.Lidarr[idx].Debugf = a.Debugf
+		a.Lidarr[idx].errorf = a.Errorf
 		a.Lidarr[idx].setup(timeout)
 	}
 

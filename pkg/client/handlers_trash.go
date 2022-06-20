@@ -50,8 +50,11 @@ func (c *Client) aggregateTrash(req *http.Request) (int, interface{}) {
 	}
 }
 
-func (c *Client) aggregateTrashSonarr(ctx context.Context, wait *sync.WaitGroup,
-	instances notifiarr.IntList) []*notifiarr.SonarrTrashPayload {
+func (c *Client) aggregateTrashSonarr(
+	ctx context.Context,
+	wait *sync.WaitGroup,
+	instances notifiarr.IntList,
+) []*notifiarr.SonarrTrashPayload {
 	output := []*notifiarr.SonarrTrashPayload{}
 
 	// Create our known+requested instances, so we can write slice values in go routines.
@@ -76,8 +79,12 @@ func (c *Client) aggregateTrashSonarr(ctx context.Context, wait *sync.WaitGroup,
 	return output
 }
 
-func (c *Client) aggregateTrashSonarrCall(ctx context.Context,
-	idx, instance int, wait *sync.WaitGroup, output []*notifiarr.SonarrTrashPayload) {
+func (c *Client) aggregateTrashSonarrCall(
+	ctx context.Context,
+	idx, instance int,
+	wait *sync.WaitGroup,
+	output []*notifiarr.SonarrTrashPayload,
+) {
 	defer wait.Done()
 
 	var err error
@@ -94,8 +101,11 @@ func (c *Client) aggregateTrashSonarrCall(ctx context.Context,
 }
 
 // This is basically a duplicate of the above code.
-func (c *Client) aggregateTrashRadarr(ctx context.Context, wait *sync.WaitGroup,
-	instances notifiarr.IntList) []*notifiarr.RadarrTrashPayload {
+func (c *Client) aggregateTrashRadarr(
+	ctx context.Context,
+	wait *sync.WaitGroup,
+	instances notifiarr.IntList,
+) []*notifiarr.RadarrTrashPayload {
 	output := []*notifiarr.RadarrTrashPayload{}
 	// Create our known+requested instances, so we can write slice values in go routines.
 	for i, app := range c.Config.Apps.Radarr {
@@ -119,8 +129,12 @@ func (c *Client) aggregateTrashRadarr(ctx context.Context, wait *sync.WaitGroup,
 	return output
 }
 
-func (c *Client) aggregateTrashRadarrCall(ctx context.Context,
-	idx, instance int, wait *sync.WaitGroup, output []*notifiarr.RadarrTrashPayload) {
+func (c *Client) aggregateTrashRadarrCall(
+	ctx context.Context,
+	idx, instance int,
+	wait *sync.WaitGroup,
+	output []*notifiarr.RadarrTrashPayload,
+) {
 	defer wait.Done()
 
 	var err error

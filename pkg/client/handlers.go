@@ -14,6 +14,8 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/gorilla/mux"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"golift.io/starr"
 )
 
@@ -45,7 +47,10 @@ func (c *Client) httpHandlers() {
 	c.Config.Router.PathPrefix(path.Join(base, "/files/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
 	c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("GET", "POST")
+	c.httpGuiHandlers(base)
+}
 
+func (c *Client) httpGuiHandlers(base string) {
 	// gui is used for authorized paths.
 	gui := c.Config.Router.PathPrefix(base).Subrouter()
 	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
@@ -60,6 +65,7 @@ func (c *Client) httpHandlers() {
 	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET")
 	gui.HandleFunc("/profile", c.handleProfilePost).Methods("POST")
 	gui.HandleFunc("/ps", c.handleProcessList).Methods("GET")
+	gui.HandleFunc("/regexTest", c.handleRegexTest).Methods("POST")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
 	gui.HandleFunc("/reload", c.handleReload).Methods("GET")
 	gui.HandleFunc("/services/check/{service}", c.handleServicesCheck).Methods("GET")
@@ -69,6 +75,8 @@ func (c *Client) httpHandlers() {
 	gui.HandleFunc("/trigger/{action}/{content}", c.handleGUITrigger).Methods("GET")
 	gui.HandleFunc("/trigger/{action}", c.handleGUITrigger).Methods("GET")
 	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
+	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
+	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }
@@ -207,6 +215,8 @@ func (c *Client) runTrigger(source notifiarr.EventType, trigger, content string)
 		c.Debugf("Incoming API Trigger: %s", trigger)
 	}
 
+	title := cases.Title(language.AmericanEnglish)
+
 	switch trigger {
 	case "cfsync":
 		c.website.Trigger.SyncCF(source)
@@ -235,19 +245,19 @@ func (c *Client) runTrigger(source notifiarr.EventType, trigger, content string)
 		c.website.Trigger.SendGaps(source)
 		return http.StatusOK, "Radarr Collections Gaps initiated."
 	case "corrupt":
-		err := c.website.Trigger.Corruption(source, starr.App(strings.Title(content)))
+		err := c.website.Trigger.Corruption(source, starr.App(title.String(content)))
 		if err != nil {
 			return http.StatusBadRequest, "Corruption trigger failed: " + err.Error()
 		}
 
-		return http.StatusOK, strings.Title(content) + " corruption checks initiated."
+		return http.StatusOK, title.String(content) + " corruption checks initiated."
 	case "backup":
-		err := c.website.Trigger.Backup(source, starr.App(strings.Title(content)))
+		err := c.website.Trigger.Backup(source, starr.App(title.String(content)))
 		if err != nil {
 			return http.StatusBadRequest, "Backup trigger failed: " + err.Error()
 		}
 
-		return http.StatusOK, strings.Title(content) + " backups check initiated."
+		return http.StatusOK, title.String(content) + " backups check initiated."
 	case "reload":
 		defer c.triggerConfigReload(notifiarr.EventAPI, "HTTP Triggered Reload")
 		return http.StatusOK, "Application reload initiated."

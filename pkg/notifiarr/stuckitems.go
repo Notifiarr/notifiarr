@@ -1,6 +1,7 @@
 package notifiarr
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -79,18 +80,14 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 		return
 	}
 
-	resp, err := c.SendData(StuckRoute.Path(event), cue, true)
-	elapsed := time.Since(start).Round(time.Millisecond)
-
-	if err != nil {
-		c.Errorf("[%s requested] Sending Stuck Queue Items "+
-			"(apps:%s total:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d): %v",
-			event, apps, elapsed, cue.Lidarr.Len(), cue.Radarr.Len(), cue.Readarr.Len(), cue.Sonarr.Len(), err)
-	} else {
-		c.Printf("[%s requested] Sent Stuck Items to Notifiarr "+
-			"(apps:%s total:%s): Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d. %s",
-			event, apps, elapsed, cue.Lidarr.Len(), cue.Radarr.Len(), cue.Readarr.Len(), cue.Sonarr.Len(), resp)
-	}
+	c.QueueData(&SendRequest{
+		Route:      StuckRoute,
+		Event:      event,
+		LogPayload: true,
+		LogMsg: fmt.Sprintf("Stuck Queue Items (apps:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d)",
+			apps, cue.Lidarr.Len(), cue.Radarr.Len(), cue.Readarr.Len(), cue.Sonarr.Len()),
+		Payload: cue,
+	})
 }
 
 // getQueues fires a routine for each app type and tries to get a lot of data fast!

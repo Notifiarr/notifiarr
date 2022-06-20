@@ -73,8 +73,6 @@ func (c *Client) runWebServer() {
 		err = c.server.ListenAndServe()
 	}
 
-	c.server = nil
-
 	if err != nil && !errors.Is(http.ErrServerClosed, err) {
 		c.Errorf("Web Server Failed: %v (shutting down)", err)
 		c.sigkil <- os.Kill // stop the app.
@@ -85,10 +83,6 @@ func (c *Client) runWebServer() {
 func (c *Client) StopWebServer() error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 	defer cancel()
-
-	if c.server == nil {
-		return ErrNoServer
-	}
 
 	if menu["stat"] != nil {
 		menu["stat"].Uncheck()
@@ -129,7 +123,12 @@ func (r *responseWrapper) Write(b []byte) (int, error) {
 }
 
 func (r *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	conn, buf, err := r.ResponseWriter.(http.Hijacker).Hijack()
+	hijack, ok := r.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, ErrNoServer
+	}
+
+	conn, buf, err := hijack.Hijack()
 	if err != nil {
 		return conn, buf, err //nolint:wrapcheck
 	}

@@ -11,6 +11,8 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -29,8 +31,10 @@ func (c *Client) PrintStartupInfo(clientInfo *notifiarr.ClientInfo) {
 		c.Printf("==> Unique ID: %s (%s)", hi.HostID, hi.Hostname)
 	}
 
+	title := cases.Title(language.AmericanEnglish)
+
 	c.Printf("==> %s <==", mnd.HelpLink)
-	c.Printf("==> %s Startup Settings <==", strings.Title(strings.ToLower(c.Config.Mode)))
+	c.Printf("==> %s Startup Settings <==", title.String(strings.ToLower(c.Config.Mode)))
 	c.printLidarr()
 	c.printProwlarr()
 	c.printRadarr()
@@ -295,7 +299,7 @@ func (c *Client) printTautulli() {
 	case taut == nil, taut.URL == "":
 		c.Printf(" => Tautulli Config (enables name map): 0 servers")
 	case taut.Name != "":
-		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:s%v check_interval:%s name:%s",
+		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%v check_interval:%s name:%s",
 			taut.URL, taut.Timeout, taut.Interval, taut.Name)
 	default:
 		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%s", taut.URL, taut.Timeout)

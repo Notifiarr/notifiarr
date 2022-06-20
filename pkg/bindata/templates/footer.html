@@ -10,11 +10,10 @@
                 <a href="https://golift.io/">Go Lift</a> &nbsp;•&nbsp;
                 <a href="https://golift.io/notifiarr/blob/main/LICENSE">MIT license</a>
                 <span class="mobile-hide">
-                {{- if or .ClientInfo.IsPatron}}
-                    &nbsp;•&nbsp; Patron
-                {{- end}}
-                {{- if or .ClientInfo.IsSub}}
-                    &nbsp;•&nbsp; Subscriber
+                {{- if .ClientInfo.IsSub}}
+                    &nbsp;•&nbsp; Subscriber &nbsp;💚
+                {{- else if .ClientInfo.IsPatron}}
+                    &nbsp;•&nbsp; Patron &nbsp;💛
                 {{- end}}
                 </span>
             </div>

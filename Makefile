@@ -131,7 +131,7 @@ README.html: md2roff
 
 rsrc: rsrc.syso
 rsrc.syso: init/windows/application.ico init/windows/manifest.xml $(shell go env GOPATH)/bin/rsrc
-	$(shell go env GOPATH)/bin/rsrc -ico init/windows/application.ico -manifest init/windows/manifest.xml
+	$(shell go env GOPATH)/bin/rsrc -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
 $(shell go env GOPATH)/bin/rsrc:
 	cd /tmp ; go get $(RSRC_BIN) ; go install $(RSRC_BIN)
 
@@ -141,19 +141,19 @@ $(shell go env GOPATH)/bin/rsrc:
 
 build: $(BINARY)
 $(BINARY): generate main.go
-	go build -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	go build $(BUILD_FLAGS) -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux: $(BINARY).amd64.linux
 $(BINARY).amd64.linux: generate main.go
 	# Building linux 64-bit x86 binary.
-	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux386: $(BINARY).386.linux
 $(BINARY).386.linux: generate main.go
 	# Building linux 32-bit x86 binary.
-	GOOS=linux GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=386 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 arm: arm64 armhf
@@ -161,14 +161,14 @@ arm: arm64 armhf
 arm64: $(BINARY).arm64.linux
 $(BINARY).arm64.linux: generate main.go
 	# Building linux 64-bit ARM binary.
-	GOOS=linux GOARCH=arm64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	# https://github.com/upx/upx/issues/351#issuecomment-599116973
 	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 armhf: $(BINARY).arm.linux
 $(BINARY).arm.linux: generate main.go
 	# Building linux 32-bit ARM binary.
-	GOOS=linux GOARCH=arm GOARM=6 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=arm GOARM=6 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 macos: $(BINARY).universal.macos
@@ -185,22 +185,22 @@ $(BINARY).arm64.macos: generate main.go
 
 freebsd: $(BINARY).amd64.freebsd
 $(BINARY).amd64.freebsd: generate main.go
-	GOOS=freebsd GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 freebsd386: $(BINARY).i386.freebsd
 $(BINARY).i386.freebsd: generate main.go
-	GOOS=freebsd GOARCH=386 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@ || true
 
 freebsdarm: $(BINARY).armhf.freebsd
 $(BINARY).armhf.freebsd: generate main.go
-	GOOS=freebsd GOARCH=arm go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=arm go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 exe: $(BINARY).amd64.exe
 windows: $(BINARY).amd64.exe
 $(BINARY).amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
-	GOOS=windows GOARCH=amd64 go build -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
+	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 ####################
@@ -448,9 +448,9 @@ test: lint
 lint: generate
 	# Checking lint.
 	$(shell go env GOPATH)/bin/golangci-lint version
-	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint --timeout=3m run $(GOLANGCI_LINT_ARGS)
-	GOOS=freebsd $(shell go env GOPATH)/bin/golangci-lint --timeout=3m run $(GOLANGCI_LINT_ARGS)
-	GOOS=windows $(shell go env GOPATH)/bin/golangci-lint --timeout=3m run $(GOLANGCI_LINT_ARGS)
+	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint run
+	GOOS=freebsd $(shell go env GOPATH)/bin/golangci-lint run
+	#GOOS=windows $(shell go env GOPATH)/bin/golangci-lint run
 
 # Mockgen and bindata are examples.
 # Your `go generate` may require other tools; add them!
@@ -486,6 +486,7 @@ docker:
 		--build-arg "BINARY=$(BINARY)" \
 		--build-arg "SOURCE_URL=$(SOURCE_URL)" \
 		--build-arg "CONFIG_FILE=$(CONFIG_FILE)" \
+		--build-arg "BUILD_FLAGS=$(BUILD_FLAGS)" \
 		--file init/docker/Dockerfile .
 
 ####################

@@ -14,6 +14,8 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/getlantern/systray"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"golift.io/starr"
 	"golift.io/version"
 )
@@ -62,7 +64,7 @@ func (c *Client) setupMenus(clientInfo *notifiarr.ClientInfo) {
 		return
 	}
 
-	menu["mode"].SetTitle("Mode: " + strings.Title(c.Config.Mode))
+	menu["mode"].SetTitle("Mode: " + cases.Title(language.AmericanEnglish).String(c.Config.Mode))
 
 	if !c.Config.Debug {
 		menu["debug"].Hide()
@@ -175,7 +177,7 @@ func (c *Client) makeMoreChannels() {
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	menu["debug"] = debug
-	menu["mode"] = debug.AddSubMenuItem("Mode: "+strings.Title(c.Config.Mode), "toggle application mode")
+	menu["mode"] = debug.AddSubMenuItem("Mode: "+cases.Title(language.AmericanEnglish).String(c.Config.Mode), "toggle application mode")
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
 	menu["console"] = debug.AddSubMenuItem("Console", "toggle the console window")
@@ -259,7 +261,7 @@ func (c *Client) buildDynamicTimerMenus(clientInfo *notifiarr.ClientInfo) {
 	}
 
 	c.Debugf("Created %d Notifiarr custom timer menu channels.", len(cases))
-	defer c.Debugf("All %d Notifiarr custom timer menu channels stopped.", len(cases))
+	defer c.Printf("All %d Notifiarr custom timer menu channels stopped.", len(cases))
 
 	for {
 		if idx, _, ok := reflect.Select(cases); ok {
@@ -313,6 +315,8 @@ func (c *Client) watchGuiChannels() {
 
 // nolint:errcheck,cyclop
 func (c *Client) watchConfigChannels() {
+	title := cases.Title(language.AmericanEnglish)
+
 	for {
 		select {
 		case <-menu["view"].ClickedCh:
@@ -337,9 +341,9 @@ func (c *Client) watchConfigChannels() {
 				c.Config.Mode = c.website.Setup(notifiarr.ModeDev)
 			}
 
-			menu["mode"].SetTitle("Mode: " + strings.Title(c.Config.Mode))
-			c.Printf("[user requested] Application mode changed to %s!", strings.Title(c.Config.Mode))
-			ui.Notify("Application mode changed to %s!", strings.Title(c.Config.Mode))
+			menu["mode"].SetTitle("Mode: " + title.String(c.Config.Mode))
+			c.Printf("[user requested] Application mode changed to %s!", title.String(c.Config.Mode))
+			ui.Notify("Application mode changed to %s!", title.String(c.Config.Mode))
 		case <-menu["svcs"].ClickedCh:
 			if menu["svcs"].Checked() {
 				menu["svcs"].Uncheck()
