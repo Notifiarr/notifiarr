@@ -4,12 +4,12 @@
 *   FOR RESPONSIVENESS      *
 ****************************/
 ::selection {
-  background: #4f5362;
+  background: #a3abc9;
   /* WebKit/Blink Browsers */
   color: #fff;
 }
 ::-moz-selection {
-  background: #4f5362;
+  background: #a3abc9;
   /* Gecko Browsers */
   color: #fff;
 }

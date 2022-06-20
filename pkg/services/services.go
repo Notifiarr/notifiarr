@@ -122,6 +122,10 @@ func (c *Config) loadServiceStates() {
 		names = append(names, valuePrefix+name)
 	}
 
+	if len(names) == 0 {
+		return
+	}
+
 	values, err := c.Notifiarr.GetValue(names...)
 	if err != nil {
 		c.Errorf("Getting initial service states from Notifiarr.com: %v", err)
@@ -138,6 +142,7 @@ func (c *Config) loadServiceStates() {
 				}
 
 				if time.Since(svc.LastCheck) < time.Hour {
+					c.Debugf("Updated initial service state with website-saved data: %s, %s", name, svc.State)
 					c.services[name].svc.Output = svc.Output
 					c.services[name].svc.State = svc.State
 					c.services[name].svc.Since = svc.Since

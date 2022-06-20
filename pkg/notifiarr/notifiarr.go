@@ -1,9 +1,9 @@
 // Package notifiarr provides a standard interface for sending data to notifiarr.com.
 // Several methods are exported to make POSTing data to notifarr easier. This package
 // also handles the incoming Plex webhook as well as the "crontab" timers for plex
-// sessions, snapshots, dashboard state, custom format sync for Radarr and release
-// profile sync for Sonarr.
-// This package's cofiguration is provided by the configfile  package.
+// sessions, snapshots, dashboard state, custom format sync for Radarr, release
+// profile sync for Sonarr, and various other tasks.
+// This package's cofiguration is provided by the configfile package.
 package notifiarr
 
 import (
