@@ -24,7 +24,6 @@ import (
 	"golift.io/datacounter"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
-	"golift.io/starr/prowlarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
 	"golift.io/starr/sonarr"
@@ -289,11 +288,11 @@ func getLidarr(r *http.Request) *lidarr.Lidarr {
 	return app.Lidarr
 }
 
-//nolint:deadcode,unused // will be used when we add http handlers for prowlarr.
-func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
+// will be used when we add http handlers for prowlarr.
+/* func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
 	app, _ := r.Context().Value(starr.Prowlarr).(*ProwlarrConfig)
 	return app.Prowlarr
-}
+} */
 
 func getRadarr(r *http.Request) *radarr.Radarr {
 	app, _ := r.Context().Value(starr.Radarr).(*RadarrConfig)
