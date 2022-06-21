@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"golift.io/datacounter"
@@ -22,7 +23,7 @@ import (
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
 	Retries int
-	Logger
+	mnd.Logger
 	*http.Client
 }
 
@@ -31,7 +32,7 @@ type httpClient struct {
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) sendPlexMeta(event EventType, hook *plexIncomingWebhook, wait bool) (*Response, error) {
+func (c *Config) sendPlexMeta(event EventType, hook *plex.IncomingWebhook, wait bool) (*Response, error) {
 	extra := time.Second
 	if wait {
 		extra = c.Plex.Delay.Duration

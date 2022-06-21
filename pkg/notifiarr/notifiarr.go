@@ -8,7 +8,6 @@ package notifiarr
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -16,6 +15,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/shirou/gopsutil/v3/host"
@@ -56,7 +56,7 @@ type Config struct {
 	Trigger    Triggers         `json:"-"`
 	MaxBody    int              `json:"maxBody"`
 	Sighup     chan os.Signal   `json:"-"`
-	Logger     `json:"-"`       // log file writer
+	mnd.Logger `json:"-"`       // log file writer
 	extras
 }
 
@@ -68,7 +68,6 @@ type extras struct {
 	client       *httpClient
 	radarrCF     map[int]*cfMapIDpayload
 	sonarrRP     map[int]*cfMapIDpayload
-	plexTimer    *Timer
 	hostInfo     *host.InfoStat
 	addWatcher   chan *WatchFile
 	stopWatcher  chan struct{}
@@ -83,20 +82,6 @@ type Triggers struct {
 	sessr   chan *holder   // Session Return Channel
 	List    []*action      // List of action triggers
 	psMutex sync.RWMutex   // Locks plex session thread.
-}
-
-// Logger is an interface for our logs package. We use this to avoid an import cycle.
-type Logger interface {
-	Print(v ...interface{})
-	Printf(msg string, v ...interface{})
-	Error(v ...interface{})
-	Errorf(msg string, v ...interface{})
-	ErrorfNoShare(msg string, v ...interface{})
-	Debug(v ...interface{})
-	Debugf(msg string, v ...interface{})
-	GetInfoLog() *log.Logger
-	DebugEnabled() bool
-	CapturePanic()
 }
 
 // Start (and log) snapshot and plex cron jobs if they're configured.
@@ -137,7 +122,6 @@ func (c *Config) Start() {
 
 	c.extras.radarrCF = make(map[int]*cfMapIDpayload)
 	c.extras.sonarrRP = make(map[int]*cfMapIDpayload)
-	c.extras.plexTimer = &Timer{}
 	c.extras.sendData = make(chan *SendRequest, 2000) //nolint:gomnd
 	c.extras.stopSendData = make(chan struct{})
 

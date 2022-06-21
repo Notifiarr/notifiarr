@@ -30,16 +30,17 @@ import (
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	Flags   *configfile.Flags
-	Config  *configfile.Config
-	server  *http.Server
-	sigkil  chan os.Signal
-	sighup  chan os.Signal
-	reload  chan customReload
-	website *notifiarr.Config
-	cookies *securecookie.SecureCookie
-	templat *template.Template
-	webauth bool
+	Flags     *configfile.Flags
+	Config    *configfile.Config
+	server    *http.Server
+	sigkil    chan os.Signal
+	sighup    chan os.Signal
+	reload    chan customReload
+	website   *notifiarr.Config
+	cookies   *securecookie.SecureCookie
+	templat   *template.Template
+	webauth   bool
+	plexTimer Timer
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" as of its creation.
 	sync.RWMutex

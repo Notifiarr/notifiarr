@@ -37,14 +37,14 @@ func (c *Config) sendPlexSessions(event EventType) {
 		return
 	}
 
-	c.collectSessions(event, nil)
+	c.CollectSessions(event, nil)
 }
 
 // collectSessions is called in a go routine after a plex media.play webhook.
 // This reaches back into Plex, asks for sessions and then sends the whole
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
-func (c *Config) collectSessions(event EventType, hook *plexIncomingWebhook) {
+func (c *Config) CollectSessions(event EventType, hook *plex.IncomingWebhook) {
 	wait := false
 	msg := ""
 
