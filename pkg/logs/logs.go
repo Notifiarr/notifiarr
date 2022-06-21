@@ -233,6 +233,16 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 	share.Log(msg)
 }
 
+// ErrorfNoShare writes log lines... to stdout and/or a file.
+func (l *Logger) ErrorfNoShare(msg string, v ...interface{}) {
+	exp.LogFiles.Add("Error Lines", 1)
+
+	err := l.ErrorLog.Output(callDepth, fmt.Sprintf(msg, v...))
+	if err != nil {
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
+	}
+}
+
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
 // This is not thread safe with Rotate(), so do not call them at the same time.
 func CustomLog(filePath, logName string) *Logger {

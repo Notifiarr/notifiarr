@@ -91,6 +91,7 @@ type Logger interface {
 	Printf(msg string, v ...interface{})
 	Error(v ...interface{})
 	Errorf(msg string, v ...interface{})
+	ErrorfNoShare(msg string, v ...interface{})
 	Debug(v ...interface{})
 	Debugf(msg string, v ...interface{})
 	GetInfoLog() *log.Logger

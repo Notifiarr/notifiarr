@@ -257,7 +257,7 @@ func (c *Config) sendJSON(ctx context.Context, url string, data []byte, log bool
 }
 
 // Do performs an http Request with retries and logging!
-func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
+func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cyclop
 	deadline, ok := req.Context().Deadline()
 	if !ok {
 		deadline = time.Now().Add(h.Timeout)
@@ -266,24 +266,25 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 	timeout := time.Until(deadline).Round(time.Millisecond)
 
 	for retry := 0; ; retry++ {
+		exp.NotifiarrCom.Add(req.Method+" Requests", 1)
+
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
 				h.Errorf("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
 			}
 
-			if resp.StatusCode < http.StatusInternalServerError && resp.StatusCode != http.StatusBadRequest {
-				exp.NotifiarrCom.Add(req.Method+" Requests", 1)
+			if resp.StatusCode < http.StatusInternalServerError &&
+				(resp.StatusCode != http.StatusBadRequest || resp.Header.Get("content-type") != "text/html") {
 				exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
-
 				return resp, nil
 			}
 
 			// resp.StatusCode is 500 or higher, make that en error.
+			// or resp.StatusCode is 400 and content-type is text/html (cloudflare error).
 			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                         // do not defer, because we're in a loop.
 			exp.NotifiarrCom.Add(req.Method+" Retries", 1)
-			exp.NotifiarrCom.Add(req.Method+" Requests", 1)
 			exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
 			exp.NotifiarrCom.Add(req.Method+" Bytes Received", size)
 			// shoehorn a non-200 error into the empty http error.
@@ -301,7 +302,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) {
 		case retry == h.Retries:
 			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			h.Debugf("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
+			h.ErrorfNoShare("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
@@ -497,12 +498,16 @@ func (c *Config) watchSendDataChan() {
 			continue
 		}
 
-		if err != nil {
-			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %v%v",
-				data.Event, time.Since(start).Round(time.Millisecond), err, resp.String())
-		} else {
+		switch {
+		case err == nil:
 			c.Printf("[%s requested] Sent (%v): "+data.LogMsg+"%v",
 				data.Event, time.Since(start).Round(time.Millisecond), resp)
+		case errors.Is(err, ErrNon200):
+			c.ErrorfNoShare("[%s requested] Sending (%v): "+data.LogMsg+": %v%v",
+				data.Event, time.Since(start).Round(time.Millisecond), err, resp.String())
+		default:
+			c.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %v%v",
+				data.Event, time.Since(start).Round(time.Millisecond), err, resp.String())
 		}
 	}
 
