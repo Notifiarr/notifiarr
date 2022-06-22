@@ -12,7 +12,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-type Config struct {
+type Action struct {
 	*common.Config
 	Plex    *plex.Server
 	sess    chan time.Time // Return Plex Sessions
@@ -38,11 +38,11 @@ type holder struct {
 }
 
 // SendPlexSessions sends plex sessions in a go routine through a channel.
-func (c *Config) SendPlexSessions(event website.EventType) {
+func (c *Action) SendPlexSessions(event website.EventType) {
 	c.Exec(event, TrigPlexSessions)
 }
 
-func (c *Config) Create() {
+func (c *Action) Run() {
 	if !c.Plex.Configured() {
 		return
 	}
@@ -80,7 +80,7 @@ func (c *Config) Create() {
 }
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
-func (c *Config) sendPlexSessions(event website.EventType) {
+func (c *Action) sendPlexSessions(event website.EventType) {
 	if !c.Plex.Configured() {
 		return
 	}
@@ -92,7 +92,7 @@ func (c *Config) sendPlexSessions(event website.EventType) {
 // This reaches back into Plex, asks for sessions and then sends the whole
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
-func (c *Config) CollectSessions(event website.EventType, hook *plex.IncomingWebhook) {
+func (c *Action) CollectSessions(event website.EventType, hook *plex.IncomingWebhook) {
 	wait := false
 	msg := ""
 
@@ -111,7 +111,7 @@ func (c *Config) CollectSessions(event website.EventType, hook *plex.IncomingWeb
 // GetSessions returns the plex sessions. This uses a channel so concurrent requests are avoided.
 // Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
 // Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
-func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
+func (c *Action) GetSessions(wait bool) (*plex.Sessions, error) {
 	c.psMutex.RLock()
 	defer c.psMutex.RUnlock()
 
@@ -131,7 +131,7 @@ func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
 }
 
 // runSessionHolder runs a session holder routine. Call Create() first.
-func (c *Config) runSessionHolder() { //nolint:cyclop
+func (c *Action) runSessionHolder() { //nolint:cyclop
 	defer c.CapturePanic()
 
 	sessions, err := c.Plex.GetSessions() // err not used until for loop.
@@ -172,7 +172,7 @@ func (c *Config) runSessionHolder() { //nolint:cyclop
 
 // plexSessionTracker checks for state changes between the previous session pull
 // and the current session pull. if changes are present, a timestmp is added.
-func (c *Config) plexSessionTracker(curr, prev []*plex.Session) {
+func (c *Action) plexSessionTracker(curr, prev []*plex.Session) {
 CURRENT:
 	for _, currSess := range curr {
 		// make sure every current session has a start time.
@@ -196,7 +196,7 @@ CURRENT:
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
-func (c *Config) checkPlexFinishedItems(sent map[string]struct{}) {
+func (c *Action) checkPlexFinishedItems(sent map[string]struct{}) {
 	sessions, err := c.GetSessions(false)
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
@@ -235,7 +235,7 @@ func (c *Config) checkPlexFinishedItems(sent map[string]struct{}) {
 	}
 }
 
-func (c *Config) checkSessionDone(session *plex.Session, pct float64) string {
+func (c *Action) checkSessionDone(session *plex.Session, pct float64) string {
 	switch {
 	case session.Duration == 0:
 		return statusIgnoring
@@ -258,7 +258,7 @@ func (c *Config) checkSessionDone(session *plex.Session, pct float64) string {
 	}
 }
 
-func (c *Config) sendSessionDone(session *plex.Session) string {
+func (c *Action) sendSessionDone(session *plex.Session) string {
 	if err := c.checkPlexAgent(session); err != nil {
 		return statusError + ": " + err.Error()
 	}
@@ -280,7 +280,7 @@ func (c *Config) sendSessionDone(session *plex.Session) string {
 	return statusSending
 }
 
-func (c *Config) checkPlexAgent(session *plex.Session) error {
+func (c *Action) checkPlexAgent(session *plex.Session) error {
 	if !strings.Contains(session.GUID, "plex://") || session.Key == "" {
 		return nil
 	}
@@ -300,8 +300,8 @@ func (c *Config) checkPlexAgent(session *plex.Session) error {
 	return nil
 }
 
-// Close the Plex session holder.
-func (c *Config) Close() {
+// Stop the Plex session holder.
+func (c *Action) Stop() {
 	c.psMutex.Lock()
 	defer c.psMutex.Unlock()
 

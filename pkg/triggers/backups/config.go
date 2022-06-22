@@ -9,8 +9,8 @@ import (
 	"golift.io/starr"
 )
 
-// Config is the data needed by the backups package to perform backup ad corruption checks.
-type Config struct {
+// Action is the data needed by the backups package to perform backup ad corruption checks.
+type Action struct {
 	*common.Config
 }
 
@@ -87,7 +87,7 @@ type Payload struct {
 }
 
 // Create sets up all the triggers.
-func (c *Config) Create() {
+func (c *Action) Create() {
 	c.makeBackupTriggersLidarr()
 	c.makeBackupTriggersRadarr()
 	c.makeBackupTriggersReadarr()

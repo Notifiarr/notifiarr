@@ -27,7 +27,7 @@ type Timer struct {
 	ch      chan website.EventType
 }
 
-type Config struct {
+type Action struct {
 	*common.Config
 	list []*Timer
 }
@@ -49,11 +49,11 @@ func (t *Timer) run(event website.EventType) {
 	}
 }
 
-func (c *Config) List() []*Timer {
+func (c *Action) List() []*Timer {
 	return c.list
 }
 
-func (c *Config) Create() {
+func (c *Action) Create() {
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
 	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s",

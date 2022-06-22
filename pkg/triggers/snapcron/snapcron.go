@@ -10,11 +10,11 @@ import (
 
 const TrigSnapshot common.TriggerName = "Gathering and sending System Snapshot."
 
-type Config struct {
+type Action struct {
 	*common.Config
 }
 
-func (c *Config) Create() {
+func (c *Action) Create() {
 	var ticker *time.Ticker
 
 	if c.Snapshot.Interval.Duration > 0 {
@@ -30,7 +30,7 @@ func (c *Config) Create() {
 	})
 }
 
-func (c *Config) printLog() {
+func (c *Action) printLog() {
 	var ex string
 
 	for key, val := range map[string]bool{
@@ -64,11 +64,11 @@ func (c *Config) printLog() {
 		c.Snapshot.Interval, c.Snapshot.Timeout, ex)
 }
 
-func (c *Config) SendSnapshot(event website.EventType) {
+func (c *Action) SendSnapshot(event website.EventType) {
 	c.Exec(event, TrigSnapshot)
 }
 
-func (c *Config) sendSnapshot(event website.EventType) {
+func (c *Action) sendSnapshot(event website.EventType) {
 	snapshot, errs, debug := c.Snapshot.GetSnapshot()
 	for _, err := range errs {
 		if err != nil {

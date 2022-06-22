@@ -16,7 +16,7 @@ import (
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Config) sendPlexMeta(
+func (c *Action) sendPlexMeta(
 	event website.EventType,
 	hook *plex.IncomingWebhook,
 	wait bool,
@@ -65,7 +65,7 @@ func (c *Config) sendPlexMeta(
 }
 
 // getMetaSnap grabs some basic system info: cpu, memory, username.
-func (c *Config) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
+func (c *Action) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	var (
 		snap = &snapshot.Snapshot{}
 		wg   sync.WaitGroup

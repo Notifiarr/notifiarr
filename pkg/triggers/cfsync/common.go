@@ -7,7 +7,7 @@ import "github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	 The code in this file deals with sending data and getting updates at an interval.
 */
 
-type Config struct {
+type Action struct {
 	*common.Config
 	radarrCF map[int]*cfMapIDpayload
 	sonarrRP map[int]*cfMapIDpayload

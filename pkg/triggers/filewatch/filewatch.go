@@ -23,7 +23,7 @@ const (
 	retryInterval = 10 * time.Second
 )
 
-type Config struct {
+type Action struct {
 	*common.Config
 	WatchFiles  []*WatchFile
 	addWatcher  chan *WatchFile
@@ -54,7 +54,7 @@ type Match struct {
 }
 
 // Run compiles any regexp's and opens a tail -f on provided watch files.
-func (c *Config) Run() {
+func (c *Action) Run() {
 	// two fake tails for internal channels.
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
@@ -107,7 +107,7 @@ func (w *WatchFile) setup(logger *log.Logger) error {
 }
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
-func (c *Config) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
+func (c *Action) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
 	c.addWatcher = make(chan *WatchFile, 1)
 	c.stopWatcher = make(chan struct{})
 	ticker := time.NewTicker(retryInterval)
@@ -137,7 +137,7 @@ func (c *Config) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *ti
 }
 
 //nolint:cyclop
-func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
+func (c *Action) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
 	defer func() {
 		defer c.CapturePanic()
 		ticker.Stop()
@@ -191,7 +191,7 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 	}
 }
 
-func (c *Config) fileWatcherTicker(died bool) bool {
+func (c *Action) fileWatcherTicker(died bool) bool {
 	if !died {
 		return false
 	}
@@ -225,7 +225,7 @@ func (c *Config) fileWatcherTicker(died bool) bool {
 
 // checkLineMatch runs when a watched file has a new line written.
 // If a match is found a notification is sent.
-func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
+func (c *Action) checkLineMatch(line *tail.Line, tail *WatchFile) {
 	if tail.re == nil || line.Text == "" || !tail.re.MatchString(line.Text) {
 		return // no match
 	}
@@ -252,7 +252,7 @@ func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
 	})
 }
 
-func (c *Config) AddFileWatcher(file *WatchFile) error {
+func (c *Action) AddFileWatcher(file *WatchFile) error {
 	c.awMutex.RLock()
 	defer c.awMutex.RUnlock()
 
@@ -286,7 +286,7 @@ func (w *WatchFile) Stop() error {
 	return nil
 }
 
-func (c *Config) Stop() {
+func (c *Action) Stop() {
 	c.awMutex.Lock()
 	defer c.awMutex.Unlock()
 

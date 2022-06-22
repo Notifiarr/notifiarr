@@ -12,14 +12,14 @@ import (
 // TrigStop is used to signal a stop/reload.
 const TrigStop TriggerName = "Stopping all triggers and timers (reload)."
 
-// RunTimers converts all the tickers and triggers into []reflect.SelectCase.
+// Run converts all the tickers and triggers into []reflect.SelectCase.
 // This allows us to run a loop with a dynamic number of channels and tickers to watch.
-func (c *Config) RunTimers() {
-	if c.triggers.stop != nil {
+func (c *Config) Run() {
+	if c.stop != nil {
 		panic("notifiarr timers cannot run more than once")
 	}
 
-	c.triggers.stop = &Action{Name: TrigStop, C: make(chan website.EventType)}
+	c.stop = &Action{Name: TrigStop, C: make(chan website.EventType)}
 
 	var (
 		cases          = []reflect.SelectCase{}
@@ -27,7 +27,7 @@ func (c *Config) RunTimers() {
 		timer, trigger int
 	)
 
-	for _, action := range append(c.triggers.list, c.triggers.stop) {
+	for _, action := range append(c.list, c.stop) {
 		if action == nil {
 			continue
 		}
@@ -123,5 +123,5 @@ func (c *Config) stopTimerLoop(actions []*Action) {
 		}
 	}
 
-	close(c.triggers.stop.C) // signal that we're done.
+	close(c.stop.C) // signal that we're done.
 }

@@ -24,7 +24,8 @@ type Config struct {
 	Apps     *apps.Apps
 	Serial   bool
 	mnd.Logger
-	triggers // add triggers.
+	stop *Action   // Triggered by calling Stop()
+	list []*Action // List of action triggers
 }
 
 // TriggerName makes sure triggers have a known name.
@@ -39,16 +40,10 @@ type Action struct {
 	Hide bool                      // prevent logging.
 }
 
-// triggers allow trigger actions in the timer routine.
-type triggers struct {
-	stop *Action   // Triggered by calling Stop()
-	list []*Action // List of action triggers
-}
-
 // Exec runs a trigger. This is abastraction method used in a bunch of places.
-func (t *triggers) Exec(event website.EventType, name TriggerName) {
-	trig := t.Get(name)
-	if t.stop == nil || trig == nil || trig.C == nil {
+func (c *Config) Exec(event website.EventType, name TriggerName) {
+	trig := c.Get(name)
+	if c.stop == nil || trig == nil || trig.C == nil {
 		return
 	}
 
@@ -57,8 +52,8 @@ func (t *triggers) Exec(event website.EventType, name TriggerName) {
 
 // Get a trigger by unique name. May return nil, and that could cause a panic.
 // We avoid panics by using a custom type with corresponding constants as input.
-func (t *triggers) Get(name TriggerName) *Action {
-	for _, trigger := range t.list {
+func (c *Config) Get(name TriggerName) *Action {
+	for _, trigger := range c.list {
 		if trigger.Name == name {
 			return trigger
 		}
@@ -69,21 +64,21 @@ func (t *triggers) Get(name TriggerName) *Action {
 
 // Add adds a new action to our list of "Actions to run."
 // actions are timers or triggers, or both.
-func (t *triggers) Add(action ...*Action) {
-	t.list = append(t.list, action...)
+func (c *Config) Add(action ...*Action) {
+	c.list = append(c.list, action...)
 }
 
-func (t *triggers) Close(event website.EventType) {
+func (c *Config) Stop(event website.EventType) {
 	// Neither of these if statements should ever fire. That's a bug somewhere else.
-	if t == nil {
+	if c == nil {
 		panic("Config is nil, cannot stop a nil config!!")
 	}
 
-	if t.stop == nil {
+	if c.stop == nil {
 		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
-	t.stop.C <- event
-	<-t.stop.C // wait for done signal.
-	t.stop = nil
+	c.stop.C <- event
+	<-c.stop.C // wait for done signal.
+	c.stop = nil
 }

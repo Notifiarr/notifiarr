@@ -24,7 +24,7 @@ type SonarrTrashPayload struct {
 }
 
 // syncSonarr triggers a custom format sync for Sonarr.
-func (c *Config) syncSonarr(event website.EventType) {
+func (c *Action) syncSonarr(event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("Cannot sync Sonarr Release Profiles. Website provided 0 instances.")
 		return
@@ -50,7 +50,7 @@ func (c *Config) syncSonarr(event website.EventType) {
 	}
 }
 
-func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
+func (c *Action) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	var (
 		err     error
 		payload = SonarrTrashPayload{Instance: instance, Name: app.Name, NewMaps: c.sonarrRP[instance]}
@@ -84,7 +84,7 @@ func (c *Config) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	return nil
 }
 
-func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) error {
+func (c *Action) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) error {
 	reply := &SonarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
@@ -143,7 +143,7 @@ func (c *Config) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byt
 }
 
 // postbackSonarrRP sends the changes back to notifiarr.com.
-func (c *Config) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
+func (c *Action) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
 	if len(maps.QP) < 1 && len(maps.RP) < 1 {
 		return nil
 	}

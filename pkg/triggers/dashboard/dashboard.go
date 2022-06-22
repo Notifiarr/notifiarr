@@ -26,9 +26,9 @@ import (
 
 const TrigDashboard common.TriggerName = "Initiating State Collection for Dashboard."
 
-type Config struct {
+type Action struct {
 	*common.Config
-	PlexCron *plexcron.Config
+	PlexCron *plexcron.Action
 }
 
 // How many "upcoming" or "newest" items to send.
@@ -103,7 +103,7 @@ type States struct {
 	Plex    *plex.Sessions `json:"plexSessions"`
 }
 
-func (c *Config) Create() {
+func (c *Action) Create() {
 	var ticker *time.Ticker
 
 	ci := c.ClientInfo
@@ -123,11 +123,11 @@ func (c *Config) Create() {
 }
 
 // SendDashboardState sends the current states for the dashboard.
-func (c *Config) SendDashboardState(event website.EventType) {
+func (c *Action) SendDashboardState(event website.EventType) {
 	c.Exec(event, TrigDashboard)
 }
 
-func (c *Config) sendDashboardState(event website.EventType) {
+func (c *Action) sendDashboardState(event website.EventType) {
 	cmd := c.getStatesParallel
 	if c.Serial {
 		cmd = c.getStatesSerial
@@ -149,7 +149,7 @@ func (c *Config) sendDashboardState(event website.EventType) {
 }
 
 // getStatesSerial grabs data for each app serially.
-func (c *Config) getStatesSerial() *States {
+func (c *Action) getStatesSerial() *States {
 	sessions, _ := c.PlexCron.GetSessions(false)
 
 	return &States{
@@ -165,7 +165,7 @@ func (c *Config) getStatesSerial() *States {
 }
 
 // getStatesParallel fires a routine for each app type and tries to get a lot of data fast!
-func (c *Config) getStatesParallel() *States {
+func (c *Action) getStatesParallel() *States {
 	states := &States{}
 
 	var wg sync.WaitGroup
@@ -217,7 +217,7 @@ func (c *Config) getStatesParallel() *States {
 	return states
 }
 
-func (c *Config) getDelugeStates() []*State {
+func (c *Action) getDelugeStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Deluge {
@@ -239,7 +239,7 @@ func (c *Config) getDelugeStates() []*State {
 	return states
 }
 
-func (c *Config) getLidarrStates() []*State {
+func (c *Action) getLidarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Lidarr {
@@ -261,7 +261,7 @@ func (c *Config) getLidarrStates() []*State {
 	return states
 }
 
-func (c *Config) getRadarrStates() []*State {
+func (c *Action) getRadarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Radarr {
@@ -283,7 +283,7 @@ func (c *Config) getRadarrStates() []*State {
 	return states
 }
 
-func (c *Config) getReadarrStates() []*State {
+func (c *Action) getReadarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Readarr {
@@ -305,7 +305,7 @@ func (c *Config) getReadarrStates() []*State {
 	return states
 }
 
-func (c *Config) getQbitStates() []*State {
+func (c *Action) getQbitStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Qbit {
@@ -327,7 +327,7 @@ func (c *Config) getQbitStates() []*State {
 	return states
 }
 
-func (c *Config) getSonarrStates() []*State {
+func (c *Action) getSonarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Sonarr {
@@ -349,7 +349,7 @@ func (c *Config) getSonarrStates() []*State {
 	return states
 }
 
-func (c *Config) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
+func (c *Action) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
 	start := time.Now()
 	size, xfers, err := app.GetXfersCompat()
 	state := &State{
@@ -421,7 +421,7 @@ func (c *Config) getDelugeState(instance int, app *apps.DelugeConfig) (*State, e
 	return state, nil
 }
 
-func (c *Config) getLidarrState(instance int, app *apps.LidarrConfig) (*State, error) {
+func (c *Action) getLidarrState(instance int, app *apps.LidarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -476,7 +476,7 @@ func (c *Config) getLidarrState(instance int, app *apps.LidarrConfig) (*State, e
 }
 
 // getLidarrHistory is not done.
-func (c *Config) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
+func (c *Action) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.Req{
 		Page:     1,
 		PageSize: showLatest + 20, //nolint:gomnd // grab extra in case some are tracks and not albums.
@@ -513,7 +513,7 @@ func (c *Config) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Config) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop,funlen
+func (c *Action) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop,funlen
 	start := time.Now()
 	size, xfers, err := app.GetXfers()
 
@@ -577,7 +577,7 @@ func (c *Config) getQbitState(instance int, app *apps.QbitConfig) (*State, error
 	return state, nil
 }
 
-func (c *Config) getRadarrState(instance int, r *apps.RadarrConfig) (*State, error) {
+func (c *Action) getRadarrState(instance int, r *apps.RadarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Latest: []*Sortable{}, Name: r.Name}
 	start := time.Now()
 
@@ -626,7 +626,7 @@ func processRadarrState(state *State, movies []*radarr.Movie) { //nolint:cyclop
 	}
 }
 
-func (c *Config) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, error) {
+func (c *Action) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -686,7 +686,7 @@ func (c *Config) getReadarrState(instance int, app *apps.ReadarrConfig) (*State,
 }
 
 // getReadarrHistory is not done.
-func (c *Config) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
+func (c *Action) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.Req{
 		Page:     1,
 		PageSize: showLatest,
@@ -714,7 +714,7 @@ func (c *Config) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error)
 	return table, nil
 }
 
-func (c *Config) getSonarrState(instance int, app *apps.SonarrConfig) (*State, error) {
+func (c *Action) getSonarrState(instance int, app *apps.SonarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -761,7 +761,7 @@ func (c *Config) getSonarrState(instance int, app *apps.SonarrConfig) (*State, e
 	return state, nil
 }
 
-func (c *Config) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
+func (c *Action) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.Req{
 		Page:     1,
 		PageSize: showLatest + 5, //nolint:gomnd // grab extra in case there's an error.
@@ -804,7 +804,7 @@ func (c *Config) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Config) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
+func (c *Action) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
 	sort.Sort(dateSorter(next))
 
 	redo := []*Sortable{}
@@ -839,7 +839,7 @@ func (c *Config) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable
 	return redo, nil
 }
 
-func (c *Config) getSabNZBStates() []*State {
+func (c *Action) getSabNZBStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.SabNZB {
@@ -861,7 +861,7 @@ func (c *Config) getSabNZBStates() []*State {
 	return states
 }
 
-func (c *Config) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, error) {
+func (c *Action) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, error) {
 	state := &State{Instance: instance, Name: s.Name}
 	start := time.Now()
 	queue, err := s.GetQueue()

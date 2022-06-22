@@ -18,20 +18,21 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
+// Actions defines all our triggers and timers.
 type Actions struct {
-	common     *common.Config
-	clientInfo *website.ClientInfo
-	Backups    *backups.Config
-	CronTimer  *crontimer.Config
-	PlexCron   *plexcron.Config
-	CFSync     *cfsync.Config
-	SnapCron   *snapcron.Config
-	Dashboard  *dashboard.Config
-	Gaps       *gaps.Config
-	StuckItems *stuckitems.Config
-	FileWatch  *filewatch.Config
+	timers     *common.Config
+	Backups    *backups.Action
+	CFSync     *cfsync.Action
+	CronTimer  *crontimer.Action
+	Dashboard  *dashboard.Action
+	FileWatch  *filewatch.Action
+	Gaps       *gaps.Action
+	PlexCron   *plexcron.Action
+	SnapCron   *snapcron.Action
+	StuckItems *stuckitems.Action
 }
 
+// Config is the required input data. Everything is mandatory.
 type Config struct {
 	Serial     bool
 	Apps       *apps.Apps
@@ -42,59 +43,56 @@ type Config struct {
 	mnd.Logger
 }
 
+// New turns a populated Config into a pile of Actions.
 func New(config *Config) *Actions {
 	var (
 		ci, _  = config.Website.GetClientInfo()
 		common = &common.Config{
-			Server:     config.Website,
 			ClientInfo: ci,
+			Server:     config.Website,
 			Snapshot:   config.Snapshot,
 			Apps:       config.Apps,
 			Serial:     config.Serial,
 			Logger:     config.Logger,
 		}
-		plex = &plexcron.Config{Config: common, Plex: config.Plex}
+		plex = &plexcron.Action{Config: common, Plex: config.Plex}
 	)
 
 	return &Actions{
-		common:     common,
-		clientInfo: ci,
-		Backups:    &backups.Config{Config: common},
-		CronTimer:  &crontimer.Config{Config: common},
+		timers:     common,
+		Backups:    &backups.Action{Config: common},
+		CFSync:     &cfsync.Action{Config: common},
+		CronTimer:  &crontimer.Action{Config: common},
+		Dashboard:  &dashboard.Action{Config: common, PlexCron: plex},
+		FileWatch:  &filewatch.Action{Config: common, WatchFiles: config.WatchFiles},
+		Gaps:       &gaps.Action{Config: common},
 		PlexCron:   plex,
-		CFSync:     &cfsync.Config{Config: common},
-		SnapCron:   &snapcron.Config{Config: common},
-		Dashboard:  &dashboard.Config{Config: common, PlexCron: plex},
-		Gaps:       &gaps.Config{Config: common},
-		StuckItems: &stuckitems.Config{Config: common},
-		FileWatch: &filewatch.Config{
-			Config:     common,
-			WatchFiles: config.WatchFiles,
-		},
+		SnapCron:   &snapcron.Action{Config: common},
+		StuckItems: &stuckitems.Action{Config: common},
 	}
 }
 
-// Start runs the timers.
+// Start creates all the triggers and runs the timers.
 func (c *Actions) Start() {
 	// Order may be important here.
-	c.PlexCron.Create() // must be closed.
-	c.StuckItems.Create()
-	c.SnapCron.Create()
-	c.Gaps.Create()
-	c.CFSync.Create()
-	c.Dashboard.Create()
+	c.PlexCron.Run() // must be stopped.
 	c.Backups.Create()
+	c.CFSync.Create()
 	c.CronTimer.Create()
-	c.common.RunTimers() // must be closed.
-	c.FileWatch.Run()
+	c.Dashboard.Create()
+	c.FileWatch.Run() // must be stopped.
+	c.Gaps.Create()
+	c.SnapCron.Create()
+	c.StuckItems.Create()
+	c.timers.Run() // must be stopped.
 }
 
 // Stop all internal cron timers and Triggers.
 func (c *Actions) Stop(event website.EventType) {
 	// This closes runTimerLoop() and fires stopTimerLoop().
-	c.common.Close(event)
+	c.timers.Stop(event)
 	// Stops the file and log watchers.
 	c.FileWatch.Stop()
 	// Closes the Plex session holder.
-	c.PlexCron.Close()
+	c.PlexCron.Stop()
 }

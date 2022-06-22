@@ -10,7 +10,7 @@ import (
 	"golift.io/starr"
 )
 
-func (c *Config) Backup(event website.EventType, app starr.App) error {
+func (c *Action) Backup(event website.EventType, app starr.App) error {
 	switch app {
 	default:
 		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
@@ -37,7 +37,7 @@ func (c *Config) Backup(event website.EventType, app starr.App) error {
 	return nil
 }
 
-func (c *Config) makeBackupTriggersLidarr() {
+func (c *Action) makeBackupTriggersLidarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Lidarr {
@@ -55,7 +55,7 @@ func (c *Config) makeBackupTriggersLidarr() {
 	})
 }
 
-func (c *Config) makeBackupTriggersRadarr() {
+func (c *Action) makeBackupTriggersRadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Radarr {
@@ -73,7 +73,7 @@ func (c *Config) makeBackupTriggersRadarr() {
 	})
 }
 
-func (c *Config) makeBackupTriggersReadarr() {
+func (c *Action) makeBackupTriggersReadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Readarr {
@@ -91,7 +91,7 @@ func (c *Config) makeBackupTriggersReadarr() {
 	})
 }
 
-func (c *Config) makeBackupTriggersSonarr() {
+func (c *Action) makeBackupTriggersSonarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Sonarr {
@@ -109,7 +109,7 @@ func (c *Config) makeBackupTriggersSonarr() {
 	})
 }
 
-func (c *Config) makeBackupTriggersProwlarr() {
+func (c *Action) makeBackupTriggersProwlarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Prowlarr {
@@ -127,7 +127,7 @@ func (c *Config) makeBackupTriggersProwlarr() {
 	})
 }
 
-func (c *Config) sendLidarrBackups(event website.EventType) {
+func (c *Action) sendLidarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Lidarr {
 		if app.Backup != mnd.Disabled || event != website.EventCron {
 			c.sendBackups(&genericInstance{
@@ -141,7 +141,7 @@ func (c *Config) sendLidarrBackups(event website.EventType) {
 	}
 }
 
-func (c *Config) sendProwlarrBackups(event website.EventType) {
+func (c *Action) sendProwlarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Prowlarr {
 		if app.Backup != mnd.Disabled || event != website.EventCron {
 			c.sendBackups(&genericInstance{
@@ -155,7 +155,7 @@ func (c *Config) sendProwlarrBackups(event website.EventType) {
 	}
 }
 
-func (c *Config) sendRadarrBackups(event website.EventType) {
+func (c *Action) sendRadarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Radarr {
 		if app.Backup != mnd.Disabled || event != website.EventCron {
 			c.sendBackups(&genericInstance{
@@ -169,7 +169,7 @@ func (c *Config) sendRadarrBackups(event website.EventType) {
 	}
 }
 
-func (c *Config) sendReadarrBackups(event website.EventType) {
+func (c *Action) sendReadarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Readarr {
 		if app.Backup != mnd.Disabled || event != website.EventCron {
 			c.sendBackups(&genericInstance{
@@ -183,7 +183,7 @@ func (c *Config) sendReadarrBackups(event website.EventType) {
 	}
 }
 
-func (c *Config) sendSonarrBackups(event website.EventType) {
+func (c *Action) sendSonarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Sonarr {
 		if app.Backup != mnd.Disabled || event != website.EventCron {
 			c.sendBackups(&genericInstance{
@@ -197,7 +197,7 @@ func (c *Config) sendSonarrBackups(event website.EventType) {
 	}
 }
 
-func (c *Config) sendBackups(input *genericInstance) {
+func (c *Action) sendBackups(input *genericInstance) {
 	fileList, err := input.app.GetBackupFiles()
 	if err != nil {
 		c.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
