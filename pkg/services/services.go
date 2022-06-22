@@ -10,10 +10,10 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
+func (c *Config) Setup(services []*Service) (*website.ServiceConfig, error) {
 	if c.Parallel > MaximumParallel {
 		c.Parallel = MaximumParallel
 	} else if c.Parallel == 0 {
@@ -31,13 +31,13 @@ func (c *Config) Setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 	return c.setup(services)
 }
 
-func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
+func (c *Config) setup(services []*Service) (*website.ServiceConfig, error) {
 	c.services = make(map[string]*Service)
-	scnfg := &notifiarr.ServiceConfig{
+	scnfg := &website.ServiceConfig{
 		Interval: c.Interval,
 		Parallel: c.Parallel,
 		Disabled: c.Disabled,
-		Checks:   make([]*notifiarr.ServiceCheck, len(services)),
+		Checks:   make([]*website.ServiceCheck, len(services)),
 	}
 
 	for idx, check := range services {
@@ -53,7 +53,7 @@ func (c *Config) setup(services []*Service) (*notifiarr.ServiceConfig, error) {
 
 		// Add this validated service to our service map.
 		c.services[services[idx].Name] = services[idx]
-		scnfg.Checks[idx] = &notifiarr.ServiceCheck{
+		scnfg.Checks[idx] = &website.ServiceCheck{
 			Name:     check.Name,
 			Type:     string(check.Type),
 			Expect:   check.Expect,
@@ -83,7 +83,7 @@ func (c *Config) Start() {
 	c.checks = make(chan *Service, DefaultBuffer)
 	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
-	c.triggerChan = make(chan notifiarr.EventType)
+	c.triggerChan = make(chan website.EventType)
 	c.checkChan = make(chan triggerCheck)
 
 	for i := uint(0); i < c.Parallel; i++ {
@@ -126,9 +126,9 @@ func (c *Config) loadServiceStates() {
 		return
 	}
 
-	values, err := c.Notifiarr.GetValue(names...)
+	values, err := c.Website.GetValue(names...)
 	if err != nil {
-		c.Errorf("Getting initial service states from Notifiarr.com: %v", err)
+		c.Errorf("Getting initial service states from website.com: %v", err)
 		return
 	}
 
@@ -173,7 +173,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 		defer second.Stop()
 
 		c.runChecks(true)
-		c.SendResults(&Results{What: notifiarr.EventStart, Svcs: c.GetResults()})
+		c.SendResults(&Results{What: website.EventStart, Svcs: c.GetResults()})
 	}
 
 	for {
@@ -186,7 +186,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 
 			return
 		case <-ticker.C:
-			c.SendResults(&Results{What: notifiarr.EventCron, Svcs: c.GetResults()})
+			c.SendResults(&Results{What: website.EventCron, Svcs: c.GetResults()})
 		case event := <-c.checkChan:
 			c.Debugf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(c.checks), cap(c.checks))

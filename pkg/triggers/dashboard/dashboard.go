@@ -1,4 +1,4 @@
-package notifiarr
+package dashboard
 
 import (
 	"fmt"
@@ -10,6 +10,9 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
@@ -21,16 +24,18 @@ import (
 /* This file sends state of affairs to notifiarr.com */
 // That is, it collects library data and downloader data.
 
+const TrigDashboard common.TriggerName = "Initiating State Collection for Dashboard."
+
+type Config struct {
+	*common.Config
+	PlexCron *plexcron.Config
+}
+
 // How many "upcoming" or "newest" items to send.
 const (
 	showNext   = 10
 	showLatest = 5
 )
-
-// dashConfig is the configuration returned from the notifiarr website.
-type dashConfig struct {
-	Interval cnfg.Duration `json:"interval"` // how often to fire in minutes.
-}
 
 // Sortable holds data about any Starr item. Kind of a generic data store.
 type Sortable struct {
@@ -98,12 +103,31 @@ type States struct {
 	Plex    *plex.Sessions `json:"plexSessions"`
 }
 
-// SendDashboardState sends the current states for the dashboard.
-func (t *Triggers) SendDashboardState(event EventType) {
-	t.exec(event, (TrigDashboard))
+func (c *Config) Create() {
+	var ticker *time.Ticker
+
+	ci := c.ClientInfo
+
+	if ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
+		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration)
+		c.Printf("==> Sending Current State Data for Dashboard, interval:%s, serial:%v",
+			ci.Actions.Dashboard.Interval, c.Config.Serial)
+	}
+
+	c.Add(&common.Action{
+		Name: TrigDashboard,
+		Fn:   c.sendDashboardState,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
 }
 
-func (c *Config) sendDashboardState(event EventType) {
+// SendDashboardState sends the current states for the dashboard.
+func (c *Config) SendDashboardState(event website.EventType) {
+	c.Exec(event, TrigDashboard)
+}
+
+func (c *Config) sendDashboardState(event website.EventType) {
 	cmd := c.getStatesParallel
 	if c.Serial {
 		cmd = c.getStatesSerial
@@ -115,8 +139,8 @@ func (c *Config) sendDashboardState(event EventType) {
 		apps   = time.Since(start).Round(time.Millisecond)
 	)
 
-	c.QueueData(&SendRequest{
-		Route:      DashRoute,
+	c.QueueData(&website.SendRequest{
+		Route:      website.DashRoute,
 		Event:      event,
 		LogPayload: true,
 		LogMsg:     fmt.Sprintf("Dashboard State (elapsed: %v)", apps),
@@ -126,7 +150,7 @@ func (c *Config) sendDashboardState(event EventType) {
 
 // getStatesSerial grabs data for each app serially.
 func (c *Config) getStatesSerial() *States {
-	sessions, _ := c.GetSessions(false)
+	sessions, _ := c.PlexCron.GetSessions(false)
 
 	return &States{
 		Deluge:  c.getDelugeStates(),
@@ -185,7 +209,7 @@ func (c *Config) getStatesParallel() *States {
 	}()
 	go func() {
 		defer c.CapturePanic()
-		states.Plex, _ = c.GetSessions(false)
+		states.Plex, _ = c.PlexCron.GetSessions(false)
 		wg.Done() //nolint:wsl
 	}()
 	wg.Wait()

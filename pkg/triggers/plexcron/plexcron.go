@@ -1,13 +1,26 @@
-package notifiarr
+package plexcron
 
 import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 )
+
+type Config struct {
+	*common.Config
+	Plex    *plex.Server
+	sess    chan time.Time // Return Plex Sessions
+	sessr   chan *holder   // Session Return Channel
+	psMutex sync.RWMutex   // Locks plex session thread.
+}
+
+const TrigPlexSessions common.TriggerName = "Gathering and sending Plex Sessions."
 
 // Statuses for an item being played on Plex.
 const (
@@ -24,15 +37,50 @@ type holder struct {
 	error    error
 }
 
-var ErrNoChannel = fmt.Errorf("no channel to send session request")
-
 // SendPlexSessions sends plex sessions in a go routine through a channel.
-func (t *Triggers) SendPlexSessions(event EventType) {
-	t.exec(event, TrigPlexSessions)
+func (c *Config) SendPlexSessions(event website.EventType) {
+	c.Exec(event, TrigPlexSessions)
+}
+
+func (c *Config) Create() {
+	if !c.Plex.Configured() {
+		return
+	}
+
+	c.sess = make(chan time.Time, 1)
+	c.sessr = make(chan *holder)
+	go c.runSessionHolder() //nolint:wsl
+
+	var ticker *time.Ticker
+
+	if c.Plex.Interval.Duration > 0 {
+		// Add a little splay to the timers to not hit plex at the same time too often.
+		ticker = time.NewTicker(c.Plex.Interval.Duration + 139*time.Millisecond)
+		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
+			c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown, c.Plex.Delay)
+	}
+
+	c.Add(&common.Action{
+		Name: TrigPlexSessions,
+		Fn:   c.sendPlexSessions,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
+
+	if c.Plex.MoviesPC != 0 || c.Plex.SeriesPC != 0 {
+		c.Printf("==> Plex Completed Items Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%%",
+			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
+		c.Add(&common.Action{
+			Name: "Checking Plex for completed sessions.",
+			Hide: true, // do not log this one.
+			SFn:  c.checkPlexFinishedItems,
+			T:    time.NewTicker(time.Minute + 179*time.Millisecond),
+		})
+	}
 }
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
-func (c *Config) sendPlexSessions(event EventType) {
+func (c *Config) sendPlexSessions(event website.EventType) {
 	if !c.Plex.Configured() {
 		return
 	}
@@ -40,11 +88,11 @@ func (c *Config) sendPlexSessions(event EventType) {
 	c.CollectSessions(event, nil)
 }
 
-// collectSessions is called in a go routine after a plex media.play webhook.
+// CollectSessions is called in a go routine after a plex media.play webhook.
 // This reaches back into Plex, asks for sessions and then sends the whole
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
-func (c *Config) CollectSessions(event EventType, hook *plex.IncomingWebhook) {
+func (c *Config) CollectSessions(event website.EventType, hook *plex.IncomingWebhook) {
 	wait := false
 	msg := ""
 
@@ -64,24 +112,25 @@ func (c *Config) CollectSessions(event EventType, hook *plex.IncomingWebhook) {
 // Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
 // Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
 func (c *Config) GetSessions(wait bool) (*plex.Sessions, error) {
-	c.Trigger.psMutex.RLock()
-	defer c.Trigger.psMutex.RUnlock()
+	c.psMutex.RLock()
+	defer c.psMutex.RUnlock()
 
-	if c.Trigger.sess == nil {
-		return nil, ErrNoChannel
+	if c.sess == nil {
+		return nil, common.ErrNoChannel
 	}
 
 	if wait {
-		c.Trigger.sess <- time.Now().Add(c.Plex.Delay.Duration)
+		c.sess <- time.Now().Add(c.Plex.Delay.Duration)
 	} else {
-		c.Trigger.sess <- time.Now().Add(-c.Plex.Delay.Duration)
+		c.sess <- time.Now().Add(-c.Plex.Delay.Duration)
 	}
 
-	s := <-c.Trigger.sessr
+	s := <-c.sessr
 
 	return s.sessions, s.error
 }
 
+// runSessionHolder runs a session holder routine. Call Create() first.
 func (c *Config) runSessionHolder() { //nolint:cyclop
 	defer c.CapturePanic()
 
@@ -93,9 +142,9 @@ func (c *Config) runSessionHolder() { //nolint:cyclop
 		}
 	}
 
-	for waitUntil := range c.Trigger.sess {
+	for waitUntil := range c.sess {
 		if sessions != nil && err == nil && sessions.Updated.After(waitUntil) {
-			c.Trigger.sessr <- &holder{sessions: sessions}
+			c.sessr <- &holder{sessions: sessions}
 			continue
 		}
 
@@ -115,10 +164,10 @@ func (c *Config) runSessionHolder() { //nolint:cyclop
 			sessions = currSessions
 		}
 
-		c.Trigger.sessr <- &holder{sessions: sessions, error: err}
+		c.sessr <- &holder{sessions: sessions, error: err}
 	}
 
-	close(c.Trigger.sessr) // indicate we're done.
+	close(c.sessr) // indicate we're done.
 }
 
 // plexSessionTracker checks for state changes between the previous session pull
@@ -192,13 +241,13 @@ func (c *Config) checkSessionDone(session *plex.Session, pct float64) string {
 		return statusIgnoring
 	case session.Player.State != "playing":
 		return statusPaused
-	case c.Plex.MoviesPC > 0 && EventType(session.Type) == EventMovie:
+	case c.Plex.MoviesPC > 0 && website.EventType(session.Type) == website.EventMovie:
 		if pct < float64(c.Plex.MoviesPC) {
 			return statusWatching
 		}
 
 		return c.sendSessionDone(session)
-	case c.Plex.SeriesPC > 0 && EventType(session.Type) == EventEpisode:
+	case c.Plex.SeriesPC > 0 && website.EventType(session.Type) == website.EventEpisode:
 		if pct < float64(c.Plex.SeriesPC) {
 			return statusWatching
 		}
@@ -214,13 +263,13 @@ func (c *Config) sendSessionDone(session *plex.Session) string {
 		return statusError + ": " + err.Error()
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), c.Snap.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(context.Background(), c.Snapshot.Timeout.Duration)
 	snap := c.getMetaSnap(ctx)
 	cancel() //nolint:wsl
 
-	route := PlexRoute.Path(EventType(session.Type))
+	route := website.PlexRoute.Path(website.EventType(session.Type))
 
-	_, err := c.SendData(route, &Payload{
+	_, err := c.SendData(route, &website.Payload{
 		Snap: snap,
 		Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
 	}, true)
@@ -249,4 +298,19 @@ func (c *Config) checkPlexAgent(session *plex.Session) error {
 	}
 
 	return nil
+}
+
+// Close the Plex session holder.
+func (c *Config) Close() {
+	c.psMutex.Lock()
+	defer c.psMutex.Unlock()
+
+	if c.sess == nil {
+		return
+	}
+
+	close(c.sess)
+	<-c.sessr // wait for session holder to return
+	c.sessr = nil
+	c.sess = nil
 }

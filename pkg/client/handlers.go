@@ -11,8 +11,8 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -117,7 +117,7 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 	response.WriteHeader(http.StatusNotFound)
 
 	if err := c.templat.ExecuteTemplate(response, "404.html", nil); err != nil {
-		c.Errorf("Sending HTTP Reply: %v", err)
+		c.Logger.Errorf("Sending HTTP Reply: %v", err)
 	}
 }
 
@@ -205,21 +205,21 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 }
 
 func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
-	return c.runTrigger(notifiarr.EventAPI, mux.Vars(r)["trigger"], mux.Vars(r)["content"])
+	return c.runTrigger(website.EventAPI, mux.Vars(r)["trigger"], mux.Vars(r)["content"])
 }
 
-func (c *Client) runTrigger(source notifiarr.EventType, trigger, content string) (int, string) { //nolint:cyclop,funlen
+func (c *Client) runTrigger(source website.EventType, trigger, content string) (int, string) { //nolint:cyclop,funlen
 	if content != "" {
-		c.Debugf("Incoming API Trigger: %s (%s)", trigger, content)
+		c.Logger.Debugf("Incoming API Trigger: %s (%s)", trigger, content)
 	} else {
-		c.Debugf("Incoming API Trigger: %s", trigger)
+		c.Logger.Debugf("Incoming API Trigger: %s", trigger)
 	}
 
 	title := cases.Title(language.AmericanEnglish)
 
 	switch trigger {
 	case "cfsync":
-		c.website.Trigger.SyncCF(source)
+		c.triggers.CFSync.SyncCF(source)
 		return http.StatusOK, "TRaSH Custom Formats and Release Profile Sync initiated."
 	case "services":
 		c.Config.Services.RunChecks(source)
@@ -229,42 +229,42 @@ func (c *Client) runTrigger(source notifiarr.EventType, trigger, content string)
 			return http.StatusNotImplemented, "Plex Sessions are not enabled."
 		}
 
-		c.website.Trigger.SendPlexSessions(source)
+		c.triggers.PlexCron.SendPlexSessions(source)
 
 		return http.StatusOK, "Plex sessions triggered."
 	case "stuckitems":
-		c.website.Trigger.SendStuckQueueItems(source)
+		c.triggers.StuckItems.SendStuckQueueItems(source)
 		return http.StatusOK, "Stuck Queue Items triggered."
 	case "dashboard":
-		c.website.Trigger.SendDashboardState(source)
+		c.triggers.Dashboard.SendDashboardState(source)
 		return http.StatusOK, "Dashboard states triggered."
 	case "snapshot":
-		c.website.Trigger.SendSnapshot(source)
+		c.triggers.SnapCron.SendSnapshot(source)
 		return http.StatusOK, "System Snapshot triggered."
 	case "gaps":
-		c.website.Trigger.SendGaps(source)
+		c.triggers.Gaps.SendGaps(source)
 		return http.StatusOK, "Radarr Collections Gaps initiated."
 	case "corrupt":
-		err := c.website.Trigger.Corruption(source, starr.App(title.String(content)))
+		err := c.triggers.Backups.Corruption(source, starr.App(title.String(content)))
 		if err != nil {
 			return http.StatusBadRequest, "Corruption trigger failed: " + err.Error()
 		}
 
 		return http.StatusOK, title.String(content) + " corruption checks initiated."
 	case "backup":
-		err := c.website.Trigger.Backup(source, starr.App(title.String(content)))
+		err := c.triggers.Backups.Backup(source, starr.App(title.String(content)))
 		if err != nil {
 			return http.StatusBadRequest, "Backup trigger failed: " + err.Error()
 		}
 
 		return http.StatusOK, title.String(content) + " backups check initiated."
 	case "reload":
-		defer c.triggerConfigReload(notifiarr.EventAPI, "HTTP Triggered Reload")
+		defer c.triggerConfigReload(website.EventAPI, "HTTP Triggered Reload")
 		return http.StatusOK, "Application reload initiated."
 	case "notification":
 		if content != "" {
 			ui.Notify("Notification: %s", content) //nolint:errcheck
-			c.Printf("NOTIFICATION: %s", content)
+			c.Logger.Printf("NOTIFICATION: %s", content)
 
 			return http.StatusOK, "Local Nntification sent."
 		}

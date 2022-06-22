@@ -11,8 +11,8 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/datacounter"
 )
 
@@ -80,12 +80,12 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "admin.database.corrupt"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
-		c.website.QueueData(&notifiarr.SendRequest{
-			Route:      notifiarr.PlexRoute,
-			Event:      notifiarr.EventHook,
+		c.website.QueueData(&website.SendRequest{
+			Route:      website.PlexRoute,
+			Event:      website.EventHook,
 			LogPayload: true,
 			LogMsg:     fmt.Sprintf("Plex Webhhok: %s '%s' ~> %s", v.Account.Title, v.Event, v.Metadata.Title),
-			Payload:    &notifiarr.Payload{Load: &v, Plex: &plex.Sessions{Name: c.Config.Plex.Name}},
+			Payload:    &website.Payload{Load: &v, Plex: &plex.Sessions{Name: c.Config.Plex.Name}},
 		})
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "process", http.StatusAccepted)
@@ -96,7 +96,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "media.play"):
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
-		go c.website.CollectSessions(notifiarr.EventHook, &v)
+		go c.triggers.PlexCron.CollectSessions(website.EventHook, &v)
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))

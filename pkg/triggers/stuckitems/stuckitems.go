@@ -1,4 +1,4 @@
-package notifiarr
+package stuckitems
 
 import (
 	"fmt"
@@ -6,11 +6,23 @@ import (
 	"sync"
 	"time"
 
-	"golift.io/cnfg"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/sonarr"
 )
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
+
+type Config struct {
+	*common.Config
+}
+
+const TrigStuckItems common.TriggerName = "Checking app queues and sending stuck items."
+
+const (
+	// How often to check starr apps for stuck items.
+	stuckDur = 5*time.Minute + 1327*time.Millisecond
+)
 
 const (
 	errorstr  = "error"
@@ -18,24 +30,6 @@ const (
 	warning   = "warning"
 	completed = "completed"
 )
-
-type appConfig struct {
-	Instance int           `json:"instance"`
-	Name     string        `json:"name"`
-	Stuck    bool          `json:"stuck"`
-	Corrupt  string        `json:"corrupt"`
-	Backup   string        `json:"backup"`
-	Interval cnfg.Duration `json:"interval"`
-}
-
-// appConfigs is the configuration returned from the notifiarr website.
-type appConfigs struct {
-	Lidarr   []*appConfig `json:"lidarr"`
-	Prowlarr []*appConfig `json:"prowlarr"`
-	Radarr   []*appConfig `json:"radarr"`
-	Readarr  []*appConfig `json:"readarr"`
-	Sonarr   []*appConfig `json:"sonarr"`
-}
 
 type ListItem struct {
 	Elapsed time.Duration `json:"elapsed"`
@@ -54,6 +48,16 @@ type QueuePayload struct {
 
 const getItemsMax = 100
 
+func (c *Config) Create() {
+	// XXX: check apps, make sure this needs to run.
+	c.Add(&common.Action{
+		Name: TrigStuckItems,
+		Fn:   c.sendStuckQueueItems,
+		C:    make(chan website.EventType, 1),
+		T:    time.NewTicker(stuckDur),
+	})
+}
+
 func (i ItemList) Len() (count int) {
 	for _, v := range i {
 		count += len(v.Queue)
@@ -66,11 +70,11 @@ func (i ItemList) Empty() bool {
 	return i.Len() < 1
 }
 
-func (t *Triggers) SendStuckQueueItems(event EventType) {
-	t.exec(event, TrigStuckItems)
+func (c *Config) SendStuckQueueItems(event website.EventType) {
+	c.Exec(event, TrigStuckItems)
 }
 
-func (c *Config) sendStuckQueueItems(event EventType) {
+func (c *Config) sendStuckQueueItems(event website.EventType) {
 	start := time.Now()
 	cue := c.getQueues()
 	apps := time.Since(start).Round(time.Millisecond)
@@ -80,8 +84,8 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 		return
 	}
 
-	c.QueueData(&SendRequest{
-		Route:      StuckRoute,
+	c.QueueData(&website.SendRequest{
+		Route:      website.StuckRoute,
 		Event:      event,
 		LogPayload: true,
 		LogMsg: fmt.Sprintf("Stuck Queue Items (apps:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d)",

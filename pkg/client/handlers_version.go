@@ -23,7 +23,7 @@ func (c *Client) versionHandler(r *http.Request) (int, interface{}) {
 	output := c.website.Info()
 	output["appsStatus"] = c.appStatsForVersion(r.Context())
 
-	if host, err := c.website.GetHostInfoUID(); err != nil {
+	if host, err := c.website.GetHostInfo(); err != nil {
 		output["hostError"] = err.Error()
 	} else {
 		output["host"] = host

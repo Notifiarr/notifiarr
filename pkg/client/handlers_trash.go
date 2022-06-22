@@ -8,7 +8,8 @@ import (
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/cfsync"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 )
 
@@ -23,12 +24,12 @@ func (c *Client) aggregateTrash(req *http.Request) (int, interface{}) {
 
 	var input struct {
 		Radarr struct { // used for "all"
-			Instances notifiarr.IntList `json:"instances"`
+			Instances website.IntList `json:"instances"`
 		} `json:"radarr"`
 		Sonarr struct { // used for "all"
-			Instances notifiarr.IntList `json:"instances"`
+			Instances website.IntList `json:"instances"`
 		} `json:"sonarr"`
-		Instances notifiarr.IntList `json:"instances"`
+		Instances website.IntList `json:"instances"`
 	}
 	// Extract POST payload.
 	err := json.NewDecoder(req.Body).Decode(&input)
@@ -53,14 +54,14 @@ func (c *Client) aggregateTrash(req *http.Request) (int, interface{}) {
 func (c *Client) aggregateTrashSonarr(
 	ctx context.Context,
 	wait *sync.WaitGroup,
-	instances notifiarr.IntList,
-) []*notifiarr.SonarrTrashPayload {
-	output := []*notifiarr.SonarrTrashPayload{}
+	instances website.IntList,
+) []*cfsync.SonarrTrashPayload {
+	output := []*cfsync.SonarrTrashPayload{}
 
 	// Create our known+requested instances, so we can write slice values in go routines.
 	for idx, app := range c.Config.Apps.Sonarr {
 		if instance := idx + 1; instances.Has(instance) {
-			output = append(output, &notifiarr.SonarrTrashPayload{Instance: instance, Name: app.Name})
+			output = append(output, &cfsync.SonarrTrashPayload{Instance: instance, Name: app.Name})
 		}
 	}
 
@@ -83,7 +84,7 @@ func (c *Client) aggregateTrashSonarrCall(
 	ctx context.Context,
 	idx, instance int,
 	wait *sync.WaitGroup,
-	output []*notifiarr.SonarrTrashPayload,
+	output []*cfsync.SonarrTrashPayload,
 ) {
 	defer wait.Done()
 
@@ -104,13 +105,13 @@ func (c *Client) aggregateTrashSonarrCall(
 func (c *Client) aggregateTrashRadarr(
 	ctx context.Context,
 	wait *sync.WaitGroup,
-	instances notifiarr.IntList,
-) []*notifiarr.RadarrTrashPayload {
-	output := []*notifiarr.RadarrTrashPayload{}
+	instances website.IntList,
+) []*cfsync.RadarrTrashPayload {
+	output := []*cfsync.RadarrTrashPayload{}
 	// Create our known+requested instances, so we can write slice values in go routines.
 	for i, app := range c.Config.Apps.Radarr {
 		if instance := i + 1; instances.Has(instance) {
-			output = append(output, &notifiarr.RadarrTrashPayload{Instance: instance, Name: app.Name})
+			output = append(output, &cfsync.RadarrTrashPayload{Instance: instance, Name: app.Name})
 		}
 	}
 
@@ -133,7 +134,7 @@ func (c *Client) aggregateTrashRadarrCall(
 	ctx context.Context,
 	idx, instance int,
 	wait *sync.WaitGroup,
-	output []*notifiarr.RadarrTrashPayload,
+	output []*cfsync.RadarrTrashPayload,
 ) {
 	defer wait.Done()
 

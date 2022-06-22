@@ -1,4 +1,4 @@
-package notifiarr
+package website
 
 import (
 	"encoding/json"

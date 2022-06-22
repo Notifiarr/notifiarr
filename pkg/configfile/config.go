@@ -20,11 +20,13 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/cnfg"
 	"golift.io/cnfgfile"
@@ -56,7 +58,7 @@ type Config struct {
 	Services   *services.Config       `json:"services" toml:"services" xml:"services" yaml:"services"`
 	Service    []*services.Service    `json:"service" toml:"service" xml:"service" yaml:"service"`
 	EnableApt  bool                   `json:"apt" toml:"apt" xml:"apt" yaml:"apt"`
-	WatchFiles []*notifiarr.WatchFile `json:"watchFiles" toml:"watch_file" xml:"watch_file" yaml:"watchFiles"`
+	WatchFiles []*filewatch.WatchFile `json:"watchFiles" toml:"watch_file" xml:"watch_file" yaml:"watchFiles"`
 	*logs.LogConfig
 	*apps.Apps
 	Allow AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
@@ -65,7 +67,7 @@ type Config struct {
 // NewConfig returns a fresh config with only defaults and a logger ready to go.
 func NewConfig(logger *logs.Logger) *Config {
 	return &Config{
-		Mode: notifiarr.ModeProd,
+		Mode: website.ModeProd,
 		Apps: &apps.Apps{
 			URLBase: "/",
 			Logger: apps.Logger{
@@ -117,24 +119,24 @@ func (c *Config) CopyConfig() (*Config, error) {
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 // You should only run this after getting a config with NewConfig().
-func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
+func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	if flag.ConfigFile != "" {
 		files := append([]string{flag.ConfigFile}, flag.ExtraConf...)
 		if err := cnfgfile.Unmarshal(c, files...); err != nil {
-			return nil, fmt.Errorf("config file: %w", err)
+			return nil, nil, fmt.Errorf("config file: %w", err)
 		}
 	} else if len(flag.ExtraConf) != 0 {
 		if err := cnfgfile.Unmarshal(c, flag.ExtraConf...); err != nil {
-			return nil, fmt.Errorf("extra config file: %w", err)
+			return nil, nil, fmt.Errorf("extra config file: %w", err)
 		}
 	}
 
 	if _, err := cnfg.UnmarshalENV(c, flag.EnvPrefix); err != nil {
-		return nil, fmt.Errorf("environment variables: %w", err)
+		return nil, nil, fmt.Errorf("environment variables: %w", err)
 	}
 
 	if err := c.setupPassword(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	c.Apps.APIKey = strings.TrimSpace(c.Apps.APIKey)
@@ -143,36 +145,42 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 
 	svcs, err := c.Services.Setup(c.Service)
 	if err != nil {
-		return nil, fmt.Errorf("service checks: %w", err)
+		return nil, nil, fmt.Errorf("service checks: %w", err)
 	}
 
 	// Make sure the port is not in use before starting the web server.
 	c.BindAddr, err = CheckPort(c.BindAddr)
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
-	c.Services.Notifiarr = &notifiarr.Config{
-		Apps:       c.Apps,
-		Plex:       c.Plex,
-		Snap:       c.Snapshot,
-		Logger:     c.Services.Logger,
-		BaseURL:    notifiarr.BaseURL,
-		Timeout:    c.Timeout,
-		MaxBody:    c.MaxBody,
-		Retries:    c.Retries,
-		Serial:     c.Serial,
-		Services:   svcs,
-		WatchFiles: c.WatchFiles,
-	}
+	c.Services.Website = website.New(&website.Config{
+		Apps:     c.Apps,
+		Plex:     c.Plex,
+		Logger:   c.Services.Logger,
+		BaseURL:  website.BaseURL,
+		Timeout:  c.Timeout,
+		MaxBody:  c.MaxBody,
+		Retries:  c.Retries,
+		Serial:   c.Serial,
+		Services: svcs,
+	})
 	c.setup()
 
-	return c.Services.Notifiarr, err
+	return c.Services.Website, triggers.New(&triggers.Config{
+		Apps:       c.Apps,
+		Plex:       c.Plex,
+		Serial:     c.Serial,
+		Website:    c.Services.Website,
+		Snapshot:   c.Snapshot,
+		WatchFiles: c.WatchFiles,
+		Logger:     c.Services.Logger,
+	}), err
 }
 
 func (c *Config) setup() {
-	c.Mode = c.Services.Notifiarr.Setup(c.Mode)
+	c.Mode = c.Services.Website.Mode
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
-	share.Setup(c.Services.Notifiarr)
+	share.Setup(c.Services.Website)
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = mnd.DefaultTimeout
@@ -210,7 +218,7 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, str
 		if _, err := os.Stat(fileName); err == nil {
 			confFile = fileName
 			break
-		} // else { c.Print("rip:", err) }
+		} //  else { log.Printf("rip: %v", err) }
 	}
 
 	if configFile = ""; confFile != "" {

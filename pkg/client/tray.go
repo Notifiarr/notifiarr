@@ -11,11 +11,9 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/getlantern/systray"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"golift.io/starr"
 	"golift.io/version"
 )
@@ -29,7 +27,7 @@ const timerPrefix = "TimErr"
 var menu = make(map[string]*systray.MenuItem) //nolint:gochecknoglobals
 
 // startTray Run()s readyTray to bring up the web server and the GUI app.
-func (c *Client) startTray(clientInfo *notifiarr.ClientInfo) {
+func (c *Client) startTray(clientInfo *website.ClientInfo) {
 	systray.Run(func() {
 		defer os.Exit(0)
 		defer c.CapturePanic()
@@ -59,12 +57,10 @@ func (c *Client) startTray(clientInfo *notifiarr.ClientInfo) {
 	})
 }
 
-func (c *Client) setupMenus(clientInfo *notifiarr.ClientInfo) {
+func (c *Client) setupMenus(clientInfo *website.ClientInfo) {
 	if !ui.HasGUI() {
 		return
 	}
-
-	menu["mode"].SetTitle("Mode: " + cases.Title(language.AmericanEnglish).String(c.Config.Mode))
 
 	if !c.Config.Debug {
 		menu["debug"].Hide()
@@ -96,7 +92,7 @@ func (c *Client) setupMenus(clientInfo *notifiarr.ClientInfo) {
 		return
 	}
 
-	go c.buildDynamicTimerMenus(clientInfo)
+	go c.buildDynamicTimerMenus()
 
 	if clientInfo.IsSub() {
 		menu["sub"].SetTitle("Subscriber \u2764\ufe0f")
@@ -177,7 +173,6 @@ func (c *Client) makeMoreChannels() {
 
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	menu["debug"] = debug
-	menu["mode"] = debug.AddSubMenuItem("Mode: "+cases.Title(language.AmericanEnglish).String(c.Config.Mode), "toggle application mode")
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
 	menu["console"] = debug.AddSubMenuItem("Console", "toggle the console window")
@@ -219,10 +214,11 @@ func (c *Client) closeDynamicTimerMenus() {
 }
 
 // dynamic & reusable menu items with reflection, anyone?
-func (c *Client) buildDynamicTimerMenus(clientInfo *notifiarr.ClientInfo) {
+func (c *Client) buildDynamicTimerMenus() {
 	defer c.CapturePanic()
 
-	if clientInfo == nil || len(clientInfo.Actions.Custom) == 0 {
+	timers := c.triggers.CronTimer.List()
+	if len(timers) == 0 {
 		return
 	}
 
@@ -236,7 +232,6 @@ func (c *Client) buildDynamicTimerMenus(clientInfo *notifiarr.ClientInfo) {
 	menu["timerinfo"].Disable()
 	defer menu["timerinfo"].Hide()
 
-	timers := clientInfo.Actions.Custom
 	cases := make([]reflect.SelectCase, len(timers))
 
 	for idx, timer := range timers {
@@ -265,7 +260,7 @@ func (c *Client) buildDynamicTimerMenus(clientInfo *notifiarr.ClientInfo) {
 
 	for {
 		if idx, _, ok := reflect.Select(cases); ok {
-			timers[idx].Run(notifiarr.EventUser)
+			timers[idx].Run(website.EventUser)
 		} else if cases = append(cases[:idx], cases[idx+1:]...); len(cases) < 1 {
 			// Channel cases[idx] has been closed, remove it.
 			return // no menus left to watch, exit.
@@ -284,7 +279,7 @@ func (c *Client) watchKillerChannels() {
 		case <-menu["debug_panic"].ClickedCh:
 			c.menuPanic()
 		case <-menu["load"].ClickedCh:
-			c.triggerConfigReload(notifiarr.EventUser, "User Requested")
+			c.triggerConfigReload(website.EventUser, "User Requested")
 		}
 	}
 }
@@ -298,13 +293,13 @@ func (c *Client) watchGuiChannels() {
 		case <-menu["gh"].ClickedCh:
 			go ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
 		case <-menu["hp"].ClickedCh:
-			go ui.OpenURL("https://notifiarr.com/")
+			go ui.OpenURL("https://website.com/")
 		case <-menu["wiki"].ClickedCh:
-			go ui.OpenURL("https://notifiarr.wiki/")
+			go ui.OpenURL("https://website.wiki/")
 		case <-menu["trash"].ClickedCh:
 			go ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/")
 		case <-menu["disc1"].ClickedCh:
-			go ui.OpenURL("https://notifiarr.com/discord")
+			go ui.OpenURL("https://website.com/discord")
 		case <-menu["disc2"].ClickedCh:
 			go ui.OpenURL("https://golift.io/discord")
 		case <-menu["sub"].ClickedCh:
@@ -313,10 +308,8 @@ func (c *Client) watchGuiChannels() {
 	}
 }
 
-// nolint:errcheck,cyclop
+// nolint:errcheck
 func (c *Client) watchConfigChannels() {
-	title := cases.Title(language.AmericanEnglish)
-
 	for {
 		select {
 		case <-menu["view"].ClickedCh:
@@ -334,16 +327,6 @@ func (c *Client) watchConfigChannels() {
 				menu["console"].Check()
 				ui.ShowConsoleWindow()
 			}
-		case <-menu["mode"].ClickedCh:
-			if c.Config.Mode == notifiarr.ModeDev {
-				c.Config.Mode = c.website.Setup(notifiarr.ModeProd)
-			} else {
-				c.Config.Mode = c.website.Setup(notifiarr.ModeDev)
-			}
-
-			menu["mode"].SetTitle("Mode: " + title.String(c.Config.Mode))
-			c.Printf("[user requested] Application mode changed to %s!", title.String(c.Config.Mode))
-			ui.Notify("Application mode changed to %s!", title.String(c.Config.Mode))
 		case <-menu["svcs"].ClickedCh:
 			if menu["svcs"].Checked() {
 				menu["svcs"].Uncheck()
@@ -392,9 +375,9 @@ func (c *Client) watchNotifiarrMenu() {
 	for {
 		select {
 		case <-menu["gaps"].ClickedCh:
-			c.website.Trigger.SendGaps(notifiarr.EventUser)
+			c.triggers.Gaps.SendGaps(website.EventUser)
 		case <-menu["sync_cf"].ClickedCh:
-			c.website.Trigger.SyncCF(notifiarr.EventUser)
+			c.triggers.CFSync.SyncCF(website.EventUser)
 		case <-menu["svcs_log"].ClickedCh:
 			c.Print("[user requested] Checking services and logging results.")
 			ui.Notify("Running and logging %d Service Checks.", len(c.Config.Service))
@@ -402,35 +385,35 @@ func (c *Client) watchNotifiarrMenu() {
 		case <-menu["svcs_prod"].ClickedCh:
 			c.Print("[user requested] Checking services and sending results to Notifiarr.")
 			ui.Notify("Running and sending %d Service Checks.", len(c.Config.Service))
-			c.Config.Services.RunChecks(notifiarr.EventUser)
+			c.Config.Services.RunChecks(website.EventUser)
 		case <-menu["app_ques"].ClickedCh:
-			c.website.Trigger.SendStuckQueueItems(notifiarr.EventUser)
+			c.triggers.StuckItems.SendStuckQueueItems(website.EventUser)
 		case <-menu["plex_prod"].ClickedCh:
-			c.website.Trigger.SendPlexSessions(notifiarr.EventUser)
+			c.triggers.PlexCron.SendPlexSessions(website.EventUser)
 		case <-menu["snap_prod"].ClickedCh:
-			c.website.Trigger.SendSnapshot(notifiarr.EventUser)
+			c.triggers.SnapCron.SendSnapshot(website.EventUser)
 		case <-menu["send_dash"].ClickedCh:
-			c.website.Trigger.SendDashboardState(notifiarr.EventUser)
+			c.triggers.Dashboard.SendDashboardState(website.EventUser)
 		case <-menu["corrLidarr"].ClickedCh:
-			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Lidarr)
+			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Lidarr)
 		case <-menu["corrProwlarr"].ClickedCh:
-			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Prowlarr)
+			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Prowlarr)
 		case <-menu["corrRadarr"].ClickedCh:
-			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Radarr)
+			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Radarr)
 		case <-menu["corrReadarr"].ClickedCh:
-			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Readarr)
+			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Readarr)
 		case <-menu["corrSonarr"].ClickedCh:
-			_ = c.website.Trigger.Corruption(notifiarr.EventUser, starr.Sonarr)
+			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Sonarr)
 		case <-menu["backLidarr"].ClickedCh:
-			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Lidarr)
+			_ = c.triggers.Backups.Backup(website.EventUser, starr.Lidarr)
 		case <-menu["backProwlarr"].ClickedCh:
-			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Prowlarr)
+			_ = c.triggers.Backups.Backup(website.EventUser, starr.Prowlarr)
 		case <-menu["backRadarr"].ClickedCh:
-			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Radarr)
+			_ = c.triggers.Backups.Backup(website.EventUser, starr.Radarr)
 		case <-menu["backReadarr"].ClickedCh:
-			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Readarr)
+			_ = c.triggers.Backups.Backup(website.EventUser, starr.Readarr)
 		case <-menu["backSonarr"].ClickedCh:
-			_ = c.website.Trigger.Backup(notifiarr.EventUser, starr.Sonarr)
+			_ = c.triggers.Backups.Backup(website.EventUser, starr.Sonarr)
 		}
 	}
 }

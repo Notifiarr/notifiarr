@@ -18,8 +18,8 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
@@ -196,7 +196,7 @@ type templateData struct {
 	Version     map[string]interface{}         `json:"version"`
 	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
-	ClientInfo  *notifiarr.ClientInfo          `json:"clientInfo"`
+	ClientInfo  *website.ClientInfo            `json:"clientInfo"`
 	Expvar      exp.AllData                    `json:"expvar"`
 	HostInfo    *host.InfoStat                 `json:"hostInfo"`
 	Disks       map[string]*snapshot.Partition `json:"disks"`
@@ -210,11 +210,12 @@ func (c *Client) renderTemplate(
 ) {
 	clientInfo, _ := c.website.GetClientInfo()
 	if clientInfo == nil {
-		clientInfo = &notifiarr.ClientInfo{}
+		clientInfo = &website.ClientInfo{}
 	}
 
 	binary, _ := os.Executable()
 	userName, dynamic := c.getUserName(req)
+	hostInfo, _ := c.website.GetHostInfo()
 
 	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
@@ -243,7 +244,7 @@ func (c *Client) renderTemplate(
 			"docker":    mnd.IsDocker,
 		},
 		Expvar:   exp.GetAllData(),
-		HostInfo: c.website.HostInfoNoError(),
+		HostInfo: hostInfo,
 	})
 	if err != nil {
 		c.Errorf("Sending HTTP Response: %v", err)

@@ -7,8 +7,8 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
 )
 
@@ -39,14 +39,14 @@ type Config struct {
 	Disabled     bool              `toml:"disabled" xml:"disabled" json:"disabled"`
 	LogFile      string            `toml:"log_file" xml:"log_file" json:"logFile"`
 	Apps         *apps.Apps        `toml:"-" json:"-"`
-	Notifiarr    *notifiarr.Config `toml:"-" json:"-"`
+	Website      *website.Server   `toml:"-" json:"-"`
 	Plugins      *snapshot.Plugins `toml:"-" json:"-"`
 	*logs.Logger `json:"-"`        // log file writer
 	services     map[string]*Service
 	checks       chan *Service
 	done         chan bool
 	stopChan     chan struct{}
-	triggerChan  chan notifiarr.EventType
+	triggerChan  chan website.EventType
 	checkChan    chan triggerCheck
 	stopLock     sync.Mutex
 }
@@ -73,12 +73,12 @@ const (
 	StateUnknown
 )
 
-// Results is sent to Notifiarr.
+// Results is sent to website.
 type Results struct {
-	Type     string              `json:"eventType"`
-	What     notifiarr.EventType `json:"what"`
-	Interval float64             `json:"interval"`
-	Svcs     []*CheckResult      `json:"services"`
+	Type     string            `json:"eventType"`
+	What     website.EventType `json:"what"`
+	Interval float64           `json:"interval"`
+	Svcs     []*CheckResult    `json:"services"`
 }
 
 // CheckResult represents the status of a service.

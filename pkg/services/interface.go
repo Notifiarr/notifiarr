@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 const valuePrefix = "serviceCheck-"
@@ -13,7 +13,7 @@ const valuePrefix = "serviceCheck-"
 var ErrSvcsStopped = fmt.Errorf("service check routine stopped")
 
 // RunChecks runs checks from an external package.
-func (c *Config) RunChecks(source notifiarr.EventType) {
+func (c *Config) RunChecks(source website.EventType) {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
 
@@ -26,7 +26,7 @@ func (c *Config) RunChecks(source notifiarr.EventType) {
 }
 
 // RunCheck runs a single check from an external package.
-func (c *Config) RunCheck(source notifiarr.EventType, name string) error {
+func (c *Config) RunCheck(source website.EventType, name string) error {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
 
@@ -108,7 +108,7 @@ func (c *Config) updateStatesOnSite() {
 		return
 	}
 
-	if err := c.Notifiarr.SetValues(values); err != nil {
+	if err := c.Website.SetValues(values); err != nil {
 		c.Errorf("Setting Service States on Notifiarr.com: %v", err)
 	}
 }
@@ -148,8 +148,8 @@ func (s *Service) copyResults() *CheckResult {
 func (c *Config) SendResults(results *Results) {
 	results.Interval = c.Interval.Seconds()
 
-	c.Notifiarr.QueueData(&notifiarr.SendRequest{
-		Route:      notifiarr.SvcRoute,
+	c.Website.QueueData(&website.SendRequest{
+		Route:      website.SvcRoute,
 		Event:      results.What,
 		LogPayload: true,
 		LogMsg: fmt.Sprintf("%d service updates to Notifiarr, event: %s, buffer: %d/%d",

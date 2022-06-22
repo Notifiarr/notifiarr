@@ -21,10 +21,10 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 )
@@ -236,7 +236,7 @@ func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
 }
 
 func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
-	defer c.triggerConfigReload(notifiarr.EventGUI, "GUI Requested")
+	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
 	http.Error(response, "OK", http.StatusOK)
 }
 
@@ -259,7 +259,7 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 
 func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Request) {
 	svc := mux.Vars(req)["service"]
-	if err := c.Config.Services.RunCheck(notifiarr.EventAPI, svc); err != nil {
+	if err := c.Config.Services.RunCheck(website.EventAPI, svc); err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -371,7 +371,7 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 }
 
 func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
-	code, data := c.runTrigger(notifiarr.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
+	code, data := c.runTrigger(website.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
 	http.Error(response, data, code)
 }
 
@@ -392,18 +392,18 @@ func (c *Client) handleStartFileWatcher(response http.ResponseWriter, request *h
 		return
 	}
 
-	if idx < 0 || idx >= len(c.website.WatchFiles) {
+	if idx < 0 || idx >= len(c.triggers.FileWatch.WatchFiles) {
 		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
 		return
 	}
 
-	watch := c.website.WatchFiles[idx]
+	watch := c.triggers.FileWatch.WatchFiles[idx]
 	if watch.Active() {
 		http.Error(response, "Watcher already running! "+watch.Path, http.StatusNotAcceptable)
 		return
 	}
 
-	if err := c.website.AddFileWatcher(watch); err != nil {
+	if err := c.triggers.FileWatch.AddFileWatcher(watch); err != nil {
 		http.Error(response, "Start Failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -418,12 +418,12 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 		return
 	}
 
-	if idx < 0 || idx >= len(c.website.WatchFiles) {
+	if idx < 0 || idx >= len(c.triggers.FileWatch.WatchFiles) {
 		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
 		return
 	}
 
-	watch := c.website.WatchFiles[idx]
+	watch := c.triggers.FileWatch.WatchFiles[idx]
 	if !watch.Active() {
 		http.Error(response, "Watcher already stopped! "+watch.Path, http.StatusNotAcceptable)
 		return
@@ -486,7 +486,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// reload.
-	defer c.triggerConfigReload(notifiarr.EventGUI, "GUI Requested")
+	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
 
 	// respond.
 	c.Printf("[gui '%s' requested] Updated Configuration.", user)
@@ -504,7 +504,7 @@ func (c *Client) saveNewConfig(config *configfile.Config) error {
 	}
 
 	// make config file backup.
-	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
+	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.website."+date+".conf")
 	if err := configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			return fmt.Errorf("backing up config file: %w", err)

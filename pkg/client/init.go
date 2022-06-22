@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"golift.io/cnfg"
@@ -19,13 +19,13 @@ import (
 
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
-func (c *Client) PrintStartupInfo(clientInfo *notifiarr.ClientInfo) {
+func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 	if clientInfo != nil {
 		c.Printf("==> %s", clientInfo)
 		c.printVersionChangeInfo()
 	}
 
-	if hi, err := c.website.GetHostInfoUID(); err != nil {
+	if hi, err := c.website.GetHostInfo(); err != nil {
 		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
 	} else {
 		c.Printf("==> Unique ID: %s (%s)", hi.HostID, hi.Hostname)

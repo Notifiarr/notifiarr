@@ -2,11 +2,12 @@
 package share
 
 import (
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 type Website interface {
-	QueueData(data *notifiarr.SendRequest)
+	QueueData(data *website.SendRequest)
 	HaveClientInfo() bool
 }
 
@@ -23,10 +24,10 @@ func Log(msg string) {
 		return
 	}
 
-	config.QueueData(&notifiarr.SendRequest{
-		Payload:    &notifiarr.Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
-		Route:      notifiarr.LogLineRoute,
-		Event:      notifiarr.EventFile,
+	config.QueueData(&website.SendRequest{
+		Payload:    &filewatch.Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
+		Route:      website.LogLineRoute,
+		Event:      website.EventFile,
 		LogPayload: true,
 	})
 }
