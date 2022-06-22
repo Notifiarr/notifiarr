@@ -1,5 +1,3 @@
-# Notifiarr Client
-
 <img src="https://docs.notifiarr.com/img/repo-logo.png">
 
 This is the unified client for [Notifiarr.com](https://notifiarr.com).
