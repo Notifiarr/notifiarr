@@ -77,7 +77,7 @@ func New(config *Config) *Actions {
 // Start runs the timers.
 func (c *Actions) Start() {
 	// Order may be important here.
-	c.PlexCron.Create()
+	c.PlexCron.Create() // must be closed.
 	c.StuckItems.Create()
 	c.SnapCron.Create()
 	c.Gaps.Create()
@@ -85,7 +85,7 @@ func (c *Actions) Start() {
 	c.Dashboard.Create()
 	c.Backups.Create()
 	c.CronTimer.Create()
-	c.common.RunTimers()
+	c.common.RunTimers() // must be closed.
 	c.FileWatch.Run()
 }
 
