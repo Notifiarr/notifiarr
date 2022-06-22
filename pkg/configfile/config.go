@@ -153,6 +153,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Website = website.New(&website.Config{
+		Mode:     c.Mode,
 		Apps:     c.Apps,
 		Plex:     c.Plex,
 		Logger:   c.Services.Logger,
