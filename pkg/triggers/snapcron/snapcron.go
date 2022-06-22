@@ -2,6 +2,7 @@ package snapcron
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -14,12 +15,18 @@ type Config struct {
 }
 
 func (c *Config) Create() {
+	var ticker *time.Ticker
+
+	if c.Snapshot.Interval.Duration > 0 {
+		ticker = time.NewTicker(c.Snapshot.Interval.Duration)
+	}
+
 	c.printLog()
 	c.Add(&common.Action{
 		Name: TrigSnapshot,
 		Fn:   c.sendSnapshot,
 		C:    make(chan website.EventType, 1),
-		T:    common.TickerOrNil(c.Snapshot.Interval.Duration),
+		T:    ticker,
 	})
 }
 

@@ -219,8 +219,11 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 
 	switch trigger {
 	case "cfsync":
-		c.triggers.CFSync.SyncCF(source)
-		return http.StatusOK, "TRaSH Custom Formats and Release Profile Sync initiated."
+		c.triggers.CFSync.SyncRadarrCF(source)
+		return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated."
+	case "qpsync":
+		c.triggers.CFSync.SyncSonarrQP(source)
+		return http.StatusOK, "TRaSH Quality Profile Sonarr Sync initiated."
 	case "services":
 		c.Config.Services.RunChecks(source)
 		return http.StatusOK, "All service checks rescheduled for immediate exeution."

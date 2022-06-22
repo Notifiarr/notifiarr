@@ -88,6 +88,14 @@ type Payload struct {
 
 // Create sets up all the triggers.
 func (c *Config) Create() {
-	c.makeBackupTriggers()
-	c.makeCorruptionTriggers()
+	c.makeBackupTriggersLidarr()
+	c.makeBackupTriggersRadarr()
+	c.makeBackupTriggersReadarr()
+	c.makeBackupTriggersSonarr()
+	c.makeBackupTriggersProwlarr()
+	c.makeCorruptionTriggersLidarr()
+	c.makeCorruptionTriggersRadarr()
+	c.makeCorruptionTriggersReadarr()
+	c.makeCorruptionTriggersSonarr()
+	c.makeCorruptionTriggersProwlarr()
 }

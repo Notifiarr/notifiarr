@@ -45,32 +45,93 @@ func (c *Config) Corruption(event website.EventType, app starr.App) error {
 	return nil
 }
 
-func (c *Config) makeCorruptionTriggers() {
+func (c *Config) makeCorruptionTriggersLidarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Lidarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(lidarrCorruptCheckDur)
+			break
+		}
+	}
+
 	c.Add(&common.Action{
 		Name: TrigLidarrCorrupt,
 		Fn:   c.sendLidarrCorruption,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(lidarrCorruptCheckDur),
-	}, &common.Action{
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeCorruptionTriggersProwlarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Prowlarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(prowlarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
 		Name: TrigProwlarrCorrupt,
 		Fn:   c.sendProwlarrCorruption,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(prowlarrCorruptCheckDur),
-	}, &common.Action{
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeCorruptionTriggersRadarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Radarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(radarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
 		Name: TrigRadarrCorrupt,
 		Fn:   c.sendRadarrCorruption,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(radarrCorruptCheckDur),
-	}, &common.Action{
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeCorruptionTriggersReadarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Readarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(readarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
 		Name: TrigReadarrCorrupt,
 		Fn:   c.sendReadarrCorruption,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(readarrCorruptCheckDur),
-	}, &common.Action{
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeCorruptionTriggersSonarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Sonarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(sonarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
 		Name: TrigSonarrCorrupt,
 		Fn:   c.sendSonarrCorruption,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(sonarrCorruptCheckDur),
+		T:    ticker,
 	})
 }
 

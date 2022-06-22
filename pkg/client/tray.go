@@ -153,7 +153,8 @@ func (c *Client) makeMoreChannels() {
 	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, service checks")
 	menu["data"] = data
 	menu["gaps"] = data.AddSubMenuItem("Send Radarr Gaps", "[premium feature] trigger radarr collections gaps")
-	menu["sync_cf"] = data.AddSubMenuItem("Sync Custom Formats", "[premium feature] trigger custom format sync")
+	menu["sync_cf"] = data.AddSubMenuItem("Sync Radarr Formats", "[premium feature] trigger radarr custom format sync")
+	menu["sync_qp"] = data.AddSubMenuItem("Sync Sonarr Profiles", "[premium feature] trigger sonarr quality profile sync")
 	menu["svcs_prod"] = data.AddSubMenuItem("Check and Send Services", "check all services and send results to notifiarr")
 	menu["plex_prod"] = data.AddSubMenuItem("Send Plex Sessions", "send plex sessions to notifiarr")
 	menu["snap_prod"] = data.AddSubMenuItem("Send System Snapshot", "send system snapshot to notifiarr")
@@ -377,7 +378,9 @@ func (c *Client) watchNotifiarrMenu() {
 		case <-menu["gaps"].ClickedCh:
 			c.triggers.Gaps.SendGaps(website.EventUser)
 		case <-menu["sync_cf"].ClickedCh:
-			c.triggers.CFSync.SyncCF(website.EventUser)
+			c.triggers.CFSync.SyncRadarrCF(website.EventUser)
+		case <-menu["sync_qp"].ClickedCh:
+			c.triggers.CFSync.SyncSonarrQP(website.EventUser)
 		case <-menu["svcs_log"].ClickedCh:
 			c.Print("[user requested] Checking services and logging results.")
 			ui.Notify("Running and logging %d Service Checks.", len(c.Config.Service))

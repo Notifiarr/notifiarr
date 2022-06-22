@@ -67,7 +67,7 @@ func (t *triggers) Get(name TriggerName) *Action {
 	return nil
 }
 
-// Add adds a new action to ou list of "Actions to run."
+// Add adds a new action to our list of "Actions to run."
 // actions are timers or triggers, or both.
 func (t *triggers) Add(action ...*Action) {
 	t.list = append(t.list, action...)
@@ -86,14 +86,4 @@ func (t *triggers) Close(event website.EventType) {
 	t.stop.C <- event
 	<-t.stop.C // wait for done signal.
 	t.stop = nil
-}
-
-// TickerOrNil is used in a place or two. It checks it a timer is nil,
-// and returns a nil ticker, otherwise it returns the ticker as requested.
-func TickerOrNil(duration time.Duration) *time.Ticker {
-	if duration == 0 {
-		return nil
-	}
-
-	return time.NewTicker(duration)
 }

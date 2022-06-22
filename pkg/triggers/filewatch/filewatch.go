@@ -32,7 +32,6 @@ type Config struct {
 }
 
 type WatchFile struct {
-	//	Cooldown  cnfg.Duration `json:"cooldown" toml:"cooldown" xml:"cooldown" yaml:"cooldown"`
 	Path      string `json:"path" toml:"path" xml:"path" yaml:"path"`
 	Regexp    string `json:"regex" toml:"regex" xml:"regex" yaml:"regex"`
 	Skip      string `json:"skip" toml:"skip" xml:"skip" yaml:"skip"`

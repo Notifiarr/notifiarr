@@ -10,7 +10,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 // handleAptHook takes a payload as stdin from dpkg and relays it to notifiarr.com.

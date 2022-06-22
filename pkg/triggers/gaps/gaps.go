@@ -22,8 +22,7 @@ func (c *Config) Create() {
 
 	var ticker *time.Ticker
 
-	// XXX: check instances to make sure this really needs to run.
-	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(c.Apps.Radarr) > 0 {
+	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
 		ticker = time.NewTicker(ci.Actions.Gaps.Interval.Duration)
 		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
 	}

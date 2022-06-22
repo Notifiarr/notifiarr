@@ -37,32 +37,93 @@ func (c *Config) Backup(event website.EventType, app starr.App) error {
 	return nil
 }
 
-func (c *Config) makeBackupTriggers() {
+func (c *Config) makeBackupTriggersLidarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Lidarr {
+		if app.Backup != mnd.Disabled {
+			ticker = time.NewTicker(lidarrBackupCheckDur)
+			break
+		}
+	}
+
 	c.Add(&common.Action{
 		Name: TrigLidarrBackup,
 		Fn:   c.sendLidarrBackups,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(lidarrBackupCheckDur),
-	}, &common.Action{
-		Name: TrigProwlarrBackup,
-		Fn:   c.sendProwlarrBackups,
-		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(prowlarrBackupCheckDur),
-	}, &common.Action{
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeBackupTriggersRadarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Radarr {
+		if app.Backup != mnd.Disabled {
+			ticker = time.NewTicker(radarrBackupCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
 		Name: TrigRadarrBackup,
 		Fn:   c.sendRadarrBackups,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(radarrBackupCheckDur),
-	}, &common.Action{
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeBackupTriggersReadarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Readarr {
+		if app.Backup != mnd.Disabled {
+			ticker = time.NewTicker(readarrBackupCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
 		Name: TrigReadarrBackup,
 		Fn:   c.sendReadarrBackups,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(readarrBackupCheckDur),
-	}, &common.Action{
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeBackupTriggersSonarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Sonarr {
+		if app.Backup != mnd.Disabled {
+			ticker = time.NewTicker(sonarrBackupCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
 		Name: TrigSonarrBackup,
 		Fn:   c.sendSonarrBackups,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(sonarrBackupCheckDur),
+		T:    ticker,
+	})
+}
+
+func (c *Config) makeBackupTriggersProwlarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Prowlarr {
+		if app.Backup != mnd.Disabled {
+			ticker = time.NewTicker(prowlarrBackupCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
+		Name: TrigProwlarrBackup,
+		Fn:   c.sendProwlarrBackups,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
 	})
 }
 

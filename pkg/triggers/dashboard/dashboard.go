@@ -110,7 +110,7 @@ func (c *Config) Create() {
 
 	if ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
 		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration)
-		c.Printf("==> Sending Current State Data for Dashboard, interval:%s, serial:%v",
+		c.Printf("==> Dashboard State timer started, interval:%s, serial:%v",
 			ci.Actions.Dashboard.Interval, c.Config.Serial)
 	}
 

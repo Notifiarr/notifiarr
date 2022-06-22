@@ -24,7 +24,10 @@ type Config struct {
 	sonarrRP map[int]*cfMapIDpayload
 }
 
-const TrigCFSync common.TriggerName = "Starting Radarr CF and Sonarr QP TRaSH sync."
+const (
+	TrigCFSyncRadarr common.TriggerName = "Starting Radarr CF TRaSH sync."
+	TrigCFSyncSonarr common.TriggerName = "Starting Sonarr QP TRaSH sync."
+)
 
 // cfMapIDpayload is used to post-back ID changes for profiles and formats.
 type cfMapIDpayload struct {
@@ -63,31 +66,45 @@ func (c *Config) Create() {
 	c.sonarrRP = make(map[int]*cfMapIDpayload)
 	ci := c.ClientInfo
 
-	var ticker *time.Ticker
+	var (
+		radarrTicker *time.Ticker
+		sonarrTicker *time.Ticker
+	)
 
 	// Check each instance and enable only if needed.
-	if ci != nil && ci.Actions.Sync.Interval.Duration > 0 && (len(c.Apps.Radarr) > 0 || len(c.Apps.Sonarr) > 0) {
-		ticker = time.NewTicker(ci.Actions.Sync.Interval.Duration)
-		c.Printf("==> Keeping %d Radarr Custom Formats and %d Sonarr Release Profiles synced, interval:%s",
-			ci.Actions.Sync.Radarr, ci.Actions.Sync.Sonarr, ci.Actions.Sync.Interval)
+	if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
+		if len(ci.Actions.Sync.RadarrInstances) > 0 {
+			radarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration)
+			c.Printf("==> Keeping %d Radarr Custom Formats synced, interval:%s",
+				ci.Actions.Sync.Radarr, ci.Actions.Sync.Interval)
+		}
+
+		if len(ci.Actions.Sync.SonarrInstances) > 0 {
+			sonarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration)
+			c.Printf("==> Keeping %d Sonarr Release Profiles synced, interval:%s",
+				ci.Actions.Sync.Sonarr, ci.Actions.Sync.Interval)
+		}
 	}
 
 	c.Add(&common.Action{
-		Name: TrigCFSync,
-		Fn:   c.syncCF,
+		Name: TrigCFSyncRadarr,
+		Fn:   c.syncRadarr,
 		C:    make(chan website.EventType, 1),
-		T:    ticker,
+		T:    radarrTicker,
+	}, &common.Action{
+		Name: TrigCFSyncSonarr,
+		Fn:   c.syncSonarr,
+		C:    make(chan website.EventType, 1),
+		T:    sonarrTicker,
 	})
 }
 
-func (c *Config) SyncCF(event website.EventType) {
-	c.Exec(event, TrigCFSync)
+func (c *Config) SyncRadarrCF(event website.EventType) {
+	c.Exec(event, TrigCFSyncRadarr)
 }
 
-func (c *Config) syncCF(event website.EventType) {
-	c.Debugf("Running CF Sync via event: %s", event)
-	c.syncRadarr(event)
-	c.syncSonarr(event)
+func (c *Config) SyncSonarrQP(event website.EventType) {
+	c.Exec(event, TrigCFSyncSonarr)
 }
 
 // syncRadarr triggers a custom format sync for Radarr.

@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/sonarr"
@@ -49,13 +50,43 @@ type QueuePayload struct {
 const getItemsMax = 100
 
 func (c *Config) Create() {
-	// XXX: check apps, make sure this needs to run.
 	c.Add(&common.Action{
 		Name: TrigStuckItems,
 		Fn:   c.sendStuckQueueItems,
 		C:    make(chan website.EventType, 1),
-		T:    time.NewTicker(stuckDur),
+		T:    getTicker(c.Apps),
 	})
+}
+
+// getTicker only returns a ticker if at least 1 app has stuck items turned on.
+func getTicker(apps *apps.Apps) *time.Ticker {
+	for _, app := range apps.Lidarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	for _, app := range apps.Radarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	for _, app := range apps.Readarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	for _, app := range apps.Sonarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	var ticker *time.Ticker
+
+	return ticker
 }
 
 func (i ItemList) Len() (count int) {
