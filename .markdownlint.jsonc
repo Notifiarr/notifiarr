@@ -1,0 +1,17 @@
+{
+      "MD030": false, // lists may have spaces before them
+      "MD041": false, // do not begin with a header
+      "MD002": false, // first header does not need to be top level
+      "MD034": false, // allow bare URLs because we put them in code blocks...
+      "MD046": false, // do not worry about code block style, it gets confused
+      "MD033": false, // what's wrong with inline html?
+      "MD031": false, // fenced code blocks wrapped in blank lines look terrible in lists.      
+      "MD013": {
+            "tables": false,
+            "line_length": 250,
+            "code_blocks": false
+      },
+      "MD007": {
+            "indent": 4
+      }
+}
