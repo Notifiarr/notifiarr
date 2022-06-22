@@ -195,9 +195,7 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	ctx, cancel := context.WithTimeout(context.Background(), maxCheckTime)
 	defer cancel()
 
-	if input.last == mnd.Disabled || input.last == "" {
-		c.Printf("[%s requested] Disabled: %s Backup File Corruption Check (%d), Last File: '%s'",
-			input.event, input.name, input.int, input.last)
+	if (input.last == mnd.Disabled || input.last == "") && input.event == EventCron {
 		return input.last
 	}
 
@@ -214,14 +212,13 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	if input.last == latest {
 		c.Printf("[%s requested] %s Backup DB Check (%d): already checked latest file: %s",
 			input.event, input.name, input.int, latest)
-		return latest
+		return input.last
 	}
 
 	backup, err := c.checkBackupFileCorruption(ctx, input, latest)
 	if err != nil {
-		// XXX: Send "error" to notifirr.com here?
-		c.Errorf("[%s requested] Checking %s Backup File Corruption (%d): %s: %v",
-			input.event, input.name, input.int, latest, err)
+		c.Errorf("[%s requested] Checking %s Backup File Corruption (%d): %s: %v (last file: %s)",
+			input.event, input.name, input.int, latest, err, input.last)
 		return input.last
 	}
 
@@ -235,12 +232,16 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 		Route:      CorruptRoute,
 		Event:      input.event,
 		LogPayload: true,
-		LogMsg: fmt.Sprintf("%s Backup File Corruption Info (%d): %v: %s: OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d",
-			input.name, input.int, err, latest, backup.Ver, backup.Integ, backup.Quick, backup.Tables, backup.Size),
+		LogMsg: fmt.Sprintf("%s Backup File Corruption Info (%d): %s: OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d",
+			input.name, input.int, latest, backup.Ver, backup.Integ, backup.Quick, backup.Tables, backup.Size),
 		Payload: backup,
 	})
 
-	return backup.Name
+	if input.last == mnd.Disabled || input.last == "" {
+		return input.last
+	}
+
+	return latest
 }
 
 func (c *Config) checkBackupFileCorruption(

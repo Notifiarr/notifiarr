@@ -87,6 +87,8 @@ func (l *Logger) SetupLogging(config *LogConfig) {
 	defer l.mu.Unlock()
 
 	fileMode = config.FileMode.Mode()
+	logFiles = config.LogFiles
+	logFileMb = config.LogFileMb
 	l.LogConfig = config
 	l.setDefaultLogPaths()
 	l.setLogPaths()
@@ -229,6 +231,16 @@ func (l *Logger) Errorf(msg string, v ...interface{}) {
 	}
 
 	share.Log(msg)
+}
+
+// ErrorfNoShare writes log lines... to stdout and/or a file.
+func (l *Logger) ErrorfNoShare(msg string, v ...interface{}) {
+	exp.LogFiles.Add("Error Lines", 1)
+
+	err := l.ErrorLog.Output(callDepth, fmt.Sprintf(msg, v...))
+	if err != nil {
+		fmt.Println("Logger Error:", err) //nolint:forbidigo
+	}
 }
 
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.

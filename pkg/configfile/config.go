@@ -137,6 +137,7 @@ func (c *Config) Get(flag *Flags) (*notifiarr.Config, error) {
 		return nil, err
 	}
 
+	c.Apps.APIKey = strings.TrimSpace(c.Apps.APIKey)
 	c.Services.Apps = c.Apps
 	c.Services.Plugins = c.Snapshot.Plugins
 

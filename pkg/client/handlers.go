@@ -95,12 +95,12 @@ func (c *Client) httpAPIHandlers() {
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:[0-9a-z-]+}")
 
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
-		c.Config.Router.HandleFunc("/plex", c.website.PlexHandler).Methods("POST").Queries("token", tokens)
-		c.Config.Router.HandleFunc("/", c.website.PlexHandler).Methods("POST").Queries("token", tokens)
+		c.Config.Router.HandleFunc("/plex", c.PlexHandler).Methods("POST").Queries("token", tokens)
+		c.Config.Router.HandleFunc("/", c.PlexHandler).Methods("POST").Queries("token", tokens)
 
 		if c.Config.URLBase != "/" {
 			// Allow plex to use the base url too.
-			c.Config.Router.HandleFunc(path.Join(c.Config.URLBase, "plex"), c.website.PlexHandler).
+			c.Config.Router.HandleFunc(path.Join(c.Config.URLBase, "plex"), c.PlexHandler).
 				Methods("POST").Queries("token", tokens)
 		}
 	}

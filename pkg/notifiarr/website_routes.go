@@ -31,9 +31,9 @@ const (
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
 type Payload struct {
-	Plex *plex.Sessions       `json:"plex,omitempty"`
-	Snap *snapshot.Snapshot   `json:"snapshot,omitempty"`
-	Load *plexIncomingWebhook `json:"payload,omitempty"`
+	Plex *plex.Sessions        `json:"plex,omitempty"`
+	Snap *snapshot.Snapshot    `json:"snapshot,omitempty"`
+	Load *plex.IncomingWebhook `json:"payload,omitempty"`
 }
 
 // SendRequest is used when sending data through a channel.
