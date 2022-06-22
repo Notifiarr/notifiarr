@@ -126,6 +126,16 @@ docker logs <container id from docker run>
 
 ## Configuration Information
 
+### WebUI
+
+To enable the webui, add this parameter to your config file, toward the top next to quiet, and restart the client:
+
+```yaml
+ui_password = "username:16CharacterPassword"
+```
+
+Use a password that is at least 16 characters long. Once you log into the web interface, you can change the password and it will be saved encrypted (so no one can snoop it).
+
 ### Config Settings
 
 - Instead of, or in addition to a config file, you may configure a docker container with environment variables.
@@ -135,22 +145,23 @@ docker logs <container id from docker run>
 - Must provide URL and API key for Sonarr or Radarr or Readarr or any combination.
 - You may provide multiple sonarr, radarr or readarr instances using `DN_SONARR_1_URL`, `DN_SONARR_2_URL`, etc or by duplicating the starr block in the conf file.
 
-| Config Name   | Variable Name      | Default / Note                                                     |
-| ------------- | ------------------ | ------------------------------------------------------------------ |
-| api_key       | `DN_API_KEY`       | **Required** / API Key from Notifiarr.com                          |
-| auto_update   | `DN_AUTO_UPDATE`   | `off` / Set to `daily` to turn on automatic updates (windows only) |
-| bind_addr     | `DN_BIND_ADDR`     | `0.0.0.0:5454` / The IP and port to listen on                      |
-| quiet         | `DN_QUIET`         | `false` / Turns off output. Set a log_file if this is true         |
-| urlbase       | `DN_URLBASE`       | default: `/` Change the web root with this setting                 |
-| upstreams     | `DN_UPSTREAMS_0`   | List of upstream networks that can set X-Forwarded-For             |
-| ssl_key_file  | `DN_SSL_KEY_FILE`  | Providing SSL files turns on the SSL listener                      |
-| ssl_cert_file | `DN_SSL_CERT_FILE` | Providing SSL files turns on the SSL listener                      |
-| log_file      | `DN_LOG_FILE`      | None by default. Optionally provide a file path to save app logs   |
-| http_log      | `DN_HTTP_LOG`      | None by default. Provide a file path to save HTTP request logs     |
-| log_file_mb   | `DN_LOG_FILE_MB`   | `100` / Max size of log files in megabytes                         |
-| log_files     | `DN_LOG_FILES`     | `10` / Log files to keep after rotating. `0` disables rotation     |
-| file_mode     | `DN_FILE_MODE`     | `"0600"` / Unix octal filemode for new log files                   |
-| timeout       | `DN_TIMEOUT`       | `60s` / Global API Timeouts (all apps default)                     |
+| Config Name   | Variable Name      | Default / Note                                                               |
+| ------------- | ------------------ | ---------------------------------------------------------------------------- |
+| api_key       | `DN_API_KEY`       | **Required** / API Key from Notifiarr.com                                    |
+| auto_update   | `DN_AUTO_UPDATE`   | `off` / Set to `daily` to turn on automatic updates (windows only)           |
+| bind_addr     | `DN_BIND_ADDR`     | `0.0.0.0:5454` / The IP and port to listen on                                |
+| quiet         | `DN_QUIET`         | `false` / Turns off output. Set a log_file if this is true                   |
+| ui_password   | `DN_UI_PASSWORD`   | None by default. Set a username:password & change the password to encrypt it |
+| urlbase       | `DN_URLBASE`       | default: `/` Change the web root with this setting                           |
+| upstreams     | `DN_UPSTREAMS_0`   | List of upstream networks that can set X-Forwarded-For                       |
+| ssl_key_file  | `DN_SSL_KEY_FILE`  | Providing SSL files turns on the SSL listener                                |
+| ssl_cert_file | `DN_SSL_CERT_FILE` | Providing SSL files turns on the SSL listener                                |
+| log_file      | `DN_LOG_FILE`      | None by default. Optionally provide a file path to save app logs             |
+| http_log      | `DN_HTTP_LOG`      | None by default. Provide a file path to save HTTP request logs               |
+| log_file_mb   | `DN_LOG_FILE_MB`   | `100` / Max size of log files in megabytes                                   |
+| log_files     | `DN_LOG_FILES`     | `10` / Log files to keep after rotating. `0` disables rotation               |
+| file_mode     | `DN_FILE_MODE`     | `"0600"` / Unix octal filemode for new log files                             |
+| timeout       | `DN_TIMEOUT`       | `60s` / Global API Timeouts (all apps default)                               |
 
 All applications below (starr, downloaders, tautulli, plex) have a `timeout` setting.
 If the configuration for an application is missing the timeout, the global timeout (above) is used.
