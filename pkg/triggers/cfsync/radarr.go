@@ -4,7 +4,6 @@ package cfsync
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -26,50 +25,8 @@ type RadarrTrashPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
-func (c *Action) Create() {
-	c.radarrCF = make(map[int]*cfMapIDpayload)
-	c.sonarrRP = make(map[int]*cfMapIDpayload)
-	ci := c.ClientInfo
-
-	var (
-		radarrTicker *time.Ticker
-		sonarrTicker *time.Ticker
-	)
-
-	// Check each instance and enable only if needed.
-	if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
-		if len(ci.Actions.Sync.RadarrInstances) > 0 {
-			radarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration)
-			c.Printf("==> Keeping %d Radarr Custom Formats synced, interval:%s",
-				ci.Actions.Sync.Radarr, ci.Actions.Sync.Interval)
-		}
-
-		if len(ci.Actions.Sync.SonarrInstances) > 0 {
-			sonarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration)
-			c.Printf("==> Keeping %d Sonarr Release Profiles synced, interval:%s",
-				ci.Actions.Sync.Sonarr, ci.Actions.Sync.Interval)
-		}
-	}
-
-	c.Add(&common.Action{
-		Name: TrigCFSyncRadarr,
-		Fn:   c.syncRadarr,
-		C:    make(chan website.EventType, 1),
-		T:    radarrTicker,
-	}, &common.Action{
-		Name: TrigCFSyncSonarr,
-		Fn:   c.syncSonarr,
-		C:    make(chan website.EventType, 1),
-		T:    sonarrTicker,
-	})
-}
-
 func (c *Action) SyncRadarrCF(event website.EventType) {
 	c.Exec(event, TrigCFSyncRadarr)
-}
-
-func (c *Action) SyncSonarrQP(event website.EventType) {
-	c.Exec(event, TrigCFSyncSonarr)
 }
 
 // syncRadarr triggers a custom format sync for Radarr.

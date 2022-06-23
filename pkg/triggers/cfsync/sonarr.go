@@ -23,6 +23,10 @@ type SonarrTrashPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
+func (c *Action) SyncSonarrRP(event website.EventType) {
+	c.Exec(event, TrigCFSyncSonarr)
+}
+
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *Action) syncSonarr(event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.SonarrInstances) < 1 {
