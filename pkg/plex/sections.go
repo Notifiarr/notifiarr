@@ -112,21 +112,20 @@ type LibrarySection struct {
 				} `json:"Stream"`
 			} `json:"Part"`
 		} `json:"Media"`
-		TitleSort           string    `json:"titleSort,omitempty"`
-		ViewOffset          int       `json:"viewOffset,omitempty"`
-		LastViewedAt        int       `json:"lastViewedAt,omitempty"`
-		ParentYear          int       `json:"parentYear,omitempty"`
-		Studio              string    `json:"studio,omitempty"`
-		AudienceRating      float64   `json:"audienceRating,omitempty"`
-		ViewCount           int       `json:"viewCount,omitempty"`
-		Tagline             string    `json:"tagline,omitempty"`
-		AudienceRatingImage string    `json:"audienceRatingImage,omitempty"`
-		ChapterSource       string    `json:"chapterSource,omitempty"`
-		PrimaryExtraKey     string    `json:"primaryExtraKey,omitempty"`
-		RatingImage         string    `json:"ratingImage,omitempty"`
-		GuID                []*GUID   `json:"Guid,omitempty"`
-		ExternalRating      []*Rating `json:"Rating,omitempty"`
-		/* These do not work as-is.
+		TitleSort           string      `json:"titleSort,omitempty"`
+		ViewOffset          int         `json:"viewOffset,omitempty"`
+		LastViewedAt        int         `json:"lastViewedAt,omitempty"`
+		ParentYear          int         `json:"parentYear,omitempty"`
+		Studio              string      `json:"studio,omitempty"`
+		AudienceRating      float64     `json:"audienceRating,omitempty"`
+		ViewCount           int         `json:"viewCount,omitempty"`
+		Tagline             string      `json:"tagline,omitempty"`
+		AudienceRatingImage string      `json:"audienceRatingImage,omitempty"`
+		ChapterSource       string      `json:"chapterSource,omitempty"`
+		PrimaryExtraKey     string      `json:"primaryExtraKey,omitempty"`
+		RatingImage         string      `json:"ratingImage,omitempty"`
+		GuID                []*GUID     `json:"Guid,omitempty"`
+		ExternalRating      []*Rating   `json:"Rating,omitempty"`
 		Country             []*Country  `json:"Country"`
 		Director            []*Director `json:"Director"`
 		Genre               []*Genre    `json:"Genre"`
@@ -134,7 +133,6 @@ type LibrarySection struct {
 		Role                []*Role     `json:"Role"`
 		Similar             []*Similar  `json:"Similar"`
 		Writer              []*Writer   `json:"Writer"`
-		*/
 	} `json:"Metadata"`
 }
 

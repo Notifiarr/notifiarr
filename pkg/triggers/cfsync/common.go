@@ -12,7 +12,23 @@ import (
 	 The code in this file deals with sending data and getting updates at an interval.
 */
 
+// New configures the library.
+func New(config *common.Config) *Action {
+	return &Action{
+		cmd: &cmd{
+			Config:   config,
+			radarrCF: make(map[int]*cfMapIDpayload),
+			sonarrRP: make(map[int]*cfMapIDpayload),
+		},
+	}
+}
+
+// Action contains the exported methods for this package.
 type Action struct {
+	cmd *cmd
+}
+
+type cmd struct {
 	*common.Config
 	radarrCF map[int]*cfMapIDpayload
 	sonarrRP map[int]*cfMapIDpayload
@@ -36,9 +52,12 @@ type idMap struct {
 // success is a ssuccessful status message from notifiarr.com.
 const success = "success"
 
-func (c *Action) Create() {
-	c.radarrCF = make(map[int]*cfMapIDpayload)
-	c.sonarrRP = make(map[int]*cfMapIDpayload)
+// Create initializes the library.
+func (a *Action) Create() {
+	a.cmd.create()
+}
+
+func (c *cmd) create() {
 	ci := c.ClientInfo
 
 	var (

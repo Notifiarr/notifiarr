@@ -21,15 +21,26 @@ const (
 	pollDur = 4*time.Minute + 977*time.Millisecond
 )
 
+// Action contains the exported methods for this package.
+type Action struct {
+	cmd *cmd
+}
+
+type cmd struct {
+	*common.Config
+	list []*Timer
+}
+
+// Timer is used to trigger actions.
 type Timer struct {
 	*website.CronTimer
-	website *common.Config
+	website *website.Server
 	ch      chan website.EventType
 }
 
-type Action struct {
-	*common.Config
-	list []*Timer
+// New configures the library.
+func New(config *common.Config) *Action {
+	return &Action{cmd: &cmd{Config: config}}
 }
 
 // Run fires a custom cron timer (GET).
@@ -43,17 +54,26 @@ func (t *Timer) Run(event website.EventType) {
 
 // run responds to the channel that the timer fired into.
 func (t *Timer) run(event website.EventType) {
-	payload := struct{ Cron string }{Cron: "thingy"}
-	if resp, err := t.website.SendData(t.CronTimer.URI, payload, true); err != nil {
-		t.website.Errorf("[%s requested] Custom Timer Request for %s failed: %v%v", event, t.CronTimer.URI, err, resp)
-	}
+	t.website.QueueData(&website.SendRequest{
+		Route:      website.Route(t.CronTimer.URI),
+		Event:      event,
+		Payload:    &struct{ Cron string }{Cron: "thingy"},
+		LogMsg:     "Custom Timer Request '" + t.CronTimer.Name + "'",
+		LogPayload: true,
+	})
 }
 
-func (c *Action) List() []*Timer {
-	return c.list
+// List returns a list of active triggers that can be executed.
+func (a *Action) List() []*Timer {
+	return a.cmd.list
 }
 
-func (c *Action) Create() {
+// Create initializes the library.
+func (a *Action) Create() {
+	a.cmd.create()
+}
+
+func (c *cmd) create() {
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
 	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s",
@@ -69,7 +89,7 @@ func (c *Action) Create() {
 		timer := &Timer{
 			CronTimer: custom,
 			ch:        make(chan website.EventType, 1),
-			website:   c.Config,
+			website:   c.Config.Server,
 		}
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 

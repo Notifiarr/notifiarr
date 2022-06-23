@@ -11,6 +11,10 @@ import (
 
 // Action is the data needed by the backups package to perform backup ad corruption checks.
 type Action struct {
+	cmd *cmd
+}
+
+type cmd struct {
 	*common.Config
 }
 
@@ -86,16 +90,21 @@ type Payload struct {
 	Files []*starr.BackupFile `json:"backups"`
 }
 
+// New configures the library.
+func New(config *common.Config) *Action {
+	return &Action{cmd: &cmd{Config: config}}
+}
+
 // Create sets up all the triggers.
-func (c *Action) Create() {
-	c.makeBackupTriggersLidarr()
-	c.makeBackupTriggersRadarr()
-	c.makeBackupTriggersReadarr()
-	c.makeBackupTriggersSonarr()
-	c.makeBackupTriggersProwlarr()
-	c.makeCorruptionTriggersLidarr()
-	c.makeCorruptionTriggersRadarr()
-	c.makeCorruptionTriggersReadarr()
-	c.makeCorruptionTriggersSonarr()
-	c.makeCorruptionTriggersProwlarr()
+func (a *Action) Create() {
+	a.cmd.makeBackupTriggersLidarr()
+	a.cmd.makeBackupTriggersRadarr()
+	a.cmd.makeBackupTriggersReadarr()
+	a.cmd.makeBackupTriggersSonarr()
+	a.cmd.makeBackupTriggersProwlarr()
+	a.cmd.makeCorruptionTriggersLidarr()
+	a.cmd.makeCorruptionTriggersRadarr()
+	a.cmd.makeCorruptionTriggersReadarr()
+	a.cmd.makeCorruptionTriggersSonarr()
+	a.cmd.makeCorruptionTriggersProwlarr()
 }

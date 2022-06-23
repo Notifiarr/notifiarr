@@ -31,6 +31,7 @@ type Config struct {
 // TriggerName makes sure triggers have a known name.
 type TriggerName string
 
+// Action defines a trigger/timer that can be executed.
 type Action struct {
 	Name TriggerName
 	Fn   func(website.EventType)   // most actions use this
@@ -68,6 +69,7 @@ func (c *Config) Add(action ...*Action) {
 	c.list = append(c.list, action...)
 }
 
+// Stop shuts down the loop/goroutine that handles all triggers and timers.
 func (c *Config) Stop(event website.EventType) {
 	// Neither of these if statements should ever fire. That's a bug somewhere else.
 	if c == nil {

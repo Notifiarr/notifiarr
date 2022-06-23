@@ -26,9 +26,14 @@ import (
 
 const TrigDashboard common.TriggerName = "Initiating State Collection for Dashboard."
 
-type Action struct {
+type Cmd struct {
 	*common.Config
 	PlexCron *plexcron.Action
+}
+
+// Action contains the exported methods for this package.
+type Action struct {
+	cmd *Cmd
 }
 
 // How many "upcoming" or "newest" items to send.
@@ -103,7 +108,22 @@ type States struct {
 	Plex    *plex.Sessions `json:"plexSessions"`
 }
 
-func (c *Action) Create() {
+// New configures the library.
+func New(config *common.Config, plex *plexcron.Action) *Action {
+	return &Action{
+		cmd: &Cmd{
+			Config:   config,
+			PlexCron: plex,
+		},
+	}
+}
+
+// Create initializes the library.
+func (a *Action) Create() {
+	a.cmd.create()
+}
+
+func (c *Cmd) create() {
 	var ticker *time.Ticker
 
 	ci := c.ClientInfo
@@ -122,12 +142,12 @@ func (c *Action) Create() {
 	})
 }
 
-// SendDashboardState sends the current states for the dashboard.
-func (c *Action) SendDashboardState(event website.EventType) {
-	c.Exec(event, TrigDashboard)
+// Send the current states for the dashboard to the website.
+func (a *Action) Send(event website.EventType) {
+	a.cmd.Exec(event, TrigDashboard)
 }
 
-func (c *Action) sendDashboardState(event website.EventType) {
+func (c *Cmd) sendDashboardState(event website.EventType) {
 	cmd := c.getStatesParallel
 	if c.Serial {
 		cmd = c.getStatesSerial
@@ -149,7 +169,7 @@ func (c *Action) sendDashboardState(event website.EventType) {
 }
 
 // getStatesSerial grabs data for each app serially.
-func (c *Action) getStatesSerial() *States {
+func (c *Cmd) getStatesSerial() *States {
 	sessions, _ := c.PlexCron.GetSessions(false)
 
 	return &States{
@@ -165,7 +185,7 @@ func (c *Action) getStatesSerial() *States {
 }
 
 // getStatesParallel fires a routine for each app type and tries to get a lot of data fast!
-func (c *Action) getStatesParallel() *States {
+func (c *Cmd) getStatesParallel() *States {
 	states := &States{}
 
 	var wg sync.WaitGroup
@@ -217,7 +237,7 @@ func (c *Action) getStatesParallel() *States {
 	return states
 }
 
-func (c *Action) getDelugeStates() []*State {
+func (c *Cmd) getDelugeStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Deluge {
@@ -239,7 +259,7 @@ func (c *Action) getDelugeStates() []*State {
 	return states
 }
 
-func (c *Action) getLidarrStates() []*State {
+func (c *Cmd) getLidarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Lidarr {
@@ -261,7 +281,7 @@ func (c *Action) getLidarrStates() []*State {
 	return states
 }
 
-func (c *Action) getRadarrStates() []*State {
+func (c *Cmd) getRadarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Radarr {
@@ -283,7 +303,7 @@ func (c *Action) getRadarrStates() []*State {
 	return states
 }
 
-func (c *Action) getReadarrStates() []*State {
+func (c *Cmd) getReadarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Readarr {
@@ -305,7 +325,7 @@ func (c *Action) getReadarrStates() []*State {
 	return states
 }
 
-func (c *Action) getQbitStates() []*State {
+func (c *Cmd) getQbitStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Qbit {
@@ -327,7 +347,7 @@ func (c *Action) getQbitStates() []*State {
 	return states
 }
 
-func (c *Action) getSonarrStates() []*State {
+func (c *Cmd) getSonarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Sonarr {
@@ -349,7 +369,7 @@ func (c *Action) getSonarrStates() []*State {
 	return states
 }
 
-func (c *Action) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
+func (c *Cmd) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
 	start := time.Now()
 	size, xfers, err := app.GetXfersCompat()
 	state := &State{
@@ -421,7 +441,7 @@ func (c *Action) getDelugeState(instance int, app *apps.DelugeConfig) (*State, e
 	return state, nil
 }
 
-func (c *Action) getLidarrState(instance int, app *apps.LidarrConfig) (*State, error) {
+func (c *Cmd) getLidarrState(instance int, app *apps.LidarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -476,7 +496,7 @@ func (c *Action) getLidarrState(instance int, app *apps.LidarrConfig) (*State, e
 }
 
 // getLidarrHistory is not done.
-func (c *Action) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
+func (c *Cmd) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.Req{
 		Page:     1,
 		PageSize: showLatest + 20, //nolint:gomnd // grab extra in case some are tracks and not albums.
@@ -513,7 +533,7 @@ func (c *Action) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Action) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop,funlen
+func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop,funlen
 	start := time.Now()
 	size, xfers, err := app.GetXfers()
 
@@ -577,7 +597,7 @@ func (c *Action) getQbitState(instance int, app *apps.QbitConfig) (*State, error
 	return state, nil
 }
 
-func (c *Action) getRadarrState(instance int, r *apps.RadarrConfig) (*State, error) {
+func (c *Cmd) getRadarrState(instance int, r *apps.RadarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Latest: []*Sortable{}, Name: r.Name}
 	start := time.Now()
 
@@ -626,7 +646,7 @@ func processRadarrState(state *State, movies []*radarr.Movie) { //nolint:cyclop
 	}
 }
 
-func (c *Action) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, error) {
+func (c *Cmd) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -686,7 +706,7 @@ func (c *Action) getReadarrState(instance int, app *apps.ReadarrConfig) (*State,
 }
 
 // getReadarrHistory is not done.
-func (c *Action) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
+func (c *Cmd) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.Req{
 		Page:     1,
 		PageSize: showLatest,
@@ -714,7 +734,7 @@ func (c *Action) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error)
 	return table, nil
 }
 
-func (c *Action) getSonarrState(instance int, app *apps.SonarrConfig) (*State, error) {
+func (c *Cmd) getSonarrState(instance int, app *apps.SonarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -761,7 +781,7 @@ func (c *Action) getSonarrState(instance int, app *apps.SonarrConfig) (*State, e
 	return state, nil
 }
 
-func (c *Action) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
+func (c *Cmd) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.Req{
 		Page:     1,
 		PageSize: showLatest + 5, //nolint:gomnd // grab extra in case there's an error.
@@ -804,7 +824,7 @@ func (c *Action) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Action) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
+func (c *Cmd) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
 	sort.Sort(dateSorter(next))
 
 	redo := []*Sortable{}
@@ -839,7 +859,7 @@ func (c *Action) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable
 	return redo, nil
 }
 
-func (c *Action) getSabNZBStates() []*State {
+func (c *Cmd) getSabNZBStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.SabNZB {
@@ -861,7 +881,7 @@ func (c *Action) getSabNZBStates() []*State {
 	return states
 }
 
-func (c *Action) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, error) {
+func (c *Cmd) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, error) {
 	state := &State{Instance: instance, Name: s.Name}
 	start := time.Now()
 	queue, err := s.GetQueue()

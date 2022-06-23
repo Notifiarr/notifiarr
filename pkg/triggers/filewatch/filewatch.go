@@ -23,14 +23,20 @@ const (
 	retryInterval = 10 * time.Second
 )
 
-type Action struct {
+type cmd struct {
 	*common.Config
-	WatchFiles  []*WatchFile
 	addWatcher  chan *WatchFile
 	stopWatcher chan struct{}
 	awMutex     sync.RWMutex
+	files       []*WatchFile
 }
 
+// Action contains the exported methods for this package.
+type Action struct {
+	cmd *cmd
+}
+
+// WatchFile is the input data needed to watch files.
 type WatchFile struct {
 	Path      string `json:"path" toml:"path" xml:"path" yaml:"path"`
 	Regexp    string `json:"regex" toml:"regex" xml:"regex" yaml:"regex"`
@@ -53,12 +59,36 @@ type Match struct {
 	Line    string   `json:"line"`
 }
 
+// New configures the library.
+func New(config *common.Config, files []*WatchFile) *Action {
+	return &Action{
+		cmd: &cmd{
+			Config: config,
+			files:  files,
+		},
+	}
+}
+
 // Run compiles any regexp's and opens a tail -f on provided watch files.
-func (c *Action) Run() {
+func (a *Action) Run() {
+	a.cmd.run()
+}
+
+// Files returns the list of files configured.
+func (a *Action) Files() []*WatchFile {
+	return a.cmd.files
+}
+
+// Stop all file watcher routines.
+func (a *Action) Stop() {
+	a.cmd.stop()
+}
+
+func (c *cmd) run() {
 	// two fake tails for internal channels.
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
-	for _, item := range c.WatchFiles {
+	for _, item := range c.files {
 		if err := item.setup(c.Logger.GetInfoLog()); err != nil {
 			c.Errorf("Unable to watch file %v", err)
 			continue
@@ -107,7 +137,7 @@ func (w *WatchFile) setup(logger *log.Logger) error {
 }
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
-func (c *Action) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
+func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
 	c.addWatcher = make(chan *WatchFile, 1)
 	c.stopWatcher = make(chan struct{})
 	ticker := time.NewTicker(retryInterval)
@@ -137,7 +167,7 @@ func (c *Action) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *ti
 }
 
 //nolint:cyclop
-func (c *Action) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
+func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
 	defer func() {
 		defer c.CapturePanic()
 		ticker.Stop()
@@ -191,14 +221,14 @@ func (c *Action) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 	}
 }
 
-func (c *Action) fileWatcherTicker(died bool) bool {
+func (c *cmd) fileWatcherTicker(died bool) bool {
 	if !died {
 		return false
 	}
 
 	var stilldead bool
 
-	for _, item := range c.WatchFiles {
+	for _, item := range c.files {
 		if item.Active() || item.retries >= maxRetries {
 			continue
 		}
@@ -209,7 +239,7 @@ func (c *Action) fileWatcherTicker(died bool) bool {
 		// move this back to debug.
 		c.Printf("Restarting File Watcher (retries: %d): %s", item.retries, item.Path)
 
-		if err := c.AddFileWatcher(item); err != nil {
+		if err := c.addFileWatcher(item); err != nil {
 			c.Errorf("Restarting File Watcher (retries: %d): %s: %v", item.retries, item.Path, err)
 			exp.FileWatcher.Add(item.Path+" Errors", 1)
 
@@ -225,7 +255,7 @@ func (c *Action) fileWatcherTicker(died bool) bool {
 
 // checkLineMatch runs when a watched file has a new line written.
 // If a match is found a notification is sent.
-func (c *Action) checkLineMatch(line *tail.Line, tail *WatchFile) {
+func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 	if tail.re == nil || line.Text == "" || !tail.re.MatchString(line.Text) {
 		return // no match
 	}
@@ -252,7 +282,11 @@ func (c *Action) checkLineMatch(line *tail.Line, tail *WatchFile) {
 	})
 }
 
-func (c *Action) AddFileWatcher(file *WatchFile) error {
+func (a *Action) AddFileWatcher(file *WatchFile) error {
+	return a.cmd.addFileWatcher(file)
+}
+
+func (c *cmd) addFileWatcher(file *WatchFile) error {
 	c.awMutex.RLock()
 	defer c.awMutex.RUnlock()
 
@@ -286,11 +320,11 @@ func (w *WatchFile) Stop() error {
 	return nil
 }
 
-func (c *Action) Stop() {
+func (c *cmd) stop() {
 	c.awMutex.Lock()
 	defer c.awMutex.Unlock()
 
-	for _, tail := range c.WatchFiles {
+	for _, tail := range c.files {
 		if err := tail.Stop(); err != nil {
 			c.Errorf("Stopping File Watcher: %s: %v", tail.Path, err)
 		}

@@ -25,12 +25,13 @@ type RadarrTrashPayload struct {
 	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
 }
 
-func (c *Action) SyncRadarrCF(event website.EventType) {
-	c.Exec(event, TrigCFSyncRadarr)
+// SyncRadarrCF initializes a custom format sync with radarr.
+func (a *Action) SyncRadarrCF(event website.EventType) {
+	a.cmd.Exec(event, TrigCFSyncRadarr)
 }
 
 // syncRadarr triggers a custom format sync for Radarr.
-func (c *Action) syncRadarr(event website.EventType) {
+func (c *cmd) syncRadarr(event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.RadarrInstances) < 1 {
 		c.Debugf("Cannot sync Radarr Custom Formats. Website provided 0 instances.")
 		return
@@ -56,7 +57,7 @@ func (c *Action) syncRadarr(event website.EventType) {
 	}
 }
 
-func (c *Action) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
+func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 	var (
 		err     error
 		payload = RadarrTrashPayload{Instance: instance, Name: app.Name, NewMaps: c.radarrCF[instance]}
@@ -90,7 +91,7 @@ func (c *Action) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 	return nil
 }
 
-func (c *Action) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) error {
+func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) error {
 	reply := &RadarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
@@ -149,7 +150,7 @@ func (c *Action) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byt
 }
 
 // postbackRadarrCF sends the changes back to notifiarr.com.
-func (c *Action) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
+func (c *cmd) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 	if len(maps.CF) < 1 && len(maps.QP) < 1 {
 		return nil
 	}

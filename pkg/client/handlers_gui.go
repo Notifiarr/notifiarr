@@ -392,12 +392,12 @@ func (c *Client) handleStartFileWatcher(response http.ResponseWriter, request *h
 		return
 	}
 
-	if idx < 0 || idx >= len(c.triggers.FileWatch.WatchFiles) {
+	if idx < 0 || idx >= len(c.triggers.FileWatch.Files()) {
 		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
 		return
 	}
 
-	watch := c.triggers.FileWatch.WatchFiles[idx]
+	watch := c.triggers.FileWatch.Files()[idx]
 	if watch.Active() {
 		http.Error(response, "Watcher already running! "+watch.Path, http.StatusNotAcceptable)
 		return
@@ -418,12 +418,12 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 		return
 	}
 
-	if idx < 0 || idx >= len(c.triggers.FileWatch.WatchFiles) {
+	if idx < 0 || idx >= len(c.triggers.FileWatch.Files()) {
 		http.Error(response, "unknown index provided:"+mux.Vars(request)["index"], http.StatusBadRequest)
 		return
 	}
 
-	watch := c.triggers.FileWatch.WatchFiles[idx]
+	watch := c.triggers.FileWatch.Files()[idx]
 	if !watch.Active() {
 		http.Error(response, "Watcher already stopped! "+watch.Path, http.StatusNotAcceptable)
 		return

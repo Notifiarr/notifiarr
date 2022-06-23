@@ -232,20 +232,20 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 			return http.StatusNotImplemented, "Plex Sessions are not enabled."
 		}
 
-		c.triggers.PlexCron.SendPlexSessions(source)
+		c.triggers.PlexCron.Send(source)
 
 		return http.StatusOK, "Plex sessions triggered."
 	case "stuckitems":
-		c.triggers.StuckItems.SendStuckQueueItems(source)
+		c.triggers.StuckItems.Send(source)
 		return http.StatusOK, "Stuck Queue Items triggered."
 	case "dashboard":
-		c.triggers.Dashboard.SendDashboardState(source)
+		c.triggers.Dashboard.Send(source)
 		return http.StatusOK, "Dashboard states triggered."
 	case "snapshot":
-		c.triggers.SnapCron.SendSnapshot(source)
+		c.triggers.SnapCron.Send(source)
 		return http.StatusOK, "System Snapshot triggered."
 	case "gaps":
-		c.triggers.Gaps.SendGaps(source)
+		c.triggers.Gaps.Send(source)
 		return http.StatusOK, "Radarr Collections Gaps initiated."
 	case "corrupt":
 		err := c.triggers.Backups.Corruption(source, starr.App(title.String(content)))

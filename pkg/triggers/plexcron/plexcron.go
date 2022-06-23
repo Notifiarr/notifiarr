@@ -12,7 +12,12 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
+// Action contains the exported methods for this package.
 type Action struct {
+	cmd *cmd
+}
+
+type cmd struct {
 	*common.Config
 	Plex    *plex.Server
 	sess    chan time.Time // Return Plex Sessions
@@ -37,19 +42,34 @@ type holder struct {
 	error    error
 }
 
-// SendPlexSessions sends plex sessions in a go routine through a channel.
-func (c *Action) SendPlexSessions(event website.EventType) {
-	c.Exec(event, TrigPlexSessions)
+// New configures the library.
+func New(config *common.Config, plex *plex.Server) *Action {
+	return &Action{
+		cmd: &cmd{
+			Config: config,
+			Plex:   plex,
+			sess:   make(chan time.Time, 1),
+			sessr:  make(chan *holder),
+		},
+	}
 }
 
-func (c *Action) Run() {
+// SendPlexSessions sends plex sessions in a go routine through a channel.
+func (a *Action) Send(event website.EventType) {
+	a.cmd.Exec(event, TrigPlexSessions)
+}
+
+// Run initializes the library.
+func (a *Action) Run() {
+	a.cmd.run()
+}
+
+func (c *cmd) run() {
 	if !c.Plex.Configured() {
 		return
 	}
 
-	c.sess = make(chan time.Time, 1)
-	c.sessr = make(chan *holder)
-	go c.runSessionHolder() //nolint:wsl
+	go c.runSessionHolder()
 
 	var ticker *time.Ticker
 
@@ -80,19 +100,23 @@ func (c *Action) Run() {
 }
 
 // sendPlexSessions is fired by a timer if plex monitoring is enabled.
-func (c *Action) sendPlexSessions(event website.EventType) {
+func (c *cmd) sendPlexSessions(event website.EventType) {
 	if !c.Plex.Configured() {
 		return
 	}
 
-	c.CollectSessions(event, nil)
+	c.collectSessions(event, nil)
 }
 
 // CollectSessions is called in a go routine after a plex media.play webhook.
 // This reaches back into Plex, asks for sessions and then sends the whole
 // payloads (incoming webhook and sessions) over to notifiarr.com.
 // SendMeta also collects system snapshot info, so a lot happens here.
-func (c *Action) CollectSessions(event website.EventType, hook *plex.IncomingWebhook) {
+func (a *Action) CollectSessions(event website.EventType, hook *plex.IncomingWebhook) {
+	a.cmd.collectSessions(event, hook)
+}
+
+func (c *cmd) collectSessions(event website.EventType, hook *plex.IncomingWebhook) {
 	wait := false
 	msg := ""
 
@@ -111,7 +135,11 @@ func (c *Action) CollectSessions(event website.EventType, hook *plex.IncomingWeb
 // GetSessions returns the plex sessions. This uses a channel so concurrent requests are avoided.
 // Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
 // Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
-func (c *Action) GetSessions(wait bool) (*plex.Sessions, error) {
+func (a *Action) GetSessions(wait bool) (*plex.Sessions, error) {
+	return a.cmd.getSessions(wait)
+}
+
+func (c *cmd) getSessions(wait bool) (*plex.Sessions, error) {
 	c.psMutex.RLock()
 	defer c.psMutex.RUnlock()
 
@@ -130,8 +158,8 @@ func (c *Action) GetSessions(wait bool) (*plex.Sessions, error) {
 	return s.sessions, s.error
 }
 
-// runSessionHolder runs a session holder routine. Call Create() first.
-func (c *Action) runSessionHolder() { //nolint:cyclop
+// runSessionHolder runs a session holder routine. Call Run() first.
+func (c *cmd) runSessionHolder() { //nolint:cyclop
 	defer c.CapturePanic()
 
 	sessions, err := c.Plex.GetSessions() // err not used until for loop.
@@ -172,7 +200,7 @@ func (c *Action) runSessionHolder() { //nolint:cyclop
 
 // plexSessionTracker checks for state changes between the previous session pull
 // and the current session pull. if changes are present, a timestmp is added.
-func (c *Action) plexSessionTracker(curr, prev []*plex.Session) {
+func (c *cmd) plexSessionTracker(curr, prev []*plex.Session) {
 CURRENT:
 	for _, currSess := range curr {
 		// make sure every current session has a start time.
@@ -196,8 +224,8 @@ CURRENT:
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
-func (c *Action) checkPlexFinishedItems(sent map[string]struct{}) {
-	sessions, err := c.GetSessions(false)
+func (c *cmd) checkPlexFinishedItems(sent map[string]struct{}) {
+	sessions, err := c.getSessions(false)
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
 		return
@@ -235,7 +263,7 @@ func (c *Action) checkPlexFinishedItems(sent map[string]struct{}) {
 	}
 }
 
-func (c *Action) checkSessionDone(session *plex.Session, pct float64) string {
+func (c *cmd) checkSessionDone(session *plex.Session, pct float64) string {
 	switch {
 	case session.Duration == 0:
 		return statusIgnoring
@@ -258,7 +286,7 @@ func (c *Action) checkSessionDone(session *plex.Session, pct float64) string {
 	}
 }
 
-func (c *Action) sendSessionDone(session *plex.Session) string {
+func (c *cmd) sendSessionDone(session *plex.Session) string {
 	if err := c.checkPlexAgent(session); err != nil {
 		return statusError + ": " + err.Error()
 	}
@@ -280,7 +308,7 @@ func (c *Action) sendSessionDone(session *plex.Session) string {
 	return statusSending
 }
 
-func (c *Action) checkPlexAgent(session *plex.Session) error {
+func (c *cmd) checkPlexAgent(session *plex.Session) error {
 	if !strings.Contains(session.GUID, "plex://") || session.Key == "" {
 		return nil
 	}
@@ -301,7 +329,11 @@ func (c *Action) checkPlexAgent(session *plex.Session) error {
 }
 
 // Stop the Plex session holder.
-func (c *Action) Stop() {
+func (a *Action) Stop() {
+	a.cmd.stop()
+}
+
+func (c *cmd) stop() {
 	c.psMutex.Lock()
 	defer c.psMutex.Unlock()
 

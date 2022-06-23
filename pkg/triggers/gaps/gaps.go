@@ -13,11 +13,26 @@ import (
 
 const TrigCollectionGaps common.TriggerName = "Sending Radarr Collection Gaps."
 
+// Action contains the exported methods for this package.
 type Action struct {
+	cmd *cmd
+}
+
+type cmd struct {
 	*common.Config
 }
 
-func (c *Action) Create() {
+// New configures the library.
+func New(config *common.Config) *Action {
+	return &Action{cmd: &cmd{Config: config}}
+}
+
+// Create initializes the library.
+func (a *Action) Create() {
+	a.cmd.create()
+}
+
+func (c *cmd) create() {
 	ci := c.ClientInfo
 
 	var ticker *time.Ticker
@@ -35,11 +50,12 @@ func (c *Action) Create() {
 	})
 }
 
-func (c *Action) SendGaps(event website.EventType) {
-	c.Exec(event, TrigCollectionGaps)
+// Send radarr collection gaps to the website.
+func (a *Action) Send(event website.EventType) {
+	a.cmd.Exec(event, TrigCollectionGaps)
 }
 
-func (c *Action) sendGaps(event website.EventType) {
+func (c *cmd) sendGaps(event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
 		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
 			event, len(c.Apps.Radarr))

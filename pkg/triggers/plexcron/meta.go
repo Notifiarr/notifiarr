@@ -16,7 +16,7 @@ import (
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *Action) sendPlexMeta(
+func (c *cmd) sendPlexMeta(
 	event website.EventType,
 	hook *plex.IncomingWebhook,
 	wait bool,
@@ -54,7 +54,7 @@ func (c *Action) sendPlexMeta(
 
 	if !wait || !c.Plex.NoActivity {
 		var err error
-		if payload.Plex, err = c.GetSessions(wait); err != nil {
+		if payload.Plex, err = c.getSessions(wait); err != nil {
 			rep <- fmt.Errorf("getting sessions: %w", err)
 		}
 	}
@@ -65,7 +65,7 @@ func (c *Action) sendPlexMeta(
 }
 
 // getMetaSnap grabs some basic system info: cpu, memory, username.
-func (c *Action) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
+func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	var (
 		snap = &snapshot.Snapshot{}
 		wg   sync.WaitGroup

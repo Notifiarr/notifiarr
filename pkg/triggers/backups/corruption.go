@@ -18,34 +18,35 @@ import (
 	"golift.io/xtractr"
 )
 
-func (c *Action) Corruption(event website.EventType, app starr.App) error {
+// Corruption initializes a corruption check for all instances of the provided app.
+func (a *Action) Corruption(event website.EventType, app starr.App) error {
 	switch app {
 	default:
 		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
 	case "":
 		return fmt.Errorf("%w: <no app provided>", common.ErrInvalidApp)
 	case "All":
-		c.Exec(event, TrigLidarrCorrupt)
-		c.Exec(event, TrigProwlarrCorrupt)
-		c.Exec(event, TrigRadarrCorrupt)
-		c.Exec(event, TrigReadarrCorrupt)
-		c.Exec(event, TrigSonarrCorrupt)
+		a.cmd.Exec(event, TrigLidarrCorrupt)
+		a.cmd.Exec(event, TrigProwlarrCorrupt)
+		a.cmd.Exec(event, TrigRadarrCorrupt)
+		a.cmd.Exec(event, TrigReadarrCorrupt)
+		a.cmd.Exec(event, TrigSonarrCorrupt)
 	case starr.Lidarr:
-		c.Exec(event, TrigLidarrCorrupt)
+		a.cmd.Exec(event, TrigLidarrCorrupt)
 	case starr.Prowlarr:
-		c.Exec(event, TrigProwlarrCorrupt)
+		a.cmd.Exec(event, TrigProwlarrCorrupt)
 	case starr.Radarr:
-		c.Exec(event, TrigRadarrCorrupt)
+		a.cmd.Exec(event, TrigRadarrCorrupt)
 	case starr.Readarr:
-		c.Exec(event, TrigReadarrCorrupt)
+		a.cmd.Exec(event, TrigReadarrCorrupt)
 	case starr.Sonarr:
-		c.Exec(event, TrigSonarrCorrupt)
+		a.cmd.Exec(event, TrigSonarrCorrupt)
 	}
 
 	return nil
 }
 
-func (c *Action) makeCorruptionTriggersLidarr() {
+func (c *cmd) makeCorruptionTriggersLidarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Lidarr {
@@ -63,7 +64,7 @@ func (c *Action) makeCorruptionTriggersLidarr() {
 	})
 }
 
-func (c *Action) makeCorruptionTriggersProwlarr() {
+func (c *cmd) makeCorruptionTriggersProwlarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Prowlarr {
@@ -81,7 +82,7 @@ func (c *Action) makeCorruptionTriggersProwlarr() {
 	})
 }
 
-func (c *Action) makeCorruptionTriggersRadarr() {
+func (c *cmd) makeCorruptionTriggersRadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Radarr {
@@ -99,7 +100,7 @@ func (c *Action) makeCorruptionTriggersRadarr() {
 	})
 }
 
-func (c *Action) makeCorruptionTriggersReadarr() {
+func (c *cmd) makeCorruptionTriggersReadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Readarr {
@@ -117,7 +118,7 @@ func (c *Action) makeCorruptionTriggersReadarr() {
 	})
 }
 
-func (c *Action) makeCorruptionTriggersSonarr() {
+func (c *cmd) makeCorruptionTriggersSonarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Sonarr {
@@ -135,7 +136,7 @@ func (c *Action) makeCorruptionTriggersSonarr() {
 	})
 }
 
-func (c *Action) sendLidarrCorruption(event website.EventType) {
+func (c *cmd) sendLidarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Lidarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -148,7 +149,7 @@ func (c *Action) sendLidarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *Action) sendProwlarrCorruption(event website.EventType) {
+func (c *cmd) sendProwlarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Prowlarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -161,7 +162,7 @@ func (c *Action) sendProwlarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *Action) sendRadarrCorruption(event website.EventType) {
+func (c *cmd) sendRadarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Radarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -174,7 +175,7 @@ func (c *Action) sendRadarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *Action) sendReadarrCorruption(event website.EventType) {
+func (c *cmd) sendReadarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Readarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -187,7 +188,7 @@ func (c *Action) sendReadarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *Action) sendSonarrCorruption(event website.EventType) {
+func (c *cmd) sendSonarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Sonarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -200,7 +201,7 @@ func (c *Action) sendSonarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *Action) sendAndLogAppCorruption(input *genericInstance) string {
+func (c *cmd) sendAndLogAppCorruption(input *genericInstance) string {
 	ctx, cancel := context.WithTimeout(context.Background(), maxCheckTime)
 	defer cancel()
 
@@ -253,7 +254,7 @@ func (c *Action) sendAndLogAppCorruption(input *genericInstance) string {
 	return latest
 }
 
-func (c *Action) checkBackupFileCorruption(
+func (c *cmd) checkBackupFileCorruption(
 	ctx context.Context,
 	input *genericInstance,
 	remotePath string,

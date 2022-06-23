@@ -14,7 +14,12 @@ import (
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
 
+// Action contains the exported methods for this package.
 type Action struct {
+	cmd *cmd
+}
+
+type cmd struct {
 	*common.Config
 }
 
@@ -49,12 +54,18 @@ type QueuePayload struct {
 
 const getItemsMax = 100
 
-func (c *Action) Create() {
-	c.Add(&common.Action{
+// New configures the library.
+func New(config *common.Config) *Action {
+	return &Action{cmd: &cmd{Config: config}}
+}
+
+// Create initializes the library.
+func (a *Action) Create() {
+	a.cmd.Add(&common.Action{
 		Name: TrigStuckItems,
-		Fn:   c.sendStuckQueueItems,
+		Fn:   a.cmd.sendStuckQueueItems,
 		C:    make(chan website.EventType, 1),
-		T:    getTicker(c.Apps),
+		T:    getTicker(a.cmd.Apps),
 	})
 }
 
@@ -101,11 +112,12 @@ func (i ItemList) Empty() bool {
 	return i.Len() < 1
 }
 
-func (c *Action) SendStuckQueueItems(event website.EventType) {
-	c.Exec(event, TrigStuckItems)
+// Send stuck items to the website.
+func (a *Action) Send(event website.EventType) {
+	a.cmd.Exec(event, TrigStuckItems)
 }
 
-func (c *Action) sendStuckQueueItems(event website.EventType) {
+func (c *cmd) sendStuckQueueItems(event website.EventType) {
 	start := time.Now()
 	cue := c.getQueues()
 	apps := time.Since(start).Round(time.Millisecond)
@@ -126,7 +138,7 @@ func (c *Action) sendStuckQueueItems(event website.EventType) {
 }
 
 // getQueues fires a routine for each app type and tries to get a lot of data fast!
-func (c *Action) getQueues() *QueuePayload {
+func (c *cmd) getQueues() *QueuePayload {
 	if c.Serial {
 		return &QueuePayload{
 			Lidarr:  c.getFinishedItemsLidarr(),
@@ -163,7 +175,7 @@ func (c *Action) getQueues() *QueuePayload {
 	return cue
 }
 
-func (c *Action) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
+func (c *cmd) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Lidarr {
@@ -209,7 +221,7 @@ func (c *Action) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
 	return stuck
 }
 
-func (c *Action) getFinishedItemsRadarr() ItemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsRadarr() ItemList { //nolint:cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Radarr {
@@ -257,7 +269,7 @@ func (c *Action) getFinishedItemsRadarr() ItemList { //nolint:cyclop
 	return stuck
 }
 
-func (c *Action) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
+func (c *cmd) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Readarr {
@@ -303,7 +315,7 @@ func (c *Action) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
 	return stuck
 }
 
-func (c *Action) getFinishedItemsSonarr() ItemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsSonarr() ItemList { //nolint:cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Sonarr {

@@ -376,7 +376,7 @@ func (c *Client) watchNotifiarrMenu() {
 	for {
 		select {
 		case <-menu["gaps"].ClickedCh:
-			c.triggers.Gaps.SendGaps(website.EventUser)
+			c.triggers.Gaps.Send(website.EventUser)
 		case <-menu["synccf"].ClickedCh:
 			c.triggers.CFSync.SyncRadarrCF(website.EventUser)
 		case <-menu["syncqp"].ClickedCh:
@@ -390,13 +390,13 @@ func (c *Client) watchNotifiarrMenu() {
 			ui.Notify("Running and sending %d Service Checks.", len(c.Config.Service))
 			c.Config.Services.RunChecks(website.EventUser)
 		case <-menu["app_ques"].ClickedCh:
-			c.triggers.StuckItems.SendStuckQueueItems(website.EventUser)
+			c.triggers.StuckItems.Send(website.EventUser)
 		case <-menu["plex_prod"].ClickedCh:
-			c.triggers.PlexCron.SendPlexSessions(website.EventUser)
+			c.triggers.PlexCron.Send(website.EventUser)
 		case <-menu["snap_prod"].ClickedCh:
-			c.triggers.SnapCron.SendSnapshot(website.EventUser)
+			c.triggers.SnapCron.Send(website.EventUser)
 		case <-menu["send_dash"].ClickedCh:
-			c.triggers.Dashboard.SendDashboardState(website.EventUser)
+			c.triggers.Dashboard.Send(website.EventUser)
 		case <-menu["corrLidarr"].ClickedCh:
 			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Lidarr)
 		case <-menu["corrProwlarr"].ClickedCh:
