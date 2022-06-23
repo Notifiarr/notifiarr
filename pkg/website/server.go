@@ -41,7 +41,6 @@ var (
 type Config struct {
 	Apps       *apps.Apps
 	Plex       *plex.Server // plex sessions
-	Services   *ServiceConfig
 	Serial     bool
 	Retries    int
 	BaseURL    string

@@ -143,7 +143,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	c.Services.Apps = c.Apps
 	c.Services.Plugins = c.Snapshot.Plugins
 
-	svcs, err := c.Services.Setup(c.Service)
+	err := c.Services.Setup(c.Service)
 	if err != nil {
 		return nil, nil, fmt.Errorf("service checks: %w", err)
 	}
@@ -153,16 +153,15 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Website = website.New(&website.Config{
-		Mode:     c.Mode,
-		Apps:     c.Apps,
-		Plex:     c.Plex,
-		Logger:   c.Services.Logger,
-		BaseURL:  website.BaseURL,
-		Timeout:  c.Timeout,
-		MaxBody:  c.MaxBody,
-		Retries:  c.Retries,
-		Serial:   c.Serial,
-		Services: svcs,
+		Mode:    c.Mode,
+		Apps:    c.Apps,
+		Plex:    c.Plex,
+		Logger:  c.Services.Logger,
+		BaseURL: website.BaseURL,
+		Timeout: c.Timeout,
+		MaxBody: c.MaxBody,
+		Retries: c.Retries,
+		Serial:  c.Serial,
 	})
 	c.setup()
 

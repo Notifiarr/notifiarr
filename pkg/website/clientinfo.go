@@ -162,7 +162,6 @@ func (s *Server) Info() map[string]interface{} {
 	}
 
 	return map[string]interface{}{
-		"services": s.config.Services,
 		"client": map[string]interface{}{
 			"arch":      runtime.GOARCH,
 			"buildDate": version.BuildDate,
@@ -193,23 +192,6 @@ func (s *Server) Info() map[string]interface{} {
 			"apps":          s.getAppConfigs(),
 		},
 	}
-}
-
-// ServiceConfig comes from the services package. It's only used for display on the website.
-type ServiceConfig struct {
-	Interval cnfg.Duration   `json:"interval"`
-	Parallel uint            `json:"parallel"`
-	Disabled bool            `json:"disabled"`
-	Checks   []*ServiceCheck `json:"checks"`
-}
-
-// ServiceCheck comes from the services package. It's only used for display on the website.
-type ServiceCheck struct {
-	Name     string        `json:"name"`
-	Type     string        `json:"type"`
-	Expect   string        `json:"expect"`
-	Timeout  cnfg.Duration `json:"timeout"`
-	Interval cnfg.Duration `json:"interval"`
 }
 
 // hostInfoNoError will return nil if there is an error, otherwise a copy of the host info.

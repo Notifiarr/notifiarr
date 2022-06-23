@@ -13,7 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-func (c *Config) Setup(services []*Service) (*website.ServiceConfig, error) {
+func (c *Config) Setup(services []*Service) error {
 	if c.Parallel > MaximumParallel {
 		c.Parallel = MaximumParallel
 	} else if c.Parallel == 0 {
@@ -31,18 +31,12 @@ func (c *Config) Setup(services []*Service) (*website.ServiceConfig, error) {
 	return c.setup(services)
 }
 
-func (c *Config) setup(services []*Service) (*website.ServiceConfig, error) {
+func (c *Config) setup(services []*Service) error {
 	c.services = make(map[string]*Service)
-	scnfg := &website.ServiceConfig{
-		Interval: c.Interval,
-		Parallel: c.Parallel,
-		Disabled: c.Disabled,
-		Checks:   make([]*website.ServiceCheck, len(services)),
-	}
 
 	for idx, check := range services {
 		if err := services[idx].Validate(); err != nil {
-			return nil, err
+			return err
 		}
 
 		exp.ServiceChecks.Add(check.Name+"&&Total", 0)
@@ -53,16 +47,9 @@ func (c *Config) setup(services []*Service) (*website.ServiceConfig, error) {
 
 		// Add this validated service to our service map.
 		c.services[services[idx].Name] = services[idx]
-		scnfg.Checks[idx] = &website.ServiceCheck{
-			Name:     check.Name,
-			Type:     string(check.Type),
-			Expect:   check.Expect,
-			Timeout:  check.Timeout,
-			Interval: check.Interval,
-		}
 	}
 
-	return scnfg, nil
+	return nil
 }
 
 // Start begins the service check routines.
