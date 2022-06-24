@@ -1,3 +1,5 @@
+// Pcakage triggers provides a simple interface to setup all sub-module triggers.
+// Adding a new trigger here should be two new lines of code and a new import.
 package triggers
 
 import (
@@ -109,7 +111,7 @@ func (c *Actions) Start() {
 
 // Stop all internal cron timers and Triggers.
 func (c *Actions) Stop(event website.EventType) {
-	defer c.timers.Stop(event)
+	c.timers.Stop(event)
 
 	actions := reflect.ValueOf(c).Elem()
 	// Stop them in reverse order they were started.
