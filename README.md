@@ -134,6 +134,8 @@ ui_password = "username:16CharacterPassword"
 
 Use a password that is at least 16 characters long. Once you log into the web interface, you can change the password and it will be saved encrypted (so no one can snoop it).
 
+You may also set ui_password to the value of "webauth" to enable proxy authentication support. You must also add your auth proxy IP or CIDR to the upstreams setting for this to work. The proxy must pass x-webauth-user: username as a header, and you will be automatically logged in.
+
 ### Config Settings
 
 - Instead of, or in addition to a config file, you may configure a docker container with environment variables.
