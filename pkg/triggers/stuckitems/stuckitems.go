@@ -1,4 +1,4 @@
-package notifiarr
+package stuckitems
 
 import (
 	"fmt"
@@ -6,11 +6,29 @@ import (
 	"sync"
 	"time"
 
-	"golift.io/cnfg"
+	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/sonarr"
 )
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
+
+// Action contains the exported methods for this package.
+type Action struct {
+	cmd *cmd
+}
+
+type cmd struct {
+	*common.Config
+}
+
+const TrigStuckItems common.TriggerName = "Checking app queues and sending stuck items."
+
+const (
+	// How often to check starr apps for stuck items.
+	stuckDur = 5*time.Minute + 1327*time.Millisecond
+)
 
 const (
 	errorstr  = "error"
@@ -18,24 +36,6 @@ const (
 	warning   = "warning"
 	completed = "completed"
 )
-
-type appConfig struct {
-	Instance int           `json:"instance"`
-	Name     string        `json:"name"`
-	Stuck    bool          `json:"stuck"`
-	Corrupt  string        `json:"corrupt"`
-	Backup   string        `json:"backup"`
-	Interval cnfg.Duration `json:"interval"`
-}
-
-// appConfigs is the configuration returned from the notifiarr website.
-type appConfigs struct {
-	Lidarr   []*appConfig `json:"lidarr"`
-	Prowlarr []*appConfig `json:"prowlarr"`
-	Radarr   []*appConfig `json:"radarr"`
-	Readarr  []*appConfig `json:"readarr"`
-	Sonarr   []*appConfig `json:"sonarr"`
-}
 
 type ListItem struct {
 	Elapsed time.Duration `json:"elapsed"`
@@ -54,6 +54,52 @@ type QueuePayload struct {
 
 const getItemsMax = 100
 
+// New configures the library.
+func New(config *common.Config) *Action {
+	return &Action{cmd: &cmd{Config: config}}
+}
+
+// Create initializes the library.
+func (a *Action) Create() {
+	a.cmd.Add(&common.Action{
+		Name: TrigStuckItems,
+		Fn:   a.cmd.sendStuckQueueItems,
+		C:    make(chan website.EventType, 1),
+		T:    getTicker(a.cmd.Apps),
+	})
+}
+
+// getTicker only returns a ticker if at least 1 app has stuck items turned on.
+func getTicker(apps *apps.Apps) *time.Ticker {
+	for _, app := range apps.Lidarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	for _, app := range apps.Radarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	for _, app := range apps.Readarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	for _, app := range apps.Sonarr {
+		if app.StuckItem {
+			return time.NewTicker(stuckDur)
+		}
+	}
+
+	var ticker *time.Ticker
+
+	return ticker
+}
+
 func (i ItemList) Len() (count int) {
 	for _, v := range i {
 		count += len(v.Queue)
@@ -66,11 +112,12 @@ func (i ItemList) Empty() bool {
 	return i.Len() < 1
 }
 
-func (t *Triggers) SendStuckQueueItems(event EventType) {
-	t.exec(event, TrigStuckItems)
+// Send stuck items to the website.
+func (a *Action) Send(event website.EventType) {
+	a.cmd.Exec(event, TrigStuckItems)
 }
 
-func (c *Config) sendStuckQueueItems(event EventType) {
+func (c *cmd) sendStuckQueueItems(event website.EventType) {
 	start := time.Now()
 	cue := c.getQueues()
 	apps := time.Since(start).Round(time.Millisecond)
@@ -80,8 +127,8 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 		return
 	}
 
-	c.QueueData(&SendRequest{
-		Route:      StuckRoute,
+	c.QueueData(&website.SendRequest{
+		Route:      website.StuckRoute,
 		Event:      event,
 		LogPayload: true,
 		LogMsg: fmt.Sprintf("Stuck Queue Items (apps:%s) (Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d)",
@@ -91,7 +138,7 @@ func (c *Config) sendStuckQueueItems(event EventType) {
 }
 
 // getQueues fires a routine for each app type and tries to get a lot of data fast!
-func (c *Config) getQueues() *QueuePayload {
+func (c *cmd) getQueues() *QueuePayload {
 	if c.Serial {
 		return &QueuePayload{
 			Lidarr:  c.getFinishedItemsLidarr(),
@@ -128,7 +175,7 @@ func (c *Config) getQueues() *QueuePayload {
 	return cue
 }
 
-func (c *Config) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
+func (c *cmd) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Lidarr {
@@ -174,7 +221,7 @@ func (c *Config) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
 	return stuck
 }
 
-func (c *Config) getFinishedItemsRadarr() ItemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsRadarr() ItemList { //nolint:cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Radarr {
@@ -222,7 +269,7 @@ func (c *Config) getFinishedItemsRadarr() ItemList { //nolint:cyclop
 	return stuck
 }
 
-func (c *Config) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
+func (c *cmd) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Readarr {
@@ -268,7 +315,7 @@ func (c *Config) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
 	return stuck
 }
 
-func (c *Config) getFinishedItemsSonarr() ItemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsSonarr() ItemList { //nolint:cyclop
 	stuck := make(ItemList)
 
 	for idx, app := range c.Apps.Sonarr {

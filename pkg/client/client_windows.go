@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/hako/durafmt"
 	"github.com/kardianos/osext"
 	"golift.io/version"
@@ -136,7 +136,7 @@ func (c *Client) handleAptHook() error {
 }
 
 func (c *Client) checkReloadSignal(sigc os.Signal) error {
-	return c.reloadConfiguration(notifiarr.EventSignal, "Caught Signal: "+sigc.String())
+	return c.reloadConfiguration(website.EventSignal, "Caught Signal: "+sigc.String())
 }
 
 func (c *Client) setSignals() {

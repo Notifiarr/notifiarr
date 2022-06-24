@@ -15,8 +15,8 @@
 }
 html,body {
   font-size: 14px;
-  height: 96%;
 }
+
 .page-container {
     min-height: 100%;
     position: relative;
@@ -759,8 +759,7 @@ li {
   cursor: pointer;
 }
 .ts-main-content .content-wrapper {
-  padding-top: 15px;
-  margin-top: 60px;
+  padding-top: 55px;
 }
 @media only screen and (min-width: 1200px) {
   .ts-main-content .ts-sidebar {
