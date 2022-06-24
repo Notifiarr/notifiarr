@@ -19,9 +19,10 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/securecookie"
 	flag "github.com/spf13/pflag"
 	"golift.io/version"
@@ -30,24 +31,25 @@ import (
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
+	plexTimer Timer
 	Flags     *configfile.Flags
 	Config    *configfile.Config
 	server    *http.Server
 	sigkil    chan os.Signal
 	sighup    chan os.Signal
 	reload    chan customReload
-	website   *notifiarr.Config
+	website   *website.Server
+	triggers  *triggers.Actions
 	cookies   *securecookie.SecureCookie
 	templat   *template.Template
 	webauth   bool
-	plexTimer Timer
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" as of its creation.
 	sync.RWMutex
 }
 
 type customReload struct {
-	event notifiarr.EventType
+	event website.EventType
 	msg   string
 }
 
@@ -77,19 +79,19 @@ func newDefaults() *Client {
 
 // Start runs the app.
 func Start() error {
-	config := newDefaults()
-	config.Flags.ParseArgs(os.Args[1:])
+	client := newDefaults()
+	client.Flags.ParseArgs(os.Args[1:])
 
 	switch {
-	case config.Flags.VerReq: // print version and exit.
-		fmt.Println(version.Print(config.Flags.Name())) //nolint:forbidigo
+	case client.Flags.VerReq: // print version and exit.
+		fmt.Println(version.Print(client.Flags.Name())) //nolint:forbidigo
 		return nil
-	case config.Flags.PSlist: // print process list and exit.
+	case client.Flags.PSlist: // print process list and exit.
 		return printProcessList()
-	case config.Flags.Curl != "": // curl a URL and exit.
-		return curlURL(config.Flags.Curl, config.Flags.Headers)
+	case client.Flags.Curl != "": // curl a URL and exit.
+		return curlURL(client.Flags.Curl, client.Flags.Headers)
 	default:
-		return config.start()
+		return client.start()
 	}
 }
 
@@ -161,7 +163,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	}
 
 	// Parse the config file and environment variables.
-	c.website, err = c.Config.Get(c.Flags)
+	c.website, c.triggers, err = c.Config.Get(c.Flags)
 	if err != nil {
 		return msg, newCon, fmt.Errorf("getting config: %w", err)
 	}
@@ -170,7 +172,7 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 }
 
 // Load configuration from the website.
-func (c *Client) loadSiteConfig() *notifiarr.ClientInfo {
+func (c *Client) loadSiteConfig() *website.ClientInfo {
 	clientInfo, err := c.website.GetClientInfo()
 	if err != nil || clientInfo == nil {
 		c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
@@ -179,7 +181,7 @@ func (c *Client) loadSiteConfig() *notifiarr.ClientInfo {
 
 	if clientInfo.Actions.Snapshot != nil {
 		clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins // use local data for plugins.
-		c.website.Snap, c.Config.Snapshot = clientInfo.Actions.Snapshot, clientInfo.Actions.Snapshot
+		c.Config.Snapshot = clientInfo.Actions.Snapshot
 	}
 
 	if clientInfo.Actions.Plex != nil && c.Config.Plex != nil {
@@ -196,10 +198,10 @@ func (c *Client) loadSiteConfig() *notifiarr.ClientInfo {
 	return clientInfo
 }
 
-func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint:cyclop
+func (c *Client) loadSiteAppsConfig(clientInfo *website.ClientInfo) { //nolint:cyclop
 	for _, app := range clientInfo.Actions.Apps.Lidarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Lidarr) {
-			c.Errorf("Website provided configuration for missing Lidarr app: %d:%s", app.Instance, app.Name)
+			c.ErrorfNoShare("Website provided configuration for missing Lidarr app: %d:%s", app.Instance, app.Name)
 			continue
 		}
 
@@ -210,7 +212,7 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 
 	for _, app := range clientInfo.Actions.Apps.Prowlarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Prowlarr) {
-			c.Errorf("Website provided configuration for missing Prowlarr app: %d:%s", app.Instance, app.Name)
+			c.ErrorfNoShare("Website provided configuration for missing Prowlarr app: %d:%s", app.Instance, app.Name)
 			continue
 		}
 
@@ -220,7 +222,7 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 
 	for _, app := range clientInfo.Actions.Apps.Radarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Radarr) {
-			c.Errorf("Website provided configuration for missing Radarr app: %d:%s", app.Instance, app.Name)
+			c.ErrorfNoShare("Website provided configuration for missing Radarr app: %d:%s", app.Instance, app.Name)
 			continue
 		}
 
@@ -231,7 +233,7 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 
 	for _, app := range clientInfo.Actions.Apps.Readarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Readarr) {
-			c.Errorf("Website provided configuration for missing Readarr app: %d:%s", app.Instance, app.Name)
+			c.ErrorfNoShare("Website provided configuration for missing Readarr app: %d:%s", app.Instance, app.Name)
 			continue
 		}
 
@@ -242,7 +244,7 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 
 	for _, app := range clientInfo.Actions.Apps.Sonarr {
 		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Sonarr) {
-			c.Errorf("Website provided configuration for missing Sonarr app: %d:%s", app.Instance, app.Name)
+			c.ErrorfNoShare("Website provided configuration for missing Sonarr app: %d:%s", app.Instance, app.Name)
 			continue
 		}
 
@@ -253,13 +255,14 @@ func (c *Client) loadSiteAppsConfig(clientInfo *notifiarr.ClientInfo) { //nolint
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices() (*notifiarr.ClientInfo, error) {
+func (c *Client) configureServices() (*website.ClientInfo, error) {
 	clientInfo := c.loadSiteConfig()
 	c.configureServicesPlex()
-	c.website.Sighup = c.sighup
+	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(clientInfo)
 	c.website.Start()
+	c.triggers.Start()
 	/* // debug stuff.
 	snap, err, _ := c.Config.Snapshot.GetSnapshot()
 	b, _ := json.MarshalIndent(snap, "", "   ")
@@ -292,7 +295,7 @@ func (c *Client) configureServicesPlex() {
 	}
 }
 
-func (c *Client) triggerConfigReload(event notifiarr.EventType, source string) {
+func (c *Client) triggerConfigReload(event website.EventType, source string) {
 	c.reload <- customReload{event: event, msg: source}
 }
 
@@ -340,11 +343,12 @@ func (c *Client) exit() error {
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
-func (c *Client) reloadConfiguration(event notifiarr.EventType, source string) error {
+func (c *Client) reloadConfiguration(event website.EventType, source string) error {
 	c.Printf("==> Reloading Configuration (%s): %s", event, source)
 	c.closeDynamicTimerMenus()
-	c.website.Stop(event)
+	c.triggers.Stop(event)
 	c.Config.Services.Stop()
+	c.website.Stop()
 
 	err := c.StopWebServer()
 	if err != nil && !errors.Is(err, ErrNoServer) {
@@ -355,7 +359,7 @@ func (c *Client) reloadConfiguration(event notifiarr.EventType, source string) e
 
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
-	if c.website, err = c.Config.Get(c.Flags); err != nil {
+	if c.website, c.triggers, err = c.Config.Get(c.Flags); err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}
 
@@ -374,7 +378,7 @@ func (c *Client) reloadConfiguration(event notifiarr.EventType, source string) e
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
-		c.Error("Creating Toast Notification:", err)
+		c.Errorf("Creating Toast Notification: %v", err)
 	}
 
 	return nil

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 // handleAptHook takes a payload as stdin from dpkg and relays it to notifiarr.com.
@@ -52,12 +52,12 @@ func (c *Client) handleAptHook() error {
 		} //nolint:wsl
 	}
 
-	resp, err := c.website.SendData(notifiarr.PkgRoute.Path("apt"), output, true)
+	resp, err := c.website.SendData(website.PkgRoute.Path("apt"), output, true)
 	//nolint:forbidigo
 	if err != nil {
-		fmt.Printf("ERROR Sending Notification to Notifiarr.com: %v%s\n", err, resp)
+		fmt.Printf("ERROR Sending Notification to website.com: %v%s\n", err, resp)
 	} else {
-		fmt.Printf("Sent notification to Notifiarr.com; install: %d, remove: %d%s\n",
+		fmt.Printf("Sent notification to website.com; install: %d, remove: %d%s\n",
 			output.Install, output.Remove, resp)
 	}
 
@@ -90,7 +90,7 @@ func (c *Client) checkReloadSignal(sigc os.Signal) error {
 			c.Errorf("Writing Config File: %v", err)
 		}
 	} else {
-		return c.reloadConfiguration(notifiarr.EventSignal, "Caught Signal: "+sigc.String())
+		return c.reloadConfiguration(website.EventSignal, "Caught Signal: "+sigc.String())
 	}
 
 	return nil

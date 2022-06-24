@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
-	"github.com/Notifiarr/notifiarr/pkg/notifiarr"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 type result struct {
@@ -22,7 +22,7 @@ type result struct {
 
 // triggerCheck is used to signal the check of one service.
 type triggerCheck struct {
-	Source  notifiarr.EventType
+	Source  website.EventType
 	Service *Service
 }
 

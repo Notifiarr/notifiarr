@@ -1,4 +1,4 @@
-package notifiarr
+package filewatch
 
 import (
 	"fmt"
@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/nxadm/tail"
 )
 
@@ -21,8 +23,21 @@ const (
 	retryInterval = 10 * time.Second
 )
 
+type cmd struct {
+	*common.Config
+	addWatcher  chan *WatchFile
+	stopWatcher chan struct{}
+	awMutex     sync.RWMutex
+	files       []*WatchFile
+}
+
+// Action contains the exported methods for this package.
+type Action struct {
+	cmd *cmd
+}
+
+// WatchFile is the input data needed to watch files.
 type WatchFile struct {
-	//	Cooldown  cnfg.Duration `json:"cooldown" toml:"cooldown" xml:"cooldown" yaml:"cooldown"`
 	Path      string `json:"path" toml:"path" xml:"path" yaml:"path"`
 	Regexp    string `json:"regex" toml:"regex" xml:"regex" yaml:"regex"`
 	Skip      string `json:"skip" toml:"skip" xml:"skip" yaml:"skip"`
@@ -44,12 +59,36 @@ type Match struct {
 	Line    string   `json:"line"`
 }
 
-// runFileWatcher compiles any regexp's and opens a tail -f on provided watch files.
-func (c *Config) runFileWatcher() {
+// New configures the library.
+func New(config *common.Config, files []*WatchFile) *Action {
+	return &Action{
+		cmd: &cmd{
+			Config: config,
+			files:  files,
+		},
+	}
+}
+
+// Run compiles any regexp's and opens a tail -f on provided watch files.
+func (a *Action) Run() {
+	a.cmd.run()
+}
+
+// Files returns the list of files configured.
+func (a *Action) Files() []*WatchFile {
+	return a.cmd.files
+}
+
+// Stop all file watcher routines.
+func (a *Action) Stop() {
+	a.cmd.stop()
+}
+
+func (c *cmd) run() {
 	// two fake tails for internal channels.
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
-	for _, item := range c.WatchFiles {
+	for _, item := range c.files {
 		if err := item.setup(c.Logger.GetInfoLog()); err != nil {
 			c.Errorf("Unable to watch file %v", err)
 			continue
@@ -98,9 +137,9 @@ func (w *WatchFile) setup(logger *log.Logger) error {
 }
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
-func (c *Config) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
-	c.extras.addWatcher = make(chan *WatchFile, 1)
-	c.extras.stopWatcher = make(chan struct{})
+func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
+	c.addWatcher = make(chan *WatchFile, 1)
+	c.stopWatcher = make(chan struct{})
 	ticker := time.NewTicker(retryInterval)
 	cases := make([]reflect.SelectCase, len(tails))
 
@@ -128,7 +167,7 @@ func (c *Config) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *ti
 }
 
 //nolint:cyclop
-func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
+func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
 	defer func() {
 		defer c.CapturePanic()
 		ticker.Stop()
@@ -182,14 +221,14 @@ func (c *Config) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticke
 	}
 }
 
-func (c *Config) fileWatcherTicker(died bool) bool {
+func (c *cmd) fileWatcherTicker(died bool) bool {
 	if !died {
 		return false
 	}
 
 	var stilldead bool
 
-	for _, item := range c.WatchFiles {
+	for _, item := range c.files {
 		if item.Active() || item.retries >= maxRetries {
 			continue
 		}
@@ -200,7 +239,7 @@ func (c *Config) fileWatcherTicker(died bool) bool {
 		// move this back to debug.
 		c.Printf("Restarting File Watcher (retries: %d): %s", item.retries, item.Path)
 
-		if err := c.AddFileWatcher(item); err != nil {
+		if err := c.addFileWatcher(item); err != nil {
 			c.Errorf("Restarting File Watcher (retries: %d): %s: %v", item.retries, item.Path, err)
 			exp.FileWatcher.Add(item.Path+" Errors", 1)
 
@@ -216,7 +255,7 @@ func (c *Config) fileWatcherTicker(died bool) bool {
 
 // checkLineMatch runs when a watched file has a new line written.
 // If a match is found a notification is sent.
-func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
+func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 	if tail.re == nil || line.Text == "" || !tail.re.MatchString(line.Text) {
 		return // no match
 	}
@@ -234,21 +273,25 @@ func (c *Config) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		Matches: tail.re.FindAllString(line.Text, -1),
 	}
 
-	c.QueueData(&SendRequest{
-		Route:      LogLineRoute,
-		Event:      EventFile,
+	c.QueueData(&website.SendRequest{
+		Route:      website.LogLineRoute,
+		Event:      website.EventFile,
 		LogPayload: tail.LogMatch,
 		LogMsg:     fmt.Sprintf("Watched-File Line Match: %s: %s", tail.Path, match.Line),
 		Payload:    match,
 	})
 }
 
-func (c *Config) AddFileWatcher(file *WatchFile) error {
-	c.extras.awMutex.RLock()
-	defer c.extras.awMutex.RUnlock()
+func (a *Action) AddFileWatcher(file *WatchFile) error {
+	return a.cmd.addFileWatcher(file)
+}
 
-	if c.extras.addWatcher == nil {
-		return ErrNoChannel
+func (c *cmd) addFileWatcher(file *WatchFile) error {
+	c.awMutex.RLock()
+	defer c.awMutex.RUnlock()
+
+	if c.addWatcher == nil {
+		return common.ErrNoChannel
 	}
 
 	if err := file.setup(c.Logger.GetInfoLog()); err != nil {
@@ -258,7 +301,7 @@ func (c *Config) AddFileWatcher(file *WatchFile) error {
 	c.Printf("Watching File: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
 		file.Path, file.Regexp, file.Skip, file.Poll, file.Pipe, file.MustExist, file.LogMatch)
 
-	c.extras.addWatcher <- file
+	c.addWatcher <- file
 
 	return nil
 }
@@ -277,21 +320,21 @@ func (w *WatchFile) Stop() error {
 	return nil
 }
 
-func (c *Config) closeFileWatchers() {
-	c.extras.awMutex.Lock()
-	defer c.extras.awMutex.Unlock()
+func (c *cmd) stop() {
+	c.awMutex.Lock()
+	defer c.awMutex.Unlock()
 
-	for _, tail := range c.WatchFiles {
+	for _, tail := range c.files {
 		if err := tail.Stop(); err != nil {
 			c.Errorf("Stopping File Watcher: %s: %v", tail.Path, err)
 		}
 	}
 
 	// The following code might wait for all the watchers to die before returning.
-	close(c.extras.addWatcher)
-	<-c.extras.stopWatcher
-	c.extras.addWatcher = nil
-	c.extras.stopWatcher = nil
+	close(c.addWatcher)
+	<-c.stopWatcher
+	c.addWatcher = nil
+	c.stopWatcher = nil
 }
 
 // this runs when a channel dies from the main go routine loop.

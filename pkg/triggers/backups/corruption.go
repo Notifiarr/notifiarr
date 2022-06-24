@@ -1,4 +1,4 @@
-package notifiarr
+package backups
 
 import (
 	"context"
@@ -12,121 +12,131 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr"
 	"golift.io/xtractr"
 )
 
-// Intervals at which these apps database backups are checked for corruption.
-const (
-	lidarrCorruptCheckDur   = 5*time.Hour + 10*time.Minute
-	prowlarrCorruptCheckDur = 5*time.Hour + 20*time.Minute
-	radarrCorruptCheckDur   = 5*time.Hour + 30*time.Minute
-	readarrCorruptCheckDur  = 5*time.Hour + 40*time.Minute
-	sonarrCorruptCheckDur   = 5*time.Hour + 50*time.Minute
-	maxCheckTime            = 10 * time.Minute
-)
-
-// Trigger Types.
-const (
-	TrigLidarrCorrupt   TriggerName = "Checking Lidarr for database backup corruption."
-	TrigProwlarrCorrupt TriggerName = "Checking Prowlarr for database backup corruption."
-	TrigRadarrCorrupt   TriggerName = "Checking Radarr for database backup corruption."
-	TrigReadarrCorrupt  TriggerName = "Checking Readarr for database backup corruption."
-	TrigSonarrCorrupt   TriggerName = "Checking Sonarr for database backup corruption."
-)
-
-// Errors returned by this package.
-var (
-	ErrNoDBInBackup = fmt.Errorf("no database file found in backup")
-)
-
-// BackupInfo contains a pile of information about a Starr database (backup).
-// This is the data sent to notifiarr.com.
-type BackupInfo struct {
-	App    starr.App `json:"app"`
-	Int    int       `json:"instance"`
-	Name   string    `json:"name"`
-	File   string    `json:"file,omitempty"`
-	Ver    string    `json:"version,omitempty"`
-	Integ  string    `json:"integrity,omitempty"`
-	Quick  string    `json:"quick,omitempty"`
-	Rows   int       `json:"rows,omitempty"`
-	Size   int64     `json:"bytes,omitempty"`
-	Tables int64     `json:"tables,omitempty"`
-	Date   time.Time `json:"date,omitempty"`
-}
-
-// genericInstance is used to abstract all starr apps to reusable methods.
-// It's also used in the backups.go file.
-type genericInstance struct {
-	event EventType
-	last  string      // app.Corrupt
-	name  starr.App   // Lidarr, Radarr, ..
-	cName string      // configured app name
-	int   int         // instance ID: 1, 2, 3...
-	app   interface { // all starr apps satisfy this interface. yay!
-		GetBackupFiles() ([]*starr.BackupFile, error)
-		starr.APIer
-	}
-}
-
-func (c *Config) makeCorruptionTriggers() {
-	c.Trigger.add(&action{
-		Name: TrigLidarrCorrupt,
-		Fn:   c.sendLidarrCorruption,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(lidarrCorruptCheckDur),
-	}, &action{
-		Name: TrigProwlarrCorrupt,
-		Fn:   c.sendProwlarrCorruption,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(prowlarrCorruptCheckDur),
-	}, &action{
-		Name: TrigRadarrCorrupt,
-		Fn:   c.sendRadarrCorruption,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(radarrCorruptCheckDur),
-	}, &action{
-		Name: TrigReadarrCorrupt,
-		Fn:   c.sendReadarrCorruption,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(readarrCorruptCheckDur),
-	}, &action{
-		Name: TrigSonarrCorrupt,
-		Fn:   c.sendSonarrCorruption,
-		C:    make(chan EventType, 1),
-		T:    time.NewTicker(sonarrCorruptCheckDur),
-	})
-}
-
-func (t *Triggers) Corruption(event EventType, app starr.App) error {
+// Corruption initializes a corruption check for all instances of the provided app.
+func (a *Action) Corruption(event website.EventType, app starr.App) error {
 	switch app {
 	default:
-		return fmt.Errorf("%w: %s", ErrInvalidApp, app)
+		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
 	case "":
-		return fmt.Errorf("%w: <no app provided>", ErrInvalidApp)
+		return fmt.Errorf("%w: <no app provided>", common.ErrInvalidApp)
 	case "All":
-		t.exec(event, TrigLidarrCorrupt)
-		t.exec(event, TrigProwlarrCorrupt)
-		t.exec(event, TrigRadarrCorrupt)
-		t.exec(event, TrigReadarrCorrupt)
-		t.exec(event, TrigSonarrCorrupt)
+		a.cmd.Exec(event, TrigLidarrCorrupt)
+		a.cmd.Exec(event, TrigProwlarrCorrupt)
+		a.cmd.Exec(event, TrigRadarrCorrupt)
+		a.cmd.Exec(event, TrigReadarrCorrupt)
+		a.cmd.Exec(event, TrigSonarrCorrupt)
 	case starr.Lidarr:
-		t.exec(event, TrigLidarrCorrupt)
+		a.cmd.Exec(event, TrigLidarrCorrupt)
 	case starr.Prowlarr:
-		t.exec(event, TrigProwlarrCorrupt)
+		a.cmd.Exec(event, TrigProwlarrCorrupt)
 	case starr.Radarr:
-		t.exec(event, TrigRadarrCorrupt)
+		a.cmd.Exec(event, TrigRadarrCorrupt)
 	case starr.Readarr:
-		t.exec(event, TrigReadarrCorrupt)
+		a.cmd.Exec(event, TrigReadarrCorrupt)
 	case starr.Sonarr:
-		t.exec(event, TrigSonarrCorrupt)
+		a.cmd.Exec(event, TrigSonarrCorrupt)
 	}
 
 	return nil
 }
 
-func (c *Config) sendLidarrCorruption(event EventType) {
+func (c *cmd) makeCorruptionTriggersLidarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Lidarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(lidarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
+		Name: TrigLidarrCorrupt,
+		Fn:   c.sendLidarrCorruption,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
+}
+
+func (c *cmd) makeCorruptionTriggersProwlarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Prowlarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(prowlarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
+		Name: TrigProwlarrCorrupt,
+		Fn:   c.sendProwlarrCorruption,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
+}
+
+func (c *cmd) makeCorruptionTriggersRadarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Radarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(radarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
+		Name: TrigRadarrCorrupt,
+		Fn:   c.sendRadarrCorruption,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
+}
+
+func (c *cmd) makeCorruptionTriggersReadarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Readarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(readarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
+		Name: TrigReadarrCorrupt,
+		Fn:   c.sendReadarrCorruption,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
+}
+
+func (c *cmd) makeCorruptionTriggersSonarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Sonarr {
+		if app.Corrupt != mnd.Disabled {
+			ticker = time.NewTicker(sonarrCorruptCheckDur)
+			break
+		}
+	}
+
+	c.Add(&common.Action{
+		Name: TrigSonarrCorrupt,
+		Fn:   c.sendSonarrCorruption,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
+}
+
+func (c *cmd) sendLidarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Lidarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -139,7 +149,7 @@ func (c *Config) sendLidarrCorruption(event EventType) {
 	}
 }
 
-func (c *Config) sendProwlarrCorruption(event EventType) {
+func (c *cmd) sendProwlarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Prowlarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -152,7 +162,7 @@ func (c *Config) sendProwlarrCorruption(event EventType) {
 	}
 }
 
-func (c *Config) sendRadarrCorruption(event EventType) {
+func (c *cmd) sendRadarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Radarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -165,7 +175,7 @@ func (c *Config) sendRadarrCorruption(event EventType) {
 	}
 }
 
-func (c *Config) sendReadarrCorruption(event EventType) {
+func (c *cmd) sendReadarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Readarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -178,7 +188,7 @@ func (c *Config) sendReadarrCorruption(event EventType) {
 	}
 }
 
-func (c *Config) sendSonarrCorruption(event EventType) {
+func (c *cmd) sendSonarrCorruption(event website.EventType) {
 	for i, app := range c.Apps.Sonarr {
 		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
@@ -191,11 +201,11 @@ func (c *Config) sendSonarrCorruption(event EventType) {
 	}
 }
 
-func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
+func (c *cmd) sendAndLogAppCorruption(input *genericInstance) string {
 	ctx, cancel := context.WithTimeout(context.Background(), maxCheckTime)
 	defer cancel()
 
-	if (input.last == mnd.Disabled || input.last == "") && input.event == EventCron {
+	if (input.last == mnd.Disabled || input.last == "") && input.event == website.EventCron {
 		return input.last
 	}
 
@@ -228,8 +238,8 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	backup.File = latest
 	backup.Date = fileList[0].Time.Round(time.Second)
 
-	c.QueueData(&SendRequest{
-		Route:      CorruptRoute,
+	c.QueueData(&website.SendRequest{
+		Route:      website.CorruptRoute,
 		Event:      input.event,
 		LogPayload: true,
 		LogMsg: fmt.Sprintf("%s Backup File Corruption Info (%d): %s: OK: ver:%s, integ:%s, quick:%s, tables:%d, size:%d",
@@ -244,11 +254,11 @@ func (c *Config) sendAndLogAppCorruption(input *genericInstance) string {
 	return latest
 }
 
-func (c *Config) checkBackupFileCorruption(
+func (c *cmd) checkBackupFileCorruption(
 	ctx context.Context,
 	input *genericInstance,
 	remotePath string,
-) (*BackupInfo, error) {
+) (*Info, error) {
 	// XXX: Set TMPDIR to configure this.
 	folder, err := ioutil.TempDir("", "notifiarr_tmp_dir")
 	if err != nil {
@@ -312,7 +322,7 @@ func (c *genericInstance) saveBackupFile(
 	}
 
 	if status != http.StatusOK {
-		return "", fmt.Errorf("(%d) %w: %s", status, ErrNon200, remotePath)
+		return "", fmt.Errorf("(%d) %w: %s", status, website.ErrNon200, remotePath)
 	}
 
 	file, err := ioutil.TempFile(localPath, "starr_"+path.Base(remotePath)+".*."+path.Ext(remotePath))
@@ -332,7 +342,7 @@ func (c *genericInstance) saveBackupFile(
 func (c *genericInstance) checkCorruptSQLite(
 	ctx context.Context,
 	filePath string,
-) (*BackupInfo, error) {
+) (*Info, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("checking db file: %w", err)
@@ -344,7 +354,7 @@ func (c *genericInstance) checkCorruptSQLite(
 	}
 	defer conn.Close()
 
-	backup := &BackupInfo{
+	backup := &Info{
 		Name:   filePath,
 		Size:   fileInfo.Size(),
 		Tables: c.getSQLLiteRowInt64(ctx, conn, "SELECT count(*) FROM sqlite_master WHERE type = 'table'"),
