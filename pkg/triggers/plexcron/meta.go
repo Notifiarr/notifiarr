@@ -11,18 +11,19 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-// sendPlexMeta is kicked off by the webserver in go routine.
+// sendPlexSessions is fired by a timer if plex monitoring is enabled.
+func (c *cmd) sendPlexSessions(event website.EventType) {
+	c.collectSessions(event, nil)
+}
+
+// collectSessions is kicked off by the webserver in go routine.
 // It's also called by the plex cron (with webhook set to nil).
 // This runs after Plex drops off a webhook telling us someone did something.
 // This gathers cpu/ram, and waits 10 seconds, then grabs plex sessions.
 // It's all POSTed to notifiarr. May be used with a nil Webhook.
-func (c *cmd) sendPlexMeta(
-	event website.EventType,
-	hook *plex.IncomingWebhook,
-	wait bool,
-) (*website.Response, error) {
+func (c *cmd) collectSessions(event website.EventType, hook *plex.IncomingWebhook) {
 	extra := time.Second
-	if wait {
+	if hook != nil {
 		extra = c.ClientInfo.Actions.Plex.Delay.Duration
 	}
 
@@ -34,17 +35,6 @@ func (c *cmd) sendPlexMeta(
 		wg      sync.WaitGroup
 	)
 
-	rep := make(chan error)
-	defer close(rep)
-
-	go func() {
-		for err := range rep {
-			if err != nil {
-				c.Errorf("Building Metadata: %v", err)
-			}
-		}
-	}()
-
 	wg.Add(1)
 
 	go func() {
@@ -52,19 +42,25 @@ func (c *cmd) sendPlexMeta(
 		wg.Done() // nolint:wsl
 	}()
 
-	if !wait || !c.ClientInfo.Actions.Plex.NoActivity {
+	if hook == nil || !c.ClientInfo.Actions.Plex.NoActivity {
 		var err error
-		if payload.Plex, err = c.getSessions(wait); err != nil {
-			rep <- fmt.Errorf("getting sessions: %w", err)
+		if payload.Plex, err = c.getSessions(hook != nil); err != nil {
+			c.Errorf("Getting Plex sessions: %v", err)
 		}
 	}
 
 	wg.Wait()
 
-	return c.GetData(&website.Request{ //nolint:wrapcheck
+	msg := ""
+	if hook != nil {
+		msg = " (and webhook)"
+	}
+
+	c.GetData(&website.Request{ //nolint:wrapcheck
 		Route:      website.PlexRoute,
 		Event:      event,
 		Payload:    payload,
+		LogMsg:     fmt.Sprintf("Plex Sessions%s", msg),
 		LogPayload: true,
 	})
 }
@@ -87,7 +83,8 @@ func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 		}
 	}()
 
-	wg.Add(3) //nolint: gomnd,wsl
+	wg.Add(3) //nolint:gomnd
+
 	go func() {
 		rep <- snap.GetCPUSample(ctx)
 		wg.Done() //nolint:wsl
