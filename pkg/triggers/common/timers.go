@@ -91,7 +91,6 @@ func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) { /
 		if action.Fn != nil {
 			action.Fn(event)
 		}
-
 	}
 }
 
@@ -117,5 +116,4 @@ func (c *Config) stopTimerLoop(actions []*Action) {
 			action.T = nil
 		}
 	}
-
 }

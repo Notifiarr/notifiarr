@@ -55,7 +55,7 @@ type SyncConfig struct {
 	SonarrInstances IntList       `json:"sonarrInstances"` // which instance IDs we sync
 }
 
-// DashConfig is the configuration returned from the notifiarr website for the dashbaord configuration.
+// DashConfig is the configuration returned from the notifiarr website for the dashboard configuration.
 type DashConfig struct {
 	Interval cnfg.Duration `json:"interval"` // how often to fire in minutes.
 }
@@ -259,11 +259,14 @@ func (s *Server) GetHostInfo() (*host.InfoStat, error) { //nolint:cyclop
 		hostInfo.PlatformFamily = "Docker"
 	}
 
-	const trueNasJunkLen = 17
+	const (
+		trueNasJunkLen   = 17
+		trueNasJunkParts = 2
+	)
 	// TrueNAS adds junk to the hostname.
 	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > trueNasJunkLen {
-		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > 2 {
-			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-2], "-")
+		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > trueNasJunkParts {
+			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-trueNasJunkParts], "-")
 		}
 	}
 

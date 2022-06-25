@@ -192,6 +192,7 @@ func (c *cmd) runSessionHolder() { //nolint:cyclop
 			}
 
 			delSessions(sessions) // memory cleanup.
+
 			currSessions.Updated.Time = time.Now()
 			sessions = currSessions
 		}
@@ -207,8 +208,6 @@ func delSessions(sess *plex.Sessions) {
 	for idx := range sess.Sessions {
 		sess.Sessions[idx] = nil
 	}
-
-	sess = nil
 }
 
 // plexSessionTracker checks for state changes between the previous session pull
@@ -258,12 +257,11 @@ func (c *cmd) sendSessionNew(session *plex.Session) {
 			Snap: snap,
 			Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
 		},
-		LogMsg: fmt.Sprintf("Plex New Session on %s {%s/%s} %s => %s: %s (%s) (sending)",
+		LogMsg: fmt.Sprintf("Plex New Session on %s {%s/%s} %s => %s: %s (%s)",
 			c.Plex.URL, session.Session.ID, session.SessionKey, session.User.Title,
 			session.Type, session.Title, session.Player.State),
 		LogPayload: true,
 	})
-
 }
 
 // This cron tab runs every minute to send a report when a user gets to the end of a movie or tv show.
@@ -307,8 +305,7 @@ func (c *cmd) checkPlexFinishedItems(website.EventType) {
 
 // checkSessionDone checks a session's data to see if it is considered finished.
 func (c *cmd) checkSessionDone(session *plex.Session, pct float64) string {
-	cfg := c.ClientInfo.Actions.Plex
-	switch {
+	switch cfg := c.ClientInfo.Actions.Plex; {
 	case session.Duration == 0:
 		return statusIgnoring
 	case session.Player.State != "playing":
