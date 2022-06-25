@@ -84,3 +84,7 @@ func (c *Config) Stop(event website.EventType) {
 	<-c.stop.C // wait for done signal.
 	c.stop = nil
 }
+
+func (c *Config) SetClientInfo(ci *website.ClientInfo) {
+	c.ClientInfo = ci
+}

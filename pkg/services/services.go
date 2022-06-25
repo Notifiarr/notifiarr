@@ -115,7 +115,7 @@ func (c *Config) loadServiceStates() {
 
 	values, err := c.Website.GetValue(names...)
 	if err != nil {
-		c.Errorf("Getting initial service states from website.com: %v", err)
+		c.Errorf("Getting initial service states from website: %v", err)
 		return
 	}
 

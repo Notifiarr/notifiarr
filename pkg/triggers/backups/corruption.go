@@ -238,7 +238,7 @@ func (c *cmd) sendAndLogAppCorruption(input *genericInstance) string {
 	backup.File = latest
 	backup.Date = fileList[0].Time.Round(time.Second)
 
-	c.QueueData(&website.SendRequest{
+	c.SendData(&website.Request{
 		Route:      website.CorruptRoute,
 		Event:      input.event,
 		LogPayload: true,

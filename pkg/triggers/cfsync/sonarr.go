@@ -71,7 +71,11 @@ func (c *cmd) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 		return fmt.Errorf("getting release profiles: %w", err)
 	}
 
-	body, err := c.SendData(website.CFSyncRoute.Path("", "app=sonarr"), payload, false)
+	body, err := c.GetData(&website.Request{
+		Route:   website.CFSyncRoute,
+		Params:  []string{"app=sonarr"},
+		Payload: payload,
+	})
 	if err != nil {
 		return fmt.Errorf("sending current profiles: %w", err)
 	}
@@ -153,10 +157,12 @@ func (c *cmd) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
 		return nil
 	}
 
-	_, err := c.SendData(website.CFSyncRoute.Path("", "app=sonarr", "updateIDs=true"), &SonarrTrashPayload{
-		Instance: instance,
-		NewMaps:  maps,
-	}, true)
+	_, err := c.GetData(&website.Request{
+		Route:      website.CFSyncRoute,
+		Params:     []string{"app=sonarr", "updateIDs=true"},
+		Payload:    &SonarrTrashPayload{Instance: instance, NewMaps: maps},
+		LogPayload: true,
+	})
 	if err != nil {
 		c.sonarrRP[instance] = maps
 		return fmt.Errorf("updating quality release ID map: %w", err)

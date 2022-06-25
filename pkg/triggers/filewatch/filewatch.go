@@ -273,7 +273,7 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		Matches: tail.re.FindAllString(line.Text, -1),
 	}
 
-	c.QueueData(&website.SendRequest{
+	c.SendData(&website.Request{
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
 		LogPayload: tail.LogMatch,

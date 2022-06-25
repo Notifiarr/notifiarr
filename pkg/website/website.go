@@ -193,37 +193,42 @@ func readBodyForLog(body io.Reader, max int64) string {
 }
 
 func (s *Server) watchSendDataChan() {
-	var start time.Time
-
 	for data := range s.sendData {
-		var uri string
-
-		if len(data.Params) > 0 {
-			uri = data.Route.Path(data.Event, data.Params...)
-		} else {
-			uri = data.Route.Path(data.Event)
-		}
-
-		start = time.Now()
-
-		resp, err := s.SendData(uri, data.Payload, data.LogPayload)
-
-		if data.LogMsg == "" {
+		switch resp, elapsed, err := s.sendRequest(data); {
+		case data.LogMsg == "":
 			continue
-		}
-
-		switch {
-		case err == nil:
-			s.config.Printf("[%s requested] Sent (%v): "+data.LogMsg+"%v",
-				data.Event, time.Since(start).Round(time.Millisecond), resp)
+		case err == nil && !data.ErrorsOnly:
+			s.config.Printf("[%s requested] Sent (%v): %s%s", data.Event, elapsed, data.LogMsg, resp)
 		case errors.Is(err, ErrNon200):
-			s.config.ErrorfNoShare("[%s requested] Sending (%v): "+data.LogMsg+": %v%v",
-				data.Event, time.Since(start).Round(time.Millisecond), err, resp.String())
+			s.config.ErrorfNoShare("[%s requested] Sending (%v): %s: %v%s", data.Event, elapsed, data.LogMsg, err, resp)
 		default:
-			s.config.Errorf("[%s requested] Sending (%v): "+data.LogMsg+": %v%v",
-				data.Event, time.Since(start).Round(time.Millisecond), err, resp.String())
+			s.config.Errorf("[%s requested] Sending (%v): %s: %v%s", data.Event, elapsed, data.LogMsg, err, resp)
 		}
 	}
 
 	close(s.stopSendData)
+}
+
+func (s *Server) sendRequest(data *Request) (*Response, time.Duration, error) {
+	var uri string
+
+	if len(data.Params) > 0 {
+		uri = data.Route.Path(data.Event, data.Params...)
+	} else {
+		uri = data.Route.Path(data.Event)
+	}
+
+	start := time.Now()
+	resp, err := s.sendPayload(uri, data.Payload, data.LogPayload)
+	elapsed := time.Since(start).Round(time.Millisecond)
+
+	if data.respChan != nil {
+		data.respChan <- &chResponse{
+			Response: resp,
+			Elapsed:  elapsed,
+			Error:    err,
+		}
+	}
+
+	return resp, elapsed, err
 }

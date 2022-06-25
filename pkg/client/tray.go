@@ -294,13 +294,13 @@ func (c *Client) watchGuiChannels() {
 		case <-menu["gh"].ClickedCh:
 			go ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
 		case <-menu["hp"].ClickedCh:
-			go ui.OpenURL("https://website.com/")
+			go ui.OpenURL("https://notifiarr.com/")
 		case <-menu["wiki"].ClickedCh:
-			go ui.OpenURL("https://website.wiki/")
+			go ui.OpenURL("https://notifiarr.wiki/")
 		case <-menu["trash"].ClickedCh:
 			go ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/")
 		case <-menu["disc1"].ClickedCh:
-			go ui.OpenURL("https://website.com/discord")
+			go ui.OpenURL("https://notifiarr.com/discord")
 		case <-menu["disc2"].ClickedCh:
 			go ui.OpenURL("https://golift.io/discord")
 		case <-menu["sub"].ClickedCh:

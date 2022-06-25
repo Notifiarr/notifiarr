@@ -7,7 +7,7 @@ import (
 )
 
 type Website interface {
-	QueueData(data *website.SendRequest)
+	SendData(data *website.Request)
 	HaveClientInfo() bool
 }
 
@@ -24,7 +24,7 @@ func Log(msg string) {
 		return
 	}
 
-	config.QueueData(&website.SendRequest{
+	config.SendData(&website.Request{
 		Payload:    &filewatch.Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,

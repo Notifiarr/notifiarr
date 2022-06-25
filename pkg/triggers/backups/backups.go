@@ -215,7 +215,7 @@ func (c *cmd) sendBackups(input *genericInstance) {
 		Files: fileList,
 	}
 
-	c.QueueData(&website.SendRequest{
+	c.SendData(&website.Request{
 		Route:      website.BackupRoute,
 		Event:      input.event,
 		LogPayload: true,

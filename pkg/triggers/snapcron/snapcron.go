@@ -99,7 +99,7 @@ func (c *cmd) sendSnapshot(event website.EventType) {
 		}
 	}
 
-	c.QueueData(&website.SendRequest{
+	c.SendData(&website.Request{
 		Route:      website.SnapRoute,
 		Event:      event,
 		LogPayload: true,

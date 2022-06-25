@@ -52,12 +52,16 @@ func (c *Client) handleAptHook() error {
 		} //nolint:wsl
 	}
 
-	resp, err := c.website.SendData(website.PkgRoute.Path("apt"), output, true)
+	resp, _, err := c.website.RawGetData(&website.Request{
+		Route:   website.PkgRoute,
+		Event:   "apt",
+		Payload: output,
+	})
 	//nolint:forbidigo
 	if err != nil {
-		fmt.Printf("ERROR Sending Notification to website.com: %v%s\n", err, resp)
+		fmt.Printf("ERROR Sending Notification to notifiarr.com: %v%s\n", err, resp)
 	} else {
-		fmt.Printf("Sent notification to website.com; install: %d, remove: %d%s\n",
+		fmt.Printf("Sent notification to notifiarr.com; install: %d, remove: %d%s\n",
 			output.Install, output.Remove, resp)
 	}
 

@@ -73,7 +73,11 @@ func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 		return fmt.Errorf("getting custom formats: %w", err)
 	}
 
-	body, err := c.SendData(website.CFSyncRoute.Path("", "app=radarr"), payload, false)
+	body, err := c.GetData(&website.Request{
+		Route:   website.CFSyncRoute,
+		Params:  []string{"app=radarr"},
+		Payload: payload,
+	})
 	if err != nil {
 		return fmt.Errorf("sending current formats: %w", err)
 	}
@@ -155,10 +159,12 @@ func (c *cmd) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
 		return nil
 	}
 
-	_, err := c.SendData(website.CFSyncRoute.Path("", "app=radarr", "updateIDs=true"), &RadarrTrashPayload{
-		Instance: instance,
-		NewMaps:  maps,
-	}, true)
+	_, err := c.GetData(&website.Request{
+		Route:      website.CFSyncRoute,
+		Params:     []string{"app=radarr", "updateIDs=true"},
+		Payload:    &RadarrTrashPayload{Instance: instance, NewMaps: maps},
+		LogPayload: true,
+	})
 	if err != nil {
 		c.radarrCF[instance] = maps
 		return fmt.Errorf("updating custom format ID map: %w", err)
