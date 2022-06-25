@@ -56,7 +56,7 @@ func (c *cmd) collectSessions(event website.EventType, hook *plex.IncomingWebhoo
 		msg = " (and webhook)"
 	}
 
-	c.GetData(&website.Request{ //nolint:wrapcheck
+	c.SendData(&website.Request{
 		Route:      website.PlexRoute,
 		Event:      event,
 		Payload:    payload,
@@ -83,21 +83,30 @@ func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 		}
 	}()
 
-	wg.Add(3) //nolint:gomnd
+	wg.Add(1)
 
 	go func() {
 		rep <- snap.GetCPUSample(ctx)
-		wg.Done() //nolint:wsl
+
+		wg.Done()
 	}()
+
+	wg.Add(1)
+
 	go func() {
 		rep <- snap.GetMemoryUsage(ctx)
-		wg.Done() //nolint:wsl
+
+		wg.Done()
 	}()
+
+	wg.Add(1)
+
 	go func() {
 		for _, err := range snap.GetLocalData(ctx) {
 			rep <- err
 		}
-		wg.Done() //nolint:wsl
+
+		wg.Done()
 	}()
 
 	wg.Wait()

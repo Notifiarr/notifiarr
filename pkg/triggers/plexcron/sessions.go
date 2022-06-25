@@ -37,7 +37,7 @@ func (c *cmd) getSessions(wait bool) (*plex.Sessions, error) {
 }
 
 // runSessionHolder runs a session holder routine. Call Run() first.
-func (c *cmd) runSessionHolder() { //nolint:cyclop
+func (c *cmd) runSessionHolder() {
 	defer func() {
 		defer c.CapturePanic()
 		close(c.sessr) // indicate we're done.
