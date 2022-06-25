@@ -35,6 +35,7 @@ const (
 var (
 	ErrNon200          = fmt.Errorf("return code was not 200")
 	ErrInvalidResponse = fmt.Errorf("invalid response")
+	ErrNoChannel       = fmt.Errorf("the website send-data channel is closed")
 )
 
 // Config is the input data needed to send payloads to notifiarr.
@@ -61,7 +62,7 @@ type Server struct {
 	clientInfo   *ClientInfo
 	client       *httpClient
 	hostInfo     *host.InfoStat
-	sendData     chan *SendRequest
+	sendData     chan *Request
 	stopSendData chan struct{}
 }
 
@@ -93,7 +94,7 @@ func New(c *Config) *Server {
 			Client:  &http.Client{},
 		},
 		hostInfo:     nil, // must start nil
-		sendData:     make(chan *SendRequest, mnd.Kilobyte),
+		sendData:     make(chan *Request, mnd.Kilobyte),
 		stopSendData: make(chan struct{}),
 	}
 }
@@ -121,8 +122,31 @@ func (s *Server) Stop() {
 	s.sendData = nil
 }
 
-// SendData sends raw data to a notifiarr URL as JSON.
-func (s *Server) SendData(uri string, payload interface{}, log bool) (*Response, error) {
+// GetData sends raw data to a notifiarr URL as JSON.
+func (s *Server) GetData(req *Request) (*Response, error) {
+	s.sdMutex.RLock()
+	defer s.sdMutex.RUnlock()
+
+	if s.sendData == nil {
+		return nil, ErrNoChannel
+	}
+
+	replyCh := make(chan *chResponse)
+	defer close(replyCh)
+
+	s.sendData <- req
+	resp := <-replyCh
+
+	return resp.Response, resp.Error
+}
+
+// RawGetData sends a request to the website without using a channel.
+// Avoid this method.
+func (s *Server) RawGetData(req *Request) (*Response, time.Duration, error) {
+	return s.sendRequest(req)
+}
+
+func (s *Server) sendPayload(uri string, payload interface{}, log bool) (*Response, error) {
 	data, err := json.Marshal(payload)
 	if err == nil {
 		var torn map[string]interface{}
@@ -158,12 +182,12 @@ func (s *Server) SendData(uri string, payload interface{}, log bool) (*Response,
 	return unmarshalResponse(s.config.BaseURL+uri, code, body)
 }
 
-// QueueData puts a send-data request to notifiarr.com into a channel queue.
-func (s *Server) QueueData(data *SendRequest) {
+// SendData puts a send-data request to notifiarr.com into a channel queue.
+func (s *Server) SendData(req *Request) {
 	s.sdMutex.RLock()
 	defer s.sdMutex.RUnlock()
 
 	if s.sendData != nil {
-		s.sendData <- data
+		s.sendData <- req
 	}
 }

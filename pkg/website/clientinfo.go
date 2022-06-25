@@ -131,7 +131,12 @@ func (s *Server) GetClientInfo() (*ClientInfo, error) {
 		return s.clientInfo, nil
 	}
 
-	body, err := s.SendData(ClientRoute.Path("reload"), s.Info(), true)
+	body, err := s.GetData(&Request{
+		Route:      ClientRoute,
+		Event:      EventStart,
+		Payload:    s.Info(),
+		LogPayload: true,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("sending client info: %w", err)
 	}
@@ -257,7 +262,12 @@ func (s *Server) GetHostInfo() (*host.InfoStat, error) { //nolint:cyclop
 }
 
 func (s *Server) PollForReload(event EventType) {
-	body, err := s.SendData(ClientRoute.Path(EventPoll), s.Info(), true)
+	body, err := s.GetData(&Request{
+		Route:      ClientRoute,
+		Event:      EventPoll,
+		Payload:    s.Info(),
+		LogPayload: true,
+	})
 	if err != nil {
 		s.config.Errorf("[%s requested] Polling Notifiarr: %v", event, err)
 		return

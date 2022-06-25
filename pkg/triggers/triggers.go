@@ -51,14 +51,12 @@ type Actions struct {
 
 // New turns a populated Config into a pile of Actions.
 func New(config *Config) *Actions {
-	ci, _ := config.Website.GetClientInfo()
 	common := &common.Config{
-		ClientInfo: ci,
-		Server:     config.Website,
-		Snapshot:   config.Snapshot,
-		Apps:       config.Apps,
-		Serial:     config.Serial,
-		Logger:     config.Logger,
+		Server:   config.Website,
+		Snapshot: config.Snapshot,
+		Apps:     config.Apps,
+		Serial:   config.Serial,
+		Logger:   config.Logger,
 	}
 	plex := plexcron.New(common, config.Plex)
 
@@ -89,10 +87,13 @@ type run interface {
 }
 
 // Start creates all the triggers and runs the timers.
-func (c *Actions) Start() {
-	defer c.timers.Run() // unexported fields do not get picked up by reflection.
+func (a *Actions) Start() {
+	defer a.timers.Run() // unexported fields do not get picked up by reflection.
 
-	actions := reflect.ValueOf(c).Elem()
+	ci, _ := a.timers.GetClientInfo()
+	a.timers.SetClientInfo(ci)
+
+	actions := reflect.ValueOf(a).Elem()
 	for i := 0; i < actions.NumField(); i++ {
 		if !actions.Field(i).CanInterface() {
 			continue
@@ -110,10 +111,10 @@ func (c *Actions) Start() {
 }
 
 // Stop all internal cron timers and Triggers.
-func (c *Actions) Stop(event website.EventType) {
-	c.timers.Stop(event)
+func (a *Actions) Stop(event website.EventType) {
+	a.timers.Stop(event)
 
-	actions := reflect.ValueOf(c).Elem()
+	actions := reflect.ValueOf(a).Elem()
 	// Stop them in reverse order they were started.
 	for i := actions.NumField() - 1; i >= 0; i-- {
 		if !actions.Field(i).CanInterface() {

@@ -80,7 +80,7 @@ func (c *cmd) sendGaps(event website.EventType) {
 			continue
 		}
 
-		c.QueueData(&website.SendRequest{
+		c.SendData(&website.Request{
 			Route:      website.DashRoute,
 			Event:      event,
 			LogPayload: true,

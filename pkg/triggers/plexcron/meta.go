@@ -61,7 +61,12 @@ func (c *cmd) sendPlexMeta(
 
 	wg.Wait()
 
-	return c.SendData(website.PlexRoute.Path(event), payload, true) //nolint:wrapcheck
+	return c.GetData(&website.Request{ //nolint:wrapcheck
+		Route:      website.PlexRoute,
+		Event:      event,
+		Payload:    payload,
+		LogPayload: true,
+	})
 }
 
 // getMetaSnap grabs some basic system info: cpu, memory, username.

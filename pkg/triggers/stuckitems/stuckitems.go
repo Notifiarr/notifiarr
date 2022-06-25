@@ -127,7 +127,7 @@ func (c *cmd) sendStuckQueueItems(event website.EventType) {
 		return
 	}
 
-	c.QueueData(&website.SendRequest{
+	c.SendData(&website.Request{
 		Route:      website.StuckRoute,
 		Event:      event,
 		LogPayload: true,

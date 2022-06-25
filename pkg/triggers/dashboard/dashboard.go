@@ -159,7 +159,7 @@ func (c *Cmd) sendDashboardState(event website.EventType) {
 		apps   = time.Since(start).Round(time.Millisecond)
 	)
 
-	c.QueueData(&website.SendRequest{
+	c.SendData(&website.Request{
 		Route:      website.DashRoute,
 		Event:      event,
 		LogPayload: true,

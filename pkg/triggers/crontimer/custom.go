@@ -54,7 +54,7 @@ func (t *Timer) Run(event website.EventType) {
 
 // run responds to the channel that the timer fired into.
 func (t *Timer) run(event website.EventType) {
-	t.website.QueueData(&website.SendRequest{
+	t.website.SendData(&website.Request{
 		Route:      website.Route(t.CronTimer.URI),
 		Event:      event,
 		Payload:    &struct{ Cron string }{Cron: "thingy"},

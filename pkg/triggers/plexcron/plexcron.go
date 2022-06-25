@@ -295,15 +295,17 @@ func (c *cmd) sendSessionDone(session *plex.Session) string {
 	snap := c.getMetaSnap(ctx)
 	cancel() //nolint:wsl
 
-	route := website.PlexRoute.Path(website.EventType(session.Type))
-
-	_, err := c.SendData(route, &website.Payload{
-		Snap: snap,
-		Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
-	}, true)
-	if err != nil {
-		return statusError + ": sending to " + route + ": " + err.Error()
-	}
+	c.SendData(&website.Request{
+		Route: website.PlexRoute,
+		Event: website.EventType(session.Type),
+		Payload: &website.Payload{
+			Snap: snap,
+			Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
+		},
+		LogMsg:     "Plex Completed Sessions",
+		LogPayload: true,
+		ErrorsOnly: true,
+	})
 
 	return statusSending
 }
