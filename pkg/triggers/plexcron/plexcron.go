@@ -49,8 +49,6 @@ func New(config *common.Config, plex *plex.Server) *Action {
 		cmd: &cmd{
 			Config: config,
 			Plex:   plex,
-			sess:   make(chan time.Time, 1),
-			sessr:  make(chan *holder),
 			sent:   make(map[string]struct{}),
 		},
 	}
@@ -70,6 +68,9 @@ func (c *cmd) run() {
 	if !c.Plex.Configured() || c.ClientInfo == nil {
 		return
 	}
+
+	c.sess = make(chan time.Time, 1)
+	c.sessr = make(chan *holder)
 
 	go c.runSessionHolder()
 
