@@ -89,7 +89,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		})
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "process", http.StatusAccepted)
-	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(c.Config.Plex.Cooldown.Duration):
+	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(c.plexCooldown()):
 		c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
@@ -106,4 +106,12 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		c.Printf("Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' ~> %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 	}
+}
+
+func (c *Client) plexCooldown() time.Duration {
+	if ci, _ := c.website.GetClientInfo(); ci != nil {
+		return ci.Actions.Plex.Cooldown.Duration
+	}
+
+	return time.Minute
 }

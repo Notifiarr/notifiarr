@@ -20,9 +20,10 @@ type Action struct {
 type cmd struct {
 	*common.Config
 	Plex    *plex.Server
-	sess    chan time.Time // Return Plex Sessions
-	sessr   chan *holder   // Session Return Channel
-	psMutex sync.RWMutex   // Locks plex session thread.
+	sess    chan time.Time      // Return Plex Sessions
+	sessr   chan *holder        // Session Return Channel
+	sent    map[string]struct{} // Tracks Finished sessions already sent.
+	psMutex sync.RWMutex        // Locks plex session thread.
 }
 
 const TrigPlexSessions common.TriggerName = "Gathering and sending Plex Sessions."
@@ -50,6 +51,7 @@ func New(config *common.Config, plex *plex.Server) *Action {
 			Plex:   plex,
 			sess:   make(chan time.Time, 1),
 			sessr:  make(chan *holder),
+			sent:   make(map[string]struct{}),
 		},
 	}
 }
@@ -65,7 +67,7 @@ func (a *Action) Run() {
 }
 
 func (c *cmd) run() {
-	if !c.Plex.Configured() {
+	if !c.Plex.Configured() || c.ClientInfo == nil {
 		return
 	}
 
@@ -73,11 +75,12 @@ func (c *cmd) run() {
 
 	var ticker *time.Ticker
 
-	if c.Plex.Interval.Duration > 0 {
+	cfg := c.ClientInfo.Actions.Plex
+	if cfg.Interval.Duration > 0 {
 		// Add a little splay to the timers to not hit plex at the same time too often.
-		ticker = time.NewTicker(c.Plex.Interval.Duration + 139*time.Millisecond)
+		ticker = time.NewTicker(cfg.Interval.Duration + 139*time.Millisecond)
 		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
-			c.Plex.URL, c.Plex.Interval, c.Plex.Timeout, c.Plex.Cooldown, c.Plex.Delay)
+			c.Plex.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
 	}
 
 	c.Add(&common.Action{
@@ -87,13 +90,13 @@ func (c *cmd) run() {
 		T:    ticker,
 	})
 
-	if c.Plex.MoviesPC != 0 || c.Plex.SeriesPC != 0 {
-		c.Printf("==> Plex Completed Items Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%%",
-			c.Plex.URL, c.Plex.Timeout, c.Plex.MoviesPC, c.Plex.SeriesPC)
+	if cfg.MoviesPC != 0 || cfg.SeriesPC != 0 || cfg.TrackSess {
+		c.Printf("==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
+			c.Plex.URL, c.Plex.Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
 		c.Add(&common.Action{
 			Name: "Checking Plex for completed sessions.",
 			Hide: true, // do not log this one.
-			SFn:  c.checkPlexFinishedItems,
+			Fn:   c.checkPlexFinishedItems,
 			T:    time.NewTicker(time.Minute + 179*time.Millisecond),
 		})
 	}
@@ -148,9 +151,9 @@ func (c *cmd) getSessions(wait bool) (*plex.Sessions, error) {
 	}
 
 	if wait {
-		c.sess <- time.Now().Add(c.Plex.Delay.Duration)
+		c.sess <- time.Now().Add(c.ClientInfo.Actions.Plex.Delay.Duration)
 	} else {
-		c.sess <- time.Now().Add(-c.Plex.Delay.Duration)
+		c.sess <- time.Now().Add(-c.ClientInfo.Actions.Plex.Delay.Duration)
 	}
 
 	s := <-c.sessr
@@ -188,6 +191,7 @@ func (c *cmd) runSessionHolder() { //nolint:cyclop
 				c.plexSessionTracker(currSessions.Sessions, sessions.Sessions)
 			}
 
+			delSessions(sessions) // memory cleanup.
 			currSessions.Updated.Time = time.Now()
 			sessions = currSessions
 		}
@@ -196,6 +200,15 @@ func (c *cmd) runSessionHolder() { //nolint:cyclop
 	}
 
 	close(c.sessr) // indicate we're done.
+}
+
+// delSessions sets pointers to nil. Should free up memory.
+func delSessions(sess *plex.Sessions) {
+	for idx := range sess.Sessions {
+		sess.Sessions[idx] = nil
+	}
+
+	sess = nil
 }
 
 // plexSessionTracker checks for state changes between the previous session pull
@@ -217,14 +230,47 @@ CURRENT:
 				continue CURRENT
 			}
 		}
+
+		// We found a brand new session. We did not check the session state (yet).
+		if c.ClientInfo != nil && c.ClientInfo.Actions.Plex.TrackSess && len(prev) > 0 {
+			// We are tracking sessions (no webhooks); send this new session to website.
+			c.sendSessionNew(currSess)
+		}
 	}
+}
+
+// sendSessionNew is used when the end user does not have or use Plex webhooks.
+// They can enable the plex session tracker to send notifications for new sessions.
+func (c *cmd) sendSessionNew(session *plex.Session) {
+	if err := c.checkPlexAgent(session); err != nil {
+		c.Errorf("Failed Plex Request: %v", err)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), c.Snapshot.Timeout.Duration)
+	snap := c.getMetaSnap(ctx)
+	cancel() //nolint:wsl
+
+	c.SendData(&website.Request{
+		Route: website.PlexRoute,
+		Event: website.EventType(session.Type),
+		Payload: &website.Payload{
+			Snap: snap,
+			Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
+		},
+		LogMsg: fmt.Sprintf("Plex New Session on %s {%s/%s} %s => %s: %s (%s) (sending)",
+			c.Plex.URL, session.Session.ID, session.SessionKey, session.User.Title,
+			session.Type, session.Title, session.Player.State),
+		LogPayload: true,
+	})
+
 }
 
 // This cron tab runs every minute to send a report when a user gets to the end of a movie or tv show.
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
-func (c *cmd) checkPlexFinishedItems(sent map[string]struct{}) {
+func (c *cmd) checkPlexFinishedItems(website.EventType) {
 	sessions, err := c.getSessions(false)
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
@@ -236,16 +282,12 @@ func (c *cmd) checkPlexFinishedItems(sent map[string]struct{}) {
 
 	for _, session := range sessions.Sessions {
 		var (
-			_, ok = sent[session.Session.ID+session.SessionKey]
-			pct   = session.ViewOffset / session.Duration * 100
-			msg   = statusSent
+			pct = session.ViewOffset / session.Duration * 100
+			msg = statusSent
 		)
 
-		if !ok { // ok means we already sent a message for this session.
+		if _, ok := c.sent[session.Session.ID+session.SessionKey]; !ok {
 			msg = c.checkSessionDone(session, pct)
-			if strings.HasPrefix(msg, statusSending) {
-				sent[session.Session.ID+session.SessionKey] = struct{}{}
-			}
 		}
 
 		// nolint:lll
@@ -263,20 +305,22 @@ func (c *cmd) checkPlexFinishedItems(sent map[string]struct{}) {
 	}
 }
 
+// checkSessionDone checks a session's data to see if it is considered finished.
 func (c *cmd) checkSessionDone(session *plex.Session, pct float64) string {
+	cfg := c.ClientInfo.Actions.Plex
 	switch {
 	case session.Duration == 0:
 		return statusIgnoring
 	case session.Player.State != "playing":
 		return statusPaused
-	case c.Plex.MoviesPC > 0 && website.EventType(session.Type) == website.EventMovie:
-		if pct < float64(c.Plex.MoviesPC) {
+	case cfg.MoviesPC > 0 && website.EventType(session.Type) == website.EventMovie:
+		if pct < float64(cfg.MoviesPC) {
 			return statusWatching
 		}
 
 		return c.sendSessionDone(session)
-	case c.Plex.SeriesPC > 0 && website.EventType(session.Type) == website.EventEpisode:
-		if pct < float64(c.Plex.SeriesPC) {
+	case cfg.SeriesPC > 0 && website.EventType(session.Type) == website.EventEpisode:
+		if pct < float64(cfg.SeriesPC) {
 			return statusWatching
 		}
 
@@ -286,6 +330,7 @@ func (c *cmd) checkSessionDone(session *plex.Session, pct float64) string {
 	}
 }
 
+// sendSessionDone is the last method to run that sends a finished session to the website.
 func (c *cmd) sendSessionDone(session *plex.Session) string {
 	if err := c.checkPlexAgent(session); err != nil {
 		return statusError + ": " + err.Error()
@@ -307,9 +352,13 @@ func (c *cmd) sendSessionDone(session *plex.Session) string {
 		ErrorsOnly: true,
 	})
 
+	c.sent[session.Session.ID+session.SessionKey] = struct{}{}
+
 	return statusSending
 }
 
+// checkPlexAgent checks the plex agent and makes another request to find the section key.
+// This is because Plex servers using the Plex Agent do not provide the show Title in the session.
 func (c *cmd) checkPlexAgent(session *plex.Session) error {
 	if !strings.Contains(session.GUID, "plex://") || session.Key == "" {
 		return nil

@@ -23,7 +23,7 @@ func (c *cmd) sendPlexMeta(
 ) (*website.Response, error) {
 	extra := time.Second
 	if wait {
-		extra = c.Plex.Delay.Duration
+		extra = c.ClientInfo.Actions.Plex.Delay.Duration
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), extra+c.Snapshot.Timeout.Duration)
@@ -52,7 +52,7 @@ func (c *cmd) sendPlexMeta(
 		wg.Done() // nolint:wsl
 	}()
 
-	if !wait || !c.Plex.NoActivity {
+	if !wait || !c.ClientInfo.Actions.Plex.NoActivity {
 		var err error
 		if payload.Plex, err = c.getSessions(wait); err != nil {
 			rep <- fmt.Errorf("getting sessions: %w", err)

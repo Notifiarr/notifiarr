@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -28,26 +27,26 @@ type ClientInfo struct {
 	} `json:"user"`
 	Actions struct {
 		Poll      bool             `json:"poll"`
-		Plex      *plex.Server     `json:"plex"`      // optional
-		Apps      AppConfigs       `json:"apps"`      // unused yet!
-		Dashboard DashConfig       `json:"dashboard"` // now in use.
-		Sync      SyncConfig       `json:"sync"`      // in use (cfsync)
-		Gaps      gapsConfig       `json:"gaps"`      // radarr collection gaps
-		Custom    []*CronTimer     `json:"custom"`    // custom GET timers
-		Snapshot  *snapshot.Config `json:"snapshot"`  // optional
+		Plex      PlexConfig       `json:"plex"`      // Site Config for Plex.
+		Apps      AppConfigs       `json:"apps"`      // Site Config for Starr.
+		Dashboard DashConfig       `json:"dashboard"` // Site Config for Dashboard.
+		Sync      SyncConfig       `json:"sync"`      // Site Config for TRaSH Sync.
+		Gaps      GapsConfig       `json:"gaps"`      // Site Config for Radarr Gaps.
+		Custom    []*CronConfig    `json:"custom"`    // Site config for Custom Crons.
+		Snapshot  *snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
 	} `json:"actions"`
 }
 
-// CronTimer defines a custom GET timer from the website.
+// CronConfig defines a custom GET timer from the website.
 // Used to offload crons to clients.
-type CronTimer struct {
+type CronConfig struct {
 	Name     string        `json:"name"`     // name of action.
 	Interval cnfg.Duration `json:"interval"` // how often to GET this URI.
 	URI      string        `json:"endpoint"` // endpoint for the URI.
 	Desc     string        `json:"description"`
 }
 
-// SyncConfig is the configuration returned from the notifiarr website.
+// SyncConfig is the configuration returned from the notifiarr website for CF/RP TraSH sync.
 type SyncConfig struct {
 	Interval        cnfg.Duration `json:"interval"`        // how often to fire in minutes.
 	Radarr          int64         `json:"radarr"`          // items in sync
@@ -56,11 +55,12 @@ type SyncConfig struct {
 	SonarrInstances IntList       `json:"sonarrInstances"` // which instance IDs we sync
 }
 
-// DashConfig is the configuration returned from the notifiarr website.
+// DashConfig is the configuration returned from the notifiarr website for the dashbaord configuration.
 type DashConfig struct {
 	Interval cnfg.Duration `json:"interval"` // how often to fire in minutes.
 }
 
+// AppConfig is the data that comes from the website for each Starr app.
 type AppConfig struct {
 	Instance int           `json:"instance"`
 	Name     string        `json:"name"`
@@ -70,7 +70,7 @@ type AppConfig struct {
 	Interval cnfg.Duration `json:"interval"`
 }
 
-// appConfigs is the configuration returned from the notifiarr website.
+// AppConfigs is the configuration returned from the notifiarr website for Starr apps.
 type AppConfigs struct {
 	Lidarr   []*AppConfig `json:"lidarr"`
 	Prowlarr []*AppConfig `json:"prowlarr"`
@@ -79,8 +79,20 @@ type AppConfigs struct {
 	Sonarr   []*AppConfig `json:"sonarr"`
 }
 
-// gapsConfig is the configuration returned from the notifiarr website.
-type gapsConfig struct {
+// PlexConfig is the website-derived configuration for Plex.
+type PlexConfig struct {
+	Interval   cnfg.Duration `json:"interval"`
+	TrackSess  bool          `json:"trackSessions"`
+	AccountMap string        `json:"accountMap"`
+	NoActivity bool          `json:"noActivity"`
+	Delay      cnfg.Duration `json:"activityDelay"`
+	Cooldown   cnfg.Duration `json:"cooldown"`
+	SeriesPC   uint          `json:"seriesPc"`
+	MoviesPC   uint          `json:"moviesPc"`
+}
+
+// GapsConfig is the configuration returned from the notifiarr website for Radarr Collection Gaps.
+type GapsConfig struct {
 	Instances IntList       `json:"instances"`
 	Interval  cnfg.Duration `json:"interval"`
 }
@@ -247,9 +259,9 @@ func (s *Server) GetHostInfo() (*host.InfoStat, error) { //nolint:cyclop
 		hostInfo.PlatformFamily = "Docker"
 	}
 
+	const trueNasJunkLen = 17
 	// TrueNAS adds junk to the hostname.
-	//nolint:gomnd
-	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > 17 {
+	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > trueNasJunkLen {
 		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > 2 {
 			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-2], "-")
 		}
@@ -323,7 +335,7 @@ func (s *Server) getAppConfigs() map[string]interface{} {
 		apps["sonarr"] = append(apps["sonarr"], add(i, app.Name))
 	}
 
-	// We do this so more apps can be added later.
+	// We do this so more apps can be added later (Tautulli).
 	reApps := make(map[string]interface{})
 	for k, v := range apps {
 		reApps[k] = v
