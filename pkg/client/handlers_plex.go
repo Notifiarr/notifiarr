@@ -96,7 +96,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "media.play"):
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
-		go c.triggers.PlexCron.CollectSessions(website.EventHook, &v)
+		go c.triggers.PlexCron.SendWebhook(&v)
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))

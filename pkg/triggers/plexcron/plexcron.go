@@ -89,15 +89,35 @@ func (c *cmd) run() {
 		c.Add(&common.Action{
 			Name: "Checking Plex for completed sessions.",
 			Hide: true, // do not log this one.
-			Fn:   c.checkPlexFinishedItems,
+			Fn:   c.checkForFinishedItems,
 			T:    time.NewTicker(time.Minute + 179*time.Millisecond),
 		})
 	}
 }
 
-// CollectSessions is called in a go routine after a plex media.play webhook.
-func (a *Action) CollectSessions(event website.EventType, hook *plex.IncomingWebhook) {
-	a.cmd.collectSessions(event, nil)
+// SendWebhook is called in a go routine after a plex media.play webhook is received.
+func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
+	a.cmd.sendWebhook(hook)
+}
+
+func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
+	sessions := &plex.Sessions{Name: c.Plex.Name}
+	// If NoActivity=false, then grab sessions.
+	if !c.ClientInfo.Actions.Plex.NoActivity {
+		var err error
+		if sessions, err = c.getSessions(true); err != nil {
+			c.Errorf("Getting Plex sessions: %v", err)
+		}
+	}
+
+	c.SendData(&website.Request{
+		Route:      website.PlexRoute,
+		Event:      website.EventHook,
+		Payload:    &website.Payload{Snap: c.getMetaSnap(), Load: hook, Plex: sessions},
+		LogMsg:     "Plex Webhook (and sessions)",
+		LogPayload: true,
+	})
+
 }
 
 // GetSessions returns the plex sessions. This uses a channel so concurrent requests are avoided.
