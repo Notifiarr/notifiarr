@@ -1,12 +1,10 @@
 package plexcron
 
 import (
-	"context"
-	"fmt"
-	"sync"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
-	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -31,63 +29,105 @@ func (c *cmd) sendPlexSessions(event website.EventType) {
 	})
 }
 
-// sendSessionNew is used when the end user does not have or use Plex webhooks.
-// They can enable the plex session tracker to send notifications for new sessions.
-func (c *cmd) sendSessionNew(session *plex.Session) {
-	if err := c.checkPlexAgent(session); err != nil {
-		c.Errorf("Failed Plex Request: %v", err)
-		return
+// getSessions interacts with the for loop/channels in runSessionHolder().
+func (c *cmd) getSessions(wait bool) (*plex.Sessions, error) {
+	c.psMutex.RLock()
+	defer c.psMutex.RUnlock()
+
+	if c.sess == nil {
+		return nil, common.ErrNoChannel
 	}
 
-	c.SendData(&website.Request{
-		Route: website.PlexRoute,
-		Event: website.EventType(session.Type),
-		Payload: &website.Payload{
-			Snap: c.getMetaSnap(),
-			Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
-		},
-		LogMsg: fmt.Sprintf("Plex New Session on %s {%s/%s} %s => %s: %s (%s)",
-			c.Plex.URL, session.Session.ID, session.SessionKey, session.User.Title,
-			session.Type, session.Title, session.Player.State),
-		LogPayload: true,
-	})
+	if wait {
+		c.sess <- time.Now().Add(c.ClientInfo.Actions.Plex.Delay.Duration)
+	} else {
+		c.sess <- time.Now().Add(-c.ClientInfo.Actions.Plex.Delay.Duration)
+	}
+
+	s := <-c.sessr
+
+	return s.sessions, s.error
 }
 
-// getMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.
-func (c *cmd) getMetaSnap() *snapshot.Snapshot {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Snapshot.Timeout.Duration)
-	defer cancel()
-
-	var (
-		snap = &snapshot.Snapshot{}
-		wg   sync.WaitGroup
-	)
-
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
-
-		_ = snap.GetCPUSample(ctx)
+// runSessionHolder runs a session holder routine. Call Run() first.
+func (c *cmd) runSessionHolder() {
+	defer func() {
+		defer c.CapturePanic()
+		close(c.sessr) // indicate we're done.
 	}()
 
-	wg.Add(1)
+	sessions, err := c.Plex.GetSessions() // err not used until for loop.
+	if sessions != nil {
+		sessions.Updated.Time = time.Now()
+		c.plexSessionTracker(sessions, nil)
+	}
 
-	go func() {
-		defer wg.Done()
+	for waitUntil := range c.sess {
+		if sessions != nil && err == nil && sessions.Updated.After(waitUntil) {
+			c.sessr <- &holder{sessions: sessions}
+			continue
+		}
 
-		_ = snap.GetMemoryUsage(ctx)
-	}()
+		if t := time.Until(waitUntil); t > 0 {
+			time.Sleep(t)
+		}
 
-	wg.Add(1)
+		var currSessions *plex.Sessions // so we can update the error.
+		if currSessions, err = c.Plex.GetSessions(); currSessions != nil {
+			c.plexSessionTracker(currSessions, sessions)
+			delSessions(sessions) // memory cleanup.
 
-	go func() {
-		defer wg.Done()
+			currSessions.Updated.Time = time.Now()
+			sessions = currSessions
+		}
 
-		_ = snap.GetLocalData(ctx)
-	}()
+		c.sessr <- &holder{sessions: sessions, error: err}
+	}
+}
 
-	wg.Wait()
+// delSessions sets pointers to nil. Should free up memory.
+func delSessions(sess *plex.Sessions) {
+	for idx := range sess.Sessions {
+		sess.Sessions[idx] = nil
+	}
+}
 
-	return snap
+// plexSessionTracker checks for state changes between the previous session pull
+// and the current session pull. if changes are present, a timestmp is added.
+func (c *cmd) plexSessionTracker(curr, prev *plex.Sessions) { //nolint:cyclop
+CURRENT:
+	for _, currSess := range curr.Sessions {
+		// make sure every session has a start time.
+		currSess.Player.StateTime.Time = time.Now()
+
+		if prev == nil { // this only happens once.
+			continue CURRENT
+		}
+
+		// now check if a current session matches a previous session
+		for _, prevSess := range prev.Sessions {
+			if currSess.Session.ID == prevSess.Session.ID {
+				// we have a match, check for state change.
+				if currSess.Player.State == prevSess.Player.State {
+					// since the state is the same, copy the previous start time.
+					currSess.Player.StateTime.Time = prevSess.Player.StateTime.Time
+				} else
+				// Check for a session that was paused and is now playing (resumed).
+				if currSess.Player.State == playing && prevSess.Player.State == paused &&
+					// Check if we're tracking sessions. If yes, send this resumed session.
+					c.ClientInfo != nil && c.ClientInfo.Actions.Plex.TrackSess {
+					c.sendSessionPlaying(currSess, curr, mediaResume)
+				}
+
+				// we found this current session in previous session list, so go to the next one.
+				continue CURRENT
+			}
+		}
+
+		// We found a brand new session. We did not check the session state (yet).
+		if currSess.Player.State == playing && c.ClientInfo != nil && c.ClientInfo.Actions.Plex.TrackSess {
+			// We are tracking sessions (no webhooks); send this new session to website.
+			c.sendSessionPlaying(currSess, curr, mediaPlay)
+		}
+	}
 }

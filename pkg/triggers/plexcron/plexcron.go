@@ -1,10 +1,12 @@
 package plexcron
 
 import (
+	"context"
 	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -117,7 +119,6 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 		LogMsg:     "Plex Webhook (and sessions)",
 		LogPayload: true,
 	})
-
 }
 
 // GetSessions returns the plex sessions. This uses a channel so concurrent requests are avoided.
@@ -144,4 +145,43 @@ func (c *cmd) stop() {
 	<-c.sessr // wait for session holder to return
 	c.sessr = nil
 	c.sess = nil
+}
+
+// getMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.
+func (c *cmd) getMetaSnap() *snapshot.Snapshot {
+	ctx, cancel := context.WithTimeout(context.Background(), c.Snapshot.Timeout.Duration)
+	defer cancel()
+
+	var (
+		snap = &snapshot.Snapshot{}
+		wg   sync.WaitGroup
+	)
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		_ = snap.GetCPUSample(ctx)
+	}()
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		_ = snap.GetMemoryUsage(ctx)
+	}()
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		_ = snap.GetLocalData(ctx)
+	}()
+
+	wg.Wait()
+
+	return snap
 }

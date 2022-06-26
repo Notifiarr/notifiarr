@@ -256,7 +256,7 @@ func (c *Client) buildDynamicTimerMenus() {
 		cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(menu[name].ClickedCh)}
 	}
 
-	c.Printf("=> Created %d Notifiarr custom timer menu channels.", len(cases))
+	c.Printf("==> Created %d Notifiarr custom timer menu channels.", len(cases))
 	defer c.Printf("!!> All %d Notifiarr custom timer menu channels stopped.", len(cases))
 
 	for {
