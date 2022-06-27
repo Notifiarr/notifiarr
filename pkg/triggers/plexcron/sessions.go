@@ -94,18 +94,18 @@ func delSessions(sess *plex.Sessions) {
 
 // plexSessionTracker checks for state changes between the previous session pull
 // and the current session pull. if changes are present, a timestmp is added.
-func (c *cmd) plexSessionTracker(curr, prev *plex.Sessions) { //nolint:cyclop
+func (c *cmd) plexSessionTracker(current, previous *plex.Sessions) { //nolint:cyclop
 CURRENT:
-	for _, currSess := range curr.Sessions {
+	for _, currSess := range current.Sessions {
 		// make sure every session has a start time.
 		currSess.Player.StateTime.Time = time.Now()
 
-		if prev == nil { // this only happens once.
+		if previous == nil { // this only happens once.
 			continue CURRENT
 		}
 
 		// now check if a current session matches a previous session
-		for _, prevSess := range prev.Sessions {
+		for _, prevSess := range previous.Sessions {
 			if currSess.Session.ID == prevSess.Session.ID {
 				// we have a match, check for state change.
 				if currSess.Player.State == prevSess.Player.State {
@@ -116,7 +116,7 @@ CURRENT:
 				if currSess.Player.State == playing && prevSess.Player.State == paused &&
 					// Check if we're tracking sessions. If yes, send this resumed session.
 					c.ClientInfo != nil && c.ClientInfo.Actions.Plex.TrackSess {
-					c.sendSessionPlaying(currSess, curr, mediaResume)
+					c.sendSessionPlaying(currSess, current, mediaResume)
 				}
 
 				// we found this current session in previous session list, so go to the next one.
@@ -127,7 +127,7 @@ CURRENT:
 		// We found a brand new session. We did not check the session state (yet).
 		if currSess.Player.State == playing && c.ClientInfo != nil && c.ClientInfo.Actions.Plex.TrackSess {
 			// We are tracking sessions (no webhooks); send this new session to website.
-			c.sendSessionPlaying(currSess, curr, mediaPlay)
+			c.sendSessionPlaying(currSess, current, mediaPlay)
 		}
 	}
 }

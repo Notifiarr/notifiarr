@@ -53,7 +53,7 @@ func (c *cmd) checkSessionDone(session *plex.Session, pct float64) string {
 	switch cfg := c.ClientInfo.Actions.Plex; {
 	case session.Duration == 0:
 		return statusIgnoring
-	case session.Player.State != "playing":
+	case session.Player.State != playing:
 		return statusPaused
 	case cfg.MoviesPC > 0 && website.EventType(session.Type) == website.EventMovie:
 		if pct < float64(cfg.MoviesPC) {
