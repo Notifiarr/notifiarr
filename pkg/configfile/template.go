@@ -277,6 +277,22 @@ retries = {{.Retries}}
 #pass     = ""
 
 
+{{end}}{{if .NZBGet}}{{range .NZBGet}}[[nzbget]]
+name     = "{{.Name}}"
+url      = "{{.URL}}"
+user     = "{{.User}}"
+pass     = "{{.Pass}}"
+interval = "{{.Interval}}" # Service check duration (if name is not empty).
+timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[nzbget]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://nzbget:6789/"
+#user     = ""
+#pass     = ""
+
+
 {{end}}{{if .SabNZB}}{{range .SabNZB}}[[sabnzbd]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"

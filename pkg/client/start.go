@@ -256,12 +256,13 @@ func (c *Client) loadSiteAppsConfig(clientInfo *website.ClientInfo) { //nolint:c
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices() (*website.ClientInfo, error) {
+	c.website.Start()
+
 	clientInfo := c.loadSiteConfig()
 	c.configureServicesPlex()
 	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(clientInfo)
-	c.website.Start()
 	c.triggers.Start()
 	/* // debug stuff.
 	snap, err, _ := c.Config.Snapshot.GetSnapshot()

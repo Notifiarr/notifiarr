@@ -13,6 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/gorilla/mux"
 	"golift.io/deluge"
+	"golift.io/nzbget"
 	"golift.io/qbit"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
@@ -22,7 +23,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-func testInstance(response http.ResponseWriter, request *http.Request) { //nolint:funlen,cyclop,gocognit
+func testInstance(response http.ResponseWriter, request *http.Request) { //nolint:funlen,cyclop,gocognit,gocyclo
 	config := configfile.Config{}
 	if err := configPostDecoder.Decode(&config, request.PostForm); err != nil {
 		http.Error(response, "Decoding POST data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
@@ -34,6 +35,10 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 
 	switch mux.Vars(request)["type"] {
 	// Downloaders.
+	case "NZBGet":
+		if len(config.Apps.NZBGet) > index {
+			reply, code = testNZBGet(config.Apps.NZBGet[index].Config)
+		}
 	case "Deluge":
 		if len(config.Apps.Deluge) > index {
 			reply, code = testDeluge(config.Apps.Deluge[index].Config)
@@ -72,7 +77,7 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 		if config.Snapshot != nil && config.Snapshot.Plugins != nil && len(config.Snapshot.Plugins.MySQL) > index {
 			reply, code = testMySQL(request.Context(), config.Snapshot.Plugins.MySQL[index])
 		}
-		// Services.
+	// Services.
 	case "Tcp":
 		if len(config.Service) > index {
 			reply, code = testTCP(config.Service[index])
@@ -103,6 +108,15 @@ func testDeluge(config *deluge.Config) (string, int) {
 	} else {
 		return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
 	}
+}
+
+func testNZBGet(config *nzbget.Config) (string, int) {
+	ver, err := nzbget.New(config).Version()
+	if err != nil {
+		return "Getting Version: " + err.Error(), http.StatusBadGateway
+	}
+
+	return fmt.Sprintf("Connection Successful! Version: %s", ver), http.StatusOK
 }
 
 func testQbit(config *qbit.Config) (string, int) {

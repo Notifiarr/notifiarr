@@ -550,6 +550,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		config.Apps.Qbit = nil
 		config.Apps.Deluge = nil
 		config.Apps.SabNZB = nil
+		config.Apps.NZBGet = nil
 	}
 
 	config.WatchFiles = nil

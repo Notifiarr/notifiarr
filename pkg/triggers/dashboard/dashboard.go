@@ -102,6 +102,7 @@ type States struct {
 	Radarr  []*State       `json:"radarr"`
 	Readarr []*State       `json:"readarr"`
 	Sonarr  []*State       `json:"sonarr"`
+	NZBGet  []*State       `json:"nzbget"`
 	Qbit    []*State       `json:"qbit"`
 	Deluge  []*State       `json:"deluge"`
 	SabNZB  []*State       `json:"sabnzbd"`
@@ -176,6 +177,7 @@ func (c *Cmd) getStatesSerial() *States {
 		Deluge:  c.getDelugeStates(),
 		Lidarr:  c.getLidarrStates(),
 		Qbit:    c.getQbitStates(),
+		NZBGet:  c.getNZBGetStates(),
 		Radarr:  c.getRadarrStates(),
 		Readarr: c.getReadarrStates(),
 		Sonarr:  c.getSonarrStates(),
@@ -190,7 +192,7 @@ func (c *Cmd) getStatesParallel() *States {
 
 	var wg sync.WaitGroup
 
-	wg.Add(8) //nolint:gomnd // we are polling 8 apps.
+	wg.Add(9) //nolint:gomnd // we are polling 9 apps.
 
 	go func() {
 		defer c.CapturePanic()
@@ -200,6 +202,11 @@ func (c *Cmd) getStatesParallel() *States {
 	go func() {
 		defer c.CapturePanic()
 		states.Lidarr = c.getLidarrStates()
+		wg.Done() //nolint:wsl
+	}()
+	go func() {
+		defer c.CapturePanic()
+		states.NZBGet = c.getNZBGetStates()
 		wg.Done() //nolint:wsl
 	}()
 	go func() {
