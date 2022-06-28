@@ -89,26 +89,29 @@ func (c *Cmd) getNZBGetState(instance int, n *apps.NZBGetConfig) (*State, error)
 }
 
 func getNzbData(instance int, n *apps.NZBGetConfig) ([]*nzbget.Group, *nzbget.Status, []*nzbget.History, error) {
-	queue, err := n.ListGroups(0)
+	queue, size, err := n.ListGroups()
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting file groups (queue) from instance %d: %w", instance, err)
 	}
 
 	exp.Apps.Add("NZBGet&&GET Requests", 1)
+	exp.Apps.Add("NZBGet&&Bytes Received", int64(size))
 
-	stat, err := n.Status()
+	stat, size, err := n.Status()
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}
 
 	exp.Apps.Add("NZBGet&&GET Requests", 1)
+	exp.Apps.Add("NZBGet&&Bytes Received", int64(size))
 
-	hist, err := n.History(true)
+	hist, size, err := n.History(true)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}
 
 	exp.Apps.Add("NZBGet&&GET Requests", 1)
+	exp.Apps.Add("NZBGet&&Bytes Received", int64(size))
 
 	return queue, stat, hist, nil
 }

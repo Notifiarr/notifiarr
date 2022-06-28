@@ -124,5 +124,5 @@ require (
 	github.com/stretchr/testify v1.7.2 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
-	golift.io/nzbget v0.1.1 // indirect
+	golift.io/nzbget v0.1.2-0.20220628091335-619174dc47da // indirect
 )

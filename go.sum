@@ -314,6 +314,8 @@ golift.io/nzbget v0.0.0-20220627093012-b50e3070c12c h1:rL989lX/buPT6bnDtKugHgKwI
 golift.io/nzbget v0.0.0-20220627093012-b50e3070c12c/go.mod h1:YYGQsadsgvadzM6qlVBS21gz8DBhfbxexGMndsGelj8=
 golift.io/nzbget v0.1.1 h1:mvPeaEWo4fzASEgvvLG7lOxE2Vkg1S1N4XQP9sxK1Ow=
 golift.io/nzbget v0.1.1/go.mod h1:YYGQsadsgvadzM6qlVBS21gz8DBhfbxexGMndsGelj8=
+golift.io/nzbget v0.1.2-0.20220628091335-619174dc47da h1:r86U6CeUpqVyoZJu1nyw/SbHcaKlduPqdnhJmOkDMxE=
+golift.io/nzbget v0.1.2-0.20220628091335-619174dc47da/go.mod h1:YYGQsadsgvadzM6qlVBS21gz8DBhfbxexGMndsGelj8=
 golift.io/qbit v0.0.0-20220317021235-151a7d2d428e h1:9Iq4xmEKkBiCFHi3cayrVUHBbaysuKpjnerP4tu9fuE=
 golift.io/qbit v0.0.0-20220317021235-151a7d2d428e/go.mod h1:nE5omag2HG0UO4NN+rwqBZyLNbRhHWNGIMbsPncn+Io=
 golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c h1:QfBF3Y5bAf6hGjkJ/QjOixKTx29mkA2BpR/FwqEhLOA=
