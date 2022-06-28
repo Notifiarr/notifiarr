@@ -135,6 +135,7 @@ func (s *Server) GetData(req *Request) (*Response, error) {
 	defer close(replyCh)
 
 	s.sendData <- req
+
 	resp := <-replyCh
 
 	return resp.Response, resp.Error

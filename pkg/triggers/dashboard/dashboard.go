@@ -187,7 +187,7 @@ func (c *Cmd) getStatesSerial() *States {
 }
 
 // getStatesParallel fires a routine for each app type and tries to get a lot of data fast!
-func (c *Cmd) getStatesParallel() *States {
+func (c *Cmd) getStatesParallel() *States { //nolint:funlen
 	states := &States{}
 
 	var wg sync.WaitGroup
