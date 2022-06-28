@@ -111,7 +111,7 @@ func testDeluge(config *deluge.Config) (string, int) {
 }
 
 func testNZBGet(config *nzbget.Config) (string, int) {
-	ver, err := nzbget.New(config).Version()
+	ver, _, err := nzbget.New(config).Version()
 	if err != nil {
 		return "Getting Version: " + err.Error(), http.StatusBadGateway
 	}
