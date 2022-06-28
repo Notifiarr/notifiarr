@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (t *TautulliConfig) Setup(timeout time.Duration) {
+func (t *TautulliConfig) setup(timeout time.Duration) {
 	if t == nil {
 		return
 	}
