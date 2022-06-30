@@ -61,7 +61,8 @@ type Plugins struct {
 var (
 	ErrPlatformUnsup = fmt.Errorf("the requested metric is not available on this platform, " +
 		"if you know how to collect it, please open an issue on the github repo")
-	ErrNonZeroExit = fmt.Errorf("cmd exited non-zero")
+	ErrNonZeroExit   = fmt.Errorf("cmd exited non-zero")
+	ErrMegaCLIOutput = fmt.Errorf("megaraid CLI output nor parseable")
 )
 
 // Snapshot is the output data sent to Notifiarr.
@@ -95,8 +96,8 @@ type Snapshot struct {
 
 // RaidData contains raid information from mdstat and/or megacli.
 type RaidData struct {
-	MDstat  string            `json:"mdstat,omitempty"`
-	MegaCLI map[string]string `json:"megacli,omitempty"`
+	MDstat  string     `json:"mdstat,omitempty"`
+	MegaCLI []*MegaCLI `json:"megacli,omitempty"`
 }
 
 // Partition is used for ZFS pools as well as normal Disk arrays.
