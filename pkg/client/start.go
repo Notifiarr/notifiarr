@@ -180,8 +180,16 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 	}
 
 	if clientInfo.Actions.Snapshot != nil {
-		clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins // use local data for plugins.
-		c.Config.Snapshot = clientInfo.Actions.Snapshot
+		c.Config.Snapshot.Interval.Duration = clientInfo.Actions.Snapshot.Interval.Duration
+		c.Config.Snapshot.ZFSPools = clientInfo.Actions.Snapshot.ZFSPools
+		c.Config.Snapshot.UseSudo = clientInfo.Actions.Snapshot.UseSudo
+		c.Config.Snapshot.Raid = clientInfo.Actions.Snapshot.Raid
+		c.Config.Snapshot.DriveData = clientInfo.Actions.Snapshot.DriveData
+		c.Config.Snapshot.DiskUsage = clientInfo.Actions.Snapshot.DiskUsage
+		c.Config.Snapshot.AllDrives = clientInfo.Actions.Snapshot.AllDrives
+		c.Config.Snapshot.IOTop = clientInfo.Actions.Snapshot.IOTop
+		c.Config.Snapshot.PSTop = clientInfo.Actions.Snapshot.PSTop
+		c.Config.Snapshot.MyTop = clientInfo.Actions.Snapshot.MyTop
 	}
 
 	c.loadSiteAppsConfig(clientInfo)
