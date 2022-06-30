@@ -348,6 +348,16 @@ Any number of downloaders of any type may be configured.
 | deluge.http_user | `DN_DELUGE_0_HTTP_USER` | Provide this username if Deluge is behind basic auth (uncommon) |
 | deluge.http_pass | `DN_DELUGE_0_HTTP_PASS` | Provide this password if Deluge is behind basic auth (uncommon) |
 
+#### NZBGet
+
+| Config Name      | Variable Name           | Note                                                            |
+| ---------------- | ----------------------- | --------------------------------------------------------------- |
+| nzbget.name      | `DN_NZBGET_0_NAME`      | No Default. Setting a name enables service checks               |
+| nzbget.url       | `DN_NZBGET_0_URL`       | No Default. Something like: `http://localhost:6789`             |
+| nzbget.user      | `DN_NZBGET_0_USER`      | No Default. Provide URL username and password if you use NZBGet |
+| nzbget.pass      | `DN_NZBGET_0_PASS`      | No Default. Provide URL username and password if you use NZBGet |
+
+
 ### Plex
 
 This application can also send Plex sessions to Notifiarr so you can receive notifications when users interact with your server. This has three different features:

@@ -192,6 +192,7 @@ func (s *Server) Info() map[string]interface{} {
 			"gui":       ui.HasGUI(),
 		},
 		"num": map[string]interface{}{
+			"nzbget":   len(s.config.Apps.NZBGet),
 			"deluge":   len(s.config.Apps.Deluge),
 			"lidarr":   len(s.config.Apps.Lidarr),
 			"plex":     numPlex,

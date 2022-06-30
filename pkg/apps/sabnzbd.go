@@ -210,7 +210,7 @@ func (s *SabNZBConfig) GetHistory() (*History, error) {
 	return hist.History, nil
 }
 
-// GetHistory returns the active queued items in SABnzbd.
+// GetQueue returns the active queued items in SABnzbd.
 func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 	if s == nil || s.URL == "" {
 		return &Queue{}, nil

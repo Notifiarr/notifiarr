@@ -126,7 +126,7 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	return svcs
 }
 
-func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
+func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funlen,cyclop
 	// Deluge instanceapp.
 	for _, app := range c.Apps.Deluge {
 		if app.Interval.Duration == 0 {
@@ -138,6 +138,24 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 				Name:     app.Name,
 				Type:     CheckHTTP,
 				Value:    strings.TrimSuffix(app.Config.URL, "/json"),
+				Expect:   "200",
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
+			})
+		}
+	}
+
+	// NZBGet instances.
+	for _, app := range c.Apps.NZBGet {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
+		}
+
+		if app.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     app.Name,
+				Type:     CheckHTTP,
+				Value:    app.Config.URL,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
