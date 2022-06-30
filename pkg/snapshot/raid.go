@@ -1,11 +1,13 @@
 package snapshot
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"io/ioutil"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 func (s *Snapshot) getRaidData(ctx context.Context, useSudo, run bool) error {
@@ -60,6 +62,15 @@ Disk Cache Policy   : Enabled
 Encryption Type     : None
 Is VD Cached: No.
 */
+
+// MegaCLI represents the megaraid cli output.
+type MegaCLI struct {
+	Drive   string            `json:"drive"`
+	Target  string            `json:"target"`
+	Adapter string            `json:"adapter"`
+	Data    map[string]string `json:"data"`
+}
+
 func (s *Snapshot) getRaidMegaCLI(ctx context.Context, useSudo bool) error {
 	megacli, err := exec.LookPath("MegaCli64")
 	for _, s := range []string{"MegaCli", "megacli", "megacli64"} {
@@ -80,16 +91,51 @@ func (s *Snapshot) getRaidMegaCLI(ctx context.Context, useSudo bool) error {
 		return err
 	}
 
-	s.Raid.MegaCLI = make(map[string]string)
-
-	go func() {
-		for stdout.Scan() {
-			if split := strings.Split(strings.TrimSpace(stdout.Text()), ":"); len(split) == 2 { // nolint:gomnd
-				s.Raid.MegaCLI[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
-			}
-		}
-		waitg.Done()
-	}()
+	go s.scanMegaCLI(stdout, waitg)
 
 	return runCommand(cmd, waitg)
+}
+
+func (s *Snapshot) scanMegaCLI(stdout *bufio.Scanner, waitg *sync.WaitGroup) {
+	var (
+		adapter string
+		current *MegaCLI
+	)
+
+	for stdout.Scan() {
+		text := stdout.Text()
+		if strings.HasPrefix(text, "Adapter ") {
+			if split := strings.Fields(text); len(split) > 1 {
+				adapter = split[1]
+			}
+
+			continue
+		}
+
+		if strings.HasPrefix(text, "Virtual Drive:") {
+			if current != nil {
+				s.Raid.MegaCLI = append(s.Raid.MegaCLI, current)
+			}
+
+			split := strings.Fields(text)
+			current = &MegaCLI{
+				Drive:   split[2],
+				Target:  strings.TrimRight(split[5], ")"),
+				Adapter: adapter,
+				Data:    make(map[string]string),
+			}
+
+			continue
+		}
+
+		if split := strings.Split(strings.TrimSpace(stdout.Text()), ":"); len(split) == 2 { // nolint:gomnd
+			current.Data[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
+		}
+	}
+
+	if current != nil {
+		s.Raid.MegaCLI = append(s.Raid.MegaCLI, current)
+	}
+
+	waitg.Done()
 }

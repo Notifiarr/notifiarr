@@ -41,6 +41,7 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 	c.printReadarr()
 	c.printSonarr()
 	c.printDeluge()
+	c.printNZBGet()
 	c.printQbit()
 	c.printSABnzbd()
 	c.printPlex()
@@ -254,6 +255,25 @@ func (c *Client) printDeluge() {
 	for i, f := range c.Config.Deluge {
 		c.Printf(" =>    Server %d: %s password:%v timeout:%s verify_ssl:%v",
 			i+1, f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+	}
+}
+
+// printNZBGet is called on startup to print info about each configured server.
+func (c *Client) printNZBGet() {
+	if len(c.Config.NZBGet) == 1 {
+		f := c.Config.NZBGet[0]
+
+		c.Printf(" => NZBGet Config: 1 server: %s username:%s password:%v timeout:%s verify_ssl:%v",
+			f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+
+		return
+	}
+
+	c.Print(" => NZBGet Config:", len(c.Config.NZBGet), "servers")
+
+	for i, f := range c.Config.NZBGet {
+		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
+			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
 	}
 }
 

@@ -104,24 +104,25 @@ require (
 )
 
 require (
-	golang.org/x/text v0.3.7
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	golang.org/x/text v0.3.7
 	golift.io/datacounter v1.0.3
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
-
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/gorilla/rpc v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.7.2 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
+	golift.io/nzbget v0.1.2-0.20220628091335-619174dc47da // indirect
 )

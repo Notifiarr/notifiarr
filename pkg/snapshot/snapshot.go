@@ -95,8 +95,8 @@ type Snapshot struct {
 
 // RaidData contains raid information from mdstat and/or megacli.
 type RaidData struct {
-	MDstat  string            `json:"mdstat,omitempty"`
-	MegaCLI map[string]string `json:"megacli,omitempty"`
+	MDstat  string     `json:"mdstat,omitempty"`
+	MegaCLI []*MegaCLI `json:"megacli,omitempty"`
 }
 
 // Partition is used for ZFS pools as well as normal Disk arrays.

@@ -180,17 +180,16 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 	}
 
 	if clientInfo.Actions.Snapshot != nil {
-		clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins // use local data for plugins.
-		c.Config.Snapshot = clientInfo.Actions.Snapshot
-	}
-
-	if clientInfo.Actions.Plex != nil && c.Config.Plex != nil {
-		c.Config.Plex.Interval = clientInfo.Actions.Plex.Interval
-		c.Config.Plex.Cooldown = clientInfo.Actions.Plex.Cooldown
-		c.Config.Plex.MoviesPC = clientInfo.Actions.Plex.MoviesPC
-		c.Config.Plex.SeriesPC = clientInfo.Actions.Plex.SeriesPC
-		c.Config.Plex.NoActivity = clientInfo.Actions.Plex.NoActivity
-		c.Config.Plex.Delay = clientInfo.Actions.Plex.Delay
+		c.Config.Snapshot.Interval.Duration = clientInfo.Actions.Snapshot.Interval.Duration
+		c.Config.Snapshot.ZFSPools = clientInfo.Actions.Snapshot.ZFSPools
+		c.Config.Snapshot.UseSudo = clientInfo.Actions.Snapshot.UseSudo
+		c.Config.Snapshot.Raid = clientInfo.Actions.Snapshot.Raid
+		c.Config.Snapshot.DriveData = clientInfo.Actions.Snapshot.DriveData
+		c.Config.Snapshot.DiskUsage = clientInfo.Actions.Snapshot.DiskUsage
+		c.Config.Snapshot.AllDrives = clientInfo.Actions.Snapshot.AllDrives
+		c.Config.Snapshot.IOTop = clientInfo.Actions.Snapshot.IOTop
+		c.Config.Snapshot.PSTop = clientInfo.Actions.Snapshot.PSTop
+		c.Config.Snapshot.MyTop = clientInfo.Actions.Snapshot.MyTop
 	}
 
 	c.loadSiteAppsConfig(clientInfo)
@@ -256,12 +255,13 @@ func (c *Client) loadSiteAppsConfig(clientInfo *website.ClientInfo) { //nolint:c
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices() (*website.ClientInfo, error) {
+	c.website.Start()
+
 	clientInfo := c.loadSiteConfig()
 	c.configureServicesPlex()
 	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(clientInfo)
-	c.website.Start()
 	c.triggers.Start()
 	/* // debug stuff.
 	snap, err, _ := c.Config.Snapshot.GetSnapshot()

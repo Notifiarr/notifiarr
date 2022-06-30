@@ -6,22 +6,23 @@ import (
 
 	"golift.io/cnfg"
 	"golift.io/deluge"
+	"golift.io/nzbget"
 	"golift.io/qbit"
 )
 
 /* Notifiarr Client provides minimal support for pulling data from Download clients. */
 
 type DelugeConfig struct {
-	Name     string        `toml:"name" xml:"name" json:"name"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	*deluge.Config
+	Name           string        `toml:"name" xml:"name" json:"name"`
+	Interval       cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	*deluge.Deluge `toml:"-" xml:"-" json:"-"`
 }
 
 type QbitConfig struct {
-	Name     string        `toml:"name" xml:"name" json:"name"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	*qbit.Config
+	Name       string        `toml:"name" xml:"name" json:"name"`
+	Interval   cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
 }
 
@@ -31,6 +32,13 @@ type TautulliConfig struct {
 	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
 	URL      string        `toml:"url" xml:"url" json:"url"`
 	APIKey   string        `toml:"api_key" xml:"api_key" json:"apiKey"`
+}
+
+type NZBGetConfig struct {
+	*nzbget.Config
+	Name           string        `toml:"name" xml:"name"`
+	Interval       cnfg.Duration `toml:"interval" xml:"interval"`
+	*nzbget.NZBGet `toml:"-" xml:"-" json:"-"`
 }
 
 func (a *Apps) setupDeluge(timeout time.Duration) error {
@@ -85,6 +93,22 @@ func (q *QbitConfig) setup(timeout time.Duration) (err error) {
 
 	if q.Timeout.Duration == 0 {
 		q.Timeout.Duration = timeout
+	}
+
+	return nil
+}
+
+func (a *Apps) setupNZBGet(timeout time.Duration) error {
+	for idx := range a.NZBGet {
+		if a.NZBGet[idx].Config == nil || a.NZBGet[idx].URL == "" {
+			return fmt.Errorf("%w: missing url: NZBGet config %d", ErrInvalidApp, idx+1)
+		}
+
+		a.NZBGet[idx].NZBGet = nzbget.New(a.NZBGet[idx].Config)
+
+		if a.NZBGet[idx].Timeout.Duration == 0 {
+			a.NZBGet[idx].Timeout.Duration = timeout
+		}
 	}
 
 	return nil

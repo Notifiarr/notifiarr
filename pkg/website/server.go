@@ -122,7 +122,7 @@ func (s *Server) Stop() {
 	s.sendData = nil
 }
 
-// GetData sends raw data to a notifiarr URL as JSON.
+// GetData sends data to a notifiarr URL as JSON.
 func (s *Server) GetData(req *Request) (*Response, error) {
 	s.sdMutex.RLock()
 	defer s.sdMutex.RUnlock()
@@ -131,11 +131,12 @@ func (s *Server) GetData(req *Request) (*Response, error) {
 		return nil, ErrNoChannel
 	}
 
-	replyCh := make(chan *chResponse)
-	defer close(replyCh)
+	req.respChan = make(chan *chResponse)
+	defer close(req.respChan)
 
 	s.sendData <- req
-	resp := <-replyCh
+
+	resp := <-req.respChan
 
 	return resp.Response, resp.Error
 }

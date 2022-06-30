@@ -42,6 +42,7 @@ type Apps struct {
 	Deluge   []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
 	Qbit     []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
 	SabNZB   []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
+	NZBGet   []*NZBGetConfig   `json:"nzbget,omitempty" toml:"nzbget" xml:"nzbget" yaml:"nzbget,omitempty"`
 	Tautulli *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
 	Router   *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
 	Logger   `toml:"-" xml:"-" json:"-"`
@@ -230,6 +231,10 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 	}
 
 	if err := a.setupDeluge(timeout); err != nil {
+		return err
+	}
+
+	if err := a.setupNZBGet(timeout); err != nil {
 		return err
 	}
 
