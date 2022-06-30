@@ -7,8 +7,44 @@ import (
 	"fmt"
 )
 
-// LibrarySection is a plex response struct.
+// LibrarySection is data about a library's section, ie movies, tv, music.
 type LibrarySection struct {
+	AllowSync        bool   `json:"allowSync"`
+	Art              string `json:"art"`
+	Composite        string `json:"composite"`
+	Filters          bool   `json:"filters"`
+	Refreshing       bool   `json:"refreshing"`
+	Thumb            string `json:"thumb"`
+	Key              string `json:"key"` // this is the ID.
+	Type             string `json:"type"`
+	Title            string `json:"title"`
+	Agent            string `json:"agent"`
+	Scanner          string `json:"scanner"`
+	Language         string `json:"language"`
+	UUID             string `json:"uuid"`
+	UpdatedAt        int    `json:"updatedAt"`
+	CreatedAt        int    `json:"createdAt"`
+	ScannedAt        int    `json:"scannedAt"`
+	Content          bool   `json:"content"`
+	Directory        bool   `json:"directory"`
+	ContentChangedAt int    `json:"contentChangedAt"`
+	Hidden           int    `json:"hidden"`
+	Location         []struct {
+		ID   int64  `json:"id"`
+		Path string `json:"path"`
+	} `json:"Location"`
+}
+
+// SectionDirectory contains the directory of sections.
+type SectionDirectory struct {
+	Size      int               `json:"size"`
+	AllowSync bool              `json:"allowSync"`
+	Title1    string            `json:"title1"`
+	Directory []*LibrarySection `json:"Directory"`
+}
+
+// MediaSection is a plex response struct.
+type MediaSection struct {
 	Size                int    `json:"size"`
 	AllowSync           bool   `json:"allowSync"`
 	Identifier          string `json:"identifier"`
@@ -112,20 +148,21 @@ type LibrarySection struct {
 				} `json:"Stream"`
 			} `json:"Part"`
 		} `json:"Media"`
-		TitleSort           string      `json:"titleSort,omitempty"`
-		ViewOffset          int         `json:"viewOffset,omitempty"`
-		LastViewedAt        int         `json:"lastViewedAt,omitempty"`
-		ParentYear          int         `json:"parentYear,omitempty"`
-		Studio              string      `json:"studio,omitempty"`
-		AudienceRating      float64     `json:"audienceRating,omitempty"`
-		ViewCount           int         `json:"viewCount,omitempty"`
-		Tagline             string      `json:"tagline,omitempty"`
-		AudienceRatingImage string      `json:"audienceRatingImage,omitempty"`
-		ChapterSource       string      `json:"chapterSource,omitempty"`
-		PrimaryExtraKey     string      `json:"primaryExtraKey,omitempty"`
-		RatingImage         string      `json:"ratingImage,omitempty"`
-		GuID                []*GUID     `json:"Guid,omitempty"`
-		ExternalRating      []*Rating   `json:"Rating,omitempty"`
+		TitleSort           string    `json:"titleSort,omitempty"`
+		ViewOffset          int       `json:"viewOffset,omitempty"`
+		LastViewedAt        int       `json:"lastViewedAt,omitempty"`
+		ParentYear          int       `json:"parentYear,omitempty"`
+		Studio              string    `json:"studio,omitempty"`
+		AudienceRating      float64   `json:"audienceRating,omitempty"`
+		ViewCount           int       `json:"viewCount,omitempty"`
+		Tagline             string    `json:"tagline,omitempty"`
+		AudienceRatingImage string    `json:"audienceRatingImage,omitempty"`
+		ChapterSource       string    `json:"chapterSource,omitempty"`
+		PrimaryExtraKey     string    `json:"primaryExtraKey,omitempty"`
+		RatingImage         string    `json:"ratingImage,omitempty"`
+		GuID                []*GUID   `json:"Guid,omitempty"`
+		ExternalRating      []*Rating `json:"Rating,omitempty"`
+		/* Notifiarr does not need these. :shrug:
 		Country             []*Country  `json:"Country"`
 		Director            []*Director `json:"Director"`
 		Genre               []*Genre    `json:"Genre"`
@@ -133,6 +170,7 @@ type LibrarySection struct {
 		Role                []*Role     `json:"Role"`
 		Similar             []*Similar  `json:"Similar"`
 		Writer              []*Writer   `json:"Writer"`
+		*/
 	} `json:"Metadata"`
 }
 
@@ -142,22 +180,56 @@ type GUID struct {
 }
 
 // GetPlexSectionKey gets a section key from Plex based on a key path.
-func (s *Server) GetPlexSectionKey(keyPath string) (*LibrarySection, error) {
+func (s *Server) GetPlexSectionKey(keyPath string) (*MediaSection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
 	defer cancel()
 
-	data, err := s.getPlexURL(ctx, s.URL+keyPath, nil)
+	return s.GetPlexSectionKeyWithContext(ctx, keyPath)
+}
+
+// GetPlexSectionKey gets a section key from Plex based on a key path.
+func (s *Server) GetPlexSectionKeyWithContext(ctx context.Context, keyPath string) (*MediaSection, error) {
+	url := s.URL + keyPath
+
+	data, err := s.getPlexURL(ctx, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var v struct {
-		MediaContainer *LibrarySection `json:"MediaContainer"`
+		MediaContainer *MediaSection `json:"MediaContainer"`
 	}
 
 	if err := json.Unmarshal(data, &v); err != nil {
-		return nil, fmt.Errorf("unmarshaling library section from %s: %w; failed payload: %s",
-			s.URL+keyPath, err, string(data))
+		return nil, fmt.Errorf("parsing library section from %s: %w; failed payload: %s", url, err, string(data))
+	}
+
+	return v.MediaContainer, nil
+}
+
+// GetDirectory returns data about all the library sections.
+func (s *Server) GetDirectory() (*SectionDirectory, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
+	defer cancel()
+
+	return s.GetDirectoryWithContext(ctx)
+}
+
+// GetDirectoryWithContext returns data about all the library sections.
+func (s *Server) GetDirectoryWithContext(ctx context.Context) (*SectionDirectory, error) {
+	url := s.URL + "/library/sections"
+
+	data, err := s.getPlexURL(ctx, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var v struct {
+		MediaContainer *SectionDirectory `json:"MediaContainer"`
+	}
+
+	if err := json.Unmarshal(data, &v); err != nil {
+		return nil, fmt.Errorf("unmarshaling directory from %s: %w; failed payload: %s", url, err, string(data))
 	}
 
 	return v.MediaContainer, nil
