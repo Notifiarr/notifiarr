@@ -61,8 +61,7 @@ type Plugins struct {
 var (
 	ErrPlatformUnsup = fmt.Errorf("the requested metric is not available on this platform, " +
 		"if you know how to collect it, please open an issue on the github repo")
-	ErrNonZeroExit   = fmt.Errorf("cmd exited non-zero")
-	ErrMegaCLIOutput = fmt.Errorf("megaraid CLI output nor parseable")
+	ErrNonZeroExit = fmt.Errorf("cmd exited non-zero")
 )
 
 // Snapshot is the output data sent to Notifiarr.
