@@ -58,17 +58,11 @@ func (c *Config) Run() {
 func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) { //nolint:cyclop
 	defer c.stopTimerLoop(actions)
 
-	// Sent is used a memory buffer for plex session tracking.
-	// This specifically makes sure we don't send a "finished item" more than once.
-	sent := make(map[string]struct{})
-
 	// This is how you watch a slice of reflect.SelectCase.
 	// This allows watching a dynamic amount of channels and tickers.
 	for {
 		index, val, _ := reflect.Select(cases)
 		action := actions[index]
-
-		c.Debugf("Action Start: %v", action.Name)
 
 		var event website.EventType
 		if _, ok := val.Interface().(time.Time); ok {
@@ -80,7 +74,7 @@ func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) { /
 		exp.TimerEvents.Add(string(event)+"&&"+string(action.Name), 1)
 		exp.TimerCounts.Add(string(action.Name), 1)
 
-		if action.Fn == nil && action.SFn == nil { // stop channel has no Functions
+		if action.Fn == nil { // stop channel has no Function.
 			return // called by c.Stop(), calls c.stopTimerLoop().
 		}
 
@@ -96,11 +90,7 @@ func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) { /
 
 		if action.Fn != nil {
 			action.Fn(event)
-		} else {
-			action.SFn(sent)
 		}
-
-		c.Debugf("Action End: %v", action.Name)
 	}
 }
 
@@ -108,11 +98,15 @@ func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) { /
 // This procedure closes all the timer channels and stops the tickers.
 // These cannot be restarted and must be fully initialized again.
 func (c *Config) stopTimerLoop(actions []*Action) {
-	defer c.CapturePanic()
+	defer func() {
+		defer c.CapturePanic()
+		close(c.stop.C) // signal that we're done.
+	}()
+
 	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
 	for _, action := range actions {
-		if action.C != nil && (action.Fn != nil || action.SFn != nil) {
+		if action.C != nil && action.C != c.stop.C { // do not close stop channel here.
 			close(action.C)
 			action.C = nil
 		}
@@ -122,6 +116,4 @@ func (c *Config) stopTimerLoop(actions []*Action) {
 			action.T = nil
 		}
 	}
-
-	close(c.stop.C) // signal that we're done.
 }

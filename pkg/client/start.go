@@ -184,15 +184,6 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 		c.Config.Snapshot = clientInfo.Actions.Snapshot
 	}
 
-	if clientInfo.Actions.Plex != nil && c.Config.Plex != nil {
-		c.Config.Plex.Interval = clientInfo.Actions.Plex.Interval
-		c.Config.Plex.Cooldown = clientInfo.Actions.Plex.Cooldown
-		c.Config.Plex.MoviesPC = clientInfo.Actions.Plex.MoviesPC
-		c.Config.Plex.SeriesPC = clientInfo.Actions.Plex.SeriesPC
-		c.Config.Plex.NoActivity = clientInfo.Actions.Plex.NoActivity
-		c.Config.Plex.Delay = clientInfo.Actions.Plex.Delay
-	}
-
 	c.loadSiteAppsConfig(clientInfo)
 
 	return clientInfo
@@ -256,12 +247,13 @@ func (c *Client) loadSiteAppsConfig(clientInfo *website.ClientInfo) { //nolint:c
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices() (*website.ClientInfo, error) {
+	c.website.Start()
+
 	clientInfo := c.loadSiteConfig()
 	c.configureServicesPlex()
 	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(clientInfo)
-	c.website.Start()
 	c.triggers.Start()
 	/* // debug stuff.
 	snap, err, _ := c.Config.Snapshot.GetSnapshot()

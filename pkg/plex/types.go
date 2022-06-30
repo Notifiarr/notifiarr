@@ -27,7 +27,7 @@ type Session struct {
 	GrandparentTheme     string    `json:"grandparentTheme"`
 	GrandparentThumb     string    `json:"grandparentThumb"`
 	GrandparentTitle     string    `json:"grandparentTitle"`
-	Index                int       `json:"index"`
+	Index                int64     `json:"index"`
 	Key                  string    `json:"key"`
 	LastViewed           int64     `json:"lastViewedAt"`
 	LibrarySectionID     string    `json:"librarySectionID"`
@@ -35,7 +35,7 @@ type Session struct {
 	LibrarySectionTitle  string    `json:"librarySectionTitle"`
 	OriginallyAvailable  string    `json:"originallyAvailableAt"`
 	ParentGUID           string    `json:"parentGuid"`
-	ParentIndex          int       `json:"parentIndex"`
+	ParentIndex          int64     `json:"parentIndex"`
 	ParentKey            string    `json:"parentKey"`
 	ParentRatingKey      string    `json:"parentRatingKey"`
 	ParentThumb          string    `json:"parentThumb"`
@@ -54,7 +54,7 @@ type Session struct {
 	Updated              int64     `json:"updatedAt"`
 	ViewCount            int64     `json:"viewCount"`
 	ViewOffset           float64   `json:"viewOffset"`
-	Year                 int64     `json:"year"`
+	Year                 int       `json:"year"`
 	Session              struct {
 		Bandwidth int64  `json:"bandwidth"`
 		ID        string `json:"id"`
@@ -137,7 +137,7 @@ type Director struct {
 type Genre struct {
 	Count  string `json:"count"`
 	Filter string `json:"filter"`
-	ID     string `json:"id"`
+	ID     int64  `json:"id"`
 	Tag    string `json:"tag"`
 }
 
