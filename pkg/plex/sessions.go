@@ -81,3 +81,74 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 func (s *Server) KillSession(sessionID, reason string) ([]byte, error) {
 	return s.KillSessionWithContext(context.Background(), sessionID, reason)
 }
+
+// MarkPlayedWithContext marks a video as played.
+func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) error {
+	if !s.Configured() {
+		return ErrNoURLToken
+	}
+
+	params := make(url.Values)
+	params.Add("identifier", "com.plexapp.plugins.library")
+	params.Add("key", key)
+
+	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
+	defer cancel()
+
+	body, err := s.getPlexURL(ctx, s.URL+"/:/scrobble", params)
+	if err != nil {
+		return fmt.Errorf("%w: %s", err, string(body))
+	}
+
+	return nil
+}
+
+// MarkPlayed marks a video as played.
+func (s *Server) MarkPlayed(key string) error {
+	return s.MarkPlayedWithContext(context.Background(), key)
+}
+
+// EmptyTrashWithContext deletes (a section's) trash.
+func (s *Server) EmptyTrashWithContext(ctx context.Context, sectionKey string) error {
+	if !s.Configured() {
+		return ErrNoURLToken
+	}
+
+	params := make(url.Values)
+	params.Add("key", sectionKey)
+
+	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
+	defer cancel()
+
+	body, err := s.getPlexURL(ctx, s.URL+"/library/sections/"+sectionKey+"/emptyTrash", params)
+	if err != nil {
+		return fmt.Errorf("%w: %s", err, string(body))
+	}
+
+	return nil
+}
+
+// EmptyTrash deletes (a section's) trash.
+func (s *Server) EmptyTrash(sectionKey string) error {
+	return s.EmptyTrashWithContext(context.Background(), sectionKey)
+}
+
+// EmptyAllTrashWithContext deletes the trash in all sections.
+func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
+	if !s.Configured() {
+		return ErrNoURLToken
+	}
+
+	directory, err := s.GetDirectoryWithContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, library := range directory.Directory {
+		if err := s.EmptyTrashWithContext(ctx, library.Key); err != nil {
+			return fmt.Errorf("emptying section '%s' trash: %w", library.Title, err)
+		}
+	}
+
+	return nil
+}
