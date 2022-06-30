@@ -16,7 +16,8 @@ var ErrInvalidApp = fmt.Errorf("invalid application provided")
 // ErrNoChannel is returned when the go routine is stopped.
 var ErrNoChannel = fmt.Errorf("no channel to send request")
 
-// Config is the input data needed to send payloads to notifiarr.
+// Config is the input data shared by most triggers.
+// Everything is mandatory.
 type Config struct {
 	*website.Server // send trigger responses to website.
 	*website.ClientInfo
@@ -34,11 +35,10 @@ type TriggerName string
 // Action defines a trigger/timer that can be executed.
 type Action struct {
 	Name TriggerName
-	Fn   func(website.EventType)   // most actions use this
-	SFn  func(map[string]struct{}) // this is just for plex sessions.
-	C    chan website.EventType    // if provided, T is optional
-	T    *time.Ticker              // if provided, C is optional.
-	Hide bool                      // prevent logging.
+	Fn   func(website.EventType) // most actions use this for triggers.
+	C    chan website.EventType  // if provided, T is optional.
+	T    *time.Ticker            // if provided, C is optional.
+	Hide bool                    // prevent logging.
 }
 
 // Exec runs a trigger. This is abastraction method used in a bunch of places.

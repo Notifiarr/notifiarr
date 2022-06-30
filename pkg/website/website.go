@@ -197,12 +197,13 @@ func (s *Server) watchSendDataChan() {
 		switch resp, elapsed, err := s.sendRequest(data); {
 		case data.LogMsg == "":
 			continue
-		case err == nil && !data.ErrorsOnly:
-			s.config.Printf("[%s requested] Sent (%v): %s%s", data.Event, elapsed, data.LogMsg, resp)
 		case errors.Is(err, ErrNon200):
 			s.config.ErrorfNoShare("[%s requested] Sending (%v): %s: %v%s", data.Event, elapsed, data.LogMsg, err, resp)
-		default:
+		case err != nil:
 			s.config.Errorf("[%s requested] Sending (%v): %s: %v%s", data.Event, elapsed, data.LogMsg, err, resp)
+		case !data.ErrorsOnly:
+			s.config.Printf("[%s requested] Sent (%v): %s%s", data.Event, elapsed, data.LogMsg, resp)
+		default:
 		}
 	}
 

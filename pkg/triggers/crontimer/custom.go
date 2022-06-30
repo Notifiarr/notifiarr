@@ -33,7 +33,7 @@ type cmd struct {
 
 // Timer is used to trigger actions.
 type Timer struct {
-	*website.CronTimer
+	*website.CronConfig
 	website *website.Server
 	ch      chan website.EventType
 }
@@ -55,10 +55,10 @@ func (t *Timer) Run(event website.EventType) {
 // run responds to the channel that the timer fired into.
 func (t *Timer) run(event website.EventType) {
 	t.website.SendData(&website.Request{
-		Route:      website.Route(t.CronTimer.URI),
+		Route:      website.Route(t.URI),
 		Event:      event,
 		Payload:    &struct{ Cron string }{Cron: "thingy"},
-		LogMsg:     "Custom Timer Request '" + t.CronTimer.Name + "'",
+		LogMsg:     "Custom Timer Request '" + t.Name + "'",
 		LogPayload: true,
 	})
 }
@@ -87,9 +87,9 @@ func (c *cmd) create() {
 
 	for _, custom := range c.ClientInfo.Actions.Custom {
 		timer := &Timer{
-			CronTimer: custom,
-			ch:        make(chan website.EventType, 1),
-			website:   c.Config.Server,
+			CronConfig: custom,
+			ch:         make(chan website.EventType, 1),
+			website:    c.Config.Server,
 		}
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 

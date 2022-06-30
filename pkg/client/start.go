@@ -184,15 +184,6 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 		c.Config.Snapshot = clientInfo.Actions.Snapshot
 	}
 
-	if clientInfo.Actions.Plex != nil && c.Config.Plex != nil {
-		c.Config.Plex.Interval = clientInfo.Actions.Plex.Interval
-		c.Config.Plex.Cooldown = clientInfo.Actions.Plex.Cooldown
-		c.Config.Plex.MoviesPC = clientInfo.Actions.Plex.MoviesPC
-		c.Config.Plex.SeriesPC = clientInfo.Actions.Plex.SeriesPC
-		c.Config.Plex.NoActivity = clientInfo.Actions.Plex.NoActivity
-		c.Config.Plex.Delay = clientInfo.Actions.Plex.Delay
-	}
-
 	c.loadSiteAppsConfig(clientInfo)
 
 	return clientInfo
