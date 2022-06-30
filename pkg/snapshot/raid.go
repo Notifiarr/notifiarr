@@ -65,10 +65,10 @@ Is VD Cached: No.
 
 // MegaCLI represents the megaraid cli output.
 type MegaCLI struct {
-	Drive   string
-	Target  string
-	Adapter string
-	Data    map[string]string
+	Drive   string            `json:"drive"`
+	Target  string            `json:"target"`
+	Adapter string            `json:"adapter"`
+	Data    map[string]string `json:"data"`
 }
 
 func (s *Snapshot) getRaidMegaCLI(ctx context.Context, useSudo bool) error {
@@ -131,6 +131,10 @@ func (s *Snapshot) scanMegaCLI(stdout *bufio.Scanner, waitg *sync.WaitGroup) {
 		if split := strings.Split(strings.TrimSpace(stdout.Text()), ":"); len(split) == 2 { // nolint:gomnd
 			current.Data[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
 		}
+	}
+
+	if current != nil {
+		s.Raid.MegaCLI = append(s.Raid.MegaCLI, current)
 	}
 
 	waitg.Done()
