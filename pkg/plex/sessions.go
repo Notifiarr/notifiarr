@@ -133,7 +133,7 @@ func (s *Server) EmptyTrash(sectionKey string) error {
 	return s.EmptyTrashWithContext(context.Background(), sectionKey)
 }
 
-// EmptyTrash deletes (a section's) trash.
+// EmptyAllTrashWithContext deletes the trash in all sections.
 func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
 	if !s.Configured() {
 		return ErrNoURLToken
@@ -146,7 +146,7 @@ func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
 
 	for _, library := range directory.Directory {
 		if err := s.EmptyTrashWithContext(ctx, library.Key); err != nil {
-			return fmt.Errorf("emptying library '%s' trash: %w", library.Title, err)
+			return fmt.Errorf("emptying section '%s' trash: %w", library.Title, err)
 		}
 	}
 
