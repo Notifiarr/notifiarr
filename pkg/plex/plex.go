@@ -10,6 +10,7 @@ package plex
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -55,7 +56,29 @@ func (s *Server) Validate() {
 }
 
 func (s *Server) getPlexURL(ctx context.Context, url string, params url.Values) ([]byte, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	return s.reqPlexURL(ctx, url, http.MethodGet, params, nil)
+}
+
+func (s *Server) putPlexURL(ctx context.Context, url string, params url.Values, putData io.Reader) ([]byte, error) {
+	return s.reqPlexURL(ctx, url, http.MethodPut, params, putData)
+}
+
+/*
+func (s *Server) postPlexURL(ctx context.Context, url string, params url.Values, postData io.Reader) ([]byte, error) {
+	return s.reqPlexURL(ctx, url, http.MethodPost, params, postData)
+}
+*/
+
+func (s *Server) reqPlexURL(
+	ctx context.Context,
+	url, method string,
+	params url.Values,
+	sendData io.Reader,
+) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, method, url, sendData)
 	if err != nil {
 		return nil, fmt.Errorf("creating http request: %w", err)
 	}
@@ -63,25 +86,25 @@ func (s *Server) getPlexURL(ctx context.Context, url string, params url.Values) 
 	req.URL.RawQuery = params.Encode()
 	req.Header.Set("X-Plex-Token", s.Token)
 	req.Header.Set("Accept", "application/json")
-	exp.Apps.Add("Plex&&GET Requests", 1)
+	exp.Apps.Add("Plex&&"+method+" Requests", 1)
 
 	resp, err := s.getClient().Do(req)
 	if err != nil {
-		exp.Apps.Add("Plex&&GET Errors", 1)
+		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		exp.Apps.Add("Plex&&GET Errors", 1)
+		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return nil, fmt.Errorf("reading http response: %w", err)
 	}
 
 	exp.Apps.Add("Plex&&Bytes Received", int64(len(body)))
 
 	if resp.StatusCode != http.StatusOK {
-		exp.Apps.Add("Plex&&GET Errors", 1)
+		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return body, ErrBadStatus
 	}
 
