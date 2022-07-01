@@ -72,13 +72,6 @@ func (r *LidarrConfig) setup(timeout time.Duration) {
 	}
 
 	r.URL = strings.TrimRight(r.URL, "/")
-
-	if u, err := r.GetURL(); err != nil {
-		r.errorf("Checking Lidarr Path: %v", err)
-	} else if u := strings.TrimRight(u, "/"); u != r.URL {
-		r.errorf("Lidarr URL fixed: %s -> %s (continuing)", r.URL, u)
-		r.URL = u
-	}
 }
 
 func lidarrAddAlbum(req *http.Request) (int, interface{}) {

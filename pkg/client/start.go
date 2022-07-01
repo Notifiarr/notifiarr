@@ -271,11 +271,6 @@ func (c *Client) configureServices() (*website.ClientInfo, error) {
 	/**/
 	c.Config.Services.Start()
 
-	// Make sure each app has a sane timeout.
-	if err := c.Config.Apps.Setup(c.Config.Timeout.Duration); err != nil {
-		return clientInfo, fmt.Errorf("setting up app: %w", err)
-	}
-
 	return clientInfo, nil
 }
 

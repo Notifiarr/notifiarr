@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
@@ -202,6 +203,8 @@ func (a *Apps) InitHandlers() {
 // Setup creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
 func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
+	a.APIKey = strings.TrimSpace(a.APIKey)
+
 	if a.Debugf == nil {
 		a.Debugf = log.New(io.Discard, "", 0).Printf
 	}
@@ -246,8 +249,7 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 		a.SabNZB[i].setup(timeout)
 	}
 
-	// This one happens in configfile package now.
-	// a.Tautulli.setup(timeout)
+	a.Tautulli.setup(timeout)
 
 	return nil
 }

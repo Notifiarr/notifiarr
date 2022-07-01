@@ -66,13 +66,6 @@ func (r *ReadarrConfig) setup(timeout time.Duration) {
 	}
 
 	r.URL = strings.TrimRight(r.URL, "/")
-
-	if u, err := r.GetURL(); err != nil {
-		r.errorf("Checking Readarr Path: %v", err)
-	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.errorf("Readarr URL fixed: %s -> %s (continuing)", r.URL, u)
-		r.URL = u
-	}
 }
 
 func readarrAddBook(req *http.Request) (int, interface{}) {

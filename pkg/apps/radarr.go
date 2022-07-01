@@ -73,13 +73,6 @@ func (r *RadarrConfig) setup(timeout time.Duration) {
 	}
 
 	r.URL = strings.TrimRight(r.URL, "/")
-
-	if u, err := r.GetURL(); err != nil {
-		r.errorf("Checking Radarr Path: %v", err)
-	} else if u = strings.TrimRight(u, "/"); u != r.URL {
-		r.errorf("Radarr URL fixed: %s -> %s (continuing)", r.URL, u)
-		r.URL = u
-	}
 }
 
 func radarrAddMovie(req *http.Request) (int, interface{}) {

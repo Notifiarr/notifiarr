@@ -139,13 +139,17 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 		return nil, nil, err
 	}
 
-	c.Apps.APIKey = strings.TrimSpace(c.Apps.APIKey)
 	c.Services.Apps = c.Apps
 	c.Services.Plugins = c.Snapshot.Plugins
 
 	err := c.Services.Setup(c.Service)
 	if err != nil {
 		return nil, nil, fmt.Errorf("service checks: %w", err)
+	}
+
+	// Make sure each app has a sane timeout.
+	if err := c.Apps.Setup(c.Timeout.Duration); err != nil {
+		return nil, nil, fmt.Errorf("setting up app: %w", err)
 	}
 
 	// Make sure the port is not in use before starting the web server.
@@ -200,8 +204,6 @@ func (c *Config) setup() {
 
 	if c.Tautulli == nil {
 		c.Tautulli = &apps.TautulliConfig{}
-	} else {
-		c.Tautulli.Setup(c.Timeout.Duration)
 	}
 }
 
