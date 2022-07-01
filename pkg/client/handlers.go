@@ -91,6 +91,9 @@ func (c *Client) httpAPIHandlers() {
 
 	if c.Config.Plex.Configured() {
 		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
+		c.Config.HandleAPIpath(starr.Plex, "directory", c.Config.Plex.HandleDirectory, "GET")
+		c.Config.HandleAPIpath(starr.Plex, "emptytrash/{key}", c.Config.Plex.HandleEmptyTrash, "GET")
+		c.Config.HandleAPIpath(starr.Plex, "markwatched/{key}", c.Config.Plex.HandleMarkWatched, "GET")
 		c.Config.HandleAPIpath(starr.Plex, "kill", c.Config.Plex.HandleKillSession, "GET").
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:[0-9a-z-]+}")
 

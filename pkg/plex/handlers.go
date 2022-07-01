@@ -39,3 +39,36 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 
 	return http.StatusOK, fmt.Sprintf("kilt session '%s' with reason: %s", sessionID, reason)
 }
+
+func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
+	plexID, _ := r.Context().Value(starr.Plex).(int)
+
+	directory, err := s.GetDirectoryWithContext(r.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("directory request failed (%d): %w", plexID, err)
+	}
+
+	return http.StatusOK, directory
+}
+
+func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
+	plexID, _ := r.Context().Value(starr.Plex).(int)
+
+	body, err := s.EmptyTrashWithContext(r.Context(), mux.Vars(r)["key"])
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("trash empty failed (%d): %w", plexID, err)
+	}
+
+	return http.StatusOK, "ok: " + string(body)
+}
+
+func (s *Server) HandleMarkWatched(r *http.Request) (int, interface{}) {
+	plexID, _ := r.Context().Value(starr.Plex).(int)
+
+	body, err := s.MarkPlayedWithContext(r.Context(), mux.Vars(r)["key"])
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("mark watch failed (%d): %w", plexID, err)
+	}
+
+	return http.StatusOK, "ok: " + string(body)
+}

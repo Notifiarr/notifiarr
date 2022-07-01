@@ -39,9 +39,6 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 		sessions = &Sessions{Name: s.Name}
 	)
 
-	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
-	defer cancel()
-
 	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
 	if err != nil {
 		return sessions, fmt.Errorf("%w: %s", err, string(body))
@@ -66,9 +63,6 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 	params.Add("sessionId", sessionID)
 	params.Add("reason", reason)
 
-	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
-	defer cancel()
-
 	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions/terminate", params)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
@@ -83,9 +77,9 @@ func (s *Server) KillSession(sessionID, reason string) ([]byte, error) {
 }
 
 // MarkPlayedWithContext marks a video as played.
-func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) error {
+func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) ([]byte, error) {
 	if !s.Configured() {
-		return ErrNoURLToken
+		return nil, ErrNoURLToken
 	}
 
 	params := make(url.Values)
@@ -97,39 +91,34 @@ func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) error {
 
 	body, err := s.getPlexURL(ctx, s.URL+"/:/scrobble", params)
 	if err != nil {
-		return fmt.Errorf("%w: %s", err, string(body))
+		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
 
-	return nil
+	return body, nil
 }
 
 // MarkPlayed marks a video as played.
-func (s *Server) MarkPlayed(key string) error {
+func (s *Server) MarkPlayed(key string) ([]byte, error) {
 	return s.MarkPlayedWithContext(context.Background(), key)
 }
 
 // EmptyTrashWithContext deletes (a section's) trash.
-func (s *Server) EmptyTrashWithContext(ctx context.Context, sectionKey string) error {
+func (s *Server) EmptyTrashWithContext(ctx context.Context, libraryKey string) ([]byte, error) {
 	if !s.Configured() {
-		return ErrNoURLToken
+		return nil, ErrNoURLToken
 	}
 
-	params := make(url.Values)
-	params.Add("key", sectionKey)
-
-	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
-	defer cancel()
-
-	body, err := s.getPlexURL(ctx, s.URL+"/library/sections/"+sectionKey+"/emptyTrash", params)
+	// Requires PUT with no data.
+	body, err := s.putPlexURL(ctx, s.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
 	if err != nil {
-		return fmt.Errorf("%w: %s", err, string(body))
+		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
 
-	return nil
+	return body, nil
 }
 
 // EmptyTrash deletes (a section's) trash.
-func (s *Server) EmptyTrash(sectionKey string) error {
+func (s *Server) EmptyTrash(sectionKey string) ([]byte, error) {
 	return s.EmptyTrashWithContext(context.Background(), sectionKey)
 }
 
@@ -145,7 +134,7 @@ func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
 	}
 
 	for _, library := range directory.Directory {
-		if err := s.EmptyTrashWithContext(ctx, library.Key); err != nil {
+		if _, err := s.EmptyTrashWithContext(ctx, library.Key); err != nil {
 			return fmt.Errorf("emptying section '%s' trash: %w", library.Title, err)
 		}
 	}

@@ -181,10 +181,7 @@ type GUID struct {
 
 // GetPlexSectionKey gets a section key from Plex based on a key path.
 func (s *Server) GetPlexSectionKey(keyPath string) (*MediaSection, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
-	defer cancel()
-
-	return s.GetPlexSectionKeyWithContext(ctx, keyPath)
+	return s.GetPlexSectionKeyWithContext(context.Background(), keyPath)
 }
 
 // GetPlexSectionKey gets a section key from Plex based on a key path.
@@ -209,10 +206,7 @@ func (s *Server) GetPlexSectionKeyWithContext(ctx context.Context, keyPath strin
 
 // GetDirectory returns data about all the library sections.
 func (s *Server) GetDirectory() (*SectionDirectory, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
-	defer cancel()
-
-	return s.GetDirectoryWithContext(ctx)
+	return s.GetDirectoryWithContext(context.Background())
 }
 
 // GetDirectoryWithContext returns data about all the library sections.
