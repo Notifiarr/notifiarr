@@ -31,23 +31,27 @@ type cmd struct {
 // Command container the input data for a defined command.
 // It also contains some saved data about the command being run.
 type Command struct {
-	Name      string        `json:"name" toml:"name" xml:"name" yaml:"name"`
-	Command   string        `json:"command" toml:"command" xml:"command" yaml:"command"`
-	Shell     bool          `json:"shell" toml:"shell" xml:"shell" yaml:"shell"`
-	Timeout   cnfg.Duration `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	LogOutput bool          `json:"logOutput" toml:"log_output" xml:"log_output" yaml:"logOutput"`
-	Hash      string        `json:"hash" toml:"-" xml:"-" yaml:"-"`
-	fails     int
-	runs      int
-	mu        sync.RWMutex
-	ch        chan website.EventType
-	log       mnd.Logger
+	Name    string        `json:"name" toml:"name" xml:"name" yaml:"name"`
+	Command string        `json:"command" toml:"command" xml:"command" yaml:"command"`
+	Shell   bool          `json:"shell" toml:"shell" xml:"shell" yaml:"shell"`
+	Log     bool          `json:"log" toml:"log" xml:"log" yaml:"log"`
+	Notify  bool          `json:"notify" toml:"notify" xml:"notify" yaml:"notify"`
+	Timeout cnfg.Duration `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	Hash    string        `json:"hash" toml:"-" xml:"-" yaml:"-"`
+	fails   int
+	runs    int
+	output  string // last output logged
+	lastRun time.Time
+	mu      sync.RWMutex
+	ch      chan website.EventType
+	log     mnd.Logger
+	website *website.Server
 }
 
 // New configures the library.
 func New(config *common.Config, commands []*Command) *Action {
 	for _, cmd := range commands {
-		cmd.setup(config.Logger)
+		cmd.Setup(config.Logger, config.Server)
 	}
 
 	return &Action{cmd: &cmd{Config: config, cmdlist: commands}}
@@ -85,8 +89,10 @@ func (a *Action) Create() {
 
 // Stats for a command's invocations.
 type Stats struct {
-	Runs  int
-	Fails int
+	Runs       int    `json:"runs"`
+	Fails      int    `json:"fails"`
+	LastOutput string `json:"output"`
+	LastRun    string `json:"last"`
 }
 
 // Stats returns statistics about a command.
@@ -94,9 +100,16 @@ func (c *Command) Stats() Stats {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	last := time.Since(c.lastRun).Round(time.Second).String()
+	if c.lastRun.IsZero() {
+		last = "never"
+	}
+
 	return Stats{
-		Runs:  c.runs,
-		Fails: c.fails,
+		Runs:       c.runs,
+		Fails:      c.fails,
+		LastOutput: c.output,
+		LastRun:    last,
 	}
 }
 

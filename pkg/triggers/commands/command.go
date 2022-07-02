@@ -10,44 +10,83 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
-	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/google/shlex"
 )
 
-// setup must run in the creation routine.
-func (c *Command) setup(logger mnd.Logger) {
-	c.log = logger
-	c.Hash = fmt.Sprintf("%x", md5.Sum([]byte(c.Command+strconv.FormatBool(c.Shell)))) //nolint:gosec
-
+// Setup must run in the creation routine.
+func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 	if c.Name == "" {
-		if args := strings.Fields(c.Command); len(args) > 0 {
+		if args, _ := shlex.Split(c.Command); len(args) > 0 {
 			c.Name = args[0]
 		}
 	}
+
+	c.Hash = fmt.Sprintf("%x", md5.Sum([]byte(c.Name+c.Command+strconv.FormatBool(c.Shell)))) //nolint:gosec
+	c.log = logger
+	c.website = website
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = defaultTimeout
 	}
 }
 
-// run executes this command and logs the output.
+// run executes this command and logs the output. This is executed from the trigger channel.
 func (c *Command) run(event website.EventType) {
-	output, err := c.exec(context.Background())
+	_, _ = c.RunNow(context.Background(), event)
+}
+
+// RunNow runs the command immediately, waits for and returns the output.
+func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, error) {
+	output, err := c.exec(ctx)
+	oLen := output.Len()
+	oStr := output.String()
+
+	eStr := ""
+	if err != nil {
+		eStr = err.Error()
+	}
+
+	// Send the notification before the lock.
+	if c.Notify {
+		c.website.SendData(&website.Request{
+			Route: "???", // TODO:
+			Event: event,
+			Payload: map[string]string{
+				"name":    c.Name,
+				"command": c.Command,
+				"hash":    c.Hash,
+				"output":  oStr,
+				"error":   eStr,
+			},
+			LogMsg:     fmt.Sprintf("Custom Command '%s' Output", c.Name),
+			LogPayload: c.Log,
+		})
+	}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.runs++
-
-	if c.LogOutput && output.Len() > 0 {
-		c.log.Printf("[%s requested] Custom Command '%s' Output: %s", output)
-	}
+	c.lastRun = time.Now().Round(time.Second)
+	c.output = oStr
 
 	if err != nil {
 		c.fails++
-		c.log.Errorf("[%s requested] Custom Command '%s' Failed: %w", c.Name, err)
+		c.output = eStr + ": " + oStr
+
+		if c.Log {
+			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %w, Output: %s", c.Name, err, oStr)
+		} else {
+			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %w", c.Name, err)
+		}
+	} else if c.Log && oLen > 0 {
+		c.log.Printf("[%s requested] Custom Command '%s' Output: %s", event, c.Name, oStr)
 	}
+
+	return oStr, err
 }
 
 // exec read-locks a command before running it and returning the output.
@@ -72,11 +111,9 @@ func run(ctx context.Context, command string, shell bool) (*bytes.Buffer, error)
 
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	// cmd.Env = env.Env()
-	// cmd.Env = append(cmd.Env, "PATH="+os.Getenv("PATH"))
 
 	if err := cmd.Run(); err != nil {
-		return &out, fmt.Errorf("running cmd %q: %w", strings.Join(cmd.Args, " "), err)
+		return &out, fmt.Errorf(`running cmd %q: %w`, cmd.Args, err)
 	}
 
 	return &out, nil
@@ -84,34 +121,47 @@ func run(ctx context.Context, command string, shell bool) (*bytes.Buffer, error)
 
 // getCmd returns the exec.Cmd for the provided arguments.
 func getCmd(ctx context.Context, command string, shell bool) (*exec.Cmd, error) {
-	args := strings.Fields(command)
-	if len(args) == 0 {
-		return nil, ErrNoCmd
-	}
-
-	cmdPath, err := filepath.Abs(args[0])
+	args, err := getArgs(command, shell)
 	if err != nil {
-		return nil, fmt.Errorf("finding command path: %w", err)
-	}
-
-	if shell {
-		if runtime.GOOS == mnd.Windows {
-			args = append([]string{"cmd", "/C"}, args...)
-		} else {
-			args = append([]string{"/bin/sh", "-c"}, args...)
-		}
+		return nil, err
 	}
 
 	var cmd *exec.Cmd
-
+	// nolint:gosec
 	switch len(args) {
 	case 0:
 		return nil, ErrNoCmd
 	case 1:
-		cmd = exec.CommandContext(ctx, cmdPath)
+		cmd = exec.CommandContext(ctx, args[0])
 	default:
-		cmd = exec.CommandContext(ctx, cmdPath, args[1:]...)
+		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
 	}
 
 	return cmd, nil
+}
+
+func getArgs(command string, shell bool) ([]string, error) {
+	if runtime.GOOS != mnd.Windows && shell {
+		return []string{"/bin/sh", "-c", command}, nil
+	}
+
+	// Special shell-split command.
+	args, err := shlex.Split(command)
+	if err != nil {
+		return nil, fmt.Errorf("splitting shell command: %w", err)
+	}
+
+	if len(args) == 0 {
+		return nil, ErrNoCmd
+	}
+
+	if args[0], err = filepath.Abs(args[0]); err != nil {
+		return nil, fmt.Errorf("finding command path: %w", err)
+	}
+
+	if shell { // if shell is set, we know it's windows.
+		return append([]string{"cmd", "/C"}, args...), nil
+	}
+
+	return args, nil
 }

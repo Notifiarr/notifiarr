@@ -278,12 +278,12 @@ retries = {{.Retries}}
 
 
 {{end}}{{if .NZBGet}}{{range .NZBGet}}[[nzbget]]
-name     = "{{.Name}}"
-url      = "{{.URL}}"
-user     = "{{.User}}"
-pass     = "{{.Pass}}"
-interval = "{{.Interval}}" # Service check duration (if name is not empty).
-timeout  = "{{.Timeout}}"
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  user     = "{{.User}}"
+  pass     = "{{.Pass}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"
 
 {{end}}
 {{else}}#[[nzbget]]
@@ -443,5 +443,33 @@ timeout  = "{{.Timeout}}"
   pipe  = true{{end}}{{if $item.MustExist}}
   must_exist = true{{end}}{{if $item.LogMatch}}
   log_match = true{{end}}{{end}}
+{{end}}{{end}}
+
+
+######################
+# Custom Commands #
+######################
+
+## Run and trigger custom commands.
+## Example:
+
+#[[command]]
+#  name    = 'some-name-for-logs'
+#  command = '/var/log/system.log'
+#  shell   = false
+#  log     = true
+#  notify  = true
+#  timeout = "10s"
+{{if .Commands}}
+## Configured Commands:
+{{- range $item := .Commands}}{{if $item}}
+
+[[command]]
+  name    = '{{$item.Name}}'
+  command = '''{{$item.Command}}'''
+  shell   = {{$item.Shell}}
+  log     = {{$item.Log}}
+  notify  = {{$item.Notify}}
+  timeout = "{{$item.Timeout}}"{{end}}
 {{end}}{{end}}
 `

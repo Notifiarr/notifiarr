@@ -6,10 +6,201 @@
                                 <hr>
                                 <p>
                                     <h3><i class="fas fa-comment"></i> Notes</h3>
-                                    <li><i class="fas fa-star"></i> This page isn't done yet.</li>
+                                    <li><i class="fas fa-star"></i> The green button will not run a command that has been changed. Save & Reload first!</li>
                                 </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <td colspan="7" class="text-center mobile-hide">
+                                                    <div style="float: left;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
+                                                    <h2 style="margin-bottom:-45px">Custom Commands</h2>
+                                                    <div style="float: right;">
+                                                        <button onclick="addCommand()" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="7" class="tablet-hide desktop-hide">
+                                                    <button id="commands-Commands-addbutton" onclick="addCommand()" data-names='["Name","Command","Shell","Log","Notify","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 style="margin-left:5px;display:inline;">Custom Commands</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:90px;min-width:90px;">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the custom command.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new custom command.<br>
+                                                        The <span class="text-success">green</span> button runs the command and displays the output.<br>
+                                                        Clicking the number in the middle displays command run statistics.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td style="min-width:120px;">
+                                                    <div style="display:none;" class="dialogText">Provide this command a pretty name for logs and notifications.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td style="min-width:190px;">
+                                                    <div style="display:none;" class="dialogText">Provide the actual command to run. Full paths preferred.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Command</span>
+                                                </td>
+                                                <td style="min-width:100px;width:100px;">
+                                                    <div style="display:none;" class="dialogText">Enabling shell causes the command to be wrapped with <code>sh -c</code> on *nix or <code>cmd.exe /C</code> on Windows.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Shell</span>
+                                                </td>
+                                                <td style="min-width:100px;width:100px;">
+                                                    <div style="display:none;" class="dialogText">Enable this option to log the command's output in the applicaton log.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Log</span>
+                                                </td>
+                                                <td style="min-width:100px;width:100px;">
+                                                    <div style="display:none;" class="dialogText">Enable this option to send a notification with the command's output.</b></div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Notify</span>
+                                                </td>
+                                                <td style="min-width:90px;width:90px;">
+                                                    <div style="display:none;" class="dialogText">Maximum amount of time to wait for the command to run. Recommend less than 60s.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="commands-Commands-container">
+                                        {{- range $index, $app := .Config.Commands}}
+                                            <input disabled style="display: none;" class="client-parameter commands-Commands{{$index}}-deleted" data-group="commands" data-label="Command {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="commands-Commands" id="commands-Commands-{{$index}}">
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;font-size:18px;">
+                                                        <button onclick="removeInstance('commands-Commands', '{{$index}}')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-trash-alt"></i></button>
+                                                        <div style="display:none;" class="dialogText" id="commandStats{{$index}}">This gets filled in by an ajax query.</div>
+                                                        <span class="dialogTitle" style="display:none;">Command Statistics</span>
+                                                        <button id="CommandsIndexLabel{{$index}}" class="btn btn-sm" onClick="getCmdStats($(this), '{{$index}}');" style="font-size:18px;width:35px;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Commands', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_COMMAND_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Commands.{{$index}}.Name" name="Commands.{{$index}}.Name"  data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_COMMAND_%d_COMMAND" $.Flags.EnvPrefix $index) )}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_COMMAND" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Commands.{{$index}}.Command" name="Commands.{{$index}}.Command" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Command" data-original="{{$app.Command}}" value="{{$app.Command}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_COMMAND_%d_SHELL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_SHELL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select autocomplete="off" id="Commands.{{$index}}.Shell" name="Commands.{{$index}}.Shell" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Shell" data-original="{{$app.Shell}}" value="{{$app.Shell}}">
+                                                                    <option {{if $app.Shell}}selected {{end}}value="true">Enabled</option>
+                                                                    <option {{if not $app.Shell}}selected {{end}}value="false">Disabled</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_COMMAND_%d_LOG" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_LOG" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select autocomplete="off" id="Commands.{{$index}}.Log" name="Commands.{{$index}}.Log" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Log" data-original="{{$app.Log}}" value="{{$app.Log}}">
+                                                                    <option {{if $app.Log}}selected {{end}}value="true">Enabled</option>
+                                                                    <option {{if not $app.Log}}selected {{end}}value="false">Disabled</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_COMMAND_%d_NOTIFY" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_NOTIFY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select autocomplete="off" id="Commands.{{$index}}.Notify" name="Commands.{{$index}}.Notify" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Notify" data-original="{{$app.Notify}}" value="{{$app.Notify}}">
+                                                                    <option {{if $app.Notify}}selected {{end}}value="true">Enabled</option>
+                                                                    <option {{if not $app.Notify}}selected {{end}}value="false">Disabled</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_COMMAND_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Commands.{{$index}}.Timeout" name="Commands.{{$index}}.Timeout" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Command {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {{- end}}
+                                            <tr id="commands-Commands-none"{{if .Config.Commands}} style="display: none;"{{end}}><td colspan="7">No custom commands configured.</td></tr>
+                                        </tbody>
                                     </table>
-                                </div>
 {{- /* end of commands (leave this comment) */ -}}

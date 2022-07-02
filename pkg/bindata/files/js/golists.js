@@ -232,6 +232,69 @@ function addWatchFiles()
     findPendingChanges();
 }
 
+function addCommand()
+{
+    const index = $('.commands-Commands').length;
+    const instance = index+1;
+    const names = $('#commands-Commands-addbutton').data('names'); // list of thinges like "Name" and "URL"
+    // This just sets the first few lines of the row (the action buttons). The more-dynamic bits get added below, in a for loop.
+    let row = '<tr class="newRow bk-success commands-Commands" id="commands-Commands-'+ instance +'">'+
+    '<td style="white-space:nowrap;">'+
+        '<div class="btn-group" role="group" style="display:flex;">'+
+            '<button onclick="removeInstance(\'commands-Commands\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-trash-alt"></i></button>'+
+            '<button id="filesIndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
+            '<button onClick="testInstance($(this), \'Commands\', \''+ index +'\')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>'+
+        '</div>'+
+    '</td>';
+
+    // Timeout and Interval must have valid go durations, or the parser errors.
+    // Host or URL are set with a value, and without an original value to make the save button appear.
+    for (const name of names) { 
+        row += '<td><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
+
+        switch (name) {
+            case "Log":
+                row += '<select id="Commands.'+ index +'.'+ name +'" name="Commands.'+ index +'.'+ name +'" data-index="'+ index +'" data-app="Commands" '+
+                'class="client-parameter form-control input-sm" data-group="commands" data-label="Command '+ instance +' '+ name +'" data-original="true" value="true">'+
+                '<option selected value="true">Enabled</option>'+
+                '<option value="false">Disabled</option></select>';
+                break;
+            case "Shell":
+            case "Notify":
+                row += '<select id="Commands.'+ index +'.'+ name +'" name="Commands.'+ index +'.'+ name +'" data-index="'+ index +'" data-app="Commands" '+
+                    'class="client-parameter form-control input-sm" data-group="commands" data-label="Command '+ instance +' '+ name +'" data-original="false" value="false">'+
+                    '<option value="true">Enabled</option>'+
+                    '<option selected value="false">Disabled</option></select>';
+                break;
+            case "Timeout":
+                row += '<input type="text" name="Commands.'+ index +'.'+ name +'" '+
+                    'id="Commands.'+ index +'.'+ name +'" '+
+                    'name="Commands.'+ index +'.'+ name +'" '+
+                    'data-app="Commands" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="commands" data-label="Command '+
+                    instance +' '+name+'" data-original="20s" value="20s">';
+                    break;
+            default:
+                row += '<input type="text" name="Commands.'+ index +'.'+ name +'" '+
+                    'id="Commands.'+ index +'.'+ name +'" '+
+                    'name="Commands.'+ index +'.'+ name +'" '+
+                    'data-app="Commands" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="commands" data-label="Command '+
+                    instance +' '+name+'" data-original="">';
+                break;
+        }
+
+        row += '</div></div></form></td>';
+    }
+
+    // Add this new data row to our table.
+    $('#commands-Commands-container').append(row);
+
+    // Hide the "no instances" item that displays when no instances are configured.
+    $('#commands-Commands-none').hide();
+
+    // Bring up the save changes button.
+    findPendingChanges();
+}
+
 function stopFileWatch(from, index)
 {
     from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-stop-circle');
