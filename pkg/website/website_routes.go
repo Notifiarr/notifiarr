@@ -124,15 +124,20 @@ const (
 
 // Path adds parameters to a route path and turns it into a string.
 func (r Route) Path(event EventType, params ...string) string {
+	sep := "?"
+	if strings.Contains(string(r), "?") {
+		sep = "&"
+	}
+
 	switch {
 	case len(params) == 0 && event == "":
 		return string(r)
 	case len(params) == 0:
-		return string(r) + "?event=" + string(event)
+		return string(r) + sep + "event=" + string(event)
 	case event == "":
-		return string(r) + "?" + strings.Join(params, "&")
+		return string(r) + sep + strings.Join(params, "&")
 	default:
-		return string(r) + "?" + strings.Join(append(params, "event="+string(event)), "&")
+		return string(r) + sep + strings.Join(append(params, "event="+string(event)), "&")
 	}
 }
 
