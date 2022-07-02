@@ -1,11 +1,12 @@
                                 <h1><i class="fas fa-running"></i> Commands</h1>
                                 <p>
                                     This application can be configured to run custom (shell) commands. 
-                                    These can be triggered from this interface, or as a premium feature, triggered from your Discord (or other chat) server.
+                                    These may be triggered from this interface, or as a premium feature, triggered from your supported chat server.
                                 </p>
                                 <hr>
                                 <p>
                                     <h3><i class="fas fa-comment"></i> Notes</h3>
+                                    <li><i class="fas fa-star"></i> Notify does not work yet, so don't bother enabling it.</li>
                                     <li><i class="fas fa-star"></i> The green button will not run a command that has been changed. Save & Reload first!</li>
                                 </p>
                                 <div class="table-responsive">
@@ -13,7 +14,7 @@
                                         <thead>
                                             <tr>
                                                 <td colspan="7" class="text-center mobile-hide">
-                                                    <div style="float: left;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
+                                                    <div style="float: left;font-size:35px;"><i class="fas fa-laptop-code"></i></div>
                                                     <h2 style="margin-bottom:-45px">Custom Commands</h2>
                                                     <div style="float: right;">
                                                         <button onclick="addCommand()" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
@@ -22,7 +23,7 @@
                                                 <td colspan="7" class="tablet-hide desktop-hide">
                                                     <button id="commands-Commands-addbutton" onclick="addCommand()" data-names='["Name","Command","Shell","Log","Notify","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Custom Commands</h2>
-                                                    <div style="float:right;"><img src="{{files}}/images/golift.png" style="height:50px;"></div>
+                                                    <div style="float:right;font-size:35px;"><i class="fas fa-laptop-code"></i></div>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -30,8 +31,9 @@
                                                     <div style="display:none;" class="dialogText">
                                                         The <span class="text-danger">red</span> button deletes the custom command.<br>
                                                         The <span class="text-primary">blue</span> button adds a new custom command.<br>
-                                                        The <span class="text-success">green</span> button runs the command and displays the output.<br>
-                                                        Clicking the number in the middle displays command run statistics.
+                                                        The <span class="text-brand">purple</span> button runs the command and stores the output.<br>
+                                                        The <span class="text-success">green</span> button tests the command and displays the output.<br>
+                                                        Clicking the number in the middle of a saved command displays statistics for that command.
                                                     </div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Actions</span>
@@ -78,7 +80,7 @@
                                                         <div style="display:none;" class="dialogText" id="commandStats{{$index}}">This gets filled in by an ajax query.</div>
                                                         <span class="dialogTitle" style="display:none;">Command Statistics</span>
                                                         <button id="CommandsIndexLabel{{$index}}" class="btn btn-sm" onClick="getCmdStats($(this), '{{$index}}');" style="font-size:18px;width:35px;">{{instance $index}}</button>
-                                                        <button onClick="testInstance($(this), 'Commands', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                        <button onClick="testInstance($(this), 'Commands', '{{$index}}')" type="button" class="btn btn-brand btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-play-circle"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -203,4 +205,5 @@
                                             <tr id="commands-Commands-none"{{if .Config.Commands}} style="display: none;"{{end}}><td colspan="7">No custom commands configured.</td></tr>
                                         </tbody>
                                     </table>
+                                </div>
 {{- /* end of commands (leave this comment) */ -}}

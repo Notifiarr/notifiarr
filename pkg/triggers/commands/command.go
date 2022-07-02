@@ -42,12 +42,14 @@ func (c *Command) run(event website.EventType) {
 // RunNow runs the command immediately, waits for and returns the output.
 func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, error) {
 	output, err := c.exec(ctx)
-	oLen := output.Len()
+	oLen := 0
 	oStr := output.String()
 
 	eStr := ""
 	if err != nil {
 		eStr = err.Error()
+	} else {
+		oLen = output.Len()
 	}
 
 	// Send the notification before the lock.
@@ -77,10 +79,10 @@ func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, 
 		c.fails++
 		c.output = eStr + ": " + oStr
 
-		if c.Log {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %w, Output: %s", c.Name, err, oStr)
+		if c.Log && oStr != "" {
+			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v, Output: %s", event, c.Name, err, oStr)
 		} else {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %w", c.Name, err)
+			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v", event, c.Name, err)
 		}
 	} else if c.Log && oLen > 0 {
 		c.log.Printf("[%s requested] Custom Command '%s' Output: %s", event, c.Name, oStr)

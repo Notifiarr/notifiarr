@@ -242,6 +242,8 @@ func (c *Client) renderTemplate(
 			"binary":    binary,
 			"environ":   environ(),
 			"docker":    mnd.IsDocker,
+			"uid":       os.Getuid(),
+			"gid":       os.Getgid(),
 		},
 		Expvar:   exp.GetAllData(),
 		HostInfo: hostInfo,

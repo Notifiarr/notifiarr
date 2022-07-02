@@ -39,7 +39,8 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	switch mux.Vars(request)["type"] {
 	case "Commands":
 		if len(c.Config.Commands) > index {
-			reply, code = testCustomCommand(request.Context(), c.Config.Commands[index])
+			c.Config.Commands[index].Run(website.EventGUI)
+			reply, code = fmt.Sprintf("Command Triggered: %s", c.Config.Commands[index].Name), http.StatusOK
 		} else if len(config.Commands) > index {
 			config.Commands[index].Setup(c.Logger, c.website)
 			reply, code = testCustomCommand(request.Context(), config.Commands[index])
