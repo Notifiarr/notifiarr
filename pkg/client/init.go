@@ -43,6 +43,7 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 	c.printDeluge()
 	c.printNZBGet()
 	c.printQbit()
+	c.printRtorrent()
 	c.printSABnzbd()
 	c.printPlex()
 	c.printTautulli()
@@ -293,6 +294,25 @@ func (c *Client) printQbit() {
 	for i, f := range c.Config.Qbit {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
 			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+	}
+}
+
+// printRtorrent is called on startup to print info about each configured server.
+func (c *Client) printRtorrent() {
+	if len(c.Config.Rtorrent) == 1 {
+		f := c.Config.Rtorrent[0]
+
+		c.Printf(" => rTorrent Config: 1 server: %s username:%s password:%v timeout:%s verify_ssl:%v",
+			f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+
+		return
+	}
+
+	c.Print(" => rTorrent Config:", len(c.Config.Rtorrent), "servers")
+
+	for i, f := range c.Config.Rtorrent {
+		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
+			i+1, f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
 	}
 }
 

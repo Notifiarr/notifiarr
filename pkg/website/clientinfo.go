@@ -198,6 +198,7 @@ func (s *Server) Info() map[string]interface{} {
 			"plex":     numPlex,
 			"prowlarr": len(s.config.Apps.Prowlarr),
 			"qbit":     len(s.config.Apps.Qbit),
+			"rtorrent": len(s.config.Apps.Rtorrent),
 			"radarr":   len(s.config.Apps.Radarr),
 			"readarr":  len(s.config.Apps.Readarr),
 			"tautulli": numTautulli,

@@ -173,6 +173,175 @@
                                         </tbody>
                                         <thead>
                                             <tr>
+                                                <td colspan="7" class="mobile-hide text-center">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/rtorrent.png" style="height:50px;"></div>
+                                                    <h2 class="mb-3" style="margin-bottom:-45px">rTorrent</h2>
+                                                    <div style="float: right;">
+                                                        <button id="download-Rtorrent-addbutton" onclick="addInstance('download', 'Rtorrent')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of rTorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="7" class="tablet-hide desktop-hide">
+                                                    <button id="download-Rtorrent-addbutton" onclick="addInstance('download', 'Rtorrent')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of rTorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 class="mb-3" style="margin-left:5px;display:inline;">rTorrent</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/logo/rtorrent.png" style="height:50px;"></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center" style="width:90px;min-width:90px;">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td style="min-width:130px;">
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td style="min-width:190px;">URL</td>
+                                                <td style="min-width:80px;">Username</td>
+                                                <td style="min-width:170px;">Password</td>
+                                                <td style="min-width:90px;width:90px">
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td style="min-width:90px;width:90px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="download-Rtorrent-container">
+                                        {{- range $index, $app := .Config.Apps.Rtorrent}}
+                                            <input disabled style="display: none;" class="client-parameter download-Rtorrent{{$index}}-deleted" data-group="download" data-label="rTorrent {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="download-Rtorrent" id="download-Rtorrent-{{$index}}">
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button onclick="removeInstance('download-Rtorrent', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button id="RtorrentIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Rtorrent', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_RTORRENT_%d_NAME" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.Name" name="Apps.Rtorrent.{{$index}}.Name" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_RTORRENT_%d_URL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.URL" name="Apps.Rtorrent.{{$index}}.URL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_RTORRENT_%d_USER" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_USER" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.User" name="Apps.Rtorrent.{{$index}}.User" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_RTORRENT_%d_PASS" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_PASS" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="password" autocomplete="off" id="Apps.Rtorrent.{{$index}}.Pass" name="Apps.Rtorrent.{{$index}}.Pass" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Rtorrent.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_RTORRENT_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.Interval" name="Apps.Rtorrent.{{$index}}.Interval" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_RTORRENT_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.Timeout" name="Apps.Rtorrent.{{$index}}.Timeout" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {{- end}}
+                                            <tr id="download-Rtorrent-none" {{if .Config.Apps.Rtorrent}} style="display: none;"{{end}}><td colspan="7">No rTorrent instances configured.</td></tr>
+                                        </tbody>
+                                        <thead>
+                                            <tr>
                                                 <td colspan="7" class="text-center mobile-hide">
                                                     <div style="float: left;"><img src="{{files}}/images/logo/deluge.png" style="height:50px;">
                                                     </div><h2 class="mb-3" style="margin-bottom:-45px">Deluge</h2>
