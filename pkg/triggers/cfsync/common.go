@@ -36,10 +36,13 @@ type cmd struct {
 
 // cfMapIDpayload is used to post-back ID changes for profiles and formats.
 type cfMapIDpayload struct {
-	Instance int     `json:"instance"`
-	RP       []idMap `json:"releaseProfiles,omitempty"`
-	QP       []idMap `json:"qualityProfiles,omitempty"`
-	CF       []idMap `json:"customFormats,omitempty"`
+	Instance int                `json:"instance"`
+	RP       []idMap            `json:"releaseProfiles,omitempty"`
+	QP       []idMap            `json:"qualityProfiles,omitempty"`
+	CF       []idMap            `json:"customFormats,omitempty"`
+	RPerr    map[int64][]string `json:"rpErrors,omitempty"`
+	QPerr    map[int64][]string `json:"qpErrors,omitempty"`
+	CFerr    map[int][]string   `json:"cfErrors,omitempty"`
 }
 
 // idMap is used a mapping list from old ID to new ID. Part of cfMapIDpayload.
