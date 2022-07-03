@@ -24,6 +24,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile", radarrQualityProfile, "GET")
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile", radarrAddQualityProfile, "POST")
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrUpdateQualityProfile, "PUT")
+	a.HandleAPIpath(starr.Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrDeleteQualityProfile, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/rootFolder", radarrRootFolders, "GET")
 	a.HandleAPIpath(starr.Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(starr.Radarr, "/tag", radarrGetTags, "GET")
@@ -36,6 +37,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrGetCustomFormats, "GET")
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrAddCustomFormat, "POST")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrUpdateCustomFormat, "PUT")
+	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrDeleteCustomFormat, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrGetImportLists, "GET")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrAddImportList, "POST")
 	a.HandleAPIpath(starr.Radarr, "/importlist/{ilid:[0-9]+}", radarrUpdateImportList, "PUT")
@@ -229,6 +231,21 @@ func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	err = getRadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
+}
+
+func radarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
+	profileID, _ := strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
+	if profileID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Delete the profile from radarr.
+	err := getRadarr(req).DeleteQualityProfileContext(req.Context(), profileID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting profile: %w", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -429,6 +446,17 @@ func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, output
+}
+
+func radarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
+	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
+
+	err := getRadarr(req).DeleteCustomFormatContext(req.Context(), cfID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting custom format: %w", err)
+	}
+
+	return http.StatusOK, "OK"
 }
 
 func radarrGetImportLists(req *http.Request) (int, interface{}) {
