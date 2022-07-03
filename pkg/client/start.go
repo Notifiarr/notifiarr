@@ -123,10 +123,7 @@ func (c *Client) start() error { //nolint:cyclop
 		return err
 	}
 
-	clientInfo, err := c.configureServices()
-	if err != nil {
-		return err
-	}
+	clientInfo := c.configureServices()
 
 	if newCon {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
@@ -254,7 +251,7 @@ func (c *Client) loadSiteAppsConfig(clientInfo *website.ClientInfo) { //nolint:c
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices() (*website.ClientInfo, error) {
+func (c *Client) configureServices() *website.ClientInfo {
 	c.website.Start()
 
 	clientInfo := c.loadSiteConfig()
@@ -271,7 +268,7 @@ func (c *Client) configureServices() (*website.ClientInfo, error) {
 	/**/
 	c.Config.Services.Start()
 
-	return clientInfo, nil
+	return clientInfo
 }
 
 func (c *Client) configureServicesPlex() {
@@ -363,12 +360,7 @@ func (c *Client) reloadConfiguration(event website.EventType, source string) err
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-
-	clientInfo, err := c.configureServices()
-	if err != nil {
-		return err
-	}
-
+	clientInfo := c.configureServices()
 	c.setupMenus(clientInfo)
 	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 

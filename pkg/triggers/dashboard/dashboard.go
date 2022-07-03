@@ -680,17 +680,12 @@ func (c *Cmd) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, er
 			state.OnDisk += int64(book.Statistics.BookFileCount)
 		}
 
-		author := "unknown author"
-		if book.Author != nil {
-			author = book.Author.AuthorName
-		}
-
 		if book.ReleaseDate.After(time.Now()) && book.Monitored && !have {
 			state.Next = append(state.Next, &Sortable{
 				id:   book.ID,
 				Name: book.Title,
 				Date: book.ReleaseDate,
-				Sub:  author,
+				Sub:  book.AuthorTitle,
 			})
 		}
 	}
@@ -732,7 +727,7 @@ func (c *Cmd) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
 		if book, err := app.GetBookByID(history.Records[idx].BookID); err == nil {
 			table = append(table, &Sortable{
 				Name: book.Title,
-				Sub:  book.Author.AuthorName,
+				Sub:  book.AuthorTitle,
 				Date: history.Records[idx].Date,
 			})
 		}
