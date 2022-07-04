@@ -272,6 +272,10 @@ func (s *Server) GetHostInfo() (*host.InfoStat, error) { //nolint:cyclop
 		}
 	}
 
+	if s.config.HostID != "" {
+		hostInfo.HostID = s.config.HostID
+	}
+
 	// This only happens once.
 	s.hostInfo = hostInfo
 
