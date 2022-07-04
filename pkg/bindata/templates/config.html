@@ -266,6 +266,36 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
+                                                            The Host ID parameter is used to uniquely identify this client installation. 
+                                                            Changing this value is discouraged; it should be found automatically.
+                                                            Do not copy this value to another Notifiarr client insallation.
+                                                        </div>
+                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                        <span class="dialogTitle">Host ID</span>
+                                                    </td>
+                                                    <td class="mobile-hide">
+                                                        {{.Config.HostID}}
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_HOST_ID" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_HOST_ID" .Flags.EnvPrefix}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <textarea id="HostID" name="HostID" class="client-parameter form-control input-sm" data-group="config" data-label="HostID" data-original="{{.Config.HostID}}">{{.Config.HostID}}</textarea>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div style="display:none;" class="dialogText">
                                                             Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications.
                                                             Spreads out CPU usage and lowers memory footprint.<br>
                                                             <b>Current Value</b>: <i>{{if .Config.Serial}}Disabled{{else}}Enabled{{end}}</i>

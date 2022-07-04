@@ -42,6 +42,7 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
+	HostID     string                 `json:"hostId" toml:"host_id" xml:"host_id" yaml:"hostId"`
 	UIPassword CryptPass              `json:"uiPassword" toml:"ui_password" xml:"ui_password" yaml:"uiPassword"`
 	BindAddr   string                 `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
 	SSLCrtFile string                 `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
@@ -166,21 +167,13 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 		MaxBody: c.MaxBody,
 		Retries: c.Retries,
 		Serial:  c.Serial,
+		HostID:  c.HostID,
 	})
-	c.setup()
 
-	return c.Services.Website, triggers.New(&triggers.Config{
-		Apps:       c.Apps,
-		Plex:       c.Plex,
-		Serial:     c.Serial,
-		Website:    c.Services.Website,
-		Snapshot:   c.Snapshot,
-		WatchFiles: c.WatchFiles,
-		Logger:     c.Services.Logger,
-	}), err
+	return c.Services.Website, c.setup(), err
 }
 
-func (c *Config) setup() {
+func (c *Config) setup() *triggers.Actions {
 	c.Mode = c.Services.Website.Mode
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
@@ -205,6 +198,16 @@ func (c *Config) setup() {
 	if c.Tautulli == nil {
 		c.Tautulli = &apps.TautulliConfig{}
 	}
+
+	return triggers.New(&triggers.Config{
+		Apps:       c.Apps,
+		Plex:       c.Plex,
+		Serial:     c.Serial,
+		Website:    c.Services.Website,
+		Snapshot:   c.Snapshot,
+		WatchFiles: c.WatchFiles,
+		Logger:     c.Services.Logger,
+	})
 }
 
 // FindAndReturn return a config file. Write one if requested.

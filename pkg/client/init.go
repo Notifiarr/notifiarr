@@ -29,6 +29,10 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
 	} else {
 		c.Printf("==> Unique ID: %s (%s)", hi.HostID, hi.Hostname)
+
+		if c.Config.HostID == "" {
+			c.Config.HostID = hi.HostID
+		}
 	}
 
 	title := cases.Title(language.AmericanEnglish)

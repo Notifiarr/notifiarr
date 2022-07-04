@@ -43,7 +43,9 @@ BINARYU:=$(shell echo $(BINARY) | tr -- - _)
 
 PACKAGE_SCRIPTS=
 ifeq ($(FORMULA),service)
-	PACKAGE_SCRIPTS=--after-install after-install-rendered.sh --before-remove before-remove-rendered.sh
+	PACKAGE_SCRIPTS=--before-install before-install-rendered.sh \
+	--after-install after-install-rendered.sh \
+	--before-remove before-remove-rendered.sh
 endif
 
 define PACKAGE_ARGS
@@ -51,6 +53,9 @@ $(PACKAGE_SCRIPTS) \
 --name $(BINARY) \
 --deb-no-default-config-files \
 --rpm-os linux \
+--deb-user $(BINARY) \
+--rpm-user $(BINARY) \
+--pacman-user $(BINARY) \
 --iteration $(ITERATION) \
 --license $(LICENSE) \
 --url $(SOURCE_URL) \
@@ -66,8 +71,8 @@ PLUGINS:=$(patsubst plugins/%/main.go,%,$(wildcard plugins/*/main.go))
 VERSION_LDFLAGS:= -X \"$(VERSION_PATH).Branch=$(BRANCH) ($(COMMIT))\" \
 	-X \"$(VERSION_PATH).BuildDate=$(DATE)\" \
 	-X \"$(VERSION_PATH).BuildUser=$(shell whoami)\" \
-  -X \"$(VERSION_PATH).Revision=$(ITERATION)\" \
-  -X \"$(VERSION_PATH).Version=$(VERSION)\"
+	-X \"$(VERSION_PATH).Revision=$(ITERATION)\" \
+	-X \"$(VERSION_PATH).Version=$(VERSION)\"
 
 # Makefile targets follow.
 
@@ -103,7 +108,8 @@ clean:
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).*.app.zip
 	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go
-	rm -rf aur package_build_* release after-install-rendered.sh before-remove-rendered.sh $(MACAPP).*.app $(MACAPP).app
+	rm -f before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh 
+	rm -rf aur package_build_* release $(MACAPP).*.app $(MACAPP).app
 
 ####################
 ##### Sidecars #####
@@ -309,7 +315,7 @@ $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
 	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
 
 # Build an environment that can be packaged for linux.
-package_build_linux_rpm: readme man plugins_linux_amd64 after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
+package_build_linux_rpm: readme man plugins_linux_amd64 before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY)
 	# Copying the binary, config file, unit file, and man page into the env.
@@ -325,7 +331,7 @@ package_build_linux_rpm: readme man plugins_linux_amd64 after-install-rendered.s
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
 
 # Build an environment that can be packaged for linux.
-package_build_linux_deb: readme man plugins_linux_amd64 after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
+package_build_linux_deb: readme man plugins_linux_amd64 before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY)
 	# Copying the binary, config file, unit file, and man page into the env.
@@ -347,6 +353,9 @@ $(BINARY).service:
 
 after-install-rendered.sh:
 	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/after-install.sh > after-install-rendered.sh
+
+before-install-rendered.sh:
+	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/before-install.sh > before-install-rendered.sh
 
 before-remove-rendered.sh:
 	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/before-remove.sh > before-remove-rendered.sh
@@ -398,7 +407,7 @@ package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 	cp $(BINARY).arm.linux $@/usr/bin/$(BINARY)
 
 # Build an environment that can be packaged for freebsd.
-package_build_freebsd: readme man after-install-rendered.sh before-remove-rendered.sh freebsd
+package_build_freebsd: readme man before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh freebsd
 	mkdir -p $@/usr/local/bin $@/usr/local/etc/$(BINARY) $@/usr/local/share/man/man1 $@/usr/local/share/doc/$(BINARY)
 	cp $(BINARY).amd64.freebsd $@/usr/local/bin/$(BINARY)
 	cp *.1.gz $@/usr/local/share/man/man1
