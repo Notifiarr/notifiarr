@@ -288,7 +288,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_HOST_ID" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <textarea id="HostID" name="HostID" class="client-parameter form-control input-sm" data-group="config" data-label="HostID" data-original="{{.Config.HostID}}">{{.Config.HostID}}</textarea>
+                                                                <input type="text" id="HostID" name="HostID" class="client-parameter form-control input-sm" data-group="config" data-label="HostID" data-original="{{.Config.HostID}}" value="{{.Config.HostID}}">
                                                             </div>
                                                         </div>
                                                     </td>
