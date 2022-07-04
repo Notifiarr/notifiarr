@@ -25,10 +25,14 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 		c.printVersionChangeInfo()
 	}
 
-	if hi, err := c.website.GetHostInfo(); err != nil {
+	switch hi, err := c.website.GetHostInfo(); {
+	case err != nil:
 		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
-	} else {
-		c.Printf("==> Unique ID: %s (%s)", hi.HostID, hi.Hostname)
+	case c.Config.HostID == "":
+		c.Config.HostID = hi.HostID
+		c.Printf("==> {UNSAVED} Unique Host ID: %s (%s)", c.Config.HostID, hi.Hostname)
+	default:
+		c.Printf("==> Unique Host ID: %s (%s)", hi.HostID, hi.Hostname)
 	}
 
 	title := cases.Title(language.AmericanEnglish)

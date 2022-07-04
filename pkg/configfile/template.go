@@ -74,6 +74,12 @@ max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
 mode  = "{{.Mode}}"
 {{end}}
 
+## HostID is used to uniquely identify this client's system.
+## Do not set or change this unless you have a good reason.
+## Do not copy this value to another server, every client must be unique.
+##
+host_id = "{{.HostID}}"
+
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
 ## Change it to /somethingelse/api by setting urlbase to "/somethingelse"
 ##
