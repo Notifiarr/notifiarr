@@ -9,20 +9,22 @@ import (
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
+var ErrInvalidResponse = fmt.Errorf("invalid response")
+
 func (c *Cmd) getRtorrentStates() []*State {
 	states := []*State{}
 
-	for instance, app := range c.Apps.NZBGet {
+	for instance, app := range c.Apps.Rtorrent {
 		if app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting NZBGet State: %d:%s", instance+1, app.URL)
+		c.Debugf("Getting rTorrent State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getRtorrentState(app)
+		state, err := c.getRtorrentState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting NZBGet Data from %d:%s: %v", instance+1, app.URL, err)
+			c.Errorf("Getting rTorrent Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -37,7 +39,7 @@ func (c *Cmd) getRtorrentState(instance int, rTorrent *apps.RtorrentConfig) (*St
 
 	data, err := getRtorrentData(rTorrent)
 	if err != nil {
-		return state, fmt.Errorf("instance %d: %w", instance, err)
+		return state, err
 	}
 
 	state.Elapsed.Duration = time.Since(start)
@@ -184,7 +186,7 @@ func rTorrentDownTotal(rTorrent *apps.RtorrentConfig) (int, error) {
 		return total, nil
 	}
 
-	return 0, fmt.Errorf("result isn't integer: %w", result)
+	return 0, fmt.Errorf("%w: result isn't integer: %s", ErrInvalidResponse, result)
 }
 
 // rTorrentUpTotal returns the total uploaded metric reported by this RTorrent instance (bytes).
@@ -202,5 +204,5 @@ func rTorrentUpTotal(rTorrent *apps.RtorrentConfig) (int, error) {
 		return total, nil
 	}
 
-	return 0, fmt.Errorf("result isn't integer: %w", result)
+	return 0, fmt.Errorf("%w: result isn't integer: %s", ErrInvalidResponse, result)
 }
