@@ -28,6 +28,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/cnfg"
 	"golift.io/cnfgfile"
 )
@@ -280,7 +281,7 @@ func (c *Config) Write(file string) (string, error) {
 	defer newFile.Close()
 
 	if c.HostID == "" {
-		c.HostID = website.GetHostID()
+		c.HostID, _ = host.HostID()
 	}
 
 	if err := Template.Execute(newFile, c); err != nil {
