@@ -33,7 +33,7 @@ func (c *Cmd) getRtorrentStates() []*State {
 	return states
 }
 
-func (c *Cmd) getRtorrentState(instance int, rTorrent *apps.RtorrentConfig) (*State, error) {
+func (c *Cmd) getRtorrentState(instance int, rTorrent *apps.RtorrentConfig) (*State, error) { //nolint:cyclop
 	state := &State{Instance: instance, Name: rTorrent.Name}
 	start := time.Now()
 
@@ -152,9 +152,16 @@ func rTorrentTorrents(rTorrent *apps.RtorrentConfig) ([]*RtorrentTorrent, error)
 
 	var torrents []*RtorrentTorrent
 
-	for _, outerResult := range results.([]interface{}) {
-		for _, innerResult := range outerResult.([]interface{}) {
-			torrentData := innerResult.([]interface{})
+	resInt, _ := results.([]interface{})
+	for _, outerResult := range resInt {
+		resOut, _ := outerResult.([]interface{})
+		for _, innerResult := range resOut {
+			torrentData, ok := innerResult.([]interface{})
+			if !ok {
+				return nil, fmt.Errorf("%w: data returned from query is unusable", ErrInvalidResponse)
+			}
+
+			//nolint:forcetypeassert // if these are bad it crashes here. :(
 			torrents = append(torrents, &RtorrentTorrent{
 				Name:      torrentData[0].(string),
 				Active:    torrentData[1].(int) > 0,
