@@ -279,6 +279,10 @@ func (c *Config) Write(file string) (string, error) {
 	}
 	defer newFile.Close()
 
+	if c.HostID == "" {
+		c.HostID = website.GetHostID()
+	}
+
 	if err := Template.Execute(newFile, c); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)
 	}

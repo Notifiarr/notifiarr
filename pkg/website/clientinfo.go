@@ -234,6 +234,19 @@ func (s *Server) hostInfoNoError() *host.InfoStat {
 	}
 }
 
+// GetHostID returns the host's ID. This may or may not match the client Host ID that is saved in config.
+func GetHostID() string {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) //nolint:gomnd
+	defer cancel()
+
+	hostInfo, err := host.InfoWithContext(ctx)
+	if err != nil {
+		return ""
+	}
+
+	return hostInfo.HostID
+}
+
 // GetHostInfo attempts to make a unique machine identifier...
 func (s *Server) GetHostInfo() (*host.InfoStat, error) { //nolint:cyclop
 	if s.hostInfo != nil {
