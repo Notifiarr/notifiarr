@@ -49,6 +49,7 @@ type Config struct {
 	MaxBody    int
 	Sighup     chan os.Signal
 	Mode       string
+	HostID     string
 	mnd.Logger // log file writer
 }
 
