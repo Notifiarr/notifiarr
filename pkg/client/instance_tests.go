@@ -137,13 +137,20 @@ func testQbit(config *qbit.Config) (string, int) {
 func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 	config.Setup(time.Minute)
 
-	name, err := config.RTorrent.Name()
+	result, err := config.Client.Call("system.hostname")
 	if err != nil {
 		return "Getting Server Name: " + err.Error(), http.StatusBadGateway
 	}
 
-	return fmt.Sprintf("Connection Successful! Server name: %s", name), http.StatusOK
+	if names, ok := result.([]interface{}); ok {
+		result = names[0]
+	}
 
+	if name, ok := result.(string); ok {
+		return fmt.Sprintf("Connection Successful! Server name: %s", name), http.StatusOK
+	}
+
+	return "Getting Server Name: result was not a string?", http.StatusBadGateway
 }
 
 func testSabNZB(config *apps.SabNZBConfig) (string, int) {

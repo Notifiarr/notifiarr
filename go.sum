@@ -320,6 +320,8 @@ golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5 h1:W9EKFeDCvnMCXrXZ/z33fmD
 golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5/go.mod h1:oXt/WBhSizIK6GmS2ka85IQ4TLmL2BFh4jHKR0bbThI=
 golift.io/datacounter v1.0.3 h1:qDIkyEMimhgWIbPoIZ3mjOP9hiwtO6yBcuyNYjea3l0=
 golift.io/datacounter v1.0.3/go.mod h1:79Yf1ucynYvZzVS/hpfrAFt6y/w82FMlOJgh+MBaZvs=
+golift.io/datacounter v1.0.4 h1:b2gLQCs8WYRtKjOMG0qM82rF1o0+oKUXB9QH7kjmxZ4=
+golift.io/datacounter v1.0.4/go.mod h1:79Yf1ucynYvZzVS/hpfrAFt6y/w82FMlOJgh+MBaZvs=
 golift.io/deluge v0.9.4-0.20220317021225-51ab09943349 h1:V9NFKPYXbieM/FpKF0paQ2I0rX6YozDmrBVO341bgeE=
 golift.io/deluge v0.9.4-0.20220317021225-51ab09943349/go.mod h1:VdlW8rst3JS+eYysPzS1Yk0VwH77q8eFod2UXteS0UM=
 golift.io/nzbget v0.1.2 h1:DetkelKmHHSztQ3H0dZ4E3yJcnQDDdwGTGk2DbxJVoE=

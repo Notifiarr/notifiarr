@@ -110,7 +110,7 @@ require (
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/text v0.3.7
-	golift.io/datacounter v1.0.3
+	golift.io/datacounter v1.0.4
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 

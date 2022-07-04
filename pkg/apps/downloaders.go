@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mrobinsn/go-rtorrent/rtorrent"
+	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/mrobinsn/go-rtorrent/xmlrpc"
 	"golift.io/cnfg"
 	"golift.io/deluge"
 	"golift.io/nzbget"
@@ -31,7 +32,7 @@ type QbitConfig struct {
 }
 
 type RtorrentConfig struct {
-	*rtorrent.RTorrent
+	*xmlrpc.Client
 	Name      string        `toml:"name" xml:"name" json:"name"`
 	URL       string        `toml:"url" xml:"url" json:"url"`
 	User      string        `toml:"user" xml:"user" json:"user"`
@@ -130,13 +131,11 @@ func (r *RtorrentConfig) Setup(timeout time.Duration) {
 		url = prefix + url
 	}
 
-	r.RTorrent = rtorrent.New(url, r.VerifySSL).WithHTTPClient(&http.Client{
+	r.Client = xmlrpc.NewClientWithHTTPClient(url, &http.Client{
 		Timeout: r.Timeout.Duration,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: r.VerifySSL, //nolint:gosec
-			},
-		},
+		Transport: exp.NewMetricsRoundTripper("rTorrent", &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: r.VerifySSL}, //nolint:gosec
+		}),
 	})
 }
 
