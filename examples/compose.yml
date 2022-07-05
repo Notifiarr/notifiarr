@@ -8,3 +8,4 @@
     volumes:
       - ${APPDATA}/notifiarr:/config
       - /var/run/utmp:/var/run/utmp
+      - /etc/machine-id:/etc/machine-id

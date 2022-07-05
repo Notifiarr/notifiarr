@@ -165,6 +165,8 @@ setuid notifiarr
 exec /usr/bin/notifiarr -c ${CONFIGFILE}
 EOT
 
+chown -R notifiarr: /etc/notifiarr
+
 echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
 status notifiarr
 if [ "$?" = "0" ]; then
