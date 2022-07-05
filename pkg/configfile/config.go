@@ -173,16 +173,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 		HostID:  c.HostID,
 	})
 
-	return c.Services.Website, triggers.New(&triggers.Config{
-		Apps:       c.Apps,
-		Plex:       c.Plex,
-		Serial:     c.Serial,
-		Website:    c.Services.Website,
-		Snapshot:   c.Snapshot,
-		WatchFiles: c.WatchFiles,
-		Commands:   c.Commands,
-		Logger:     c.Services.Logger,
-	}), err
+	return c.Services.Website, c.setup(), err
 }
 
 func (c *Config) setup() *triggers.Actions {
