@@ -54,7 +54,8 @@ type Config struct {
 
 // Plugins is optional configuration for "plugins".
 type Plugins struct {
-	MySQL []*MySQLConfig `toml:"mysql" xml:"mysql" json:"mysql"`
+	Nvidia *NvidiaConfig  `toml:"nvidia" xml:"nvidia" json:"nvidia"`
+	MySQL  []*MySQLConfig `toml:"mysql" xml:"mysql" json:"mysql"`
 }
 
 // Errors this package generates.
@@ -91,6 +92,7 @@ type Snapshot struct {
 	Processes  Processes                      `json:"processes,omitempty"`
 	ZFSPool    map[string]*Partition          `json:"zfsPools,omitempty"`
 	MySQL      map[string]*MySQLServerData    `json:"mysql,omitempty"`
+	Nvidia     []*NvidiaOutput                `json:"nvidia,omitempty"`
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -180,6 +182,7 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 	errs = append(errs, snap.getIOTop(ctx, c.UseSudo, c.IOTop))
 	errs = append(errs, snap.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
 	errs = append(errs, snap.getIoStat2(ctx, c.DiskUsage))
+	errs = append(errs, snap.getNvidiaData(ctx, c.Nvidia))
 
 	return errs, debug
 }
