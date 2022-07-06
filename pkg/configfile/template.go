@@ -283,7 +283,7 @@ retries = {{.Retries}}
 #pass     = ""
 
 
-{{end}}{{if .Rtorent}}{{range .Rtorent}}[[rtorrent]]
+{{end}}{{if .Rtorrent}}{{range .Rtorrent}}[[rtorrent]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
   user     = "{{.User}}"
