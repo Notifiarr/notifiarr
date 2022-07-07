@@ -8,8 +8,11 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // NvidiaConfig is our intput data.
@@ -34,17 +37,13 @@ type NvidiaOutput struct {
 
 // HasID returns true if the ID is requested, or no IDs are filtered.
 func (n *NvidiaConfig) HasID(busID string) bool {
-	if len(n.BusIDs) == 0 {
-		return true
-	}
-
 	for _, id := range n.BusIDs {
 		if id == busID {
 			return true
 		}
 	}
 
-	return false
+	return len(n.BusIDs) == 0
 }
 
 // GetNvidia requires nvidia-smi executable and Nvidia drivers.
@@ -60,30 +59,26 @@ func (s *Snapshot) GetNvidia(ctx context.Context, config *NvidiaConfig) error {
 		if _, err = os.Stat(cmdPath); err != nil {
 			return fmt.Errorf("unable to locate nvidia-smi at provided path '%s': %w", cmdPath, err)
 		}
-	} else if cmdPath, err = exec.LookPath("nvidia-smi"); err != nil {
+	} else if cmdPath, err = exec.LookPath(nvidiaSMIname()); err != nil {
 		// do not throw an error if nvidia-smi is missing.
 		// return fmt.Errorf("nvidia-smi missing! %w", err)
 		return nil //nolint:nilerr
 	}
 
-	cmd := exec.CommandContext(
-		ctx,
-		cmdPath,
-		"--format=csv,noheader",
-		"--query-gpu=name,"+
-			"driver_version,"+
-			"pstate,"+
-			"vbios_version,"+
-			"pci.bus_id,"+
-			"temperature.gpu,"+
-			"utilization.gpu,"+
-			"memory.total,"+
-			"memory.free",
+	cmd := exec.CommandContext(ctx, cmdPath, "--format=csv,noheader", "--query-gpu="+
+		"name,"+ // 0
+		"driver_version,"+ // 1
+		"pstate,"+ // 2
+		"vbios_version,"+ // 3
+		"pci.bus_id,"+ // 4
+		"temperature.gpu,"+ // 5
+		"utilization.gpu,"+ // 6
+		"memory.total,"+ // 7
+		"memory.free", // 8
 	)
 	sysCallSettings(cmd)
 
-	stderr := bytes.Buffer{}
-	stdout := bytes.Buffer{}
+	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	scanner := bufio.NewScanner(&stdout)
@@ -122,4 +117,12 @@ func (s *Snapshot) scanNvidiaSMIOutput(scanner *bufio.Scanner, config *NvidiaCon
 
 		s.Nvidia = append(s.Nvidia, &output)
 	}
+}
+
+func nvidiaSMIname() string {
+	if runtime.GOOS == mnd.Windows {
+		return "nvidia-smi.exe"
+	}
+
+	return "nvidia-smi"
 }
