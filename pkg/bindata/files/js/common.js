@@ -180,7 +180,7 @@ function jsLoader()
 {
     let path        = '';
     let script      = '';
-    const files     = ['navigation', 'golists', 'fileViewer', 'services', 'triggers', 'websocket'];
+    const files     = ['navigation', 'golists', 'fileViewer', 'services', 'triggers', 'websocket', 'filebrowser'];
 
     for (const file of files) {
         path        = URLBase+'files/js/' + file + '.js';

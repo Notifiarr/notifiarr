@@ -80,7 +80,7 @@ a:hover {
   text-align: left;
 }
 .btn-brand {
-  background: #37a6c4;
+  background: #6441A4;
   color: #fff;
 }
 .btn-brand:hover {
@@ -878,4 +878,8 @@ div .file-content .line-number {
     font-size:20px;
     width:35px;
     pointer-events:none;
+}
+
+.fileBrowser {
+  margin: 5px;
 }
