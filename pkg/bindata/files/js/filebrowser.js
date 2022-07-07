@@ -1,6 +1,6 @@
 function browseFiles(target) {
     $('<div>').dialog({
-        title: $(target).data('label'),
+        title: 'Choose File: ' + $(target).data('label'),
         modal: true,
         height: 'auto',
         resizable: false,
@@ -16,7 +16,7 @@ function browseFiles(target) {
         }
     }).dialog('open').browse({
         separator: DirSep,
-        name: 'Notifiarr',
+        name: 'Choose File: ' + $(target).data('label'),
         dir: function(path) {
             return new Promise(function(resolve, reject) {
                 $.ajax({
@@ -26,7 +26,7 @@ function browseFiles(target) {
                     dataType: 'json',
                     success: resolve,
                     error: function (response, status, error) {
-                        if (status === undefined) {
+                        if (response.responseText === undefined) {
                             toast('Web Server Error',
                                 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
                         } else {
@@ -40,6 +40,8 @@ function browseFiles(target) {
         open: function(filename) {
             $(target).val(filename);
             $('.ui-widget-overlay').siblings('.ui-dialog').find('.ui-dialog-content').dialog('close');
+            // Bring up the save changes button.
+            findPendingChanges();
         },
         item_class: function(_, name) {
             return name.match(/^[A-Z]:|^\/$/) ? 'drive' : '';

@@ -333,7 +333,7 @@ function savePendingChanges()
             toast('Config Saved', 'Wait 5 seconds; reloading the new configuration...', 'success');
         },
         error: function (response, status, error) {
-            if (status === undefined) {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
@@ -363,7 +363,7 @@ function saveProfileChanges()
             toast('Profile Saved', data, 'success');
         },
         error: function (response, status, error) {
-            if (error == "") {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
