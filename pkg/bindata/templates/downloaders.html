@@ -171,6 +171,7 @@
                                         {{- end}}
                                             <tr id="download-Qbit-none" {{if .Config.Apps.Qbit}} style="display: none;"{{end}}><td colspan="7">No Qbittorrent instances configured.</td></tr>
                                         </tbody>
+{{ template "downloaders-rtorrent.html" .}}  
                                         <thead>
                                             <tr>
                                                 <td colspan="7" class="text-center mobile-hide">

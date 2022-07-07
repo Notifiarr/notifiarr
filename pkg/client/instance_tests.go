@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
@@ -48,6 +49,10 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 	case "Qbit":
 		if len(config.Apps.Qbit) > index {
 			reply, code = testQbit(config.Apps.Qbit[index].Config)
+		}
+	case "Rtorrent":
+		if len(config.Apps.Rtorrent) > index {
+			reply, code = testRtorrent(config.Apps.Rtorrent[index])
 		}
 	case "SabNZB":
 		if len(config.Apps.SabNZB) > index {
@@ -134,6 +139,25 @@ func testQbit(config *qbit.Config) (string, int) {
 	} else {
 		return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
 	}
+}
+
+func testRtorrent(config *apps.RtorrentConfig) (string, int) {
+	config.Setup(time.Minute)
+
+	result, err := config.Client.Call("system.hostname")
+	if err != nil {
+		return "Getting Server Name: " + err.Error(), http.StatusBadGateway
+	}
+
+	if names, ok := result.([]interface{}); ok {
+		result = names[0]
+	}
+
+	if name, ok := result.(string); ok {
+		return fmt.Sprintf("Connection Successful! Server name: %s", name), http.StatusOK
+	}
+
+	return "Getting Server Name: result was not a string?", http.StatusBadGateway
 }
 
 func testSabNZB(config *apps.SabNZBConfig) (string, int) {
