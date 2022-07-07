@@ -384,7 +384,7 @@ timeout  = "{{.Timeout}}"
 
 [snapshot.nvidia]
 disabled = {{.Snapshot.Nvidia.Disabled}}
-smi_path = "{{.Snapshot.Nvidia.SMIPath}}"
+smi_path = '''{{.Snapshot.Nvidia.SMIPath}}'''
 bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
 
 ##################

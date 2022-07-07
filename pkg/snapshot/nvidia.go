@@ -5,13 +5,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"reflect"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 // NvidiaConfig is our intput data.
@@ -23,15 +21,15 @@ type NvidiaConfig struct {
 
 // NvidiaOutput is what we send to the website.
 type NvidiaOutput struct {
-	Name        string
-	Driver      string
-	Pstate      string
-	Vbios       string
-	BusID       string
-	Temperature int
-	Utilization int
-	MemTotal    int
-	MemFree     int
+	Name        string `json:"name"`
+	Driver      string `json:"driverVersion"`
+	Pstate      string `json:"pState"`
+	Vbios       string `json:"vBios"`
+	BusID       string `json:"busId"`
+	Temperature int    `json:"temperature"`
+	Utilization int    `json:"utiliization"`
+	MemTotal    int    `json:"memTotal"`
+	MemFree     int    `json:"memFree"`
 }
 
 // HasID returns true if the ID is requested, or no IDs are filtered.
@@ -84,50 +82,40 @@ func (s *Snapshot) GetNvidia(ctx context.Context, config *NvidiaConfig) error {
 	)
 	sysCallSettings(cmd)
 
-	stderr := &bytes.Buffer{}
-	stdout := &bytes.Buffer{}
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
+	stderr := bytes.Buffer{}
+	stdout := bytes.Buffer{}
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	scanner := bufio.NewScanner(&stdout)
+	scanner.Split(bufio.ScanLines)
 
-	var wg sync.WaitGroup
-	defer wg.Wait()
-	wg.Add(1)
-
-	go s.scanNvidiaSMIOutput(stdout, config, &wg)
+	defer s.scanNvidiaSMIOutput(scanner, config)
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%v: %w: %s", cmd.Args, err, stderr)
+		return fmt.Errorf("%v: %w: %s", cmd.Args, err, stderr.String())
 	}
 
 	return nil
 }
 
-func (s *Snapshot) scanNvidiaSMIOutput(stdout io.Reader, config *NvidiaConfig, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	scanner := bufio.NewScanner(stdout)
-	scanner.Split(bufio.ScanLines)
+func (s *Snapshot) scanNvidiaSMIOutput(scanner *bufio.Scanner, config *NvidiaConfig) {
 	// Output (1 card per line):
 	// NVIDIA GeForce GTX 1060 3GB, 465.19.01, P0, 86.06.3C.40.17, 00000000:04:00.0, 63, 2 %, 3017 MiB, 3017 MiB
+	// GeForce GTX 1660 Ti, 456.71, P2, 90.16.20.00.89, 00000000:01:00.0, 50, 0 %, 6144 MiB, 4292 MiB
 	for scanner.Scan() {
-		item := strings.Split(scanner.Text(), ",")
-		if len(item) != reflect.TypeOf(config).NumField() {
-			continue
-		}
-
-		busID := strings.TrimSpace(item[4])
-		if !config.HasID(busID) {
-			continue
+		item := strings.Split(scanner.Text(), ", ")
+		if len(item) != reflect.TypeOf(config).NumField() || !config.HasID(item[4]) {
+			continue // line has wrong item count, or ID not in list of allowed Bus IDs.
 		}
 
 		output := NvidiaOutput{
-			Name:   strings.TrimSpace(item[0]),
-			Driver: strings.TrimSpace(item[1]),
-			Pstate: strings.TrimSpace(item[2]),
-			Vbios:  strings.TrimSpace(item[3]),
-			BusID:  busID,
+			Name:   item[0],
+			Driver: item[1],
+			Pstate: item[2],
+			Vbios:  item[3],
+			BusID:  item[4],
 		}
-		output.Temperature, _ = strconv.Atoi(strings.TrimSpace(item[5]))
+		output.Temperature, _ = strconv.Atoi(item[5])
 		output.Utilization, _ = strconv.Atoi(strings.Fields(item[6])[0])
 		output.MemTotal, _ = strconv.Atoi(strings.Fields(item[7])[0])
 		output.MemFree, _ = strconv.Atoi(strings.Fields(item[8])[0])
