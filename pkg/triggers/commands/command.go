@@ -55,7 +55,7 @@ func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, 
 	// Send the notification before the lock.
 	if c.Notify {
 		c.website.SendData(&website.Request{
-			Route: "/no/path/for/commands/output/yet/sorry",
+			Route: website.CommandRoute,
 			Event: event,
 			Payload: map[string]string{
 				"name":    c.Name,

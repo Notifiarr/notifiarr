@@ -120,6 +120,7 @@ const (
 	TestRoute    Route = notifiRoute + "/test"
 	PkgRoute     Route = notifiRoute + "/packageManager"
 	LogLineRoute Route = notifiRoute + "/logWatcher"
+	CommandRoute Route = notifiRoute + "/command"
 )
 
 // Path adds parameters to a route path and turns it into a string.
