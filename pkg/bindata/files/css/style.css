@@ -85,7 +85,7 @@ a:hover {
 }
 .btn-brand:hover {
   color: #fff;
-  background: #2c849c;
+  background: #8155d4;
 }
 .btn-dark {
   background: #272727;
@@ -94,6 +94,14 @@ a:hover {
 .btn-dark:hover {
   color: #fff;
   background: #2c849c;
+}
+.btn-dgrey {
+  color: #fff;
+  background: #818181;
+}
+.btn-dgrey:hover {
+  color: #fff;
+  background: #444444;
 }
 .btn-red {
   background: #4f5362;

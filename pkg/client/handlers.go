@@ -78,15 +78,18 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
 	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")
 	gui.HandleFunc("/browse", c.handleFileBrowser).Queries("dir", "{dir}").Methods("GET")
+	gui.HandleFunc("/cmdstats/{command}", c.handleCommandStats).Methods("GET")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }
 
 // httpAPIHandlers initializes API routes.
 func (c *Client) httpAPIHandlers() {
+	c.Config.HandleAPIpath("", "info", c.infoHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
+
 	// Aggregate handlers. Non-app specific.
 	c.Config.HandleAPIpath("", "/trash/{app}", c.aggregateTrash, "POST")
 
@@ -222,10 +225,19 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 	title := cases.Title(language.AmericanEnglish)
 
 	switch trigger {
+	case "command":
+		cmd := c.triggers.Commands.GetByHash(content)
+		if cmd == nil {
+			return http.StatusBadRequest, "No command hash provided."
+		}
+
+		cmd.Run(source)
+
+		return http.StatusOK, "Command triggered: " + cmd.Name
 	case "cfsync":
 		c.triggers.CFSync.SyncRadarrCF(source)
 		return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated."
-	case "qpsync":
+	case "rpsync":
 		c.triggers.CFSync.SyncSonarrRP(source)
 		return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated."
 	case "services":

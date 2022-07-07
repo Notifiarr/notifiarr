@@ -134,6 +134,7 @@ func (s *Snapshot) scanMegaCLI(stdout *bufio.Scanner, waitg *sync.WaitGroup) {
 	}
 
 	if current != nil {
+		// Append the final (last) VD.
 		s.Raid.MegaCLI = append(s.Raid.MegaCLI, current)
 	}
 
