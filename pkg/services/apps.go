@@ -192,7 +192,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Name:     app.Name,
 				Type:     CheckHTTP,
 				Value:    app.URL,
-				Expect:   "200",
+				Expect:   "401", // could not find a 200...
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
 			})
