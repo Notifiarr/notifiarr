@@ -11,6 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/cfsync"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/crontimer"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
@@ -30,6 +31,7 @@ type Config struct {
 	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
+	Commands   []*commands.Command
 	mnd.Logger
 }
 
@@ -47,6 +49,7 @@ type Actions struct {
 	Gaps       *gaps.Action
 	SnapCron   *snapcron.Action
 	StuckItems *stuckitems.Action
+	Commands   *commands.Action
 }
 
 // New turns a populated Config into a pile of Actions.
@@ -70,6 +73,7 @@ func New(config *Config) *Actions {
 		Gaps:       gaps.New(common),
 		SnapCron:   snapcron.New(common),
 		StuckItems: stuckitems.New(common),
+		Commands:   commands.New(common, config.Commands),
 		timers:     common,
 	}
 }

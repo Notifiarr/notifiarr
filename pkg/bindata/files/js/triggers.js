@@ -45,3 +45,24 @@ function testRegex()
         }
     });
 }
+
+// getCmdStats returns the cmdstats template for a specific command.
+function getCmdStats(caller, index)
+{
+    toast('Working', 'Getting stats!', 'success', 2200);
+    $.ajax({
+        url: URLBase+'cmdstats/'+index,
+        success: function (data){
+            $('#commandStats'+index).html(data);
+            dialog(caller, 'left');
+        },
+        error: function (response, status, error) {
+            if (error == "") {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 20000);
+            } else {
+                toast(error, response.responseText, 'error', 15000);
+            }
+        }
+    });
+}

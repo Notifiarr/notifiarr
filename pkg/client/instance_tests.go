@@ -14,6 +14,8 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"golift.io/deluge"
 	"golift.io/nzbget"
@@ -26,7 +28,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-func testInstance(response http.ResponseWriter, request *http.Request) { //nolint:funlen,cyclop,gocognit,gocyclo
+//nolint:funlen,cyclop,gocognit,gocyclo
+func (c *Client) testInstance(response http.ResponseWriter, request *http.Request) {
 	config := configfile.Config{}
 	if err := configPostDecoder.Decode(&config, request.PostForm); err != nil {
 		http.Error(response, "Decoding POST data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
@@ -37,6 +40,14 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 	reply, code := "Unknown Check Type Requested!", http.StatusNotImplemented
 
 	switch mux.Vars(request)["type"] {
+	case "Commands":
+		if len(c.Config.Commands) > index {
+			c.Config.Commands[index].Run(website.EventGUI)
+			reply, code = fmt.Sprintf("Command Triggered: %s", c.Config.Commands[index].Name), http.StatusOK
+		} else if len(config.Commands) > index {
+			config.Commands[index].Setup(c.Logger, c.website)
+			reply, code = testCustomCommand(request.Context(), config.Commands[index])
+		}
 	// Downloaders.
 	case "NZBGet":
 		if len(config.Apps.NZBGet) > index {
@@ -129,6 +140,18 @@ func testNZBGet(config *nzbget.Config) (string, int) {
 	}
 
 	return fmt.Sprintf("Connection Successful! Version: %s", ver), http.StatusOK
+}
+
+func testCustomCommand(ctx context.Context, cmd *commands.Command) (string, int) {
+	ctx, cancel := context.WithTimeout(ctx, cmd.Timeout.Duration)
+	defer cancel()
+
+	output, err := cmd.RunNow(ctx, website.EventGUI)
+	if err != nil {
+		return fmt.Sprintf("Command Failed! Error: %v", err), http.StatusInternalServerError
+	}
+
+	return fmt.Sprintf("Command Successful! Output: %s", output), http.StatusOK
 }
 
 func testQbit(config *qbit.Config) (string, int) {

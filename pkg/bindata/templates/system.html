@@ -15,11 +15,11 @@
                                                 <td style="display:none;"></td>
                                                 <td colspan="2">
                                                     {{- if .ClientInfo.IsSub}}
-                                                    <font color="green"><i class="fas fa-user" style="float:left;font-size:40px"></i></font>
+                                                    <font color="green"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-tie{{end}}" style="float:left;font-size:40px"></i></font>
                                                     {{- else if .ClientInfo.IsPatron}}
-                                                    <font color="purple"><i class="fas fa-user" style="float:left;font-size:40px"></i></font>
+                                                    <font color="purple"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-ninja{{end}}" style="float:left;font-size:40px"></i></font>
                                                     {{- else}}
-                                                    <i class="fas fa-user" style="float:left;font-size:40px"></i>
+                                                    <i class="fas fa-user-alt" style="float:left;font-size:40px"></i>
                                                     {{- end}}
                                                     <h4>User</h4>
                                                 </td>
@@ -110,7 +110,7 @@
                                                  <td style="display:none;"></td>
                                                  <td style="display:none;"></td>
                                                  <td colspan="2">
-                                                     <i class="fas fa-desktop" style="float:left;font-size:40px"></i>
+                                                     <i class="fas fa-server" style="float:left;font-size:40px"></i>
                                                      <h4>Operating System</h4>
                                                  </td>
                                              </tr>
@@ -145,19 +145,19 @@
                                              {{- end }}
                                              <tr>
                                                  <td>Operating System</td>
-                                                 <td>{{.Version.os}} ({{.Version.arch}}}</td>
+                                                 <td>{{.Version.os}} ({{.Version.arch}})</td>
                                                  <td style="display:none;"></td>
                                              </tr>
                                              <tr class="text-center">
                                                  <td style="display:none;"></td>
                                                  <td style="display:none;"></td>
                                                  <td colspan="2">
-                                                     <i class="fas fa-terminal" style="float:left;font-size:40px"></i>
+                                                     <i class="fas fa-sliders-h" style="float:left;font-size:40px"></i>
                                                      <h4>Startup Parameters</h4>
                                                  </td>
                                              </tr>
                                              <tr>
-                                                 <td>Binary</td>
+                                                 <td>Binary Path</td>
                                                  <td>{{.Version.binary}}</td>
                                                  <td style="display:none;"></td>
                                              </tr>
@@ -180,26 +180,16 @@
                                              {{- end}}
                                              {{- if .Flags.Assets}}
                                              <tr>
-                                                 <td>Assets</td>
+                                                 <td>Assets Path</td>
                                                  <td>{{.Flags.Assets}}</td>
                                                  <td style="display:none;"></td>
                                              </tr>
                                              {{- end}}
-                                             <tr class="text-center">
-                                                 <td style="display:none;"></td>
-                                                 <td style="display:none;"></td>
-                                                 <td colspan="2">
-                                                     <i class="fas fa-outdent" style="float:left;font-size:40px"></i>
-                                                     <h4>Environment</h4>
-                                                 </td>
-                                             </tr>
-                                             {{- range $k, $v := .Version.environ }}
                                              <tr>
-                                                 <td>{{$k}}</td>
-                                                 <td style="word-wrap:break-word;max-width:400px;">{{$v}}</td>
-                                                 <td style="display:none;"></td>
-                                             </tr>
-                                             {{- end }}
+                                                <td>User, Group IDs</td>
+                                                <td>{{.Version.uid}}, {{.Version.gid}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
                                              <tr class="text-center">
                                                  <td style="display:none;"></td>
                                                  <td style="display:none;"></td>
@@ -222,6 +212,21 @@
                                                  </td>
                                              </tr>
                                              {{- end }}
+                                             <tr class="text-center">
+                                                <td style="display:none;"></td>
+                                                <td style="display:none;"></td>
+                                                <td colspan="2">
+                                                    <i class="fas fa-cloud-sun-rain" style="float:left;font-size:40px"></i>
+                                                    <h4>Environment</h4>
+                                                </td>
+                                            </tr>
+                                            {{- range $k, $v := .Version.environ }}
+                                            <tr>
+                                                <td>{{$k}}</td>
+                                                <td style="word-wrap:break-word;max-width:400px;">{{$v}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
+                                            {{- end }}
                                          </tbody>
                                     </table>
                                 </div>
