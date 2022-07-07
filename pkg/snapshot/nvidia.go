@@ -49,8 +49,8 @@ func (n *NvidiaConfig) HasID(busID string) bool {
 	return false
 }
 
-// getNvidiaData requires nvidia-smi executable and Nvidia drivers.
-func (s *Snapshot) getNvidiaData(ctx context.Context, config *NvidiaConfig) error {
+// GetNvidia requires nvidia-smi executable and Nvidia drivers.
+func (s *Snapshot) GetNvidia(ctx context.Context, config *NvidiaConfig) error {
 	if config == nil || config.Disabled {
 		return nil
 	}

@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/exec"
 	"strconv"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -76,6 +78,11 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 	case "MySQL":
 		if config.Snapshot != nil && config.Snapshot.Plugins != nil && len(config.Snapshot.Plugins.MySQL) > index {
 			reply, code = testMySQL(request.Context(), config.Snapshot.Plugins.MySQL[index])
+		}
+		// Snapshots.
+	case "Nvidia":
+		if config.Snapshot != nil && config.Snapshot.Plugins != nil && config.Snapshot.Plugins.Nvidia != nil {
+			reply, code = testNvidia(request.Context(), config.Snapshot.Plugins.Nvidia)
 		}
 	// Services.
 	case "Tcp":
@@ -197,6 +204,40 @@ func testMySQL(ctx context.Context, config *snapshot.MySQLConfig) (string, int) 
 	}
 
 	return "Connection Successful!", http.StatusOK
+}
+
+func testNvidia(ctx context.Context, config *snapshot.NvidiaConfig) (string, int) {
+	if config.SMIPath != "" {
+		if _, err := os.Stat(config.SMIPath); err != nil {
+			return fmt.Sprintf("nvidia-smi not found at provided path '%s': %v", config.SMIPath, err), http.StatusNotAcceptable
+		}
+	} else if _, err := exec.LookPath("nvidia-smi"); err != nil {
+		return fmt.Sprintf("unable to locate nvidia-smi in PATH '%s'", os.Getenv("PATH")), http.StatusNotAcceptable
+	}
+
+	snaptest := &snapshot.Snapshot{}
+	config.Disabled = false
+
+	if err := snaptest.GetNvidia(ctx, config); err != nil {
+		return err.Error(), http.StatusBadGateway
+	}
+
+	msg := fmt.Sprintf("SMI found %d Graphics Adapter", len(snaptest.Nvidia))
+
+	switch len(snaptest.Nvidia) {
+	case 0:
+		msg += "s."
+	case 1:
+		msg += ":"
+	default:
+		msg += "s:"
+	}
+
+	for _, adapter := range snaptest.Nvidia {
+		msg += "<br>" + adapter.BusID
+	}
+
+	return msg, http.StatusOK
 }
 
 func testTCP(svc *services.Service) (string, int) {

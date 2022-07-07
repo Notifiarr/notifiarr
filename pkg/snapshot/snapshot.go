@@ -182,7 +182,7 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 	errs = append(errs, snap.getIOTop(ctx, c.UseSudo, c.IOTop))
 	errs = append(errs, snap.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
 	errs = append(errs, snap.getIoStat2(ctx, c.DiskUsage))
-	errs = append(errs, snap.getNvidiaData(ctx, c.Nvidia))
+	errs = append(errs, snap.GetNvidia(ctx, c.Nvidia))
 
 	return errs, debug
 }
