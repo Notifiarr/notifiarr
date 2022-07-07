@@ -48,7 +48,7 @@ func testInstance(response http.ResponseWriter, request *http.Request) { //nolin
 		if len(config.Apps.Qbit) > index {
 			reply, code = testQbit(config.Apps.Qbit[index].Config)
 		}
-	case "rTorrent":
+	case "Rtorrent":
 		if len(config.Apps.Rtorrent) > index {
 			reply, code = testRtorrent(config.Apps.Rtorrent[index])
 		}

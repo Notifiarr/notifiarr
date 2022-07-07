@@ -60,6 +60,10 @@ func (c *Cmd) getRtorrentState(instance int, rTorrent *apps.RtorrentConfig) (*St
 			state.Uploading++
 		}
 
+		if xfer.Message != "" {
+			state.Errors++
+		}
+
 		if xfer.DownRate > 0 {
 			state.Downloading++
 		}
@@ -122,6 +126,7 @@ func getRtorrentData(rTorrent *apps.RtorrentConfig) (*rTorrentData, error) {
 
 type RtorrentTorrent struct {
 	Name      string
+	Message   string
 	Active    bool // inactive/active
 	Size      int  // Total Size in bytes
 	UpRate    int
@@ -136,6 +141,7 @@ func rTorrentTorrents(rTorrent *apps.RtorrentConfig) ([]*RtorrentTorrent, error)
 		"",
 		string(rtorrent.ViewMain),
 		rtorrent.DName.Query(),
+		"d.message=",
 		rtorrent.DIsActive.Query(),
 		rtorrent.DSizeInBytes.Query(),
 		rtorrent.DUpRate.Query(),
@@ -164,13 +170,14 @@ func rTorrentTorrents(rTorrent *apps.RtorrentConfig) ([]*RtorrentTorrent, error)
 			//nolint:forcetypeassert // if these are bad it crashes here. :(
 			torrents = append(torrents, &RtorrentTorrent{
 				Name:      torrentData[0].(string),
-				Active:    torrentData[1].(int) > 0,
-				Size:      torrentData[2].(int),
-				UpRate:    torrentData[3].(int),
-				DownRate:  torrentData[4].(int),
-				Completed: torrentData[5].(int),
-				Finished:  time.Unix(int64(torrentData[6].(int)), 0),
-				Started:   time.Unix(int64(torrentData[7].(int)), 0),
+				Message:   torrentData[1].(string),
+				Active:    torrentData[2].(int) > 0,
+				Size:      torrentData[3].(int),
+				UpRate:    torrentData[4].(int),
+				DownRate:  torrentData[5].(int),
+				Completed: torrentData[6].(int),
+				Finished:  time.Unix(int64(torrentData[7].(int)), 0),
+				Started:   time.Unix(int64(torrentData[8].(int)), 0),
 			})
 		}
 	}
