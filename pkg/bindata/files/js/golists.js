@@ -242,7 +242,7 @@ function addCommand()
     '<td style="white-space:nowrap;">'+
         '<div class="btn-group" role="group" style="display:flex;">'+
             '<button onclick="removeInstance(\'commands-Commands\', '+ instance +')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-trash-alt"></i></button>'+
-            '<button id="filesIndexLabel'+ index +'" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">'+ instance +'</button>'+
+            '<button id="filesIndexLabel'+ index +'" class="btn btn-sm btn-dark" style="font-size:18px;width:40px;pointer-events:none;"><i class="text-success fa fa-exclamation-triangle"></i></button>'+
             '<button onClick="testInstance($(this), \'Commands\', \''+ index +'\')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>'+
         '</div>'+
     '</td>';

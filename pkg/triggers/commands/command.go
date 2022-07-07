@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -25,7 +24,8 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 		}
 	}
 
-	c.Hash = fmt.Sprintf("%x", md5.Sum([]byte(c.Name+c.Command+strconv.FormatBool(c.Shell)))) //nolint:gosec
+	hash := md5.Sum([]byte(fmt.Sprint(c.Name, c.Command, c.Shell, c.Log, c.Notify, c.Timeout))) //nolint:gosec
+	c.Hash = fmt.Sprintf("%x", hash)
 	c.log = logger
 	c.website = website
 

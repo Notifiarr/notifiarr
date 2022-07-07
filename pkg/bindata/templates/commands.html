@@ -1,13 +1,13 @@
                                 <h1><i class="fas fa-running"></i> Commands</h1>
                                 <p>
                                     This application can be configured to run custom (shell) commands. 
-                                    These may be triggered from this interface, or as a premium feature, triggered from your supported chat server.
+                                    These may be triggered from this interface. Subscription users may trigger them from a supported chat server (ie. Discord).
+                                    Other trigger-options are created as requested.
                                 </p>
                                 <hr>
                                 <p>
                                     <h3><i class="fas fa-comment"></i> Notes</h3>
-                                    <li><i class="fas fa-star"></i> Notify does not work yet, so don't bother enabling it.</li>
-                                    <li><i class="fas fa-star"></i> The green button will not run a command that has been changed. Save & Reload first!</li>
+                                    <li><i class="fas fa-star"></i> The green button will not run a command that has been modified. Save & Reload first!</li>
                                 </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
@@ -33,7 +33,7 @@
                                                         The <span class="text-primary">blue</span> button adds a new custom command.<br>
                                                         The <span class="text-brand">purple</span> button runs the command and stores the output.<br>
                                                         The <span class="text-success">green</span> button tests the command and displays the output.<br>
-                                                        Clicking the number in the middle of a saved command displays statistics for that command.
+                                                        The <span class="text-dgrey">rocket</span> displays statistics for that [saved] command.
                                                     </div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Actions</span>
@@ -79,11 +79,11 @@
                                                         <button onclick="removeInstance('commands-Commands', '{{$index}}')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-trash-alt"></i></button>
                                                         <div style="display:none;" class="dialogText" id="commandStats{{$index}}">This gets filled in by an ajax query.</div>
                                                         <span class="dialogTitle" style="display:none;">Command Statistics</span>
-                                                        <button id="CommandsIndexLabel{{$index}}" class="btn btn-sm" onClick="getCmdStats($(this), '{{$index}}');" style="font-size:18px;width:35px;">{{instance $index}}</button>
+                                                        <button id="CommandsIndexLabel{{$index}}" class="btn btn-sm btn-dgrey" onClick="getCmdStats($(this), '{{$index}}');" style="font-size:20px;width:40px;"><i class="fas fa-rocket"></i></button>
                                                         <button onClick="testInstance($(this), 'Commands', '{{$index}}')" type="button" class="btn btn-brand btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-play-circle"></i></button>
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td title="{{$app.Hash}}">
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
