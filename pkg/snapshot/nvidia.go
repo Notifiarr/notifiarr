@@ -99,7 +99,7 @@ func (s *Snapshot) scanNvidiaSMIOutput(scanner *bufio.Scanner, config *NvidiaCon
 	// GeForce GTX 1660 Ti, 456.71, P2, 90.16.20.00.89, 00000000:01:00.0, 50, 0 %, 6144 MiB, 4292 MiB
 	for scanner.Scan() {
 		item := strings.Split(scanner.Text(), ", ")
-		if len(item) != reflect.TypeOf(config).NumField() || !config.HasID(item[4]) {
+		if len(item) != reflect.TypeOf(NvidiaOutput{}).NumField() || !config.HasID(item[4]) {
 			continue // line has wrong item count, or ID not in list of allowed Bus IDs.
 		}
 
