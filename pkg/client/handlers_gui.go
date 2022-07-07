@@ -367,12 +367,24 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 		return
 	}
 
-	testInstance(response, request)
+	c.testInstance(response, request)
 }
 
 func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
 	code, data := c.runTrigger(website.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
 	http.Error(response, data, code)
+}
+
+func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.Request) {
+	cID, _ := strconv.Atoi(mux.Vars(request)["command"])
+	if cID < 0 || cID >= len(c.triggers.Commands.List()) {
+		http.Error(response, "Invalid command ID provided", http.StatusBadRequest)
+	}
+
+	cmd := c.triggers.Commands.List()[cID]
+	if err := c.templat.ExecuteTemplate(response, "cmdstats.html", cmd); err != nil {
+		http.Error(response, "template error: "+err.Error(), http.StatusOK)
+	}
 }
 
 // handleProcessList just returns the running process list for a human to view.
@@ -557,6 +569,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 
 	config.Plex = nil
 	config.WatchFiles = nil
+	config.Commands = nil
 	config.Service = nil
 	config.Snapshot.Plugins.MySQL = nil
 

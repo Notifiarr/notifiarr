@@ -24,6 +24,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -61,6 +62,7 @@ type Config struct {
 	Service    []*services.Service    `json:"service" toml:"service" xml:"service" yaml:"service"`
 	EnableApt  bool                   `json:"apt" toml:"apt" xml:"apt" yaml:"apt"`
 	WatchFiles []*filewatch.WatchFile `json:"watchFiles" toml:"watch_file" xml:"watch_file" yaml:"watchFiles"`
+	Commands   []*commands.Command    `json:"commands" toml:"command" xml:"command" yaml:"commands"`
 	*logs.LogConfig
 	*apps.Apps
 	Allow AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
@@ -207,6 +209,7 @@ func (c *Config) setup() *triggers.Actions {
 		Website:    c.Services.Website,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
+		Commands:   c.Commands,
 		Logger:     c.Services.Logger,
 	})
 }

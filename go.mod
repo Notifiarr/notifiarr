@@ -43,7 +43,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/cabbie v1.0.3 // indirect
-	github.com/google/glazier v0.0.0-20220701005559-3b816b88e30e // indirect
+	github.com/google/glazier v0.0.0-20220701183807-c2e83cfef969 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
@@ -65,7 +65,7 @@ require (
 	github.com/tklauser/numcpus v0.5.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
-	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b
+	golang.org/x/sys v0.0.0-20220701225701-179beb0bd1a1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
@@ -114,13 +114,14 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 
-require golift.io/nzbget v0.1.2
+require golift.io/nzbget v0.1.3-0.20220701235118-24fa142aefc6
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gorilla/rpc v1.2.0 // indirect
 	github.com/mrobinsn/go-rtorrent v1.8.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
