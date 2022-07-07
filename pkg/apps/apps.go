@@ -42,6 +42,7 @@ type Apps struct {
 	Prowlarr []*ProwlarrConfig `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
 	Deluge   []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
 	Qbit     []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
+	Rtorrent []*RtorrentConfig `json:"rtorrent,omitempty" toml:"rtorrent" xml:"rtorrent" yaml:"rtorrent,omitempty"`
 	SabNZB   []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
 	NZBGet   []*NZBGetConfig   `json:"nzbget,omitempty" toml:"nzbget" xml:"nzbget" yaml:"nzbget,omitempty"`
 	Tautulli *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
@@ -242,6 +243,10 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 	}
 
 	if err := a.setupQbit(timeout); err != nil {
+		return err
+	}
+
+	if err := a.setupRtorrent(timeout); err != nil {
 		return err
 	}
 
