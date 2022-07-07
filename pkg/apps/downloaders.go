@@ -1,9 +1,14 @@
 package apps
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
+	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/mrobinsn/go-rtorrent/xmlrpc"
 	"golift.io/cnfg"
 	"golift.io/deluge"
 	"golift.io/nzbget"
@@ -24,6 +29,17 @@ type QbitConfig struct {
 	Name       string        `toml:"name" xml:"name" json:"name"`
 	Interval   cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
+}
+
+type RtorrentConfig struct {
+	*xmlrpc.Client
+	Name      string        `toml:"name" xml:"name" json:"name"`
+	URL       string        `toml:"url" xml:"url" json:"url"`
+	User      string        `toml:"user" xml:"user" json:"user"`
+	Pass      string        `toml:"pass" xml:"pass" json:"pass"`
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
+	VerifySSL bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 }
 
 type TautulliConfig struct {
@@ -83,6 +99,44 @@ func (a *Apps) setupQbit(timeout time.Duration) error {
 	}
 
 	return nil
+}
+
+func (a *Apps) setupRtorrent(timeout time.Duration) error {
+	for idx := range a.Rtorrent {
+		if a.Rtorrent[idx] == nil || a.Rtorrent[idx].URL == "" {
+			return fmt.Errorf("%w: missing url: rTorrent config %d", ErrInvalidApp, idx+1)
+		}
+
+		a.Rtorrent[idx].Setup(timeout)
+	}
+
+	return nil
+}
+
+func (r *RtorrentConfig) Setup(timeout time.Duration) {
+	if r.Timeout.Duration == 0 {
+		r.Timeout.Duration = timeout
+	}
+
+	prefix := "http://"
+	if strings.HasPrefix(r.URL, "https://") {
+		prefix = "https://"
+	}
+
+	// Append the username and password to the URL.
+	url := strings.TrimPrefix(strings.TrimPrefix(r.URL, "https://"), "http://")
+	if r.User != "" || r.Pass != "" {
+		url = prefix + r.User + ":" + r.Pass + "@" + url
+	} else {
+		url = prefix + url
+	}
+
+	r.Client = xmlrpc.NewClientWithHTTPClient(url, &http.Client{
+		Timeout: r.Timeout.Duration,
+		Transport: exp.NewMetricsRoundTripper("rTorrent", &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: r.VerifySSL}, //nolint:gosec
+		}),
+	})
 }
 
 func (q *QbitConfig) setup(timeout time.Duration) (err error) {
