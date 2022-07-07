@@ -319,6 +319,9 @@ You can add supported downloaders so they show up on the dashboard integration.
 You may easily add service checks to these downloaders by adding a name.
 Any number of downloaders of any type may be configured.
 
+These all also have `interval` and `timeout` represented as a Go Duration. 
+Examples: `1m`, `1m30s`, `3m15s`, 1h5m`. Valid units are `s`, `m`, and `h`. Combining units is additive.
+
 #### QbitTorrent
 
 | Config Name    | Variable Name         | Note                                                          |
@@ -329,6 +332,15 @@ Any number of downloaders of any type may be configured.
 | qbit.pass      | `DN_QBIT_0_PASS`      | No Default. Provide URL, user and pass if you use Qbit        |
 | qbit.http_user | `DN_QBIT_0_HTTP_USER` | Provide this username if Qbit is behind basic auth (uncommon) |
 | qbit.http_pass | `DN_QBIT_0_HTTP_PASS` | Provide this password if Qbit is behind basic auth (uncommon) |
+
+#### rTorrent
+
+| Config Name    | Variable Name         | Note                                                       |
+| -------------- | --------------------- | ---------------------------------------------------------- |
+| rtorrent.name  | `DN_RTORRENT_0_NAME`  | No Default. Setting a name enables service checks          |
+| rtorrent.url   | `DN_RTORRENT_0_URL`   | No Default. Something like: `http://localhost:5000`        |
+| rtorrent.user  | `DN_RTORRENT_0_USER`  | No Default. Provide URL, user and pass if you use rTorrent |
+| rtorrent.pass  | `DN_RTORRENT_0_PASS`  | No Default. Provide URL, user and pass if you use rTorrent |
 
 #### SABnzbd
 

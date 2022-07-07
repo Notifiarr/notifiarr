@@ -560,11 +560,14 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		config.Apps.Readarr = nil
 		config.Apps.Sonarr = nil
 		config.Apps.Qbit = nil
+		config.Apps.Rtorrent = nil
 		config.Apps.Deluge = nil
 		config.Apps.SabNZB = nil
 		config.Apps.NZBGet = nil
+		config.Apps.Tautulli = nil
 	}
 
+	config.Plex = nil
 	config.WatchFiles = nil
 	config.Commands = nil
 	config.Service = nil

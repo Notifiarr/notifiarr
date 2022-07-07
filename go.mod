@@ -110,20 +110,24 @@ require (
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/text v0.3.7
-	golift.io/datacounter v1.0.3
+	golift.io/datacounter v1.0.4
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 
 require golift.io/nzbget v0.1.3-0.20220701235118-24fa142aefc6
 
 require (
+	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gorilla/rpc v1.2.0 // indirect
+	github.com/mrobinsn/go-rtorrent v1.8.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
+	github.com/urfave/cli v1.22.5 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
 )

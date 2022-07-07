@@ -283,6 +283,22 @@ retries = {{.Retries}}
 #pass     = ""
 
 
+{{end}}{{if .Rtorrent}}{{range .Rtorrent}}[[rtorrent]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  user     = "{{.User}}"
+  pass     = "{{.Pass}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"
+
+{{end}}
+{{else}}#[[rtorrent]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://rtorrent:5000/"
+#user     = ""
+#pass     = ""
+
+
 {{end}}{{if .NZBGet}}{{range .NZBGet}}[[nzbget]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
