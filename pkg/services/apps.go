@@ -181,6 +181,24 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 		}
 	}
 
+	// rTorrent instanceapp.
+	for _, app := range c.Apps.Rtorrent {
+		if app.Interval.Duration == 0 {
+			app.Interval.Duration = DefaultCheckInterval
+		}
+
+		if app.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     app.Name,
+				Type:     CheckHTTP,
+				Value:    app.URL,
+				Expect:   "401", // could not find a 200...
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: app.Interval,
+			})
+		}
+	}
+
 	// SabNBZd instanceapp.
 	for _, app := range c.Apps.SabNZB {
 		if app.Interval.Duration == 0 {
