@@ -16,6 +16,7 @@ function browseFiles(target) {
         }
     }).dialog('open').browse({
         separator: DirSep,
+        root: DirSep == '\\' ? '' : '/',
         name: 'Choose File: ' + $(target).data('label'),
         dir: function(path) {
             return new Promise(function(resolve, reject) {

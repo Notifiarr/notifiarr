@@ -387,7 +387,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 
 	switch dirPath := mux.Vars(request)["dir"]; {
 	case dirPath != "":
-		dir, err := ioutil.ReadDir(dirPath)
+		dir, err := ioutil.ReadDir(filepath.Join(dirPath, "/"))
 		if err != nil {
 			http.Error(response, err.Error(), http.StatusNotAcceptable)
 			return
