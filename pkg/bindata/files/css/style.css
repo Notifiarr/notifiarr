@@ -891,3 +891,7 @@ div .file-content .line-number {
 .fileBrowser {
   margin: 5px;
 }
+
+.browser-menu .new, .browser-menu .rename, .browser-menu .delete {
+  display:none;
+}
