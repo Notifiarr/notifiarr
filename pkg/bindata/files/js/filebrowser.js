@@ -40,7 +40,7 @@ function browseFiles(target, findFile) {
         },
         open: function(filename) {
             // Add findFile is a folder was selected.
-            filename = filename.match(/\/$|\\$/)&&findFile!==undefined ? filename+DirSep+findFile : filename;
+            filename = filename.charAt(filename.length - 1) == DirSep && findFile != undefined ? filename+findFile : filename;
             $(target).val(filename);
             $('.ui-widget-overlay').siblings('.ui-dialog').find('.ui-dialog-content').dialog('close');
             // Bring up the save changes button.
