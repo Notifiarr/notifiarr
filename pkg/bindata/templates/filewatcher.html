@@ -104,6 +104,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="WatchFiles.{{$index}}.Path" name="WatchFiles.{{$index}}.Path"  data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Name" data-original="{{$app.Path}}" value="{{$app.Path}}">
+                                                                <div onClick="browseFiles('#WatchFiles\\.{{$index}}\\.Path');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </form>

@@ -199,6 +199,7 @@ function addWatchFiles()
         }
 
         row += '<td><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
+        let extra = '';
 
         switch (name) {
              case "Poll":
@@ -210,12 +211,14 @@ function addWatchFiles()
                     '<option value="true">Enabled</option>'+
                     '<option selected value="false">Disabled</option></select>';
                 break;
+            case "Path":
+                extra = '<div onClick="browseFiles(\'#WatchFiles\\\\.'+index+'\\\\.Path\');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>';
              default:
                 row += '<input type="text" name="WatchFiles.'+ index +'.'+ name +'" '+
                     'id="WatchFiles.'+ index +'.'+ name +'" '+
                     'name="WatchFiles.'+ index +'.'+ name +'" '+
                     'data-app="WatchFiles" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="files" data-label="Files '+
-                    instance +' '+name+'" data-original="" value="'+ nameval +'">';
+                    instance +' '+name+'" data-original="" value="'+ nameval +'">'+extra;
                 break;
         }
 
@@ -251,6 +254,7 @@ function addCommand()
     // Host or URL are set with a value, and without an original value to make the save button appear.
     for (const name of names) { 
         row += '<td><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
+        let extra = '';
 
         switch (name) {
             case "Log":
@@ -273,12 +277,14 @@ function addCommand()
                     'data-app="Commands" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="commands" data-label="Command '+
                     instance +' '+name+'" data-original="20s" value="20s">';
                     break;
+            case "Command":
+                extra = '<div onClick="browseFiles(\'#Commands\\\\.'+index+'\\\\.Command\');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>';
             default:
                 row += '<input type="text" name="Commands.'+ index +'.'+ name +'" '+
                     'id="Commands.'+ index +'.'+ name +'" '+
                     'name="Commands.'+ index +'.'+ name +'" '+
                     'data-app="Commands" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="commands" data-label="Command '+
-                    instance +' '+name+'" data-original="">';
+                    instance +' '+name+'" data-original="">'+extra;
                 break;
         }
 

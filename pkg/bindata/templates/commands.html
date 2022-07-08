@@ -115,6 +115,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Commands.{{$index}}.Command" name="Commands.{{$index}}.Command" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Command" data-original="{{$app.Command}}" value="{{$app.Command}}">
+                                                                <div onClick="browseFiles('#Commands\\.{{$index}}\\.Command');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </form>
