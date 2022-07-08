@@ -887,11 +887,3 @@ div .file-content .line-number {
     width:35px;
     pointer-events:none;
 }
-
-.fileBrowser {
-  margin: 5px;
-}
-
-.browser-menu .new, .browser-menu .rename, .browser-menu .delete {
-  display:none;
-}

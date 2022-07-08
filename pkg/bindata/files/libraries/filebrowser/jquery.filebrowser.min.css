@@ -145,6 +145,9 @@
 .browser-widget .toolbar ul:not(.labels) li {
     padding-top: 20px;
 }
+.browser-widget ul.labels li.pick::before {
+    background-position: -96px -128px
+}
 .browser-widget ul.labels li.back::before {
     background-position: 0 -160px
 }

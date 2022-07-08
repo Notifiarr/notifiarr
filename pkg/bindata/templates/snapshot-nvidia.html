@@ -83,7 +83,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Snapshot.Nvidia.SMIPath"  name="Snapshot.Nvidia.SMIPath" data-app="Nvidia" class="client-parameter form-control input-sm" data-group="snaps" data-label="Nvidia SMI Path" data-original="{{.Config.Snapshot.Nvidia.SMIPath}}" value="{{.Config.Snapshot.Nvidia.SMIPath}}">
-                                                                <div onClick="browseFiles('#Snapshot\\.Nvidia\\.SMIPath');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                                                                <div onClick="browseFiles('#Snapshot\\.Nvidia\\.SMIPath', 'nvidia-smi{{if eq .Version.os "windows"}}.exe{{end}}');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </form>
