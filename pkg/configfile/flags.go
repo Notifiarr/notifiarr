@@ -20,6 +20,7 @@ type Flags struct {
 	AptHook       bool     `json:"aptHook"`
 	Updated       bool     `json:"updated"`
 	PSlist        bool     `json:"pslist"`
+	Fortune       bool     `json:"fortune"`
 	Write         string   `json:"wrte"`
 	Curl          string   `json:"curl"`
 	ConfigFile    string   `json:"configFile"`
@@ -39,6 +40,7 @@ func (f *Flags) ParseArgs(args []string) {
 		"Separate with commas, or pass -e more than once.")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix.")
 	f.BoolVarP(&f.VerReq, "version", "v", false, "Print the version and exit.")
+	f.BoolVar(&f.Fortune, "fortune", false, "Print a fortune and exit.")
 	f.StringVar(&f.Curl, "curl", "", "GET a URL and display headers and payload.")
 	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")

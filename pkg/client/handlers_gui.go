@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	minPasswordLen   = 16
+	minPasswordLen   = 9
 	fileSourceLogs   = "logs"
 	fileSourceConfig = "config"
 )

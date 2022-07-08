@@ -88,6 +88,9 @@ func Start() error {
 		return nil
 	case client.Flags.PSlist: // print process list and exit.
 		return printProcessList()
+	case client.Flags.Fortune: // print fortune and exit.
+		fmt.Println(Fortune()) //nolint:forbidigo
+		return nil
 	case client.Flags.Curl != "": // curl a URL and exit.
 		return curlURL(client.Flags.Curl, client.Flags.Headers)
 	default:
