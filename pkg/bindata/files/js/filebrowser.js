@@ -15,6 +15,7 @@ function browseFiles(target) {
             duration: 150
         }
     }).dialog('open').browse({
+        contextmenu: true,
         separator: DirSep,
         root: DirSep == '\\' ? '' : '/',
         name: 'Choose File: ' + $(target).data('label'),
@@ -46,7 +47,30 @@ function browseFiles(target) {
         },
         item_class: function(_, name) {
             return name.match(/^[A-Z]:|^\/$/) ? 'drive' : '';
-        }
+        },
+        menu: function(type) {
+            if (type == 'content') {
+                return {
+                    'Create File': function() {
+                        var name = prompt('name: ');
+                        var path;
+                        if (name) {
+                            path = this.join(this.path(), name);
+                        }
+                        this.create('file', path);
+                    }
+                };
+            } else {
+                return {
+                    'Select': function($li) {
+                        $(target).val(this.join(this.path(), $li.text()));
+                        $('.ui-widget-overlay').siblings('.ui-dialog').find('.ui-dialog-content').dialog('close');
+                        // Bring up the save changes button.
+                        findPendingChanges();
+                    }
+                };
+            }
+        },
     });
 
 };
