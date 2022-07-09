@@ -29,9 +29,11 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/qualityProfile", sonarrGetQualityProfile, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/qualityProfile", sonarrAddQualityProfile, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/qualityProfile/{profileID:[0-9]+}", sonarrUpdateQualityProfile, "PUT")
+	a.HandleAPIpath(starr.Sonarr, "/qualityProfile/{profileID:[0-9]+}", sonarrDeleteQualityProfile, "DELETE")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfiles", sonarrGetReleaseProfiles, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile", sonarrAddReleaseProfile, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile/{profileID:[0-9]+}", sonarrUpdateReleaseProfile, "PUT")
+	a.HandleAPIpath(starr.Sonarr, "/releaseProfile/{profileID:[0-9]+}", sonarrDeleteReleaseProfile, "DELETE")
 	a.HandleAPIpath(starr.Sonarr, "/rootFolder", sonarrRootFolders, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/tag", sonarrGetTags, "GET")
@@ -267,7 +269,7 @@ func sonarrAddQualityProfile(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from sonarr.
 	id, err := getSonarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
@@ -290,10 +292,25 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from sonarr.
 	_, err = getSonarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
+}
+
+func sonarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
+	profileID, _ := strconv.Atoi(mux.Vars(req)["profileID"])
+	if profileID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Delete the profile from sonarr.
+	err := getSonarr(req).DeleteQualityProfileContext(req.Context(), profileID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting profile: %w", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -318,7 +335,7 @@ func sonarrAddReleaseProfile(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from sonarr.
 	id, err := getSonarr(req).AddReleaseProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
@@ -341,10 +358,25 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from sonarr.
 	_, err = getSonarr(req).UpdateReleaseProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+	}
+
+	return http.StatusOK, "OK"
+}
+
+func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
+	profileID, _ := strconv.Atoi(mux.Vars(req)["profileID"])
+	if profileID == 0 {
+		return http.StatusBadRequest, ErrNonZeroID
+	}
+
+	// Delete the profile from sonarr.
+	err := getSonarr(req).DeleteReleaseProfileContext(req.Context(), profileID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting profile: %w", err)
 	}
 
 	return http.StatusOK, "OK"
