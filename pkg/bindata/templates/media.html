@@ -32,8 +32,8 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Plex Token</span>
                                                 </td>
-                                                <td style="min-width:90px;width:90px">
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to Plex may elapse.</div>
+                                                <td style="min-width:120px;width:120px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
@@ -99,7 +99,17 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}" value="{{.Config.Plex.Timeout}}">
+                                                                <select type="text" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $.Config.Plex.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $.Config.Plex.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $.Config.Plex.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -134,7 +144,7 @@
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
                                                 <td>
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to Tautulli may elapse.</div>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
@@ -233,7 +243,17 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}" value="{{.Config.Apps.Tautulli.Timeout}}">
+                                                                <select type="text" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $.Config.Apps.Tautulli.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $.Config.Apps.Tautulli.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $.Config.Apps.Tautulli.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
