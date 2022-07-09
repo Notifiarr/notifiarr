@@ -50,7 +50,7 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Lidarr {
-		if app.Corrupt != mnd.Disabled {
+		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(lidarrCorruptCheckDur)
 			break
 		}
@@ -68,7 +68,7 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Prowlarr {
-		if app.Corrupt != mnd.Disabled {
+		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(prowlarrCorruptCheckDur)
 			break
 		}
@@ -86,7 +86,7 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Radarr {
-		if app.Corrupt != mnd.Disabled {
+		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(radarrCorruptCheckDur)
 			break
 		}
@@ -104,7 +104,7 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Readarr {
-		if app.Corrupt != mnd.Disabled {
+		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(readarrCorruptCheckDur)
 			break
 		}
@@ -122,7 +122,7 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Sonarr {
-		if app.Corrupt != mnd.Disabled {
+		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(sonarrCorruptCheckDur)
 			break
 		}
@@ -145,6 +145,7 @@ func (c *cmd) sendLidarrCorruption(event website.EventType) {
 			int:   i + 1,
 			app:   app.Lidarr,
 			cName: app.Name,
+			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 		})
 	}
 }
@@ -158,6 +159,7 @@ func (c *cmd) sendProwlarrCorruption(event website.EventType) {
 			int:   i + 1,
 			app:   app.Prowlarr,
 			cName: app.Name,
+			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 		})
 	}
 }
@@ -171,6 +173,7 @@ func (c *cmd) sendRadarrCorruption(event website.EventType) {
 			int:   i + 1,
 			app:   app.Radarr,
 			cName: app.Name,
+			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 		})
 	}
 }
@@ -184,6 +187,7 @@ func (c *cmd) sendReadarrCorruption(event website.EventType) {
 			int:   i + 1,
 			app:   app.Readarr,
 			cName: app.Name,
+			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 		})
 	}
 }
@@ -197,11 +201,16 @@ func (c *cmd) sendSonarrCorruption(event website.EventType) {
 			int:   i + 1,
 			app:   app.Sonarr,
 			cName: app.Name,
+			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 		})
 	}
 }
 
-func (c *cmd) sendAndLogAppCorruption(input *genericInstance) string {
+func (c *cmd) sendAndLogAppCorruption(input *genericInstance) string { //nolint:cyclop
+	if input.skip {
+		return input.last
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), maxCheckTime)
 	defer cancel()
 

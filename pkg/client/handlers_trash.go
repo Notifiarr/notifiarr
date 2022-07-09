@@ -60,7 +60,7 @@ func (c *Client) aggregateTrashSonarr(
 
 	// Create our known+requested instances, so we can write slice values in go routines.
 	for idx, app := range c.Config.Apps.Sonarr {
-		if instance := idx + 1; instances.Has(instance) {
+		if instance := idx + 1; instances.Has(instance) && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
 			output = append(output, &cfsync.SonarrTrashPayload{Instance: instance, Name: app.Name})
 		}
 	}
@@ -110,7 +110,7 @@ func (c *Client) aggregateTrashRadarr(
 	output := []*cfsync.RadarrTrashPayload{}
 	// Create our known+requested instances, so we can write slice values in go routines.
 	for i, app := range c.Config.Apps.Radarr {
-		if instance := i + 1; instances.Has(instance) {
+		if instance := i + 1; instances.Has(instance) && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
 			output = append(output, &cfsync.RadarrTrashPayload{Instance: instance, Name: app.Name})
 		}
 	}

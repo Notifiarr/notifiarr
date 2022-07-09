@@ -23,6 +23,10 @@ func (c *Config) collectApps() []*Service {
 
 func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Lidarr {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -44,6 +48,10 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Prowlarr {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -65,6 +73,10 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Radarr {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -86,6 +98,10 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Readarr {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -107,6 +123,10 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Sonarr {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -126,9 +146,13 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	return svcs
 }
 
-func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funlen,cyclop
+func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funlen,cyclop,gocognit
 	// Deluge instanceapp.
 	for _, app := range c.Apps.Deluge {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -147,6 +171,10 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// NZBGet instances.
 	for _, app := range c.Apps.NZBGet {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -165,6 +193,10 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// Qbittorrent instanceapp.
 	for _, app := range c.Apps.Qbit {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -183,6 +215,10 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// rTorrent instanceapp.
 	for _, app := range c.Apps.Rtorrent {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -201,6 +237,10 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// SabNBZd instanceapp.
 	for _, app := range c.Apps.SabNZB {
+		if app.Timeout.Duration < 0 {
+			continue
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -223,6 +263,10 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 	// Tautulli instance (1).
 	if app := c.Apps.Tautulli; app != nil && app.URL != "" && app.Name != "" {
+		if app.Timeout.Duration < 0 {
+			return svcs
+		}
+
 		if app.Interval.Duration == 0 {
 			app.Interval.Duration = DefaultCheckInterval
 		}
@@ -246,12 +290,14 @@ func (c *Config) collectMySQLApps(svcs []*Service) []*Service {
 	}
 
 	for _, plugin := range c.Plugins.MySQL {
-		if plugin.Interval.Duration == 0 {
-			plugin.Interval.Duration = DefaultCheckInterval
+		if plugin.Timeout.Duration < 0 {
+			continue
+		} else if plugin.Timeout.Duration == 0 {
+			plugin.Timeout.Duration = DefaultTimeout
 		}
 
-		if plugin.Timeout.Duration == 0 {
-			plugin.Timeout.Duration = DefaultTimeout
+		if plugin.Interval.Duration == 0 {
+			plugin.Interval.Duration = DefaultCheckInterval
 		}
 
 		host := strings.TrimLeft(strings.TrimRight(plugin.Host, ")"), "@tcp(")

@@ -42,7 +42,7 @@ var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
 
 // Configured returns true ifthe server is configured, false otherwise.
 func (s *Server) Configured() bool {
-	return s != nil && s.URL != "" && s.Token != ""
+	return s != nil && s.URL != "" && s.Token != "" && s.Timeout.Duration >= 0
 }
 
 // Validate checks input values and starts the cron interval if it's configured.

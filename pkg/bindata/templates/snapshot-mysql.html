@@ -1,7 +1,8 @@
-                                <p>
-                                    You may add MySQL credentials to your Notifiarr client configuration to snapshot MySQL service health.
-                                    This feature snapshots <code>SHOW PROCESSLIST</code> and <code>SHOW STATUS</code> data.
-                                    <br>Access to a database is not required. Example Grant: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>
+                                </p>
+                                    <h3><i class="fas fa-comment text-orange"></i> MySQL Notes</h3>
+                                    <li><i class="fas fa-star"></i> You may add MySQL credentials to your Notifiarr client configuration to snapshot MySQL service health.</li>
+                                    <li><i class="fas fa-star"></i> This feature snapshots <code>SHOW PROCESSLIST</code> and <code>SHOW STATUS</code> data.</li>
+                                    <li><i class="fas fa-star"></i>Access to a database is not required. Example Grant: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code></li>
                                 </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
@@ -55,8 +56,8 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
-                                                <td style="min-width:90px;width:90px">
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                <td style="min-width:120px;width:120px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
@@ -177,7 +178,17 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Snapshot.MySQL.{{$index}}.Timeout" name="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                                <select type="text" id="Snapshot.MySQL.{{$index}}.Timeout" name="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

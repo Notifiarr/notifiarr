@@ -40,8 +40,8 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
-                                                <td style="min-width:90px;width:90px">
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                <td style="min-width:120px;width:120px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
@@ -162,7 +162,17 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -210,7 +220,7 @@
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
                                                 <td>
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
@@ -313,7 +323,17 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Deluge.{{$index}}.Timeout" name="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Deluge.{{$index}}.Timeout" name="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -360,7 +380,7 @@
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
                                                 <td>
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
@@ -463,7 +483,17 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.SabNZB.{{$index}}.Timeout" name="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.SabNZB.{{$index}}.Timeout" name="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -510,8 +540,8 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
-                                                <td style="min-width:90px;width:90px">
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
+                                                <td style="min-width:120px;width:120px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
@@ -632,7 +662,17 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_NZBGET_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.NZBGet.{{$index}}.Config.Timeout" name="Apps.NZBGet.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.NZBGet.{{$index}}.Config.Timeout" name="Apps.NZBGet.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m0s">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
