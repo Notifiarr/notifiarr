@@ -84,6 +84,7 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 
 func (c *Client) getFuncMap() template.FuncMap {
 	return template.FuncMap{
+		"fortune": Fortune,
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.

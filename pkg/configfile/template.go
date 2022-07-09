@@ -37,7 +37,7 @@ const tmpl = `###############################################
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}{{if .ExKeys}}
 extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
 
-## Setting a UI password enables the human accessible web GUI. Must be at least 16 characters.
+## Setting a UI password enables the human accessible web GUI. Must be at least 9 characters.
 ## The default username is admin; change it by setting ui_password to "username:password"
 ## Set to "webauth" to disable the login form and use only proxy authentication. See upstreams, below.
 ## Your proxy auth must pass x-webauth-user header if you set this to "webauth".

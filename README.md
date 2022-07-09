@@ -10,7 +10,7 @@ The client enables content requests from Media Bot in your Discord Server and al
 Linux repository hosting provided by
 [![packagecloud](https://docs.golift.io/integrations/packagecloud-full.png "PackageCloud.io")](http://packagecloud.io)
 
-This works on any system with apt or yum. If your system does not use APT or YUM, then download a package from the [Releases](https://github.com/Notifiarr/notifiarr/releases) page.
+This works on any system with apt or yum. If your system does not use APT or YUM, then download a binary from the [Releases](https://github.com/Notifiarr/notifiarr/releases) page.
 
 On Linux, Notifiarr runs as `user:group` of `notifiarr:notifiarr`.
 
@@ -129,12 +129,15 @@ docker logs <container id from docker run>
 To enable the webui, add this parameter to your config file, toward the top next to quiet, and restart the client:
 
 ```yaml
-ui_password = "username:16CharacterPassword"
+ui_password = "username:9CharacterPassword"
 ```
 
-Use a password that is at least 16 characters long. Once you log into the web interface, you can change the password and it will be saved encrypted (so no one can snoop it).
+Use a password that is at least 9 characters long. 
+Once you log into the web interface, you can change the password and it will be saved encrypted (so no one can snoop it).
 
-You may also set ui_password to the value of "webauth" to enable proxy authentication support. You must also add your auth proxy IP or CIDR to the upstreams setting for this to work. The proxy must pass x-webauth-user: username as a header, and you will be automatically logged in.
+You may also set `ui_password` to the value of `"webauth"` to enable proxy authentication support. 
+You must also add your auth proxy IP or CIDR to the `upstreams` setting for this to work. 
+The proxy must pass `x-webauth-user: username` as a header, and you will be automatically logged in.
 
 ### Config Settings
 
@@ -372,13 +375,15 @@ Examples: `1m`, `1m30s`, `3m15s`, 1h5m`. Valid units are `s`, `m`, and `h`. Comb
 
 ### Plex
 
-This application can also send Plex sessions to Notifiarr so you can receive notifications when users interact with your server. This has three different features:
+This application can also send Plex sessions to Notifiarr so you can receive notifications when users interact with your server. 
+This has three different features:
 
 - Notify all sessions on a longer interval (30+ minutes).
 - Notify on session nearing completion (percent complete).
 - Notify on session change (Plex Webhook) ie. pause/resume.
 
-You [must provide Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) for this to work. You may also need to add a webhook to Plex so it sends notices to this application.
+You [must provide Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) for this to work.
+You may also need to add a webhook to Plex so it sends notices to this application.
 
 - In Plex Media Server, add this URL to webhooks:
     - `http://localhost:5454/plex?token=plex-token-here`
@@ -393,7 +398,8 @@ You [must provide Plex Token](https://support.plex.tv/articles/204059436-finding
 
 ### Tautulli
 
-Only 1 Tautulli instance may be configured per client. Providing Tautulli allows Notifiarr to use the "Friendly Name" for your Plex users and it allows you to easily enable a service check.
+Only 1 Tautulli instance may be configured per client. 
+Providing Tautulli allows Notifiarr to use the "Friendly Name" for your Plex users and it allows you to easily enable a service check.
 
 | Config Name      | Variable Name         | Note                                                                    |
 | ---------------- | --------------------- | ----------------------------------------------------------------------- |
@@ -451,14 +457,33 @@ subfolder. We'll assume you want to serve the app from `/notifiarr/` and
 it's running on `192.168.3.33` - here's a sample nginx config to do that:
 
 ```nginx
-location /notifiarr/ {
+location /notifiarr {
   proxy_set_header X-Forwarded-For $remote_addr;
-  proxy_pass http://192.168.3.33:5454$request_uri;
+  set $notifiarr http://192.168.3.33:5454;
+  proxy_pass $notifiarr$request_uri;
 }
 ```
 
-Make sure the `location` path matches the `urlbase` and ends with a `/`.
+Make sure the Nginx `location` path matches the `urlbase` Notifiarr setting.
 That's all there is to it.
+
+Using an auth proxy? Be sure to set `ui_password` to the string `"webauth"`.
+The Nginx config looks more like this:
+
+```nginx
+location /notifiarr/api {
+  proxy_set_header X-Forwarded-For $remote_addr;
+  set $notifiarr http://192.168.3.33:5454;
+  proxy_pass $notifiarr$request_uri;
+}
+
+location /notifiarr {
+  proxy_set_header X-Forwarded-For $remote_addr;
+  proxy_set_header X-WebAuth-User $_username;
+  set $notifiarr http://192.168.3.33:5454;
+  proxy_pass $notifiarr$request_uri;
+}
+```
 
 Here are two more example Nginx configs:
 
@@ -468,7 +493,7 @@ Here are two more example Nginx configs:
 ## Troubleshooting
 
 - Find help on [GoLift Discord](https://golift.io/discord).
-- And/or on [Notifiarr Discord](https://discord.gg/AURf8Yz).
+- And/or on [Notifiarr Discord](https://notifiarr.com/discord).
 
 ### Log files
 

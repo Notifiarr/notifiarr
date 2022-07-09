@@ -5,10 +5,12 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -142,4 +144,10 @@ func printCurlReply(resp *http.Response, body []byte) {
 
 	fmt.Println("")
 	fmt.Println(string(body))
+}
+
+// Fortune returns a fortune.
+func Fortune() string {
+	fortunes := strings.Split(bindata.MustAssetString("other/fortunes.txt"), "\n%\n")
+	return fortunes[rand.Intn(len(fortunes))] //nolint:gosec
 }

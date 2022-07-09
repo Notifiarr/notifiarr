@@ -32,11 +32,11 @@ type cmd struct {
 // It also contains some saved data about the command being run.
 type Command struct {
 	Name    string        `json:"name" toml:"name" xml:"name" yaml:"name"`
-	Command string        `json:"command" toml:"command" xml:"command" yaml:"command"`
+	Command string        `json:"-" toml:"command" xml:"command" yaml:"command"`
 	Shell   bool          `json:"shell" toml:"shell" xml:"shell" yaml:"shell"`
 	Log     bool          `json:"log" toml:"log" xml:"log" yaml:"log"`
 	Notify  bool          `json:"notify" toml:"notify" xml:"notify" yaml:"notify"`
-	Timeout cnfg.Duration `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
+	Timeout cnfg.Duration `json:"-" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Hash    string        `json:"hash" toml:"-" xml:"-" yaml:"-"`
 	fails   int
 	runs    int
