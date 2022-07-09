@@ -390,6 +390,19 @@ retries = {{.Retries}}
 #pass = "password"
 {{- end}}
 
+###################
+# Nvidia Snapshot #
+###################
+
+# The app will automatically collect Nvidia data if nvidia-smi is present.
+# Use the settings below to disable Nvidia GPU collection, or restrict collection to only specific Bus IDs.
+# SMI Path is found automatically if left blank. Set it to path to nvidia-smi (nvidia-smi.exe on Windows).
+
+[snapshot.nvidia]
+disabled = {{.Snapshot.Nvidia.Disabled}}
+smi_path = '''{{.Snapshot.Nvidia.SMIPath}}'''
+bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
+
 ##################
 # Service Checks #
 ##################

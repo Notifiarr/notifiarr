@@ -87,3 +87,7 @@ a sup {
 .secret-input {
     color:#000000;
 }
+
+.modal-body {
+    background-color: rgb(50, 29, 29);
+  }
