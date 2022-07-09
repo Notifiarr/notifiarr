@@ -8,7 +8,7 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/qbittorrent.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">qBittorrent</h2>
                                                     <div style="float: right;">
-                                                        <button id="download-Qbit-addbutton" onclick="addInstance('download', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="download-Qbit-addbutton" onclick="addInstance('download', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
@@ -162,7 +162,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
+                                                                <input type="text" id="Apps.Qbit.{{$index}}.Timeout" name="Apps.Qbit.{{$index}}.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}" value="{{$app.Timeout}}">
                                                             </div>
                                                         </div>
                                                     </form>

@@ -350,7 +350,7 @@ func (s *Server) getAppConfigs() map[string]interface{} {
 		reApps[k] = v
 	}
 
-	if u, err := s.config.Apps.Tautulli.GetUsers(); err != nil {
+	if u, err := s.config.Apps.Tautulli.GetUsers(context.Background()); err != nil {
 		s.config.Error("Getting Tautulli Users:", err)
 	} else {
 		reApps["tautulli"] = map[string]interface{}{"users": u.MapEmailName()}

@@ -51,15 +51,15 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	// Downloaders.
 	case "NZBGet":
 		if len(config.Apps.NZBGet) > index {
-			reply, code = testNZBGet(config.Apps.NZBGet[index].Config)
+			reply, code = testNZBGet(request.Context(), config.Apps.NZBGet[index].Config)
 		}
 	case "Deluge":
 		if len(config.Apps.Deluge) > index {
-			reply, code = testDeluge(config.Apps.Deluge[index].Config)
+			reply, code = testDeluge(request.Context(), config.Apps.Deluge[index].Config)
 		}
 	case "Qbit":
 		if len(config.Apps.Qbit) > index {
-			reply, code = testQbit(config.Apps.Qbit[index].Config)
+			reply, code = testQbit(request.Context(), config.Apps.Qbit[index].Config)
 		}
 	case "Rtorrent":
 		if len(config.Apps.Rtorrent) > index {
@@ -67,7 +67,7 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 		}
 	case "SabNZB":
 		if len(config.Apps.SabNZB) > index {
-			reply, code = testSabNZB(config.Apps.SabNZB[index])
+			reply, code = testSabNZB(request.Context(), config.Apps.SabNZB[index])
 		}
 	// Starrs.
 	case "Lidarr":
@@ -117,24 +117,24 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	case "Plex":
 		reply, code = testPlex(request.Context(), config.Plex)
 	case "Tautulli":
-		reply, code = testTautulli(config.Apps.Tautulli)
+		reply, code = testTautulli(request.Context(), config.Apps.Tautulli)
 	}
 
 	http.Error(response, reply, code)
 }
 
-func testDeluge(config *deluge.Config) (string, int) {
-	if _, deluge, err := deluge.New(config); err != nil {
+func testDeluge(ctx context.Context, config *deluge.Config) (string, int) {
+	if deluge, err := deluge.NewNoAuth(config); err != nil {
 		return "Connecting: " + err.Error(), http.StatusBadGateway
-	} else if _, xfers, err := deluge.GetXfers(); err != nil {
+	} else if xfers, err := deluge.GetXfersContext(ctx); err != nil {
 		return "Getting Transfers: " + err.Error(), http.StatusBadGateway
 	} else {
 		return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
 	}
 }
 
-func testNZBGet(config *nzbget.Config) (string, int) {
-	ver, err := nzbget.New(config).Version()
+func testNZBGet(ctx context.Context, config *nzbget.Config) (string, int) {
+	ver, err := nzbget.New(config).VersionContext(ctx)
 	if err != nil {
 		return "Getting Version: " + err.Error(), http.StatusBadGateway
 	}
@@ -154,10 +154,10 @@ func testCustomCommand(ctx context.Context, cmd *commands.Command) (string, int)
 	return fmt.Sprintf("Command Successful! Output: %s", output), http.StatusOK
 }
 
-func testQbit(config *qbit.Config) (string, int) {
-	if qbit, err := qbit.New(config); err != nil {
+func testQbit(ctx context.Context, config *qbit.Config) (string, int) {
+	if qbit, err := qbit.New(ctx, config); err != nil {
 		return "Connecting: " + err.Error(), http.StatusBadGateway
-	} else if _, xfers, err := qbit.GetXfers(); err != nil {
+	} else if xfers, err := qbit.GetXfersContext(ctx); err != nil {
 		return "Getting Transfers: " + err.Error(), http.StatusBadGateway
 	} else {
 		return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
@@ -183,8 +183,8 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 	return "Getting Server Name: result was not a string?", http.StatusBadGateway
 }
 
-func testSabNZB(config *apps.SabNZBConfig) (string, int) {
-	sab, err := config.GetQueue()
+func testSabNZB(ctx context.Context, config *apps.SabNZBConfig) (string, int) {
+	sab, err := config.GetQueue(ctx)
 	if err != nil {
 		return "Getting Queue: " + err.Error(), http.StatusBadGateway
 	}
@@ -338,8 +338,8 @@ func testPlex(ctx context.Context, app *plex.Server) (string, int) {
 	return "Plex OK! Version: " + info.Version, http.StatusOK
 }
 
-func testTautulli(app *apps.TautulliConfig) (string, int) {
-	users, err := app.GetUsers()
+func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
+	users, err := app.GetUsers(ctx)
 	if err != nil {
 		return "Getting Users: " + err.Error(), http.StatusBadGateway
 	}
