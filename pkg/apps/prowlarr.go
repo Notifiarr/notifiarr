@@ -1,10 +1,13 @@
 package apps
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"golift.io/starr"
 	"golift.io/starr/prowlarr"
 )
@@ -22,14 +25,23 @@ type ProwlarrConfig struct {
 }
 
 func (a *Apps) setupProwlarr(timeout time.Duration) error {
-	for i, prowl := range a.Prowlarr {
-		if prowl.Config == nil || prowl.Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Prowlarr config %d", ErrInvalidApp, i+1)
+	for idx, app := range a.Prowlarr {
+		if app.Config == nil || app.Config.URL == "" {
+			return fmt.Errorf("%w: missing url: Prowlarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		prowl.Debugf = a.Debugf
-		prowl.errorf = a.Errorf
-		prowl.setup(timeout)
+		app.Config.Client = &http.Client{
+			Timeout: app.Timeout.Duration,
+			CheckRedirect: func(r *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+			Transport: exp.NewMetricsRoundTripper(string(starr.Prowlarr), &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: app.Config.ValidSSL}, //nolint:gosec
+			}),
+		}
+		app.Debugf = a.Debugf
+		app.errorf = a.Errorf
+		app.setup(timeout)
 	}
 
 	return nil
@@ -37,7 +49,6 @@ func (a *Apps) setupProwlarr(timeout time.Duration) error {
 
 func (r *ProwlarrConfig) setup(timeout time.Duration) {
 	r.Prowlarr = prowlarr.New(r.Config)
-	r.Prowlarr.APIer = &starrAPI{api: r.Prowlarr.APIer, app: starr.Prowlarr.String()}
 
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout

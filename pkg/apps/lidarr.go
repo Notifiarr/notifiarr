@@ -2,6 +2,7 @@
 package apps
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -50,14 +52,23 @@ type LidarrConfig struct {
 }
 
 func (a *Apps) setupLidarr(timeout time.Duration) error {
-	for idx := range a.Lidarr {
-		if a.Lidarr[idx].Config == nil || a.Lidarr[idx].Config.URL == "" {
+	for idx, app := range a.Lidarr {
+		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Lidarr[idx].Debugf = a.Debugf
-		a.Lidarr[idx].errorf = a.Errorf
-		a.Lidarr[idx].setup(timeout)
+		app.Config.Client = &http.Client{
+			Timeout: app.Timeout.Duration,
+			CheckRedirect: func(r *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+			Transport: exp.NewMetricsRoundTripper(string(starr.Lidarr), &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: app.Config.ValidSSL}, //nolint:gosec
+			}),
+		}
+		app.Debugf = a.Debugf
+		app.errorf = a.Errorf
+		app.setup(timeout)
 	}
 
 	return nil
@@ -65,7 +76,6 @@ func (a *Apps) setupLidarr(timeout time.Duration) error {
 
 func (r *LidarrConfig) setup(timeout time.Duration) {
 	r.Lidarr = lidarr.New(r.Config)
-	r.Lidarr.APIer = &starrAPI{api: r.Lidarr.APIer, app: starr.Lidarr.String()}
 
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout

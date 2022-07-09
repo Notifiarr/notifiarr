@@ -1,6 +1,7 @@
 package apps
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -44,14 +46,23 @@ type ReadarrConfig struct {
 }
 
 func (a *Apps) setupReadarr(timeout time.Duration) error {
-	for idx := range a.Readarr {
-		if a.Readarr[idx].Config == nil || a.Readarr[idx].Config.URL == "" {
+	for idx, app := range a.Readarr {
+		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Readarr[idx].Debugf = a.Debugf
-		a.Readarr[idx].errorf = a.Errorf
-		a.Readarr[idx].setup(timeout)
+		app.Config.Client = &http.Client{
+			Timeout: app.Timeout.Duration,
+			CheckRedirect: func(r *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+			Transport: exp.NewMetricsRoundTripper(string(starr.Readarr), &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: app.Config.ValidSSL}, //nolint:gosec
+			}),
+		}
+		app.Debugf = a.Debugf
+		app.errorf = a.Errorf
+		app.setup(timeout)
 	}
 
 	return nil
@@ -59,7 +70,6 @@ func (a *Apps) setupReadarr(timeout time.Duration) error {
 
 func (r *ReadarrConfig) setup(timeout time.Duration) {
 	r.Readarr = readarr.New(r.Config)
-	r.Readarr.APIer = &starrAPI{api: r.Readarr.APIer, app: starr.Readarr.String()}
 
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout

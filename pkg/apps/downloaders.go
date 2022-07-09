@@ -79,6 +79,10 @@ func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
 		return fmt.Errorf("deluge setup failed: %w", err)
 	}
 
+	d.Deluge.Client.Client.Transport = exp.NewMetricsRoundTripper("Deluge", &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: d.VerifySSL}, //nolint:gosec
+	})
+
 	if d.Timeout.Duration == 0 {
 		d.Timeout.Duration = timeout
 	}
@@ -97,6 +101,23 @@ func (a *Apps) setupQbit(timeout time.Duration) error {
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (q *QbitConfig) setup(timeout time.Duration) (err error) {
+	if q.Timeout.Duration == 0 {
+		q.Timeout.Duration = timeout
+	}
+
+	q.Qbit, err = qbit.NewNoAuth(q.Config)
+	if err != nil {
+		return fmt.Errorf("qbit setup failed: %w", err)
+	}
+
+	q.Qbit.Transport = exp.NewMetricsRoundTripper("qBittorrent", &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: q.VerifySSL}, //nolint:gosec
+	})
 
 	return nil
 }
@@ -139,19 +160,6 @@ func (r *RtorrentConfig) Setup(timeout time.Duration) {
 	})
 }
 
-func (q *QbitConfig) setup(timeout time.Duration) (err error) {
-	q.Qbit, err = qbit.NewNoAuth(q.Config)
-	if err != nil {
-		return fmt.Errorf("qbit setup failed: %w", err)
-	}
-
-	if q.Timeout.Duration == 0 {
-		q.Timeout.Duration = timeout
-	}
-
-	return nil
-}
-
 func (a *Apps) setupNZBGet(timeout time.Duration) error {
 	for idx := range a.NZBGet {
 		if a.NZBGet[idx].Config == nil || a.NZBGet[idx].URL == "" {
@@ -159,7 +167,6 @@ func (a *Apps) setupNZBGet(timeout time.Duration) error {
 		}
 
 		a.NZBGet[idx].NZBGet = nzbget.New(a.NZBGet[idx].Config)
-
 		if a.NZBGet[idx].Timeout.Duration == 0 {
 			a.NZBGet[idx].Timeout.Duration = timeout
 		}

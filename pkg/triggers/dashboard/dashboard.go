@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
@@ -385,7 +384,7 @@ func (c *Cmd) getSonarrStates() []*State {
 
 func (c *Cmd) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
 	start := time.Now()
-	size, xfers, err := app.GetXfersCompat()
+	_, xfers, err := app.GetXfersCompat()
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
 		Instance: instance,
@@ -394,11 +393,7 @@ func (c *Cmd) getDelugeState(instance int, app *apps.DelugeConfig) (*State, erro
 		Latest:   []*Sortable{},
 	}
 
-	exp.Apps.Add("Deluge&&GET Requests", 1)
-	exp.Apps.Add("Deluge&&Bytes Received", size)
-
 	if err != nil {
-		exp.Apps.Add("Deluge&&GET Errors", 1)
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
 
@@ -549,7 +544,7 @@ func (c *Cmd) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 
 func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop,funlen
 	start := time.Now()
-	size, xfers, err := app.GetXfers()
+	_, xfers, err := app.GetXfers()
 
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
@@ -559,11 +554,7 @@ func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) {
 		Latest:   []*Sortable{},
 	}
 
-	exp.Apps.Add("Qbit&&GET Requests", 1)
-	exp.Apps.Add("Qbit&&Bytes Received", size)
-
 	if err != nil {
-		exp.Apps.Add("Qbit&&GET Errors", 1)
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
 

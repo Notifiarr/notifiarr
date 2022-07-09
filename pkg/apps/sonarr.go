@@ -2,6 +2,7 @@
 package apps
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -51,14 +53,23 @@ type SonarrConfig struct {
 }
 
 func (a *Apps) setupSonarr(timeout time.Duration) error {
-	for idx := range a.Sonarr {
-		if a.Sonarr[idx].Config == nil || a.Sonarr[idx].Config.URL == "" {
+	for idx, app := range a.Sonarr {
+		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Sonarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Sonarr[idx].Debugf = a.Debugf
-		a.Sonarr[idx].errorf = a.Errorf
-		a.Sonarr[idx].setup(timeout)
+		app.Config.Client = &http.Client{
+			Timeout: app.Timeout.Duration,
+			CheckRedirect: func(r *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+			Transport: exp.NewMetricsRoundTripper(string(starr.Sonarr), &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: app.Config.ValidSSL}, //nolint:gosec
+			}),
+		}
+		app.Debugf = a.Debugf
+		app.errorf = a.Errorf
+		app.setup(timeout)
 	}
 
 	return nil
@@ -66,7 +77,6 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 
 func (r *SonarrConfig) setup(timeout time.Duration) {
 	r.Sonarr = sonarr.New(r.Config)
-	r.Sonarr.APIer = &starrAPI{api: r.Sonarr.APIer, app: starr.Sonarr.String()}
 
 	if r.Timeout.Duration == 0 {
 		r.Timeout.Duration = timeout

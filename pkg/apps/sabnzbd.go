@@ -2,6 +2,7 @@ package apps
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -243,24 +244,20 @@ func GetURLInto(app string, timeout time.Duration, url string, params url.Values
 		return fmt.Errorf("creating request: %w", err)
 	}
 
-	exp.Apps.Add(app+"&&GET Requests", 1)
-
 	req.URL.RawQuery = params.Encode()
 
-	resp, err := (&http.Client{Timeout: timeout}).Do(req)
+	resp, err := (&http.Client{Timeout: timeout, Transport: exp.NewMetricsRoundTripper(app, &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+	})}).Do(req)
 	if err != nil {
-		exp.Apps.Add(app+"&&GET Errors", 1)
 		return fmt.Errorf("making request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		exp.Apps.Add(app+"&&GET Errors", 1)
 		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
 	}
-
-	exp.Apps.Add(app+"&&Bytes Received", int64(len(body)))
 
 	if err := json.Unmarshal(body, into); err != nil {
 		return fmt.Errorf("decoding response (%s): %w: %s", resp.Status, err, string(body))
