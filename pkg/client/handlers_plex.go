@@ -8,12 +8,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"golift.io/datacounter"
 )
 
 // Timer is used to set a cooldown time.
@@ -41,13 +39,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	exp.Apps.Add("Plex&&Incoming Webhooks", 1)
 
 	start := time.Now()
-	rcvd := datacounter.NewReaderCounter(r.Body)
-	r.Body = &apps.FakeCloser{
-		App:     "Plex",
-		Rcvd:    rcvd.Count,   // This gets added...
-		CloseFn: r.Body.Close, // when this gets called.
-		Reader:  rcvd,
-	}
+	r.Body = exp.NewFakeCloser("Plex", "Webhook", r.Body)
 
 	if err := r.ParseMultipartForm(mnd.Megabyte); err != nil {
 		c.Errorf("Parsing Multipart Form (plex): %v", err)
@@ -60,7 +52,6 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	payload := r.Form.Get("payload")
 	c.Debugf("Plex Webhook Payload: %s", payload)
 	r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
-	exp.Apps.Add("Plex&&Bytes Received", int64(rcvd.Count()))
 
 	var v plex.IncomingWebhook
 

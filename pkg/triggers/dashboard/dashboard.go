@@ -542,7 +542,7 @@ func (c *Cmd) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop,funlen
+func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop
 	start := time.Now()
 	_, xfers, err := app.GetXfers()
 

@@ -9,6 +9,7 @@ package plex
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -86,11 +87,9 @@ func (s *Server) reqPlexURL(
 	req.URL.RawQuery = params.Encode()
 	req.Header.Set("X-Plex-Token", s.Token)
 	req.Header.Set("Accept", "application/json")
-	exp.Apps.Add("Plex&&"+method+" Requests", 1)
 
 	resp, err := s.getClient().Do(req)
 	if err != nil {
-		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
@@ -100,8 +99,6 @@ func (s *Server) reqPlexURL(
 		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return nil, fmt.Errorf("reading http response: %w", err)
 	}
-
-	exp.Apps.Add("Plex&&Bytes Received", int64(len(body)))
 
 	if resp.StatusCode != http.StatusOK {
 		exp.Apps.Add("Plex&&"+method+" Errors", 1)
@@ -113,7 +110,12 @@ func (s *Server) reqPlexURL(
 
 func (s *Server) getClient() *http.Client {
 	if s.client == nil {
-		s.client = &http.Client{}
+		s.client = &http.Client{
+			Timeout: s.Timeout.Duration,
+			Transport: exp.NewMetricsRoundTripper("Plex", &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: false}, //nolint:gosec
+			}),
+		}
 	}
 
 	return s.client
