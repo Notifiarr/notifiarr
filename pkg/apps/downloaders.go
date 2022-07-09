@@ -52,8 +52,10 @@ type TautulliConfig struct {
 
 type NZBGetConfig struct {
 	*nzbget.Config
-	Name           string        `toml:"name" xml:"name"`
-	Interval       cnfg.Duration `toml:"interval" xml:"interval"`
+	Name           string        `toml:"name" xml:"name" json:"name"`
+	Interval       cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	Timeout        cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
+	VerifySSL      bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 	*nzbget.NZBGet `toml:"-" xml:"-" json:"-"`
 }
 
@@ -161,9 +163,16 @@ func (r *RtorrentConfig) Setup(timeout time.Duration) {
 }
 
 func (a *Apps) setupNZBGet(timeout time.Duration) error {
-	for idx := range a.NZBGet {
-		if a.NZBGet[idx].Config == nil || a.NZBGet[idx].URL == "" {
+	for idx, nzb := range a.NZBGet {
+		if nzb.Config == nil || nzb.URL == "" {
 			return fmt.Errorf("%w: missing url: NZBGet config %d", ErrInvalidApp, idx+1)
+		}
+
+		nzb.Client = &http.Client{
+			Timeout: nzb.Timeout.Duration,
+			Transport: exp.NewMetricsRoundTripper("NZBGet", &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: nzb.VerifySSL}, //nolint:gosec
+			}),
 		}
 
 		a.NZBGet[idx].NZBGet = nzbget.New(a.NZBGet[idx].Config)

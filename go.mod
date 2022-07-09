@@ -114,7 +114,7 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 
-require golift.io/nzbget v0.1.3-0.20220701235118-24fa142aefc6
+require golift.io/nzbget v0.1.3-0.20220709200057-e7ea4be8dad7
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
