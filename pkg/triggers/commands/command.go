@@ -58,11 +58,10 @@ func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, 
 			Route: website.CommandRoute,
 			Event: event,
 			Payload: map[string]string{
-				"name":    c.Name,
-				"command": c.Command,
-				"hash":    c.Hash,
-				"output":  oStr,
-				"error":   eStr,
+				"name":   c.Name,
+				"hash":   c.Hash,
+				"output": oStr,
+				"error":  eStr,
 			},
 			LogMsg:     fmt.Sprintf("Custom Command '%s' Output", c.Name),
 			LogPayload: c.Log,
@@ -115,7 +114,7 @@ func run(ctx context.Context, command string, shell bool) (*bytes.Buffer, error)
 	cmd.Stderr = &out
 
 	if err := cmd.Run(); err != nil {
-		return &out, fmt.Errorf(`running cmd %q: %w`, cmd.Args, err)
+		return &out, fmt.Errorf(`running cmd %s: %w`, cmd.Args, err)
 	}
 
 	return &out, nil
