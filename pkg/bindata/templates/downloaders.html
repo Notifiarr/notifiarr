@@ -168,7 +168,7 @@
                                                                     {{- range $i := one259 }}
                                                                     <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
                                                                     {{- end}}
-                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m0s">1 minute</option>
                                                                     {{- range $i := one259 }}
                                                                     <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
                                                                     {{- end}}
@@ -329,7 +329,7 @@
                                                                     {{- range $i := one259 }}
                                                                     <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
                                                                     {{- end}}
-                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m0s">1 minute</option>
                                                                     {{- range $i := one259 }}
                                                                     <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
                                                                     {{- end}}
