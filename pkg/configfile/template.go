@@ -37,7 +37,7 @@ const tmpl = `###############################################
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}{{if .ExKeys}}
 extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
 
-## Setting a UI password enables the human accessible web GUI. Must be at least 16 characters.
+## Setting a UI password enables the human accessible web GUI. Must be at least 9 characters.
 ## The default username is admin; change it by setting ui_password to "username:password"
 ## Set to "webauth" to disable the login form and use only proxy authentication. See upstreams, below.
 ## Your proxy auth must pass x-webauth-user header if you set this to "webauth".
@@ -389,6 +389,19 @@ retries = {{.Retries}}
 #user = "notifiarr"
 #pass = "password"
 {{- end}}
+
+###################
+# Nvidia Snapshot #
+###################
+
+# The app will automatically collect Nvidia data if nvidia-smi is present.
+# Use the settings below to disable Nvidia GPU collection, or restrict collection to only specific Bus IDs.
+# SMI Path is found automatically if left blank. Set it to path to nvidia-smi (nvidia-smi.exe on Windows).
+
+[snapshot.nvidia]
+disabled = {{.Snapshot.Nvidia.Disabled}}
+smi_path = '''{{.Snapshot.Nvidia.SMIPath}}'''
+bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
 
 ##################
 # Service Checks #

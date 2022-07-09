@@ -477,6 +477,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" name="SSLKeyFile" id="SSLKeyFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}">
+                                                                <div onClick="browseFiles('#SSLKeyFile');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -507,6 +508,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" name="SSLCrtFile" id="SSLCrtFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}">
+                                                                <div onClick="browseFiles('#SSLCrtFile');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -732,6 +734,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="LogFile" name="LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}">
+                                                                <div onClick="browseFiles('#LogFile', 'notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -739,12 +742,12 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write the http logs to a dedicated file.
+                                                            Setting a log file path here will make the application write the HTTP logs to a dedicated file.
                                                             The file format is in apachelog. Highly recommended.<br>
                                                             <b>Current Value</b>: <i>{{ .Config.HTTPLog }}</i>
                                                         </div>
                                                         <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">HTTP Logfile</span>
+                                                        <span class="dialogTitle">HTTP Log File</span>
                                                     </td>
                                                     <td class="mobile-hide">
                                                         {{.Config.HTTPLog}}
@@ -762,6 +765,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" name="HTTPLog" id="HTTPLog" class="client-parameter form-control input-sm" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}">
+                                                                <div onClick="browseFiles('#HTTPLog', 'http-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -792,6 +796,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Services.LogFile" name="Services.LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Service Log" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}">
+                                                                <div onClick="browseFiles('#Services\\.LogFile', 'services-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -822,6 +827,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="LogConfig.DebugLog" name="LogConfig.DebugLog" class="client-parameter form-control input-sm" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}">
+                                                                <div onClick="browseFiles('#LogConfig\\.DebugLog', 'debug-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </td>

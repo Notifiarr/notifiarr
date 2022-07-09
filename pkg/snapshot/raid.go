@@ -128,7 +128,7 @@ func (s *Snapshot) scanMegaCLI(stdout *bufio.Scanner, waitg *sync.WaitGroup) {
 			continue
 		}
 
-		if split := strings.Split(strings.TrimSpace(stdout.Text()), ":"); len(split) == 2 { // nolint:gomnd
+		if split := strings.SplitN(strings.TrimSpace(text), ":", 2); len(split) == 2 && current != nil { //nolint:gomnd
 			current.Data[strings.TrimSpace(split[0])] = strings.TrimSpace(split[1])
 		}
 	}

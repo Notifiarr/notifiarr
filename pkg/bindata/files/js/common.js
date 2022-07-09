@@ -180,7 +180,7 @@ function jsLoader()
 {
     let path        = '';
     let script      = '';
-    const files     = ['navigation', 'golists', 'fileViewer', 'services', 'triggers', 'websocket'];
+    const files     = ['navigation', 'golists', 'fileViewer', 'services', 'triggers', 'websocket', 'filebrowser'];
 
     for (const file of files) {
         path        = URLBase+'files/js/' + file + '.js';
@@ -333,7 +333,7 @@ function savePendingChanges()
             toast('Config Saved', 'Wait 5 seconds; reloading the new configuration...', 'success');
         },
         error: function (response, status, error) {
-            if (status === undefined) {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
@@ -363,7 +363,7 @@ function saveProfileChanges()
             toast('Profile Saved', data, 'success');
         },
         error: function (response, status, error) {
-            if (error == "") {
+            if (response.responseText === undefined) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {

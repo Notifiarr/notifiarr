@@ -3,9 +3,11 @@ package client
 import (
 	"archive/zip"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime"
 	"net/http"
 	"os"
@@ -13,6 +15,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -21,16 +24,18 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 const (
-	minPasswordLen   = 16
+	minPasswordLen   = 9
 	fileSourceLogs   = "logs"
 	fileSourceConfig = "config"
 )
@@ -368,6 +373,49 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 	}
 
 	c.testInstance(response, request)
+}
+
+// handleFileBrowser returns a list of files and folders in a path.
+// part of the file browser javascript code.
+func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.Request) {
+	type dir struct {
+		Dirs  []string `json:"dirs"`
+		Files []string `json:"files"`
+	}
+
+	output := dir{Dirs: []string{}, Files: []string{}}
+
+	switch dirPath := mux.Vars(request)["dir"]; {
+	case dirPath != "":
+		dir, err := ioutil.ReadDir(filepath.Join(dirPath, "/"))
+		if err != nil {
+			http.Error(response, err.Error(), http.StatusNotAcceptable)
+			return
+		}
+
+		for _, file := range dir {
+			if file.IsDir() {
+				output.Dirs = append(output.Dirs, file.Name())
+			} else {
+				output.Files = append(output.Files, file.Name())
+			}
+		}
+	case runtime.GOOS == mnd.Windows:
+		partitions, err := disk.Partitions(false)
+		if err != nil {
+			c.Errorf("Getting disk partitions: %v", err)
+		}
+		// this runs anyway.
+		for _, partition := range partitions {
+			output.Dirs = append(output.Dirs, partition.Mountpoint)
+		}
+	default:
+		output.Dirs = []string{"/"}
+	}
+
+	if err := json.NewEncoder(response).Encode(&output); err != nil {
+		c.Errorf("Encoding file browser directory: %v", err)
+	}
 }
 
 func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {

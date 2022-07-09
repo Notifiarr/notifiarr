@@ -7,7 +7,7 @@
                                 <hr>
                                 <p>
                                     <h3><i class="fas fa-comment"></i> Notes</h3>
-                                    <li><i class="fas fa-star"></i> The green button will not run a command that has been modified. Save & Reload first!</li>
+                                    <li><i class="fas fa-star"></i> The <span class="text-brand">purple</span> button will not run a command that has been modified. Save & Reload first!</li>
                                 </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
@@ -32,8 +32,8 @@
                                                         The <span class="text-danger">red</span> button deletes the custom command.<br>
                                                         The <span class="text-primary">blue</span> button adds a new custom command.<br>
                                                         The <span class="text-brand">purple</span> button runs the command and stores the output.<br>
-                                                        The <span class="text-success">green</span> button tests the command and displays the output.<br>
-                                                        The <span class="text-dgrey">rocket</span> displays statistics for that [saved] command.
+                                                        The <span class="text-success">green</span> button tests the [unsaved] command and displays the output.<br>
+                                                        The <span class="text-dgrey">rocket</span> displays output and statistics for that [saved] command.
                                                     </div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Actions</span>
@@ -115,6 +115,7 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Commands.{{$index}}.Command" name="Commands.{{$index}}.Command" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Command" data-original="{{$app.Command}}" value="{{$app.Command}}">
+                                                                <div onClick="browseFiles('#Commands\\.{{$index}}\\.Command');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
                                                             </div>
                                                         </div>
                                                     </form>

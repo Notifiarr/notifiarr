@@ -77,6 +77,7 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
 	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
 	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")
+	gui.HandleFunc("/browse", c.handleFileBrowser).Queries("dir", "{dir}").Methods("GET")
 	gui.HandleFunc("/cmdstats/{command}", c.handleCommandStats).Methods("GET")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
