@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
 
@@ -79,6 +80,10 @@ func (c *Client) appStatsForVersion(ctx context.Context) map[string]interface{} 
 
 func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*conTest, fg bool) {
 	for idx, app := range lidarrs {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+			lid[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
+		}
+
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
 			lid[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
@@ -98,6 +103,10 @@ func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps
 
 func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*apps.ProwlarrConfig, prl []*conTest, fg bool) {
 	for idx, app := range prowlarrs {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+			prl[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
+		}
+
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
 			prl[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
@@ -117,6 +126,10 @@ func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*
 
 func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps.RadarrConfig, rad []*conTest, fg bool) {
 	for idx, app := range radarrs {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+			rad[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
+		}
+
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
 			rad[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
@@ -136,6 +149,10 @@ func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps
 
 func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*apps.ReadarrConfig, read []*conTest, fg bool) {
 	for idx, app := range readarrs {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+			read[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
+		}
+
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
 			read[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
@@ -155,6 +172,10 @@ func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*ap
 
 func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps.SonarrConfig, son []*conTest, fg bool) {
 	for idx, app := range sonarrs {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+			son[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
+		}
+
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
 			son[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}

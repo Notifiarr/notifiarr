@@ -255,7 +255,7 @@ func (c *Cmd) getDelugeStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Deluge {
-		if app.Deluge.URL == "" {
+		if app.Timeout.Duration < 0 || app.Deluge.URL == "" {
 			continue
 		}
 
@@ -277,7 +277,7 @@ func (c *Cmd) getLidarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Lidarr {
-		if app.URL == "" {
+		if app.Timeout.Duration < 0 || app.URL == "" {
 			continue
 		}
 
@@ -299,7 +299,7 @@ func (c *Cmd) getRadarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Radarr {
-		if app.URL == "" {
+		if app.Timeout.Duration < 0 || app.URL == "" {
 			continue
 		}
 
@@ -321,7 +321,7 @@ func (c *Cmd) getReadarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Readarr {
-		if app.URL == "" {
+		if app.Timeout.Duration < 0 || app.URL == "" {
 			continue
 		}
 
@@ -343,7 +343,7 @@ func (c *Cmd) getQbitStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Qbit {
-		if app.URL == "" {
+		if app.Timeout.Duration < 0 || app.URL == "" {
 			continue
 		}
 
@@ -365,7 +365,7 @@ func (c *Cmd) getSonarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Sonarr {
-		if app.URL == "" {
+		if app.Timeout.Duration < 0 || app.URL == "" {
 			continue
 		}
 
@@ -877,7 +877,7 @@ func (c *Cmd) getSabNZBStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.SabNZB {
-		if app.URL == "" {
+		if app.Timeout.Duration < 0 || app.URL == "" {
 			continue
 		}
 

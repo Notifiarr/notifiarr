@@ -40,7 +40,8 @@ func (c *cmd) syncSonarr(event website.EventType) {
 
 	for i, app := range c.Apps.Sonarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || !c.ClientInfo.Actions.Sync.SonarrInstances.Has(instance) {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
+			!c.ClientInfo.Actions.Sync.SonarrInstances.Has(instance) {
 			c.Debugf("CF Sync Skipping Sonarr instance %d. Not in sync list: %v",
 				instance, c.ClientInfo.Actions.Sync.SonarrInstances)
 			continue

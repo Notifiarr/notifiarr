@@ -42,7 +42,8 @@ func (c *cmd) syncRadarr(event website.EventType) {
 
 	for i, app := range c.Apps.Radarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || !c.ClientInfo.Actions.Sync.RadarrInstances.Has(instance) {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
+			!c.ClientInfo.Actions.Sync.RadarrInstances.Has(instance) {
 			c.Debugf("CF Sync Skipping Radarr instance %d. Not in sync list: %v",
 				instance, c.ClientInfo.Actions.Sync.RadarrInstances)
 			continue

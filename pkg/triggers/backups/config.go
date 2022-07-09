@@ -71,6 +71,7 @@ type Info struct {
 // genericInstance is used to abstract all starr apps to reusable methods.
 // It's also used in the go file.
 type genericInstance struct {
+	skip  bool
 	event website.EventType
 	last  string      // app.Corrupt
 	name  starr.App   // Lidarr, Radarr, ..
