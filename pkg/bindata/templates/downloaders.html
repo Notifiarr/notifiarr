@@ -162,7 +162,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -323,7 +323,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_DELUGE_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Deluge.{{$index}}.Timeout" name="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Deluge.{{$index}}.Timeout" name="Apps.Deluge.{{$index}}.Timeout" data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -483,7 +483,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.SabNZB.{{$index}}.Timeout" name="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.SabNZB.{{$index}}.Timeout" name="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -662,7 +662,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_NZBGET_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.NZBGet.{{$index}}.Config.Timeout" name="Apps.NZBGet.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.NZBGet.{{$index}}.Config.Timeout" name="Apps.NZBGet.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}

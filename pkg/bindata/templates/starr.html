@@ -1,5 +1,9 @@
                                 <h1><i class="fas fa-star"></i> Starr Apps</h1>
                                 <p>Notifiarr client has deep integrations with the whole suite of Starr applications. The rest of the settings for these can be found on the Notifiarr.com website.</p>
+                                <p>
+                                    <h3><i class="fas fa-comment text-orange"></i> Notes</h3>
+                                    <li><i class="fas fa-star text-dgrey"></i> Temporarily disable an instance by setting the <b>Timeout</b> to <b>Disabled</b>.</li>
+                                </p>
                                 <div class="table-responsive">
                                     <table class="table table-bordered bk-dark" style="width:100%">
                                         <thead>
@@ -198,7 +202,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Lidarr.{{$index}}.Timeout" name="Apps.Lidarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Lidarr.{{$index}}.Timeout" name="Apps.Lidarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -413,7 +417,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Prowlarr.{{$index}}.Timeout" name="Apps.Prowlarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Prowlarr.{{$index}}.Timeout" name="Apps.Prowlarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -630,7 +634,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Radarr.{{$index}}.Timeout" name="Apps.Radarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Radarr.{{$index}}.Timeout" name="Apps.Radarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -845,7 +849,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Readarr.{{$index}}.Timeout" name="Apps.Readarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Readarr.{{$index}}.Timeout" name="Apps.Readarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -1060,7 +1064,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Sonarr.{{$index}}.Timeout" name="Apps.Sonarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Sonarr.{{$index}}.Timeout" name="Apps.Sonarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}

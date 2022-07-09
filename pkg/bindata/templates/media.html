@@ -1,8 +1,9 @@
                                 <h1><i class="fas fa-photo-video"></i> Media Apps</h1>
                                 <p>
-                                    <li style="list-style: disc;">The Plex integration is comprehensive, and many of the settings are configured on the Notifiarr.com website.</li>
-                                    <li style="list-style: disc;">The Tautulli integration is used to provide a Plex username to custom name mapping in notifications.</li>
-                                    <li style="list-style: disc;"><b>To disable Plex or Tautulli, simply remove the URL for the application.</b> The client only supports one of each.</li>
+                                    <h3><i class="fas fa-comment text-orange"></i> Notes</h3>
+                                    <li><i class="fas fa-star text-dgrey"></i> The Plex integration is comprehensive, and many of the settings are configured on the Notifiarr.com website.</li>
+                                    <li><i class="fas fa-star text-dgrey"></i> The Tautulli integration is used to provide a Plex username to custom name mapping in notifications.</li>
+                                    <li><i class="fas fa-star text-dgrey"></i> Disable Ples or Tautulli by removing the URL or setting Timeout to Disabled. The client only supports one of each.</li>
                                 </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">
@@ -99,7 +100,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}">
+                                                                <select type="select" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -243,7 +244,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}">
+                                                                <select type="select" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}

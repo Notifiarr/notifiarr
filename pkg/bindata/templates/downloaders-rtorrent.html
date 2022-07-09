@@ -158,7 +158,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Apps.Rtorrent.{{$index}}.Timeout" name="Apps.Rtorrent.{{$index}}.Timeout" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Rtorrent.{{$index}}.Timeout" name="Apps.Rtorrent.{{$index}}.Timeout" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
