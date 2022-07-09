@@ -39,7 +39,9 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	exp.Apps.Add("Plex&&Incoming Webhooks", 1)
 
 	start := time.Now()
+
 	r.Body = exp.NewFakeCloser("Plex", "Webhook", r.Body)
+	defer r.Body.Close()
 
 	if err := r.ParseMultipartForm(mnd.Megabyte); err != nil {
 		c.Errorf("Parsing Multipart Form (plex): %v", err)
