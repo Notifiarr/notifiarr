@@ -189,7 +189,7 @@ func (s *SabNZBConfig) setup(timeout time.Duration) {
 }
 
 // GetHistory returns the history items in SABnzbd.
-func (s *SabNZBConfig) GetHistory() (*History, error) {
+func (s *SabNZBConfig) GetHistory(ctx context.Context) (*History, error) {
 	if s == nil || s.URL == "" {
 		return &History{}, nil
 	}
@@ -203,7 +203,7 @@ func (s *SabNZBConfig) GetHistory() (*History, error) {
 		History *History `json:"history"`
 	}
 
-	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &hist)
+	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &hist)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func (s *SabNZBConfig) GetHistory() (*History, error) {
 }
 
 // GetQueue returns the active queued items in SABnzbd.
-func (s *SabNZBConfig) GetQueue() (*Queue, error) {
+func (s *SabNZBConfig) GetQueue(ctx context.Context) (*Queue, error) {
 	if s == nil || s.URL == "" {
 		return &Queue{}, nil
 	}
@@ -226,7 +226,7 @@ func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 		Queue *Queue `json:"queue"`
 	}
 
-	err := GetURLInto("SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &que)
+	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &que)
 	if err != nil {
 		return nil, err
 	}
@@ -235,10 +235,14 @@ func (s *SabNZBConfig) GetQueue() (*Queue, error) {
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func GetURLInto(app string, timeout time.Duration, url string, params url.Values, into interface{}) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
+func GetURLInto(
+	ctx context.Context,
+	app string,
+	timeout time.Duration,
+	url string,
+	params url.Values,
+	into interface{},
+) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)

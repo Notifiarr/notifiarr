@@ -8,6 +8,8 @@ import (
 	"golift.io/datacounter"
 )
 
+/* The code in thie files powers the metrics collection for prety much every integrated app. */
+
 type fakeCloser struct {
 	App     string
 	Method  string
@@ -54,11 +56,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	}
 
 	resp, err := rt.next.RoundTrip(req)
-	if err != nil {
-		Apps.Add(rt.app+"&&"+req.Method+" Errors", 1)
-	}
-
-	Apps.Add(rt.app+"&&"+req.Method+" Requests", 1)
+	checkResp(rt.app, req.Method, resp, err)
 
 	if resp == nil || resp.Body == nil {
 		return resp, err //nolint:wrapcheck
@@ -78,5 +76,17 @@ func NewFakeCloser(app, method string, body io.ReadCloser) io.ReadCloser {
 		Rcvd:    rcvd.Count, // This gets added...
 		CloseFn: body.Close, // when this gets called.
 		Reader:  rcvd,
+	}
+}
+
+func checkResp(app, method string, resp *http.Response, err error) {
+	Apps.Add(app+"&&"+method+" Requests", 1)
+
+	if resp != nil {
+		Apps.Add(app+"&&"+method+" Response: "+resp.Status, 1)
+	}
+
+	if err != nil || resp == nil {
+		Apps.Add(app+"&&"+method+" Request Errors", 1)
 	}
 }

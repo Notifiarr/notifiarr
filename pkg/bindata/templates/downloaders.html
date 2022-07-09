@@ -8,11 +8,11 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/qbittorrent.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">qBittorrent</h2>
                                                     <div style="float: right;">
-                                                        <button id="download-Qbit-addbutton" onclick="addInstance('download', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="download-Qbit-addbutton" onclick="addInstance('download', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
-                                                    <button id="download-Qbit-addbutton" onclick="addInstance('download', 'Qbit')" data-prefix="Apps" data-names='["Name","URL","User","Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button onclick="addInstance('download', 'Qbit')" data-prefix="Apps" type="button" title="Add another instance of Qbittorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 class="mb-3" style="margin-left:5px;display:inline;">qBittorrent</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/qbittorrent.png" style="height:50px;"></div>
                                                 </td>
@@ -162,7 +162,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="select" id="Apps.Qbit.{{$index}}.Config.Timeout" name="Apps.Qbit.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Qbit.{{$index}}.Timeout" name="Apps.Qbit.{{$index}}.Timeout" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -192,7 +192,7 @@
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
-                                                    <button id="download-Deluge-addbutton" onclick="addInstance('download', 'Deluge')" data-prefix="Apps" data-names='["Name","","Config.URL","Config.Password","Interval","Timeout"]' type="button" title="Add another instance of Deluge." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button onclick="addInstance('download', 'Deluge')" data-prefix="Apps" type="button" title="Add another instance of Deluge." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 class="mb-3" style="margin-left:5px;display:inline;">Deluge</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/deluge.png" style="height:50px;"></div>
                                                 </td>
@@ -352,7 +352,7 @@
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
-                                                    <button id="download-SabNZB-addbutton" onclick="addInstance('download','SabNZB')" data-prefix="Apps" data-names='["Name","", "URL","APIKey","Interval","Timeout"]' type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button onclick="addInstance('download','SabNZB')" data-prefix="Apps" type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 class="mb-3" style="margin-left:5px;display:inline;">SabNZB</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
                                                 </td>
@@ -508,11 +508,11 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/nzbget.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">NZBGet</h2>
                                                     <div style="float: right;">
-                                                        <button id="download-NZBGet-addbutton" onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" data-names='["Name","Config.URL","Config.User","Config.Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="download-NZBGet-addbutton" onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" data-names='["Name","Config.URL","Config.User","Config.Pass","Interval","Timeout"]' type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
-                                                    <button id="download-NZBGet-addbutton" onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" data-names='["Name","Config.URL","Config.User","Config.Pass","Interval","Config.Timeout"]' type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 class="mb-3" style="margin-left:5px;display:inline;">NZBGet</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/nzbget.png" style="height:50px;"></div>
                                                 </td>
@@ -662,7 +662,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_NZBGET_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="select" id="Apps.NZBGet.{{$index}}.Config.Timeout" name="Apps.NZBGet.{{$index}}.Config.Timeout" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.NZBGet.{{$index}}.Timeout" name="Apps.NZBGet.{{$index}}.Timeout" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}

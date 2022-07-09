@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/nzbget"
 )
@@ -40,7 +39,6 @@ func (c *Cmd) getNZBGetState(instance int, n *apps.NZBGetConfig) (*State, error)
 
 	queue, stat, hist, err := getNzbData(instance, n)
 	if err != nil {
-		exp.Apps.Add("NZBGet&&GET Errors", 1)
 		return state, err
 	}
 
@@ -89,29 +87,20 @@ func (c *Cmd) getNZBGetState(instance int, n *apps.NZBGetConfig) (*State, error)
 }
 
 func getNzbData(instance int, n *apps.NZBGetConfig) ([]*nzbget.Group, *nzbget.Status, []*nzbget.History, error) {
-	queue, size, err := n.ListGroups()
+	queue, err := n.ListGroups()
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting file groups (queue) from instance %d: %w", instance, err)
 	}
 
-	exp.Apps.Add("NZBGet&&GET Requests", 1)
-	exp.Apps.Add("NZBGet&&Bytes Received", int64(size))
-
-	stat, size, err := n.Status()
+	stat, err := n.Status()
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}
 
-	exp.Apps.Add("NZBGet&&GET Requests", 1)
-	exp.Apps.Add("NZBGet&&Bytes Received", int64(size))
-
-	hist, size, err := n.History(true)
+	hist, err := n.History(true)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}
-
-	exp.Apps.Add("NZBGet&&GET Requests", 1)
-	exp.Apps.Add("NZBGet&&Bytes Received", int64(size))
 
 	return queue, stat, hist, nil
 }

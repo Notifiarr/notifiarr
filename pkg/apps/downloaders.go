@@ -21,6 +21,8 @@ type DelugeConfig struct {
 	*deluge.Config
 	Name           string        `toml:"name" xml:"name" json:"name"`
 	Interval       cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	Timeout        cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
+	VerifySSL      bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 	*deluge.Deluge `toml:"-" xml:"-" json:"-"`
 }
 
@@ -28,6 +30,8 @@ type QbitConfig struct {
 	*qbit.Config
 	Name       string        `toml:"name" xml:"name" json:"name"`
 	Interval   cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	Timeout    cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
+	VerifySSL  bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
 }
 
@@ -52,8 +56,10 @@ type TautulliConfig struct {
 
 type NZBGetConfig struct {
 	*nzbget.Config
-	Name           string        `toml:"name" xml:"name"`
-	Interval       cnfg.Duration `toml:"interval" xml:"interval"`
+	Name           string        `toml:"name" xml:"name" json:"name"`
+	Interval       cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	Timeout        cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
+	VerifySSL      bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 	*nzbget.NZBGet `toml:"-" xml:"-" json:"-"`
 }
 
@@ -72,19 +78,22 @@ func (a *Apps) setupDeluge(timeout time.Duration) error {
 	return nil
 }
 
-func (d *DelugeConfig) setup(timeout time.Duration) (err error) {
-	_, d.Deluge, err = deluge.NewNoAuth(d.Config)
-
-	if err != nil {
-		return fmt.Errorf("deluge setup failed: %w", err)
-	}
-
-	d.Deluge.Client.Client.Transport = exp.NewMetricsRoundTripper("Deluge", &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: d.VerifySSL}, //nolint:gosec
-	})
-
+func (d *DelugeConfig) setup(timeout time.Duration) error {
 	if d.Timeout.Duration == 0 {
 		d.Timeout.Duration = timeout
+	}
+
+	d.Config.Client = &http.Client{
+		Timeout: d.Timeout.Duration,
+		Transport: exp.NewMetricsRoundTripper("Deluge", &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: d.VerifySSL}, //nolint:gosec
+		}),
+	}
+
+	var err error
+
+	if d.Deluge, err = deluge.NewNoAuth(d.Config); err != nil {
+		return fmt.Errorf("deluge setup failed: %w", err)
 	}
 
 	return nil
@@ -110,14 +119,17 @@ func (q *QbitConfig) setup(timeout time.Duration) (err error) {
 		q.Timeout.Duration = timeout
 	}
 
+	q.Config.Client = &http.Client{
+		Timeout: q.Timeout.Duration,
+		Transport: exp.NewMetricsRoundTripper("qBittorrent", &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: q.VerifySSL}, //nolint:gosec
+		}),
+	}
+
 	q.Qbit, err = qbit.NewNoAuth(q.Config)
 	if err != nil {
 		return fmt.Errorf("qbit setup failed: %w", err)
 	}
-
-	q.Qbit.Transport = exp.NewMetricsRoundTripper("qBittorrent", &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: q.VerifySSL}, //nolint:gosec
-	})
 
 	return nil
 }
@@ -161,9 +173,16 @@ func (r *RtorrentConfig) Setup(timeout time.Duration) {
 }
 
 func (a *Apps) setupNZBGet(timeout time.Duration) error {
-	for idx := range a.NZBGet {
-		if a.NZBGet[idx].Config == nil || a.NZBGet[idx].URL == "" {
+	for idx, nzb := range a.NZBGet {
+		if nzb.Config == nil || nzb.URL == "" {
 			return fmt.Errorf("%w: missing url: NZBGet config %d", ErrInvalidApp, idx+1)
+		}
+
+		nzb.Client = &http.Client{
+			Timeout: nzb.Timeout.Duration,
+			Transport: exp.NewMetricsRoundTripper("NZBGet", &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: nzb.VerifySSL}, //nolint:gosec
+			}),
 		}
 
 		a.NZBGet[idx].NZBGet = nzbget.New(a.NZBGet[idx].Config)

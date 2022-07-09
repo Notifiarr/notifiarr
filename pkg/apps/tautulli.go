@@ -1,6 +1,7 @@
 package apps
 
 import (
+	"context"
 	"net/url"
 	"strings"
 	"time"
@@ -19,7 +20,7 @@ func (t *TautulliConfig) setup(timeout time.Duration) {
 }
 
 // GetUsers returns the Tautulli users.
-func (t *TautulliConfig) GetUsers() (*TautulliUsers, error) {
+func (t *TautulliConfig) GetUsers(ctx context.Context) (*TautulliUsers, error) {
 	if t == nil || t.URL == "" {
 		return &TautulliUsers{}, nil
 	}
@@ -30,7 +31,7 @@ func (t *TautulliConfig) GetUsers() (*TautulliUsers, error) {
 
 	var users TautulliUsers
 
-	err := GetURLInto("Tautulli", t.Timeout.Duration, t.URL+"/api/v2", params, &users)
+	err := GetURLInto(ctx, "Tautulli", t.Timeout.Duration, t.URL+"/api/v2", params, &users)
 	if err != nil {
 		return nil, err
 	}
