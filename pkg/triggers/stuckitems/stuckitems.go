@@ -70,27 +70,27 @@ func (a *Action) Create() {
 }
 
 // getTicker only returns a ticker if at least 1 app has stuck items turned on.
-func getTicker(apps *apps.Apps) *time.Ticker {
+func getTicker(apps *apps.Apps) *time.Ticker { //nolint:gocognit,cyclop
 	for _, app := range apps.Lidarr {
-		if app.StuckItem {
+		if app.StuckItem && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
 			return time.NewTicker(stuckDur)
 		}
 	}
 
 	for _, app := range apps.Radarr {
-		if app.StuckItem {
+		if app.StuckItem && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
 			return time.NewTicker(stuckDur)
 		}
 	}
 
 	for _, app := range apps.Readarr {
-		if app.StuckItem {
+		if app.StuckItem && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
 			return time.NewTicker(stuckDur)
 		}
 	}
 
 	for _, app := range apps.Sonarr {
-		if app.StuckItem {
+		if app.StuckItem && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
 			return time.NewTicker(stuckDur)
 		}
 	}
@@ -181,7 +181,7 @@ func (c *cmd) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
 	for idx, app := range c.Apps.Lidarr {
 		instance := idx + 1
 
-		if !app.StuckItem {
+		if !app.StuckItem || app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -227,7 +227,7 @@ func (c *cmd) getFinishedItemsRadarr() ItemList { //nolint:cyclop
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
 
-		if !app.StuckItem {
+		if !app.StuckItem || app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -275,7 +275,7 @@ func (c *cmd) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
 	for idx, app := range c.Apps.Readarr {
 		instance := idx + 1
 
-		if !app.StuckItem {
+		if !app.StuckItem || app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -321,7 +321,7 @@ func (c *cmd) getFinishedItemsSonarr() ItemList { //nolint:cyclop
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
 
-		if !app.StuckItem {
+		if !app.StuckItem || app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 

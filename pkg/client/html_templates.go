@@ -115,6 +115,15 @@ func (c *Client) getFuncMap() template.FuncMap {
 			}
 			return "0"
 		},
+		"one259": func() (num []float64) {
+			for i := float64(1); i < 60; i++ {
+				num = append(num, i)
+			}
+			return num
+		},
+		"add": func(i, j float64) float64 {
+			return i + j
+		},
 	}
 }
 

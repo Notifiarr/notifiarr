@@ -64,7 +64,8 @@ func (c *cmd) sendGaps(event website.EventType) {
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
-		if app.URL == "" || app.APIKey == "" || !c.ClientInfo.Actions.Gaps.Instances.Has(instance) {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
+			!c.ClientInfo.Actions.Gaps.Instances.Has(instance) {
 			continue
 		}
 

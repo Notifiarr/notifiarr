@@ -119,7 +119,7 @@ function addInstance(section, app)
         let nameval = ""
         let nameori = ""
         let extra = ""
-        let itype = "text"
+        let itype = "<input type=\"text\""
 
         // Blank items in the name list add a colspan to the next item.
         if (name == "") {
@@ -135,7 +135,7 @@ function addInstance(section, app)
             case "Password":
             case "APIKey":
                 extra = '<div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword(\''+ prefix +'.'+ app +'.'+ index +'.'+ name + '\', $(this).find(\'i\'));"><i class="fas fa-low-vision secret-input"></i></div>';
-                itype = "password";
+                itype = "<input type=\"password\"";
                 break;
             case "Config.Interval":
             case "Interval":
@@ -144,8 +144,17 @@ function addInstance(section, app)
              break;
              case "Config.Timeout":
              case "Timeout":
-                nameval = "1m";
                 nameori = "1m";
+                itype = "<select type=\"select\""
+                extra = '<option value="-1s">Disabled</option><option value="0s">No Timeout</option><option selected value="1s">1 second</option>';
+                for (i = 2 ; i < 60 ; i++) {
+                    extra += '<option value="'+i+'s">'+i+' seconds</option>';
+                }
+                extra += '<option selected value="1m">1 minute</option>';
+                for (i = 1 ; i < 60 ; i++) {
+                    extra += '<option value="1m'+i+'s">1 min '+i+' sec</option>';
+                }
+                extra += '</select>';
              break;
              case "Config.URL":
              case "URL":
@@ -156,7 +165,7 @@ function addInstance(section, app)
         }
 
         row += '<td colspan="'+ colspan +'"><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
-        row += '<input type="'+ itype +'" name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
+        row += itype +'" name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
         'id="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
         'name="'+ prefix +'.'+ app +'.'+ index +'.'+ name +'" '+
         'data-app="'+ app +'" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="'+ section +'" data-label="'+ app +' '+
@@ -271,11 +280,20 @@ function addCommand()
                     '<option selected value="false">Disabled</option></select>';
                 break;
             case "Timeout":
-                row += '<input type="text" name="Commands.'+ index +'.'+ name +'" '+
+                row += '<select type="select" name="Commands.'+ index +'.'+ name +'" '+
                     'id="Commands.'+ index +'.'+ name +'" '+
                     'name="Commands.'+ index +'.'+ name +'" '+
                     'data-app="Commands" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="commands" data-label="Command '+
-                    instance +' '+name+'" data-original="20s" value="20s">';
+                    instance +' '+name+'" data-original="20s" value="20s"><option value="0s">No Timeout</option><option value="1s">1 second</option>'+
+                    '<option value="2s">2 seconds</option><option value="3s">3 seconds</option><option value="4s">4 seconds</option>'+
+                    '<option value="5s">5 seconds</option><option value="6s">6 seconds</option><option value="7s">7 seconds</option>'+
+                    '<option value="8s">8 seconds</option><option value="9s">9 seconds</option><option value="10s">10 seconds</option>'+
+                    '<option value="15s">15 seconds</option><option value="20s">20 seconds</option><option value="25s">25 seconds</option>'+
+                    '<option value="30s">30 seconds</option><option value="45s">45 seconds</option><option value="1m">1 minute</option>'+
+                    '<option value="1m15s">1 min 15 sec</option><option value="1m30s">1 min 30 sec</option><option value="1m45s">1 min 45 sec</option>'+
+                    '<option value="2m">2 minutes</option><option value="2m30s">2 min 30 sec</option><option value="3m">3 minutes</option>'+
+                    '<option value="3m">4 minutes</option><option value="3m">5 minutes</option><option value="3m">6 minutes</option>'+
+                    '<option value="3m">7 minutes</option></select>';
                     break;
             case "Command":
                 extra = '<div onClick="browseFiles(\'#Commands\\\\.'+index+'\\\\.Command\');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>';

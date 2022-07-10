@@ -89,7 +89,7 @@ func (c *cmd) create() {
 		C:    make(chan website.EventType, 1),
 		T:    radarrTicker,
 	}, &common.Action{
-		Name: TrigCFSyncSonarr,
+		Name: TrigRPSyncSonarr,
 		Fn:   c.syncSonarr,
 		C:    make(chan website.EventType, 1),
 		T:    sonarrTicker,
