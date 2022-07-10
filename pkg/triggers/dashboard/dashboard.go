@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -8,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
@@ -255,16 +255,16 @@ func (c *Cmd) getDelugeStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Deluge {
-		if app.Timeout.Duration < 0 || app.Deluge.URL == "" {
+		if app.Timeout.Duration < 0 || app.URL == "" {
 			continue
 		}
 
-		c.Debugf("Getting Deluge State: %d:%s", instance+1, app.Deluge.URL)
+		c.Debugf("Getting Deluge State: %d:%s", instance+1, app.URL)
 
 		state, err := c.getDelugeState(instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, app.Deluge.URL, err)
+			c.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -385,7 +385,7 @@ func (c *Cmd) getSonarrStates() []*State {
 
 func (c *Cmd) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
 	start := time.Now()
-	size, xfers, err := app.GetXfersCompat()
+	xfers, err := app.GetXfersCompat()
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
 		Instance: instance,
@@ -394,11 +394,7 @@ func (c *Cmd) getDelugeState(instance int, app *apps.DelugeConfig) (*State, erro
 		Latest:   []*Sortable{},
 	}
 
-	exp.Apps.Add("Deluge&&GET Requests", 1)
-	exp.Apps.Add("Deluge&&Bytes Received", size)
-
 	if err != nil {
-		exp.Apps.Add("Deluge&&GET Errors", 1)
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
 
@@ -547,9 +543,9 @@ func (c *Cmd) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop,funlen
+func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop
 	start := time.Now()
-	size, xfers, err := app.GetXfers()
+	xfers, err := app.GetXfers()
 
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
@@ -559,11 +555,7 @@ func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) {
 		Latest:   []*Sortable{},
 	}
 
-	exp.Apps.Add("Qbit&&GET Requests", 1)
-	exp.Apps.Add("Qbit&&Bytes Received", size)
-
 	if err != nil {
-		exp.Apps.Add("Qbit&&GET Errors", 1)
 		return state, fmt.Errorf("getting transfers from instance %d: %w", instance, err)
 	}
 
@@ -893,8 +885,8 @@ func (c *Cmd) getSabNZBStates() []*State {
 func (c *Cmd) getSabNZBState(instance int, s *apps.SabNZBConfig) (*State, error) {
 	state := &State{Instance: instance, Name: s.Name}
 	start := time.Now()
-	queue, err := s.GetQueue()
-	hist, err2 := s.GetHistory()
+	queue, err := s.GetQueue(context.Background())
+	hist, err2 := s.GetHistory(context.Background())
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
