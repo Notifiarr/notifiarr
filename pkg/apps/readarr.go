@@ -119,7 +119,7 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 		"id":        book.ID,
 		"hasFile":   hasFile,
 		"monitored": book.Monitored,
-		"tags":      book.Author.Tags,
+		// "tags":      book.Author.Tags,
 	}
 }
 
@@ -276,8 +276,8 @@ func readarrSearchBook(req *http.Request) (int, interface{}) {
 				"id":       book.ID,
 				"title":    book.Title,
 				"release":  book.ReleaseDate,
-				"author":   book.Author.AuthorName,
-				"authorId": book.Author.ID,
+				"author":   book.AuthorTitle,
+				"authorId": book.AuthorID,
 				"overview": book.Overview,
 				"ratings":  book.Ratings.Value,
 				"pages":    book.PageCount,
