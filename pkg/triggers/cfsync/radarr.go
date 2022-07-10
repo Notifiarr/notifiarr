@@ -96,21 +96,29 @@ func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 	return nil
 }
 
+//nolint:funlen // split this thing up.
 func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) error {
 	reply := &RadarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
 
-	c.Debugf("Received %d quality profiles and %d custom formats for Radarr: %d:%s",
+	c.Printf("Received %d quality profiles and %d custom formats for Radarr: %d:%s",
 		len(reply.QualityProfiles), len(reply.CustomFormats), instance, app.URL)
 
-	maps := &cfMapIDpayload{QP: []idMap{}, CF: []idMap{}, Instance: instance}
+	maps := &cfMapIDpayload{
+		QP:       []idMap{},
+		CF:       []idMap{},
+		Instance: instance,
+		QPerr:    make(map[int64][]string),
+		CFerr:    make(map[int][]string),
+	}
 
 	for idx, profile := range reply.CustomFormats {
 		newID, existingID := profile.ID, profile.ID
 
 		if _, err := app.UpdateCustomFormat(profile, existingID); err != nil {
+			maps.CFerr[existingID] = append(maps.CFerr[existingID], err.Error())
 			profile.ID = 0
 
 			c.Debugf("Error Updating custom format [%d/%d] (attempting to ADD %d): %v",
@@ -118,8 +126,10 @@ func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) 
 
 			newAdd, err2 := app.AddCustomFormat(profile)
 			if err2 != nil {
+				maps.CFerr[existingID] = append(maps.CFerr[existingID], err2.Error())
 				c.Errorf("Ensuring custom format [%d/%d] %d: (update) %v, (add) %v",
 					idx+1, len(reply.CustomFormats), existingID, err, err2)
+
 				continue
 			}
 
@@ -133,6 +143,7 @@ func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) 
 		newID, existingID := profile.ID, profile.ID
 
 		if err := app.UpdateQualityProfile(profile); err != nil {
+			maps.QPerr[existingID] = append(maps.QPerr[existingID], err.Error())
 			profile.ID = 0
 
 			c.Debugf("Error Updating quality profile [%d/%d] (attempting to ADD %d): %v",
@@ -140,8 +151,10 @@ func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) 
 
 			newAddID, err2 := app.AddQualityProfile(profile)
 			if err2 != nil {
+				maps.QPerr[existingID] = append(maps.QPerr[existingID], err2.Error())
 				c.Errorf("Ensuring quality profile [%d/%d] %d: (update) %v, (add) %v",
 					idx+1, len(reply.QualityProfiles), existingID, err, err2)
+
 				continue
 			}
 

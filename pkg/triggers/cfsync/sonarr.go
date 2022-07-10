@@ -94,21 +94,30 @@ func (c *cmd) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	return nil
 }
 
+//nolint:funlen // split this thing up.
 func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) error {
 	reply := &SonarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
 		return fmt.Errorf("bad json response: %w", err)
 	}
 
-	c.Debugf("Received %d quality profiles and %d release profiles for Sonarr: %d:%s",
+	c.Printf("Received %d quality profiles and %d release profiles for Sonarr: %d:%s",
 		len(reply.QualityProfiles), len(reply.ReleaseProfiles), instance, app.URL)
 
-	maps := &cfMapIDpayload{RP: []idMap{}, QP: []idMap{}, Instance: instance}
+	maps := &cfMapIDpayload{
+		QP:       []idMap{},
+		RP:       []idMap{},
+		Instance: instance,
+		QPerr:    make(map[int64][]string),
+		RPerr:    make(map[int64][]string),
+	}
 
 	for idx, profile := range reply.ReleaseProfiles {
 		newID, existingID := profile.ID, profile.ID
 
 		if _, err := app.UpdateReleaseProfile(profile); err != nil {
+			maps.RPerr[existingID] = append(maps.RPerr[existingID], err.Error())
+
 			profile.ID = 0
 
 			c.Debugf("Error Updating release profile [%d/%d] (attempting to ADD %d): %v",
@@ -116,8 +125,10 @@ func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) 
 
 			newProfile, err2 := app.AddReleaseProfile(profile)
 			if err2 != nil {
+				maps.RPerr[existingID] = append(maps.RPerr[existingID], err2.Error())
 				c.Errorf("Ensuring release profile [%d/%d] %d: (update) %v, (add) %v",
 					idx+1, len(reply.ReleaseProfiles), existingID, err, err2)
+
 				continue
 			}
 
@@ -131,6 +142,7 @@ func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) 
 		newID, existingID := profile.ID, profile.ID
 
 		if _, err := app.UpdateQualityProfile(profile); err != nil {
+			maps.QPerr[existingID] = append(maps.QPerr[existingID], err.Error())
 			profile.ID = 0
 
 			c.Debugf("Error Updating quality format [%d/%d] (attempting to ADD %d): %v",
@@ -138,8 +150,10 @@ func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) 
 
 			newProfile, err2 := app.AddQualityProfile(profile)
 			if err2 != nil {
+				maps.QPerr[existingID] = append(maps.QPerr[existingID], err2.Error())
 				c.Errorf("Ensuring quality format [%d/%d] %d: (update) %v, (add) %v",
 					idx+1, len(reply.QualityProfiles), existingID, err, err2)
+
 				continue
 			}
 
