@@ -42,7 +42,7 @@ func (c *cmd) makeBackupTriggersLidarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Lidarr {
-		if app.Backup != mnd.Disabled {
+		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(lidarrBackupCheckDur)
 			break
 		}
@@ -60,7 +60,7 @@ func (c *cmd) makeBackupTriggersRadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Radarr {
-		if app.Backup != mnd.Disabled {
+		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(radarrBackupCheckDur)
 			break
 		}
@@ -78,7 +78,7 @@ func (c *cmd) makeBackupTriggersReadarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Readarr {
-		if app.Backup != mnd.Disabled {
+		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(readarrBackupCheckDur)
 			break
 		}
@@ -96,7 +96,7 @@ func (c *cmd) makeBackupTriggersSonarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Sonarr {
-		if app.Backup != mnd.Disabled {
+		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(sonarrBackupCheckDur)
 			break
 		}
@@ -114,7 +114,7 @@ func (c *cmd) makeBackupTriggersProwlarr() {
 	var ticker *time.Ticker
 
 	for _, app := range c.Apps.Prowlarr {
-		if app.Backup != mnd.Disabled {
+		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			ticker = time.NewTicker(prowlarrBackupCheckDur)
 			break
 		}
@@ -137,6 +137,7 @@ func (c *cmd) sendLidarrBackups(event website.EventType) {
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
+				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 			})
 		}
 	}
@@ -151,6 +152,7 @@ func (c *cmd) sendProwlarrBackups(event website.EventType) {
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
+				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 			})
 		}
 	}
@@ -165,6 +167,7 @@ func (c *cmd) sendRadarrBackups(event website.EventType) {
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
+				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 			})
 		}
 	}
@@ -179,6 +182,7 @@ func (c *cmd) sendReadarrBackups(event website.EventType) {
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
+				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 			})
 		}
 	}
@@ -193,12 +197,17 @@ func (c *cmd) sendSonarrBackups(event website.EventType) {
 				cName: app.Name,
 				int:   idx + 1,
 				app:   app,
+				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
 			})
 		}
 	}
 }
 
 func (c *cmd) sendBackups(input *genericInstance) {
+	if input.skip {
+		return
+	}
+
 	fileList, err := input.app.GetBackupFiles()
 	if err != nil {
 		c.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)

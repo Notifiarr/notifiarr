@@ -243,6 +243,9 @@ a:hover {
 .text-yellow {
   color: #ffff00;
 }
+.text-orange {
+  color: #c38502;
+}
 .title .line {
   display: inline-block;
   padding-bottom: 10px;

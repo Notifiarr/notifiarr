@@ -10,7 +10,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-const TrigCFSyncSonarr common.TriggerName = "Starting Sonarr QP TRaSH sync."
+const TrigRPSyncSonarr common.TriggerName = "Starting Sonarr Release Profile TRaSH sync."
 
 // SonarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Sonarr.
@@ -25,7 +25,7 @@ type SonarrTrashPayload struct {
 
 // SyncSonarrRP initializes a release profile sync with sonarr.
 func (a *Action) SyncSonarrRP(event website.EventType) {
-	a.cmd.Exec(event, TrigCFSyncSonarr)
+	a.cmd.Exec(event, TrigRPSyncSonarr)
 }
 
 // syncSonarr triggers a custom format sync for Sonarr.
@@ -40,7 +40,8 @@ func (c *cmd) syncSonarr(event website.EventType) {
 
 	for i, app := range c.Apps.Sonarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || !c.ClientInfo.Actions.Sync.SonarrInstances.Has(instance) {
+		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
+			!c.ClientInfo.Actions.Sync.SonarrInstances.Has(instance) {
 			c.Debugf("CF Sync Skipping Sonarr instance %d. Not in sync list: %v",
 				instance, c.ClientInfo.Actions.Sync.SonarrInstances)
 			continue
