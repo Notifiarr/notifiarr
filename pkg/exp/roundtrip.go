@@ -52,7 +52,9 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		sent := datacounter.NewReaderCounter(req.Body)
 		req.Body = ioutil.NopCloser(sent)
 
-		defer Apps.Add(rt.app+"&&"+req.Method+" Bytes Sent", int64(sent.Count()))
+		defer func() {
+			Apps.Add(rt.app+"&&"+req.Method+" Bytes Sent", int64(sent.Count()))
+		}()
 	}
 
 	resp, err := rt.next.RoundTrip(req)
