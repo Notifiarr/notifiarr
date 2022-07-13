@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -47,6 +48,23 @@ func (c *Client) loadAssetsTemplates() error {
 		return fmt.Errorf("cannot watch '%s' templates path: %w", templates, err)
 	}
 
+	dirList, err := ioutil.ReadDir(templates)
+	if err != nil {
+		return fmt.Errorf("cannot watch '%s' templates subfolders: %w", templates, err)
+	}
+
+	for _, item := range dirList {
+		if !item.IsDir() {
+			continue
+		}
+
+		// Watch each sub folder too.
+		name := filepath.Join(templates, item.Name())
+		if err := fsn.Add(name); err != nil {
+			return fmt.Errorf("cannot watch '%s' templates subfolder: %w", name, err)
+		}
+	}
+
 	go c.watchAssetsTemplates(fsn)
 
 	return nil
@@ -73,7 +91,7 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 				panic("Stopping web server: " + err.Error())
 			}
 
-			if err := c.ParseGUITemplates(); err != nil {
+			if err := c.parseCustomTemplates(); err != nil {
 				c.Errorf("fsnotify/parsing templates: %v", err)
 			}
 
@@ -169,7 +187,7 @@ func since(t time.Time) string {
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
-func (c *Client) ParseGUITemplates() (err error) {
+func (c *Client) ParseGUITemplates() error {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
 	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
@@ -177,23 +195,48 @@ func (c *Client) ParseGUITemplates() (err error) {
 	// Parse all our compiled-in templates.
 	for _, name := range bindata.AssetNames() {
 		if strings.HasPrefix(name, "templates/") {
-			c.templat = template.Must(c.templat.New(path.Base(name)).Parse(bindata.MustAssetString(name)))
+			trim := strings.TrimPrefix(name, "templates/")
+			c.templat = template.Must(c.templat.New(trim).Parse(bindata.MustAssetString(name)))
 		}
 	}
 
-	if c.Flags.Assets == "" {
-		return nil
-	}
-
-	templates := filepath.Join(c.Flags.Assets, "templates", "*.html")
-	c.Printf("==> Parsing and watching HTML templates @ %s", templates)
-
-	c.templat, err = c.templat.ParseGlob(templates)
-	if err != nil {
-		return fmt.Errorf("parsing custom template: %w", err)
+	if c.Flags.Assets != "" {
+		return c.parseCustomTemplates()
 	}
 
 	return nil
+}
+
+func (c *Client) parseCustomTemplates() error {
+	templatePath := filepath.Join(c.Flags.Assets, "templates")
+
+	c.Printf("==> Parsing and watching HTML templates @ %s", templatePath)
+
+	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error { //nolint:wrapcheck
+		if err != nil {
+			return fmt.Errorf("walking custom template path: %w", err)
+		}
+
+		if info.IsDir() {
+			return nil // cannot parse directories.
+		}
+
+		// Convert windows paths to unix paths for template names.
+		trim := strings.TrimPrefix(strings.ReplaceAll(strings.TrimPrefix(path, templatePath), `\`, "/"), "/")
+		c.Debugf("Parsing Template File '%s' to %s", path, trim)
+
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("reading custom template: %w", err)
+		}
+
+		c.templat, err = c.templat.New(trim).Parse(string(data))
+		if err != nil {
+			return fmt.Errorf("parsing custom template: %w", err)
+		}
+
+		return nil
+	})
 }
 
 type templateData struct {
