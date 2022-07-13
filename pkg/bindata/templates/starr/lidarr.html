@@ -1,0 +1,216 @@
+                                        <thead>
+                                            <tr>
+                                                <td colspan="8" class="text-center mobile-hide">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/lidarr.png" style="height:50px;"></div>
+                                                    <h2 style="margin-bottom:-45px">Lidarr</h2>
+                                                    <div style="float: right;">
+                                                        <button id="starr-Lidarr-addbutton" onclick="addInstance('starr', 'Lidarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="8" class="tablet-hide desktop-hide">
+                                                    <button id="starr-Lidarr-addbutton" onclick="addInstance('starr', 'Lidarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 style="margin-left:5px;display:inline;">Lidarr</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/logo/lidarr.png" style="height:50px;"></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:70px;min-width:70px;" class="text-center">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td style="min-width:120px;">
+                                                    <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td style="min-width:180px;">
+                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Username</span>
+                                                </td>
+                                                <td style="min-width:155px;">
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Password</span>
+                                                </td>
+                                                <td style="width:90px;min-width:90px;">
+                                                    <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td style="min-width:120px;width:120px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="starr-Lidarr-container">
+                                        {{- range $index, $app := .Config.Apps.Lidarr}}
+                                            <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Lidarr{{$index}}-deleted" data-group="starr" data-label="Lidarr {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="starr-Lidarr" id="starr-Lidarr-{{$index}}">
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button onclick="removeInstance('starr-Lidarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button id="LidarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Lidarr', '{{$index}}')" style="font-size:18px;" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                         <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_LIDARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Lidarr.{{$index}}.Name" name="Apps.Lidarr.{{$index}}.Name" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                         <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_LIDARR_%d_URL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Lidarr.{{$index}}.URL" name="Apps.Lidarr.{{$index}}.URL" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_LIDARR_%d_API_KEY" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.APIKey" name="Apps.Lidarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_LIDARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Lidarr.{{$index}}.Username" name="Apps.Lidarr.{{$index}}.Username" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="password" autocomplete="off" id="Apps.Lidarr.{{$index}}.Password" name="Apps.Lidarr.{{$index}}.Password" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Lidarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Lidarr.{{$index}}.Interval" name="Apps.Lidarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select type="select" id="Apps.Lidarr.{{$index}}.Timeout" name="Apps.Lidarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                    <option value="-1s">Disabled</option>
+                                                                    <option value="0s">No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {{- end}}
+                                            <tr id="starr-Lidarr-none"{{if .Config.Apps.Lidarr}} style="display: none;"{{end}}><td colspan="8">No Lidarr instances configured.</td></tr>
+                                        </tbody>
+{{- /* end of lidarr (leave this comment) */ -}}

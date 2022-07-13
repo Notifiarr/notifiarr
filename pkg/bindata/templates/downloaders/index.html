@@ -1,0 +1,12 @@
+                                <h1><i class="fas fa-cart-arrow-down"></i> Download Apps</h1>
+                                <p>Adding and enabling these downloader applications makes them show up in the <b>Dashboard Integration</b> on Notifiarr.com.</p>
+                                <div class="table-responsive">
+                                    <table class="table bk-dark table-bordered">
+{{ template "downloaders/qbit.html" .}}  
+{{ template "downloaders/rtorrent.html" .}}  
+{{ template "downloaders/deluge.html" .}}  
+{{ template "downloaders/sabnzbd.html" .}}  
+{{ template "downloaders/nzbget.html" .}}  
+                                    </table>
+                                </div>
+{{- /* end of download clients (leave this comment) */ -}}

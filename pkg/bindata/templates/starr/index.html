@@ -1,0 +1,16 @@
+                                <h1><i class="fas fa-star"></i> Starr Apps</h1>
+                                <p>Notifiarr client has deep integrations with the whole suite of Starr applications. The rest of the settings for these can be found on the Notifiarr.com website.</p>
+                                <p>
+                                    <h3><i class="fas fa-comment text-orange"></i> Notes</h3>
+                                    <li><i class="fas fa-star text-dgrey"></i> Temporarily disable an instance by setting the <b>Timeout</b> to <b>Disabled</b>.</li>
+                                </p>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered bk-dark" style="width:100%">
+{{ template "starr/lidarr.html" . }}
+{{ template "starr/prowlarr.html" . }}
+{{ template "starr/radarr.html" . }}
+{{ template "starr/readarr.html" . }}
+{{ template "starr/sonarr.html" . }}
+                                    </table>
+                                </div><!-- table-responsive -->
+{{- /* end of starr (leave this comment) */ -}}
