@@ -101,6 +101,10 @@ dmg: clean $(MACAPP).app
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
+signdmg: clean $(MACAPP).app
+	mkdir -p release
+	say "Attention Needed!"
+	gon init/macos/gon.json
 
 # Delete all build assets.
 clean:

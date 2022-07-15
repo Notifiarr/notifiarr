@@ -40,10 +40,11 @@ func Notify(msg string, vars ...interface{}) error {
 	} else if filepath.Base(app) == "MacOS" {
 		app = filepath.Join(filepath.Dir(app), "Resources", "terminal-notifier.app", "Contents", "MacOS", "terminal-notifier")
 	} else if app, err = exec.LookPath("terminal-notifier"); err != nil {
-		return fmt.Errorf("cannot locate terminal-notifier: %w", err)
+		list, _ := ioutil.ReadDir(filepath.Dir(app))
+		return fmt.Errorf("cannot locate terminal-notifier: %w, app folder: %s, ../: %s", err, app, list)
 	}
 
-	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "com.notifiarr.client")
+	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "io.golift.notifiarr")
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}
