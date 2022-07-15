@@ -121,7 +121,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.SabNZB.{{$index}}.Interval" name="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.SabNZB.{{$index}}.Interval" name="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

@@ -48,7 +48,7 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Password</span>
                                                 </td>
-                                                <td style="width:90px;min-width:90px;">
+                                                <td style="width:110px;min-width:110px;">
                                                     <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
@@ -176,7 +176,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_LIDARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Lidarr.{{$index}}.Interval" name="Apps.Lidarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.Lidarr.{{$index}}.Interval" name="Apps.Lidarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

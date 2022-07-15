@@ -177,7 +177,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Sonarr.{{$index}}.Interval" name="Apps.Sonarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.Sonarr.{{$index}}.Interval" name="Apps.Sonarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

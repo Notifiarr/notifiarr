@@ -140,7 +140,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_NZBGET_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.NZBGet.{{$index}}.Interval" name="Apps.NZBGet.{{$index}}.Interval" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.NZBGet.{{$index}}.Interval" name="Apps.NZBGet.{{$index}}.Interval" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

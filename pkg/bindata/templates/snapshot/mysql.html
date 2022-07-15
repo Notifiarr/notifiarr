@@ -51,7 +51,7 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Password</span>
                                                 </td>
-                                                <td style="min-width:90px;width:90px;">
+                                                <td style="min-width:115px;width:115px;">
                                                     <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
@@ -160,7 +160,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Snapshot.MySQL.{{$index}}.Interval" name="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Snapshot.MySQL.{{$index}}.Interval" name="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

@@ -176,7 +176,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Prowlarr.{{$index}}.Interval" name="Apps.Prowlarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.Prowlarr.{{$index}}.Interval" name="Apps.Prowlarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

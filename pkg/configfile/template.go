@@ -380,8 +380,9 @@ retries = {{.Retries}}
   host     = "{{.Host}}"
 	user     = "{{.User}}"
 	pass     = "{{.Pass}}"
-{{if .Name}}interval = "{{.Interval}}" # Service check duration.
-  timeout  = "{{.Timeout}}" # Service check timeout.{{end}}{{end}}
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+	timeout  = "{{.Timeout}}"
+{{end}}
 {{else}}
 #[[snapshot.mysql]]
 #name = "" # only set a name to enable service checks.

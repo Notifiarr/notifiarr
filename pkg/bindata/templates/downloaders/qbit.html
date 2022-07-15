@@ -31,7 +31,7 @@
                                                 <td style="min-width:190px;">URL</td>
                                                 <td style="min-width:80px;">Username</td>
                                                 <td style="min-width:170px;">Password</td>
-                                                <td style="min-width:90px;width:90px">
+                                                <td style="min-width:120px;width:120px">
                                                     <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
@@ -140,7 +140,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_QBIT_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Qbit.{{$index}}.Interval" name="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.Qbit.{{$index}}.Interval" name="Apps.Qbit.{{$index}}.Interval" data-index="{{$index}}" data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

@@ -176,7 +176,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_READARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Readarr.{{$index}}.Interval" name="Apps.Readarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.Readarr.{{$index}}.Interval" name="Apps.Readarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

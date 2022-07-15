@@ -65,12 +65,12 @@
                                                         <th style="min-width:108px;">Type</th>
                                                         <th style="min-width:170px;">Check Value</th>
                                                         <th style="min-width:210px;">Expect</th>
-                                                        <th style="min-width:90px;width:90px;">
+                                                        <th style="min-width:110px;width:110px;">
                                                             <div style="display:none;" class="dialogText">This interval value controls how often the service is checked.</div>
                                                             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                             <span class="dialogTitle">Interval </span>
                                                         </th>
-                                                        <th style="min-width:70px;width:70px">Timeout</th>
+                                                        <th style="min-width:110px;width:110px">Timeout</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="services-Checks-container">
@@ -240,7 +240,9 @@
                                                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                     </div>
                                                                     {{- end}}
-                                                                    <input type="text" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}" value="{{$svc.Interval}}">
+                                                                    <select type="select" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}">
+{{template "includes/intervaloptions.html" $svc.Interval}}
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -256,7 +258,17 @@
                                                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                     </div>
                                                                     {{- end}}
-                                                                    <input type="text" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}" value="{{$svc.Timeout}}">
+                                                                    <select type="select" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}">
+                                                                        <!-- option value="-1s">Disabled</option -->
+                                                                        <option value="0s">No Timeout</option>
+                                                                        {{- range $i := one259 }}
+                                                                        <option {{if eq $svc.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                        {{- end}}
+                                                                        <option {{if eq $svc.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                        {{- range $i := one259 }}
+                                                                        <option {{if eq $svc.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                        {{- end}}
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </td>

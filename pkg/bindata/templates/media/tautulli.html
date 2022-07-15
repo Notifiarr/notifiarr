@@ -20,7 +20,7 @@
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">API Key</span>
                                                 </td>
-                                                <td style="min-width:85px;width:85px;">
+                                                <td style="min-width:110px;width:110px;">
                                                     <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
@@ -107,7 +107,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_INTERVAL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Tautulli.Interval" name="Apps.Tautulli.Interval" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Interval" data-original="{{.Config.Apps.Tautulli.Interval}}" value="{{.Config.Apps.Tautulli.Interval}}">
+                                                                <select type="select" id="Apps.Tautulli.Interval" name="Apps.Tautulli.Interval" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Interval" data-original="{{.Config.Apps.Tautulli.Interval}}">
+{{template "includes/intervaloptions.html" $.Config.Apps.Tautulli.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>

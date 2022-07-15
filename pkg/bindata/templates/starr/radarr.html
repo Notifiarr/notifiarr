@@ -178,7 +178,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Radarr.{{$index}}.Interval" name="Apps.Radarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.Radarr.{{$index}}.Interval" name="Apps.Radarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
