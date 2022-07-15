@@ -139,8 +139,23 @@ function addInstance(section, app)
                 break;
             case "Config.Interval":
             case "Interval":
-                nameval = "5m";
                 nameori = "5m";
+                itype = "<select type=\"select\""
+                extra = '<option value="45s">45 seconds</option>'+
+                '<option value="1m">1 minute</option>'+
+                '<option value="1m15s">1 min 15 sec</option>'+
+                '<option value="1m30s">1 min 30 sec</option>'+
+                '<option value="2m">2 minutes</option>'+
+                '<option value="2m30s">2 min 30 sec</option>'+
+                '<option value="3m">3 minutes</option>'+
+                '<option value="4m">4 minutes</option>'+
+                '<option value="5m">5 minutes</option>'+
+                '<option value="10m">10 minutes</option>'+
+                '<option value="15m">15 minutes</option>'+
+                '<option value="30m">30 minutes</option>'+
+                '<option value="45m">45 minutes</option>'+
+                '<option value="60m">60 minutes</option>'+
+                '</select>';
              break;
              case "Config.Timeout":
              case "Timeout":

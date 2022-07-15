@@ -9,3 +9,5 @@ make generate
 ```
 
 See: https://github.com/kevinburke/go-bindata
+
+- **Do not put anything except Go HTML template files in the templates/ directory.**

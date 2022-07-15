@@ -1,24 +1,17 @@
-                                </p>
-                                    <h3><i class="fas fa-comment text-orange"></i> MySQL Notes</h3>
-                                    <li><i class="fas fa-star"></i> You may add MySQL credentials to your Notifiarr client configuration to snapshot MySQL service health.</li>
-                                    <li><i class="fas fa-star"></i> This feature snapshots <code>SHOW PROCESSLIST</code> and <code>SHOW STATUS</code> data.</li>
-                                    <li><i class="fas fa-star"></i>Access to a database is not required. Example Grant: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code></li>
-                                </p>
-                                <div class="table-responsive">
-                                    <table class="table bk-dark table-bordered">
+
                                         <thead>
                                             <tr>
-                                                <td colspan="7" class="text-center mobile-hide">
-                                                    <div style="float: left;"><img src="{{files}}/images/logo/mysql.png" style="height:50px;"></div>
-                                                    <h2 style="margin-bottom:-45px">MySQL</h2>
+                                                <td colspan="8" class="text-center mobile-hide">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/sonarr.png" style="height:50px;"></div>
+                                                    <h2 style="margin-bottom:-45px">Sonarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Sonarr-addbutton" onclick="addInstance('starr', 'Sonarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
-                                                <td colspan="7" class="tablet-hide desktop-hide">
-                                                    <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                                    <h2 style="margin-left:5px;display:inline;">MySQL</h2>
-                                                    <div style="float:right;"><img src="{{files}}/images/logo/mysql.png" style="height:50px;"></div>
+                                                <td colspan="8" class="tablet-hide desktop-hide">
+                                                    <button id="starr-Sonarr-addbutton" onclick="addInstance('starr', 'Sonarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 style="margin-left:5px;display:inline;">Sonarr</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/logo/sonarr.png" style="height:50px;"></div>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -31,63 +24,68 @@
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Actions</span>
                                                 </td>
-                                                <td style="min-width:120px;">
+                                                <td>
                                                     <div style="display:none;" class="dialogText">Adding a name to any application enables service checks for the instance.</div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Name</span>
                                                 </td>
-                                                <td style="min-width:170px;">
-                                                    <div style="display:none;" class="dialogText">The MySQL host must be in the format host:port or ip:port. ie. localhost:3306. If you ommit the port, 3306 is used.</div>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.</div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">Host</span>
+                                                    <span class="dialogTitle">URL</span>
                                                 </td>
-                                                <td style="min-width:120px;">
-                                                    <div style="display:none;" class="dialogText">This must be the username used in the GRANT statement.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                <td style="min-width:100px;">
+                                                    <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">API Key</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Username</span>
                                                 </td>
-                                                <td style="min-width:120px;">
-                                                    <div style="display:none;" class="dialogText">This must be the password used to authenticate the username.</div>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Password</span>
                                                 </td>
-                                                <td style="min-width:90px;width:90px;">
+                                                <td>
                                                     <div style="display:none;" class="dialogText">Service checks are enabled when a name is added. This controls how often to check.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Interval</span>
                                                 </td>
-                                                <td style="min-width:120px;width:120px">
-                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
                                                 </td>
                                             </tr>
                                         </thead>
-                                        <tbody id="snaps-MySQL-container">
-                                        {{- range $index, $app := .Config.Snapshot.MySQL}}
-                                            <input disabled style="display: none;" class="client-parameter snaps-MySQL{{$index}}-deleted" data-group="snaps" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="snaps-MySQL" id="snaps-MySQL-{{$index}}">
+                                        <tbody id="starr-Sonarr-container">
+                                            {{- range $index, $app := .Config.Apps.Sonarr}}
+                                            <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Sonarr{{$index}}-deleted" data-group="starr" data-label="Sonarr {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="starr-Sonarr" id="starr-Sonarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
-                                                    <div class="btn-group" role="group" style="display:flex;font-size:18px;">
-                                                        <button onclick="removeInstance('snaps-MySQL', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-minus"></i></button>
-                                                        <button id="MySQLIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                                                        <button onClick="testInstance($(this), 'MySQL', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button onclick="removeInstance('starr-Sonarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button id="SonarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Sonarr', '{{$index}}')" style="font-size:18px;" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SNAPSHOT_MYSQL_%d_NAME" $.Flags.EnvPrefix $index)) }}
+                                                                {{- if (locked (printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
                                                                     <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Snapshot.MySQL.{{$index}}.Name" name="Snapshot.MySQL.{{$index}}.Name"  data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                                                                <input type="text" id="Apps.Sonarr.{{$index}}.Name" name="Apps.Sonarr.{{$index}}.Name" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
                                                         </div>
                                                     </form>
@@ -96,16 +94,16 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SNAPSHOT_MYSQL_%d_HOST" $.Flags.EnvPrefix $index))}}
+                                                                {{- if (locked (printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index)) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
                                                                     <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_HOST" $.Flags.EnvPrefix $index}}</span>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Snapshot.MySQL.{{$index}}.Host" name="Snapshot.MySQL.{{$index}}.Host" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Host" data-original="{{$app.Host}}" value="{{$app.Host}}">
+                                                                <input type="text" id="Apps.Sonarr.{{$index}}.URL" name="Apps.Sonarr.{{$index}}.URL" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                             </div>
                                                         </div>
                                                     </form>
@@ -114,16 +112,17 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SNAPSHOT_MYSQL_%d_USER" $.Flags.EnvPrefix $index) )}}
+                                                                {{- if (locked (printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index)) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
                                                                     <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_USER" $.Flags.EnvPrefix $index}}</span>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Snapshot.MySQL.{{$index}}.User" name="Snapshot.MySQL.{{$index}}.User" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.APIKey" name="Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -132,17 +131,16 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index))}}
+                                                                {{- if (locked (printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_PASS" $.Flags.EnvPrefix $index}}</span>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Snapshot.MySQL.{{$index}}.Pass" name="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
-                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Snapshot.MySQL.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                                <input type="text" id="Apps.Sonarr.{{$index}}.Username" name="Apps.Sonarr.{{$index}}.Username" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
                                                         </div>
                                                     </form>
@@ -151,16 +149,17 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SNAPSHOT_MYSQL_%d_INTERVAL" $.Flags.EnvPrefix $index)) }}
+                                                                {{- if (locked (printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index))}}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Snapshot.MySQL.{{$index}}.Interval" name="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.Password" name="Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -169,16 +168,36 @@
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SNAPSHOT_MYSQL_%d_TIMEOUT" $.Flags.EnvPrefix $index) )}}
+                                                                {{- if (locked (printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
                                                                 <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="text" id="Snapshot.MySQL.{{$index}}.Timeout" name="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.Sonarr.{{$index}}.Interval" name="Apps.Sonarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select type="select" id="Apps.Sonarr.{{$index}}.Timeout" name="Apps.Sonarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s">Disabled</option>
                                                                     <option value="0s">No Timeout</option>
                                                                     {{- range $i := one259 }}
@@ -194,9 +213,7 @@
                                                     </form>
                                                 </td>
                                             </tr>
-                                        {{- end}}
-                                            <tr id="snaps-MySQL-none"{{if .Config.Snapshot.MySQL}} style="display: none;"{{end}}><td colspan="7">No MySQL instances configured.</td></tr>
+                                            {{- end}}
+                                            <tr id="starr-Sonarr-none"{{if .Config.Apps.Sonarr}} style="display: none;"{{end}}><td colspan="8">No Sonarr instances configured.</td></tr>
                                         </tbody>
-                                    </table>
-                                </div>
-{{- /* end of snapshot-mysql (leave this comment) */ -}}
+{{- /* end of sonarr (leave this comment) */ -}}

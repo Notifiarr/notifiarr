@@ -142,7 +142,7 @@ type Queue struct {
 	Diskspacetotal1   float64      `json:"diskspacetotal1,string"`
 	Diskspacetotal2   float64      `json:"diskspacetotal2,string"`
 	Loadavg           string       `json:"loadavg"`
-	Speedlimit        int          `json:"speedlimit,string"`
+	Speedlimit        float64      `json:"speedlimit,string"`
 	SpeedlimitAbs     string       `json:"speedlimit_abs"`
 	HaveWarnings      string       `json:"have_warnings"`
 	Finishaction      interface{}  `json:"finishaction"`

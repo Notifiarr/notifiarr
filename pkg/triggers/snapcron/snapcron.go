@@ -88,7 +88,7 @@ func (c *cmd) sendSnapshot(event website.EventType) {
 	snapshot, errs, debug := c.Snapshot.GetSnapshot()
 	for _, err := range errs {
 		if err != nil {
-			c.Errorf("[%s requested] Snapshot: %v", event, err)
+			c.ErrorfNoShare("[%s requested] Snapshot: %v", event, err)
 		}
 	}
 

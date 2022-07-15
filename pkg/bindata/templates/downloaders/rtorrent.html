@@ -140,7 +140,9 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.Interval" name="Apps.Rtorrent.{{$index}}.Interval" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                                                                <select type="select" id="Apps.Rtorrent.{{$index}}.Interval" name="Apps.Rtorrent.{{$index}}.Interval" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -177,4 +179,4 @@
                                         {{- end}}
                                             <tr id="download-Rtorrent-none" {{if .Config.Apps.Rtorrent}} style="display: none;"{{end}}><td colspan="7">No rTorrent instances configured.</td></tr>
                                         </tbody>
-{{- /* end of rtorrent (leave this comment) */ -}}
+{{- /* end of downloaders rtorrent (leave this comment) */ -}}

@@ -102,6 +102,16 @@ function addServiceCheck()
      //-- DO NOT RELY ON 'index' FOR DIRECT IMPLEMENTATION, USE IT TO SORT AND RE-INDEX DURING THE SAVE
     const index = serviceTable.rows().count();
     const instance = index+1;
+
+    let options = '<option value="0s">No Timeout</option><option value="1s">1 second</option>';
+    for (i = 2 ; i < 60 ; i++) {
+        options += '<option value="'+i+'s">'+i+' seconds</option>';
+    }
+    options += '<option selected value="1m">1 minute</option>';
+    for (i = 1 ; i < 60 ; i++) {
+        options += '<option value="1m'+i+'s">1 min '+i+' sec</option>';
+    }
+
     const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
     '<td style="white-space:nowrap;">'+
         '<div class="btn-group" role="group" style="display:flex;">'+
@@ -221,14 +231,31 @@ function addServiceCheck()
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<input type="text" id="Service.'+ index +'.Interval" name="Service.'+ index +'.Interval" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Interval" data-original="5m" value="5m">'+
+                '<select type="select" id="Service.'+ index +'.Interval" name="Service.'+ index +'.Interval" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Interval" data-original="5m">'+
+                '<option value="45s">45 seconds</option>'+
+                '<option value="1m">1 minute</option>'+
+                '<option value="1m15s">1 min 15 sec</option>'+
+                '<option value="1m30s">1 min 30 sec</option>'+
+                '<option value="2m">2 minutes</option>'+
+                '<option value="2m30s">2 min 30 sec</option>'+
+                '<option value="3m">3 minutes</option>'+
+                '<option value="4m">4 minutes</option>'+
+                '<option selected value="5m">5 minutes</option>'+
+                '<option value="10m">10 minutes</option>'+
+                '<option value="15m">15 minutes</option>'+
+                '<option value="30m">30 minutes</option>'+
+                '<option value="45m">45 minutes</option>'+
+                '<option value="60m">60 minutes</option>'+
+                '</select>'+
             '</div>'+
         '</div>'+
     '</td>'+
     '<td>'+
         '<div class="form-group" style="width:100%">'+
             '<div class="input-group" style="width:100%">'+
-                '<input type="text" id="Service.'+ index +'.Timeout" name="Service.'+ index +'.Timeout" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m" value="1m">'+
+                '<select type="select" id="Service.'+ index +'.Timeout" name="Service.'+ index +'.Timeout" data-app="checks" data-index="'+ index +'" class="client-parameter form-control input-sm" data-group="services" data-label="Check '+ instance +' Timeout" data-original="1m">'+
+                options+
+                '</select>'+
             '</div>'+
         '</div>'+
     '</td>'+

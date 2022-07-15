@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -24,6 +25,7 @@ import (
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
+	"golift.io/cnfg"
 	"golift.io/version"
 )
 
@@ -47,12 +49,31 @@ func (c *Client) loadAssetsTemplates() error {
 		return fmt.Errorf("cannot watch '%s' templates path: %w", templates, err)
 	}
 
+	dirList, err := ioutil.ReadDir(templates)
+	if err != nil {
+		return fmt.Errorf("cannot watch '%s' templates subfolders: %w", templates, err)
+	}
+
+	for _, item := range dirList {
+		if !item.IsDir() {
+			continue
+		}
+
+		// Watch each sub folder too.
+		name := filepath.Join(templates, item.Name())
+		if err := fsn.Add(name); err != nil {
+			return fmt.Errorf("cannot watch '%s' templates subfolder: %w", name, err)
+		}
+	}
+
 	go c.watchAssetsTemplates(fsn)
 
 	return nil
 }
 
 func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
+	defer c.CapturePanic()
+
 	for {
 		select {
 		case err := <-fsn.Errors:
@@ -124,7 +145,125 @@ func (c *Client) getFuncMap() template.FuncMap {
 		"add": func(i, j float64) float64 {
 			return i + j
 		},
+		"intervaloptions": intervaloptions,
 	}
+}
+
+type option struct {
+	Val string
+	Op  string
+	Sel bool
+}
+
+func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
+	times := []time.Duration{
+		30 * time.Second,
+		45 * time.Second,
+		1 * time.Minute,
+		1*time.Minute + 15*time.Second,
+		1*time.Minute + 30*time.Second,
+		1*time.Minute + 45*time.Second,
+		2 * time.Minute,
+		2*time.Minute + 15*time.Second,
+		2*time.Minute + 30*time.Second,
+		2*time.Minute + 45*time.Second,
+		3 * time.Minute,
+		3*time.Minute + 15*time.Second,
+		3*time.Minute + 30*time.Second,
+		3*time.Minute + 45*time.Second,
+		4 * time.Minute,
+		4*time.Minute + 15*time.Second,
+		4*time.Minute + 30*time.Second,
+		4*time.Minute + 45*time.Second,
+		5 * time.Minute,
+		5*time.Minute + 15*time.Second,
+		5*time.Minute + 30*time.Second,
+		5*time.Minute + 45*time.Second,
+		6 * time.Minute,
+		6*time.Minute + 30*time.Second,
+		7 * time.Minute,
+		7*time.Minute + 30*time.Second,
+		8 * time.Minute,
+		8*time.Minute + 30*time.Second,
+		9 * time.Minute,
+		9*time.Minute + 30*time.Second,
+		10 * time.Minute,
+		11 * time.Minute,
+		12 * time.Minute,
+		13 * time.Minute,
+		14 * time.Minute,
+		15 * time.Minute,
+		20 * time.Minute,
+		30 * time.Minute,
+		35 * time.Minute,
+		40 * time.Minute,
+		45 * time.Minute,
+		50 * time.Minute,
+		1 * time.Hour,
+		1*time.Hour + 30*time.Minute,
+		2 * time.Hour,
+	}
+	output := []*option{}
+
+	if current.Duration == 0 {
+		output = append(output, &option{
+			Val: current.String(),
+			Op:  "select...",
+			Sel: true,
+		})
+	}
+
+	for idx, dur := range times {
+		if idx != 0 && current.Duration < dur && current.Duration > times[idx-1] {
+			output = append(output, &option{
+				Val: current.String(),
+				Op:  durShort(current.Duration),
+				Sel: true,
+			})
+		}
+
+		output = append(output, &option{
+			Val: cnfg.Duration{Duration: dur}.String(),
+			Op:  durShort(dur),
+			Sel: current.Duration == dur,
+		})
+	}
+
+	return output
+}
+
+// durShort is gross but gets the job done.
+func durShort(dur time.Duration) string {
+	output := cnfg.Duration{Duration: dur}.String()
+	output = strings.ReplaceAll(output, "m", " min")
+	output = strings.ReplaceAll(output, "s", " sec")
+	output = strings.ReplaceAll(output, "h", " hour")
+
+	s := ""
+	if dur.Hours() != 1 {
+		s = "s"
+	}
+
+	if dur.Minutes() != 0 {
+		output = strings.ReplaceAll(output, "hour", "hour"+s+" ")
+	}
+
+	s = ""
+	if dur.Minutes() != 1 {
+		s = "s"
+	}
+
+	if dur.Seconds() > 60 && int(dur.Seconds())%60 != 0 || int(dur.Hours()) > 0 {
+		output = strings.ReplaceAll(output, "min", "min ")
+	} else {
+		output = strings.ReplaceAll(output, "min", "minute"+s)
+	}
+
+	if dur.Minutes() < 1 {
+		output = strings.ReplaceAll(output, "sec", " seconds")
+	}
+
+	return output
 }
 
 func megabyte(size interface{}) string {
@@ -169,31 +308,60 @@ func since(t time.Time) string {
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
-func (c *Client) ParseGUITemplates() (err error) {
+func (c *Client) ParseGUITemplates() error {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
 	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
 
+	var err error
+
 	// Parse all our compiled-in templates.
 	for _, name := range bindata.AssetNames() {
 		if strings.HasPrefix(name, "templates/") {
-			c.templat = template.Must(c.templat.New(path.Base(name)).Parse(bindata.MustAssetString(name)))
+			trim := strings.TrimPrefix(name, "templates/")
+			if c.templat, err = c.templat.New(trim).Parse(bindata.MustAssetString(name)); err != nil {
+				return fmt.Errorf("bug parsing internal template: %w", err)
+			}
 		}
 	}
 
-	if c.Flags.Assets == "" {
-		return nil
-	}
-
-	templates := filepath.Join(c.Flags.Assets, "templates", "*.html")
-	c.Printf("==> Parsing and watching HTML templates @ %s", templates)
-
-	c.templat, err = c.templat.ParseGlob(templates)
-	if err != nil {
-		return fmt.Errorf("parsing custom template: %w", err)
+	if c.Flags.Assets != "" {
+		return c.parseCustomTemplates()
 	}
 
 	return nil
+}
+
+func (c *Client) parseCustomTemplates() error {
+	templatePath := filepath.Join(c.Flags.Assets, "templates")
+
+	c.Printf("==> Parsing and watching HTML templates @ %s", templatePath)
+
+	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error { //nolint:wrapcheck
+		if err != nil {
+			return fmt.Errorf("walking custom template path: %w", err)
+		}
+
+		if info.IsDir() {
+			return nil // cannot parse directories.
+		}
+
+		// Convert windows paths to unix paths for template names.
+		trim := strings.TrimPrefix(strings.ReplaceAll(strings.TrimPrefix(path, templatePath), `\`, "/"), "/")
+		c.Debugf("Parsing Template File '%s' to %s", path, trim)
+
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("reading custom template: %w", err)
+		}
+
+		c.templat, err = c.templat.New(trim).Parse(string(data))
+		if err != nil {
+			return fmt.Errorf("parsing custom template: %w", err)
+		}
+
+		return nil
+	})
 }
 
 type templateData struct {
