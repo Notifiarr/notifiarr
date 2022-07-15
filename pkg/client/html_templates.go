@@ -155,7 +155,7 @@ type option struct {
 	Sel bool
 }
 
-func intervaloptions(current cnfg.Duration) []*option {
+func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
 	times := []time.Duration{
 		30 * time.Second,
 		45 * time.Second,
@@ -227,7 +227,6 @@ func intervaloptions(current cnfg.Duration) []*option {
 			Op:  durShort(dur),
 			Sel: current.Duration == dur,
 		})
-
 	}
 
 	return output
