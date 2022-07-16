@@ -28,7 +28,14 @@
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Name</span>
                                                 </td>
-                                                <td style="min-width:190px;">URL</td>
+                                                <td>
+                                                    <div style="display:none;" class="dialogText">
+                                                        http:// or https:// URL for the application instance. Providing an https:// URL reveals a checkbox. 
+                                                        Checking this box enables SSL certificate validation; invalid certificates generate an error.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
                                                 <td style="min-width:80px;">Username</td>
                                                 <td style="min-width:170px;">Password</td>
                                                 <td style="min-width:90px;width:90px">
@@ -85,7 +92,10 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RTORRENT_%d_URL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.URL" name="Apps.Rtorrent.{{$index}}.URL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <input type="text" id="Apps.Rtorrent.{{$index}}.URL" onChange="showhttps($(this).val(), '#Rtorrent{{$index}}SSL');" name="Apps.Rtorrent.{{$index}}.URL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Rtorrent{{$index}}SSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.Rtorrent.{{$index}}.VerifySSL" name="Apps.Rtorrent.{{$index}}.VerifySSL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter" data-group="download" data-label="Rtorrent {{instance $index}} SSL" data-original="{{$app.VerifySSL}}" {{if $app.VerifySSL}}checked {{end}}value="true">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>

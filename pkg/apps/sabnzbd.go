@@ -20,11 +20,12 @@ import (
 var ErrUnknownByteType = fmt.Errorf("unknown byte type")
 
 type SabNZBConfig struct {
-	Name     string        `toml:"name" xml:"name"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval"`
-	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout"`
-	URL      string        `toml:"url" xml:"url"`
-	APIKey   string        `toml:"api_key" xml:"api_key"`
+	Name      string        `toml:"name" xml:"name"`
+	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout"`
+	URL       string        `toml:"url" xml:"url"`
+	APIKey    string        `toml:"api_key" xml:"api_key"`
+	VerifySSL bool          `toml:"verify_ssl" xml:"verify_ssl"`
 }
 
 // QueueSlots has the following data structure.
@@ -203,7 +204,7 @@ func (s *SabNZBConfig) GetHistory(ctx context.Context) (*History, error) {
 		History *History `json:"history"`
 	}
 
-	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &hist)
+	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.VerifySSL, s.URL+"/api", params, &hist)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +227,7 @@ func (s *SabNZBConfig) GetQueue(ctx context.Context) (*Queue, error) {
 		Queue *Queue `json:"queue"`
 	}
 
-	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.URL+"/api", params, &que)
+	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.VerifySSL, s.URL+"/api", params, &que)
 	if err != nil {
 		return nil, err
 	}
@@ -239,6 +240,7 @@ func GetURLInto(
 	ctx context.Context,
 	app string,
 	timeout time.Duration,
+	ssl bool,
 	url string,
 	params url.Values,
 	into interface{},
@@ -251,7 +253,7 @@ func GetURLInto(
 	req.URL.RawQuery = params.Encode()
 
 	resp, err := (&http.Client{Timeout: timeout, Transport: exp.NewMetricsRoundTripper(app, &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: ssl}, //nolint:gosec
 	})}).Do(req)
 	if err != nil {
 		return fmt.Errorf("making request: %w", err)

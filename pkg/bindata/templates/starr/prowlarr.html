@@ -29,9 +29,11 @@
                                                     <span class="dialogTitle">Name</span>
                                                 </td>
                                                 <td>
-                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">URL</span>
+                                                    <div style="display:none;" class="dialogText">
+                                                        http:// or https:// URL for the application instance. Include the Base URL if that's configured in your application.
+                                                        Providing an https:// URL reveals a checkbox. 
+                                                        Checking this box enables SSL certificate validation; invalid certificates generate an error.
+                                                    </div>
                                                 </td>
                                                 <td style="min-width:100px;">
                                                     <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
@@ -102,7 +104,10 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Prowlarr.{{$index}}.URL" name="Apps.Prowlarr.{{$index}}.URL" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <input type="text" id="Apps.Prowlarr.{{$index}}.URL" name="Apps.Prowlarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Prowlarr{{$index}}SSL');" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Prowlarr{{$index}}SSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.Prowlarr.{{$index}}.ValidSSL" name="Apps.Prowlarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="download" data-label="Prowlarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>
