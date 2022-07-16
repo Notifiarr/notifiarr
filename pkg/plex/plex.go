@@ -114,7 +114,7 @@ func (s *Server) getClient() *http.Client {
 		s.client = &http.Client{
 			Timeout: s.Timeout.Duration,
 			Transport: exp.NewMetricsRoundTripper("Plex", &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: s.VerifySSL}, //nolint:gosec
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: !s.VerifySSL}, //nolint:gosec
 			}),
 		}
 	}

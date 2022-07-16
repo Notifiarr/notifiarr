@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -150,7 +151,17 @@ func (s *Service) checkHTTP() *result {
 		return res
 	}
 
-	resp, err := (&http.Client{}).Do(req)
+	validSSL := false
+
+	for _, code := range strings.Split(s.Expect, ",") {
+		if strings.EqualFold(code, "ssl") {
+			validSSL = true
+		}
+	}
+
+	resp, err := (&http.Client{Timeout: s.Timeout.Duration, Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: !validSSL}, //nolint:gosec
+	}}).Do(req)
 	if err != nil {
 		res.output = "making request: " + RemoveSecrets(s.Value, err.Error())
 		return res

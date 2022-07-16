@@ -150,6 +150,7 @@ function addServiceCheck()
             '<div class="input-group" style="width:100%">'+
                 '<input id="Service.'+ index +'.Expect" name="Service.'+ index +'.Expect" data-index="'+ index +'" data-app="checks" class="client-parameter serviceProcessParamExpect" data-group="services" data-label="Check '+ instance +' Expect" value="200" data-original="200" style="display:none;">'+
                 '<select multiple id="Service.'+ index +'.Expect.StatusCode" onChange="checkExpectChange($(this));" value="200" data-index="'+ index +'" data-app="checks" class="form-control input-sm serviceHTTPParam" style="width:100%">'+
+                    '<option value="SSL">SSL: Validate Certificate</option>'+
                     '<option value="100">100: Continue</option>'+
                     '<option value="101">101: SwitchingProtocols</option>'+
                     '<option value="102">102: Processing</option>'+

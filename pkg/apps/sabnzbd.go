@@ -253,7 +253,7 @@ func GetURLInto(
 	req.URL.RawQuery = params.Encode()
 
 	resp, err := (&http.Client{Timeout: timeout, Transport: exp.NewMetricsRoundTripper(app, &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: ssl}, //nolint:gosec
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: !ssl}, //nolint:gosec
 	})}).Do(req)
 	if err != nil {
 		return fmt.Errorf("making request: %w", err)
