@@ -215,9 +215,12 @@ notifiarr ALL=(root) NOPASSWD:/usr/sbin/iotop *
 notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 ```
 
+These paths may not be the same on all systems. Adjust the username for macOS.
+
 #### Snapshot Packages
 
 - **Windows**:  `smartmontools` - get it here <https://sourceforge.net/projects/smartmontools/>
+- **macOS**:    `brew install smartmontools`
 - **Linux**:
     - Debian/Ubuntu: `apt install smartmontools`
     - RedHat/CentOS: `yum install smartmontools`
@@ -228,7 +231,7 @@ notifiarr ALL=(root) NOPASSWD:/usr/sbin/MegaCli64 -LDInfo -Lall -aALL
 
 #### Snapshot Configuration
 
-There is no client configuration for snapshots (except MySQL, below).
+There is no client configuration for snapshots (except Nvidia and MySQL, below).
 Snapshot configuration is found on the [website](https://notifiarr.com).
 
 #### MySQL Snapshots
@@ -248,6 +251,16 @@ GRANT PROCESS ON *.* to 'notifiarr'@'localhost'
 | snapshot.mysql.host | `DN_SNAPSHOT_MYSQL_HOST` | Something like: `localhost:3306`               |
 | snapshot.mysql.user | `DN_SNAPSHOT_MYSQL_USER` | Username in the GRANT statement                |
 | snapshot.mysql.pass | `DN_SNAPSHOT_MYSQL_PASS` | Password for the user in the GRANT statement   |
+
+#### Nvidia Snapshots
+
+You may report your GPU and memory Utilization for Nvidia cards. Automatic if `nvidia-smi` is found in `PATH`.
+
+| Config Name              | Variable Name                 | Note                                               |
+| ------------------------ | ----------------------------- | -------------------------------------------------- |
+| snapshot.nvidia.disabled | `DN_SNAPSHOT_NVIDIA_DISABLED` | Set to `true` to disable Nvidia data collection    |
+| snapshot.nvidia.smi_path | `DN_SNAPSHOT_NVIDIA_SMI_PATH` | Optional path to `nvidia-smi`, or `nvidia-smi.exe` |
+| snapshot.nvidia.bus_ids  | `DN_SNAPSHOT_NVIDIA_BUS_ID_0` | List of Bus IDs to restrict data collection to     |
 
 ### Lidarr
 
