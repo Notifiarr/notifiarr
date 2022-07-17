@@ -4,11 +4,11 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/radarr.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">Radarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <button onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Radarr</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/radarr.png" style="height:50px;"></div>
                                                 </td>
@@ -29,9 +29,11 @@
                                                     <span class="dialogTitle">Name</span>
                                                 </td>
                                                 <td>
-                                                    <div style="display:none;" class="dialogText">Include the Base URL if that's configured in your application.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">URL</span>
+                                                    <div style="display:none;" class="dialogText">
+                                                        http:// or https:// URL for the application instance. Include the Base URL if that's configured in your application.
+                                                        Providing an https:// URL reveals a checkbox. 
+                                                        Checking this box enables SSL certificate validation; invalid certificates generate an error.
+                                                    </div>
                                                 </td>
                                                 <td style="min-width:100px;">
                                                     <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
@@ -102,7 +104,10 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Radarr.{{$index}}.URL" name="Apps.Radarr.{{$index}}.URL" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <input type="text" id="Apps.Radarr.{{$index}}.URL" name="Apps.Radarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Radarr{{$index}}SSL');" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Radarr{{$index}}SSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.Radarr.{{$index}}.ValidSSL" name="Apps.Radarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Radarr" class="client-parameter" data-group="download" data-label="Radarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>

@@ -31,7 +31,7 @@ func (t *TautulliConfig) GetUsers(ctx context.Context) (*TautulliUsers, error) {
 
 	var users TautulliUsers
 
-	err := GetURLInto(ctx, "Tautulli", t.Timeout.Duration, t.URL+"/api/v2", params, &users)
+	err := GetURLInto(ctx, "Tautulli", t.Timeout.Duration, t.VerifySSL, t.URL+"/api/v2", params, &users)
 	if err != nil {
 		return nil, err
 	}

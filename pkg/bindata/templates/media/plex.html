@@ -13,9 +13,14 @@
                                                     <span class="dialogTitle">Name</span>
                                                 </td>
                                                 <td style="min-width:180px;">
-                                                    <div style="display:none;" class="dialogText">If your application has a Base URL, include it.</div>
+                                                    <div style="display:none;" class="dialogText">
+                                                        http:// or https:// URL for the application instance. If your application has a Base URL, include it.
+                                                        Providing an https:// URL reveals a checkbox.
+                                                        Checking this box enables SSL certificate validation; invalid certificates generate an error.
+                                                    </div>
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">URL</span>
+                                                    </td>
                                                 </td>
                                                 <td colspan="2">
                                                     <div style="display:none;" class="dialogText">
@@ -54,7 +59,10 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_URL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Plex.URL" name="Plex.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}">
+                                                                <input type="text" onChange="showhttps($(this).val(), '#PlexSSL');" id="Plex.URL" name="Plex.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains .Config.Plex.URL "https://")}}display:none;{{end}}" id="PlexSSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Plex.VerifySSL" name="Plex.VerifySSL" data-app="Plex" class="client-parameter" data-group="media" data-label="Plex SSL" data-original="{{.Config.Plex.VerifySSL}}" {{if .Config.Plex.VerifySSL}}checked {{end}}value="true">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>

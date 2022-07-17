@@ -4,7 +4,7 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/nzbget.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">NZBGet</h2>
                                                     <div style="float: right;">
-                                                        <button id="download-NZBGet-addbutton" onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" data-names='["Name","Config.URL","Config.User","Config.Pass","Interval","Timeout"]' type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="download-NZBGet-addbutton" onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" data-sslname="VerifySSL" data-names='["Name","Config.URL","Config.User","Config.Pass","Interval","Timeout"]' type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
@@ -28,7 +28,14 @@
                                                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Name</span>
                                                 </td>
-                                                <td style="min-width:190px;">URL</td>
+                                                <td style="min-width:190px;">
+                                                    <div style="display:none;" class="dialogText">
+                                                        http:// or https:// URL for the application instance. Providing an https:// URL reveals a checkbox. 
+                                                        Checking this box enables SSL certificate validation; invalid certificates generate an error.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
                                                 <td style="min-width:80px;">Username</td>
                                                 <td style="min-width:170px;">Password</td>
                                                 <td style="min-width:90px;width:90px">
@@ -85,7 +92,10 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_NZBGET_%d_URL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.NZBGet.{{$index}}.Config.URL" name="Apps.NZBGet.{{$index}}.Config.URL" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <input type="text" id="Apps.NZBGet.{{$index}}.Config.URL" onChange="showhttps($(this).val(), '#NZBGet{{$index}}SSL');" name="Apps.NZBGet.{{$index}}.Config.URL" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="NZBGet{{$index}}SSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.NZBGet.{{$index}}.VerifySSL" name="Apps.NZBGet.{{$index}}.VerifySSL" data-index="{{$index}}" data-app="NZBGet" class="client-parameter" data-group="download" data-label="NZBGet {{instance $index}} SSL" data-original="{{$app.VerifySSL}}" {{if $app.VerifySSL}}checked {{end}}value="true">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>

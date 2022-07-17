@@ -47,11 +47,12 @@ type RtorrentConfig struct {
 }
 
 type TautulliConfig struct {
-	Name     string        `toml:"name" xml:"name" json:"name"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
-	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
-	URL      string        `toml:"url" xml:"url" json:"url"`
-	APIKey   string        `toml:"api_key" xml:"api_key" json:"apiKey"`
+	Name      string        `toml:"name" xml:"name" json:"name"`
+	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
+	URL       string        `toml:"url" xml:"url" json:"url"`
+	APIKey    string        `toml:"api_key" xml:"api_key" json:"apiKey"`
+	VerifySSL bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 }
 
 type NZBGetConfig struct {

@@ -11,9 +11,11 @@
                                                     <span class="dialogTitle">Name</span>
                                                 </td>
                                                 <td>
-                                                    <div style="display:none;" class="dialogText">If your application has a Base URL, include it.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">URL</span>
+                                                    <div style="display:none;" class="dialogText">
+                                                        http:// or https:// URL for the application instance. If your application has a Base URL, include it.
+                                                        Providing an https:// URL reveals a checkbox.
+                                                        Checking this box enables SSL certificate validation; invalid certificates generate an error.
+                                                    </div>
                                                 </td>
                                                 <td style="min-width:150px;">
                                                     <div style="display:none;" class="dialogText">Get this from Tautulli Settings.</div>
@@ -70,7 +72,10 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_URL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Apps.Tautulli.URL" name="Apps.Tautulli.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}">
+                                                                <input type="text" onChange="showhttps($(this).val(), '#TautulliSSL');" id="Apps.Tautulli.URL" name="Apps.Tautulli.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains .Config.Apps.Tautulli.URL "https://")}}display:none;{{end}}" id="TautulliSSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.Tautulli.VerifySSL" name="Apps.Tautulli.VerifySSL" data-app="Tautulli" class="client-parameter" data-group="media" data-label="Tautulli SSL" data-original="{{.Config.Apps.Tautulli.VerifySSL}}" {{if .Config.Apps.Tautulli.VerifySSL}}checked {{end}}value="true">
+                                                                </div>  
                                                             </div>
                                                         </div>
                                                     </form>
