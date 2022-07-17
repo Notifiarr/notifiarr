@@ -103,6 +103,7 @@ type Service struct {
 	Expect   string        `toml:"expect" xml:"expect" json:"expect"`       // 200
 	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`    // 10s
 	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"` // 1m
+	validSSL bool          // can be set for https checks.
 	svc      service
 }
 

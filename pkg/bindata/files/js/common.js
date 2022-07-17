@@ -284,6 +284,10 @@ function findPendingChanges()
         col         = $(this).parents('td');
         row         = col.parents('tr');
 
+        if ($(this).attr('type') == "checkbox") {
+            current = ""+$(this).prop('checked');
+        }
+
         if (original != current) {
             col.addClass(row.hasClass('newRow')?'':'bk-warning');
             counter++;

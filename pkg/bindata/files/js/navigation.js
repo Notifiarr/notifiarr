@@ -101,3 +101,12 @@ function reloadConfig()
          },
      });
 }
+
+// This toggles visibility of the verify ssl checkbox.
+function showhttps(val, elem) {
+    if (val.lastIndexOf ("https://", 0) === 0) {
+        $(elem).show();
+    } else {
+        $(elem).hide();
+    }
+}

@@ -150,6 +150,7 @@
                                                                     </div>
                                                                     {{- end}}
                                                                     <select multiple id="Service.{{$index}}.Expect.StatusCode" onChange="checkExpectChange($(this));" data-index="{{$index}}" data-app="checks" style="width:100%;{{if ne $svc.Type "http"}}display:none;{{end}}" class="form-control input-sm serviceHTTPParam">
+                                                                        <option value="SSL"{{if and (eq $svc.Type "http") (contains $svc.Expect "SSL")}} selected{{end}}>SSL: Validate Certificate</option>
                                                                         <option value="100"{{if and (eq $svc.Type "http") (contains $svc.Expect "100")}} selected{{end}}>100: Continue</option>
                                                                         <option value="101"{{if and (eq $svc.Type "http") (contains $svc.Expect "101")}} selected{{end}}>101: SwitchingProtocols</option>
                                                                         <option value="102"{{if and (eq $svc.Type "http") (contains $svc.Expect "102")}} selected{{end}}>102: Processing</option>

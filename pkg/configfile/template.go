@@ -165,6 +165,9 @@ retries = {{.Retries}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
   max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[lidarr]]
@@ -184,6 +187,9 @@ retries = {{.Retries}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
   max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[prowlarr]]
@@ -203,6 +209,9 @@ retries = {{.Retries}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{ if .MaxBody }}
   max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[radarr]]
@@ -222,6 +231,9 @@ retries = {{.Retries}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
   max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[readarr]]
@@ -241,6 +253,9 @@ retries = {{.Retries}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"{{if .MaxBody}}
   max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[sonarr]]
@@ -259,6 +274,9 @@ retries = {{.Retries}}
   password = "{{.Password}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  {{- if .VerifySSL}}
+  verify_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[deluge]]
@@ -274,6 +292,9 @@ retries = {{.Retries}}
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  {{- if .VerifySSL}}
+  verify_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[qbit]]
@@ -290,6 +311,9 @@ retries = {{.Retries}}
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  {{- if .VerifySSL}}
+  verify_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[rtorrent]]
@@ -306,6 +330,9 @@ retries = {{.Retries}}
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  {{- if .VerifySSL}}
+  verify_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[nzbget]]
@@ -321,6 +348,9 @@ retries = {{.Retries}}
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  {{- if .VerifySSL}}
+  verify_ssl = true
+  {{- end}}
 
 {{end}}
 {{else}}#[[sabnzbd]]
@@ -341,6 +371,9 @@ retries = {{.Retries}}
   url     = "{{.Plex.URL}}"   # Your plex URL
   token   = "{{.Plex.Token}}"   # your plex token; get this from a web inspector
   timeout = "{{.Plex.Timeout}}"  # how long to wait for HTTP responses
+  {{- if .Plex.VerifySSL}}
+  verify_ssl = true
+  {{- end}}
 {{- else}}#[plex]
 #url     = "http://localhost:32400/" # Your plex URL
 #token   = "" # your plex token; get this from a web inspector
@@ -359,6 +392,9 @@ retries = {{.Retries}}
   api_key  = "{{.Tautulli.APIKey}}" # your tautulli api key; get this from settings
   timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
   interval = "{{.Tautulli.Interval}}" # how often to send service checks
+  {{- if .Tautulli.VerifySSL}}
+  verify_ssl = true
+  {{- end}}
 {{- else}}
 #[tautulli]
 #  name    = "" # only set a name to enable service checks.
