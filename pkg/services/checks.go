@@ -16,6 +16,11 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
+const (
+	sslstring   = "SSL" // used for checking HTTPS certs
+	expectdelim = ","   // extra (split) delimiter
+)
+
 type result struct {
 	output string
 	state  CheckState
@@ -43,6 +48,12 @@ func (s *Service) Validate() error { //nolint:cyclop
 	case CheckHTTP:
 		if s.Expect == "" {
 			s.Expect = "200"
+		}
+
+		for _, code := range strings.Split(s.Expect, expectdelim) {
+			if strings.EqualFold(code, sslstring) {
+				s.validSSL = true
+			}
 		}
 	case CheckTCP:
 		if !strings.Contains(s.Value, ":") {
@@ -151,16 +162,8 @@ func (s *Service) checkHTTP() *result {
 		return res
 	}
 
-	validSSL := false
-
-	for _, code := range strings.Split(s.Expect, ",") {
-		if strings.EqualFold(code, "ssl") {
-			validSSL = true
-		}
-	}
-
 	resp, err := (&http.Client{Timeout: s.Timeout.Duration, Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: !validSSL}, //nolint:gosec
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: !s.validSSL}, //nolint:gosec
 	}}).Do(req)
 	if err != nil {
 		res.output = "making request: " + RemoveSecrets(s.Value, err.Error())
@@ -174,7 +177,7 @@ func (s *Service) checkHTTP() *result {
 		return res
 	}
 
-	for _, code := range strings.Split(s.Expect, ",") {
+	for _, code := range strings.Split(s.Expect, expectdelim) {
 		if strconv.Itoa(resp.StatusCode) == strings.TrimSpace(code) {
 			res.state = StateOK
 			res.output = resp.Status

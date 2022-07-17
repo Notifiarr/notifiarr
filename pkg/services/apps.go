@@ -39,6 +39,7 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -64,6 +65,7 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -89,6 +91,7 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -114,6 +117,7 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -139,6 +143,7 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -165,6 +170,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.VerifySSL,
 			})
 		}
 	}
@@ -187,6 +193,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.VerifySSL,
 			})
 		}
 	}
@@ -209,6 +216,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.VerifySSL,
 			})
 		}
 	}
@@ -228,9 +236,10 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Name:     app.Name,
 				Type:     CheckHTTP,
 				Value:    app.URL,
-				Expect:   "401", // could not find a 200...
+				Expect:   "200,401", // could not find a 200...
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.VerifySSL,
 			})
 		}
 	}
@@ -253,6 +262,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: app.Interval,
+				validSSL: app.VerifySSL,
 			})
 		}
 	}
@@ -278,6 +288,7 @@ func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 			Expect:   "200",
 			Timeout:  app.Timeout,
 			Interval: app.Interval,
+			validSSL: app.VerifySSL,
 		})
 	}
 
