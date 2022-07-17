@@ -29,16 +29,16 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	)
 
 	switch runtime.GOOS {
-	case "windows":
+	case "linux":
+		err = getSmartDisks(ctx, useSudo, disks)
+	case "darwin":
+		err = getBlocks(disks)
+	case mnd.Windows:
 		if err := getParts(ctx, disks); err != nil {
 			errs = append(errs, err)
 		}
 
 		fallthrough
-	case "linux":
-		err = getSmartDisks(ctx, useSudo, disks)
-	case "darwin":
-		err = getBlocks(disks)
 	default:
 		err = getParts(ctx, disks)
 	}
@@ -94,7 +94,14 @@ func getBlocks(disks map[string]string) error {
 		return fmt.Errorf("unable to get block devices: %w", err)
 	}
 
+	have := make(map[string]struct{})
 	for _, dev := range block.Disks {
+		if _, ok := have[dev.BusPath]; ok {
+			continue
+		}
+
+		have[dev.BusPath] = struct{}{}
+
 		if runtime.GOOS != mnd.Windows {
 			disks[path.Join("/dev", dev.Name)] = ""
 		} else {

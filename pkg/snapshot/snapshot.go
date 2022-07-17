@@ -67,8 +67,7 @@ var (
 
 // Snapshot is the output data sent to Notifiarr.
 type Snapshot struct {
-	Version string
-	Uptime  time.Duration
+	Version string `json:"version"`
 	System  struct {
 		*host.InfoStat
 		Username string             `json:"username"`
@@ -138,10 +137,7 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
-	snap := &Snapshot{
-		Version: version.Version + "-" + version.Revision,
-		Uptime:  time.Since(version.Started),
-	}
+	snap := &Snapshot{Version: version.Version + "-" + version.Revision}
 	errs, debug := c.getSnapshot(ctx, snap)
 
 	return snap, errs, debug
