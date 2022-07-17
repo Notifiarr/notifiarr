@@ -1,0 +1,7 @@
+{
+    "notarize": [{
+      "path": "release/Notifiarr.dmg",
+      "bundle_id": "io.golift.notifiarr",
+      "staple": true
+    }]
+}
