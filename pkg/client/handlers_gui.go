@@ -625,9 +625,22 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
 	}
 
+	return c.validateNewServiceConfig(config)
+}
+
+func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 	// Check service checks for non-unique names.
 	serviceNames := make(map[string]struct{})
-	for index, svc := range config.Service {
+	index := 0
+
+	for _, svc := range config.Service {
+		if svc == nil {
+			continue
+		}
+
+		config.Service[index] = svc
+		index++
+
 		if _, ok := serviceNames[svc.Name]; ok {
 			return fmt.Errorf("%w (%d): %s", services.ErrNoName, index+1, svc.Name)
 		}
@@ -638,6 +651,13 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 
 		serviceNames[svc.Name] = struct{}{}
 	}
+
+	// Clean up to avoid leaking memory.
+	for j := index; j < len(config.Service); j++ {
+		config.Service[j] = nil
+	}
+
+	config.Service = config.Service[:index]
 
 	return nil
 }

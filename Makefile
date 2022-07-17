@@ -101,6 +101,10 @@ dmg: clean $(MACAPP).app
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
+signdmg: clean $(MACAPP).app
+	mkdir -p release
+	say "Attention Needed!"
+	gon init/macos/gon.json
 
 # Delete all build assets.
 clean:
@@ -218,10 +222,15 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
 macapp: $(MACAPP).app
-$(MACAPP).app: $(BINARY).universal.macos
-	[ -z "$(MACAPP)" ] || mkdir -p init/macos/$(MACAPP).app/Contents/MacOS
-	[ -z "$(MACAPP)" ] || cp $(BINARY).universal.macos init/macos/$(MACAPP).app/Contents/MacOS/$(MACAPP)
+$(MACAPP).app: clean $(BINARY).universal.macos
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
+	[ -z "$(MACAPP)" ] || mkdir -p $(MACAPP).app/Contents/MacOS
+	[ -z "$(MACAPP)" ] || cp $(BINARY).universal.macos $(MACAPP).app/Contents/MacOS/$(MACAPP)
+	[ -z "$(MACAPP)" ] || sed -i '' \
+		-e "s/{{VERSION}}/$(VERSION)/g" \
+		-e "s%{{BINARY}}%$(BINARY)%g" \
+		-e "s%{{MACAPP}}%$(MACAPP)%g" \
+		$(MACAPP).app/Contents/Info.plist
 
 aur: PKGBUILD SRCINFO $(BINARY).aur.install
 	mkdir -p $@
