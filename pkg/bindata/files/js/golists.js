@@ -102,6 +102,7 @@ function addInstance(section, app)
     const instance = index+1;
     const prefix = $('#'+ section +'-'+ app +'-addbutton').data('prefix');  // storage location like Apps or Snapshot.
     const names = $('#'+ section +'-'+ app +'-addbutton').data('names'); // list of thinges like "Name" and "URL"
+    const sslname = $('#'+ section +'-'+ app +'-addbutton').data('sslname'); // name for ValidSSL input.
     // This just sets the first few lines of the row (the action buttons). The more-dynamic bits get added below, in a for loop.
     let row = '<tr class="newRow bk-success '+ section +'-'+ app +'" id="'+ section +'-'+ app +'-'+ instance +'">'+
     '<td style="white-space:nowrap;">'+
@@ -173,6 +174,12 @@ function addInstance(section, app)
              break;
              case "Config.URL":
              case "URL":
+                itype = '<input type="text" onChange="showhttps($(this).val(), \'#'+app+index+'SSL\');"';
+                extra = '<div style="width:30px; max-width:30px;display:none" id="'+app+index+'SSL" class="input-group-addon input-sm">'+
+                        '<input type="checkbox" id="'+ prefix +'.'+ app +'.'+ index +'.'+sslname+'" name="'+ prefix +'.'+ app +'.'+ index +
+                            '.'+sslname+'" data-index="'+index+'" data-app="'+app+'" class="client-parameter" data-group="'+section+'" data-label="'+
+                            app+' '+instance+' SSL" data-original="false" value="true">'+
+                        '</div>';
              case "Host":
                 nameval = "changeme";
                 nameori = "";
