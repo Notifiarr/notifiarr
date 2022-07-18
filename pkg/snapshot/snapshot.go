@@ -25,11 +25,11 @@ import (
 )
 
 // DefaultTimeout is used when one is not provided.
-const DefaultTimeout = 30 * time.Second
+const DefaultTimeout = 45 * time.Second
 
 const (
-	minimumTimeout  = 5 * time.Second
-	maximumTimeout  = time.Minute
+	minimumTimeout  = 20 * time.Second
+	maximumTimeout  = 3 * time.Minute
 	minimumInterval = time.Minute
 	defaultMyLimit  = 10
 )

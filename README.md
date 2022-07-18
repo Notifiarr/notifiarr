@@ -65,8 +65,7 @@ brew services start notifiarr
 
 #### macOS App
 
-- You can use the unsigned app on the Releases page.
-- You must right click the app and select `Open` so macOS allows it.
+- You can use the Apple-signed app on the Releases page.
 - When you open it for the first time it will create a config file and log file:
     - `~/.notifiarr/notifiarr.conf`
     - `~/.notifiarr/notifiarr.log`

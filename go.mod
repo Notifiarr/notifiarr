@@ -30,7 +30,7 @@ require (
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gonutz/w32 v1.0.0
-	github.com/iamacarpet/go-win64api v0.0.0-20220531152116-0aa0ec10b240
+	github.com/iamacarpet/go-win64api v0.0.0-20220531131246-e84054eb584d
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2 // indirect

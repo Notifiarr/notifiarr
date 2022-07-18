@@ -29,16 +29,16 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	)
 
 	switch runtime.GOOS {
-	case "linux":
-		err = getSmartDisks(ctx, useSudo, disks)
-	case "darwin":
-		err = getBlocks(disks)
 	case mnd.Windows:
 		if err := getParts(ctx, disks); err != nil {
 			errs = append(errs, err)
 		}
 
 		fallthrough
+	case "linux":
+		err = getSmartDisks(ctx, useSudo, disks)
+	case "darwin":
+		err = getBlocks(disks)
 	default:
 		err = getParts(ctx, disks)
 	}
