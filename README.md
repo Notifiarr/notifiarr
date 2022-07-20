@@ -194,6 +194,9 @@ If you use smartctl on Linux, you must enable sudo. Add the sudoers entry below 
 `/etc/sudoers` and fix the path to `smartctl` if yours differs. If you monitor
 raid and use MegaCli (LSI card), add the appropriate sudoers entry for that too.
 
+Usage of smartctl on Windows requires running this application as an administrator.
+Not entirely sure why, but the elevated privileges allow smartctl to gather drive data.
+
 To monitor application disk I/O you may install `iotop` and add the sudoers entry
 for it, shown below. This feature is enabled on the website.
 
