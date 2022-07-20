@@ -65,8 +65,7 @@ brew services start notifiarr
 
 #### macOS App
 
-- You can use the unsigned app on the Releases page.
-- You must right click the app and select `Open` so macOS allows it.
+- You can use the Apple-signed app on the Releases page.
 - When you open it for the first time it will create a config file and log file:
     - `~/.notifiarr/notifiarr.conf`
     - `~/.notifiarr/notifiarr.log`
@@ -87,6 +86,10 @@ This project builds automatically in [Docker Cloud](https://hub.docker.com/r/gol
 and creates [ready-to-use multi-architecture images](https://hub.docker.com/r/golift/notifiarr/tags).
 The `latest` tag is always a tagged release in GitHub. The `main` tag corresponds
 to the `main` branch in GitHub and may be broken.
+
+**Unraid Users** - You must configure a Notifiarr API Key in the Unraid Template. If you wish to use Plex then you'll also need to set the Plex Token and Plex URL in the template as well.
+
+**Docker Users** - Note that Docker Enviormental Variables - and thus the Unraid Template - override the Config file.
 
 #### Docker Config File
 
@@ -194,6 +197,9 @@ If you monitor drive health you must have smartmontools (`smartctl`) installed.
 If you use smartctl on Linux, you must enable sudo. Add the sudoers entry below to
 `/etc/sudoers` and fix the path to `smartctl` if yours differs. If you monitor
 raid and use MegaCli (LSI card), add the appropriate sudoers entry for that too.
+
+Usage of smartctl on Windows requires running this application as an administrator.
+Not entirely sure why, but the elevated privileges allow smartctl to gather drive data.
 
 To monitor application disk I/O you may install `iotop` and add the sudoers entry
 for it, shown below. This feature is enabled on the website.

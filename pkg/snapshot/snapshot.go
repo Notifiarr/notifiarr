@@ -25,11 +25,11 @@ import (
 )
 
 // DefaultTimeout is used when one is not provided.
-const DefaultTimeout = 30 * time.Second
+const DefaultTimeout = 45 * time.Second
 
 const (
-	minimumTimeout  = 5 * time.Second
-	maximumTimeout  = time.Minute
+	minimumTimeout  = 20 * time.Second
+	maximumTimeout  = 3 * time.Minute
 	minimumInterval = time.Minute
 	defaultMyLimit  = 10
 )
@@ -67,8 +67,7 @@ var (
 
 // Snapshot is the output data sent to Notifiarr.
 type Snapshot struct {
-	Version string
-	Uptime  time.Duration
+	Version string `json:"version"`
 	System  struct {
 		*host.InfoStat
 		Username string             `json:"username"`
@@ -138,10 +137,7 @@ func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
 	defer cancel()
 
-	snap := &Snapshot{
-		Version: version.Version + "-" + version.Revision,
-		Uptime:  time.Since(version.Started),
-	}
+	snap := &Snapshot{Version: version.Version + "-" + version.Revision}
 	errs, debug := c.getSnapshot(ctx, snap)
 
 	return snap, errs, debug

@@ -181,6 +181,7 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 
 	if clientInfo.Actions.Snapshot != nil {
 		c.Config.Snapshot.Interval.Duration = clientInfo.Actions.Snapshot.Interval.Duration
+		c.Config.Snapshot.Timeout.Duration = clientInfo.Actions.Snapshot.Timeout.Duration
 		c.Config.Snapshot.ZFSPools = clientInfo.Actions.Snapshot.ZFSPools
 		c.Config.Snapshot.UseSudo = clientInfo.Actions.Snapshot.UseSudo
 		c.Config.Snapshot.Raid = clientInfo.Actions.Snapshot.Raid

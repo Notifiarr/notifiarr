@@ -105,7 +105,7 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	sessions := &plex.Sessions{Name: c.Plex.Name}
 	// If NoActivity=false, then grab sessions.
-	if !c.ClientInfo.Actions.Plex.NoActivity {
+	if c.ClientInfo != nil && !c.ClientInfo.Actions.Plex.NoActivity {
 		var err error
 		if sessions, err = c.getSessions(true); err != nil {
 			c.Errorf("Getting Plex sessions: %v", err)
