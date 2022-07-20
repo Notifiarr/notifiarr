@@ -7,6 +7,7 @@ require (
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5
 	golift.io/deluge v0.10.0
+	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
 	golift.io/qbit v0.0.0-20220709224202-8d3d80f96de0
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
 	golift.io/starr v0.14.1-0.20220703064953-eb83ba0253dd
@@ -30,7 +31,7 @@ require (
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gonutz/w32 v1.0.0
-	github.com/iamacarpet/go-win64api v0.0.0-20220531152116-0aa0ec10b240
+	github.com/iamacarpet/go-win64api v0.0.0-20220531131246-e84054eb584d
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2 // indirect
@@ -102,6 +103,7 @@ require (
 	modernc.org/token v1.0.0 // indirect
 )
 
+// file watcher stuff.
 require (
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gorilla/schema v1.2.0
@@ -115,16 +117,12 @@ require (
 )
 
 require (
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
-	github.com/mrobinsn/go-rtorrent v1.8.0
-	golift.io/nzbget v0.1.3
-)
-
-require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/gorilla/rpc v1.2.0 // indirect
+	github.com/mrobinsn/go-rtorrent v1.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
 	go.opentelemetry.io/otel v1.8.0 // indirect

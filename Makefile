@@ -96,14 +96,13 @@ release: clean linux_packages freebsd_packages windows
 # DMG only makes a DMG file if MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
 dmg: clean $(MACAPP).app
 	mkdir -p release
-	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP).dmg -srcfolder $(MACAPP).app -ov
+	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP)-unsigned.dmg -srcfolder $(MACAPP).app -ov
 	[ "$(MACAPP)" != "" ] || mv $(BINARY).*.macos release/
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
 signdmg: clean $(MACAPP).app
 	mkdir -p release
-	say "Attention Needed!"
 	gon init/macos/gon.json
 
 # Delete all build assets.
