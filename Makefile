@@ -102,15 +102,14 @@ dmg: clean $(MACAPP).app
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
 signdmg: clean $(MACAPP).app
-	mkdir -p release
-	gon init/macos/gon.json
+	bash scripts/makedmg.sh
 
 # Delete all build assets.
 clean:
 	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
 	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).*.app.zip
-	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go
+	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go pack.temp.dmg
 	rm -f before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh 
 	rm -rf aur package_build_* release $(MACAPP).*.app $(MACAPP).app
 

@@ -1,9 +1,0 @@
-{
-    "source": ["Notifiarr.app"],
-    "bundle_id": "io.golift.notifiarr",
-    "sign": { "application_identity" : "1AE9653F18114B23927AF7FA6624EF74F95A4544" },
-    "dmg": {
-        "output_path":  "release/Notifiarr.dmg",
-        "volume_name":  "Notifiarr"
-    }
-}
