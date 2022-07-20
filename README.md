@@ -88,7 +88,9 @@ and creates [ready-to-use multi-architecture images](https://hub.docker.com/r/go
 The `latest` tag is always a tagged release in GitHub. The `main` tag corresponds
 to the `main` branch in GitHub and may be broken.
 
-**Unraid Users** - You must configure a Notifiarr API Key (and Plex Token if you wish to use Plex) in the Unraid Template.  Enviormental Variables and thus the Template override the Config file
+**Unraid Users** - You must configure a Notifiarr API Key in the Unraid Template. If you wish to use Plex then you'll also need to set the Plex Token and Plex URL in the template as well.
+
+**Docker Users** - Note that Docker Enviormental Variables and thus the Template override the Config file.
 
 #### Docker Config File
 
