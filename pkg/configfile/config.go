@@ -40,6 +40,7 @@ const (
 	MsgConfigFailed = "Using env variables only. Could not create config file: "
 	MsgConfigCreate = "Created new config file: "
 	MsgConfigFound  = "Using Config File: "
+	DefaultUsername = "admin"
 )
 
 // Config represents the data in our config file.

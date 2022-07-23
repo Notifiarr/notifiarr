@@ -123,6 +123,7 @@ func (c *Client) makeChannels() {
 	menu["conf"] = conf
 	menu["view"] = conf.AddSubMenuItem("View", "show configuration")
 	menu["edit"] = conf.AddSubMenuItem("Edit", "edit configuration")
+	menu["pass"] = conf.AddSubMenuItem("Password", "create or update the Web UI admin password")
 	menu["write"] = conf.AddSubMenuItem("Write", "write config file")
 	menu["svcs"] = conf.AddSubMenuItem("Services", "toggle service checks routine")
 	menu["load"] = conf.AddSubMenuItem("Reload", "reload configuration")
@@ -315,6 +316,8 @@ func (c *Client) watchConfigChannels() {
 		select {
 		case <-menu["view"].ClickedCh:
 			go ui.Info(mnd.Title+": Configuration", c.displayConfig())
+		case <-menu["pass"].ClickedCh:
+			c.updatePassword()
 		case <-menu["edit"].ClickedCh:
 			go ui.OpenFile(c.Flags.ConfigFile)
 			c.Print("user requested] Editing Config File:", c.Flags.ConfigFile)

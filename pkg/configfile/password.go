@@ -11,9 +11,8 @@ import (
 type CryptPass string
 
 const (
-	cryptedPassPfx  = "!!cryptd!!"
-	defaultUsername = "admin"
-	webauth         = "webauth"
+	cryptedPassPfx = "!!cryptd!!"
+	webauth        = "webauth"
 )
 
 func (c *Config) setupPassword() error {
@@ -27,7 +26,7 @@ func (c *Config) setupPassword() error {
 	}
 
 	if !c.UIPassword.IsCrypted() && !strings.Contains(pass, ":") {
-		pass = defaultUsername + ":" + pass
+		pass = DefaultUsername + ":" + pass
 	}
 
 	if err := c.UIPassword.Set(pass); err != nil {

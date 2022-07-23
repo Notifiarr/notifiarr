@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -183,4 +184,35 @@ func (c *Client) openGUI() {
 	// This always has a colon, or the app will not start.
 	port := strings.Split(c.Config.BindAddr, ":")[1]
 	go ui.OpenURL(uri + ":" + port + c.Config.URLBase) //nolint:errcheck
+}
+
+func (c *Client) updatePassword() {
+	pass, _, err := ui.Entry(mnd.Title, "Enter new Web UI admin password (must be 9+ characters):", "")
+	if err != nil {
+		c.Errorf("err: %v", err)
+		return
+	}
+
+	if err := c.StopWebServer(); err != nil {
+		c.Errorf("Stopping web server: %v", err)
+
+		if err = ui.Notify("Stopping web server failed, password not updated."); err != nil {
+			c.Errorf("Creating Toast Notification: %v", err)
+		}
+
+		return
+	}
+
+	c.Print("[user requested] Updating Web UI password.")
+
+	defer c.StartWebServer()
+
+	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
+		c.Errorf("Updating Web UI Password: %v", err)
+		_, _ = ui.Error(mnd.Title+" Error", "Updating Web UI Password: "+err.Error())
+	}
+
+	if err = ui.Notify("Web UI password updated. Save config to persist this change."); err != nil {
+		c.Errorf("Creating Toast Notification: %v", err)
+	}
 }
