@@ -124,13 +124,12 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 }
 
 func testDeluge(ctx context.Context, config *deluge.Config) (string, int) {
-	if deluge, err := deluge.NewNoAuth(config); err != nil {
+	deluge, err := deluge.New(ctx, config)
+	if err != nil {
 		return "Connecting: " + err.Error(), http.StatusBadGateway
-	} else if xfers, err := deluge.GetXfersContext(ctx); err != nil {
-		return "Getting Transfers: " + err.Error(), http.StatusBadGateway
-	} else {
-		return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
 	}
+
+	return fmt.Sprintf("Connection Successful! Version: %s", deluge.Version), http.StatusOK
 }
 
 func testNZBGet(ctx context.Context, config *nzbget.Config) (string, int) {

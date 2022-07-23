@@ -207,10 +207,12 @@ func (c *Config) Running() bool {
 	return c.stopChan != nil
 }
 
-// Stop ends all service checker routines.
+// Stop sends current states to the website and ends all service checker routines.
 func (c *Config) Stop() {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
+
+	c.updateStatesOnSite()
 
 	if c.stopChan == nil {
 		return

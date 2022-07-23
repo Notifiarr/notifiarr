@@ -6,6 +6,11 @@
         <div class="page-container">
             <div class="page-body">
                 <div class="brand clearfix" style="z-index:100;">
+                    <span class="mobile-hide tablet-hide" title="Unsaved Changes!">
+                        <span class="pending-change-container" style="display:none;margin:10px 0px 0px 10px;font-size: 18px;">
+                            <i class="fas text-danger fa-exclamation-circle" style="display:none;"></i>
+                        </span>
+                    </span>
                     <a class="nav-link" href="#landing" onclick="swapNavigationTemplate('landing')"><!-- outside the h4 to keep it white -->
                         <h4 class="text-uppercase text-white" style="margin:10px 0px 0px 10px">
                             <img src="{{files}}/images/logo/notifiarr.png" style="height:47px;">
@@ -19,12 +24,18 @@
                     <a class="nav-button text-danger fas fa-power-off" title="Shut down application (quit)." onClick="shutDownApp();" style="margin-right:0;"></a>
                     <a class="nav-button text-success fas fa-recycle" title="Reload application configuraton and refresh." onClick="reloadConfig();"></a>
                     {{- end}}
-                    <span class="menu-btn pull-left" style="font-size:1.3em;"><i class="fa fa-bars"> <span class="pending-change-container" style="display:none;"><i class="fas text-danger fa-exclamation-circle" title="Unsaved Changes!" style="display:none;"></i></span></i></span>
+                    <span class="menu-btn pull-left" style="font-size:1.3em;">
+                        <i class="fa fa-bars">
+                            <span class="pending-change-container" style="display:none;">
+                                <i class="fas text-danger fa-exclamation-circle" title="Unsaved Changes!" style="display:none;"></i>
+                            </span>
+                        </i>
+                    </span>
                     <ul class="ts-profile-nav"><div style="margin-top:25px; height:40px;">&nbsp;</div></ul>
                 </div>
 
                 <div class="ts-main-content">
-                    <nav class="ts-sidebar">
+                    <nav class="ts-sidebar" style="margin-bottom: 25px;">
                         <ul class="ts-sidebar-menu">
                         {{- if .Username }}
                             {{- if .Dynamic }}

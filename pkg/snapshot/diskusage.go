@@ -11,7 +11,7 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
-func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error {
+func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error { // nolint:cyclop
 	if !run {
 		return nil
 	}
@@ -38,6 +38,10 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 			((runtime.GOOS == "darwin" || strings.HasSuffix(runtime.GOOS, "bsd")) &&
 				!strings.HasPrefix(partitions[idx].Device, "/dev/")) {
 			continue
+		}
+
+		if usage.Used == 0 && usage.Free > 0 && usage.Total > usage.Free {
+			usage.Used = usage.Total - usage.Free
 		}
 
 		s.DiskUsage[partitions[idx].Device] = &Partition{
