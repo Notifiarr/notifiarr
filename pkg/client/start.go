@@ -99,7 +99,7 @@ func Start() error {
 }
 
 func (c *Client) start() error { //nolint:cyclop
-	msg, newCon, err := c.loadConfiguration()
+	msg, newPassword, err := c.loadConfiguration()
 
 	switch {
 	case c.Flags.AptHook:
@@ -128,12 +128,14 @@ func (c *Client) start() error { //nolint:cyclop
 
 	clientInfo := c.configureServices()
 
-	if newCon {
+	if newPassword != "" {
 		_, _ = c.Config.Write(c.Flags.ConfigFile)
 		_ = ui.OpenFile(c.Flags.ConfigFile)
 		_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
 			c.Flags.ConfigFile+" - it should open in a text editor. "+
-			"Please edit the file and reload this application using the tray menu.")
+			"Please edit the file and reload this application using the tray menu. "+
+			"Your Web UI password was set to "+newPassword+
+			" and was also printed in the log file '"+c.Config.LogFile+"' and/or app ouptput.")
 	} else if c.Config.AutoUpdate != "" {
 		go c.AutoWatchUpdate() // do not run updater if there's a brand new config file.
 	}
@@ -148,15 +150,15 @@ func (c *Client) start() error { //nolint:cyclop
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running confguration.
-func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
+func (c *Client) loadConfiguration() (msg string, newPassword string, err error) {
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.
 	write := (!c.Flags.Restart && ui.HasGUI()) || mnd.IsDocker
-	c.Flags.ConfigFile, newCon, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
+	c.Flags.ConfigFile, newPassword, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
 
 	if c.Flags.Restart {
-		return msg, newCon, update.Restart(&update.Command{ //nolint:wrapcheck
+		return msg, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
 			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
 		})
@@ -165,10 +167,10 @@ func (c *Client) loadConfiguration() (msg string, newCon bool, err error) {
 	// Parse the config file and environment variables.
 	c.website, c.triggers, err = c.Config.Get(c.Flags)
 	if err != nil {
-		return msg, newCon, fmt.Errorf("getting config: %w", err)
+		return msg, newPassword, fmt.Errorf("getting config: %w", err)
 	}
 
-	return msg, newCon, nil
+	return msg, newPassword, nil
 }
 
 // Load configuration from the website.

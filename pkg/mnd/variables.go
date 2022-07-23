@@ -1,6 +1,10 @@
 package mnd
 
-import "os"
+import (
+	"math/rand"
+	"os"
+	"time"
+)
 
 //nolint:gochecknoglobals
 var (
@@ -12,6 +16,9 @@ var (
 
 //nolint:gochecknoinits
 func init() {
+	// initialize global pseudo random generator that gets used in a few places.
+	rand.Seed(time.Now().UnixNano())
+
 	_, err := os.Stat(Synology)
 	IsSynology = err == nil
 }
