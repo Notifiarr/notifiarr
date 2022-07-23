@@ -40,6 +40,10 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 			continue
 		}
 
+		if usage.Used == 0 && usage.Free > 0 && usage.Total > usage.Free {
+			usage.Used = usage.Total - usage.Free
+		}
+
 		s.DiskUsage[partitions[idx].Device] = &Partition{
 			Device: partitions[idx].Mountpoint,
 			Total:  usage.Total,
