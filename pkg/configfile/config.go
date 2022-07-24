@@ -38,8 +38,10 @@ import (
 const (
 	MsgNoConfigFile = "Using env variables only. Config file not found."
 	MsgConfigFailed = "Using env variables only. Could not create config file: "
-	MsgConfigCreate = "Created new config file: "
+	MsgConfigCreate = "Created new config file '%s'. Your Web UI '%s' password is '%s' " +
+		"and will not be printed again. Log in, and change it."
 	MsgConfigFound  = "Using Config File: "
+	DefaultUsername = "admin"
 )
 
 // Config represents the data in our config file.
@@ -217,7 +219,7 @@ func (c *Config) setup() *triggers.Actions {
 }
 
 // FindAndReturn return a config file. Write one if requested.
-func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, string) {
+func (c *Config) FindAndReturn(configFile string, write bool) (string, string, string) {
 	var confFile string
 
 	defaultConfigFile, configFileList := defaultLocactions()
@@ -234,25 +236,31 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, bool, str
 
 	if configFile = ""; confFile != "" {
 		configFile, _ = filepath.Abs(confFile)
-		return configFile, false, MsgConfigFound + configFile
+		return configFile, "", MsgConfigFound + configFile
 	}
 
 	if defaultConfigFile == "" || !write {
-		return configFile, false, MsgNoConfigFile
+		return configFile, "", MsgNoConfigFile
 	}
+
+	// If we are writing a
+	newPassword := generatePassword()
+	_ = c.UIPassword.Set(DefaultUsername + ":" + newPassword)
 
 	findFile, err := c.Write(defaultConfigFile)
 	if err != nil {
-		return configFile, true, MsgConfigFailed + err.Error()
+		return configFile, newPassword, MsgConfigFailed + err.Error()
 	} else if findFile == "" {
-		return configFile, false, MsgNoConfigFile
+		return configFile, "", MsgNoConfigFile
 	}
+
+	msg := fmt.Sprintf(MsgConfigCreate, findFile, DefaultUsername, newPassword)
 
 	if err := cnfgfile.Unmarshal(c, findFile); err != nil {
-		return findFile, true, MsgConfigCreate + findFile + ": " + err.Error()
+		return findFile, newPassword, msg + ": " + err.Error()
 	}
 
-	return findFile, true, MsgConfigCreate + findFile
+	return findFile, newPassword, msg
 }
 
 // Write config to a file.
