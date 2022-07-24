@@ -66,7 +66,6 @@ amber
 amend
 amino
 among
-anal
 andy
 angel
 anger
@@ -563,7 +562,6 @@ diet
 diff
 diffs
 digit
-dildo
 dirt
 dirty
 disc
@@ -615,7 +613,6 @@ drop
 drops
 drove
 drug
-drugs
 drum
 drums
 drunk
@@ -625,7 +622,6 @@ dubai
 duck
 dude
 duke
-dumb
 dump
 dust
 dutch
@@ -744,7 +740,6 @@ feet
 fell
 felt
 fence
-feof
 ferry
 fever
 fewer
@@ -860,7 +855,6 @@ gate
 gates
 gauge
 gave
-gays
 gear
 geek
 gene
@@ -884,7 +878,6 @@ glenn
 globe
 glory
 glow
-gmbh
 gnome
 goal
 goals
@@ -930,7 +923,6 @@ grove
 grow
 grown
 grows
-guam
 guard
 guess
 guest
@@ -1028,9 +1020,6 @@ hour
 hours
 house
 howto
-href
-html
-http
 huge
 hugh
 hugo
@@ -1048,7 +1037,6 @@ ideal
 ideas
 idle
 idol
-ieee
 image
 inbox
 inch
@@ -1062,11 +1050,9 @@ inns
 input
 intel
 inter
-intl
 into
 intro
 iowa
-ipaq
 ipod
 iran
 iraq
@@ -1074,15 +1060,12 @@ iraqi
 irish
 iron
 isaac
-isbn
 islam
 isle
-issn
 issue
 italy
 item
 items
-itsa
 ivory
 jack
 jacob
@@ -1124,7 +1107,6 @@ jones
 jose
 josh
 joyce
-jpeg
 juan
 judge
 judy
@@ -1450,11 +1432,6 @@ move
 moved
 moves
 movie
-mpeg
-mpegs
-mrna
-msgid
-msie
 much
 multi
 music
@@ -1513,7 +1490,6 @@ notes
 notre
 nova
 novel
-ntsc
 nude
 nuke
 null
@@ -1524,12 +1500,9 @@ oaks
 oasis
 occur
 ocean
-oclc
 odds
-oecd
 offer
 often
-ohio
 oils
 okay
 older
@@ -1550,7 +1523,6 @@ oral
 orbit
 order
 organ
-orgy
 oscar
 other
 ought
@@ -1609,7 +1581,6 @@ pearl
 peas
 peer
 peers
-penis
 penn
 penny
 pens
@@ -1625,8 +1596,6 @@ phase
 phil
 phone
 photo
-phpbb
-phys
 piano
 pick
 picks
@@ -1642,7 +1611,6 @@ pink
 pins
 pipe
 pipes
-piss
 pitch
 pixel
 pizza
@@ -1660,7 +1628,6 @@ plot
 plots
 plug
 plus
-pmid
 poem
 poems
 poet
@@ -1678,8 +1645,6 @@ pools
 poor
 pope
 pork
-porn
-porno
 port
 ports
 pose
@@ -1693,15 +1658,12 @@ prep
 press
 prev
 price
-pride
 prime
 print
 prior
 prix
 prize
 probe
-proc
-prof
 promo
 proof
 pros
@@ -1880,7 +1842,6 @@ saved
 saver
 saves
 says
-sbjct
 scale
 scan
 scary
@@ -1891,7 +1852,6 @@ score
 scott
 scout
 screw
-scsi
 scuba
 seal
 sean
@@ -1921,8 +1881,6 @@ serve
 sets
 setup
 seven
-sexo
-sexy
 shade
 shaft
 shake
@@ -1994,15 +1952,12 @@ slope
 slot
 slots
 slow
-slut
-sluts
 small
 smart
 smell
 smile
 smith
 smoke
-smtp
 snake
 snap
 snow
@@ -2048,7 +2003,6 @@ speed
 spell
 spend
 spent
-sperm
 spice
 spies
 spin
@@ -2306,7 +2260,6 @@ union
 unit
 units
 unity
-univ
 unix
 until
 unto
@@ -2315,16 +2268,12 @@ upper
 upset
 urban
 urge
-urls
 usage
-usda
 used
 user
 users
 uses
-usgs
 using
-usps
 usual
 utah
 utils
@@ -2417,7 +2366,6 @@ while
 white
 whole
 whom
-whore
 whose
 wide
 wider
@@ -2467,11 +2415,8 @@ wrist
 write
 wrong
 wrote
-xanax
 xbox
 xerox
-xhtml
-xnxx
 yacht
 yahoo
 yale
