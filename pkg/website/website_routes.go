@@ -104,6 +104,7 @@ api/v1/user/trash?app=...
 const (
 	BaseURL            = "https://notifiarr.com"
 	DevBaseURL         = "https://dev.notifiarr.com"
+	TestBaseURL        = "https://test.notifiarr.com"
 	userRoute1   Route = "/api/v1/user"
 	userRoute2   Route = "/api/v2/user"
 	ClientRoute  Route = userRoute2 + "/client"

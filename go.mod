@@ -8,7 +8,7 @@ require (
 	golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5
 	golift.io/deluge v0.10.1-0.20220720064250-90bc206753c9
 	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
-	golift.io/qbit v0.0.0-20220709224202-8d3d80f96de0
+	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
 	golift.io/starr v0.14.1-0.20220703064953-eb83ba0253dd
 	golift.io/version v0.0.2
@@ -25,13 +25,13 @@ require (
 	github.com/getlantern/golog v0.0.0-20211223150227-d4d95a44d873 // indirect
 	github.com/getlantern/hex v0.0.0-20220104173244-ad7e4b9194dc // indirect
 	github.com/getlantern/hidden v0.0.0-20220104173330-f221c5a24770 // indirect
-	github.com/getlantern/ops v0.0.0-20220622024155-46238aeb954f // indirect
+	github.com/getlantern/ops v0.0.0-20220713155959-1315d978fff7 // indirect
 	github.com/getlantern/systray v1.2.1
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gonutz/w32 v1.0.0
-	github.com/iamacarpet/go-win64api v0.0.0-20220531131246-e84054eb584d
+	github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2 // indirect
@@ -39,12 +39,12 @@ require (
 
 // snapshot and other stuff.
 require (
-	github.com/BurntSushi/toml v1.1.0
+	github.com/BurntSushi/toml v1.2.0
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/cabbie v1.0.3 // indirect
-	github.com/google/glazier v0.0.0-20220708182830-b60d5d51d8d6 // indirect
+	github.com/google/glazier v0.0.0-20220729155659-3eedade551a8 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
@@ -65,8 +65,8 @@ require (
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.5.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
-	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
-	golang.org/x/sys v0.0.0-20220708085239-5a0f0661e09d
+	golang.org/x/net v0.0.0-20220728211354-c7608f3a8462 // indirect
+	golang.org/x/sys v0.0.0-20220731174439-a90be440212d
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
@@ -90,15 +90,15 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/tools v0.1.11 // indirect
+	golang.org/x/tools v0.1.12 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
-	modernc.org/cc/v3 v3.36.0 // indirect
-	modernc.org/ccgo/v3 v3.16.7 // indirect
-	modernc.org/libc v1.16.14 // indirect
+	modernc.org/cc/v3 v3.36.1 // indirect
+	modernc.org/ccgo/v3 v3.16.8 // indirect
+	modernc.org/libc v1.16.19 // indirect
 	modernc.org/mathutil v1.4.1 // indirect
 	modernc.org/memory v1.1.1 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.17.3
+	modernc.org/sqlite v1.18.0
 	modernc.org/strutil v1.1.2 // indirect
 	modernc.org/token v1.0.0 // indirect
 )
@@ -110,7 +110,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/text v0.3.7
 	golift.io/datacounter v1.0.4
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
