@@ -5,7 +5,7 @@
 
 source .settings.sh
 
-[ $MACAPP != "" ] || exit 1
+[ -z "$MACAPP" ] || exit 1
 
 echo "Signing App."
 gon init/macos/sign.json

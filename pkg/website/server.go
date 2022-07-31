@@ -71,10 +71,12 @@ func New(c *Config) *Server {
 	switch strings.ToLower(c.Mode) {
 	default:
 		c.BaseURL = BaseURL
+	case "test", "testing":
+		c.BaseURL = TestBaseURL
 	case "prod", ModeProd:
 		c.BaseURL = BaseURL
 		c.Mode = ModeProd
-	case "dev", "devel", ModeDev, "test", "testing":
+	case "dev", "devel", ModeDev:
 		c.BaseURL = DevBaseURL
 		c.Mode = ModeDev
 	}
