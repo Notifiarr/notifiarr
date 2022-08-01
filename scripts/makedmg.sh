@@ -3,9 +3,9 @@
 # This only works on macOS.
 ###########################################
 
-source .settings.sh
+source settings.sh
 
-[ -z "$MACAPP" ] || exit 1
+[ -n "$MACAPP" ] || exit 1
 
 echo "Signing App."
 gon init/macos/sign.json
