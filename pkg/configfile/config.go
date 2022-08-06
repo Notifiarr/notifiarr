@@ -53,7 +53,6 @@ type Config struct {
 	SSLKeyFile string                 `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
 	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
 	MaxBody    int                    `json:"maxBody" toml:"max_body" xml:"max_body" yaml:"maxBody"`
-	Mode       string                 `json:"mode" toml:"mode" xml:"mode" yaml:"mode"`
 	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Serial     bool                   `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
@@ -73,7 +72,6 @@ type Config struct {
 // NewConfig returns a fresh config with only defaults and a logger ready to go.
 func NewConfig(logger *logs.Logger) *Config {
 	return &Config{
-		Mode: website.ModeProd,
 		Apps: &apps.Apps{
 			URLBase: "/",
 			Logger: apps.Logger{
@@ -165,7 +163,6 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Website = website.New(&website.Config{
-		Mode:    c.Mode,
 		Apps:    c.Apps,
 		Plex:    c.Plex,
 		Logger:  c.Services.Logger,
@@ -181,7 +178,6 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 }
 
 func (c *Config) setup() *triggers.Actions {
-	c.Mode = c.Services.Website.Mode
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
 	share.Setup(c.Services.Website)

@@ -162,46 +162,6 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            Only choose Development when asked, your Notifiarr account must have dev-access to be able to use Development mode.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.Mode }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Mode</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.Mode}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if not .ClientInfo.User.DevAllowed}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        Your account does not have access to the development system.
-                                                                    </div>
-                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-user-lock"></a>
-                                                                    <span class="dialogTitle" style="display:none;">No Access</span>
-                                                                </div>
-                                                                {{- else if (locked (printf "%s_MODE" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_MODE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Client Mode" id="Mode" name="Mode" data-original="{{.Config.Mode}}">
-                                                                    <option {{if eq .Config.Mode "production" }}selected {{end}}value="production">Production</option>
-                                                                    <option {{if not .ClientInfo.User.DevAllowed}}disabled {{else if eq .Config.Mode "development"}}selected {{end}}value="development">Development</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
                                                             This application serves HTTP on <span class="text-warning">/</span> by default.
                                                             You can change that by typing in something else here.<br>
                                                             <b>Example</b>: <i class="text-warning">/notifiarr/</i><br>

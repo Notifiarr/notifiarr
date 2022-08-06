@@ -68,11 +68,6 @@ quiet = {{.Quiet}}
 ## Debug prints more data and json payloads. This increases application memory usage.
 debug = {{.Debug}}
 max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
-{{- if and .Mode (ne .Mode "production")}}
-
-## Mode may be "prod" or "dev" or "test". Default, invalid, or unknown uses "prod".
-mode  = "{{.Mode}}"
-{{end}}
 
 ## HostID is used to uniquely identify this client's system.
 ## Do not set or change this unless you have a good reason.
