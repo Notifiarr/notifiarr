@@ -204,8 +204,8 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <select type="select" id="Apps.Radarr.{{$index}}.Timeout" name="Apps.Radarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
-                                                                    <option value="-1s">Disabled</option>
-                                                                    <option value="0s">No Timeout</option>
+                                                                    <option value="-1s" {{if eq $app.Timeout.Seconds (add 0 -1)}}selected {{end}}>Disabled</option>
+                                                                    <option value="0s" {{if eq $app.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
                                                                     {{- range $i := one259 }}
                                                                     <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
                                                                     {{- end}}

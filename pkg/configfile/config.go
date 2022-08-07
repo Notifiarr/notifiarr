@@ -154,7 +154,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	}
 
 	// Make sure each app has a sane timeout.
-	if err := c.Apps.Setup(c.Timeout.Duration); err != nil {
+	if err := c.Apps.Setup(); err != nil {
 		return nil, nil, fmt.Errorf("setting up app: %w", err)
 	}
 

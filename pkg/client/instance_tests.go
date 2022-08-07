@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
@@ -164,7 +163,7 @@ func testQbit(ctx context.Context, config *qbit.Config) (string, int) {
 }
 
 func testRtorrent(config *apps.RtorrentConfig) (string, int) {
-	config.Setup(time.Minute)
+	config.Setup()
 
 	result, err := config.Client.Call("system.hostname")
 	if err != nil {

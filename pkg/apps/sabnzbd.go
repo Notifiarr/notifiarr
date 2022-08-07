@@ -177,13 +177,9 @@ type Queue struct {
 	HaveQuota         bool         `json:"have_quota"`
 }
 
-func (s *SabNZBConfig) setup(timeout time.Duration) {
+func (s *SabNZBConfig) setup() {
 	if s == nil {
 		return
-	}
-
-	if s.Timeout.Duration == 0 {
-		s.Timeout.Duration = timeout
 	}
 
 	s.URL = strings.TrimRight(s.URL, "/")

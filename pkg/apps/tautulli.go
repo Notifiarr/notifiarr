@@ -4,16 +4,11 @@ import (
 	"context"
 	"net/url"
 	"strings"
-	"time"
 )
 
-func (t *TautulliConfig) setup(timeout time.Duration) {
+func (t *TautulliConfig) setup() {
 	if t == nil {
 		return
-	}
-
-	if t.Timeout.Duration == 0 {
-		t.Timeout.Duration = timeout
 	}
 
 	t.URL = strings.TrimRight(t.URL, "/")
