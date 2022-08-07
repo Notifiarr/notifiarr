@@ -31,5 +31,9 @@ chown -R ${{BINARYU}}_user $(dirname ${pidfile})
 # ie. add something like the following to this file: export DN_DEBUG=true
 [ -f "/usr/local/etc/defaults/${real_name}" ] && . "/usr/local/etc/defaults/${real_name}"
 
+export DN_LOG_FILE=/usr/local/var/log/{{BINARY}}/app.log
+export DN_HTTP_LOG=/usr/local/var/log/{{BINARY}}/http.log
+export DN_DEBUG_LOG=/usr/local/var/log/{{BINARY}}/debug.log
+
 # Go!
 run_rc_command "$1"

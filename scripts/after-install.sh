@@ -13,6 +13,14 @@ if [ -d /etc/{{BINARY}} ]; then
   chown -R {{BINARY}}: /etc/{{BINARY}}
 fi
 
+if [ -d /var/log/{{BINARY}} ]; then
+  chown -R {{BINARY}}: /var/log/{{BINARY}}
+fi
+
+if [ -d /usr/local/var/log/{{BINARY}} ]; then
+  chown -R {{BINARY}}: /usr/local/var/log/{{BINARY}}
+fi
+
 if [ -x "/bin/systemctl" ]; then
   # Reload and restart - this starts the application as user nobody.
   /bin/systemctl daemon-reload

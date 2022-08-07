@@ -324,7 +324,7 @@ $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
 # Build an environment that can be packaged for linux.
 package_build_linux_rpm: readme man plugins_linux_amd64 before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
 	# Building package environment for linux.
-	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY)
+	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY) $@/var/log/$(BINARY)
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp $(BINARY).amd64.linux $@/usr/bin/$(BINARY)
 	cp *.1.gz $@/usr/share/man/man1
@@ -340,7 +340,7 @@ package_build_linux_rpm: readme man plugins_linux_amd64 before-install-rendered.
 # Build an environment that can be packaged for linux.
 package_build_linux_deb: readme man plugins_linux_amd64 before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
 	# Building package environment for linux.
-	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY)
+	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY) $@/var/log/$(BINARY)
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp $(BINARY).amd64.linux $@/usr/bin/$(BINARY)
 	cp *.1.gz $@/usr/share/man/man1
@@ -415,7 +415,7 @@ package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 
 # Build an environment that can be packaged for freebsd.
 package_build_freebsd: readme man before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh freebsd
-	mkdir -p $@/usr/local/bin $@/usr/local/etc/$(BINARY) $@/usr/local/share/man/man1 $@/usr/local/share/doc/$(BINARY)
+	mkdir -p $@/usr/local/bin $@/usr/local/etc/$(BINARY) $@/usr/local/share/man/man1 $@/usr/local/share/doc/$(BINARY) $@/usr/local/var/log/$(BINARY)
 	cp $(BINARY).amd64.freebsd $@/usr/local/bin/$(BINARY)
 	cp *.1.gz $@/usr/local/share/man/man1
 	cp examples/$(CONFIG_FILE).example $@/usr/local/etc/$(BINARY)/

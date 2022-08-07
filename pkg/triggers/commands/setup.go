@@ -57,7 +57,7 @@ func New(config *common.Config, commands []*Command) *Action {
 	return &Action{cmd: &cmd{Config: config, cmdlist: commands}}
 }
 
-// Run fires a custom cron timer (GET).
+// Run fires a custom command.
 func (c *Command) Run(event website.EventType) {
 	if c.ch == nil {
 		return
