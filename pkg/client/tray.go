@@ -159,7 +159,6 @@ func (c *Client) makeMoreChannels() {
 	menu["svcs_prod"] = data.AddSubMenuItem("Check and Send Services", "check all services and send results to notifiarr")
 	menu["plex_prod"] = data.AddSubMenuItem("Send Plex Sessions", "send plex sessions to notifiarr")
 	menu["snap_prod"] = data.AddSubMenuItem("Send System Snapshot", "send system snapshot to notifiarr")
-	menu["app_ques"] = data.AddSubMenuItem("Stuck Queue Items Check", "check app queues for stuck items and send to notifiarr")
 	menu["send_dash"] = data.AddSubMenuItem("Send Dashboard States", "collect and send all application states for a dashboard update")
 	menu["corrLidarr"] = data.AddSubMenuItem("Check Lidarr Backups", "check latest backup database in each instance for corruption")
 	menu["corrProwlarr"] = data.AddSubMenuItem("Check Prowlarr Backups", "check latest backup database in each instance for corruption")
@@ -392,8 +391,6 @@ func (c *Client) watchNotifiarrMenu() {
 			c.Print("[user requested] Checking services and sending results to Notifiarr.")
 			ui.Notify("Running and sending %d Service Checks.", len(c.Config.Service))
 			c.Config.Services.RunChecks(website.EventUser)
-		case <-menu["app_ques"].ClickedCh:
-			c.triggers.StuckItems.Send(website.EventUser)
 		case <-menu["plex_prod"].ClickedCh:
 			c.triggers.PlexCron.Send(website.EventUser)
 		case <-menu["snap_prod"].ClickedCh:

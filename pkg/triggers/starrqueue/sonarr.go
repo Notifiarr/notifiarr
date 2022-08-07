@@ -1,11 +1,55 @@
-package stuckitems
+package starrqueue
 
 import (
+	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/sonarr"
 )
+
+const TrigSonarrQueue common.TriggerName = "Checking Sonarr queue and sending incomplete items."
+
+// SonarrStuckItems sends Sonarr's stuck items to the website.
+func (a *Action) SonarrStuckItems(event website.EventType) {
+	a.cmd.Exec(event, TrigSonarrQueue)
+}
+
+func (c *cmd) setupSonarr() {
+	var ticker *time.Ticker
+
+	for _, app := range c.Apps.Sonarr {
+		if app.StuckItem && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
+			ticker = time.NewTicker(queueDuration + time.Duration(rand.Intn(randomSeconds))) //nolint:gosec
+			break
+		}
+	}
+
+	c.Add(&common.Action{
+		Name: TrigSonarrQueue,
+		Fn:   c.sonarrStuckItems,
+		C:    make(chan website.EventType, 1),
+		T:    ticker,
+	})
+}
+
+func (c *cmd) sonarrStuckItems(event website.EventType) {
+	start := time.Now()
+
+	if cue := c.getFinishedItemsSonarr(); !cue.Empty() {
+		c.SendData(&website.Request{
+			Route:      website.StuckRoute,
+			Event:      event,
+			LogPayload: true,
+			LogMsg: fmt.Sprintf("Stuck Sonarr Queue (elapsed:%s): Sonarr: %d",
+				time.Since(start).Round(time.Millisecond), cue.Len()),
+			Payload: map[string]ItemList{"sonarr": cue},
+		})
+	}
+}
 
 func (c *cmd) getFinishedItemsSonarr() ItemList { //nolint:cyclop
 	stuck := make(ItemList)
@@ -24,7 +68,7 @@ func (c *cmd) getFinishedItemsSonarr() ItemList { //nolint:cyclop
 
 		start := time.Now()
 
-		queue, err := app.GetQueue(getItemsMax, 1)
+		queue, err := app.GetQueue(queueItemsMax, 1)
 		if err != nil {
 			c.Errorf("Getting Sonarr Queue (%d): %v", instance, err)
 			continue
