@@ -12,6 +12,8 @@ Requires=network.target
 Environment=DN_LOG_FILE=/var/log/{{BINARY}}/app.log
 Environment=DN_HTTP_LOG=/var/log/{{BINARY}}/http.log
 Environment=DN_DEBUG_LOG=/var/log/{{BINARY}}/debug.log
+Environment=DN_SERVICES_LOG_FILE=/var/log/{{BINARY}}/services.log
+Environment=DN_QUIET=true
 ExecStart=/usr/bin/{{BINARY}} $DAEMON_OPTS
 EnvironmentFile=-/etc/default/{{BINARY}}
 EnvironmentFile=-/etc/sysconfig/{{BINARY}}

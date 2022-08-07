@@ -34,6 +34,7 @@ chown -R ${{BINARYU}}_user $(dirname ${pidfile})
 export DN_LOG_FILE=/usr/local/var/log/{{BINARY}}/app.log
 export DN_HTTP_LOG=/usr/local/var/log/{{BINARY}}/http.log
 export DN_DEBUG_LOG=/usr/local/var/log/{{BINARY}}/debug.log
+export DN_SERVICES_LOG_FILE=/usr/local/var/log/{{BINARY}}/services.log
 
 # Go!
 run_rc_command "$1"
