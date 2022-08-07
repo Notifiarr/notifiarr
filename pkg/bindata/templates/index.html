@@ -1,7 +1,7 @@
 {{- if not .Config.UIPassword -}}
     <p>notifiarr: <strong>working</strong></p>
 {{- else}}
-{{- template "header.html" . }}
+{{- template "includes/header.html" . }}
     <body>
         <div class="page-container">
             <div class="page-body">
@@ -192,5 +192,5 @@
 {{- else }}       {{- /* if .Username */}}
 {{ template "login.html" . }}
 {{- end}}         {{- /* if .Username */}}
-{{ template "footer.html" . }}
+{{ template "includes/footer.html" . }}
 {{- end -}}       {{- /* if .Config.UIPassword */}}
