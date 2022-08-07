@@ -34,6 +34,8 @@
                                                         Providing an https:// URL reveals a checkbox. 
                                                         Checking this box enables SSL certificate validation; invalid certificates generate an error.
                                                     </div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
                                                 </td>
                                                 <td style="min-width:100px;">
                                                     <div style="display:none;" class="dialogText">Get your API key from the application's General Settings. You know the thing, c'mon man!</div>
@@ -87,9 +89,6 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.Name" name="Apps.Readarr.{{$index}}.Name" onChange="showhttps($(this).val(), '#Readarr{{$index}}SSL');" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
-                                                                <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Readarr{{$index}}SSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Apps.Readarr.{{$index}}.ValidSSL" name="Apps.Readarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="download" data-label="Readarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
-                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -108,6 +107,9 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Readarr.{{$index}}.URL" name="Apps.Readarr.{{$index}}.URL" data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Readarr{{$index}}SSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.Readarr.{{$index}}.ValidSSL" name="Apps.Readarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Readarr" class="client-parameter" data-group="download" data-label="Readarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>
