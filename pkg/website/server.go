@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -23,12 +22,6 @@ const (
 	DefaultRetries = 4
 	// RetryDelay is how long to Sleep between retries.
 	RetryDelay = 222 * time.Millisecond
-)
-
-// Possible application modes.
-const (
-	ModeDev  = "development"
-	ModeProd = "production"
 )
 
 // Errors returned by this library.
@@ -48,14 +41,12 @@ type Config struct {
 	Timeout    cnfg.Duration
 	MaxBody    int
 	Sighup     chan os.Signal
-	Mode       string
 	HostID     string
 	mnd.Logger // log file writer
 }
 
 // Server is what you get for providing a Config to New().
 type Server struct {
-	Mode   string
 	config *Config
 	// Internal cruft.
 	sdMutex      sync.RWMutex // senddata/queuedata
@@ -68,18 +59,7 @@ type Server struct {
 }
 
 func New(c *Config) *Server {
-	switch strings.ToLower(c.Mode) {
-	default:
-		c.BaseURL = BaseURL
-	case "test", "testing":
-		c.BaseURL = TestBaseURL
-	case "prod", ModeProd:
-		c.BaseURL = BaseURL
-		c.Mode = ModeProd
-	case "dev", "devel", ModeDev:
-		c.BaseURL = DevBaseURL
-		c.Mode = ModeDev
-	}
+	c.BaseURL = BaseURL
 
 	if c.Retries < 0 {
 		c.Retries = 0
@@ -88,7 +68,6 @@ func New(c *Config) *Server {
 	}
 
 	return &Server{
-		Mode:   c.Mode,
 		config: c,
 		// clientInfo:   &ClientInfo{},
 		client: &httpClient{

@@ -6,9 +6,11 @@
 /aur
 /*.log
 /*.conf
+/cmd
 /*.gz
 /*.zip
 /*.upx
+/*.dmg
 /*.1
 /*.deb
 /*.rpm

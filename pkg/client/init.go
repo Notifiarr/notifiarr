@@ -7,12 +7,9 @@ package client
 
 import (
 	"path"
-	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -35,10 +32,8 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 		c.Printf("==> Unique Host ID: %s (%s)", hi.HostID, hi.Hostname)
 	}
 
-	title := cases.Title(language.AmericanEnglish)
-
 	c.Printf("==> %s <==", mnd.HelpLink)
-	c.Printf("==> %s Startup Settings <==", title.String(strings.ToLower(c.Config.Mode)))
+	c.Printf("==> Startup Settings <==")
 	c.printLidarr()
 	c.printProwlarr()
 	c.printRadarr()
