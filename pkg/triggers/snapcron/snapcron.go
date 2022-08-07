@@ -2,6 +2,7 @@ package snapcron
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -38,7 +39,8 @@ func (c *cmd) create() {
 	var ticker *time.Ticker
 
 	if c.Snapshot.Interval.Duration > 0 {
-		ticker = time.NewTicker(c.Snapshot.Interval.Duration)
+		randomTime := time.Duration(rand.Intn(3000)) * time.Millisecond
+		ticker = time.NewTicker(c.Snapshot.Interval.Duration + randomTime)
 	}
 
 	c.printLog()

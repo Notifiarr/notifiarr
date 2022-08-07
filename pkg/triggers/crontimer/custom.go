@@ -2,6 +2,7 @@ package crontimer
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -18,7 +19,7 @@ const (
 	// This only fires when:
 	// 1. the cliet isn't reachable from the website.
 	// 2. the client didn't get a valid response to clientInfo.
-	pollDur = 4*time.Minute + 977*time.Millisecond
+	pollDur = 4 * time.Minute
 )
 
 // Action contains the exported methods for this package.
@@ -78,7 +79,11 @@ func (c *cmd) create() {
 	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s",
 			c.ClientInfo != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)})
-		c.Add(&common.Action{Name: TrigPollSite, Fn: c.PollForReload, T: time.NewTicker(pollDur)})
+		c.Add(&common.Action{
+			Name: TrigPollSite,
+			Fn:   c.PollForReload,
+			T:    time.NewTicker(pollDur + time.Duration(rand.Intn(30))*time.Second), //nolint:gosec
+		})
 	}
 
 	if c.ClientInfo == nil {
@@ -99,13 +104,14 @@ func (c *cmd) create() {
 			c.Errorf("Website provided custom cron interval under 1 minute. Ignored! Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
 		} else {
-			ticker = time.NewTicker(custom.Interval.Duration)
+			randomTime := time.Duration(rand.Intn(5000)) * time.Millisecond //nolint:gosec
+			ticker = time.NewTicker(custom.Interval.Duration + randomTime)
 		}
 
 		c.list = append(c.list, timer)
 
 		c.Add(&common.Action{
-			Name: common.TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s' POST %s", custom.Name, custom.URI)),
+			Name: common.TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s'", custom.Name)),
 			Fn:   timer.run,
 			C:    timer.ch,
 			T:    ticker,

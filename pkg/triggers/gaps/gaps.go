@@ -2,6 +2,7 @@ package gaps
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -38,7 +39,8 @@ func (c *cmd) create() {
 	var ticker *time.Ticker
 
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
-		ticker = time.NewTicker(ci.Actions.Gaps.Interval.Duration)
+		randomTime := time.Duration(rand.Intn(5000)) * time.Millisecond
+		ticker = time.NewTicker(ci.Actions.Gaps.Interval.Duration + randomTime)
 		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
 	}
 

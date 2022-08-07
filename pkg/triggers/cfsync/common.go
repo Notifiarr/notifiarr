@@ -1,6 +1,7 @@
 package cfsync
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -71,13 +72,15 @@ func (c *cmd) create() {
 	// Check each instance and enable only if needed.
 	if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
 		if len(ci.Actions.Sync.RadarrInstances) > 0 {
-			radarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration)
+			randomTime := time.Duration(rand.Intn(5000)) * time.Millisecond
+			radarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
 			c.Printf("==> Keeping %d Radarr Custom Formats synced, interval:%s",
 				ci.Actions.Sync.Radarr, ci.Actions.Sync.Interval)
 		}
 
 		if len(ci.Actions.Sync.SonarrInstances) > 0 {
-			sonarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration)
+			randomTime := time.Duration(rand.Intn(5000)) * time.Millisecond
+			sonarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
 			c.Printf("==> Keeping %d Sonarr Release Profiles synced, interval:%s",
 				ci.Actions.Sync.Sonarr, ci.Actions.Sync.Interval)
 		}

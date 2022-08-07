@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -50,7 +51,10 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 
 	for _, app := range c.Apps.Lidarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(lidarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -68,7 +72,10 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 
 	for _, app := range c.Apps.Prowlarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(prowlarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -86,7 +93,10 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 
 	for _, app := range c.Apps.Radarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(radarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -104,7 +114,10 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 
 	for _, app := range c.Apps.Readarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(readarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -122,7 +135,10 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 
 	for _, app := range c.Apps.Sonarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(sonarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}

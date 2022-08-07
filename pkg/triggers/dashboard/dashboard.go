@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -122,7 +123,8 @@ func (c *Cmd) create() {
 	ci := c.ClientInfo
 
 	if ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
-		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration)
+		randomTime := time.Duration(rand.Intn(2500)) * time.Millisecond
+		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration + randomTime)
 		c.Printf("==> Dashboard State timer started, interval:%s, serial:%v",
 			ci.Actions.Dashboard.Interval, c.Config.Serial)
 	}

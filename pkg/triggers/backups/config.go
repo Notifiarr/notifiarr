@@ -25,17 +25,9 @@ var (
 
 // Intervals at which these apps database backups are checked for corruption.
 const (
-	lidarrCorruptCheckDur   = 5*time.Hour + 10*time.Minute
-	prowlarrCorruptCheckDur = 5*time.Hour + 20*time.Minute
-	radarrCorruptCheckDur   = 5*time.Hour + 30*time.Minute
-	readarrCorruptCheckDur  = 5*time.Hour + 40*time.Minute
-	sonarrCorruptCheckDur   = 5*time.Hour + 50*time.Minute
-	lidarrBackupCheckDur    = 6*time.Hour + 10*time.Minute
-	prowlarrBackupCheckDur  = 6*time.Hour + 20*time.Minute
-	radarrBackupCheckDur    = 6*time.Hour + 30*time.Minute
-	readarrBackupCheckDur   = 6*time.Hour + 40*time.Minute
-	sonarrBackupCheckDur    = 6*time.Hour + 50*time.Minute
-	maxCheckTime            = 10 * time.Minute
+	checkInterval = 5 * time.Hour
+	randomMinutes = 60
+	maxCheckTime  = 10 * time.Minute
 )
 
 // Trigger Types.

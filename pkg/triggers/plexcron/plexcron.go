@@ -2,6 +2,7 @@ package plexcron
 
 import (
 	"context"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -18,11 +19,10 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
-	Plex    *plex.Server
-	sess    chan time.Time      // Return Plex Sessions
-	sessr   chan *holder        // Session Return Channel
-	sent    map[string]struct{} // Tracks Finished sessions already sent.
-	psMutex sync.RWMutex        // Locks plex session thread.
+	Plex  *plex.Server
+	sess  chan time.Time      // Return Plex Sessions
+	sessr chan *holder        // Session Return Channel
+	sent  map[string]struct{} // Tracks Finished sessions already sent.
 }
 
 const TrigPlexSessions common.TriggerName = "Gathering and sending Plex Sessions."
@@ -72,8 +72,8 @@ func (c *cmd) run() {
 
 	cfg := c.ClientInfo.Actions.Plex
 	if cfg.Interval.Duration > 0 {
-		// Add a little splay to the timers to not hit plex at the same time too often.
-		ticker = time.NewTicker(cfg.Interval.Duration + 139*time.Millisecond)
+		randomTime := time.Duration(rand.Intn(3000)) * time.Millisecond
+		ticker = time.NewTicker(cfg.Interval.Duration + randomTime)
 		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
 			c.Plex.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
 	}
@@ -92,7 +92,7 @@ func (c *cmd) run() {
 			Name: "Checking Plex for completed sessions.",
 			Hide: true, // do not log this one.
 			Fn:   c.checkForFinishedItems,
-			T:    time.NewTicker(time.Minute + 179*time.Millisecond),
+			T:    time.NewTicker(time.Minute + time.Duration(rand.Intn(400))*time.Millisecond),
 		})
 	}
 }
@@ -134,9 +134,6 @@ func (a *Action) Stop() {
 }
 
 func (c *cmd) stop() {
-	c.psMutex.Lock()
-	defer c.psMutex.Unlock()
-
 	if c.sess == nil {
 		return
 	}

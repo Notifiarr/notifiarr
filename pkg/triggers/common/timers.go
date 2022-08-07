@@ -55,7 +55,7 @@ func (c *Config) Run() {
 // All of the actions this library runs are contained in this one go routine.
 // That means only 1 action can run at a time. If c.Serial is set to true, then
 // some of those actions (especially dashboard) will spawn their own go routines.
-func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) { //nolint:cyclop
+func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) {
 	defer c.stopTimerLoop(actions)
 
 	// This is how you watch a slice of reflect.SelectCase.
@@ -78,19 +78,23 @@ func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) { /
 			return // called by c.Stop(), calls c.stopTimerLoop().
 		}
 
-		if event == website.EventUser && action.Name != "" {
-			if err := ui.Notify(string(action.Name)); err != nil {
-				c.Errorf("Displaying toast notification: %v", err)
-			}
-		}
+		c.runEventAction(event, action)
+	}
+}
 
-		if action.Name != "" && !action.Hide {
-			c.Printf("[%s requested] %s", event, action.Name)
+func (c *Config) runEventAction(event website.EventType, action *Action) {
+	if event == website.EventUser && action.Name != "" {
+		if err := ui.Notify(string(action.Name)); err != nil {
+			c.Errorf("Displaying toast notification: %v", err)
 		}
+	}
 
-		if action.Fn != nil {
-			action.Fn(event)
-		}
+	if action.Name != "" && !action.Hide {
+		c.Printf("[%s requested] %s", event, action.Name)
+	}
+
+	if action.Fn != nil {
+		action.Fn(event)
 	}
 }
 
@@ -106,14 +110,14 @@ func (c *Config) stopTimerLoop(actions []*Action) {
 	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
 	for _, action := range actions {
-		if action.C != nil && action.C != c.stop.C { // do not close stop channel here.
-			close(action.C)
-			action.C = nil
-		}
-
 		if action.T != nil {
 			action.T.Stop()
 			action.T = nil
+		}
+
+		if action.C != nil && action.C != c.stop.C { // do not close stop channel here.
+			close(action.C)
+			action.C = nil
 		}
 	}
 }

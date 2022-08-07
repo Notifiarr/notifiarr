@@ -2,6 +2,7 @@ package backups
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -43,7 +44,10 @@ func (c *cmd) makeBackupTriggersLidarr() {
 
 	for _, app := range c.Apps.Lidarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(lidarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -61,7 +65,10 @@ func (c *cmd) makeBackupTriggersRadarr() {
 
 	for _, app := range c.Apps.Radarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(radarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -79,7 +86,10 @@ func (c *cmd) makeBackupTriggersReadarr() {
 
 	for _, app := range c.Apps.Readarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(readarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -97,7 +107,10 @@ func (c *cmd) makeBackupTriggersSonarr() {
 
 	for _, app := range c.Apps.Sonarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(sonarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -115,7 +128,10 @@ func (c *cmd) makeBackupTriggersProwlarr() {
 
 	for _, app := range c.Apps.Prowlarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(prowlarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
