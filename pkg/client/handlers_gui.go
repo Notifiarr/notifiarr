@@ -430,7 +430,7 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 	}
 
 	cmd := c.triggers.Commands.List()[cID]
-	if err := c.templat.ExecuteTemplate(response, "cmdstats.html", cmd); err != nil {
+	if err := c.templat.ExecuteTemplate(response, "ajax/cmdstats.html", cmd); err != nil {
 		http.Error(response, "template error: "+err.Error(), http.StatusOK)
 	}
 }

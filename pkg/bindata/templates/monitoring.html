@@ -47,12 +47,34 @@
                                                 <tbody>
                                                 {{- range .Config.Services.GetResults }}
                                                     <tr class="bk-{{if eq .State 0}}success{{else if eq .State 1}}warning{{else if eq .State 2}}danger{{else}}brand{{end}}">
-                                                        <td><span class="text-bold" title="{{.Check}}">{{.Name}}</span> <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo-alt"></a></td>
-                                                        <td data-sort="{{.State.Value}}" title="{{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}, {{- end }}">{{.State}}</td>
-                                                        <td title="{{.Expect}}">{{.Type}}</td>
-                                                        <td title="{{.Time}}">{{since .Time}}</td>
-                                                        <td title="{{.Since}}">{{since .Since}}</td>
-                                                        <td>{{.IntervalDur}}</td>
+                                                        <td>
+                                                            <span class="text-bold" title="{{.Check}}">{{.Name}}</span>
+                                                            <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo-alt"></a>
+                                                        </td>
+                                                        <td data-sort="{{.State.Value}}">
+                                                            <div style="display:none;" class="dialogText">
+                                                                <h4>Service Check Counters</h4><hr>
+                                                                {{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}<br> {{- end }}
+                                                            </div>
+                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">{{.State}}</span>
+                                                        </td>
+                                                        <td data-sort="{{.Type}}">
+                                                            <div style="display:none;" class="dialogText">Expect: {{.Expect}}</div>
+                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">{{.Type}}</span>
+                                                        </td>
+                                                        <td data-sort="{{.Time.Unix}}">
+                                                            <div style="display:none;" class="dialogText">Service last checked time <h4>{{.Time}}</h4></div>
+                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">{{since .Time}} ago</span>
+                                                        </td>
+                                                        <td data-sort="{{.Since.Unix}}">
+                                                            <div style="display:none;" class="dialogText">Service has been in this state since: {{.Time}}</div>
+                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle">{{since .Since}} ago</span>
+                                                        </td>
+                                                        <td data-sort="{{.IntervalDur.Seconds}}">{{.IntervalDur}}</td>
                                                         <td>{{.Output}}</td>
                                                     </tr>
                                                 {{- end}}
