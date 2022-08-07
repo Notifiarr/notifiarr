@@ -44,6 +44,7 @@ type TautulliUsers struct {
 }
 
 // TautulliUser is the user data from the get_users API call.
+//
 //nolint:tagliatelle
 type TautulliUser struct {
 	RowID           int64    `json:"row_id"`

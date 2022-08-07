@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -269,15 +268,15 @@ func (c *cmd) checkBackupFileCorruption(
 	remotePath string,
 ) (*Info, error) {
 	// XXX: Set TMPDIR to configure this.
-	folder, err := ioutil.TempDir("", "notifiarr_tmp_dir")
+	folder, err := os.CreateTemp("", "notifiarr_tmp_dir")
 	if err != nil {
 		return nil, fmt.Errorf("creating temporary folder: %w", err)
 	}
 
-	defer os.RemoveAll(folder) // clean up when we're done.
+	defer os.RemoveAll(folder.Name()) // clean up when we're done.
 	c.Debugf("[%s requested] Downloading %s backup file (%d): %s", input.event, input.name, input.int, remotePath)
 
-	fileName, err := input.saveBackupFile(ctx, remotePath, folder)
+	fileName, err := input.saveBackupFile(ctx, remotePath, folder.Name())
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +285,7 @@ func (c *cmd) checkBackupFileCorruption(
 
 	_, newFiles, err := xtractr.ExtractZIP(&xtractr.XFile{
 		FilePath:  fileName,
-		OutputDir: folder,
+		OutputDir: folder.Name(),
 		FileMode:  mnd.Mode0600,
 		DirMode:   mnd.Mode0750,
 	})
@@ -334,7 +333,7 @@ func (c *genericInstance) saveBackupFile(
 		return "", fmt.Errorf("(%d) %w: %s", status, website.ErrNon200, remotePath)
 	}
 
-	file, err := ioutil.TempFile(localPath, "starr_"+path.Base(remotePath)+".*."+path.Ext(remotePath))
+	file, err := os.CreateTemp(localPath, "starr_"+path.Base(remotePath)+".*."+path.Ext(remotePath))
 	if err != nil {
 		return "", fmt.Errorf("creating temporary file: %w", err)
 	}

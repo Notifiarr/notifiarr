@@ -11,7 +11,8 @@ import (
 )
 
 // These are used for custom logs.
-// nolint:gochecknoglobals
+
+//nolint:gochecknoglobals
 var (
 	fileMode = rotatorr.FileMode
 )

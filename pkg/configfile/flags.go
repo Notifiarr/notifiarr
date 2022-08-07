@@ -53,5 +53,5 @@ func (f *Flags) ParseArgs(args []string) {
 		f.BoolVar(&f.Updated, "updated", false, "This flag causes the app to print an 'updated' message.")
 	}
 
-	f.Parse(args) // nolint: errcheck
+	f.Parse(args) //nolint: errcheck
 }

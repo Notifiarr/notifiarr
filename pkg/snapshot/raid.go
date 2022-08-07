@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"io/ioutil"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -31,7 +31,7 @@ md1 : active raid1 sdd2[3] sdb2[1] sdc2[2] sda2[0]
 unused devices: <none>.
 */
 func (s *Snapshot) getRaidMDstat() {
-	data, _ := ioutil.ReadFile("/proc/mdstat")
+	data, _ := os.ReadFile("/proc/mdstat")
 	// Remove the first line "Personalities".
 	if i := bytes.IndexByte(data, '\n'); i != -1 && len(data) > i+1 {
 		data = data[i+1:]

@@ -2,7 +2,7 @@ package ui
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -40,7 +40,7 @@ func Notify(msg string, vars ...interface{}) error {
 	} else if filepath.Base(app) == "MacOS" {
 		app = filepath.Join(filepath.Dir(app), "Resources", "terminal-notifier.app", "Contents", "MacOS", "terminal-notifier")
 	} else if app, err = exec.LookPath("terminal-notifier"); err != nil {
-		list, _ := ioutil.ReadDir(filepath.Dir(app))
+		list, _ := os.ReadDir(filepath.Dir(app))
 		return fmt.Errorf("cannot locate terminal-notifier: %w, app folder: %s, ../: %s", err, app, list)
 	}
 
@@ -96,8 +96,8 @@ func getPNG() string {
 // StartCmd starts a command.
 func StartCmd(c string, v ...string) error {
 	cmd := exec.Command(c, v...)
-	cmd.Stdout = ioutil.Discard
-	cmd.Stderr = ioutil.Discard
+	cmd.Stdout = io.Discard
+	cmd.Stderr = io.Discard
 
 	return cmd.Run() //nolint:wrapcheck
 }

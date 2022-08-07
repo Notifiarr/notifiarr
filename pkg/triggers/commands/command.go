@@ -128,7 +128,7 @@ func getCmd(ctx context.Context, command string, shell bool) (*exec.Cmd, error) 
 	}
 
 	var cmd *exec.Cmd
-	// nolint:gosec
+	//nolint:gosec
 	switch len(args) {
 	case 0:
 		return nil, ErrNoCmd

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -177,7 +176,7 @@ func readBodyForLog(body io.Reader, max int64) string {
 
 	if max > 0 {
 		limitReader := io.LimitReader(body, max)
-		bodyBytes, _ := ioutil.ReadAll(limitReader)
+		bodyBytes, _ := io.ReadAll(limitReader)
 		remaining, _ := io.Copy(io.Discard, body) // finish reading to the end.
 
 		if remaining > 0 {
@@ -187,7 +186,7 @@ func readBodyForLog(body io.Reader, max int64) string {
 		return string(bodyBytes)
 	}
 
-	bodyBytes, _ := ioutil.ReadAll(body)
+	bodyBytes, _ := io.ReadAll(body)
 
 	return string(bodyBytes)
 }

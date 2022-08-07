@@ -153,7 +153,7 @@ func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bo
 	return runCommand(cmd, waitg)
 }
 
-//nolint: cyclop
+//nolint:cyclop
 func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.WaitGroup) {
 	for stdout.Scan() {
 		text := stdout.Text()
@@ -166,7 +166,7 @@ func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.
 		case strings.Contains(text, "self-assessment ") ||
 			strings.Contains(text, "SMART Health Status:"):
 			s.DiskHealth[name] = fields[len(fields)-1]
-		case len(fields) < 10: // nolint: gomnd
+		case len(fields) < 10: //nolint: gomnd
 			continue
 		case strings.HasPrefix(fields[1], "Airflow_Temp") ||
 			strings.HasPrefix(fields[1], "Temperature_Cel"):

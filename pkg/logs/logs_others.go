@@ -9,7 +9,7 @@ import (
 	"syscall"
 )
 
-// nolint:gochecknoglobals
+//nolint:gochecknoglobals
 var stderr = os.Stderr.Fd()
 
 func redirectStderr(file *os.File) {

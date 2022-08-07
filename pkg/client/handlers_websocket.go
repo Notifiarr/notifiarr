@@ -94,7 +94,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 
 	defer func() {
 		c.CapturePanic()
-		fileTail.Stop() // nolint:errcheck
+		fileTail.Stop() //nolint:errcheck
 		pingTicker.Stop()
 		socket.Close()
 	}()

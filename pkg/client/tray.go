@@ -149,6 +149,7 @@ func (c *Client) makeChannels() {
 }
 
 // makeMoreChannels makes the Notifiarr menu and Debug menu items.
+//
 //nolint:lll
 func (c *Client) makeMoreChannels() {
 	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, service checks")
@@ -285,7 +286,7 @@ func (c *Client) watchKillerChannels() {
 	}
 }
 
-// nolint:errcheck
+//nolint:errcheck
 func (c *Client) watchGuiChannels() {
 	for {
 		select {
@@ -309,7 +310,7 @@ func (c *Client) watchGuiChannels() {
 	}
 }
 
-// nolint:errcheck
+//nolint:errcheck
 func (c *Client) watchConfigChannels() {
 	for {
 		select {
@@ -344,7 +345,7 @@ func (c *Client) watchConfigChannels() {
 	}
 }
 
-// nolint:errcheck
+//nolint:errcheck
 func (c *Client) watchLogsChannels() {
 	for {
 		select {

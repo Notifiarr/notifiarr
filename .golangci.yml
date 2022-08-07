@@ -21,6 +21,7 @@ linters:
     - nlreturn
     - nonamedreturns
     - varnamelen
+    - ifshort
     - nosnakecase # broken on syscall.
 run:
   timeout: 5m

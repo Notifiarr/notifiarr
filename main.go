@@ -24,6 +24,6 @@ func main() {
 
 	if err := client.Start(); err != nil {
 		_, _ = ui.Error(mnd.Title, err.Error())
-		log.Fatal(err) // nolint:gocritic // defer does not need to run if we have an error.
+		log.Fatal(err) //nolint:gocritic // defer does not need to run if we have an error.
 	}
 }

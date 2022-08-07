@@ -86,6 +86,7 @@ func (p CryptPass) IsCrypted() bool {
 }
 
 // generatePassword uses a word list to create a randmo password of two words and a number.
+//
 //nolint:gosec,gomnd
 func generatePassword() string {
 	title := cases.Title(language.AmericanEnglish)

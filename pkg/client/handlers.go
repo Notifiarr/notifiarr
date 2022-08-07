@@ -261,11 +261,12 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 			c.triggers.StarrQueue.ReadarrStuckItems(source)
 		case starr.Sonarr.Lower():
 			c.triggers.StarrQueue.SonarrStuckItems(source)
-		default:
+		default: // XXX: need to get rid of this path.
 			c.triggers.StarrQueue.LidarrStuckItems(source)
 			c.triggers.StarrQueue.RadarrStuckItems(source)
 			c.triggers.StarrQueue.ReadarrStuckItems(source)
 			c.triggers.StarrQueue.SonarrStuckItems(source)
+
 			return http.StatusOK, "Stuck Queue Items triggered for all Starr apps."
 		}
 
