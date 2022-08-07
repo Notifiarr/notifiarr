@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"golift.io/starr"
@@ -24,7 +23,7 @@ type ProwlarrConfig struct {
 	errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func (a *Apps) setupProwlarr(timeout time.Duration) error {
+func (a *Apps) setupProwlarr() error {
 	for idx, app := range a.Prowlarr {
 		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Prowlarr config %d", ErrInvalidApp, idx+1)
@@ -41,18 +40,9 @@ func (a *Apps) setupProwlarr(timeout time.Duration) error {
 		}
 		app.Debugf = a.Debugf
 		app.errorf = a.Errorf
-		app.setup(timeout)
+		app.URL = strings.TrimRight(app.URL, "/")
+		app.Prowlarr = prowlarr.New(app.Config)
 	}
 
 	return nil
-}
-
-func (r *ProwlarrConfig) setup(timeout time.Duration) {
-	r.Prowlarr = prowlarr.New(r.Config)
-
-	if r.Timeout.Duration == 0 {
-		r.Timeout.Duration = timeout
-	}
-
-	r.URL = strings.TrimRight(r.URL, "/")
 }

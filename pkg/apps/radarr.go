@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -54,7 +53,7 @@ type RadarrConfig struct {
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func (a *Apps) setupRadarr(timeout time.Duration) error {
+func (a *Apps) setupRadarr() error {
 	for idx, app := range a.Radarr {
 		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Radarr config %d", ErrInvalidApp, idx+1)
@@ -72,20 +71,11 @@ func (a *Apps) setupRadarr(timeout time.Duration) error {
 
 		app.Debugf = a.Debugf
 		app.errorf = a.Errorf
-		app.setup(timeout)
+		app.URL = strings.TrimRight(app.URL, "/")
+		app.Radarr = radarr.New(app.Config)
 	}
 
 	return nil
-}
-
-func (r *RadarrConfig) setup(timeout time.Duration) {
-	r.Radarr = radarr.New(r.Config)
-
-	if r.Timeout.Duration == 0 {
-		r.Timeout.Duration = timeout
-	}
-
-	r.URL = strings.TrimRight(r.URL, "/")
 }
 
 func radarrAddMovie(req *http.Request) (int, interface{}) {

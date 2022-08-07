@@ -203,7 +203,7 @@ func (a *Apps) InitHandlers() {
 
 // Setup creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
-func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
+func (a *Apps) Setup() error { //nolint:cyclop
 	a.APIKey = strings.TrimSpace(a.APIKey)
 
 	if a.Debugf == nil {
@@ -214,47 +214,47 @@ func (a *Apps) Setup(timeout time.Duration) error { //nolint:cyclop
 		a.Errorf = log.New(io.Discard, "", 0).Printf
 	}
 
-	if err := a.setupLidarr(timeout); err != nil {
+	if err := a.setupLidarr(); err != nil {
 		return err
 	}
 
-	if err := a.setupProwlarr(timeout); err != nil {
+	if err := a.setupProwlarr(); err != nil {
 		return err
 	}
 
-	if err := a.setupRadarr(timeout); err != nil {
+	if err := a.setupRadarr(); err != nil {
 		return err
 	}
 
-	if err := a.setupReadarr(timeout); err != nil {
+	if err := a.setupReadarr(); err != nil {
 		return err
 	}
 
-	if err := a.setupSonarr(timeout); err != nil {
+	if err := a.setupSonarr(); err != nil {
 		return err
 	}
 
-	if err := a.setupDeluge(timeout); err != nil {
+	if err := a.setupDeluge(); err != nil {
 		return err
 	}
 
-	if err := a.setupNZBGet(timeout); err != nil {
+	if err := a.setupNZBGet(); err != nil {
 		return err
 	}
 
-	if err := a.setupQbit(timeout); err != nil {
+	if err := a.setupQbit(); err != nil {
 		return err
 	}
 
-	if err := a.setupRtorrent(timeout); err != nil {
+	if err := a.setupRtorrent(); err != nil {
 		return err
 	}
 
 	for i := range a.SabNZB {
-		a.SabNZB[i].setup(timeout)
+		a.SabNZB[i].setup()
 	}
 
-	a.Tautulli.setup(timeout)
+	a.Tautulli.setup()
 
 	return nil
 }

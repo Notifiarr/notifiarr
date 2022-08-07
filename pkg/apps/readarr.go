@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -45,7 +44,7 @@ type ReadarrConfig struct {
 	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func (a *Apps) setupReadarr(timeout time.Duration) error {
+func (a *Apps) setupReadarr() error {
 	for idx, app := range a.Readarr {
 		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, idx+1)
@@ -62,20 +61,11 @@ func (a *Apps) setupReadarr(timeout time.Duration) error {
 		}
 		app.Debugf = a.Debugf
 		app.errorf = a.Errorf
-		app.setup(timeout)
+		app.URL = strings.TrimRight(app.URL, "/")
+		app.Readarr = readarr.New(app.Config)
 	}
 
 	return nil
-}
-
-func (r *ReadarrConfig) setup(timeout time.Duration) {
-	r.Readarr = readarr.New(r.Config)
-
-	if r.Timeout.Duration == 0 {
-		r.Timeout.Duration = timeout
-	}
-
-	r.URL = strings.TrimRight(r.URL, "/")
 }
 
 func readarrAddBook(req *http.Request) (int, interface{}) {

@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -54,7 +53,7 @@ type SonarrConfig struct {
 	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func (a *Apps) setupSonarr(timeout time.Duration) error {
+func (a *Apps) setupSonarr() error {
 	for idx, app := range a.Sonarr {
 		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Sonarr config %d", ErrInvalidApp, idx+1)
@@ -71,20 +70,11 @@ func (a *Apps) setupSonarr(timeout time.Duration) error {
 		}
 		app.Debugf = a.Debugf
 		app.errorf = a.Errorf
-		app.setup(timeout)
+		app.URL = strings.TrimRight(app.URL, "/")
+		app.Sonarr = sonarr.New(app.Config)
 	}
 
 	return nil
-}
-
-func (r *SonarrConfig) setup(timeout time.Duration) {
-	r.Sonarr = sonarr.New(r.Config)
-
-	if r.Timeout.Duration == 0 {
-		r.Timeout.Duration = timeout
-	}
-
-	r.URL = strings.TrimRight(r.URL, "/")
 }
 
 func sonarrAddSeries(req *http.Request) (int, interface{}) {

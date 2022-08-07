@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -51,7 +50,7 @@ type LidarrConfig struct {
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func (a *Apps) setupLidarr(timeout time.Duration) error {
+func (a *Apps) setupLidarr() error {
 	for idx, app := range a.Lidarr {
 		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, idx+1)
@@ -68,20 +67,11 @@ func (a *Apps) setupLidarr(timeout time.Duration) error {
 		}
 		app.Debugf = a.Debugf
 		app.errorf = a.Errorf
-		app.setup(timeout)
+		app.URL = strings.TrimRight(app.URL, "/")
+		app.Lidarr = lidarr.New(app.Config)
 	}
 
 	return nil
-}
-
-func (r *LidarrConfig) setup(timeout time.Duration) {
-	r.Lidarr = lidarr.New(r.Config)
-
-	if r.Timeout.Duration == 0 {
-		r.Timeout.Duration = timeout
-	}
-
-	r.URL = strings.TrimRight(r.URL, "/")
 }
 
 func lidarrAddAlbum(req *http.Request) (int, interface{}) {
