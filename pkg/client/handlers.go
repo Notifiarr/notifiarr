@@ -270,7 +270,7 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 			return http.StatusOK, "Stuck Queue Items triggered for all Starr apps."
 		}
 
-		return http.StatusOK, "Stuck Queue Items triggered for " + content
+		return http.StatusOK, "Stuck Queue Items triggered for " + title.String(content) + "."
 	case "dashboard":
 		c.triggers.Dashboard.Send(source)
 		return http.StatusOK, "Dashboard states triggered."

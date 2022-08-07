@@ -43,8 +43,8 @@ func (c *cmd) lidarrStuckItems(event website.EventType) {
 			Route:      website.StuckRoute,
 			Event:      event,
 			LogPayload: true,
-			LogMsg: fmt.Sprintf("Stuck Lidarr Queue (elapsed:%s): Lidarr: %d",
-				time.Since(start).Round(time.Millisecond), cue.Len()),
+			LogMsg: fmt.Sprintf("Lidarr Queue: %d stuck items (elapsed:%s)",
+				cue.Len(), time.Since(start).Round(time.Millisecond)),
 			Payload: map[string]ItemList{"lidarr": cue},
 		})
 	}

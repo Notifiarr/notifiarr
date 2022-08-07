@@ -44,8 +44,8 @@ func (c *cmd) sonarrStuckItems(event website.EventType) {
 			Route:      website.StuckRoute,
 			Event:      event,
 			LogPayload: true,
-			LogMsg: fmt.Sprintf("Stuck Sonarr Queue (elapsed:%s): Sonarr: %d",
-				time.Since(start).Round(time.Millisecond), cue.Len()),
+			LogMsg: fmt.Sprintf("Sonarr Queue: %d stuck items (elapsed:%s)",
+				cue.Len(), time.Since(start).Round(time.Millisecond)),
 			Payload: map[string]ItemList{"sonarr": cue},
 		})
 	}

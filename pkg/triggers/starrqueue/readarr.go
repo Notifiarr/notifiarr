@@ -43,8 +43,8 @@ func (c *cmd) readarrStuckItems(event website.EventType) {
 			Route:      website.StuckRoute,
 			Event:      event,
 			LogPayload: true,
-			LogMsg: fmt.Sprintf("Stuck Readarr Queue (elapsed:%s): Readarr: %d",
-				time.Since(start).Round(time.Millisecond), cue.Len()),
+			LogMsg: fmt.Sprintf("Readarr Queue: %d stuck items (elapsed:%s)",
+				cue.Len(), time.Since(start).Round(time.Millisecond)),
 			Payload: map[string]ItemList{"readarr": cue},
 		})
 	}
