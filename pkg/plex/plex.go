@@ -12,7 +12,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -95,7 +94,7 @@ func (s *Server) reqPlexURL(
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return nil, fmt.Errorf("reading http response: %w", err)

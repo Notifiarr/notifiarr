@@ -33,7 +33,7 @@ func (c *cmd) checkForFinishedItems(website.EventType) {
 			msg = c.checkSessionDone(session, pct)
 		}
 
-		// nolint:lll
+		//nolint:lll
 		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
 		if strings.HasPrefix(msg, statusSending) || strings.HasPrefix(msg, statusError) {

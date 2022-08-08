@@ -109,7 +109,7 @@ func (s *Snapshot) GetProcesses(ctx context.Context, count int) (errs []error) {
 		_, _ = proc.PercentWithContext(ctx, 0)
 	}
 
-	time.Sleep(4 * time.Second) // nolint:gomnd
+	time.Sleep(4 * time.Second) //nolint:gomnd
 
 	for idx, proc := range procs {
 		s.Processes[idx].CPUPercent, err = proc.PercentWithContext(ctx, 0)

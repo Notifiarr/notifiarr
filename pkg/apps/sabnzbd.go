@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -85,6 +85,7 @@ type StageLog struct {
 }
 
 // HistorySlots is part of the json response from SABnzbd.
+//
 //nolint:tagliatelle
 type HistorySlots struct {
 	ID           int64       `json:"id"`
@@ -256,7 +257,7 @@ func GetURLInto(
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
 	}

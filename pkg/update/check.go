@@ -16,7 +16,7 @@ import (
 
 // OSsuffixMap is the OS to file suffix map for downloads.
 var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
-	"darwin":    ".dmg",
+	"darwin":    "Notifiarr.dmg",
 	mnd.Windows: ".exe.zip",
 	"freebsd":   ".txz",
 	"linux":     "", // too many variants right now.

@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -16,6 +17,8 @@ import (
 // That is, it collects library data and downloader data.
 
 const TrigDashboard common.TriggerName = "Initiating State Collection for Dashboard."
+
+const randomMilliseconds = 2500
 
 type Cmd struct {
 	*common.Config
@@ -121,8 +124,10 @@ func (c *Cmd) create() {
 
 	ci := c.ClientInfo
 
+	//nolint:gosec
 	if ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
-		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration)
+		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
+		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration + randomTime)
 		c.Printf("==> Dashboard State timer started, interval:%s, serial:%v",
 			ci.Actions.Dashboard.Interval, c.Config.Serial)
 	}

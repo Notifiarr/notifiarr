@@ -25,7 +25,7 @@
                                                     <tr>
                                                         <th style="min-width:100px;">Name</th>
                                                         <th style="min-width:50px;">State</th>
-                                                        <th style="min-width:50px;">Type</th>
+                                                        <th style="min-width:50px;">Type/Expect</th>
                                                         <th style="min-width:70px;">
                                                             <div style="display:none;" class="dialogText">How long ago this service was checked.</div>
                                                             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -48,8 +48,8 @@
                                                 {{- range .Config.Services.GetResults }}
                                                     <tr class="bk-{{if eq .State 0}}success{{else if eq .State 1}}warning{{else if eq .State 2}}danger{{else}}brand{{end}}">
                                                         <td>
-                                                            <span class="text-bold" title="{{.Check}}">{{.Name}}</span>
-                                                            <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo-alt"></a>
+                                                            <span class="text-bold">{{.Name}}</span>
+                                                            <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo"></a>
                                                         </td>
                                                         <td data-sort="{{.State.Value}}">
                                                             <div style="display:none;" class="dialogText">
@@ -57,22 +57,23 @@
                                                                 {{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}<br> {{- end }}
                                                             </div>
                                                             <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle">{{.State}}</span>
+                                                            <span class="dialogTitle" style="display:none;">Current State: {{.State}}</span>
+                                                            {{.State}}
                                                         </td>
-                                                        <td data-sort="{{.Type}}">
-                                                            <div style="display:none;" class="dialogText">Service Expectation: {{.Expect}}<hr>* SSL means valid certificate.</div>
-                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle">{{.Type}}</span>
+                                                        <td>
+                                                            {{.Type}}; {{.Expect}}
                                                         </td>
                                                         <td data-sort="{{.Time.Unix}}">
                                                             <div style="display:none;" class="dialogText">Service last checked at: <h4>{{.Time}}</h4></div>
-                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle">{{since .Time}} ago</span>
+                                                            <a onClick="dialog($(this), 'middle')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle" style="display:none;">Last Check: {{since .Time}} ago</span>
+                                                            {{since .Time}}
                                                         </td>
                                                         <td data-sort="{{.Since.Unix}}">
                                                             <div style="display:none;" class="dialogText">Service has been in this state since: <h4>{{.Time}}</h4></div>
-                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle">{{since .Since}} ago</span>
+                                                            <a onClick="dialog($(this), 'right')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                                                            <span class="dialogTitle" style="display:none;">Current State Duration: {{since .Since}}</span>
+                                                            {{since .Since}}
                                                         </td>
                                                         <td data-sort="{{.IntervalDur.Seconds}}">{{.IntervalDur}}</td>
                                                         <td>{{.Output}}</td>

@@ -7,19 +7,19 @@ jobs:
     if: tag IS present
     osx_image: xcode13.2
     language: go
-    go: 1.17.x
+    go: 1.19.x
   - if: tag IS NOT present AND branch != unstable
     os: linux
     dist: bionic
     services: docker
     language: go
-    go: 1.17.x
+    go: 1.19.x
   - if: tag IS present OR branch = unstable
     os: linux
     dist: bionic
     services: docker
     language: go
-    go: 1.17.x
+    go: 1.19.x
     env: MAKEBUILD=release
 git:
   depth: false
@@ -41,7 +41,7 @@ addons:
     - upx
 install:
   - mkdir -p $(go env GOPATH)/bin
-  - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2
+  - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.48.0
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm install 2.6.0; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do gem install --no-document fpm -v 1.11.0; fi
   - make generate

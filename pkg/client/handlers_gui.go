@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 	"net/http"
 	"os"
@@ -43,7 +42,7 @@ const (
 // userNameValue is used a context value key.
 type userNameValue int
 
-// nolint:gochecknoglobals // used as context value key.
+//nolint:gochecknoglobals // used as context value key.
 var userNameStr interface{} = userNameValue(1)
 
 func (c *Client) checkAuthorized(next http.Handler) http.Handler {
@@ -387,7 +386,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 
 	switch dirPath := mux.Vars(request)["dir"]; {
 	case dirPath != "":
-		dir, err := ioutil.ReadDir(filepath.Join(dirPath, "/"))
+		dir, err := os.ReadDir(filepath.Join(dirPath, "/"))
 		if err != nil {
 			http.Error(response, err.Error(), http.StatusNotAcceptable)
 			return

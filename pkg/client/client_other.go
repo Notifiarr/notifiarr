@@ -69,6 +69,7 @@ func (c *Client) handleAptHook() error {
 }
 
 // If you need more fake methods, add them.
+//
 //nolint:gochecknoglobals
 var menu = make(map[string]*fakeMenu)
 

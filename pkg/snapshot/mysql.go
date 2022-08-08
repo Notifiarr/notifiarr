@@ -205,7 +205,7 @@ func scanMySQLStatus(ctx context.Context, dbase *sql.DB) (MySQLStatus, error) {
 			list[vname] = v
 		}
 
-		rows.Close() //nolint:sqlclosecheck // not defered because we're in a loop.
+		rows.Close()
 	}
 
 	return list, nil

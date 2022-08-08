@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
@@ -115,7 +114,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			start   = time.Now()
 			buf     bytes.Buffer
 			tee     = io.TeeReader(r.Body, &buf) // must read tee first.
-			post, _ = ioutil.ReadAll(tee)
+			post, _ = io.ReadAll(tee)
 			appName = app.String()
 		)
 

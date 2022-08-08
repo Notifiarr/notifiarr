@@ -24,7 +24,7 @@ func (c *Client) StartWebServer() {
 	c.Lock()
 	defer c.Unlock()
 
-	// nolint:lll // Create an apache-style logger.
+	//nolint:lll // Create an apache-style logger.
 	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %{X-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	// Create a request router.
 	c.Config.Router = mux.NewRouter()
@@ -39,7 +39,7 @@ func (c *Client) StartWebServer() {
 	smx.Handle("/", c.stripSecrets(apache.Wrap(c.Config.Router, c.Logger.HTTPLog.Writer())))
 
 	// Create a server.
-	c.server = &http.Server{ // nolint: exhaustivestruct
+	c.server = &http.Server{ //nolint: exhaustivestruct
 		Handler:           smx,
 		Addr:              c.Config.BindAddr,
 		IdleTimeout:       time.Minute,

@@ -2,7 +2,6 @@ package exp
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"golift.io/datacounter"
@@ -50,7 +49,7 @@ func NewMetricsRoundTripper(app string, next http.RoundTripper) *LoggingRoundTri
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	if req.Body != nil {
 		sent := datacounter.NewReaderCounter(req.Body)
-		req.Body = ioutil.NopCloser(sent)
+		req.Body = io.NopCloser(sent)
 
 		defer func() {
 			Apps.Add(rt.app+"&&"+req.Method+" Bytes Sent", int64(sent.Count()))
