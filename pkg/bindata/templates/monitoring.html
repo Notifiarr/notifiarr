@@ -64,13 +64,13 @@
                                                             {{.Type}}; {{.Expect}}
                                                         </td>
                                                         <td data-sort="{{.Time.Unix}}">
-                                                            <div style="display:none;" class="dialogText">Service last checked at: <h4>{{.Time}}</h4></div>
+                                                            <div style="display:none;" class="dialogText">Service last checked at: <h4>{{dateFmt .Time}}</h4>{{.Time}}</div>
                                                             <a onClick="dialog($(this), 'middle')" style="float:right;" class="help-icon far fa-question-circle"></a>
                                                             <span class="dialogTitle" style="display:none;">Last Check: {{since .Time}} ago</span>
                                                             {{since .Time}}
                                                         </td>
                                                         <td data-sort="{{.Since.Unix}}">
-                                                            <div style="display:none;" class="dialogText">Service has been in this state since: <h4>{{.Time}}</h4></div>
+                                                            <div style="display:none;" class="dialogText">Service has been in this state since: <h4>{{dateFmt .Since}}</h4>{{.Since}}</div>
                                                             <a onClick="dialog($(this), 'right')" style="float:right;" class="help-icon far fa-question-circle"></a>
                                                             <span class="dialogTitle" style="display:none;">Current State Duration: {{since .Since}}</span>
                                                             {{since .Since}}

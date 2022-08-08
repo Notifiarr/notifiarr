@@ -104,6 +104,13 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 
 func (c *Client) getFuncMap() template.FuncMap {
 	return template.FuncMap{
+		"dateFmt": func(date time.Time) string {
+			if ci, _ := c.website.GetClientInfo(); ci != nil {
+				return ci.User.DateFormat.Format(date)
+			}
+
+			return date.String()
+		},
 		"fortune": Fortune,
 		// returns the current time.
 		"now": time.Now,

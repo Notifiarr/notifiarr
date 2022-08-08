@@ -17,16 +17,16 @@
                                         {{- end}}
                                             <tr>
                                                 <th>Size</th>
-                                                <td><span title="{{$file.Size}} Bytes">{{megabyte $file.Size}}</span></td>
+                                                <td title="{{$file.Size}} Bytes"><span>{{megabyte $file.Size}}</span></td>
                                             </tr>
                                             <tr>
                                                 <th>Date</th>
-                                                <td><span title="Last Write: {{since $file.Time}}">{{$file.Time}}</span></td>
+                                                <td title="Last Write: {{since $file.Time}}"><span>{{dateFmt $file.Time}}</span></td>
                                             </tr>
                                             <tr>
                                                 <th>Used</th>
-                                                <td>
-                                                    <i class="help-icon far fa-question-circle" title="True indicates the file is being actively used (possibly written to).">
+                                                <td title="True indicates the file is being actively used (possibly written to).">
+                                                    <i class="help-icon far fa-question-circle">
                                                         {{$file.Used}}
                                                     </i>
                                                 </td>

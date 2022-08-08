@@ -145,8 +145,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 		return nil, nil, err
 	}
 
-	c.Services.Apps = c.Apps
-	c.Services.Plugins = c.Snapshot.Plugins
+	c.fixConfig()
 
 	err := c.Services.Setup(c.Service)
 	if err != nil {
@@ -175,6 +174,17 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	})
 
 	return c.Services.Website, c.setup(), err
+}
+
+func (c *Config) fixConfig() {
+	if c.Retries < 0 {
+		c.Retries = 0
+	} else if c.Retries == 0 {
+		c.Retries = website.DefaultRetries
+	}
+
+	c.Services.Apps = c.Apps
+	c.Services.Plugins = c.Snapshot.Plugins
 }
 
 func (c *Config) setup() *triggers.Actions {
