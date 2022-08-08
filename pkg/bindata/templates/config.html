@@ -792,7 +792,7 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            {{- if (eq .Version.os "windows") }}
+                                            {{- if not (eq .Version.os "windows") }}
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
