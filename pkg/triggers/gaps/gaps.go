@@ -87,7 +87,7 @@ func (c *cmd) sendGaps(event website.EventType) {
 		}
 
 		c.SendData(&website.Request{
-			Route:      website.DashRoute,
+			Route:      website.GapsRoute,
 			Event:      event,
 			LogPayload: true,
 			LogMsg:     fmt.Sprintf("Radarr Collection Gaps (%d:%s)", instance, app.URL),
