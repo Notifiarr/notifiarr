@@ -47,6 +47,11 @@
                                                 <td style="display:none;"></td>
                                             </tr>
                                             {{- end}}
+                                            <tr>
+                                                <td>Date Format</td>
+                                                <td>{{if .ClientInfo}}{{.ClientInfo.User.DateFormat.String}} from {{.ClientInfo.User.DateFormat.PHP}}{{end}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
                                              <tr class="text-center">
                                                  <td style="display:none;"></td>
                                                  <td style="display:none;"></td>
@@ -67,7 +72,7 @@
                                              </tr>
                                              <tr>
                                                  <td>Started</td>
-                                                 <td>{{.Version.started}}</td>
+                                                 <td>{{dateFmt .Version.started}} &nbsp; ({{.Version.started}})</td>
                                                  <td style="display:none;"></td>
                                              </tr>
                                              <tr>
