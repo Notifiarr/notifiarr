@@ -11,6 +11,8 @@ import (
 
 const TrigSnapshot common.TriggerName = "Gathering and sending System Snapshot."
 
+const randomMilliseconds = 4000
+
 // Action contains the exported methods for this package.
 type Action struct {
 	cmd *cmd
@@ -38,8 +40,9 @@ func (a *Action) Send(event website.EventType) {
 func (c *cmd) create() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	if c.Snapshot.Interval.Duration > 0 {
-		randomTime := time.Duration(rand.Intn(3000)) * time.Millisecond
+		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
 		ticker = time.NewTicker(c.Snapshot.Interval.Duration + randomTime)
 	}
 

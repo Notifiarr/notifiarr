@@ -12,6 +12,11 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
+const (
+	randomMilliseconds  = 3000
+	randomMilliseconds2 = 400
+)
+
 // Action contains the exported methods for this package.
 type Action struct {
 	cmd *cmd
@@ -72,7 +77,7 @@ func (c *cmd) run() {
 
 	cfg := c.ClientInfo.Actions.Plex
 	if cfg.Interval.Duration > 0 {
-		randomTime := time.Duration(rand.Intn(3000)) * time.Millisecond
+		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
 		ticker = time.NewTicker(cfg.Interval.Duration + randomTime)
 		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
 			c.Plex.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
@@ -92,7 +97,7 @@ func (c *cmd) run() {
 			Name: "Checking Plex for completed sessions.",
 			Hide: true, // do not log this one.
 			Fn:   c.checkForFinishedItems,
-			T:    time.NewTicker(time.Minute + time.Duration(rand.Intn(400))*time.Millisecond),
+			T:    time.NewTicker(time.Minute + time.Duration(rand.Intn(randomMilliseconds2))*time.Millisecond), //nolint:gosec
 		})
 	}
 }

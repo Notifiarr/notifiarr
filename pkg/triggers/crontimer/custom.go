@@ -19,7 +19,9 @@ const (
 	// This only fires when:
 	// 1. the cliet isn't reachable from the website.
 	// 2. the client didn't get a valid response to clientInfo.
-	pollDur = 4 * time.Minute
+	pollDur            = 4 * time.Minute
+	randomMilliseconds = 5000
+	randomSeconds      = 30
 )
 
 // Action contains the exported methods for this package.
@@ -82,7 +84,7 @@ func (c *cmd) create() {
 		c.Add(&common.Action{
 			Name: TrigPollSite,
 			Fn:   c.PollForReload,
-			T:    time.NewTicker(pollDur + time.Duration(rand.Intn(30))*time.Second), //nolint:gosec
+			T:    time.NewTicker(pollDur + time.Duration(rand.Intn(randomSeconds))*time.Second), //nolint:gosec
 		})
 	}
 
@@ -104,7 +106,7 @@ func (c *cmd) create() {
 			c.Errorf("Website provided custom cron interval under 1 minute. Ignored! Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
 		} else {
-			randomTime := time.Duration(rand.Intn(5000)) * time.Millisecond //nolint:gosec
+			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
 			ticker = time.NewTicker(custom.Interval.Duration + randomTime)
 		}
 

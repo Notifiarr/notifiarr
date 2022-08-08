@@ -49,6 +49,7 @@ func (a *Action) Corruption(event website.EventType, app starr.App) error {
 func (c *cmd) makeCorruptionTriggersLidarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Lidarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -70,6 +71,7 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 func (c *cmd) makeCorruptionTriggersProwlarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Prowlarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -91,6 +93,7 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 func (c *cmd) makeCorruptionTriggersRadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Radarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -112,6 +115,7 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 func (c *cmd) makeCorruptionTriggersReadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Readarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -133,6 +137,7 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 func (c *cmd) makeCorruptionTriggersSonarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Sonarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +

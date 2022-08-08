@@ -42,6 +42,7 @@ func (a *Action) Backup(event website.EventType, app starr.App) error {
 func (c *cmd) makeBackupTriggersLidarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Lidarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -63,6 +64,7 @@ func (c *cmd) makeBackupTriggersLidarr() {
 func (c *cmd) makeBackupTriggersRadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Radarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -84,6 +86,7 @@ func (c *cmd) makeBackupTriggersRadarr() {
 func (c *cmd) makeBackupTriggersReadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Readarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -105,6 +108,7 @@ func (c *cmd) makeBackupTriggersReadarr() {
 func (c *cmd) makeBackupTriggersSonarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Sonarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
@@ -126,6 +130,7 @@ func (c *cmd) makeBackupTriggersSonarr() {
 func (c *cmd) makeBackupTriggersProwlarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Prowlarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
