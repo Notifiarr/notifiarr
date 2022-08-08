@@ -6,7 +6,7 @@ go 1.19
 require (
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5
-	golift.io/deluge v0.10.1-0.20220720064250-90bc206753c9
+	golift.io/deluge v0.10.1-0.20220724230358-943104994ccb
 	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
 	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
