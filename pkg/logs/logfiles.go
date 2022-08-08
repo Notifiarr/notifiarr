@@ -5,7 +5,6 @@ import (
 	"expvar"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -24,7 +23,7 @@ import (
 //nolint:gochecknoglobals
 var (
 	stdout  = logCounter(os.Stdout.Name(), os.Stdout)
-	discard = logCounter("/dev/null", ioutil.Discard)
+	discard = logCounter("/dev/null", io.Discard)
 )
 
 // setDefaultLogPaths makes sure a GUI app has log files defined.

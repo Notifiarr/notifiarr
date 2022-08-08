@@ -10,10 +10,11 @@ import (
 )
 
 // ForceAllTmpl allows you to force some specific settings. Used to build a default template.
-var ForceAllTmpl = false // nolint:gochecknoglobals
+var ForceAllTmpl = false //nolint:gochecknoglobals
 
 // Template is the config file template.
-//nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
 var Template = template.Must(template.New("config").Funcs(Funcs()).Parse(tmpl))
 
 // Funcs returns our template functions.

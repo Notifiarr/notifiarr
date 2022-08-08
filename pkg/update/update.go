@@ -12,7 +12,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -169,7 +168,7 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 func (u *Command) decompressFile(tempFile *os.File, resp io.Reader, size int64) error {
 	switch {
 	case strings.HasSuffix(u.URL, ".zip"):
-		if body, err := ioutil.ReadAll(resp); err != nil {
+		if body, err := io.ReadAll(resp); err != nil {
 			return fmt.Errorf("reading file from URL: %w", err)
 		} else if err := u.writeZipFile(tempFile, body, size); err != nil {
 			return err

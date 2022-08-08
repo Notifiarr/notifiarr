@@ -19,7 +19,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/snapcron"
-	"github.com/Notifiarr/notifiarr/pkg/triggers/stuckitems"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/starrqueue"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -48,7 +48,7 @@ type Actions struct {
 	FileWatch  *filewatch.Action
 	Gaps       *gaps.Action
 	SnapCron   *snapcron.Action
-	StuckItems *stuckitems.Action
+	StarrQueue *starrqueue.Action
 	Commands   *commands.Action
 }
 
@@ -72,7 +72,7 @@ func New(config *Config) *Actions {
 		FileWatch:  filewatch.New(common, config.WatchFiles),
 		Gaps:       gaps.New(common),
 		SnapCron:   snapcron.New(common),
-		StuckItems: stuckitems.New(common),
+		StarrQueue: starrqueue.New(common),
 		Commands:   commands.New(common, config.Commands),
 		timers:     common,
 	}

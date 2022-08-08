@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -49,9 +49,13 @@ func (a *Action) Corruption(event website.EventType, app starr.App) error {
 func (c *cmd) makeCorruptionTriggersLidarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Lidarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(lidarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -67,9 +71,13 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 func (c *cmd) makeCorruptionTriggersProwlarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Prowlarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(prowlarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -85,9 +93,13 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 func (c *cmd) makeCorruptionTriggersRadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Radarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(radarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -103,9 +115,13 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 func (c *cmd) makeCorruptionTriggersReadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Readarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(readarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -121,9 +137,13 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 func (c *cmd) makeCorruptionTriggersSonarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Sonarr {
 		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(sonarrCorruptCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -269,15 +289,15 @@ func (c *cmd) checkBackupFileCorruption(
 	remotePath string,
 ) (*Info, error) {
 	// XXX: Set TMPDIR to configure this.
-	folder, err := ioutil.TempDir("", "notifiarr_tmp_dir")
+	folder, err := os.CreateTemp("", "notifiarr_tmp_dir")
 	if err != nil {
 		return nil, fmt.Errorf("creating temporary folder: %w", err)
 	}
 
-	defer os.RemoveAll(folder) // clean up when we're done.
+	defer os.RemoveAll(folder.Name()) // clean up when we're done.
 	c.Debugf("[%s requested] Downloading %s backup file (%d): %s", input.event, input.name, input.int, remotePath)
 
-	fileName, err := input.saveBackupFile(ctx, remotePath, folder)
+	fileName, err := input.saveBackupFile(ctx, remotePath, folder.Name())
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +306,7 @@ func (c *cmd) checkBackupFileCorruption(
 
 	_, newFiles, err := xtractr.ExtractZIP(&xtractr.XFile{
 		FilePath:  fileName,
-		OutputDir: folder,
+		OutputDir: folder.Name(),
 		FileMode:  mnd.Mode0600,
 		DirMode:   mnd.Mode0750,
 	})
@@ -334,7 +354,7 @@ func (c *genericInstance) saveBackupFile(
 		return "", fmt.Errorf("(%d) %w: %s", status, website.ErrNon200, remotePath)
 	}
 
-	file, err := ioutil.TempFile(localPath, "starr_"+path.Base(remotePath)+".*."+path.Ext(remotePath))
+	file, err := os.CreateTemp(localPath, "starr_"+path.Base(remotePath)+".*."+path.Ext(remotePath))
 	if err != nil {
 		return "", fmt.Errorf("creating temporary file: %w", err)
 	}

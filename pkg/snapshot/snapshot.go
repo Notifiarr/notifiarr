@@ -35,6 +35,7 @@ const (
 )
 
 // Config determines which checks to run, etc.
+//
 //nolint:lll
 type Config struct {
 	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`                     // total run time allowed.

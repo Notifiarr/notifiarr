@@ -2,6 +2,7 @@ package backups
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -41,9 +42,13 @@ func (a *Action) Backup(event website.EventType, app starr.App) error {
 func (c *cmd) makeBackupTriggersLidarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Lidarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(lidarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -59,9 +64,13 @@ func (c *cmd) makeBackupTriggersLidarr() {
 func (c *cmd) makeBackupTriggersRadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Radarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(radarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -77,9 +86,13 @@ func (c *cmd) makeBackupTriggersRadarr() {
 func (c *cmd) makeBackupTriggersReadarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Readarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(readarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -95,9 +108,13 @@ func (c *cmd) makeBackupTriggersReadarr() {
 func (c *cmd) makeBackupTriggersSonarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Sonarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(sonarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}
@@ -113,9 +130,13 @@ func (c *cmd) makeBackupTriggersSonarr() {
 func (c *cmd) makeBackupTriggersProwlarr() {
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	for _, app := range c.Apps.Prowlarr {
 		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
-			ticker = time.NewTicker(prowlarrBackupCheckDur)
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			ticker = time.NewTicker(checkInterval + randomTime)
+
 			break
 		}
 	}

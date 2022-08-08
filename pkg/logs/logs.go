@@ -37,7 +37,8 @@ type Logger struct {
 }
 
 // These are used for custom logs.
-// nolint:gochecknoglobals
+//
+//nolint:gochecknoglobals
 var (
 	logFiles  = 1
 	logFileMb = 100

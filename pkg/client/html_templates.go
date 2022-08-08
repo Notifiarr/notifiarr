@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -49,7 +48,7 @@ func (c *Client) loadAssetsTemplates() error {
 		return fmt.Errorf("cannot watch '%s' templates path: %w", templates, err)
 	}
 
-	dirList, err := ioutil.ReadDir(templates)
+	dirList, err := os.ReadDir(templates)
 	if err != nil {
 		return fmt.Errorf("cannot watch '%s' templates subfolders: %w", templates, err)
 	}
@@ -350,7 +349,7 @@ func (c *Client) parseCustomTemplates() error {
 		trim := strings.TrimPrefix(strings.ReplaceAll(strings.TrimPrefix(path, templatePath), `\`, "/"), "/")
 		c.Debugf("Parsing Template File '%s' to %s", path, trim)
 
-		data, err := ioutil.ReadFile(path)
+		data, err := os.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("reading custom template: %w", err)
 		}
@@ -548,7 +547,7 @@ func readFileTail(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 
 	// This is a magic number.
 	// We assume 150 characters per line to optimize the buffer.
-	output.Grow(count * 150) // nolint:gomnd
+	output.Grow(count * 150) //nolint:gomnd
 
 	for {
 		location-- // read 1 byte
@@ -560,7 +559,7 @@ func readFileTail(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 			return nil, fmt.Errorf("reading open file: %w", err)
 		}
 
-		if location != -1 && (char[0] == 10) { // nolint:gomnd
+		if location != -1 && (char[0] == 10) { //nolint:gomnd
 			found++ // we found a line
 		}
 
@@ -590,7 +589,7 @@ func readFileHead(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 
 	// This is a magic number.
 	// We assume 150 characters per line to optimize the buffer.
-	output.Grow(count * 150) // nolint:gomnd
+	output.Grow(count * 150) //nolint:gomnd
 
 	for ; ; location++ {
 		if _, err := fileHandle.Seek(location, io.SeekStart); err != nil {
@@ -601,7 +600,7 @@ func readFileHead(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 			return nil, fmt.Errorf("reading open file: %w", err)
 		}
 
-		if char[0] == 10 { // nolint:gomnd
+		if char[0] == 10 { //nolint:gomnd
 			found++ // we have a line
 
 			if found <= skip {

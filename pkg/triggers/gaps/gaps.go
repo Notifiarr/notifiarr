@@ -2,6 +2,7 @@ package gaps
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -12,6 +13,8 @@ import (
 /* Gaps allows filling gaps in Radarr collections. */
 
 const TrigCollectionGaps common.TriggerName = "Sending Radarr Collection Gaps."
+
+const randomMilliseconds = 5000
 
 // Action contains the exported methods for this package.
 type Action struct {
@@ -37,8 +40,10 @@ func (c *cmd) create() {
 
 	var ticker *time.Ticker
 
+	//nolint:gosec
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
-		ticker = time.NewTicker(ci.Actions.Gaps.Interval.Duration)
+		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
+		ticker = time.NewTicker(ci.Actions.Gaps.Interval.Duration + randomTime)
 		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
 	}
 

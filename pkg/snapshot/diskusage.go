@@ -11,7 +11,7 @@ import (
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
-func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error { // nolint:cyclop
+func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error { //nolint:cyclop
 	if !run {
 		return nil
 	}

@@ -15,6 +15,7 @@ import (
 var ErrNotSynology = fmt.Errorf("the running host is not a Synology")
 
 // Synology is the data we care about from the config file.
+//
 //nolint:tagliatelle
 type Synology struct {
 	Build   string `json:"last_admin_login_build"` // 254263

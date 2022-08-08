@@ -214,14 +214,19 @@ function setTooltips(start = document)
     $(start).find('a, div, i, img, input, span, td, button').balloon({
         position: 'bottom',
         classname: 'balloon-tooltip',
+        showDuration: 120,
+        hideDuration:  20,
+        delay: 400,
+        maxLifetime: 2200,
+        minLifetime: 220,
         css: {
             fontSize: '18px',
             borderRadius: '12px',
             height: 'auto',
             maxWidth: '500px',
-            minWidth: '100px',
+            minWidth: '80px',
             padding: '0.5em',
-            opacity: 0.95,
+            opacity: 0.90,
             borderColor: '#FFF',
         }
     });
