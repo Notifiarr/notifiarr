@@ -289,15 +289,15 @@ func (c *cmd) checkBackupFileCorruption(
 	remotePath string,
 ) (*Info, error) {
 	// XXX: Set TMPDIR to configure this.
-	folder, err := os.CreateTemp("", "notifiarr_tmp_dir")
+	folder, err := os.MkdirTemp("", "notifiarr_tmp_dir")
 	if err != nil {
 		return nil, fmt.Errorf("creating temporary folder: %w", err)
 	}
 
-	defer os.RemoveAll(folder.Name()) // clean up when we're done.
+	defer os.RemoveAll(folder) // clean up when we're done.
 	c.Debugf("[%s requested] Downloading %s backup file (%d): %s", input.event, input.name, input.int, remotePath)
 
-	fileName, err := input.saveBackupFile(ctx, remotePath, folder.Name())
+	fileName, err := input.saveBackupFile(ctx, remotePath, folder)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +306,7 @@ func (c *cmd) checkBackupFileCorruption(
 
 	_, newFiles, err := xtractr.ExtractZIP(&xtractr.XFile{
 		FilePath:  fileName,
-		OutputDir: folder.Name(),
+		OutputDir: folder,
 		FileMode:  mnd.Mode0600,
 		DirMode:   mnd.Mode0750,
 	})
