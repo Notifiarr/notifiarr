@@ -5,14 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
-	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -29,7 +27,7 @@ type ClientInfo struct {
 	Actions struct {
 		Poll      bool             `json:"poll"`
 		Plex      PlexConfig       `json:"plex"`      // Site Config for Plex.
-		Apps      AppConfigs       `json:"apps"`      // Site Config for Starr.
+		Apps      AllAppConfigs    `json:"apps"`      // Site Config for Starr.
 		Dashboard DashConfig       `json:"dashboard"` // Site Config for Dashboard.
 		Sync      SyncConfig       `json:"sync"`      // Site Config for TRaSH Sync.
 		Gaps      GapsConfig       `json:"gaps"`      // Site Config for Radarr Gaps.
@@ -65,19 +63,23 @@ type DashConfig struct {
 type AppConfig struct {
 	Instance int           `json:"instance"`
 	Name     string        `json:"name"`
-	Stuck    bool          `json:"stuck"`
 	Corrupt  string        `json:"corrupt"`
 	Backup   string        `json:"backup"`
 	Interval cnfg.Duration `json:"interval"`
+	Stuck    bool          `json:"stuck"`
+	Finished bool          `json:"finished"`
 }
 
-// AppConfigs is the configuration returned from the notifiarr website for Starr apps.
-type AppConfigs struct {
-	Lidarr   []*AppConfig `json:"lidarr"`
-	Prowlarr []*AppConfig `json:"prowlarr"`
-	Radarr   []*AppConfig `json:"radarr"`
-	Readarr  []*AppConfig `json:"readarr"`
-	Sonarr   []*AppConfig `json:"sonarr"`
+// InstanceConfig allows binding methods to a list of instance configurations.
+type InstanceConfig []*AppConfig
+
+// AllAppConfigs is the configuration returned from the notifiarr website for Starr apps.
+type AllAppConfigs struct {
+	Lidarr   InstanceConfig `json:"lidarr"`
+	Prowlarr InstanceConfig `json:"prowlarr"`
+	Radarr   InstanceConfig `json:"radarr"`
+	Readarr  InstanceConfig `json:"readarr"`
+	Sonarr   InstanceConfig `json:"sonarr"`
 }
 
 // PlexConfig is the website-derived configuration for Plex.
@@ -214,75 +216,6 @@ func (s *Server) Info() map[string]interface{} {
 	}
 }
 
-// hostInfoNoError will return nil if there is an error, otherwise a copy of the host info.
-func (s *Server) hostInfoNoError() *host.InfoStat {
-	if s.hostInfo == nil {
-		return nil
-	}
-
-	return &host.InfoStat{
-		Hostname:             s.hostInfo.Hostname,
-		Uptime:               uint64(time.Now().Unix()) - s.hostInfo.BootTime,
-		BootTime:             s.hostInfo.BootTime,
-		OS:                   s.hostInfo.OS,
-		Platform:             s.hostInfo.Platform,
-		PlatformFamily:       s.hostInfo.PlatformFamily,
-		PlatformVersion:      s.hostInfo.PlatformVersion,
-		KernelVersion:        s.hostInfo.KernelVersion,
-		KernelArch:           s.hostInfo.KernelArch,
-		VirtualizationSystem: s.hostInfo.VirtualizationSystem,
-		VirtualizationRole:   s.hostInfo.VirtualizationRole,
-		HostID:               s.hostInfo.HostID,
-	}
-}
-
-// GetHostInfo attempts to make a unique machine identifier...
-func (s *Server) GetHostInfo() (*host.InfoStat, error) { //nolint:cyclop
-	if s.hostInfo != nil {
-		return s.hostInfoNoError(), nil
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) //nolint:gomnd
-	defer cancel()
-
-	hostInfo, err := host.InfoWithContext(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("getting host info: %w", err)
-	}
-
-	syn, err := snapshot.GetSynology()
-	if err == nil {
-		// This method writes synology data into hostInfo.
-		syn.SetInfo(hostInfo)
-	}
-
-	if hostInfo.Platform == "" &&
-		(hostInfo.VirtualizationSystem == "docker" || mnd.IsDocker) {
-		hostInfo.Platform = "Docker " + hostInfo.KernelVersion
-		hostInfo.PlatformFamily = "Docker"
-	}
-
-	const (
-		trueNasJunkLen   = 17
-		trueNasJunkParts = 2
-	)
-	// TrueNAS adds junk to the hostname.
-	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > trueNasJunkLen {
-		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > trueNasJunkParts {
-			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-trueNasJunkParts], "-")
-		}
-	}
-
-	if s.config.HostID != "" {
-		hostInfo.HostID = s.config.HostID
-	}
-
-	// This only happens once.
-	s.hostInfo = hostInfo
-
-	return s.hostInfoNoError(), nil // return a copy.
-}
-
 func (s *Server) PollForReload(event EventType) {
 	body, err := s.GetData(&Request{
 		Route:      ClientRoute,
@@ -358,4 +291,44 @@ func (s *Server) getAppConfigs() map[string]interface{} {
 	}
 
 	return reApps
+}
+
+func (i InstanceConfig) Finished(instance int) bool {
+	for _, app := range i {
+		if app.Instance == instance {
+			return app.Finished
+		}
+	}
+
+	return false
+}
+
+func (i InstanceConfig) Stuck(instance int) bool {
+	for _, app := range i {
+		if app.Instance == instance {
+			return app.Stuck
+		}
+	}
+
+	return false
+}
+
+func (i InstanceConfig) Backup(instance int) string {
+	for _, app := range i {
+		if app.Instance == instance {
+			return app.Backup
+		}
+	}
+
+	return mnd.Disabled
+}
+
+func (i InstanceConfig) Corrupt(instance int) string {
+	for _, app := range i {
+		if app.Instance == instance {
+			return app.Corrupt
+		}
+	}
+
+	return mnd.Disabled
 }

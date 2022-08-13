@@ -23,12 +23,13 @@ func (c *Config) collectApps() []*Service {
 
 func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Lidarr {
-		if app.Timeout.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -38,7 +39,7 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.ValidSSL,
 			})
 		}
@@ -49,12 +50,13 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Prowlarr {
-		if app.Timeout.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -64,7 +66,7 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.ValidSSL,
 			})
 		}
@@ -75,12 +77,13 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Radarr {
-		if app.Timeout.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -90,7 +93,7 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 				Value:    app.URL + "/api/v3/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.ValidSSL,
 			})
 		}
@@ -101,12 +104,13 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Readarr {
-		if app.Timeout.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -116,7 +120,7 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.ValidSSL,
 			})
 		}
@@ -127,12 +131,13 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Sonarr {
-		if app.Timeout.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -142,7 +147,7 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 				Value:    app.URL + "/api/v3/system/status?apikey=" + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.ValidSSL,
 			})
 		}
@@ -158,8 +163,9 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -169,7 +175,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Value:    strings.TrimSuffix(app.Config.URL, "/json"),
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.VerifySSL,
 			})
 		}
@@ -181,18 +187,27 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
+		}
+
+		prefix := "" // add auth to the url here. woo, hacky, but it works!
+		if !strings.Contains(app.Config.URL, "@") {
+			prefix = "http://" + app.User + ":" + app.Pass + "@"
+			if strings.HasPrefix(app.Config.URL, "https://") {
+				prefix = "https://" + app.User + ":" + app.Pass + "@"
+			}
 		}
 
 		if app.Name != "" {
 			svcs = append(svcs, &Service{
 				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    app.Config.URL,
+				Value:    prefix + strings.TrimPrefix(strings.TrimPrefix(app.Config.URL, "https://"), "http://"),
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.VerifySSL,
 			})
 		}
@@ -204,8 +219,9 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -215,7 +231,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Value:    app.URL,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.VerifySSL,
 			})
 		}
@@ -227,8 +243,9 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -238,7 +255,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Value:    app.URL,
 				Expect:   "200,401", // could not find a 200...
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.VerifySSL,
 			})
 		}
@@ -250,8 +267,9 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 			continue
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		if app.Name != "" {
@@ -261,7 +279,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 				Value:    app.URL + "/api?mode=version&apikey=" + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-				Interval: app.Interval,
+				Interval: interval,
 				validSSL: app.VerifySSL,
 			})
 		}
@@ -277,8 +295,9 @@ func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 			return svcs
 		}
 
-		if app.Interval.Duration == 0 {
-			app.Interval.Duration = DefaultCheckInterval
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		svcs = append(svcs, &Service{
@@ -287,7 +306,7 @@ func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 			Value:    app.URL + "/api/v2?cmd=status&apikey=" + app.APIKey,
 			Expect:   "200",
 			Timeout:  app.Timeout,
-			Interval: app.Interval,
+			Interval: interval,
 			validSSL: app.VerifySSL,
 		})
 	}
@@ -307,8 +326,9 @@ func (c *Config) collectMySQLApps(svcs []*Service) []*Service {
 			plugin.Timeout.Duration = DefaultTimeout
 		}
 
-		if plugin.Interval.Duration == 0 {
-			plugin.Interval.Duration = DefaultCheckInterval
+		interval := plugin.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
 		}
 
 		host := strings.TrimLeft(strings.TrimRight(plugin.Host, ")"), "@tcp(")
@@ -325,7 +345,7 @@ func (c *Config) collectMySQLApps(svcs []*Service) []*Service {
 			Type:     CheckTCP,
 			Value:    host,
 			Timeout:  plugin.Timeout,
-			Interval: plugin.Interval,
+			Interval: interval,
 		})
 	}
 

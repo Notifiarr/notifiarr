@@ -43,8 +43,8 @@ func (c *cmd) makeBackupTriggersLidarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Lidarr {
-		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Lidarr {
+		if c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -65,8 +65,8 @@ func (c *cmd) makeBackupTriggersRadarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Radarr {
-		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Radarr {
+		if c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -87,8 +87,8 @@ func (c *cmd) makeBackupTriggersReadarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Readarr {
-		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Readarr {
+		if c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -109,8 +109,8 @@ func (c *cmd) makeBackupTriggersSonarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Sonarr {
-		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Sonarr {
+		if c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -131,8 +131,8 @@ func (c *cmd) makeBackupTriggersProwlarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Prowlarr {
-		if app.Backup != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Prowlarr {
+		if c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -151,7 +151,8 @@ func (c *cmd) makeBackupTriggersProwlarr() {
 
 func (c *cmd) sendLidarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Lidarr {
-		if app.Backup != mnd.Disabled || event != website.EventCron {
+		if event != website.EventCron ||
+			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Lidarr,
@@ -166,7 +167,8 @@ func (c *cmd) sendLidarrBackups(event website.EventType) {
 
 func (c *cmd) sendProwlarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Prowlarr {
-		if app.Backup != mnd.Disabled || event != website.EventCron {
+		if event != website.EventCron ||
+			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Prowlarr,
@@ -181,7 +183,8 @@ func (c *cmd) sendProwlarrBackups(event website.EventType) {
 
 func (c *cmd) sendRadarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Radarr {
-		if app.Backup != mnd.Disabled || event != website.EventCron {
+		if event != website.EventCron ||
+			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Radarr,
@@ -196,7 +199,8 @@ func (c *cmd) sendRadarrBackups(event website.EventType) {
 
 func (c *cmd) sendReadarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Readarr {
-		if app.Backup != mnd.Disabled || event != website.EventCron {
+		if event != website.EventCron ||
+			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Readarr,
@@ -211,7 +215,8 @@ func (c *cmd) sendReadarrBackups(event website.EventType) {
 
 func (c *cmd) sendSonarrBackups(event website.EventType) {
 	for idx, app := range c.Apps.Sonarr {
-		if app.Backup != mnd.Disabled || event != website.EventCron {
+		if event != website.EventCron ||
+			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(&genericInstance{
 				event: event,
 				name:  starr.Sonarr,

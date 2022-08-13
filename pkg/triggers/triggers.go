@@ -94,8 +94,7 @@ type run interface {
 func (a *Actions) Start() {
 	defer a.timers.Run() // unexported fields do not get picked up by reflection.
 
-	ci, _ := a.timers.GetClientInfo()
-	a.timers.SetClientInfo(ci)
+	a.timers.ClientInfo, _ = a.timers.GetClientInfo()
 
 	actions := reflect.ValueOf(a).Elem()
 	for i := 0; i < actions.NumField(); i++ {

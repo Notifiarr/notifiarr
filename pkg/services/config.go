@@ -116,3 +116,10 @@ type service struct {
 	proc         *procExpect // only used for process checks.
 	sync.RWMutex `json:"-"`
 }
+
+func (s *service) Due(interval time.Duration) bool {
+	s.RLock()
+	defer s.RUnlock()
+
+	return time.Since(s.LastCheck) > interval
+}

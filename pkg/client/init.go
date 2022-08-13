@@ -20,6 +20,8 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 	if clientInfo != nil {
 		c.Printf("==> %s", clientInfo)
 		c.printVersionChangeInfo()
+	} else {
+		clientInfo = &website.ClientInfo{}
 	}
 
 	switch hi, err := c.website.GetHostInfo(); {
@@ -34,11 +36,11 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 
 	c.Printf("==> %s <==", mnd.HelpLink)
 	c.Printf("==> Startup Settings <==")
-	c.printLidarr()
-	c.printProwlarr()
-	c.printRadarr()
-	c.printReadarr()
-	c.printSonarr()
+	c.printLidarr(&clientInfo.Actions.Apps.Lidarr)
+	c.printProwlarr(&clientInfo.Actions.Apps.Prowlarr)
+	c.printRadarr(&clientInfo.Actions.Apps.Radarr)
+	c.printReadarr(&clientInfo.Actions.Apps.Readarr)
+	c.printSonarr(&clientInfo.Actions.Apps.Sonarr)
 	c.printDeluge()
 	c.printNZBGet()
 	c.printQbit()
@@ -135,122 +137,93 @@ func (c *Client) printPlex() {
 }
 
 // printLidarr is called on startup to print info about each configured server.
-func (c *Client) printLidarr() {
+func (c *Client) printLidarr(app *website.InstanceConfig) {
+	s := "s"
 	if len(c.Config.Lidarr) == 1 {
-		f := c.Config.Lidarr[0]
-
-		c.Printf(" => Lidarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "servers")
+	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "server"+s)
 
-	for i, f := range c.Config.Lidarr {
+	for idx, f := range c.Config.Lidarr {
 		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem,
-			f.Corrupt != "" && f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
 
 // printProwlarr is called on startup to print info about each configured server.
-func (c *Client) printProwlarr() {
+func (c *Client) printProwlarr(app *website.InstanceConfig) {
+	s := "s"
 	if len(c.Config.Prowlarr) == 1 {
-		f := c.Config.Prowlarr[0]
-
-		c.Printf(" => Prowlarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v corrupt:%v backup:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), "servers")
+	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), "server"+s)
 
-	for i, f := range c.Config.Prowlarr {
+	for idx, f := range c.Config.Prowlarr {
 		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v corrupt:%v backup:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL,
+			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
 
 // printRadarr is called on startup to print info about each configured server.
-func (c *Client) printRadarr() {
+func (c *Client) printRadarr(app *website.InstanceConfig) {
+	s := "s"
 	if len(c.Config.Radarr) == 1 {
-		f := c.Config.Radarr[0]
-
-		c.Printf(" => Radarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => Radarr Config:", len(c.Config.Radarr), "servers")
+	c.Print(" => Radarr Config:", len(c.Config.Radarr), "server"+s)
 
-	for i, f := range c.Config.Radarr {
+	for idx, f := range c.Config.Radarr {
 		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
 
 // printReadarr is called on startup to print info about each configured server.
-func (c *Client) printReadarr() {
+func (c *Client) printReadarr(app *website.InstanceConfig) {
+	s := "s"
 	if len(c.Config.Readarr) == 1 {
-		f := c.Config.Readarr[0]
-
-		c.Printf(" => Readarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => Readarr Config:", len(c.Config.Readarr), "servers")
+	c.Print(" => Readarr Config:", len(c.Config.Readarr), "server"+s)
 
-	for i, f := range c.Config.Readarr {
+	for idx, f := range c.Config.Readarr {
 		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
 
 // printSonarr is called on startup to print info about each configured server.
-func (c *Client) printSonarr() {
+func (c *Client) printSonarr(app *website.InstanceConfig) {
+	s := "s"
 	if len(c.Config.Sonarr) == 1 {
-		f := c.Config.Sonarr[0]
-
-		c.Printf(" => Sonarr Config: 1 server: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			f.URL, f.APIKey != "", f.Timeout.String(), f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "servers")
+	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "server"+s)
 
-	for i, f := range c.Config.Sonarr {
+	for idx, f := range c.Config.Sonarr {
 		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			i+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, f.StuckItem, f.Corrupt != "" &&
-				f.Corrupt != mnd.Disabled, f.Backup != mnd.Disabled)
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
 
 // printDeluge is called on startup to print info about each configured server.
 func (c *Client) printDeluge() {
+	s := "s'"
 	if len(c.Config.Deluge) == 1 {
-		f := c.Config.Deluge[0]
-
-		c.Printf(" => Deluge Config: 1 server: %s password:%v timeout:%s verify_ssl:%v",
-			f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => Deluge Config:", len(c.Config.Deluge), "servers")
+	c.Print(" => Deluge Config:", len(c.Config.Deluge), "server"+s)
 
 	for i, f := range c.Config.Deluge {
 		c.Printf(" =>    Server %d: %s password:%v timeout:%s verify_ssl:%v",
@@ -260,16 +233,12 @@ func (c *Client) printDeluge() {
 
 // printNZBGet is called on startup to print info about each configured server.
 func (c *Client) printNZBGet() {
+	s := "s"
 	if len(c.Config.NZBGet) == 1 {
-		f := c.Config.NZBGet[0]
-
-		c.Printf(" => NZBGet Config: 1 server: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => NZBGet Config:", len(c.Config.NZBGet), "servers")
+	c.Print(" => NZBGet Config:", len(c.Config.NZBGet), "server"+s)
 
 	for i, f := range c.Config.NZBGet {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
@@ -279,16 +248,12 @@ func (c *Client) printNZBGet() {
 
 // printQbit is called on startup to print info about each configured server.
 func (c *Client) printQbit() {
+	s := "s"
 	if len(c.Config.Qbit) == 1 {
-		f := c.Config.Qbit[0]
-
-		c.Printf(" => Qbit Config: 1 server: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => Qbit Config:", len(c.Config.Qbit), "servers")
+	c.Print(" => Qbit Config:", len(c.Config.Qbit), "server"+s)
 
 	for i, f := range c.Config.Qbit {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
@@ -298,16 +263,12 @@ func (c *Client) printQbit() {
 
 // printRtorrent is called on startup to print info about each configured server.
 func (c *Client) printRtorrent() {
+	s := "s"
 	if len(c.Config.Rtorrent) == 1 {
-		f := c.Config.Rtorrent[0]
-
-		c.Printf(" => rTorrent Config: 1 server: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => rTorrent Config:", len(c.Config.Rtorrent), "servers")
+	c.Print(" => rTorrent Config:", len(c.Config.Rtorrent), "server"+s)
 
 	for i, f := range c.Config.Rtorrent {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
@@ -317,15 +278,12 @@ func (c *Client) printRtorrent() {
 
 // printSABnzbd is called on startup to print info about each configured SAB downloader.
 func (c *Client) printSABnzbd() {
+	s := "s"
 	if len(c.Config.SabNZB) == 1 {
-		f := c.Config.SabNZB[0]
-
-		c.Printf(" => SABnzbd Config: 1 server: %s api_key:%v timeout:%s", f.URL, f.APIKey != "", f.Timeout)
-
-		return
+		s = ""
 	}
 
-	c.Print(" => SABnzbd Config:", len(c.Config.SabNZB), "servers")
+	c.Print(" => SABnzbd Config:", len(c.Config.SabNZB), "server"+s)
 
 	for i, f := range c.Config.SabNZB {
 		c.Printf(" =>    Server %d: %s, api_key:%v timeout:%s", i+1, f.URL, f.APIKey != "", f.Timeout)
@@ -351,18 +309,12 @@ func (c *Client) printMySQL() {
 		return
 	}
 
+	s := "s"
 	if len(c.Config.Snapshot.MySQL) == 1 {
-		if m := c.Config.Snapshot.MySQL[0]; m.Name != "" {
-			c.Printf(" => MySQL Config: 1 server: %s user:%v timeout:%s check_interval:%s name:%s",
-				m.Host, m.User, m.Timeout, m.Interval, m.Name)
-		} else {
-			c.Printf(" => MySQL Config: 1 server: %s user:%v timeout:%s", m.Host, m.User, m.Timeout)
-		}
-
-		return
+		s = ""
 	}
 
-	c.Print(" => MySQL Config:", len(c.Config.Snapshot.MySQL), "servers")
+	c.Print(" => MySQL Config:", len(c.Config.Snapshot.MySQL), "server"+s)
 
 	for i, m := range c.Config.Snapshot.MySQL {
 		if m.Name != "" {

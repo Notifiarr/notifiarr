@@ -50,6 +50,11 @@ type LidarrConfig struct {
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
+// Enabled returns true if the Lidarr instance is enabled and usable.
+func (l *LidarrConfig) Enabled() bool {
+	return l != nil && l.Config != nil && l.URL != "" && l.APIKey != "" && l.Timeout.Duration > 0
+}
+
 func (a *Apps) setupLidarr() error {
 	for idx, app := range a.Lidarr {
 		if app.Config == nil || app.Config.URL == "" {

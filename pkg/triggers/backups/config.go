@@ -16,6 +16,11 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
+	lidarr   map[int]string
+	prowlarr map[int]string
+	radarr   map[int]string
+	readarr  map[int]string
+	sonarr   map[int]string
 }
 
 // Errors returned by this package.
@@ -85,7 +90,14 @@ type Payload struct {
 
 // New configures the library.
 func New(config *common.Config) *Action {
-	return &Action{cmd: &cmd{Config: config}}
+	return &Action{cmd: &cmd{
+		Config:   config,
+		lidarr:   make(map[int]string),
+		prowlarr: make(map[int]string),
+		radarr:   make(map[int]string),
+		readarr:  make(map[int]string),
+		sonarr:   make(map[int]string),
+	}}
 }
 
 // Create sets up all the triggers.

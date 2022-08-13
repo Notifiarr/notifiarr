@@ -54,12 +54,10 @@ type Logger struct {
 	Errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 	Debugf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
+
 type starrConfig struct {
-	Name      string        `toml:"name" xml:"name" json:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
-	StuckItem bool          `toml:"stuck_items" xml:"stuck_items" json:"stuckItems"`
-	Corrupt   string        `toml:"corrupt" xml:"corrupt" json:"corrupt"`
-	Backup    string        `toml:"backup" xml:"backup" json:"backup"`
+	Name     string        `toml:"name" xml:"name" json:"name"`
+	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 }
 
 // Errors sent to client web requests.

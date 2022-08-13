@@ -23,6 +23,11 @@ type ProwlarrConfig struct {
 	errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
+// Enabled returns true if the Prowlarr instance is enabled and usable.
+func (p *ProwlarrConfig) Enabled() bool {
+	return p != nil && p.Config != nil && p.URL != "" && p.APIKey != "" && p.Timeout.Duration > 0
+}
+
 func (a *Apps) setupProwlarr() error {
 	for idx, app := range a.Prowlarr {
 		if app.Config == nil || app.Config.URL == "" {

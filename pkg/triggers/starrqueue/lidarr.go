@@ -1,78 +1,81 @@
 package starrqueue
 
 import (
-	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-const TrigLidarrQueue common.TriggerName = "Checking Lidarr queue and sending incomplete items."
+const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
 
-// LidarrStuckItems sends Lidarr's stuck items to the website.
-func (a *Action) LidarrStuckItems(event website.EventType) {
-	a.cmd.Exec(event, TrigLidarrQueue)
-}
-
-func (c *cmd) setupLidarr() {
-	var ticker *time.Ticker
-
-	for _, app := range c.Apps.Lidarr {
-		if app.StuckItem && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
-			ticker = time.NewTicker(queueDuration + time.Duration(rand.Intn(randomSeconds))) //nolint:gosec
-			break
-		}
-	}
-
-	c.Add(&common.Action{
-		Name: TrigLidarrQueue,
-		Fn:   c.lidarrStuckItems,
-		C:    make(chan website.EventType, 1),
-		T:    ticker,
-	})
-}
-
-func (c *cmd) lidarrStuckItems(event website.EventType) {
-	start := time.Now()
-
-	if cue := c.getFinishedItemsLidarr(); cue.Empty() {
-		c.SendData(&website.Request{
-			Route:      website.StuckRoute,
-			Event:      event,
-			LogPayload: true,
-			LogMsg: fmt.Sprintf("Lidarr Queue: %d stuck items (elapsed:%s)",
-				cue.Len(), time.Since(start).Round(time.Millisecond)),
-			Payload: map[string]ItemList{"lidarr": cue},
-		})
+// StoreLidarr fetches and stores the Lidarr queue immediately for the specified instance.
+// Does not send data to the website.
+func (a *Action) StoreLidarr(event website.EventType, instance int) {
+	if name := TrigLidarrQueue.WithInstance(instance); !a.cmd.Exec(event, name) {
+		a.cmd.Errorf("Failed! %s Disbled?", name)
 	}
 }
 
-func (c *cmd) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
-	stuck := make(ItemList)
+type lidarrApp struct {
+	app *apps.LidarrConfig
+	cmd *cmd
+	idx int
+}
+
+// storeQueue runs at an interval and saves the queue for an app internally.
+func (app *lidarrApp) storeQueue(event website.EventType) {
+	var err error
+	if app.cmd.lidarr[app.idx], err = app.app.GetQueue(queueItemsMax, 1); err != nil {
+		app.cmd.Errorf("Getting Lidarr Queue (instance %d): %v", app.idx+1, err)
+		return
+	}
+
+	for _, record := range app.cmd.lidarr[app.idx].Records {
+		record.Quality = nil
+	}
+}
+
+func (c *cmd) setupLidarr() bool {
+	var enabled bool
 
 	for idx, app := range c.Apps.Lidarr {
+		if !app.Enabled() || !c.HaveClientInfo() {
+			continue
+		}
+
+		var ticker *time.Ticker
+
 		instance := idx + 1
-
-		if !app.StuckItem || app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
-			continue
+		if c.ClientInfo.Actions.Apps.Lidarr.Finished(instance) {
+			ticker = time.NewTicker(finishedDuration)
+		} else if c.ClientInfo.Actions.Apps.Lidarr.Stuck(instance) {
+			ticker = time.NewTicker(stuckDuration)
 		}
 
-		if app.Lidarr == nil {
-			c.Errorf("Getting Lidarr Queue (%d): Lidarr config is nil? This is probably a bug.", instance)
-			continue
+		if ticker != nil {
+			enabled = true
+
+			c.Add(&common.Action{
+				Hide: true,
+				Name: TrigLidarrQueue.WithInstance(instance),
+				Fn:   (&lidarrApp{app: app, cmd: c, idx: idx}).storeQueue,
+				C:    make(chan website.EventType, 1),
+				T:    ticker,
+			})
 		}
+	}
 
-		start := time.Now()
+	return enabled
+}
 
-		queue, err := app.GetQueue(queueItemsMax, queueItemsMax)
-		if err != nil {
-			c.Errorf("Getting Lidarr Queue (%d): %v", instance, err)
-			continue
-		}
+func (c *cmd) getFinishedItemsLidarr() itemList {
+	stuck := make(itemList)
 
+	for idx, queue := range c.lidarr {
+		instance := idx + 1
 		stuckapp := stuck[instance]
 
 		for _, item := range queue.Records {
@@ -81,12 +84,10 @@ func (c *cmd) getFinishedItemsLidarr() ItemList { //nolint:dupl,cyclop
 				continue
 			}
 
-			item.Quality = nil
 			stuckapp.Queue = append(stuckapp.Queue, item)
 		}
 
-		stuckapp.Name = app.Name
-		stuckapp.Elapsed = time.Since(start)
+		stuckapp.Name = c.Apps.Lidarr[idx].Name // this should be safe.
 		stuck[instance] = stuckapp
 
 		c.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",

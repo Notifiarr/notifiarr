@@ -50,8 +50,8 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Lidarr {
-		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Lidarr {
+		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Lidarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -72,8 +72,8 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Prowlarr {
-		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Prowlarr {
+		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Prowlarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -94,8 +94,8 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Radarr {
-		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Radarr {
+		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Radarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -116,8 +116,8 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Readarr {
-		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Readarr {
+		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Readarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -138,8 +138,8 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	for _, app := range c.Apps.Sonarr {
-		if app.Corrupt != mnd.Disabled && app.Timeout.Duration >= 0 && app.URL != "" {
+	for idx, app := range c.Apps.Sonarr {
+		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Sonarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -157,12 +157,12 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 }
 
 func (c *cmd) sendLidarrCorruption(event website.EventType) {
-	for i, app := range c.Apps.Lidarr {
-		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
+	for idx, app := range c.Apps.Lidarr {
+		c.lidarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
-			last:  app.Corrupt,
+			last:  c.lidarr[idx],
 			name:  starr.Lidarr,
-			int:   i + 1,
+			int:   idx + 1,
 			app:   app.Lidarr,
 			cName: app.Name,
 			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
@@ -171,12 +171,12 @@ func (c *cmd) sendLidarrCorruption(event website.EventType) {
 }
 
 func (c *cmd) sendProwlarrCorruption(event website.EventType) {
-	for i, app := range c.Apps.Prowlarr {
-		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
+	for idx, app := range c.Apps.Prowlarr {
+		c.prowlarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
-			last:  app.Corrupt,
+			last:  c.prowlarr[idx],
 			name:  starr.Prowlarr,
-			int:   i + 1,
+			int:   idx + 1,
 			app:   app.Prowlarr,
 			cName: app.Name,
 			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
@@ -185,12 +185,12 @@ func (c *cmd) sendProwlarrCorruption(event website.EventType) {
 }
 
 func (c *cmd) sendRadarrCorruption(event website.EventType) {
-	for i, app := range c.Apps.Radarr {
-		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
+	for idx, app := range c.Apps.Radarr {
+		c.radarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
-			last:  app.Corrupt,
+			last:  c.radarr[idx],
 			name:  starr.Radarr,
-			int:   i + 1,
+			int:   idx + 1,
 			app:   app.Radarr,
 			cName: app.Name,
 			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
@@ -199,12 +199,12 @@ func (c *cmd) sendRadarrCorruption(event website.EventType) {
 }
 
 func (c *cmd) sendReadarrCorruption(event website.EventType) {
-	for i, app := range c.Apps.Readarr {
-		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
+	for idx, app := range c.Apps.Readarr {
+		c.readarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
-			last:  app.Corrupt,
+			last:  c.readarr[idx],
 			name:  starr.Readarr,
-			int:   i + 1,
+			int:   idx + 1,
 			app:   app.Readarr,
 			cName: app.Name,
 			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
@@ -213,12 +213,12 @@ func (c *cmd) sendReadarrCorruption(event website.EventType) {
 }
 
 func (c *cmd) sendSonarrCorruption(event website.EventType) {
-	for i, app := range c.Apps.Sonarr {
-		app.Corrupt = c.sendAndLogAppCorruption(&genericInstance{
+	for idx, app := range c.Apps.Sonarr {
+		c.sonarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
 			event: event,
-			last:  app.Corrupt,
+			last:  c.sonarr[idx],
 			name:  starr.Sonarr,
-			int:   i + 1,
+			int:   idx + 1,
 			app:   app.Sonarr,
 			cName: app.Name,
 			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,

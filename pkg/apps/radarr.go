@@ -53,6 +53,11 @@ type RadarrConfig struct {
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
+// Enabled returns true if the Radarr instance is enabled and usable.
+func (r *RadarrConfig) Enabled() bool {
+	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration > 0
+}
+
 func (a *Apps) setupRadarr() error {
 	for idx, app := range a.Radarr {
 		if app.Config == nil || app.Config.URL == "" {
