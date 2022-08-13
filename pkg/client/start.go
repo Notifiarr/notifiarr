@@ -82,15 +82,19 @@ func Start() error {
 	client := newDefaults()
 	client.Flags.ParseArgs(os.Args[1:])
 
+	//nolint:forbidigo,wrapcheck
 	switch {
+	case client.Flags.LongVerReq: // print version and exit.
+		_, err := fmt.Println(version.Print(client.Flags.Name()))
+		return err
 	case client.Flags.VerReq: // print version and exit.
-		fmt.Println(version.Print(client.Flags.Name())) //nolint:forbidigo
-		return nil
+		_, err := fmt.Println(client.Flags.Name() + " " + version.Version + "-" + version.Revision)
+		return err
 	case client.Flags.PSlist: // print process list and exit.
 		return printProcessList()
 	case client.Flags.Fortune: // print fortune and exit.
-		fmt.Println(Fortune()) //nolint:forbidigo
-		return nil
+		_, err := fmt.Println(Fortune())
+		return err
 	case client.Flags.Curl != "": // curl a URL and exit.
 		return curlURL(client.Flags.Curl, client.Flags.Headers)
 	default:
