@@ -242,3 +242,10 @@ func (s *Service) checkPING() *result {
 		output: "ping does not work yet",
 	}
 }
+
+func (s *Service) Due() bool {
+	s.svc.RLock()
+	defer s.svc.RUnlock()
+
+	return time.Since(s.svc.LastCheck) > s.Interval.Duration
+}

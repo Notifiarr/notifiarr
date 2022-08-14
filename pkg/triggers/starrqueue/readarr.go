@@ -1,78 +1,83 @@
 package starrqueue
 
 import (
-	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-const TrigReadarrQueue common.TriggerName = "Checking Readarr queue and sending incomplete items."
+const TrigReadarrQueue common.TriggerName = "Storing Readarr instance %d queue."
 
-// ReadarrStuckItems sends Readarr's stuck items to the website.
-func (a *Action) ReadarrStuckItems(event website.EventType) {
-	a.cmd.Exec(event, TrigReadarrQueue)
+type readarrApp struct {
+	app *apps.ReadarrConfig
+	cmd *cmd
+	idx int
 }
 
-func (c *cmd) setupReadarr() {
-	var ticker *time.Ticker
-
-	for _, app := range c.Apps.Readarr {
-		if app.StuckItem && app.URL != "" && app.APIKey != "" && app.Timeout.Duration >= 0 {
-			ticker = time.NewTicker(queueDuration + time.Duration(rand.Intn(randomSeconds))) //nolint:gosec
-			break
-		}
-	}
-
-	c.Add(&common.Action{
-		Name: TrigReadarrQueue,
-		Fn:   c.readarrStuckItems,
-		C:    make(chan website.EventType, 1),
-		T:    ticker,
-	})
-}
-
-func (c *cmd) readarrStuckItems(event website.EventType) {
-	start := time.Now()
-
-	if cue := c.getFinishedItemsReadarr(); !cue.Empty() {
-		c.SendData(&website.Request{
-			Route:      website.StuckRoute,
-			Event:      event,
-			LogPayload: true,
-			LogMsg: fmt.Sprintf("Readarr Queue: %d stuck items (elapsed:%s)",
-				cue.Len(), time.Since(start).Round(time.Millisecond)),
-			Payload: map[string]ItemList{"readarr": cue},
-		})
+// StoreReadarr fetches and stores the Readarr queue immediately for the specified instance.
+// Does not send data to the website.
+func (a *Action) StoreReadarr(event website.EventType, instance int) {
+	if name := TrigReadarrQueue.WithInstance(instance); !a.cmd.Exec(event, name) {
+		a.cmd.Errorf("Failed! %s Disbled?", name)
 	}
 }
 
-func (c *cmd) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
-	stuck := make(ItemList)
+// storeQueue runs at an interval and saves the queue for an app internally.
+func (app *readarrApp) storeQueue(event website.EventType) {
+	var err error
+	if app.cmd.readarr[app.idx], err = app.app.GetQueue(queueItemsMax, 1); err != nil {
+		app.cmd.Errorf("Getting Readarr Queue (instance %d): %v", app.idx+1, err)
+		return
+	}
+
+	for _, record := range app.cmd.readarr[app.idx].Records {
+		record.Quality = nil
+	}
+}
+
+func (c *cmd) setupReadarr() bool {
+	var enable bool
 
 	for idx, app := range c.Apps.Readarr {
+		if !app.Enabled() || !c.HaveClientInfo() {
+			continue
+		}
+
+		var ticker *time.Ticker
+
 		instance := idx + 1
 
-		if !app.StuckItem || app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+		switch {
+		case c.ClientInfo.Actions.Apps.Readarr.Finished(instance):
+			enable = true
+			ticker = time.NewTicker(finishedDuration)
+		case c.ClientInfo.Actions.Apps.Readarr.Stuck(instance):
+			enable = true
+			ticker = time.NewTicker(stuckDuration)
+		default:
 			continue
 		}
 
-		if app.Readarr == nil {
-			c.Errorf("Getting Readarr Queue (%d): Readarr config is nil? This is probably a bug.", instance)
-			continue
-		}
+		c.Add(&common.Action{
+			Hide: true,
+			Name: TrigReadarrQueue.WithInstance(instance),
+			Fn:   (&readarrApp{app: app, cmd: c, idx: idx}).storeQueue,
+			C:    make(chan website.EventType, 1),
+			T:    ticker,
+		})
+	}
 
-		start := time.Now()
+	return enable
+}
 
-		queue, err := app.GetQueue(queueItemsMax, queueItemsMax)
-		if err != nil {
-			c.Errorf("Getting Readarr Queue (%d): %v", instance, err)
-			continue
-		}
+func (c *cmd) getFinishedItemsReadarr() itemList {
+	stuck := make(itemList)
 
+	for idx, queue := range c.readarr {
+		instance := idx + 1
 		stuckapp := stuck[instance]
 
 		for _, item := range queue.Records {
@@ -81,12 +86,10 @@ func (c *cmd) getFinishedItemsReadarr() ItemList { //nolint:dupl,cyclop
 				continue
 			}
 
-			item.Quality = nil
 			stuckapp.Queue = append(stuckapp.Queue, item)
 		}
 
-		stuckapp.Name = app.Name
-		stuckapp.Elapsed = time.Since(start)
+		stuckapp.Name = c.Apps.Readarr[idx].Name // this should be safe.
 		stuck[instance] = stuckapp
 
 		c.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",

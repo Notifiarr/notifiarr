@@ -44,6 +44,11 @@ type ReadarrConfig struct {
 	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
+// Enabled returns true if the Readarr instance is enabled and usable.
+func (r *ReadarrConfig) Enabled() bool {
+	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration > 0
+}
+
 func (a *Apps) setupReadarr() error {
 	for idx, app := range a.Readarr {
 		if app.Config == nil || app.Config.URL == "" {

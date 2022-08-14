@@ -34,27 +34,9 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>{{index .Expvar.TimerCounts "Checking Lidarr queue and sending incomplete items."}}</td>
+                                            <td>{{index .Expvar.TimerCounts "Sending cached stuck items to website."}}</td>
                                             <td>
-                                                <a href="#triggers" onClick="triggerAction('stuckitems/lidarr')">Lidarr Stuck Queue Items Check</a></td><td>Checks all your Lidarr apps for stuck items and sends them if they exist.
-                                            </td>
-                                        </tr>
-                                          <tr>
-                                            <td>{{index .Expvar.TimerCounts "Checking Radarr queue and sending incomplete items."}}</td>
-                                            <td>
-                                                <a href="#triggers" onClick="triggerAction('stuckitems/radarr')">Radarr Stuck Queue Items Check</a></td><td>Checks all your Radarr apps for stuck items and sends them if they exist.
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{index .Expvar.TimerCounts "Checking Readarr queue and sending incomplete items."}}</td>
-                                            <td>
-                                                <a href="#triggers" onClick="triggerAction('stuckitems/readarr')">Readarr Stuck Queue Items Check</a></td><td>Checks all your Readarr apps for stuck items and sends them if they exist.
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{index .Expvar.TimerCounts "Checking Sonarr queue and sending incomplete items."}}</td>
-                                            <td>
-                                                <a href="#triggers" onClick="triggerAction('stuckitems/sonarr')">Sonarr Stuck Queue Items Check</a></td><td>Checks all your Sonarr apps for stuck items and sends them if they exist.
+                                                <a href="#triggers" onClick="triggerAction('stuckitems')">Send Stuck Queue Items</a></td><td>Sends cached stuck queue items to website.
                                             </td>
                                         </tr>
                                         <tr>

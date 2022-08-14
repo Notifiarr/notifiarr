@@ -46,10 +46,7 @@ func (c *Config) RunCheck(source website.EventType, name string) error {
 
 // runCheck runs a service check if it is due. Passing force runs it regardless.
 func (c *Config) runCheck(svc *Service, force bool) bool {
-	svc.svc.RLock()
-	defer svc.svc.RUnlock()
-
-	if force || svc.svc.LastCheck.Add(svc.Interval.Duration).Before(time.Now()) {
+	if force || svc.Due() {
 		c.checks <- svc
 		return <-c.done
 	}

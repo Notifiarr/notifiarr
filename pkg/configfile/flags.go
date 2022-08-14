@@ -16,6 +16,7 @@ import (
 type Flags struct {
 	*flag.FlagSet `json:"-"`
 	VerReq        bool     `json:"verReq"`
+	LongVerReq    bool     `json:"longVerReq"`
 	Restart       bool     `json:"restart"`
 	AptHook       bool     `json:"aptHook"`
 	Updated       bool     `json:"updated"`
@@ -39,7 +40,8 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringSliceVarP(&f.ExtraConf, "extraconfig", "e", nil, "This app supports multiple config files. "+
 		"Separate with commas, or pass -e more than once.")
 	f.StringVarP(&f.EnvPrefix, "prefix", "p", mnd.DefaultEnvPrefix, "Environment Variable Prefix.")
-	f.BoolVarP(&f.VerReq, "version", "v", false, "Print the version and exit.")
+	f.BoolVar(&f.LongVerReq, "version", false, "Print the long version and exit.")
+	f.BoolVarP(&f.VerReq, "v", "v", false, "Print the version and exit.")
 	f.BoolVar(&f.Fortune, "fortune", false, "Print a fortune and exit.")
 	f.StringVar(&f.Curl, "curl", "", "GET a URL and display headers and payload.")
 	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")

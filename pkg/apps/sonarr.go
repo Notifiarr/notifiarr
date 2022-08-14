@@ -53,6 +53,11 @@ type SonarrConfig struct {
 	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
+// Enabled returns true if the Sonarr instance is enabled and usable.
+func (s *SonarrConfig) Enabled() bool {
+	return s != nil && s.Config != nil && s.URL != "" && s.APIKey != "" && s.Timeout.Duration > 0
+}
+
 func (a *Apps) setupSonarr() error {
 	for idx, app := range a.Sonarr {
 		if app.Config == nil || app.Config.URL == "" {

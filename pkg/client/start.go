@@ -82,15 +82,19 @@ func Start() error {
 	client := newDefaults()
 	client.Flags.ParseArgs(os.Args[1:])
 
+	//nolint:forbidigo,wrapcheck
 	switch {
+	case client.Flags.LongVerReq: // print version and exit.
+		_, err := fmt.Println(version.Print(client.Flags.Name()))
+		return err
 	case client.Flags.VerReq: // print version and exit.
-		fmt.Println(version.Print(client.Flags.Name())) //nolint:forbidigo
-		return nil
+		_, err := fmt.Println(client.Flags.Name() + " " + version.Version + "-" + version.Revision)
+		return err
 	case client.Flags.PSlist: // print process list and exit.
 		return printProcessList()
 	case client.Flags.Fortune: // print fortune and exit.
-		fmt.Println(Fortune()) //nolint:forbidigo
-		return nil
+		_, err := fmt.Println(Fortune())
+		return err
 	case client.Flags.Curl != "": // curl a URL and exit.
 		return curlURL(client.Flags.Curl, client.Flags.Headers)
 	default:
@@ -195,65 +199,7 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 		c.Config.Snapshot.MyTop = clientInfo.Actions.Snapshot.MyTop
 	}
 
-	c.loadSiteAppsConfig(clientInfo)
-
 	return clientInfo
-}
-
-func (c *Client) loadSiteAppsConfig(clientInfo *website.ClientInfo) { //nolint:cyclop
-	for _, app := range clientInfo.Actions.Apps.Lidarr {
-		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Lidarr) {
-			c.ErrorfNoShare("Website provided configuration for missing Lidarr app: %d:%s", app.Instance, app.Name)
-			continue
-		}
-
-		c.Config.Apps.Lidarr[app.Instance-1].StuckItem = app.Stuck
-		c.Config.Apps.Lidarr[app.Instance-1].Corrupt = app.Corrupt
-		c.Config.Apps.Lidarr[app.Instance-1].Backup = app.Backup
-	}
-
-	for _, app := range clientInfo.Actions.Apps.Prowlarr {
-		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Prowlarr) {
-			c.ErrorfNoShare("Website provided configuration for missing Prowlarr app: %d:%s", app.Instance, app.Name)
-			continue
-		}
-
-		c.Config.Apps.Prowlarr[app.Instance-1].Corrupt = app.Corrupt
-		c.Config.Apps.Prowlarr[app.Instance-1].Backup = app.Backup
-	}
-
-	for _, app := range clientInfo.Actions.Apps.Radarr {
-		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Radarr) {
-			c.ErrorfNoShare("Website provided configuration for missing Radarr app: %d:%s", app.Instance, app.Name)
-			continue
-		}
-
-		c.Config.Apps.Radarr[app.Instance-1].StuckItem = app.Stuck
-		c.Config.Apps.Radarr[app.Instance-1].Corrupt = app.Corrupt
-		c.Config.Apps.Radarr[app.Instance-1].Backup = app.Backup
-	}
-
-	for _, app := range clientInfo.Actions.Apps.Readarr {
-		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Readarr) {
-			c.ErrorfNoShare("Website provided configuration for missing Readarr app: %d:%s", app.Instance, app.Name)
-			continue
-		}
-
-		c.Config.Apps.Readarr[app.Instance-1].StuckItem = app.Stuck
-		c.Config.Apps.Readarr[app.Instance-1].Corrupt = app.Corrupt
-		c.Config.Apps.Readarr[app.Instance-1].Backup = app.Backup
-	}
-
-	for _, app := range clientInfo.Actions.Apps.Sonarr {
-		if app.Instance < 1 || app.Instance > len(c.Config.Apps.Sonarr) {
-			c.ErrorfNoShare("Website provided configuration for missing Sonarr app: %d:%s", app.Instance, app.Name)
-			continue
-		}
-
-		c.Config.Apps.Sonarr[app.Instance-1].StuckItem = app.Stuck
-		c.Config.Apps.Sonarr[app.Instance-1].Corrupt = app.Corrupt
-		c.Config.Apps.Sonarr[app.Instance-1].Backup = app.Backup
-	}
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.

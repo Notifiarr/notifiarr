@@ -42,13 +42,15 @@ type Action struct {
 }
 
 // Exec runs a trigger. This is abastraction method used in a bunch of places.
-func (c *Config) Exec(event website.EventType, name TriggerName) {
+func (c *Config) Exec(event website.EventType, name TriggerName) bool {
 	trig := c.Get(name)
 	if c.stop == nil || trig == nil || trig.C == nil {
-		return
+		return false
 	}
 
 	trig.C <- event
+
+	return true
 }
 
 // Get a trigger by unique name. May return nil, and that could cause a panic.
@@ -85,6 +87,7 @@ func (c *Config) Stop(event website.EventType) {
 	c.stop = nil
 }
 
-func (c *Config) SetClientInfo(ci *website.ClientInfo) {
-	c.ClientInfo = ci
+// WithInstance returns a trigger name with an instance ID.
+func (name TriggerName) WithInstance(instance int) TriggerName {
+	return TriggerName(fmt.Sprintf(string(name), instance))
 }

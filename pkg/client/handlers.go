@@ -252,25 +252,8 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 
 		return http.StatusOK, "Plex sessions triggered."
 	case "stuckitems":
-		switch strings.ToLower(content) {
-		case starr.Lidarr.Lower():
-			c.triggers.StarrQueue.LidarrStuckItems(source)
-		case starr.Radarr.Lower():
-			c.triggers.StarrQueue.RadarrStuckItems(source)
-		case starr.Readarr.Lower():
-			c.triggers.StarrQueue.ReadarrStuckItems(source)
-		case starr.Sonarr.Lower():
-			c.triggers.StarrQueue.SonarrStuckItems(source)
-		default: // XXX: need to get rid of this path.
-			c.triggers.StarrQueue.LidarrStuckItems(source)
-			c.triggers.StarrQueue.RadarrStuckItems(source)
-			c.triggers.StarrQueue.ReadarrStuckItems(source)
-			c.triggers.StarrQueue.SonarrStuckItems(source)
-
-			return http.StatusOK, "Stuck Queue Items triggered for all Starr apps."
-		}
-
-		return http.StatusOK, "Stuck Queue Items triggered for " + title.String(content) + "."
+		c.triggers.StarrQueue.StuckItems(source)
+		return http.StatusOK, "Stuck Queue Items triggered."
 	case "dashboard":
 		c.triggers.Dashboard.Send(source)
 		return http.StatusOK, "Dashboard states triggered."
