@@ -194,10 +194,10 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 		}
 
 		prefix := "" // add auth to the url here. woo, hacky, but it works!
+
 		if !strings.Contains(app.Config.URL, "@") {
 			user := url.PathEscape(app.User) + ":" + url.PathEscape(app.Pass) + "@"
-			prefix = "http://" + user
-			if strings.HasPrefix(app.Config.URL, "https://") {
+			if prefix = "http://" + user; strings.HasPrefix(app.Config.URL, "https://") {
 				prefix = "https://" + user
 			}
 		}
