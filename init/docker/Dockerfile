@@ -3,22 +3,26 @@
 # https://github.com/golift/application-builder
 #
 
+FROM golang:1-buster as builder
+
+# Build speed magic! 
+# https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
+WORKDIR /src
+COPY go.mod go.sum .
+RUN go mod download
+COPY . .
+
+ARG BINARY=application-builder
 ARG BUILD_DATE=0
 ARG COMMIT=0
 ARG VERSION=unknown
-ARG BINARY=application-builder
-
-FROM golang:1-buster as builder
 ARG TARGETOS
 ARG BINARY
 ARG TARGETARCH
 ARG BUILD_FLAGS
-RUN mkdir -p $GOPATH/pkg/mod $GOPATH/bin $GOPATH/src /${BINARY}
-COPY . /${BINARY}
-WORKDIR /${BINARY}
 
 # For megacli. All the *'s are to deal with multiarch. :(
-RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 && \
+RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils && \
     curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
     mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
@@ -33,7 +37,9 @@ RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 && \
     ln -s /usr/lib /tmp/lib_link/lib
 
 # Build the app.
-RUN CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 FROM scratch
 ARG TARGETOS
@@ -47,7 +53,6 @@ ARG SOURCE_URL=http://github.com/golift/application-builder
 ARG DESC=application-builder
 ARG VENDOR=golift
 ARG AUTHOR=golift
-ARG CONFIG_FILE=config.conf
 
 # Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
@@ -63,7 +68,7 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.licenses="${LICENSE}" \
       org.opencontainers.image.version="${VERSION}"
 
-COPY --from=builder /${BINARY}/${BINARY}.${TARGETARCH}.${TARGETOS} /image
+COPY --from=builder /src/${BINARY}.${TARGETARCH}.${TARGETOS} /image
 
 # For megacli.
 COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /

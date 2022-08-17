@@ -32,7 +32,6 @@ read -r -d '' CMD << EOF
   --build-arg "AUTHOR=${MAINT}" \
   --build-arg "BINARY=${BINARY}" \
   --build-arg "SOURCE_URL=${SOURCE_URL}" \
-  --build-arg "CONFIG_FILE=${CONFIG_FILE}" \
   --file ${DOCKERFILE_PATH} .
 EOF
 
