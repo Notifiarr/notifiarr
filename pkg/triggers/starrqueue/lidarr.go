@@ -75,6 +75,10 @@ func (c *cmd) getFinishedItemsLidarr() itemList {
 	stuck := make(itemList)
 
 	for idx, queue := range c.lidarr {
+		if queue == nil {
+			continue
+		}
+
 		instance := idx + 1
 		stuckapp := stuck[instance]
 

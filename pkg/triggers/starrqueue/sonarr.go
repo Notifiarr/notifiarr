@@ -74,15 +74,18 @@ func (c *cmd) setupSonarr() bool {
 	return enable
 }
 
-func (c *cmd) getFinishedItemsSonarr() itemList {
+func (c *cmd) getFinishedItemsSonarr() itemList { //nolint:cyclop
 	stuck := make(itemList)
 
 	for idx, queue := range c.sonarr {
-		instance := idx + 1
+		if queue == nil {
+			continue
+		}
 
+		instance := idx + 1
+		stuckapp := stuck[instance]
 		// repeatStomper is used to collapse duplicate download IDs.
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
-		stuckapp := stuck[instance]
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
