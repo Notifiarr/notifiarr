@@ -77,6 +77,10 @@ func (c *cmd) getFinishedItemsReadarr() itemList {
 	stuck := make(itemList)
 
 	for idx, queue := range c.readarr {
+		if queue == nil {
+			continue
+		}
+
 		instance := idx + 1
 		stuckapp := stuck[instance]
 
