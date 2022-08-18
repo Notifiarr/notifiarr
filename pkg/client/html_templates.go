@@ -111,7 +111,8 @@ func (c *Client) getFuncMap() template.FuncMap {
 
 			return date.String()
 		},
-		"fortune": Fortune,
+		"todaysemoji": mnd.TodaysEmoji,
+		"fortune":     Fortune,
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
