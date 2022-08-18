@@ -15,12 +15,13 @@ const (
 func TodaysEmoji() string {
 	today := version.Started.YearDay()
 
-	if leapYear(version.Started.Year()) {
-		if today == leapDay {
-			today = altLeapDay
-		} else {
-			today--
-		}
+	switch year := version.Started.Year(); {
+	case !leapYear(year), today < leapDay:
+		break
+	case today == leapDay:
+		today = altLeapDay
+	default:
+		today--
 	}
 
 	if emoji, ok := specialDays[today]; ok {
@@ -59,5 +60,4 @@ var specialDays = map[int]string{ //nolint:gochecknoglobals
 	328:        "🦃", // November 24
 	359:        "🎄", // December 25
 	altLeapDay: "🤹", // February 29 (Leap Day)
-
 }
