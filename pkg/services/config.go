@@ -49,6 +49,7 @@ type Config struct {
 	triggerChan  chan website.EventType
 	checkChan    chan triggerCheck
 	stopLock     sync.Mutex
+	lastUpdate   time.Time // last time we sent service states to website.
 }
 
 // CheckType locks us into a few specific types of checks.

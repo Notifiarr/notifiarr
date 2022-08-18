@@ -21,7 +21,7 @@ const (
 	Bits32    = 32
 	Windows   = "windows"
 	Disabled  = "disabled"
-	HelpLink  = "GoLift Discord: https://golift.io/discord"
+	HelpLink  = "Notifiarr Discord: https://notifiarr.com/discord"
 	UserRepo  = "Notifiarr/notifiarr"
 	BugIssue  = "This is a bug please report it on github: https://github.com/" + UserRepo + "/issues/new"
 	DockerV   = "NOTIFIARR_IN_DOCKER"

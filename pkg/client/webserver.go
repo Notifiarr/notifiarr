@@ -16,9 +16,6 @@ import (
 	apachelog "github.com/lestrrat-go/apache-logformat"
 )
 
-// ErrNoServer returns when the server is already stopped and a stop req occurs.
-var ErrNoServer = fmt.Errorf("the web server is not running, cannot stop it")
-
 // StartWebServer starts the web server.
 func (c *Client) StartWebServer() {
 	c.Lock()
@@ -81,6 +78,8 @@ func (c *Client) runWebServer() {
 
 // StopWebServer stops the web servers. Panics if that causes an error or timeout.
 func (c *Client) StopWebServer() error {
+	c.Print("==> Stopping Web Server!")
+
 	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
 	defer cancel()
 
@@ -125,7 +124,7 @@ func (r *responseWrapper) Write(b []byte) (int, error) {
 func (r *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	hijack, ok := r.ResponseWriter.(http.Hijacker)
 	if !ok {
-		return nil, nil, ErrNoServer
+		panic("cannot hijack connection!")
 	}
 
 	conn, buf, err := hijack.Hijack()

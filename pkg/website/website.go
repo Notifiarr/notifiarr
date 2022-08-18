@@ -192,6 +192,11 @@ func readBodyForLog(body io.Reader, max int64) string {
 }
 
 func (s *Server) watchSendDataChan() {
+	defer func() {
+		defer s.config.CapturePanic()
+		s.config.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
+	}()
+
 	for data := range s.sendData {
 		switch resp, elapsed, err := s.sendRequest(data); {
 		case data.LogMsg == "":

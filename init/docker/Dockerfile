@@ -12,14 +12,9 @@ COPY go.mod go.sum .
 RUN go mod download
 COPY . .
 
-ARG BINARY=application-builder
-ARG BUILD_DATE=0
-ARG COMMIT=0
-ARG VERSION=unknown
 ARG TARGETOS
 ARG BINARY
 ARG TARGETARCH
-ARG BUILD_FLAGS
 
 # For megacli. All the *'s are to deal with multiarch. :(
 RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils && \
