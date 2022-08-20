@@ -1,6 +1,7 @@
 package services
 
 import (
+	"net/url"
 	"strings"
 
 	"golift.io/cnfg"
@@ -193,10 +194,11 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 		}
 
 		prefix := "" // add auth to the url here. woo, hacky, but it works!
+
 		if !strings.Contains(app.Config.URL, "@") {
-			prefix = "http://" + app.User + ":" + app.Pass + "@"
-			if strings.HasPrefix(app.Config.URL, "https://") {
-				prefix = "https://" + app.User + ":" + app.Pass + "@"
+			user := url.PathEscape(app.User) + ":" + url.PathEscape(app.Pass) + "@"
+			if prefix = "http://" + user; strings.HasPrefix(app.Config.URL, "https://") {
+				prefix = "https://" + user
 			}
 		}
 

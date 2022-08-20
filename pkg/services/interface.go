@@ -55,9 +55,9 @@ func (c *Config) runCheck(svc *Service, force bool) bool {
 }
 
 // runChecks runs checks that are due. Passing true, runs them even if they're not due.
-func (c *Config) runChecks(forceAll bool) {
+func (c *Config) runChecks(forceAll bool) bool {
 	if c.checks == nil || c.done == nil {
-		return
+		return false
 	}
 
 	count := 0
@@ -79,12 +79,14 @@ func (c *Config) runChecks(forceAll bool) {
 		somethingChanged = <-c.done || somethingChanged
 	}
 
-	if somethingChanged {
-		c.updateStatesOnSite()
-	}
+	return somethingChanged
 }
 
-func (c *Config) updateStatesOnSite() {
+func (c *Config) updateStatesOnSite(force bool) {
+	if !force && time.Since(c.lastUpdate) < time.Hour {
+		return
+	}
+
 	var (
 		err    error
 		values = make(map[string][]byte)
@@ -102,11 +104,15 @@ func (c *Config) updateStatesOnSite() {
 	}
 
 	if len(values) == 0 {
+		c.Printf("No service states to send updates to website? Weird.")
 		return
 	}
 
 	if err := c.Website.SetValues(values); err != nil {
-		c.Errorf("Setting Service States on Notifiarr.com: %v", err)
+		c.Errorf("Setting Service States on website: %v", err)
+	} else {
+		c.lastUpdate = time.Now()
+		c.Printf("==> Updated [internal] Service States on website.")
 	}
 }
 

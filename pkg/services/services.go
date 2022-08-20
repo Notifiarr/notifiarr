@@ -128,8 +128,10 @@ func (c *Config) loadServiceStates() {
 					break
 				}
 
-				if time.Since(svc.LastCheck) < time.Hour {
-					c.Debugf("Updated initial service state with website-saved data: %s, %s", name, svc.State)
+				if time.Since(svc.LastCheck) < 2*time.Hour {
+					c.Printf("==> Set service state with website-saved data: %s, %s for %s",
+						name, svc.State, time.Since(svc.Since).Round(time.Second))
+
 					c.services[name].svc.Output = svc.Output
 					c.services[name].svc.State = svc.State
 					c.services[name].svc.Since = svc.Since
@@ -177,10 +179,10 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 		case event := <-c.checkChan:
 			c.Debugf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
-			c.runCheck(event.Service, true)
+			c.updateStatesOnSite(c.runCheck(event.Service, true))
 		case event := <-c.triggerChan:
 			c.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(c.checks), cap(c.checks))
-			c.runChecks(true)
+			c.updateStatesOnSite(c.runChecks(true))
 
 			if event != "log" {
 				c.SendResults(&Results{What: event, Svcs: c.GetResults()})
@@ -195,7 +197,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 
 			c.Debug("Service Checks Payload (log only):", string(data))
 		case <-second.C:
-			c.runChecks(false)
+			c.updateStatesOnSite(c.runChecks(false))
 		}
 	}
 }
@@ -212,7 +214,7 @@ func (c *Config) Stop() {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
 
-	c.updateStatesOnSite()
+	c.updateStatesOnSite(true)
 
 	if c.stopChan == nil {
 		return

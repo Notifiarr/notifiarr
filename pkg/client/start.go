@@ -7,7 +7,6 @@ package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -24,6 +23,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/securecookie"
+	"github.com/hako/durafmt"
 	flag "github.com/spf13/pflag"
 	"golift.io/version"
 )
@@ -120,8 +120,9 @@ func (c *Client) start() error { //nolint:cyclop
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.Printf("%s v%s-%s Starting! [PID: %v] %v",
-		c.Flags.Name(), version.Version, version.Revision, os.Getpid(), time.Now())
+	c.Printf(" %s %s v%s-%s Starting! [PID: %v] %s",
+		mnd.TodaysEmoji(), c.Flags.Name(), version.Version, version.Revision, os.Getpid(),
+		version.Started.Format("Monday, January 2, 2006 @ 3:04:05 PM MST -0700"))
 	c.Printf("==> %s", msg)
 
 	c.printUpdateMessage()
@@ -245,6 +246,12 @@ func (c *Client) triggerConfigReload(event website.EventType, source string) {
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit() error {
+	defer func() {
+		defer c.CapturePanic()
+		//nolint:gomnd
+		c.Print(" ❌ Good bye! Uptime:", durafmt.Parse(time.Since(version.Started).Round(time.Second)).LimitFirstN(3))
+	}()
+
 	c.StartWebServer()
 	c.setSignals()
 
@@ -257,7 +264,7 @@ func (c *Client) Exit() error {
 			}
 		case sigc := <-c.sigkil:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
-			return c.exit()
+			return c.stop(website.EventSignal)
 		case sigc := <-c.sighup:
 			if err := c.checkReloadSignal(sigc); err != nil {
 				return err // reloadConfiguration()
@@ -266,40 +273,18 @@ func (c *Client) Exit() error {
 	}
 }
 
-// This is called from at least two different exit points.
-func (c *Client) exit() error {
-	if c.server == nil {
-		return nil
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
-	defer cancel()
-
-	if err := c.server.Shutdown(ctx); err != nil {
-		return fmt.Errorf("server shutdown failed: %w", err)
-	}
-
-	c.server = nil
-
-	return nil
-}
-
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(event website.EventType, source string) error {
 	c.Printf("==> Reloading Configuration (%s): %s", event, source)
-	c.closeDynamicTimerMenus()
-	c.triggers.Stop(event)
-	c.Config.Services.Stop()
-	c.website.Stop()
 
-	err := c.StopWebServer()
-	if err != nil && !errors.Is(err, ErrNoServer) {
+	err := c.stop(event)
+	if err != nil {
 		return fmt.Errorf("stoping web server: %w", err)
-	} else if err == nil {
-		defer c.StartWebServer()
 	}
+
+	defer c.StartWebServer()
 
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
@@ -314,11 +299,25 @@ func (c *Client) reloadConfiguration(event website.EventType, source string) err
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	clientInfo := c.configureServices()
 	c.setupMenus(clientInfo)
-	c.Print("==> Configuration Reloaded! Config File:", c.Flags.ConfigFile)
+	c.Print(" 🔄 Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
 	}
 
 	return nil
+}
+
+// stop is called from at least two different exit points and on reload.
+func (c *Client) stop(event website.EventType) error {
+	defer func() {
+		defer c.CapturePanic()
+		c.closeDynamicTimerMenus()
+		c.triggers.Stop(event)
+		c.Config.Services.Stop()
+		c.website.Stop()
+		c.Print("==> All systems powered down!")
+	}()
+
+	return c.StopWebServer()
 }

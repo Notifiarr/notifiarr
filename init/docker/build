@@ -5,6 +5,7 @@ pushd ../..
 
 source settings.sh
 
+docker buildx create --use
 
 if [ "v$VERSION" = "$SOURCE_BRANCH" ]; then
   TAGS="--tag ${DOCKER_REPO}:$VERSION"

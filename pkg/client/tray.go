@@ -48,7 +48,7 @@ func (c *Client) startTray(clientInfo *website.ClientInfo) {
 		}
 	}, func() {
 		// This code only fires from menu->quit.
-		if err := c.exit(); err != nil {
+		if err := c.stop(website.EventUser); err != nil {
 			c.Errorf("Server: %v", err)
 			os.Exit(1) // web server problem
 		}
