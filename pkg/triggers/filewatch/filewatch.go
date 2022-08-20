@@ -168,16 +168,14 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 
 //nolint:cyclop
 func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
-	defer func() {
-		defer c.CapturePanic()
-		ticker.Stop()
-		c.Printf("==> All file watchers stopped.")
-		close(c.stopWatcher) // signal we're done.
-	}()
+	limitChan, limitTicker := getLimiter()
+	defer c.closeWatcher(limitChan, limitTicker, ticker)
 
 	var died bool
 
 	for {
+		<-limitChan
+
 		idx, data, running := reflect.Select(cases)
 		item := tails[idx]
 
@@ -219,6 +217,42 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 			exp.FileWatcher.Add(item.Path+" Bytes", int64(len(line.Text)))
 		}
 	}
+}
+
+// closeWatcher is defered when the watcher dies.
+func (c *cmd) closeWatcher(limiter chan time.Time, tickers ...*time.Ticker) {
+	defer c.CapturePanic()
+
+	for _, ticker := range tickers {
+		ticker.Stop()
+	}
+
+	c.Printf("==> All file watchers stopped.")
+	close(limiter)
+	close(c.stopWatcher) // signal we're done.
+}
+
+// getLimiter returns a channel that limits requests to 1 per second, with a burst rate of 10.
+func getLimiter() (chan time.Time, *time.Ticker) {
+	const (
+		burstRate  = 10
+		requestPer = time.Second
+	)
+
+	limiter := time.NewTicker(requestPer)
+
+	burstyLimiter := make(chan time.Time, burstRate)
+	for i := 0; i < 3; i++ {
+		burstyLimiter <- time.Now()
+	}
+
+	go func() {
+		for t := range limiter.C {
+			burstyLimiter <- t
+		}
+	}()
+
+	return burstyLimiter, limiter
 }
 
 func (c *cmd) fileWatcherTicker(died bool) bool {
