@@ -24,7 +24,7 @@ func (c *Config) collectApps() []*Service {
 
 func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Lidarr {
-		if !app.Enabled() {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
@@ -51,7 +51,7 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Prowlarr {
-		if !app.Enabled() {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
@@ -78,7 +78,7 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Radarr {
-		if !app.Enabled() {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
@@ -105,7 +105,7 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Readarr {
-		if !app.Enabled() {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
@@ -132,7 +132,7 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Sonarr {
-		if !app.Enabled() {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
@@ -157,10 +157,11 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	return svcs
 }
 
-func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funlen,cyclop,gocognit
+//nolint:funlen,cyclop,gocognit,gocyclo // split this one up.
+func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 	// Deluge instanceapp.
 	for _, app := range c.Apps.Deluge {
-		if app.Timeout.Duration < 0 {
+		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -184,7 +185,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// NZBGet instances.
 	for _, app := range c.Apps.NZBGet {
-		if app.Timeout.Duration < 0 {
+		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -217,7 +218,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// Qbittorrent instanceapp.
 	for _, app := range c.Apps.Qbit {
-		if app.Timeout.Duration < 0 {
+		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -241,7 +242,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// rTorrent instanceapp.
 	for _, app := range c.Apps.Rtorrent {
-		if app.Timeout.Duration < 0 {
+		if app == nil || app.Name == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -265,7 +266,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 	// SabNBZd instanceapp.
 	for _, app := range c.Apps.SabNZB {
-		if app.Timeout.Duration < 0 {
+		if app == nil || app.Name == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -292,37 +293,36 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service { //nolint:funl
 
 func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 	// Tautulli instance (1).
-	if app := c.Apps.Tautulli; app != nil && app.URL != "" && app.Name != "" {
-		if app.Timeout.Duration < 0 {
-			return svcs
-		}
-
-		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
-		}
-
-		svcs = append(svcs, &Service{
-			Name:     app.Name,
-			Type:     CheckHTTP,
-			Value:    app.URL + "/api/v2?cmd=status&apikey=" + app.APIKey,
-			Expect:   "200",
-			Timeout:  app.Timeout,
-			Interval: interval,
-			validSSL: app.VerifySSL,
-		})
+	app := c.Apps.Tautulli
+	if app == nil || app.URL == "" || app.Name == "" || app.Timeout.Duration < 0 {
+		return svcs
 	}
+
+	interval := app.Interval
+	if interval.Duration == 0 {
+		interval.Duration = DefaultCheckInterval
+	}
+
+	svcs = append(svcs, &Service{
+		Name:     app.Name,
+		Type:     CheckHTTP,
+		Value:    app.URL + "/api/v2?cmd=status&apikey=" + app.APIKey,
+		Expect:   "200",
+		Timeout:  app.Timeout,
+		Interval: interval,
+		validSSL: app.VerifySSL,
+	})
 
 	return svcs
 }
 
-func (c *Config) collectMySQLApps(svcs []*Service) []*Service {
+func (c *Config) collectMySQLApps(svcs []*Service) []*Service { //nolint:cyclop
 	if c.Plugins == nil {
 		return svcs
 	}
 
 	for _, plugin := range c.Plugins.MySQL {
-		if plugin.Timeout.Duration < 0 {
+		if plugin.Host == "" || plugin.Timeout.Duration < 0 {
 			continue
 		} else if plugin.Timeout.Duration == 0 {
 			plugin.Timeout.Duration = DefaultTimeout

@@ -83,7 +83,7 @@ func (c *Config) runChecks(forceAll bool) bool {
 }
 
 func (c *Config) updateStatesOnSite(force bool) {
-	if !force && time.Since(c.lastUpdate) < time.Hour {
+	if !force && time.Since(c.lastUpdate) < time.Hour || len(c.services) == 0 {
 		return
 	}
 
@@ -104,7 +104,6 @@ func (c *Config) updateStatesOnSite(force bool) {
 	}
 
 	if len(values) == 0 {
-		c.Printf("No service states to send updates to website? Weird.")
 		return
 	}
 

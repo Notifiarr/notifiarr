@@ -20,6 +20,7 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
+	"golift.io/version"
 )
 
 // Logger provides some methods with baked in assumptions.
@@ -165,7 +166,8 @@ func (l *Logger) CapturePanic() {
 	if r := recover(); r != nil {
 		ui.ShowConsoleWindow()
 		l.ErrorLog.Output(callDepth, //nolint:errcheck
-			fmt.Sprintf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack())))
+			fmt.Sprintf("Go Panic! %s\n%s-%s %s %v\n%s", mnd.BugIssue,
+				version.Version, version.Revision, version.Branch, r, string(debug.Stack())))
 		panic(r)
 	}
 }
