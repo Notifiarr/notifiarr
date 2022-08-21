@@ -14,16 +14,17 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/nxadm/tail"
+	"github.com/nxadm/tail/ratelimiter"
 )
 
 var ErrInvalidRegexp = fmt.Errorf("invalid regexp")
 
 const (
-	maxRetries    = 6
-	retryInterval = 10 * time.Second
-	specialCase   = 2           // We have two special channels in our select cases.
-	burstRate     = 10          // burst to this many 'matches' before throttling.
-	requestPer    = time.Second // 1 request per this time period allowed + burst rate.
+	maxRetries    = 6                                  // how many times to retry watching a file.
+	retryInterval = 10 * time.Second                   // how often channels are checked for being closed.
+	specialCase   = 2                                  // We have two special channels in our select cases.
+	burstRate     = 6                                  // burst to this many 'matches' before throttling.
+	requestPer    = time.Second + 500*time.Millisecond // 1 request per this time period allowed + burst rate.
 )
 
 type cmd struct {
@@ -128,6 +129,7 @@ func (w *WatchFile) setup(logger *log.Logger) error {
 		CompleteLines: true,
 		Location:      &tail.SeekInfo{Whence: io.SeekEnd},
 		Logger:        logger,
+		RateLimiter:   ratelimiter.NewLeakyBucket(burstRate, requestPer),
 	})
 	if err != nil {
 		exp.FileWatcher.Add(w.Path+" Errors", 1)
@@ -171,15 +173,16 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 }
 
 func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
-	closeLimiter := make(chan struct{})
-	defer c.closeWatcher(closeLimiter, ticker)
-	limitCh := getLimiter(closeLimiter)
+	defer func() {
+		defer c.CapturePanic()
+		ticker.Stop()
+		c.Printf("==> All file watchers stopped.")
+		close(c.stopWatcher) // signal we're done.
+	}()
 
 	var died bool
 
 	for {
-		<-limitCh
-
 		idx, data, running := reflect.Select(cases)
 		item := tails[idx]
 
@@ -211,16 +214,6 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 	}
 }
 
-// closeWatcher is defered when the watcher dies.
-func (c *cmd) closeWatcher(closeLimiter chan struct{}, ticker *time.Ticker) {
-	defer c.CapturePanic()
-	closeLimiter <- struct{}{}
-	<-closeLimiter // wait for it to close.
-	ticker.Stop()
-	c.Printf("==> All file watchers stopped.")
-	close(c.stopWatcher) // signal we're done.
-}
-
 // killWatcher runs the Stop method on the tail.
 // If that returns an error, it means it died.
 // If that does not return an error, it means Stop was already called.
@@ -237,35 +230,7 @@ func (c *cmd) killWatcher(item *WatchFile) bool {
 	return false
 }
 
-// getLimiter returns a channel that limits requests to 1 per second, with a burst rate of 10.
-func getLimiter(done chan struct{}) chan time.Time {
-	limitTicker := time.NewTicker(requestPer)
-	limitCh := make(chan time.Time, burstRate)
-
-	for i := 0; i < burstRate; i++ {
-		limitCh <- time.Now()
-	}
-
-	go func() {
-		defer func() {
-			limitTicker.Stop()
-			close(limitCh)
-			close(done)
-		}()
-
-		for {
-			select {
-			case <-done:
-				return
-			case t := <-limitTicker.C:
-				limitCh <- t
-			}
-		}
-	}()
-
-	return limitCh
-}
-
+// fileWatcherTicker checks if a file watcher died and needs to be restarted.
 func (c *cmd) fileWatcherTicker(died bool) bool {
 	if !died {
 		return false
