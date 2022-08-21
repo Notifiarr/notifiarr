@@ -300,7 +300,7 @@ func (c *Client) reloadConfiguration(event website.EventType, source string) err
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	clientInfo := c.configureServices()
 	c.setupMenus(clientInfo)
-	c.Print(" 🔄 Configuration Reloaded! Config File:", c.Flags.ConfigFile)
+	c.Print(" 🌀 Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
