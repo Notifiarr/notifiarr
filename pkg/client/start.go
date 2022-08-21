@@ -195,6 +195,7 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 		c.Config.Snapshot.DriveData = clientInfo.Actions.Snapshot.DriveData
 		c.Config.Snapshot.DiskUsage = clientInfo.Actions.Snapshot.DiskUsage
 		c.Config.Snapshot.AllDrives = clientInfo.Actions.Snapshot.AllDrives
+		c.Config.Snapshot.Quotas = clientInfo.Actions.Snapshot.Quotas
 		c.Config.Snapshot.IOTop = clientInfo.Actions.Snapshot.IOTop
 		c.Config.Snapshot.PSTop = clientInfo.Actions.Snapshot.PSTop
 		c.Config.Snapshot.MyTop = clientInfo.Actions.Snapshot.MyTop

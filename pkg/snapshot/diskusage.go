@@ -55,6 +55,42 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 	return errs
 }
 
+func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
+	if !run {
+		return nil
+	}
+
+	cmd, stdout, waitg, err := readyCommand(ctx, false, "quota")
+	if err != nil {
+		return err
+	}
+
+	s.Quotas = make(map[string]*Partition)
+
+	go func() {
+		for stdout.Scan() {
+			fields := strings.Fields(stdout.Text())
+
+			if len(fields) < 4 || fields[0][0] != '/' { // partitions tend to start with a slash.
+				continue
+			}
+
+			disk := fields[0]
+			space, _ := strconv.Atoi(fields[1])
+			quota, _ := strconv.Atoi(fields[2])
+			s.Quotas[disk] = &Partition{
+				Device: disk,
+				Total:  uint64(quota),
+				Free:   uint64(quota - space),
+				Used:   uint64(space),
+			}
+		}
+		waitg.Done()
+	}()
+
+	return runCommand(cmd, waitg)
+}
+
 // Does not work on windows at all. Linux and Solaris only.
 func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 	if len(pools) == 0 {
