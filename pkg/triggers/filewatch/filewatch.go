@@ -21,6 +21,9 @@ var ErrInvalidRegexp = fmt.Errorf("invalid regexp")
 const (
 	maxRetries    = 6
 	retryInterval = 10 * time.Second
+	specialCase   = 2           // We have two special channels in our select cases.
+	burstRate     = 10          // burst to this many 'matches' before throttling.
+	requestPer    = time.Second // 1 request per this time period allowed + burst rate.
 )
 
 type cmd struct {
@@ -144,6 +147,7 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 	cases := make([]reflect.SelectCase, len(tails))
 
 	for idx, item := range tails {
+		// If you add more special cases here, increment specialCase.
 		if idx == 0 { // 0 is skipped (see above), and used as an internal I/O channel
 			cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(c.addWatcher)}
 			continue
@@ -166,40 +170,28 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 	return cases, ticker
 }
 
-//nolint:cyclop
 func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
-	limitChan, limitTicker := getLimiter()
-	defer c.closeWatcher(limitChan, limitTicker, ticker)
+	closeLimiter := make(chan struct{})
+	defer c.closeWatcher(closeLimiter, ticker)
+	limitCh := getLimiter(closeLimiter)
 
 	var died bool
 
 	for {
-		<-limitChan
+		<-limitCh
 
 		idx, data, running := reflect.Select(cases)
 		item := tails[idx]
 
 		switch {
 		case !running && idx == 0:
-			return // main channel closed, bail out.
+			if len(cases) <= specialCase {
+				return // all channels are now closed, bail out.
+			}
 		case !running:
 			tails = append(tails[:idx], tails[idx+1:]...) // The channel was closed? okay, remove it.
 			cases = append(cases[:idx], cases[idx+1:]...)
-
-			// This routines runs the Stop method on the tail.
-			// If that returns an error, it means it died.
-			// If that does not return an error, it means Stop was already called.
-			if err := item.deactivate(); err != nil {
-				c.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
-				exp.FileWatcher.Add(item.Path+" Errors", 1)
-				died = true //nolint:wsl
-			} else {
-				c.Printf("==> No longer watching file (channel closed): %s", item.Path)
-			}
-
-			if len(cases) < 1 {
-				return
-			}
+			died = c.killWatcher(item)
 		case idx == 1:
 			died = c.fileWatcherTicker(died)
 		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
@@ -220,39 +212,58 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 }
 
 // closeWatcher is defered when the watcher dies.
-func (c *cmd) closeWatcher(limiter chan time.Time, tickers ...*time.Ticker) {
+func (c *cmd) closeWatcher(closeLimiter chan struct{}, ticker *time.Ticker) {
 	defer c.CapturePanic()
-
-	for _, ticker := range tickers {
-		ticker.Stop()
-	}
-
+	closeLimiter <- struct{}{}
+	<-closeLimiter // wait for it to close.
+	ticker.Stop()
 	c.Printf("==> All file watchers stopped.")
-	close(limiter)
 	close(c.stopWatcher) // signal we're done.
 }
 
+// killWatcher runs the Stop method on the tail.
+// If that returns an error, it means it died.
+// If that does not return an error, it means Stop was already called.
+func (c *cmd) killWatcher(item *WatchFile) bool {
+	if err := item.deactivate(); err != nil {
+		c.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
+		exp.FileWatcher.Add(item.Path+" Errors", 1)
+
+		return true
+	}
+
+	c.Printf("==> No longer watching file (channel closed): %s", item.Path)
+
+	return false
+}
+
 // getLimiter returns a channel that limits requests to 1 per second, with a burst rate of 10.
-func getLimiter() (chan time.Time, *time.Ticker) {
-	const (
-		burstRate  = 10
-		requestPer = time.Second
-	)
+func getLimiter(done chan struct{}) chan time.Time {
+	limitTicker := time.NewTicker(requestPer)
+	limitCh := make(chan time.Time, burstRate)
 
-	limiter := time.NewTicker(requestPer)
-
-	burstyLimiter := make(chan time.Time, burstRate)
-	for i := 0; i < 3; i++ {
-		burstyLimiter <- time.Now()
+	for i := 0; i < burstRate; i++ {
+		limitCh <- time.Now()
 	}
 
 	go func() {
-		for t := range limiter.C {
-			burstyLimiter <- t
+		defer func() {
+			limitTicker.Stop()
+			close(limitCh)
+			close(done)
+		}()
+
+		for {
+			select {
+			case <-done:
+				return
+			case t := <-limitTicker.C:
+				limitCh <- t
+			}
 		}
 	}()
 
-	return burstyLimiter, limiter
+	return limitCh
 }
 
 func (c *cmd) fileWatcherTicker(died bool) bool {
