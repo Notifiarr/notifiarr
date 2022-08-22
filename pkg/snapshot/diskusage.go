@@ -60,7 +60,7 @@ func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
 		return nil
 	}
 
-	cmd, stdout, waitg, err := readyCommand(ctx, false, "quota")
+	cmd, stdout, waitg, err := readyCommand(ctx, false, "quota", "--no-wrap", "--show-mntpoint", "--human-readable")
 	if err != nil {
 		return err
 	}
@@ -70,16 +70,16 @@ func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
 	go func() {
 		for stdout.Scan() {
 			fields := strings.Fields(stdout.Text())
-
 			if len(fields) < 4 || fields[0][0] != '/' { // partitions tend to start with a slash.
 				continue
 			}
 
-			disk := fields[0]
-			space, _ := strconv.Atoi(fields[1])
-			quota, _ := strconv.Atoi(fields[2])
-			s.Quotas[disk] = &Partition{
-				Device: disk,
+			// 	Filesystem                    mount space   quota     limit           grace  files   quota   limit   grace
+			// /dev/mapper/ubuntu--vg-ubuntu--lv /  95216K  10485760K 11534336K       0      1k      0k      0k       0
+			space := getQuotaSize(fields[2])
+			quota := getQuotaSize(fields[3])
+			s.Quotas[fields[0]] = &Partition{
+				Device: fields[1],
 				Total:  uint64(quota),
 				Free:   uint64(quota - space),
 				Used:   uint64(space),
@@ -88,7 +88,28 @@ func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
 		waitg.Done()
 	}()
 
-	return runCommand(cmd, waitg)
+	if err := runCommand(cmd, waitg); err != nil {
+		return fmt.Errorf("PLEASE REPORT THIS ERROR: %w", err)
+	}
+
+	return nil
+}
+
+func getQuotaSize(line string) int {
+	size, _ := strconv.Atoi(strings.TrimRight(line, "KMGT"))
+
+	switch line[len(line)-1] {
+	case 'K':
+		return size * mnd.Kilobyte
+	case 'M':
+		return size * mnd.Megabyte
+	case 'G':
+		return size * mnd.Megabyte * mnd.Kilobyte
+	case 'T':
+		return size * mnd.Megabyte * mnd.Megabyte
+	default:
+		return size
+	}
 }
 
 // Does not work on windows at all. Linux and Solaris only.
