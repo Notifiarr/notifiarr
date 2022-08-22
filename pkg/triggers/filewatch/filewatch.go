@@ -3,7 +3,6 @@ package filewatch
 import (
 	"fmt"
 	"io"
-	"log"
 	"reflect"
 	"regexp"
 	"strings"
@@ -33,6 +32,7 @@ type cmd struct {
 	stopWatcher chan struct{}
 	awMutex     sync.RWMutex
 	files       []*WatchFile
+	limiter     *ratelimiter.LeakyBucket
 }
 
 // Action contains the exported methods for this package.
@@ -67,8 +67,9 @@ type Match struct {
 func New(config *common.Config, files []*WatchFile) *Action {
 	return &Action{
 		cmd: &cmd{
-			Config: config,
-			files:  files,
+			Config:  config,
+			files:   files,
+			limiter: ratelimiter.NewLeakyBucket(burstRate, requestPer),
 		},
 	}
 }
@@ -93,7 +94,7 @@ func (c *cmd) run() {
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
 	for _, item := range c.files {
-		if err := item.setup(c.Logger.GetInfoLog()); err != nil {
+		if err := item.setup(&logger{Logger: c.Config.Logger}); err != nil {
 			c.Errorf("Unable to watch file %v", err)
 			continue
 		}
@@ -107,7 +108,7 @@ func (c *cmd) run() {
 	}
 }
 
-func (w *WatchFile) setup(logger *log.Logger) error {
+func (w *WatchFile) setup(logger *logger) error {
 	var err error
 
 	w.retries = maxRetries // so it will not get "restarted" unless it passes validation.
@@ -129,7 +130,6 @@ func (w *WatchFile) setup(logger *log.Logger) error {
 		CompleteLines: true,
 		Location:      &tail.SeekInfo{Whence: io.SeekEnd},
 		Logger:        logger,
-		RateLimiter:   ratelimiter.NewLeakyBucket(burstRate, requestPer),
 	})
 	if err != nil {
 		exp.FileWatcher.Add(w.Path+" Errors", 1)
@@ -283,6 +283,11 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		Matches: tail.re.FindAllString(line.Text, -1),
 	}
 
+	if !c.limiter.Pour(1) {
+		exp.FileWatcher.Add(tail.Path+" Dropped", 1)
+		return // rate limited.
+	}
+
 	c.SendData(&website.Request{
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
@@ -304,7 +309,7 @@ func (c *cmd) addFileWatcher(file *WatchFile) error {
 		return common.ErrNoChannel
 	}
 
-	if err := file.setup(c.Logger.GetInfoLog()); err != nil {
+	if err := file.setup(&logger{Logger: c.Config.Logger}); err != nil {
 		return err
 	}
 
