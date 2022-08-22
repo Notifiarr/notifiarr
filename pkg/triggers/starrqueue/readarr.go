@@ -6,7 +6,9 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golift.io/starr/readarr"
 )
 
 const TrigReadarrQueue common.TriggerName = "Storing Readarr instance %d queue."
@@ -27,15 +29,17 @@ func (a *Action) StoreReadarr(event website.EventType, instance int) {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *readarrApp) storeQueue(event website.EventType) {
-	var err error
-	if app.cmd.readarr[app.idx], err = app.app.GetQueue(queueItemsMax, 1); err != nil {
+	queue, err := app.app.GetQueue(queueItemsMax, 1)
+	if err != nil {
 		app.cmd.Errorf("Getting Readarr Queue (instance %d): %v", app.idx+1, err)
 		return
 	}
 
-	for _, record := range app.cmd.readarr[app.idx].Records {
+	for _, record := range queue.Records {
 		record.Quality = nil
 	}
+
+	data.SaveWithID("readarr", app.idx, queue)
 }
 
 func (c *cmd) setupReadarr() bool {
@@ -73,14 +77,20 @@ func (c *cmd) setupReadarr() bool {
 	return enable
 }
 
-func (c *cmd) getFinishedItemsReadarr() itemList {
+func (c *cmd) getFinishedItemsReadarr() itemList { //nolint:cyclop
 	stuck := make(itemList)
 
-	for idx, queue := range c.readarr {
-		if queue == nil {
+	for idx, app := range c.Apps.Readarr {
+		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Readarr.Stuck(idx+1) {
 			continue
 		}
 
+		item := data.GetWithID("readarr", idx)
+		if item == nil || item.Data == nil {
+			continue
+		}
+
+		queue, _ := item.Data.(*readarr.Queue)
 		instance := idx + 1
 		stuckapp := stuck[instance]
 

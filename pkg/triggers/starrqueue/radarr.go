@@ -6,7 +6,9 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golift.io/starr/radarr"
 )
 
 const TrigRadarrQueue common.TriggerName = "Storing Radarr instance %d queue."
@@ -27,17 +29,19 @@ type radarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *radarrApp) storeQueue(event website.EventType) {
-	var err error
-	if app.cmd.radarr[app.idx], err = app.app.GetQueue(queueItemsMax, 1); err != nil {
+	queue, err := app.app.GetQueue(queueItemsMax, 1)
+	if err != nil {
 		app.cmd.Errorf("Getting Radarr Queue (instance %d): %v", app.idx+1, err)
 		return
 	}
 
-	for _, item := range app.cmd.radarr[app.idx].Records {
+	for _, item := range queue.Records {
 		item.Quality = nil
 		item.CustomFormats = nil
 		item.Languages = nil
 	}
+
+	data.SaveWithID("radarr", app.idx, queue)
 }
 
 func (c *cmd) setupRadarr() bool {
@@ -73,14 +77,20 @@ func (c *cmd) setupRadarr() bool {
 	return enabled
 }
 
-func (c *cmd) getFinishedItemsRadarr() itemList {
+func (c *cmd) getFinishedItemsRadarr() itemList { //nolint:cyclop
 	stuck := make(itemList)
 
-	for idx, queue := range c.radarr {
-		if queue == nil {
+	for idx, app := range c.Apps.Radarr {
+		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Radarr.Stuck(idx+1) {
 			continue
 		}
 
+		item := data.GetWithID("radarr", idx)
+		if item == nil || item.Data == nil {
+			continue
+		}
+
+		queue, _ := item.Data.(*radarr.Queue)
 		instance := idx + 1
 		stuckapp := stuck[instance]
 

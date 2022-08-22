@@ -3,11 +3,10 @@ package dashboard
 import (
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
@@ -92,16 +91,16 @@ type State struct {
 
 // States is our compiled states for the dashboard.
 type States struct {
-	Lidarr   []*State       `json:"lidarr"`
-	Radarr   []*State       `json:"radarr"`
-	Readarr  []*State       `json:"readarr"`
-	Sonarr   []*State       `json:"sonarr"`
-	NZBGet   []*State       `json:"nzbget"`
-	RTorrent []*State       `json:"rtorrent"`
-	Qbit     []*State       `json:"qbit"`
-	Deluge   []*State       `json:"deluge"`
-	SabNZB   []*State       `json:"sabnzbd"`
-	Plex     *plex.Sessions `json:"plexSessions"`
+	Lidarr   []*State `json:"lidarr"`
+	Radarr   []*State `json:"radarr"`
+	Readarr  []*State `json:"readarr"`
+	Sonarr   []*State `json:"sonarr"`
+	NZBGet   []*State `json:"nzbget"`
+	RTorrent []*State `json:"rtorrent"`
+	Qbit     []*State `json:"qbit"`
+	Deluge   []*State `json:"deluge"`
+	SabNZB   []*State `json:"sabnzbd"`
+	Plex     any      `json:"plexSessions"`
 }
 
 // New configures the library.
@@ -128,8 +127,7 @@ func (c *Cmd) create() {
 	if ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
 		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration + randomTime)
-		c.Printf("==> Dashboard State timer started, interval:%s, serial:%v",
-			ci.Actions.Dashboard.Interval, c.Config.Serial)
+		c.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
 	}
 
 	c.Add(&common.Action{
@@ -146,17 +144,13 @@ func (a *Action) Send(event website.EventType) {
 }
 
 func (c *Cmd) sendDashboardState(event website.EventType) {
-	cmd := c.getStatesParallel
-	if c.Serial {
-		cmd = c.getStatesSerial
-	}
-
 	var (
 		start  = time.Now()
-		states = cmd()
+		states = c.getStates()
 		apps   = time.Since(start).Round(time.Millisecond)
 	)
 
+	data.Save("dashboard", states)
 	c.SendData(&website.Request{
 		Route:      website.DashRoute,
 		Event:      event,
@@ -166,9 +160,9 @@ func (c *Cmd) sendDashboardState(event website.EventType) {
 	})
 }
 
-// getStatesSerial grabs data for each app serially.
-func (c *Cmd) getStatesSerial() *States {
-	sessions, _ := c.PlexCron.GetSessions(false)
+// getStates grabs data for each app.
+func (c *Cmd) getStates() *States {
+	sessions, _ := c.PlexCron.GetSessions()
 
 	return &States{
 		Deluge:   c.getDelugeStates(),
@@ -182,69 +176,6 @@ func (c *Cmd) getStatesSerial() *States {
 		SabNZB:   c.getSabNZBStates(),
 		Plex:     sessions,
 	}
-}
-
-// getStatesParallel fires a routine for each app type and tries to get a lot of data fast!
-func (c *Cmd) getStatesParallel() *States { //nolint:funlen
-	states := &States{}
-
-	var wg sync.WaitGroup
-
-	wg.Add(10) //nolint:gomnd // we are polling 10 apps.
-
-	go func() {
-		defer c.CapturePanic()
-		states.Deluge = c.getDelugeStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.Lidarr = c.getLidarrStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.NZBGet = c.getNZBGetStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.RTorrent = c.getRtorrentStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.Qbit = c.getQbitStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.Radarr = c.getRadarrStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.Readarr = c.getReadarrStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.Sonarr = c.getSonarrStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.SabNZB = c.getSabNZBStates()
-		wg.Done() //nolint:wsl
-	}()
-	go func() {
-		defer c.CapturePanic()
-		states.Plex, _ = c.PlexCron.GetSessions(false)
-		wg.Done() //nolint:wsl
-	}()
-	wg.Wait()
-
-	return states
 }
 
 type dateSorter []*Sortable

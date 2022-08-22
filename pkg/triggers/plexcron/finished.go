@@ -3,6 +3,7 @@ package plexcron
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -13,7 +14,7 @@ import (
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
 func (c *cmd) checkForFinishedItems(website.EventType) {
-	sessions, err := c.getSessions(false)
+	sessions, err := c.getSessions(time.Second)
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
 		return

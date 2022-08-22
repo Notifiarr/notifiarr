@@ -6,10 +6,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"golift.io/starr/lidarr"
-	"golift.io/starr/radarr"
-	"golift.io/starr/readarr"
-	"golift.io/starr/sonarr"
 )
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
@@ -21,10 +17,6 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
-	lidarr  map[int]*lidarr.Queue
-	radarr  map[int]*radarr.Queue
-	readarr map[int]*readarr.Queue
-	sonarr  map[int]*sonarr.Queue
 }
 
 const (
@@ -51,11 +43,7 @@ func New(config *common.Config) *Action {
 }
 
 // Run initializes the library.
-func (a *Action) Run() {
-	a.cmd.lidarr = make(map[int]*lidarr.Queue)
-	a.cmd.radarr = make(map[int]*radarr.Queue)
-	a.cmd.readarr = make(map[int]*readarr.Queue)
-	a.cmd.sonarr = make(map[int]*sonarr.Queue)
+func (a *Action) Create() {
 	lidarr := a.cmd.setupLidarr()
 	radarr := a.cmd.setupRadarr()
 	readarr := a.cmd.setupReadarr()
@@ -69,50 +57,6 @@ func (a *Action) Run() {
 			T:    time.NewTicker(stuckDuration),
 		})
 	}
-}
-
-// Stop just frees up memory. The are no routines to stop.
-func (a *Action) Stop() {
-	for idx := range a.cmd.lidarr {
-		for i := range a.cmd.lidarr[idx].Records {
-			a.cmd.lidarr[idx].Records[i] = nil
-		}
-
-		a.cmd.lidarr[idx] = nil
-		delete(a.cmd.lidarr, idx)
-	}
-
-	for idx := range a.cmd.radarr {
-		for i := range a.cmd.radarr[idx].Records {
-			a.cmd.radarr[idx].Records[i] = nil
-		}
-
-		a.cmd.radarr[idx] = nil
-		delete(a.cmd.radarr, idx)
-	}
-
-	for idx := range a.cmd.readarr {
-		for i := range a.cmd.readarr[idx].Records {
-			a.cmd.readarr[idx].Records[i] = nil
-		}
-
-		a.cmd.readarr[idx] = nil
-		delete(a.cmd.readarr, idx)
-	}
-
-	for idx := range a.cmd.sonarr {
-		for i := range a.cmd.sonarr[idx].Records {
-			a.cmd.sonarr[idx].Records[i] = nil
-		}
-
-		a.cmd.sonarr[idx] = nil
-		delete(a.cmd.sonarr, idx)
-	}
-
-	a.cmd.lidarr = nil
-	a.cmd.radarr = nil
-	a.cmd.readarr = nil
-	a.cmd.sonarr = nil
 }
 
 // StuckItems sends the stuck queues items for all apps.

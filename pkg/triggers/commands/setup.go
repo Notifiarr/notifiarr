@@ -28,7 +28,7 @@ type cmd struct {
 	cmdlist []*Command
 }
 
-// Command container the input data for a defined command.
+// Command contains the input data for a defined command.
 // It also contains some saved data about the command being run.
 type Command struct {
 	Name    string        `json:"name" toml:"name" xml:"name" yaml:"name"`
