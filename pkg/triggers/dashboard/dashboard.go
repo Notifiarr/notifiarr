@@ -162,11 +162,7 @@ func (c *Cmd) sendDashboardState(event website.EventType) {
 
 // getStates grabs data for each app.
 func (c *Cmd) getStates() *States {
-	var sessions any
-
-	if item := data.Get("plexCurrentSessions"); item != nil {
-		sessions = item.Data
-	}
+	sessions, _ := c.PlexCron.GetSessions()
 
 	return &States{
 		Deluge:   c.getDelugeStates(),

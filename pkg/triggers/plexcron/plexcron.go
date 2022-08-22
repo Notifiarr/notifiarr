@@ -109,7 +109,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 		time.Sleep(c.ClientInfo.Actions.Plex.Delay.Duration)
 
 		var err error
-		if sessions, err = c.getSessions(time.Now()); err != nil {
+		if sessions, err = c.getSessions(time.Second); err != nil {
 			c.Errorf("Getting Plex sessions: %v", err)
 		}
 	}
@@ -121,6 +121,11 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 		LogMsg:     "Plex Webhook (and sessions)",
 		LogPayload: true,
 	})
+}
+
+// GetSessions returns the plex sessions up to 1 minute old. This uses a channel so concurrent requests are avoided.
+func (a *Action) GetSessions() (*plex.Sessions, error) {
+	return a.cmd.getSessions(time.Minute)
 }
 
 // getMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.

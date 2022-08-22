@@ -11,7 +11,7 @@ import (
 
 // sendPlexSessions is fired by a timer if Plex Sessions feature has an interval defined.
 func (c *cmd) sendPlexSessions(event website.EventType) {
-	sessions, err := c.getSessions(time.Now().Add(-time.Minute))
+	sessions, err := c.getSessions(time.Minute)
 	if err != nil {
 		c.Errorf("Getting Plex sessions: %v", err)
 	}
@@ -28,12 +28,12 @@ func (c *cmd) sendPlexSessions(event website.EventType) {
 // getSessions interacts with the for loop/channels in runSessionHolder().
 // The Lock ensures only one request to Plex happens at once.
 // Because of the cache two requests may get the same answer.
-func (c *cmd) getSessions(after time.Time) (*plex.Sessions, error) {
+func (c *cmd) getSessions(allowedAge time.Duration) (*plex.Sessions, error) {
 	c.Lock()
 	defer c.Unlock()
 
 	item := data.Get("plexCurrentSessions")
-	if item != nil && item.Time.After(after) && item.Data != nil {
+	if item != nil && time.Now().Add(-allowedAge).Before(item.Time) && item.Data != nil {
 		return item.Data.(*plex.Sessions), nil //nolint:forcetypeassert
 	}
 
