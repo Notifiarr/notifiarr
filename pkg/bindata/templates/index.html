@@ -104,6 +104,7 @@
                                     <li><a class="nav-link text-grey" onClick="triggerAction('backup/sonarr')">Sonarr Backups</a></li>
                                 </ul>
                             </div>
+                            <li><i class="nav-icon fas fa-bezier-curve"></i><a class="nav-link" href="#integrations" onclick="swapNavigationTemplate('integrations')">Integrations</a></li>
                             <li><i class="nav-icon fas fa-temperature-high"></i><a class="nav-link" href="#monitoring" onclick="swapNavigationTemplate('monitoring')">Monitoring</a></li>
                             <li><i class="nav-icon fas fa-chart-line"></i><a class="nav-link" href="#metrics" onclick="swapNavigationTemplate('metrics')">Metrics</a></li>
                             <li><i class="nav-icon fas fa-file-medical-alt"></i><a class="nav-link" href="#logfiles" onclick="swapNavigationTemplate('logfiles')">Log Files</a></li>
@@ -167,6 +168,9 @@
                             </div>
                             <div class="navigation-item" id="template-monitoring" style="display: none;">
 {{ template "monitoring.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-integrations" style="display: none;">
+{{ template "integrations.html" . }}
                             </div>
                             <div class="navigation-item" id="template-metrics" style="display: none;">
 {{ template "metrics.html" . }}
