@@ -6,6 +6,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/sonarr"
 )
@@ -29,16 +30,18 @@ type sonarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *sonarrApp) storeQueue(event website.EventType) {
-	var err error
-	if app.cmd.sonarr[app.idx], err = app.app.GetQueue(queueItemsMax, 1); err != nil {
+	queue, err := app.app.GetQueue(queueItemsMax, 1)
+	if err != nil {
 		app.cmd.Errorf("Getting Sonarr Queue (instance %d): %v", app.idx+1, err)
 		return
 	}
 
-	for _, record := range app.cmd.sonarr[app.idx].Records {
+	for _, record := range queue.Records {
 		record.Quality = nil
 		record.Language = nil
 	}
+
+	data.SaveWithID("sonarr", app.idx, queue)
 }
 
 func (c *cmd) setupSonarr() bool {
@@ -77,11 +80,17 @@ func (c *cmd) setupSonarr() bool {
 func (c *cmd) getFinishedItemsSonarr() itemList { //nolint:cyclop
 	stuck := make(itemList)
 
-	for idx, queue := range c.sonarr {
-		if queue == nil {
+	for idx, app := range c.Apps.Sonarr {
+		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Sonarr.Stuck(idx+1) {
 			continue
 		}
 
+		item := data.GetWithID("sonarr", idx)
+		if item == nil || item.Data == nil {
+			continue
+		}
+
+		queue, _ := item.Data.(*sonarr.Queue)
 		instance := idx + 1
 		stuckapp := stuck[instance]
 		// repeatStomper is used to collapse duplicate download IDs.

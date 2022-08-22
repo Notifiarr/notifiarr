@@ -12,7 +12,6 @@ type Sessions struct {
 	Name     string     `json:"server"`
 	HostID   string     `json:"hostId"`
 	Sessions []*Session `json:"sessions"`
-	Updated  structDur  `json:"updateTime,omitempty"`
 }
 
 // ErrBadStatus is returned when plex returns an invalid status code.

@@ -8,6 +8,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
@@ -92,16 +93,16 @@ type State struct {
 
 // States is our compiled states for the dashboard.
 type States struct {
-	Lidarr   []*State       `json:"lidarr"`
-	Radarr   []*State       `json:"radarr"`
-	Readarr  []*State       `json:"readarr"`
-	Sonarr   []*State       `json:"sonarr"`
-	NZBGet   []*State       `json:"nzbget"`
-	RTorrent []*State       `json:"rtorrent"`
-	Qbit     []*State       `json:"qbit"`
-	Deluge   []*State       `json:"deluge"`
-	SabNZB   []*State       `json:"sabnzbd"`
-	Plex     *plex.Sessions `json:"plexSessions"`
+	Lidarr   []*State `json:"lidarr"`
+	Radarr   []*State `json:"radarr"`
+	Readarr  []*State `json:"readarr"`
+	Sonarr   []*State `json:"sonarr"`
+	NZBGet   []*State `json:"nzbget"`
+	RTorrent []*State `json:"rtorrent"`
+	Qbit     []*State `json:"qbit"`
+	Deluge   []*State `json:"deluge"`
+	SabNZB   []*State `json:"sabnzbd"`
+	Plex     any      `json:"plexSessions"`
 }
 
 // New configures the library.
@@ -157,6 +158,7 @@ func (c *Cmd) sendDashboardState(event website.EventType) {
 		apps   = time.Since(start).Round(time.Millisecond)
 	)
 
+	data.Save("dashboard", states)
 	c.SendData(&website.Request{
 		Route:      website.DashRoute,
 		Event:      event,
@@ -168,7 +170,10 @@ func (c *Cmd) sendDashboardState(event website.EventType) {
 
 // getStatesSerial grabs data for each app serially.
 func (c *Cmd) getStatesSerial() *States {
-	sessions, _ := c.PlexCron.GetSessions(false)
+	sessions := (*plex.Sessions)(nil)
+	if item := data.Get("plexCurrentSessions"); item != nil && item.Data != nil {
+		sessions, _ = item.Data.(*plex.Sessions)
+	}
 
 	return &States{
 		Deluge:   c.getDelugeStates(),
@@ -239,7 +244,10 @@ func (c *Cmd) getStatesParallel() *States { //nolint:funlen
 	}()
 	go func() {
 		defer c.CapturePanic()
-		states.Plex, _ = c.PlexCron.GetSessions(false)
+
+		if item := data.Get("plexCurrentSessions"); item != nil && item.Data != nil {
+			states.Plex = item.Data
+		}
 		wg.Done() //nolint:wsl
 	}()
 	wg.Wait()
