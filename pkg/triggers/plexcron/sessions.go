@@ -1,20 +1,17 @@
 package plexcron
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-type holder struct {
-	sessions *plex.Sessions
-	error    error
-}
-
 // sendPlexSessions is fired by a timer if Plex Sessions feature has an interval defined.
 func (c *cmd) sendPlexSessions(event website.EventType) {
-	sessions, err := c.getSessions(false)
+	sessions, err := c.getSessions(time.Minute)
 	if err != nil {
 		c.Errorf("Getting Plex sessions: %v", err)
 	}
@@ -29,65 +26,40 @@ func (c *cmd) sendPlexSessions(event website.EventType) {
 }
 
 // getSessions interacts with the for loop/channels in runSessionHolder().
-func (c *cmd) getSessions(wait bool) (*plex.Sessions, error) {
-	if wait {
-		c.sess <- time.Now().Add(c.ClientInfo.Actions.Plex.Delay.Duration)
-	} else {
-		c.sess <- time.Now().Add(-c.ClientInfo.Actions.Plex.Delay.Duration)
+// The Lock ensures only one request to Plex happens at once.
+// Because of the cache two requests may get the same answer.
+func (c *cmd) getSessions(allowedAge time.Duration) (*plex.Sessions, error) {
+	c.Lock()
+	defer c.Unlock()
+
+	item := data.Get("plexCurrentSessions")
+	if item != nil && time.Now().Add(-allowedAge).Before(item.Time) && item.Data != nil {
+		return item.Data.(*plex.Sessions), nil //nolint:forcetypeassert
 	}
 
-	s := <-c.sessr
+	sessions, err := c.Plex.GetSessions()
 
-	return s.sessions, s.error
-}
-
-// runSessionHolder runs a session holder routine. Call Run() first.
-func (c *cmd) runSessionHolder() {
-	defer func() {
-		defer c.CapturePanic()
-		close(c.sessr) // indicate we're done.
-	}()
-
-	sessions, err := c.Plex.GetSessions() // err not used until for loop.
-	if sessions != nil {
-		sessions.Updated.Time = time.Now()
+	switch {
+	case err != nil:
+		return &plex.Sessions{Name: c.Plex.Name}, fmt.Errorf("plex sessions: %w", err)
+	case item != nil && item.Data != nil:
+		c.plexSessionTracker(sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
+	default:
 		c.plexSessionTracker(sessions, nil)
 	}
 
-	for waitUntil := range c.sess {
-		if sessions != nil && err == nil && sessions.Updated.After(waitUntil) {
-			c.sessr <- &holder{sessions: sessions}
-			continue
-		}
+	sessions.Name = c.Plex.Name
 
-		if t := time.Until(waitUntil); t > 0 {
-			time.Sleep(t)
-		}
-
-		var currSessions *plex.Sessions // so we can update the error.
-		if currSessions, err = c.Plex.GetSessions(); currSessions != nil {
-			c.plexSessionTracker(currSessions, sessions)
-			delSessions(sessions) // memory cleanup.
-
-			currSessions.Updated.Time = time.Now()
-			sessions = currSessions
-		}
-
-		c.sessr <- &holder{sessions: sessions, error: err}
-	}
-}
-
-// delSessions sets pointers to nil. Should free up memory.
-func delSessions(sess *plex.Sessions) {
-	for idx := range sess.Sessions {
-		sess.Sessions[idx] = nil
-	}
+	return sessions, nil
 }
 
 // plexSessionTracker checks for state changes between the previous session pull
 // and the current session pull. if changes are present, a timestmp is added.
 func (c *cmd) plexSessionTracker(current, previous *plex.Sessions) {
 	now := time.Now()
+
+	// data.Save("plexPreviousSessions", previous)
+	data.Save("plexCurrentSessions", current)
 
 	for _, currSess := range current.Sessions {
 		// make sure every session has a start time.
@@ -98,7 +70,7 @@ func (c *cmd) plexSessionTracker(current, previous *plex.Sessions) {
 			continue // this only happens once.
 		case c.checkExistingSession(currSess, current, previous):
 			continue // existing session.
-		case currSess.Player.State == playing && c.ClientInfo != nil && c.ClientInfo.Actions.Plex.TrackSess:
+		case currSess.Player.State == playing && c.ClientInfo.Actions.Plex.TrackSess:
 			// We are tracking sessions (no webhooks); send this brand new session to website.
 			c.sendSessionPlaying(currSess, current, mediaPlay)
 		}
@@ -120,7 +92,7 @@ func (c *cmd) checkExistingSession(currSess *plex.Session, current, previous *pl
 		// Check for a session that was paused and is now playing (resumed).
 		if currSess.Player.State == playing && prevSess.Player.State == paused &&
 			// Check if we're tracking sessions. If yes, send this resumed session.
-			c.ClientInfo != nil && c.ClientInfo.Actions.Plex.TrackSess {
+			c.ClientInfo.Actions.Plex.TrackSess {
 			c.sendSessionPlaying(currSess, current, mediaResume)
 		}
 

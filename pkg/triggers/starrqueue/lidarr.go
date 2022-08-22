@@ -6,7 +6,9 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golift.io/starr/lidarr"
 )
 
 const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
@@ -27,15 +29,17 @@ type lidarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *lidarrApp) storeQueue(event website.EventType) {
-	var err error
-	if app.cmd.lidarr[app.idx], err = app.app.GetQueue(queueItemsMax, 1); err != nil {
+	queue, err := app.app.GetQueue(queueItemsMax, 1)
+	if err != nil {
 		app.cmd.Errorf("Getting Lidarr Queue (instance %d): %v", app.idx+1, err)
 		return
 	}
 
-	for _, record := range app.cmd.lidarr[app.idx].Records {
+	for _, record := range queue.Records {
 		record.Quality = nil
 	}
+
+	data.SaveWithID("lidarr", app.idx, queue)
 }
 
 func (c *cmd) setupLidarr() bool {
@@ -71,14 +75,20 @@ func (c *cmd) setupLidarr() bool {
 	return enabled
 }
 
-func (c *cmd) getFinishedItemsLidarr() itemList {
+func (c *cmd) getFinishedItemsLidarr() itemList { //nolint:cyclop
 	stuck := make(itemList)
 
-	for idx, queue := range c.lidarr {
-		if queue == nil {
+	for idx, app := range c.Apps.Lidarr {
+		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Lidarr.Stuck(idx+1) {
 			continue
 		}
 
+		item := data.GetWithID("lidarr", idx)
+		if item == nil || item.Data == nil {
+			continue
+		}
+
+		queue, _ := item.Data.(*lidarr.Queue)
 		instance := idx + 1
 		stuckapp := stuck[instance]
 

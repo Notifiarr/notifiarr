@@ -4,8 +4,10 @@ go 1.19
 
 // home grown goodness.
 require (
+	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5
+	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1-0.20220724230358-943104994ccb
 	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
 	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
@@ -92,11 +94,11 @@ require (
 	go.uber.org/zap v1.22.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
-	modernc.org/cc/v3 v3.36.1 // indirect
+	modernc.org/cc/v3 v3.36.2 // indirect
 	modernc.org/ccgo/v3 v3.16.8 // indirect
-	modernc.org/libc v1.16.19 // indirect
+	modernc.org/libc v1.17.0 // indirect
 	modernc.org/mathutil v1.4.1 // indirect
-	modernc.org/memory v1.1.1 // indirect
+	modernc.org/memory v1.2.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
 	modernc.org/sqlite v1.18.1
 	modernc.org/strutil v1.1.2 // indirect
@@ -112,7 +114,6 @@ require (
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
 	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8
 	golang.org/x/text v0.3.7
-	golift.io/datacounter v1.0.4
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 

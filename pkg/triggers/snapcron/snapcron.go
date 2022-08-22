@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -104,6 +105,7 @@ func (c *cmd) sendSnapshot(event website.EventType) {
 		}
 	}
 
+	data.Save("snapshot", snapshot)
 	c.SendData(&website.Request{
 		Route:      website.SnapRoute,
 		Event:      event,

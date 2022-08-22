@@ -24,10 +24,9 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
-	Plex  *plex.Server
-	sess  chan time.Time      // Return Plex Sessions
-	sessr chan *holder        // Session Return Channel
-	sent  map[string]struct{} // Tracks Finished sessions already sent.
+	Plex *plex.Server
+	sent map[string]struct{} // Tracks Finished sessions already sent.
+	sync.Mutex
 }
 
 const TrigPlexSessions common.TriggerName = "Gathering and sending Plex Sessions."
@@ -59,7 +58,7 @@ func (a *Action) Send(event website.EventType) {
 }
 
 // Run initializes the library.
-func (a *Action) Run() {
+func (a *Action) Create() {
 	a.cmd.run()
 }
 
@@ -68,14 +67,10 @@ func (c *cmd) run() {
 		return
 	}
 
-	c.sess = make(chan time.Time, 1)
-	c.sessr = make(chan *holder)
-
-	go c.runSessionHolder()
-
 	var ticker *time.Ticker
 
 	cfg := c.ClientInfo.Actions.Plex
+
 	if cfg.Interval.Duration > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
 		ticker = time.NewTicker(cfg.Interval.Duration + randomTime)
@@ -109,10 +104,12 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 
 func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	sessions := &plex.Sessions{Name: c.Plex.Name}
-	// If NoActivity=false, then grab sessions.
+	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.
 	if c.ClientInfo != nil && !c.ClientInfo.Actions.Plex.NoActivity {
+		time.Sleep(c.ClientInfo.Actions.Plex.Delay.Duration)
+
 		var err error
-		if sessions, err = c.getSessions(true); err != nil {
+		if sessions, err = c.getSessions(time.Second); err != nil {
 			c.Errorf("Getting Plex sessions: %v", err)
 		}
 	}
@@ -126,27 +123,9 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	})
 }
 
-// GetSessions returns the plex sessions. This uses a channel so concurrent requests are avoided.
-// Passing wait=true makes sure the results are current. Waits up to 10 seconds before requesting.
-// Passing wait=false will allow for sessions up to 10 seconds old. This may return faster.
-func (a *Action) GetSessions(wait bool) (*plex.Sessions, error) {
-	return a.cmd.getSessions(wait)
-}
-
-// Stop the Plex session holder.
-func (a *Action) Stop() {
-	a.cmd.stop()
-}
-
-func (c *cmd) stop() {
-	if c.sess == nil {
-		return
-	}
-
-	close(c.sess)
-	<-c.sessr // wait for session holder to return
-	c.sessr = nil
-	c.sess = nil
+// GetSessions returns the plex sessions up to 1 minute old. This uses a channel so concurrent requests are avoided.
+func (a *Action) GetSessions() (*plex.Sessions, error) {
+	return a.cmd.getSessions(time.Minute)
 }
 
 // getMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.
