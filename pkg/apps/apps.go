@@ -323,9 +323,12 @@ func getSonarr(r *http.Request) *sonarr.Sonarr {
 
 func metricMaker(app string) func(string, string, int, int, error) {
 	return func(status, method string, sent, rcvd int, err error) {
-		exp.Apps.Add(app+"&&"+method+" Bytes Sent", int64(sent))
 		exp.Apps.Add(app+"&&"+method+" Bytes Received", int64(rcvd))
 		exp.Apps.Add(app+"&&"+method+" Requests", 1)
+
+		if method != "GET" || sent > 0 {
+			exp.Apps.Add(app+"&&"+method+" Bytes Sent", int64(sent))
+		}
 
 		if err != nil {
 			exp.Apps.Add(app+"&&"+method+" Request Errors", 1)
