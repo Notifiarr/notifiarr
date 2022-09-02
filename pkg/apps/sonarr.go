@@ -2,17 +2,16 @@
 package apps
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
+	"golift.io/starr/debuglog"
 	"golift.io/starr/sonarr"
 )
 
@@ -33,6 +32,12 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile", sonarrAddReleaseProfile, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile/{profileID:[0-9]+}", sonarrUpdateReleaseProfile, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile/{profileID:[0-9]+}", sonarrDeleteReleaseProfile, "DELETE")
+	a.HandleAPIpath(starr.Sonarr, "/customformats", sonarrGetCustomFormats, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/customformats", sonarrAddCustomFormat, "POST")
+	a.HandleAPIpath(starr.Sonarr, "/customformats/{cfid:[0-9]+}", sonarrUpdateCustomFormat, "PUT")
+	a.HandleAPIpath(starr.Sonarr, "/customformats/{cfid:[0-9]+}", sonarrDeleteCustomFormat, "DELETE")
+	a.HandleAPIpath(starr.Sonarr, "/qualitydefinitions", sonarrGetQualityDefinitions, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/qualitydefinition", sonarrUpdateQualityDefinition, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/rootFolder", sonarrRootFolders, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/tag", sonarrGetTags, "GET")
@@ -64,16 +69,11 @@ func (a *Apps) setupSonarr() error {
 			return fmt.Errorf("%w: missing url: Sonarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		app.Config.Client = &http.Client{
-			Timeout: app.Timeout.Duration,
-			CheckRedirect: func(r *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-			Transport: exp.NewMetricsRoundTripper(string(starr.Sonarr), &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: app.Config.ValidSSL}, //nolint:gosec
-			}),
-		}
-		app.Debugf = a.Debugf
+		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+			MaxBody: app.MaxBody,
+			Debugf:  a.Debugf,
+			Caller:  metricMaker(string(starr.Sonarr)),
+		})
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Sonarr = sonarr.New(app.Config)
@@ -502,4 +502,79 @@ func sonarrSeasonPass(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "ok"
+}
+
+func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
+	var cusform sonarr.CustomFormat
+
+	err := json.NewDecoder(req.Body).Decode(&cusform)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	resp, err := getSonarr(req).AddCustomFormatContext(req.Context(), &cusform)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("adding custom format: %w", err)
+	}
+
+	return http.StatusOK, resp
+}
+
+func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
+	cusform, err := getSonarr(req).GetCustomFormatsContext(req.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
+	}
+
+	return http.StatusOK, cusform
+}
+
+func sonarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
+	var cusform sonarr.CustomFormat
+	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
+
+	output, err := getSonarr(req).UpdateCustomFormatContext(req.Context(), &cusform, cfID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
+	}
+
+	return http.StatusOK, output
+}
+
+func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
+	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
+
+	err := getSonarr(req).DeleteCustomFormatContext(req.Context(), cfID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting custom format: %w", err)
+	}
+
+	return http.StatusOK, "OK"
+}
+
+func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
+	output, err := getSonarr(req).GetQualityDefinitionsContext(req.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting quality definitions: %w", err)
+	}
+
+	return http.StatusOK, output
+}
+
+func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
+	var input sonarr.QualityDefinition
+	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	output, err := getSonarr(req).UpdateQualityDefinitionContext(req.Context(), &input)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating quality definition: %w", err)
+	}
+
+	return http.StatusOK, output
 }

@@ -1,17 +1,16 @@
 package apps
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
+	"golift.io/starr/debuglog"
 	"golift.io/starr/radarr"
 )
 
@@ -38,6 +37,8 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrGetCustomFormats, "GET")
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrAddCustomFormat, "POST")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrUpdateCustomFormat, "PUT")
+	a.HandleAPIpath(starr.Radarr, "/qualitydefinitions", radarrGetQualityDefinitions, "GET")
+	a.HandleAPIpath(starr.Radarr, "/qualitydefinition", radarrUpdateQualityDefinition, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrDeleteCustomFormat, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrGetImportLists, "GET")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrAddImportList, "POST")
@@ -64,17 +65,11 @@ func (a *Apps) setupRadarr() error {
 			return fmt.Errorf("%w: missing url: Radarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		app.Config.Client = &http.Client{
-			Timeout: app.Timeout.Duration,
-			CheckRedirect: func(r *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-			Transport: exp.NewMetricsRoundTripper(string(starr.Radarr), &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: app.Config.ValidSSL}, //nolint:gosec
-			}),
-		}
-
-		app.Debugf = a.Debugf
+		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+			MaxBody: app.MaxBody,
+			Debugf:  a.Debugf,
+			Caller:  metricMaker(string(starr.Radarr)),
+		})
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Radarr = radarr.New(app.Config)
@@ -499,6 +494,29 @@ func radarrAddImportList(req *http.Request) (int, interface{}) {
 	output, err := getRadarr(req).CreateImportListContext(req.Context(), &ilist)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("creating import list: %w", err)
+	}
+
+	return http.StatusOK, output
+}
+
+func radarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
+	output, err := getRadarr(req).GetQualityDefinitionsContext(req.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting quality definitions: %w", err)
+	}
+
+	return http.StatusOK, output
+}
+
+func radarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
+	var input radarr.QualityDefinition
+	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	output, err := getRadarr(req).UpdateQualityDefinitionContext(req.Context(), &input)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("updating quality definition: %w", err)
 	}
 
 	return http.StatusOK, output

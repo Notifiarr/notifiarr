@@ -100,6 +100,12 @@ func (c *Client) aggregateTrashSonarrCall(
 	} else if output[idx].ReleaseProfiles, err = app.GetReleaseProfilesContext(ctx); err != nil {
 		output[idx].Error = fmt.Sprintf("getting release profiles: %v", err)
 		c.Errorf("Handling Sonarr API request (%d): %s", instance, output[idx].Error)
+	} else if output[idx].QualityDefinitions, err = app.GetQualityDefinitionsContext(ctx); err != nil {
+		output[idx].Error = fmt.Sprintf("getting quality definitions: %v", err)
+		c.Errorf("Handling Sonarr API request (%d): %s", instance, output[idx].Error)
+	} else if output[idx].CustomFormats, err = app.GetCustomFormatsContext(ctx); err != nil {
+		output[idx].Error = fmt.Sprintf("getting custom formats: %v", err)
+		c.Errorf("Handling Sonarr API request (%d): %s", instance, output[idx].Error)
 	}
 }
 
@@ -151,6 +157,9 @@ func (c *Client) aggregateTrashRadarrCall(
 		c.Errorf("Handling Radarr API request (%d): %s", instance, output[idx].Error)
 	} else if output[idx].CustomFormats, err = app.GetCustomFormatsContext(ctx); err != nil {
 		output[idx].Error = fmt.Sprintf("getting custom formats: %v", err)
+		c.Errorf("Handling Radarr API request (%d): %s", instance, output[idx].Error)
+	} else if output[idx].QualityDefinitions, err = app.GetQualityDefinitionsContext(ctx); err != nil {
+		output[idx].Error = fmt.Sprintf("getting quality definitions: %v", err)
 		c.Errorf("Handling Radarr API request (%d): %s", instance, output[idx].Error)
 	}
 }

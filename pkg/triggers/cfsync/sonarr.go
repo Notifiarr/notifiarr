@@ -15,12 +15,14 @@ const TrigRPSyncSonarr common.TriggerName = "Starting Sonarr Release Profile TRa
 // SonarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Sonarr.
 type SonarrTrashPayload struct {
-	Instance        int                      `json:"instance"`
-	Name            string                   `json:"name"`
-	ReleaseProfiles []*sonarr.ReleaseProfile `json:"releaseProfiles,omitempty"`
-	QualityProfiles []*sonarr.QualityProfile `json:"qualityProfiles,omitempty"`
-	Error           string                   `json:"error"`
-	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
+	Instance           int                         `json:"instance"`
+	Name               string                      `json:"name"`
+	ReleaseProfiles    []*sonarr.ReleaseProfile    `json:"releaseProfiles,omitempty"`
+	QualityProfiles    []*sonarr.QualityProfile    `json:"qualityProfiles,omitempty"`
+	CustomFormats      []*sonarr.CustomFormat      `json:"customFormats,omitempty"`
+	QualityDefinitions []*sonarr.QualityDefinition `json:"qualityDefinitions,omitempty"`
+	Error              string                      `json:"error"`
+	NewMaps            *cfMapIDpayload             `json:"newMaps,omitempty"`
 }
 
 // SyncSonarrRP initializes a release profile sync with sonarr.
@@ -70,6 +72,16 @@ func (c *cmd) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	payload.ReleaseProfiles, err = app.GetReleaseProfiles()
 	if err != nil {
 		return fmt.Errorf("getting release profiles: %w", err)
+	}
+
+	payload.QualityDefinitions, err = app.GetQualityDefinitions()
+	if err != nil {
+		return fmt.Errorf("getting quality definitions: %w", err)
+	}
+
+	payload.CustomFormats, err = app.GetCustomFormats()
+	if err != nil {
+		return fmt.Errorf("getting custom formats: %w", err)
 	}
 
 	body, err := c.GetData(&website.Request{
