@@ -19,11 +19,13 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
+	"golift.io/cache"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -379,6 +381,7 @@ type templateData struct {
 	Webauth     bool                           `json:"webauth"`
 	Msg         string                         `json:"msg,omitempty"`
 	Version     map[string]interface{}         `json:"version"`
+	Cache       map[string]*cache.Item         `json:"cache"`
 	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
 	ClientInfo  *website.ClientInfo            `json:"clientInfo"`
@@ -413,6 +416,15 @@ func (c *Client) renderTemplate(
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(),
+		Cache: map[string]*cache.Item{
+			"dashboard": data.Get("dashboard"),
+			"sessions":  data.Get("plexCurrentSessions"),
+			"snapshot":  data.Get("snapshot"),
+			"lidarr":    data.Get("lidarr"),
+			"radarr":    data.Get("radarr"),
+			"readarr":   data.Get("readarr"),
+			"sonarr":    data.Get("sonarr"),
+		},
 		Version: map[string]interface{}{
 			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),
