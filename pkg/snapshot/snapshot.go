@@ -46,6 +46,7 @@ type Config struct {
 	DriveData bool          `toml:"monitor_drives" xml:"monitor_drives" json:"monitorDrives"` // smartctl commands.
 	DiskUsage bool          `toml:"monitor_space" xml:"monitor_space" json:"monitorSpace"`    // get disk usage.
 	AllDrives bool          `toml:"all_drives" xml:"all_drives" json:"allDrives"`             // usage for all drives?
+	Quotas    bool          `toml:"quotas" xml:"quotas" json:"quotas"`                        // usage for user quotas?
 	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`                           // number of processes to include from ioTop
 	PSTop     int           `toml:"pstop" xml:"pstop" json:"psTop"`                           // number of processes to include from top (cpu usage)
 	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                           // number of processes to include from mysql servers.
@@ -85,6 +86,7 @@ type Snapshot struct {
 	DriveAges  map[string]int                 `json:"driveAges,omitempty"`
 	DriveTemps map[string]int                 `json:"driveTemps,omitempty"`
 	DiskUsage  map[string]*Partition          `json:"diskUsage,omitempty"`
+	Quotas     map[string]*Partition          `json:"quotas,omitempty"`
 	DiskHealth map[string]string              `json:"driveHealth,omitempty"`
 	IOTop      *IOTopData                     `json:"ioTop,omitempty"`
 	IOStat     *IoStatDisks                   `json:"ioStat,omitempty"`
@@ -160,6 +162,10 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 
 	if err := snap.getDisksUsage(ctx, c.DiskUsage, c.AllDrives); len(err) != 0 {
 		errs = append(errs, err...)
+	}
+
+	if err := snap.getQuota(ctx, c.Quotas); err != nil {
+		errs = append(errs, err)
 	}
 
 	var debug []error
