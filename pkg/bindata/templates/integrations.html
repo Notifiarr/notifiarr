@@ -6,8 +6,8 @@
                                 <div class="col-lg-2 col-md-3 col-sm-6 col-xl-2">
                                     <h2>Plex</h2>
                                     {{- if .Cache.sessions }}
-                                    Server: {{.Cache.sessions.Data.Name}}
-                                    Sessions Age: {{since .Cache.sessions.Time}}<br>
+                                    Server: {{.Cache.sessions.Data.Name}}<br>
+                                    Data Age: {{since .Cache.sessions.Time}}<br>
                                     Sessions: {{len .Cache.sessions.Data.Sessions}}
                                     {{- else }}
                                     No Plex sessions cached.
