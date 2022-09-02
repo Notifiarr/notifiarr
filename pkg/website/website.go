@@ -83,7 +83,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 	if log {
 		defer s.debughttplog(resp, url, start, string(data), tee)
 	} else {
-		defer s.debughttplog(resp, url, start, "<data not logged>", tee)
+		defer s.debughttplog(resp, url, start, fmt.Sprintf("<data not logged, length:%d>", len(data)), tee)
 	}
 
 	return resp.StatusCode, io.NopCloser(&buf), nil

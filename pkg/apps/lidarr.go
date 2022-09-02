@@ -52,7 +52,7 @@ type LidarrConfig struct {
 
 // Enabled returns true if the Lidarr instance is enabled and usable.
 func (l *LidarrConfig) Enabled() bool {
-	return l != nil && l.Config != nil && l.URL != "" && l.APIKey != "" && l.Timeout.Duration > 0
+	return l != nil && l.Config != nil && l.URL != "" && l.APIKey != "" && l.Timeout.Duration >= 0
 }
 
 func (a *Apps) setupLidarr() error {

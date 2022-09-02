@@ -46,7 +46,7 @@ type ReadarrConfig struct {
 
 // Enabled returns true if the Readarr instance is enabled and usable.
 func (r *ReadarrConfig) Enabled() bool {
-	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration > 0
+	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration >= 0
 }
 
 func (a *Apps) setupReadarr() error {

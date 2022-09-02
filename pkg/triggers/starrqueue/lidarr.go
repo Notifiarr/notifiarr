@@ -39,6 +39,7 @@ func (app *lidarrApp) storeQueue(event website.EventType) {
 		record.Quality = nil
 	}
 
+	app.cmd.Debugf("Stored Lidarr Queue (%d items), instance %d %s", len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("lidarr", app.idx, queue)
 }
 

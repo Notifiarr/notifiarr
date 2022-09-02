@@ -25,7 +25,7 @@ type ProwlarrConfig struct {
 
 // Enabled returns true if the Prowlarr instance is enabled and usable.
 func (p *ProwlarrConfig) Enabled() bool {
-	return p != nil && p.Config != nil && p.URL != "" && p.APIKey != "" && p.Timeout.Duration > 0
+	return p != nil && p.Config != nil && p.URL != "" && p.APIKey != "" && p.Timeout.Duration >= 0
 }
 
 func (a *Apps) setupProwlarr() error {

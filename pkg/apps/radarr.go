@@ -55,7 +55,7 @@ type RadarrConfig struct {
 
 // Enabled returns true if the Radarr instance is enabled and usable.
 func (r *RadarrConfig) Enabled() bool {
-	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration > 0
+	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration >= 0
 }
 
 func (a *Apps) setupRadarr() error {

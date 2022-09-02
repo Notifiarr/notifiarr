@@ -41,6 +41,7 @@ func (app *sonarrApp) storeQueue(event website.EventType) {
 		record.Language = nil
 	}
 
+	app.cmd.Debugf("Stored Sonarr Queue (%d items), instance %d %s", len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("sonarr", app.idx, queue)
 }
 

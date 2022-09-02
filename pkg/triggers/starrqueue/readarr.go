@@ -39,6 +39,7 @@ func (app *readarrApp) storeQueue(event website.EventType) {
 		record.Quality = nil
 	}
 
+	app.cmd.Debugf("Stored Readarr Queue (%d items), instance %d %s", len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("readarr", app.idx, queue)
 }
 

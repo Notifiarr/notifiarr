@@ -41,6 +41,7 @@ func (app *radarrApp) storeQueue(event website.EventType) {
 		item.Languages = nil
 	}
 
+	app.cmd.Debugf("Stored Radarr Queue (%d items), instance %d %s", len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("radarr", app.idx, queue)
 }
 

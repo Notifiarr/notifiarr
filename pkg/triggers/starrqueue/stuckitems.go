@@ -96,6 +96,7 @@ func (c *cmd) sendStuckQueues(event website.EventType) {
 	sonarr := c.getFinishedItemsSonarr()
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
+		c.Debugf("No stuck items found.")
 		return
 	}
 
