@@ -330,28 +330,28 @@ func (c *genericInstance) saveBackupFile(
 	remotePath,
 	localPath string,
 ) (string, error) {
-	reader, status, err := c.app.GetBody(ctx, remotePath, nil)
+	resp, err := c.app.Get(ctx, remotePath, nil)
 	if err != nil {
 		return "", fmt.Errorf("getting http response body: %w", err)
 	}
-	defer reader.Close()
+	defer resp.Body.Close()
 
-	if status >= http.StatusMultipleChoices && status <= http.StatusPermanentRedirect {
+	if resp.StatusCode >= http.StatusMultipleChoices && resp.StatusCode <= http.StatusPermanentRedirect {
 		if err := c.app.Login(ctx); err != nil {
-			return "", fmt.Errorf("(%d) %w: you may need to set a username and password to download backup files: %s",
-				status, err, remotePath)
+			return "", fmt.Errorf("(%s) %w: you may need to set a username and password to download backup files: %s",
+				resp.Status, err, remotePath)
 		}
 
 		// Try again after logging in.
-		reader, status, err = c.app.GetBody(ctx, remotePath, nil)
+		resp, err = c.app.Get(ctx, remotePath, nil)
 		if err != nil {
 			return "", fmt.Errorf("getting http response body: %w", err)
 		}
-		defer reader.Close()
+		defer resp.Body.Close()
 	}
 
-	if status != http.StatusOK {
-		return "", fmt.Errorf("(%d) %w: %s", status, website.ErrNon200, remotePath)
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("(%s) %w: %s", resp.Status, website.ErrNon200, remotePath)
 	}
 
 	file, err := os.CreateTemp(localPath, "starr_"+path.Base(remotePath)+".*."+path.Ext(remotePath))
@@ -360,7 +360,7 @@ func (c *genericInstance) saveBackupFile(
 	}
 	defer file.Close()
 
-	size, err := io.Copy(file, reader)
+	size, err := io.Copy(file, resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("writing temporary file: %d, %w", size, err)
 	}

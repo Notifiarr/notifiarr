@@ -17,12 +17,13 @@ const TrigCFSyncRadarr common.TriggerName = "Starting Radarr CF TRaSH sync."
 // to/from notifarr.com when updating custom formats for Radarr.
 // This is used in other places, like the trash API handler in the 'client' module.
 type RadarrTrashPayload struct {
-	Instance        int                      `json:"instance"`
-	Name            string                   `json:"name"`
-	CustomFormats   []*radarr.CustomFormat   `json:"customFormats,omitempty"`
-	QualityProfiles []*radarr.QualityProfile `json:"qualityProfiles,omitempty"`
-	Error           string                   `json:"error"`
-	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
+	Instance           int                         `json:"instance"`
+	Name               string                      `json:"name"`
+	CustomFormats      []*radarr.CustomFormat      `json:"customFormats,omitempty"`
+	QualityProfiles    []*radarr.QualityProfile    `json:"qualityProfiles,omitempty"`
+	QualityDefinitions []*radarr.QualityDefinition `json:"qualityDefinitions,omitempty"`
+	Error              string                      `json:"error"`
+	NewMaps            *cfMapIDpayload             `json:"newMaps,omitempty"`
 }
 
 // SyncRadarrCF initializes a custom format sync with radarr.
@@ -72,6 +73,11 @@ func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 	payload.CustomFormats, err = app.GetCustomFormats()
 	if err != nil {
 		return fmt.Errorf("getting custom formats: %w", err)
+	}
+
+	payload.QualityDefinitions, err = app.GetQualityDefinitions()
+	if err != nil {
+		return fmt.Errorf("getting quality definitions: %w", err)
 	}
 
 	body, err := c.GetData(&website.Request{

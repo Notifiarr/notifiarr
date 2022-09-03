@@ -256,8 +256,6 @@ golang.org/x/net v0.0.0-20201006153459-a7d1128ccaa0/go.mod h1:sp8m0HH+o8qH0wwXwY
 golang.org/x/net v0.0.0-20201021035429-f5854403a974/go.mod h1:sp8m0HH+o8qH0wwXwYZr8TS3Oi6o0r6Gce1SSxlDquU=
 golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4/go.mod h1:p54w0d4576C0XHj96bSt6lcn1PtDYWL6XObtHCRCNQM=
 golang.org/x/net v0.0.0-20210614182718-04defd469f4e/go.mod h1:9nx3DQGgdP8bBQD5qxJ1jj9UTztislL4KSBs9R2vV5Y=
-golang.org/x/net v0.0.0-20220812174116-3211cb980234 h1:RDqmgfe7SvlMWoqC3xwQ2blLO3fcWcxMa3eBLRdRW7E=
-golang.org/x/net v0.0.0-20220812174116-3211cb980234/go.mod h1:YDH+HFinaLZZlnHAfSS6ZXJJ9M9t4Dl22yv3iI2vPwk=
 golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b h1:ZmngSVLe/wycRns9MKikG9OWIEjGcGAkacif7oYQaUY=
 golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b/go.mod h1:YDH+HFinaLZZlnHAfSS6ZXJJ9M9t4Dl22yv3iI2vPwk=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
@@ -328,12 +326,8 @@ golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c h1:Cf7/ap3GkxihjRY0Wm0skMgDkvJ
 golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c/go.mod h1:EkoczbbHaxO5ys7VhYl1Nd3crqmqLjhHPXTQwPQfxWk=
 golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c h1:QfBF3Y5bAf6hGjkJ/QjOixKTx29mkA2BpR/FwqEhLOA=
 golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c/go.mod h1:EZevRvIGRh8jDMwuYL0/tlPns0KynquPZzb0SerIC1s=
-golift.io/starr v0.14.1-0.20220703064953-eb83ba0253dd h1:hIEn0BGK6P6YNgMHukGg6zYd9lOe/jLfWg4btk8dk+0=
-golift.io/starr v0.14.1-0.20220703064953-eb83ba0253dd/go.mod h1:Xw7P9bWrN9+ZeqdK5nFRBMuT61wcH35r/jPZUJxltt0=
-golift.io/starr v0.14.1-0.20220828044228-8a3b8efd33c2 h1:lbDv8pqnkqQF8/f3PPnqcQQNn8GA1dv7BKhHCV/uHqI=
-golift.io/starr v0.14.1-0.20220828044228-8a3b8efd33c2/go.mod h1:Xw7P9bWrN9+ZeqdK5nFRBMuT61wcH35r/jPZUJxltt0=
-golift.io/starr v0.14.1-0.20220903213444-9eb56a8fcde9 h1:vu6AycpHTvzFoO4kf5AF+dKxmcK3ApgVrEm1VrEmlps=
-golift.io/starr v0.14.1-0.20220903213444-9eb56a8fcde9/go.mod h1:yvDQ/A7kpXG+9gXiaYgYe7dRZcMPaQ0F6wJkTgGT4/Q=
+golift.io/starr v0.14.1-0.20220903221904-52426082f330 h1:wlQPz7MK3y7/5ijsyBPsL4omGrpJbC2amurGf0zMNgU=
+golift.io/starr v0.14.1-0.20220903221904-52426082f330/go.mod h1:yvDQ/A7kpXG+9gXiaYgYe7dRZcMPaQ0F6wJkTgGT4/Q=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 golift.io/xtractr v0.1.2 h1:KscliIem7C6LhcLOMziBgE8wn+gy2HEde9hxkhi7ZOk=

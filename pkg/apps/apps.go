@@ -57,7 +57,10 @@ type Logger struct {
 
 type starrConfig struct {
 	Name     string        `toml:"name" xml:"name" json:"name"`
+	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
 	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
+	MaxBody  int           `toml:"max_body" xml:"max_body" json:"maxBody"`
+	ValidSSL bool          `toml:"valid_ssl" xml:"valid_ssl" json:"validSsl"`
 }
 
 // Errors sent to client web requests.
@@ -316,4 +319,21 @@ func getReadarr(r *http.Request) *readarr.Readarr {
 func getSonarr(r *http.Request) *sonarr.Sonarr {
 	app, _ := r.Context().Value(starr.Sonarr).(*SonarrConfig)
 	return app.Sonarr
+}
+
+func metricMaker(app string) func(string, string, int, int, error) {
+	return func(status, method string, sent, rcvd int, err error) {
+		exp.Apps.Add(app+"&&"+method+" Bytes Received", int64(rcvd))
+		exp.Apps.Add(app+"&&"+method+" Requests", 1)
+
+		if method != "GET" || sent > 0 {
+			exp.Apps.Add(app+"&&"+method+" Bytes Sent", int64(sent))
+		}
+
+		if err != nil {
+			exp.Apps.Add(app+"&&"+method+" Request Errors", 1)
+		} else {
+			exp.Apps.Add(app+"&&"+method+" Response: "+status, 1)
+		}
+	}
 }
