@@ -25,6 +25,8 @@ import (
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"golift.io/cache"
 	"golift.io/cnfg"
 	"golift.io/version"
@@ -105,6 +107,8 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 }
 
 func (c *Client) getFuncMap() template.FuncMap {
+	title := cases.Title(language.AmericanEnglish)
+
 	return template.FuncMap{
 		"dateFmt": func(date time.Time) string {
 			if ci, _ := c.website.GetClientInfo(); ci != nil {
@@ -113,6 +117,7 @@ func (c *Client) getFuncMap() template.FuncMap {
 
 			return date.String()
 		},
+		"title":       title.String,
 		"todaysemoji": mnd.TodaysEmoji,
 		"fortune":     Fortune,
 		// returns the current time.

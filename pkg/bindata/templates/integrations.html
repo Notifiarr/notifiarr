@@ -2,40 +2,54 @@
                                 <p>
                                     This page displays data from integrated applications. More to come!
                                 </p>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
                                     <h2>Plex</h2>
-                                    <div class="col-sm-12 col-md-6 col-lg-4">
-                                        <img src="{{files}}/images/logo/plex.png" style="height:120px;float:left;margin-right:5px;">
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <table class="table table-striped table-bordered">
+                                            <tr>
+                                                <td rowspan="20" style="width:120px;">
+                                                    <img src="{{files}}/images/logo/plex.png" style="height:120px;float:left;margin-right:5px;">
+                                                </td>
+                                            </tr>
+                                            {{- if .Cache.sessions }}
+                                            <tr>
+                                                <td colspan="2">
+                                                    <h3>{{.Cache.sessions.Data.Name}}</h3>
+                                                    <a href="{{.Config.Plex.URL}}">{{.Config.Plex.URL}}</a>
+                                                </td>
+                                            </tr>
+                                            <tr><td>Sessions Cached</td><td>{{len .Cache.sessions.Data.Sessions}}</td></tr>
+                                            <tr><td>Cache Age:</td><td>{{since .Cache.sessions.Time}}</td></tr>
+                                            {{- else }}
+                                            <tr>
+                                                <td>No Plex sessions cached.</td>
+                                            </tr>
+                                            {{- end }}
+                                        </table>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <table class="table table-striped table-bordered">
+                                            <tr>
+                                                <td><b>Session</b></td>
+                                                <td><b>User</b></td>
+                                                <td><b>Player</b></td>
+                                                <td><b>Complete</b></td>
+                                                <td><b>Transcode</b></td>
+                                                <td><b>Title</b></td>
+                                            </tr>
                                         {{- if .Cache.sessions }}
-                                        <b>{{.Cache.sessions.Data.Name}}</b><br>
-                                        Sessions Cached: {{len .Cache.sessions.Data.Sessions}}<br>
-                                        Cache Age: {{since .Cache.sessions.Time}}<br>
-                                        &nbsp;<br>
-                                        &nbsp;<br>
-                                        &nbsp;<br>
-                                        {{- else }}
-                                        No Plex sessions cached.<br>
-                                        &nbsp;<br>
-                                        &nbsp;<br>
-                                        &nbsp;<br>
-                                        &nbsp;<br>
-                                        &nbsp;<br>
+                                            {{- range  $session := .Cache.sessions.Data.Sessions }}
+                                            <tr>
+                                                <td>{{ title $session.Type }} <i style="color:{{if eq $session.Player.State "paused"}}red{{else}}green{{end}}">{{$session.Player.State}} for {{ since $session.Player.StateTime.Time}}</i></td>
+                                                <td title="uid: {{$session.User.ID}}"><img src="{{$session.User.Thumb}}" style="height:25px;"> <font size="4">{{ $session.User.Title }}</font></td>
+                                                <td>{{ $session.Player.Title }}</td>
+                                                <td>{{ percent $session.ViewOffset $session.Duration }}%</td>
+                                                <td>
+                                                    {{if eq $session.TranscodeSession.VideoDecision "transcode"}}<i title="Video Transcode" class="fas fa-film"></i>{{end}}
+                                                    {{if eq $session.TranscodeSession.AudioDecision "transcode"}}<i title="Audio Transcode" class="fas fa-deaf"></i>{{end}}
+                                                </td>
+                                                <td>{{ $session.GrandparentTitle }} {{ $session.Title }} {{if $session.Year}}({{ $session.Year }}){{end}}</td>
+                                            </tr>
+                                            {{- end }}
                                         {{- end }}
-                                        <hr>
+                                        </table>
                                     </div>
-                                    {{- if .Cache.sessions }}{{range $idx, $session := .Cache.sessions.Data.Sessions }}
-                                    <div class="col-sm-12 col-md-6 col-lg-4">
-                                        <img src="{{$session.User.Thumb}}" style="height:120px;float:left;margin-right:5px;">
-                                        <b>{{ $session.User.Title }}</b><br>
-                                        Session {{ instance $idx }}, {{ $session.Type }}<br>
-                                        Player: {{ $session.Player.Title }}<br>
-                                        Title: {{ $session.GrandparentTitle }} {{ $session.Title }} {{if $session.Year}}({{ $session.Year }}){{end}}<br>
-                                        Complete: {{ percent $session.ViewOffset $session.Duration }}%<br>
-                                        State: {{$session.Player.State}} for {{ since $session.Player.StateTime.Time}}<br>
-                                        <hr>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                    <hr>
-                                </div>
-                                {{- end }}{{ end }}
