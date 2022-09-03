@@ -1,17 +1,43 @@
                                 <h1><i class="fas fa-bezier-curve"></i> Integration Insights</h1>
                                 <p>
-                                    This page (soon) displays data from integrated applications.
+                                    This page displays data from integrated applications. More to come!
                                 </p>
-                                <hr>
-                                <div class="col-lg-2 col-md-3 col-sm-6 col-xl-2">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
                                     <h2>Plex</h2>
-                                    {{- if .Cache.sessions }}
-                                    Server: {{.Cache.sessions.Data.Name}}<br>
-                                    Data Age: {{since .Cache.sessions.Time}}<br>
-                                    Sessions: {{len .Cache.sessions.Data.Sessions}}
-                                    {{- else }}
-                                    No Plex sessions cached.
-                                    {{- end }}
+                                    <div class="col-sm-12 col-md-6 col-lg-4">
+                                        <img src="{{files}}/images/logo/plex.png" style="height:120px;float:left;margin-right:5px;">
+                                        {{- if .Cache.sessions }}
+                                        <b>{{.Cache.sessions.Data.Name}}</b><br>
+                                        Sessions Cached: {{len .Cache.sessions.Data.Sessions}}<br>
+                                        Cache Age: {{since .Cache.sessions.Time}}<br>
+                                        &nbsp;<br>
+                                        &nbsp;<br>
+                                        &nbsp;<br>
+                                        {{- else }}
+                                        No Plex sessions cached.<br>
+                                        &nbsp;<br>
+                                        &nbsp;<br>
+                                        &nbsp;<br>
+                                        &nbsp;<br>
+                                        &nbsp;<br>
+                                        {{- end }}
+                                        <hr>
+                                    </div>
+                                    {{- if .Cache.sessions }}{{range $idx, $session := .Cache.sessions.Data.Sessions }}
+                                    <div class="col-sm-12 col-md-6 col-lg-4">
+                                        <img src="{{$session.User.Thumb}}" style="height:120px;float:left;margin-right:5px;">
+                                        <b>{{ $session.User.Title }}</b><br>
+                                        Session {{ instance $idx }}, {{ $session.Type }}<br>
+                                        Player: {{ $session.Player.Title }}<br>
+                                        Title: {{ $session.GrandparentTitle }} {{ $session.Title }} {{if $session.Year}}({{ $session.Year }}){{end}}<br>
+                                        Complete: {{ percent $session.ViewOffset $session.Duration }}%<br>
+                                        State: {{$session.Player.State}} for {{ since $session.Player.StateTime.Time}}<br>
+                                        <hr>
+                                    </div>
                                 </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                    <hr>
+                                </div>
+                                {{- end }}{{ end }}
 
                                 

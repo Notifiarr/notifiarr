@@ -129,6 +129,9 @@ func (c *Client) getFuncMap() template.FuncMap {
 		"locked":   func(env string) bool { return os.Getenv(env) != "" },
 		"contains": strings.Contains,
 		"since":    since,
+		"percent": func(i, j float64) int64 {
+			return int64(i / j * 100) //nolint:gomnd
+		},
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
 				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {
