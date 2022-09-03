@@ -566,12 +566,12 @@ func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 }
 
 func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
-	var input sonarr.QualityDefinition
+	var input []*sonarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	output, err := getSonarr(req).UpdateQualityDefinitionContext(req.Context(), &input)
+	output, err := getSonarr(req).UpdateQualityDefinitionsContext(req.Context(), input)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating quality definition: %w", err)
 	}

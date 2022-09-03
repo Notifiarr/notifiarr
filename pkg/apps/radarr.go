@@ -509,12 +509,12 @@ func radarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 }
 
 func radarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
-	var input radarr.QualityDefinition
+	var input []*radarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	output, err := getRadarr(req).UpdateQualityDefinitionContext(req.Context(), &input)
+	output, err := getRadarr(req).UpdateQualityDefinitionsContext(req.Context(), input)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating quality definition: %w", err)
 	}
