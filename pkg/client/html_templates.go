@@ -666,6 +666,10 @@ func (c *Client) getDisks() map[string]*snapshot.Partition {
 		output[k] = v
 	}
 
+	for k, v := range snapshot.Quotas {
+		output["Quota: "+k] = v
+	}
+
 	for k, v := range snapshot.ZFSPool {
 		output[k] = v
 	}

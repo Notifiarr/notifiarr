@@ -196,27 +196,27 @@
                                                 <td style="display:none;"></td>
                                             </tr>
                                              <tr class="text-center">
-                                                 <td style="display:none;"></td>
-                                                 <td style="display:none;"></td>
-                                                 <td colspan="2">
-                                                     <i class="fas fa-box-open" style="float:left;font-size:40px"></i>
-                                                     <h4>Storage</h4>
-                                                 </td>
-                                             </tr>
-                                             {{- range $k, $v := .Disks }}
-                                             <tr>
-                                                 <td>{{$k}}</td>
-                                                 <td style="display:none;">{{$v.Device}}</td>
-                                                 <td>
-                                                     <div class="row">
-                                                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">{{$v.Device}}</div>
-                                                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Total: {{megabyte $v.Total}}</div>
-                                                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Free: {{megabyte $v.Free}}</div>
-                                                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Used: {{megabyte $v.Used}}</div>
-                                                     </div>
-                                                 </td>
-                                             </tr>
-                                             {{- end }}
+                                                <td style="display:none;"></td>
+                                                <td style="display:none;"></td>
+                                                <td colspan="2">
+                                                    <i class="fas fa-box-open" style="float:left;font-size:40px"></i>
+                                                    <h4>Storage</h4>
+                                                </td>
+                                            </tr>
+                                            {{- range $k, $v := .Disks }}
+                                            <tr>
+                                                <td>{{$k}}</td>
+                                                <td style="display:none;">{{$v.Device}}</td>
+                                                <td>
+                                                    <div class="row">
+                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">{{$v.Device}}</div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Total: {{megabyte $v.Total}}</div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Free: {{megabyte $v.Free}}</div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Used: {{megabyte $v.Used}}</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {{- end }}
                                              <tr class="text-center">
                                                 <td style="display:none;"></td>
                                                 <td style="display:none;"></td>
