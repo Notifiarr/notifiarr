@@ -33,7 +33,7 @@
                                                 <td><b>User</b></td>
                                                 <td><b>Player</b></td>
                                                 <td><b>Complete</b></td>
-                                                <td><b>Transcode</b></td>
+                                                <td><b>Encoding</b></td>
                                                 <td><b>Title</b></td>
                                             </tr>
                                         {{- if .Cache.sessions }}
@@ -44,8 +44,11 @@
                                                 <td>{{ $session.Player.Title }}</td>
                                                 <td>{{ percent $session.ViewOffset $session.Duration }}%</td>
                                                 <td>
+                                                    {{$codecs := plexmedia $session.Media}}
                                                     {{if eq $session.TranscodeSession.VideoDecision "transcode"}}<i title="Video Transcode" class="fas fa-film"></i>{{end}}
+                                                    {{index $codecs 0}},
                                                     {{if eq $session.TranscodeSession.AudioDecision "transcode"}}<i title="Audio Transcode" class="fas fa-deaf"></i>{{end}}
+                                                    {{index $codecs 1}}
                                                 </td>
                                                 <td>{{ $session.GrandparentTitle }} {{ $session.Title }} {{if $session.Year}}({{ $session.Year }}){{end}}</td>
                                             </tr>

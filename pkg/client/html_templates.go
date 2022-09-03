@@ -18,6 +18,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -118,6 +119,7 @@ func (c *Client) getFuncMap() template.FuncMap {
 			return date.String()
 		},
 		"title":       title.String,
+		"plexmedia":   plex.GetMediaTranscode,
 		"todaysemoji": mnd.TodaysEmoji,
 		"fortune":     Fortune,
 		// returns the current time.
