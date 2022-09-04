@@ -108,7 +108,6 @@ func (c *cmd) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	return nil
 }
 
-//nolint:funlen // split this thing up.
 func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) error {
 	reply := &SonarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
@@ -121,11 +120,48 @@ func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) 
 	maps := &cfMapIDpayload{
 		QP:       []idMap{},
 		RP:       []idMap{},
+		CF:       []idMap{},
 		Instance: instance,
 		QPerr:    make(map[int64][]string),
 		RPerr:    make(map[int64][]string),
+		CFerr:    make(map[int][]string),
 	}
 
+	c.updateSonarrCustomFormats(app, reply, maps)
+	c.updateSonarrReleaseProfiles(app, reply, maps)
+	c.updateSonarrQualityProfiles(app, reply, maps)
+
+	return c.postbackSonarrRP(instance, maps)
+}
+
+func (c *cmd) updateSonarrCustomFormats(app *apps.SonarrConfig, reply *SonarrTrashPayload, maps *cfMapIDpayload) {
+	for idx, profile := range reply.CustomFormats {
+		newID, existingID := profile.ID, profile.ID
+
+		if _, err := app.UpdateCustomFormat(profile, existingID); err != nil {
+			maps.CFerr[existingID] = append(maps.CFerr[existingID], err.Error())
+			profile.ID = 0
+
+			c.Debugf("Error Updating custom format [%d/%d] (attempting to ADD %d): %v",
+				idx+1, len(reply.CustomFormats), existingID, err)
+
+			newAdd, err2 := app.AddCustomFormat(profile)
+			if err2 != nil {
+				maps.CFerr[existingID] = append(maps.CFerr[existingID], err2.Error())
+				c.ErrorfNoShare("Ensuring custom format [%d/%d] %d: (update) %v, (add) %v",
+					idx+1, len(reply.CustomFormats), existingID, err, err2)
+
+				continue
+			}
+
+			newID = newAdd.ID
+		}
+
+		maps.CF = append(maps.CF, idMap{profile.Name, int64(existingID), int64(newID)})
+	}
+}
+
+func (c *cmd) updateSonarrReleaseProfiles(app *apps.SonarrConfig, reply *SonarrTrashPayload, maps *cfMapIDpayload) {
 	for idx, profile := range reply.ReleaseProfiles {
 		newID, existingID := profile.ID, profile.ID
 
@@ -151,7 +187,9 @@ func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) 
 
 		maps.RP = append(maps.RP, idMap{profile.Name, existingID, newID})
 	}
+}
 
+func (c *cmd) updateSonarrQualityProfiles(app *apps.SonarrConfig, reply *SonarrTrashPayload, maps *cfMapIDpayload) {
 	for idx, profile := range reply.QualityProfiles {
 		newID, existingID := profile.ID, profile.ID
 
@@ -176,13 +214,11 @@ func (c *cmd) updateSonarrRP(instance int, app *apps.SonarrConfig, data []byte) 
 
 		maps.QP = append(maps.QP, idMap{profile.Name, existingID, newID})
 	}
-
-	return c.postbackSonarrRP(instance, maps)
 }
 
 // postbackSonarrRP sends the changes back to notifiarr.com.
 func (c *cmd) postbackSonarrRP(instance int, maps *cfMapIDpayload) error {
-	if len(maps.QP) < 1 && len(maps.RP) < 1 {
+	if len(maps.QP) < 1 && len(maps.RP) < 1 && len(maps.CF) < 1 {
 		return nil
 	}
 
