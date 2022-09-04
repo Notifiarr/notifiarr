@@ -18,12 +18,17 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+	"golift.io/cache"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -103,6 +108,8 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 }
 
 func (c *Client) getFuncMap() template.FuncMap {
+	title := cases.Title(language.AmericanEnglish)
+
 	return template.FuncMap{
 		"dateFmt": func(date time.Time) string {
 			if ci, _ := c.website.GetClientInfo(); ci != nil {
@@ -111,6 +118,8 @@ func (c *Client) getFuncMap() template.FuncMap {
 
 			return date.String()
 		},
+		"title":       title.String,
+		"plexmedia":   plex.GetMediaTranscode,
 		"todaysemoji": mnd.TodaysEmoji,
 		"fortune":     Fortune,
 		// returns the current time.
@@ -127,6 +136,9 @@ func (c *Client) getFuncMap() template.FuncMap {
 		"locked":   func(env string) bool { return os.Getenv(env) != "" },
 		"contains": strings.Contains,
 		"since":    since,
+		"percent": func(i, j float64) int64 {
+			return int64(i / j * 100) //nolint:gomnd
+		},
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
 				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {
@@ -379,6 +391,7 @@ type templateData struct {
 	Webauth     bool                           `json:"webauth"`
 	Msg         string                         `json:"msg,omitempty"`
 	Version     map[string]interface{}         `json:"version"`
+	Cache       map[string]*cache.Item         `json:"cache"`
 	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
 	ClientInfo  *website.ClientInfo            `json:"clientInfo"`
@@ -413,6 +426,15 @@ func (c *Client) renderTemplate(
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(),
+		Cache: map[string]*cache.Item{
+			"dashboard": data.Get("dashboard"),
+			"sessions":  data.Get("plexCurrentSessions"),
+			"snapshot":  data.Get("snapshot"),
+			"lidarr":    data.Get("lidarr"),
+			"radarr":    data.Get("radarr"),
+			"readarr":   data.Get("readarr"),
+			"sonarr":    data.Get("sonarr"),
+		},
 		Version: map[string]interface{}{
 			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),
@@ -652,6 +674,10 @@ func (c *Client) getDisks() map[string]*snapshot.Partition {
 
 	for k, v := range snapshot.DiskUsage {
 		output[k] = v
+	}
+
+	for k, v := range snapshot.Quotas {
+		output["Quota: "+k] = v
 	}
 
 	for k, v := range snapshot.ZFSPool {

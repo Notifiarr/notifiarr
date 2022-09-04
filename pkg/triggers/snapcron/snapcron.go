@@ -63,6 +63,7 @@ func (c *cmd) printLog() {
 		"cpu, load, memory, uptime, users, temps": true,
 		"raid":   c.Snapshot.Raid,
 		"disks":  c.Snapshot.DiskUsage,
+		"quota":  c.Snapshot.Quotas,
 		"drives": c.Snapshot.DriveData,
 		"iotop":  c.Snapshot.IOTop > 0,
 		"pstop":  c.Snapshot.PSTop > 0,
