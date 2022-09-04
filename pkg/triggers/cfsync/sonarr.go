@@ -2,11 +2,13 @@ package cfsync
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
@@ -80,7 +82,7 @@ func (c *cmd) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 	}
 
 	payload.CustomFormats, err = app.GetCustomFormats()
-	if err != nil {
+	if err != nil && !errors.Is(err, starr.ErrInvalidStatusCode) {
 		return fmt.Errorf("getting custom formats: %w", err)
 	}
 
