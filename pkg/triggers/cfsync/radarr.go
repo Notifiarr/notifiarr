@@ -102,7 +102,6 @@ func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 	return nil
 }
 
-//nolint:funlen // split this thing up.
 func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) error {
 	reply := &RadarrTrashPayload{}
 	if err := json.Unmarshal(data, &reply); err != nil {
@@ -120,6 +119,13 @@ func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) 
 		CFerr:    make(map[int][]string),
 	}
 
+	c.updateRadarrCustomFormats(app, reply, maps)
+	c.updateRadarrQualityProfiles(app, reply, maps)
+
+	return c.postbackRadarrCF(instance, maps)
+}
+
+func (c *cmd) updateRadarrCustomFormats(app *apps.RadarrConfig, reply *RadarrTrashPayload, maps *cfMapIDpayload) {
 	for idx, profile := range reply.CustomFormats {
 		newID, existingID := profile.ID, profile.ID
 
@@ -144,7 +150,9 @@ func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) 
 
 		maps.CF = append(maps.CF, idMap{profile.Name, int64(existingID), int64(newID)})
 	}
+}
 
+func (c *cmd) updateRadarrQualityProfiles(app *apps.RadarrConfig, reply *RadarrTrashPayload, maps *cfMapIDpayload) {
 	for idx, profile := range reply.QualityProfiles {
 		newID, existingID := profile.ID, profile.ID
 
@@ -169,8 +177,6 @@ func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) 
 
 		maps.QP = append(maps.QP, idMap{profile.Name, existingID, newID})
 	}
-
-	return c.postbackRadarrCF(instance, maps)
 }
 
 // postbackRadarrCF sends the changes back to notifiarr.com.
