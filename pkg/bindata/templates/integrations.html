@@ -2,9 +2,8 @@
                                 <p>
                                     This page displays data from integrated applications. More to come!
                                 </p>
-                                    <h2>Plex</h2>
                                     <div class="col-sm-12 col-md-12 col-lg-12">
-                                        <table class="table table-striped table-bordered">
+                                        <table class="table table-striped">
                                             <tr>
                                                 <td rowspan="20" style="width:120px;">
                                                     <img src="{{files}}/images/logo/plex.png" style="height:120px;float:left;margin-right:5px;">
@@ -17,8 +16,8 @@
                                                     <a href="{{.Config.Plex.URL}}">{{.Config.Plex.URL}}</a>
                                                 </td>
                                             </tr>
-                                            <tr><td>Sessions Cached</td><td>{{len .Cache.sessions.Data.Sessions}}</td></tr>
-                                            <tr><td>Cache Age:</td><td>{{since .Cache.sessions.Time}}</td></tr>
+                                            <tr><td style="width:200px;min-width:200px;">Sessions Cached</td><td>{{len .Cache.sessions.Data.Sessions}}</td></tr>
+                                            <tr><td style="width:200px;min-width:200px;">Cache Age:</td><td>{{since .Cache.sessions.Time}}</td></tr>
                                             {{- else }}
                                             <tr>
                                                 <td>No Plex sessions cached.</td>
@@ -26,33 +25,31 @@
                                             {{- end }}
                                         </table>
                                     </div>
-                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                    {{- if .Cache.sessions }}
+                                    <div class="col-sm-12 col-md-12 col-lg-12 table-responsive">
                                         <table class="table table-striped table-bordered">
                                             <tr>
+                                                <td colspan="2"><b>User</b></td>
                                                 <td><b>Session</b></td>
-                                                <td><b>User</b></td>
-                                                <td><b>Player</b></td>
                                                 <td><b>Complete</b></td>
                                                 <td><b>Encoding</b></td>
                                                 <td><b>Title</b></td>
                                             </tr>
-                                        {{- if .Cache.sessions }}
                                             {{- range  $session := .Cache.sessions.Data.Sessions }}
                                             <tr>
+                                                <td style="width:25px;"><img src="{{$session.User.Thumb}}" style="height:25px;"></td>
+                                                <td title="uid: {{$session.User.ID}}"><font size="4">{{ $session.User.Title }}</font></td>
                                                 <td>{{ title $session.Type }} <i style="color:{{if eq $session.Player.State "paused"}}red{{else}}green{{end}}">{{$session.Player.State}} for {{ since $session.Player.StateTime.Time}}</i></td>
-                                                <td title="uid: {{$session.User.ID}}"><img src="{{$session.User.Thumb}}" style="height:25px;"> <font size="4">{{ $session.User.Title }}</font></td>
-                                                <td>{{ $session.Player.Title }}</td>
-                                                <td>{{ percent $session.ViewOffset $session.Duration }}%</td>
+                                                <td>{{ $session.Player.Title }}, {{ percent $session.ViewOffset $session.Duration }}%</td>
                                                 <td>
-                                                    {{$codecs := plexmedia $session.Media}}
-                                                    {{if eq $session.TranscodeSession.VideoDecision "transcode"}}<i title="Video Transcode" class="fas fa-film"></i>{{end}}
-                                                    {{index $codecs 0}},
-                                                    {{if eq $session.TranscodeSession.AudioDecision "transcode"}}<i title="Audio Transcode" class="fas fa-deaf"></i>{{end}}
-                                                    {{index $codecs 1}}
+                                                    {{- $codecs := plexmedia $session.Media}}
+                                                    {{index $codecs 0}}, {{index $codecs 1}}
                                                 </td>
                                                 <td>{{ $session.GrandparentTitle }} {{ $session.Title }} {{if $session.Year}}({{ $session.Year }}){{end}}</td>
                                             </tr>
                                             {{- end }}
-                                        {{- end }}
                                         </table>
                                     </div>
+                                    {{- end }}
+{{- /* TODO: dashbaord, snapshot, starr apps. */ -}}
+{{- /* end of integrations (leave this comment) */ -}}
