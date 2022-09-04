@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // Sessions is the config input data.
@@ -139,4 +140,33 @@ func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// GetMediaTranscode returns the transcode info in a format for an html template to consume.
+func GetMediaTranscode(medias []*Media) []string {
+	if len(medias) == 0 || len(medias[0].Part) == 0 {
+		return []string{"", ""}
+	}
+
+	var (
+		media    = medias[0]
+		videoMsg string
+		audioMsg string
+	)
+
+	for _, stream := range media.Part[0].Stream {
+		if stream.StreamType == 1 {
+			videoMsg = stream.DisplayTitle
+			if stream.Decision == "transcode" {
+				videoMsg += fmt.Sprintf(" → %s (%s)", media.VideoResolution, strings.ToUpper(stream.Codec))
+			}
+		} else if stream.StreamType == 2 { //nolint:gomnd
+			audioMsg = stream.DisplayTitle
+			if stream.Decision == "transcode" {
+				audioMsg += " → " + strings.ToUpper(stream.Codec)
+			}
+		}
+	}
+
+	return []string{videoMsg, audioMsg}
 }
