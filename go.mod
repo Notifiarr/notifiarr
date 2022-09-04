@@ -12,7 +12,7 @@ require (
 	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
 	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
-	golift.io/starr v0.14.1-0.20220903221904-52426082f330
+	golift.io/starr v0.14.1-0.20220904184902-1bde41dc6669
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.1.2
 )
