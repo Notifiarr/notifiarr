@@ -155,8 +155,8 @@ func (c *Client) makeMoreChannels() {
 	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, service checks")
 	menu["data"] = data
 	menu["gaps"] = data.AddSubMenuItem("Send Radarr Gaps", "[premium feature] trigger radarr collections gaps")
-	menu["synccf"] = data.AddSubMenuItem("Sync Radarr Formats", "[premium feature] trigger radarr custom format sync")
-	menu["syncqp"] = data.AddSubMenuItem("Sync Sonarr Profiles", "[premium feature] trigger sonarr quality profile sync")
+	menu["synccf"] = data.AddSubMenuItem("TRaSH: Sync Radarr", "[premium feature] trigger TRaSH radarr sync")
+	menu["syncqp"] = data.AddSubMenuItem("TRaSH: Sync Sonarr", "[premium feature] trigger TRaSH sonarr sync")
 	menu["svcs_prod"] = data.AddSubMenuItem("Check and Send Services", "check all services and send results to notifiarr")
 	menu["plex_prod"] = data.AddSubMenuItem("Send Plex Sessions", "send plex sessions to notifiarr")
 	menu["snap_prod"] = data.AddSubMenuItem("Send System Snapshot", "send system snapshot to notifiarr")

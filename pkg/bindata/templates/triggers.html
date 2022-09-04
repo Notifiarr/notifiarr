@@ -4,13 +4,13 @@
                                     <table class="table table-striped">
                                         <tr><td>Runs</td><td>Action &nbsp; <a title="Refresh Page" href="#triggers" class="fas fa-sync" onClick="refreshPage('triggers');"></a></td><td>Description</td></tr>
                                         <tr>
-                                            <td>{{index .Expvar.TimerCounts "Starting Radarr CF TRaSH sync."}}</td>
+                                            <td>{{index .Expvar.TimerCounts "Starting Radarr Custom Format TRaSH sync."}}</td>
                                             <td>
                                                 <a href="#triggers" onClick="triggerAction('cfsync')">Sync Custom Formats</a></td><td>Syncs TRaSH custom formats to Radarr.
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>{{index .Expvar.TimerCounts "Starting Sonarr RP TRaSH sync."}}</td>
+                                            <td>{{index .Expvar.TimerCounts "Starting Sonarr Release Profile TRaSH sync."}}</td>
                                             <td>
                                                 <a href="#triggers" onClick="triggerAction('rpsync')">Sync Release Profiles</a></td><td>Syncs TRaSH release profiles to Sonarr.
                                             </td>
