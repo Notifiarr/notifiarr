@@ -49,7 +49,7 @@ func (c *cmd) syncRadarr(event website.EventType) {
 			continue
 		}
 
-		if err := c.syncRadarrCF(instance, app); err != nil {
+		if err := c.syncRadarrCF(event, instance, app); err != nil {
 			c.Errorf("[%s requested] Radarr Custom Formats sync request for '%d:%s' failed: %v", event, instance, app.URL, err)
 			continue
 		}
@@ -58,7 +58,7 @@ func (c *cmd) syncRadarr(event website.EventType) {
 	}
 }
 
-func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
+func (c *cmd) syncRadarrCF(event website.EventType, instance int, app *apps.RadarrConfig) error {
 	var (
 		err     error
 		payload = RadarrTrashPayload{Instance: instance, Name: app.Name}
@@ -82,10 +82,12 @@ func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
 
 	c.SendData(&website.Request{
 		Route:      website.CFSyncRoute,
+		Event:      event,
 		Params:     []string{"app=radarr"},
 		Payload:    payload,
 		LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
 		LogPayload: true,
+		ErrorsOnly: false,
 	})
 
 	return nil
