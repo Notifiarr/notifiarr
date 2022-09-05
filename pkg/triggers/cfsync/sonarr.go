@@ -50,7 +50,7 @@ func (c *cmd) syncSonarr(event website.EventType) {
 			continue
 		}
 
-		if err := c.syncSonarrRP(instance, app); err != nil {
+		if err := c.syncSonarrRP(event, instance, app); err != nil {
 			c.Errorf("[%s requested] Sonarr Release Profiles sync for '%d:%s' failed: %v", event, instance, app.URL, err)
 			continue
 		}
@@ -59,7 +59,7 @@ func (c *cmd) syncSonarr(event website.EventType) {
 	}
 }
 
-func (c *cmd) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
+func (c *cmd) syncSonarrRP(event website.EventType, instance int, app *apps.SonarrConfig) error {
 	var (
 		err     error
 		payload = SonarrTrashPayload{Instance: instance, Name: app.Name}
@@ -89,6 +89,7 @@ func (c *cmd) syncSonarrRP(instance int, app *apps.SonarrConfig) error {
 
 	c.SendData(&website.Request{
 		Route:      website.CFSyncRoute,
+		Event:      event,
 		Params:     []string{"app=sonarr"},
 		Payload:    payload,
 		LogMsg:     fmt.Sprintf("Sonarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
