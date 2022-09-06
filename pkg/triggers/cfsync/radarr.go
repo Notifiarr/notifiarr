@@ -2,10 +2,11 @@
 package cfsync
 
 import (
+	"context"
 	"fmt"
+	"sync"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/radarr"
@@ -33,62 +34,102 @@ func (a *Action) SyncRadarrCF(event website.EventType) {
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *cmd) syncRadarr(event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.RadarrInstances) < 1 {
-		c.Debugf("Cannot sync Radarr Custom Formats. Website provided 0 instances.")
+		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. Website provided 0 instances.", event)
 		return
 	} else if len(c.Apps.Radarr) < 1 {
-		c.Debugf("Cannot sync Radarr Custom Formats. No Radarr instances configured.")
+		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. No Radarr instances configured.", event)
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), maxSyncTime)
+	defer cancel()
 
 	for i, app := range c.Apps.Radarr {
 		instance := i + 1
 		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
 			!c.ClientInfo.Actions.Sync.RadarrInstances.Has(instance) {
-			c.Debugf("CF Sync Skipping Radarr instance %d. Not in sync list: %v",
-				instance, c.ClientInfo.Actions.Sync.RadarrInstances)
+			c.Debugf("[%s requested] CF Sync Skipping Radarr instance %d. Not in sync list: %v",
+				event, instance, c.ClientInfo.Actions.Sync.RadarrInstances)
 			continue
 		}
 
-		if err := c.syncRadarrCF(event, instance, app); err != nil {
-			c.Errorf("[%s requested] Radarr Custom Formats sync request for '%d:%s' failed: %v", event, instance, app.URL, err)
-			continue
-		}
-
-		c.Printf("[%s requested] Synced Custom Formats from Notifiarr for Radarr: %d:%s", event, instance, app.URL)
+		start := time.Now()
+		payload := c.getRadarrProfiles(ctx, event, instance)
+		c.SendData(&website.Request{
+			Route:      website.CFSyncRoute,
+			Event:      event,
+			Params:     []string{"app=radarr"},
+			Payload:    payload,
+			LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
+			LogPayload: true,
+		})
+		c.Printf("[%s requested] Synced Custom Formats for Radarr instance %d (%s/%s)", event, instance, app.Name, app.URL)
 	}
 }
 
-func (c *cmd) syncRadarrCF(event website.EventType, instance int, app *apps.RadarrConfig) error {
+func (c *cmd) getRadarrProfiles(ctx context.Context, event website.EventType, instance int) *RadarrTrashPayload {
 	var (
 		err     error
+		app     = c.Config.Apps.Radarr[instance-1]
 		payload = RadarrTrashPayload{Instance: instance, Name: app.Name}
-		start   = time.Now()
 	)
 
-	payload.QualityProfiles, err = app.GetQualityProfiles()
+	payload.QualityProfiles, err = app.GetQualityProfilesContext(ctx)
 	if err != nil {
-		return fmt.Errorf("getting quality profiles: %w", err)
+		errStr := fmt.Sprintf("getting quality profiles: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
-	payload.CustomFormats, err = app.GetCustomFormats()
+	payload.CustomFormats, err = app.GetCustomFormatsContext(ctx)
 	if err != nil {
-		return fmt.Errorf("getting custom formats: %w", err)
+		errStr := fmt.Sprintf("getting custom formats: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
-	payload.QualityDefinitions, err = app.GetQualityDefinitions()
+	payload.QualityDefinitions, err = app.GetQualityDefinitionsContext(ctx)
 	if err != nil {
-		return fmt.Errorf("getting quality definitions: %w", err)
+		errStr := fmt.Sprintf("getting quality definitions: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
-	c.SendData(&website.Request{
-		Route:      website.CFSyncRoute,
-		Event:      event,
-		Params:     []string{"app=radarr"},
-		Payload:    payload,
-		LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
-		LogPayload: true,
-		ErrorsOnly: false,
-	})
+	return &payload
+}
 
-	return nil
+// aggregateTrashRadarr is fired by the api handler.
+func (c *cmd) aggregateTrashRadarr(
+	ctx context.Context,
+	wait *sync.WaitGroup,
+	instances website.IntList,
+) []*RadarrTrashPayload {
+	output := []*RadarrTrashPayload{}
+	event := website.EventAPI
+
+	// Create our known+requested instances, so we can write slice values in go routines.
+	for idx, app := range c.Config.Apps.Radarr {
+		if instance := idx + 1; instances.Has(instance) && app.Enabled() {
+			output = append(output, &RadarrTrashPayload{Instance: instance, Name: app.Name})
+		} else {
+			c.Errorf("[%s requested] Aggegregate request for disabled Radarr instance %d (%s)", event, instance, app.Name)
+		}
+	}
+
+	// Grab data for each requested instance in parallel/go routine.
+	for idx := range output {
+		if c.Config.Serial {
+			output[idx] = c.getRadarrProfiles(ctx, event, output[idx].Instance)
+			continue
+		}
+
+		wait.Add(1)
+
+		go func(idx int) {
+			output[idx] = c.getRadarrProfiles(ctx, event, output[idx].Instance)
+			wait.Done() //nolint:wsl
+		}(idx)
+	}
+
+	return output
 }
