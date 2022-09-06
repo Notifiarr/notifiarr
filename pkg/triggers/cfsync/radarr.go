@@ -2,27 +2,28 @@
 package cfsync
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
+	"sync"
+	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/radarr"
 )
 
-const TrigCFSyncRadarr common.TriggerName = "Starting Radarr CF TRaSH sync."
+const TrigCFSyncRadarr common.TriggerName = "Starting Radarr Custom Format TRaSH sync."
 
 // RadarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Radarr.
 // This is used in other places, like the trash API handler in the 'client' module.
 type RadarrTrashPayload struct {
-	Instance        int                      `json:"instance"`
-	Name            string                   `json:"name"`
-	CustomFormats   []*radarr.CustomFormat   `json:"customFormats,omitempty"`
-	QualityProfiles []*radarr.QualityProfile `json:"qualityProfiles,omitempty"`
-	Error           string                   `json:"error"`
-	NewMaps         *cfMapIDpayload          `json:"newMaps,omitempty"`
+	Instance           int                         `json:"instance"`
+	Name               string                      `json:"name"`
+	CustomFormats      []*radarr.CustomFormat      `json:"customFormats,omitempty"`
+	QualityProfiles    []*radarr.QualityProfile    `json:"qualityProfiles,omitempty"`
+	QualityDefinitions []*radarr.QualityDefinition `json:"qualityDefinitions,omitempty"`
+	Error              string                      `json:"error"`
 }
 
 // SyncRadarrCF initializes a custom format sync with radarr.
@@ -33,158 +34,102 @@ func (a *Action) SyncRadarrCF(event website.EventType) {
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *cmd) syncRadarr(event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.RadarrInstances) < 1 {
-		c.Debugf("Cannot sync Radarr Custom Formats. Website provided 0 instances.")
+		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. Website provided 0 instances.", event)
 		return
 	} else if len(c.Apps.Radarr) < 1 {
-		c.Debugf("Cannot sync Radarr Custom Formats. No Radarr instances configured.")
+		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. No Radarr instances configured.", event)
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), maxSyncTime)
+	defer cancel()
 
 	for i, app := range c.Apps.Radarr {
 		instance := i + 1
 		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
 			!c.ClientInfo.Actions.Sync.RadarrInstances.Has(instance) {
-			c.Debugf("CF Sync Skipping Radarr instance %d. Not in sync list: %v",
-				instance, c.ClientInfo.Actions.Sync.RadarrInstances)
+			c.Debugf("[%s requested] CF Sync Skipping Radarr instance %d. Not in sync list: %v",
+				event, instance, c.ClientInfo.Actions.Sync.RadarrInstances)
 			continue
 		}
 
-		if err := c.syncRadarrCF(instance, app); err != nil {
-			c.Errorf("[%s requested] Radarr Custom Formats sync request for '%d:%s' failed: %v", event, instance, app.URL, err)
-			continue
-		}
-
-		c.Printf("[%s requested] Synced Custom Formats from Notifiarr for Radarr: %d:%s", event, instance, app.URL)
+		start := time.Now()
+		payload := c.getRadarrProfiles(ctx, event, instance)
+		c.SendData(&website.Request{
+			Route:      website.CFSyncRoute,
+			Event:      event,
+			Params:     []string{"app=radarr"},
+			Payload:    payload,
+			LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
+			LogPayload: true,
+		})
+		c.Printf("[%s requested] Synced Custom Formats for Radarr instance %d (%s/%s)", event, instance, app.Name, app.URL)
 	}
 }
 
-func (c *cmd) syncRadarrCF(instance int, app *apps.RadarrConfig) error {
+func (c *cmd) getRadarrProfiles(ctx context.Context, event website.EventType, instance int) *RadarrTrashPayload {
 	var (
 		err     error
-		payload = RadarrTrashPayload{Instance: instance, Name: app.Name, NewMaps: c.radarrCF[instance]}
+		app     = c.Config.Apps.Radarr[instance-1]
+		payload = RadarrTrashPayload{Instance: instance, Name: app.Name}
 	)
 
-	payload.QualityProfiles, err = app.GetQualityProfiles()
+	payload.QualityProfiles, err = app.GetQualityProfilesContext(ctx)
 	if err != nil {
-		return fmt.Errorf("getting quality profiles: %w", err)
+		errStr := fmt.Sprintf("getting quality profiles: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
-	payload.CustomFormats, err = app.GetCustomFormats()
+	payload.CustomFormats, err = app.GetCustomFormatsContext(ctx)
 	if err != nil {
-		return fmt.Errorf("getting custom formats: %w", err)
+		errStr := fmt.Sprintf("getting custom formats: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
-	body, err := c.GetData(&website.Request{
-		Route:   website.CFSyncRoute,
-		Params:  []string{"app=radarr"},
-		Payload: payload,
-	})
+	payload.QualityDefinitions, err = app.GetQualityDefinitionsContext(ctx)
 	if err != nil {
-		return fmt.Errorf("sending current formats: %w", err)
+		errStr := fmt.Sprintf("getting quality definitions: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
-	delete(c.radarrCF, instance)
-
-	if body.Result != success {
-		return fmt.Errorf("%w: %s", website.ErrInvalidResponse, body.Result)
-	}
-
-	if err := c.updateRadarrCF(instance, app, body.Details.Response); err != nil {
-		return fmt.Errorf("updating application: %w", err)
-	}
-
-	return nil
+	return &payload
 }
 
-//nolint:funlen // split this thing up.
-func (c *cmd) updateRadarrCF(instance int, app *apps.RadarrConfig, data []byte) error {
-	reply := &RadarrTrashPayload{}
-	if err := json.Unmarshal(data, &reply); err != nil {
-		return fmt.Errorf("bad json response: %w", err)
+// aggregateTrashRadarr is fired by the api handler.
+func (c *cmd) aggregateTrashRadarr(
+	ctx context.Context,
+	wait *sync.WaitGroup,
+	instances website.IntList,
+) []*RadarrTrashPayload {
+	output := []*RadarrTrashPayload{}
+	event := website.EventAPI
+
+	// Create our known+requested instances, so we can write slice values in go routines.
+	for idx, app := range c.Config.Apps.Radarr {
+		if instance := idx + 1; instances.Has(instance) && app.Enabled() {
+			output = append(output, &RadarrTrashPayload{Instance: instance, Name: app.Name})
+		} else {
+			c.Errorf("[%s requested] Aggegregate request for disabled Radarr instance %d (%s)", event, instance, app.Name)
+		}
 	}
 
-	c.Printf("Received %d quality profiles and %d custom formats for Radarr: %d:%s",
-		len(reply.QualityProfiles), len(reply.CustomFormats), instance, app.URL)
-
-	maps := &cfMapIDpayload{
-		QP:       []idMap{},
-		CF:       []idMap{},
-		Instance: instance,
-		QPerr:    make(map[int64][]string),
-		CFerr:    make(map[int][]string),
-	}
-
-	for idx, profile := range reply.CustomFormats {
-		newID, existingID := profile.ID, profile.ID
-
-		if _, err := app.UpdateCustomFormat(profile, existingID); err != nil {
-			maps.CFerr[existingID] = append(maps.CFerr[existingID], err.Error())
-			profile.ID = 0
-
-			c.Debugf("Error Updating custom format [%d/%d] (attempting to ADD %d): %v",
-				idx+1, len(reply.CustomFormats), existingID, err)
-
-			newAdd, err2 := app.AddCustomFormat(profile)
-			if err2 != nil {
-				maps.CFerr[existingID] = append(maps.CFerr[existingID], err2.Error())
-				c.Errorf("Ensuring custom format [%d/%d] %d: (update) %v, (add) %v",
-					idx+1, len(reply.CustomFormats), existingID, err, err2)
-
-				continue
-			}
-
-			newID = newAdd.ID
+	// Grab data for each requested instance in parallel/go routine.
+	for idx := range output {
+		if c.Config.Serial {
+			output[idx] = c.getRadarrProfiles(ctx, event, output[idx].Instance)
+			continue
 		}
 
-		maps.CF = append(maps.CF, idMap{profile.Name, int64(existingID), int64(newID)})
+		wait.Add(1)
+
+		go func(idx int) {
+			output[idx] = c.getRadarrProfiles(ctx, event, output[idx].Instance)
+			wait.Done() //nolint:wsl
+		}(idx)
 	}
 
-	for idx, profile := range reply.QualityProfiles {
-		newID, existingID := profile.ID, profile.ID
-
-		if err := app.UpdateQualityProfile(profile); err != nil {
-			maps.QPerr[existingID] = append(maps.QPerr[existingID], err.Error())
-			profile.ID = 0
-
-			c.Debugf("Error Updating quality profile [%d/%d] (attempting to ADD %d): %v",
-				idx+1, len(reply.QualityProfiles), existingID, err)
-
-			newAddID, err2 := app.AddQualityProfile(profile)
-			if err2 != nil {
-				maps.QPerr[existingID] = append(maps.QPerr[existingID], err2.Error())
-				c.Errorf("Ensuring quality profile [%d/%d] %d: (update) %v, (add) %v",
-					idx+1, len(reply.QualityProfiles), existingID, err, err2)
-
-				continue
-			}
-
-			newID = newAddID
-		}
-
-		maps.QP = append(maps.QP, idMap{profile.Name, existingID, newID})
-	}
-
-	return c.postbackRadarrCF(instance, maps)
-}
-
-// postbackRadarrCF sends the changes back to notifiarr.com.
-func (c *cmd) postbackRadarrCF(instance int, maps *cfMapIDpayload) error {
-	if len(maps.CF) < 1 && len(maps.QP) < 1 {
-		return nil
-	}
-
-	_, err := c.GetData(&website.Request{
-		Route:      website.CFSyncRoute,
-		Params:     []string{"app=radarr", "updateIDs=true"},
-		Payload:    &RadarrTrashPayload{Instance: instance, NewMaps: maps},
-		LogPayload: true,
-	})
-	if err != nil {
-		c.radarrCF[instance] = maps
-		return fmt.Errorf("updating custom format ID map: %w", err)
-	}
-
-	delete(c.radarrCF, instance)
-
-	return nil
+	return output
 }

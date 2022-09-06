@@ -1,17 +1,16 @@
 package apps
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
+	"golift.io/starr/debuglog"
 	"golift.io/starr/readarr"
 )
 
@@ -55,16 +54,11 @@ func (a *Apps) setupReadarr() error {
 			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		app.Config.Client = &http.Client{
-			Timeout: app.Timeout.Duration,
-			CheckRedirect: func(r *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-			Transport: exp.NewMetricsRoundTripper(string(starr.Readarr), &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: app.Config.ValidSSL}, //nolint:gosec
-			}),
-		}
-		app.Debugf = a.Debugf
+		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+			MaxBody: app.MaxBody,
+			Debugf:  a.Debugf,
+			Caller:  metricMaker(string(starr.Readarr)),
+		})
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Readarr = readarr.New(app.Config)
