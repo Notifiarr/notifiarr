@@ -80,7 +80,7 @@ func (c *Cmd) getSonarrState(instance int, app *apps.SonarrConfig) (*State, erro
 }
 
 func (c *Cmd) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistoryPage(&starr.Req{
+	history, err := app.GetHistoryPage(&starr.PageReq{
 		Page:     1,
 		PageSize: showLatest + 5, //nolint:gomnd // grab extra in case there's an error.
 		SortDir:  starr.SortDescend,

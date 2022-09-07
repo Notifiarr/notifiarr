@@ -330,7 +330,7 @@ func (c *genericInstance) saveBackupFile(
 	remotePath,
 	localPath string,
 ) (string, error) {
-	resp, err := c.app.Get(ctx, remotePath, nil)
+	resp, err := c.app.Get(ctx, starr.Request{URI: remotePath})
 	if err != nil {
 		return "", fmt.Errorf("getting http response body: %w", err)
 	}
@@ -343,7 +343,7 @@ func (c *genericInstance) saveBackupFile(
 		}
 
 		// Try again after logging in.
-		resp, err = c.app.Get(ctx, remotePath, nil)
+		resp, err = c.app.Get(ctx, starr.Request{URI: remotePath})
 		if err != nil {
 			return "", fmt.Errorf("getting http response body: %w", err)
 		}

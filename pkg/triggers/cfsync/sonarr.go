@@ -101,6 +101,10 @@ func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, in
 		errStr := fmt.Sprintf("getting custom formats: %v ", err)
 		payload.Error += errStr
 		c.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+	} else if errors.Is(err, starr.ErrInvalidStatusCode) {
+		// This error is required so the site knows it's sonarr v3.
+		errStr := fmt.Sprintf("getting custom formats: %v ", err)
+		payload.Error += errStr
 	}
 
 	return &payload
