@@ -51,8 +51,8 @@ func (c *Client) httpHandlers() {
 }
 
 func (c *Client) httpGuiHandlers(base string) {
-	// gui is used for authorized paths.
-	gui := c.Config.Router.PathPrefix(base).Subrouter()
+	// gui is used for authorized paths. All these paths have a prefix of /ui.
+	gui := c.Config.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
 	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
 	gui.Handle("/debug/vars", expvar.Handler()).Methods("GET")
 	gui.HandleFunc("/deleteFile/{source}/{id}", c.getFileDeleteHandler).Methods("GET")

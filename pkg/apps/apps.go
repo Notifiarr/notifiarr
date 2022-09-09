@@ -34,6 +34,7 @@ type Apps struct {
 	APIKey   string            `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
 	ExKeys   []string          `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
 	URLBase  string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	MaxBody  int               `toml:"max_body" xml:"max_body" json:"maxBody"`
 	Sonarr   []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
 	Radarr   []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
 	Lidarr   []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
@@ -59,7 +60,6 @@ type starrConfig struct {
 	Name     string        `toml:"name" xml:"name" json:"name"`
 	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
 	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
-	MaxBody  int           `toml:"max_body" xml:"max_body" json:"maxBody"`
 	ValidSSL bool          `toml:"valid_ssl" xml:"valid_ssl" json:"validSsl"`
 }
 
