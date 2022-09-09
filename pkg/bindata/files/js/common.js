@@ -183,7 +183,7 @@ function jsLoader()
     const files     = ['navigation', 'golists', 'fileViewer', 'services', 'triggers', 'websocket', 'filebrowser'];
 
     for (const file of files) {
-        path        = URLBase+'files/js/' + file + '.js';
+        path        = FilesBase+'/js/' + file + '.js';
         script      = document.createElement('script');
         script.src  = path;
         document.head.appendChild(script);

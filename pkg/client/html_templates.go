@@ -127,7 +127,7 @@ func (c *Client) getFuncMap() template.FuncMap {
 		// returns an integer divided by a million.
 		"megabyte": megabyte,
 		// returns the URL base.
-		"base": func() string { return strings.TrimSuffix(c.Config.URLBase, "/") },
+		"base": func() string { return path.Join(c.Config.URLBase, "ui") + "/" },
 		// returns the files url base.
 		"files": func() string { return path.Join(c.Config.URLBase, "files") },
 		// adds 1 an integer, to deal with instance IDs for humans.

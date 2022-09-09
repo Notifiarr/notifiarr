@@ -55,7 +55,7 @@ func (a *Apps) setupReadarr() error {
 		}
 
 		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
-			MaxBody: app.MaxBody,
+			MaxBody: a.MaxBody,
 			Debugf:  a.Debugf,
 			Caller:  metricMaker(string(starr.Readarr)),
 		})

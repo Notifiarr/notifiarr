@@ -52,7 +52,6 @@ type Config struct {
 	SSLCrtFile string                 `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
 	SSLKeyFile string                 `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
 	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
-	MaxBody    int                    `json:"maxBody" toml:"max_body" xml:"max_body" yaml:"maxBody"`
 	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Serial     bool                   `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
