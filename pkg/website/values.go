@@ -41,7 +41,7 @@ func (s *Server) SetValuesContext(ctx context.Context, values map[string][]byte)
 
 	code, body, err := s.sendJSON(ctx, s.config.BaseURL+ClientRoute.Path("setStates"), data, true)
 	if err != nil {
-		return fmt.Errorf("inalid response (%d): %w", code, err)
+		return fmt.Errorf("invalid response (%d): %w", code, err)
 	}
 
 	_, err = unmarshalResponse(s.config.BaseURL+ClientRoute.Path("getStates"), code, body)
@@ -71,7 +71,7 @@ func (s *Server) DelValueContext(ctx context.Context, keys ...string) error {
 
 	code, body, err := s.sendJSON(ctx, s.config.BaseURL+ClientRoute.Path("setStates"), data, true)
 	if err != nil {
-		return fmt.Errorf("inalid response (%d): %w", code, err)
+		return fmt.Errorf("invalid response (%d): %w", code, err)
 	}
 
 	_, err = unmarshalResponse(s.config.BaseURL+ClientRoute.Path("setStates"), code, body)
@@ -99,7 +99,7 @@ func (s *Server) GetValueContext(ctx context.Context, keys ...string) (map[strin
 
 	code, body, err := s.sendJSON(ctx, s.config.BaseURL+ClientRoute.Path("getStates"), data, true)
 	if err != nil {
-		return nil, fmt.Errorf("inalid response (%d): %w", code, err)
+		return nil, fmt.Errorf("invalid response (%d): %w", code, err)
 	}
 
 	resp, err := unmarshalResponse(s.config.BaseURL+ClientRoute.Path("getStates"), code, body)

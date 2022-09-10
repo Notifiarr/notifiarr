@@ -240,8 +240,23 @@ func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
 }
 
 func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
+	c.Lock()
+	c.reloading = true
+	c.Unlock()
+
 	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
 	http.Error(response, "OK", http.StatusOK)
+}
+
+func (c *Client) handlePing(response http.ResponseWriter, _ *http.Request) {
+	c.RLock()
+	defer c.RUnlock()
+
+	if c.reloading {
+		http.Error(response, "Reloading", http.StatusLocked)
+	} else {
+		http.Error(response, "OK", http.StatusOK)
+	}
 }
 
 func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http.Request) {
@@ -546,6 +561,10 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 	// reload.
 	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
+
+	c.Lock()
+	c.reloading = true
+	c.Unlock()
 
 	// respond.
 	c.Printf("[gui '%s' requested] Updated Configuration.", user)

@@ -68,6 +68,7 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/regexTest", c.handleRegexTest).Methods("POST")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
 	gui.HandleFunc("/reload", c.handleReload).Methods("GET")
+	gui.HandleFunc("/ping", c.handlePing).Methods("GET")
 	gui.HandleFunc("/services/check/{service}", c.handleServicesCheck).Methods("GET")
 	gui.HandleFunc("/services/{action:stop|start}", c.handleServicesStopStart).Methods("GET")
 	gui.HandleFunc("/shutdown", c.handleShutdown).Methods("GET")

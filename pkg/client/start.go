@@ -43,8 +43,9 @@ type Client struct {
 	cookies   *securecookie.SecureCookie
 	templat   *template.Template
 	webauth   bool
+	reloading bool
 	// this locks anything that may be updated while running.
-	// at least "UIPassword" as of its creation.
+	// at least "UIPassword" and "reloading" as of its creation.
 	sync.RWMutex
 }
 
@@ -305,6 +306,9 @@ func (c *Client) reloadConfiguration(event website.EventType, source string) err
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
 	}
+
+	// This doesn't need to lock because web server is not running.
+	c.reloading = false // We're done.
 
 	return nil
 }

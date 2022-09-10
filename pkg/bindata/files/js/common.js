@@ -338,13 +338,22 @@ function savePendingChanges()
         data: fields,
         success: function (data){
             $('.pending-change-container').remove();          // remove save button.
-            setTimeout(function(){location.reload();}, 5000); // reload window in 5 seconds.
-            toast('Config Saved', 'Wait 5 seconds; reloading the new configuration...', 'success');
+            toast('Config Saving', 'The page will reload when the client is finished reloading the changes.', 'success', 60000);
+            const ping = setInterval(function () {
+                $.ajax({
+                    url: URLBase+'ping',
+                    complete: function(xhr){
+                        if (xhr.status == 200) {
+                            clearInterval(ping);
+                            location.reload();
+                        }
+                    }
+                });
+            }, 1000);
         },
         error: function (response, status, error) {
             if (response.responseText === undefined) {
-                toast('Web Server Error',
-                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+                toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
                 toast('Save Error', error+': '+response.responseText, 'error', 15000);
             }
