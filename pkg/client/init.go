@@ -218,7 +218,7 @@ func (c *Client) printSonarr(app *website.InstanceConfig) {
 
 // printDeluge is called on startup to print info about each configured server.
 func (c *Client) printDeluge() {
-	s := "s'"
+	s := "s"
 	if len(c.Config.Deluge) == 1 {
 		s = ""
 	}
