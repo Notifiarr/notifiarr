@@ -231,10 +231,11 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 		if content == "true" || content == "on" || content == "enable" {
 			share.Setup(c.website)
 			return http.StatusBadRequest, "Client log notifications enabled."
-		} else {
-			share.StopLogs()
-			return http.StatusBadRequest, "Client log notifications disabled."
 		}
+
+		share.StopLogs()
+
+		return http.StatusBadRequest, "Client log notifications disabled."
 	case "command":
 		cmd := c.triggers.Commands.GetByHash(content)
 		if cmd == nil {
