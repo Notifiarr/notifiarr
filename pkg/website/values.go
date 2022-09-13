@@ -28,6 +28,10 @@ func (s *Server) SetValues(values map[string][]byte) error {
 
 // SetValuesContext sets values stored in the website database.
 func (s *Server) SetValuesContext(ctx context.Context, values map[string][]byte) error {
+	if s.validAPIKey() != nil {
+		return nil //nolint:nilerr
+	}
+
 	for key, val := range values {
 		if val != nil { // ignore nil byte slices.
 			values[key] = []byte(base64.StdEncoding.EncodeToString(val))
@@ -59,6 +63,10 @@ func (s *Server) DelValue(keys ...string) error {
 
 // DelValueContext deletes a value stored in the website database.
 func (s *Server) DelValueContext(ctx context.Context, keys ...string) error {
+	if s.validAPIKey() != nil {
+		return nil //nolint:nilerr
+	}
+
 	values := make(map[string]interface{})
 	for _, key := range keys {
 		values[key] = nil
@@ -92,6 +100,10 @@ func (s *Server) GetValue(keys ...string) (map[string][]byte, error) {
 
 // GetValueContext gets a value stored in the website database.
 func (s *Server) GetValueContext(ctx context.Context, keys ...string) (map[string][]byte, error) {
+	if s.validAPIKey() != nil {
+		return make(map[string][]byte), nil //nolint:nilerr
+	}
+
 	data, err := json.Marshal(map[string][]string{"fields": keys})
 	if err != nil {
 		return nil, fmt.Errorf("converting keys to json: %w", err)

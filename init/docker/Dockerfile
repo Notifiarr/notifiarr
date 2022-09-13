@@ -32,9 +32,7 @@ RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-c
     ln -s /usr/lib /tmp/lib_link/lib
 
 # Build the app.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
+RUN CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 FROM scratch
 ARG TARGETOS

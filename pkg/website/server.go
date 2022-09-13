@@ -22,6 +22,8 @@ const (
 	DefaultRetries = 4
 	// RetryDelay is how long to Sleep between retries.
 	RetryDelay = 222 * time.Millisecond
+	// APIKeyLength is the string length of a valid notifiarr API key.
+	APIKeyLength = 36
 )
 
 // Errors returned by this library.
@@ -29,6 +31,7 @@ var (
 	ErrNon200          = fmt.Errorf("return code was not 200")
 	ErrInvalidResponse = fmt.Errorf("invalid response")
 	ErrNoChannel       = fmt.Errorf("the website send-data channel is closed")
+	ErrInvalidAPIKey   = fmt.Errorf("configured notifiarr API key is invalid")
 )
 
 // Config is the input data needed to send payloads to notifiarr.

@@ -22,6 +22,14 @@ type httpClient struct {
 	*http.Client
 }
 
+func (s *Server) validAPIKey() error {
+	if len(s.config.Apps.APIKey) != APIKeyLength {
+		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
+	}
+
+	return nil
+}
+
 // unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
 func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, error) {
 	var (
@@ -199,7 +207,7 @@ func (s *Server) watchSendDataChan() {
 
 	for data := range s.sendData {
 		switch resp, elapsed, err := s.sendRequest(data); {
-		case data.LogMsg == "":
+		case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 			continue
 		case errors.Is(err, ErrNon200):
 			s.config.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
@@ -218,6 +226,18 @@ func (s *Server) watchSendDataChan() {
 }
 
 func (s *Server) sendRequest(data *Request) (*Response, time.Duration, error) {
+	if err := s.validAPIKey(); err != nil {
+		if data.respChan != nil {
+			data.respChan <- &chResponse{
+				Response: nil,
+				Elapsed:  0,
+				Error:    err,
+			}
+		}
+
+		return nil, 0, err
+	}
+
 	var uri string
 
 	if len(data.Params) > 0 {

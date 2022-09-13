@@ -7,6 +7,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -184,7 +185,13 @@ func (c *Client) loadConfiguration() (msg string, newPassword string, err error)
 func (c *Client) loadSiteConfig() *website.ClientInfo {
 	clientInfo, err := c.website.GetClientInfo()
 	if err != nil || clientInfo == nil {
-		c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
+		if errors.Is(err, website.ErrInvalidAPIKey) {
+			c.ErrorfNoShare("==> Problem validating API key: %v", err)
+			c.ErrorfNoShare("==> NOTICE! No Further requests will be sent to the website until you reload with a valid API Key!")
+		} else {
+			c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
+		}
+
 		return nil
 	}
 
