@@ -18,7 +18,6 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
-	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
@@ -52,7 +51,6 @@ type Config struct {
 	SSLCrtFile string                 `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
 	SSLKeyFile string                 `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
 	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
-	MaxBody    int                    `json:"maxBody" toml:"max_body" xml:"max_body" yaml:"maxBody"`
 	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Serial     bool                   `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
@@ -190,7 +188,6 @@ func (c *Config) fixConfig() {
 func (c *Config) setup() *triggers.Actions {
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
-	share.Setup(c.Services.Website)
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = mnd.DefaultTimeout

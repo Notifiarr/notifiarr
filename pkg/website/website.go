@@ -13,6 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/datacounter"
+	"golift.io/version"
 )
 
 // httpClient is our custom http client to wrap Do and provide retries.
@@ -22,7 +23,15 @@ type httpClient struct {
 	*http.Client
 }
 
-// unmarshalResponse attempts to turn the reply from notifiarr.com into structured data.
+func (s *Server) validAPIKey() error {
+	if len(s.config.Apps.APIKey) != APIKeyLength {
+		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
+	}
+
+	return nil
+}
+
+// unmarshalResponse attempts to turn the reply from the website into structured data.
 func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, error) {
 	var (
 		buf     bytes.Buffer
@@ -32,7 +41,7 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 
 	defer func() {
 		body.Close()
-		exp.NotifiarrCom.Add("POST Bytes Received", int64(counter.Count()))
+		exp.Website.Add("POST Bytes Received", int64(counter.Count()))
 	}()
 
 	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
@@ -42,8 +51,8 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 				ErrNon200, url, code, http.StatusText(code), err, buf.String())
 		}
 
-		return nil, fmt.Errorf("%w: %s: %d %s, %s: %s",
-			ErrNon200, url, code, http.StatusText(code), resp.Result, resp.Details.Response)
+		return &resp, fmt.Errorf("%w: %s: %d %s",
+			ErrNon200, url, code, http.StatusText(code))
 	}
 
 	if err != nil {
@@ -91,6 +100,8 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 
 // Do performs an http Request with retries and logging!
 func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cyclop
+	req.Header.Set("User-Agent", fmt.Sprintf("%s v%s-%s %s", mnd.Title, version.Version, version.Revision, version.Branch))
+
 	deadline, ok := req.Context().Deadline()
 	if !ok {
 		deadline = time.Now().Add(h.Timeout)
@@ -99,17 +110,17 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 	timeout := time.Until(deadline).Round(time.Millisecond)
 
 	for retry := 0; ; retry++ {
-		exp.NotifiarrCom.Add(req.Method+" Requests", 1)
+		exp.Website.Add(req.Method+" Requests", 1)
 
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
-				h.ErrorfNoShare("Unexpected cookie [%v/%v] returned from notifiarr.com: %s", i+1, len(resp.Cookies()), c.String())
+				h.ErrorfNoShare("Unexpected cookie [%v/%v] returned from website: %s", i+1, len(resp.Cookies()), c.String())
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError &&
 				(resp.StatusCode != http.StatusBadRequest || resp.Header.Get("content-type") != "text/html") {
-				exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
+				exp.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
 				return resp, nil
 			}
 
@@ -117,9 +128,9 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 			// or resp.StatusCode is 400 and content-type is text/html (cloudflare error).
 			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                         // do not defer, because we're in a loop.
-			exp.NotifiarrCom.Add(req.Method+" Retries", 1)
-			exp.NotifiarrCom.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
-			exp.NotifiarrCom.Add(req.Method+" Bytes Received", size)
+			exp.Website.Add(req.Method+" Retries", 1)
+			exp.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
+			exp.Website.Add(req.Method+" Bytes Received", size)
 			// shoehorn a non-200 error into the empty http error.
 			err = fmt.Errorf("%w: %s: %d bytes, %s", ErrNon200, req.URL, size, resp.Status)
 		}
@@ -127,15 +138,15 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 		switch {
 		case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
 			if retry == 0 {
-				return resp, fmt.Errorf("notifiarr req timed out after %s: %s: %w", timeout, req.URL, err)
+				return resp, fmt.Errorf("website req timed out after %s: %s: %w", timeout, req.URL, err)
 			}
 
-			return resp, fmt.Errorf("[%d/%d] Notifiarr req timed out after %s, giving up: %w",
+			return resp, fmt.Errorf("[%d/%d] website req timed out after %s, giving up: %w",
 				retry+1, h.Retries+1, timeout, err)
 		case retry == h.Retries:
-			return resp, fmt.Errorf("[%d/%d] Notifiarr req failed: %w", retry+1, h.Retries+1, err)
+			return resp, fmt.Errorf("[%d/%d] website req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			h.ErrorfNoShare("[%d/%d] Notifiarr req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
+			h.ErrorfNoShare("[%d/%d] website req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
@@ -199,7 +210,7 @@ func (s *Server) watchSendDataChan() {
 
 	for data := range s.sendData {
 		switch resp, elapsed, err := s.sendRequest(data); {
-		case data.LogMsg == "":
+		case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 			continue
 		case errors.Is(err, ErrNon200):
 			s.config.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
@@ -218,6 +229,18 @@ func (s *Server) watchSendDataChan() {
 }
 
 func (s *Server) sendRequest(data *Request) (*Response, time.Duration, error) {
+	if err := s.validAPIKey(); err != nil {
+		if data.respChan != nil {
+			data.respChan <- &chResponse{
+				Response: nil,
+				Elapsed:  0,
+				Error:    err,
+			}
+		}
+
+		return nil, 0, err
+	}
+
 	var uri string
 
 	if len(data.Params) > 0 {

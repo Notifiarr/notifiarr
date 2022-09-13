@@ -115,7 +115,7 @@ func (c *Config) loadServiceStates() {
 
 	values, err := c.Website.GetValue(names...)
 	if err != nil {
-		c.Errorf("Getting initial service states from website: %v", err)
+		c.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return
 	}
 
@@ -124,7 +124,7 @@ func (c *Config) loadServiceStates() {
 			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
 				var svc service
 				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
-					c.Errorf("Service check data for '%s' returned from site is invalid: %v", name, err)
+					c.ErrorfNoShare("Service check data for '%s' returned from site is invalid: %v", name, err)
 					break
 				}
 

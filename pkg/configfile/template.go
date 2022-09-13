@@ -9,13 +9,14 @@ import (
 	"golift.io/version"
 )
 
-// ForceAllTmpl allows you to force some specific settings. Used to build a default template.
-var ForceAllTmpl = false //nolint:gochecknoglobals
-
-// Template is the config file template.
-//
 //nolint:gochecknoglobals
-var Template = template.Must(template.New("config").Funcs(Funcs()).Parse(tmpl))
+var (
+	// ForceAllTmpl allows you to force some specific settings. Used to build a default template.
+	ForceAllTmpl = false
+
+	// Template is the config file template.
+	Template = template.Must(template.New("config").Funcs(Funcs()).Parse(tmpl))
+)
 
 // Funcs returns our template functions.
 func Funcs() template.FuncMap {
@@ -159,8 +160,7 @@ retries = {{.Retries}}
   http_user = "{{.HTTPUser}}"
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{if .MaxBody}}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  timeout  = "{{.Timeout}}"
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}
@@ -181,8 +181,7 @@ retries = {{.Retries}}
   http_user = "{{.HTTPUser}}"
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{if .MaxBody}}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  timeout  = "{{.Timeout}}"
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}
@@ -203,8 +202,7 @@ retries = {{.Retries}}
   http_user = "{{.HTTPUser}}"
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{ if .MaxBody }}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  timeout  = "{{.Timeout}}"
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}
@@ -225,8 +223,7 @@ retries = {{.Retries}}
   http_user = "{{.HTTPUser}}"
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{if .MaxBody}}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  timeout  = "{{.Timeout}}"
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}
@@ -247,8 +244,7 @@ retries = {{.Retries}}
   http_user = "{{.HTTPUser}}"
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-  timeout  = "{{.Timeout}}"{{if .MaxBody}}
-  max_body = {{ .MaxBody }} # maximum body size for debug logs. 0 = no limit.{{end}}
+  timeout  = "{{.Timeout}}"
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}

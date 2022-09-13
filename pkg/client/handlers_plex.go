@@ -86,7 +86,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
-	case strings.EqualFold(v.Event, "media.play"):
+	case strings.EqualFold(v.Event, "media.play"), strings.EqualFold(v.Event, "playback.started"):
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
 		go c.triggers.PlexCron.SendWebhook(&v)

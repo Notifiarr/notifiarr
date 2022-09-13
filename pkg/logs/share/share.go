@@ -2,6 +2,8 @@
 package share
 
 import (
+	"sync"
+
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -11,15 +13,32 @@ type Website interface {
 	HaveClientInfo() bool
 }
 
-// Config is setup by the configfile package.
-var config Website //nolint:gochecknoglobals
+//nolint:gochecknoglobals
+var (
+	// Config is setup by the configfile package.
+	config Website
+	locker sync.RWMutex
+)
 
 func Setup(website Website) {
+	locker.Lock()
+	defer locker.Unlock()
+
 	config = website
+}
+
+func StopLogs() {
+	locker.Lock()
+	defer locker.Unlock()
+
+	config = nil
 }
 
 // Log sends an error message to the website.
 func Log(msg string) {
+	locker.RLock()
+	defer locker.RUnlock()
+
 	if config == nil || !config.HaveClientInfo() {
 		return
 	}

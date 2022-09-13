@@ -5,21 +5,21 @@ import (
 	"bytes"
 	"context"
 	"crypto/md5" //nolint:gosec
+	"errors"
 	"fmt"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"github.com/google/shlex"
+	"github.com/hugelgupf/go-shlex"
 )
 
 // Setup must run in the creation routine.
 func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 	if c.Name == "" {
-		if args, _ := shlex.Split(c.Command); len(args) > 0 {
+		if args := shlex.Split(c.Command); len(args) > 0 {
 			c.Name = args[0]
 		}
 	}
@@ -147,16 +147,13 @@ func getArgs(command string, shell bool) ([]string, error) {
 	}
 
 	// Special shell-split command.
-	args, err := shlex.Split(command)
-	if err != nil {
-		return nil, fmt.Errorf("splitting shell command: %w", err)
-	}
-
+	args := shlex.Split(command)
 	if len(args) == 0 {
 		return nil, ErrNoCmd
 	}
 
-	if args[0], err = filepath.Abs(args[0]); err != nil {
+	var err error
+	if args[0], err = exec.LookPath(args[0]); err != nil && !errors.Is(err, exec.ErrDot) {
 		return nil, fmt.Errorf("finding command path: %w", err)
 	}
 

@@ -108,7 +108,7 @@ func (c *Config) updateStatesOnSite(force bool) {
 	}
 
 	if err := c.Website.SetValues(values); err != nil {
-		c.Errorf("Setting Service States on website: %v", err)
+		c.ErrorfNoShare("Setting Service States on website: %v", err)
 	} else {
 		c.lastUpdate = time.Now()
 		c.Printf("==> Updated [internal] Service States on website.")

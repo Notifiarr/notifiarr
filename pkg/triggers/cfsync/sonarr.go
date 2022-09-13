@@ -47,8 +47,7 @@ func (c *cmd) syncSonarr(event website.EventType) {
 
 	for i, app := range c.Apps.Sonarr {
 		instance := i + 1
-		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
-			!c.ClientInfo.Actions.Sync.SonarrInstances.Has(instance) {
+		if !app.Enabled() || !c.ClientInfo.Actions.Sync.SonarrInstances.Has(instance) {
 			c.Debugf("[%s requested] CF Sync Skipping Sonarr instance %d. Not in sync list: %v",
 				event, instance, c.ClientInfo.Actions.Sync.SonarrInstances)
 			continue
@@ -101,6 +100,10 @@ func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, in
 		errStr := fmt.Sprintf("getting custom formats: %v ", err)
 		payload.Error += errStr
 		c.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+	} else if errors.Is(err, starr.ErrInvalidStatusCode) {
+		// This error is required so the site knows it's sonarr v3.
+		errStr := fmt.Sprintf("getting custom formats: %v ", err)
+		payload.Error += errStr
 	}
 
 	return &payload
@@ -117,10 +120,12 @@ func (c *cmd) aggregateTrashSonarr(
 
 	// Create our known+requested instances, so we can write slice values in go routines.
 	for idx, app := range c.Config.Apps.Sonarr {
-		if instance := idx + 1; instances.Has(instance) && app.Enabled() {
-			output = append(output, &SonarrTrashPayload{Instance: instance, Name: app.Name})
-		} else {
-			c.Errorf("[%s requested] Aggegregate request for disabled Sonarr instance %d (%s)", event, instance, app.Name)
+		if instance := idx + 1; instances.Has(instance) {
+			if app.Enabled() {
+				output = append(output, &SonarrTrashPayload{Instance: instance, Name: app.Name})
+			} else {
+				c.Errorf("[%s requested] Aggegregate request for disabled Sonarr instance %d (%s)", event, instance, app.Name)
+			}
 		}
 	}
 

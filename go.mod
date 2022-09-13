@@ -12,7 +12,7 @@ require (
 	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
 	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
-	golift.io/starr v0.14.1-0.20220905010041-b121085b6ddd
+	golift.io/starr v0.14.1-0.20220910081414-42718522e759
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.1.2
 )
@@ -67,7 +67,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.5.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
-	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
 	golang.org/x/sys v0.0.0-20220818161305-2296e01440c6
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -121,8 +121,8 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/gorilla/rpc v1.2.0 // indirect
+	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
 	github.com/mrobinsn/go-rtorrent v1.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect

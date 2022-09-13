@@ -88,7 +88,7 @@ func (c *Cmd) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, er
 
 // getReadarrHistory is not done.
 func (c *Cmd) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistoryPage(&starr.Req{
+	history, err := app.GetHistoryPage(&starr.PageReq{
 		Page:     1,
 		PageSize: showLatest,
 		SortDir:  starr.SortDescend,

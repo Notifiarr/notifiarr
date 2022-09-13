@@ -88,8 +88,18 @@ function reloadConfig()
     $.ajax({
         url: URLBase+'reload',
         success: function (data){
-            setTimeout(function(){location.reload();}, 5000); // reload window in 5 seconds.
-            toast('Reloading', 'Application Reload Initiated', 'success');
+            toast('Reloading', 'Page will refresh after reload finishes.', 'success', 60000);
+            const ping = setInterval(function () {
+                $.ajax({
+                    url: URLBase+'ping',
+                    complete: function(xhr){
+                        if (xhr.status == 200) {
+                            clearInterval(ping);
+                            location.reload();
+                        }
+                    }
+                });
+            }, 1000);
         },
          error: function (request, status, error) {
              if (error == "") {

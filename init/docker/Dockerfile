@@ -17,7 +17,7 @@ ARG BINARY
 ARG TARGETARCH
 
 # For megacli. All the *'s are to deal with multiarch. :(
-RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils && \
+RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates && \
     curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
     mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
@@ -32,9 +32,7 @@ RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils && \
     ln -s /usr/lib /tmp/lib_link/lib
 
 # Build the app.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
+RUN CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 FROM scratch
 ARG TARGETOS

@@ -11,6 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
@@ -51,8 +52,8 @@ func (c *Client) httpHandlers() {
 }
 
 func (c *Client) httpGuiHandlers(base string) {
-	// gui is used for authorized paths.
-	gui := c.Config.Router.PathPrefix(base).Subrouter()
+	// gui is used for authorized paths. All these paths have a prefix of /ui.
+	gui := c.Config.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
 	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
 	gui.Handle("/debug/vars", expvar.Handler()).Methods("GET")
 	gui.HandleFunc("/deleteFile/{source}/{id}", c.getFileDeleteHandler).Methods("GET")
@@ -68,6 +69,7 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/regexTest", c.handleRegexTest).Methods("POST")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
 	gui.HandleFunc("/reload", c.handleReload).Methods("GET")
+	gui.HandleFunc("/ping", c.handlePing).Methods("GET")
 	gui.HandleFunc("/services/check/{service}", c.handleServicesCheck).Methods("GET")
 	gui.HandleFunc("/services/{action:stop|start}", c.handleServicesStopStart).Methods("GET")
 	gui.HandleFunc("/shutdown", c.handleShutdown).Methods("GET")
@@ -91,7 +93,7 @@ func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
 
 	// Aggregate handlers. Non-app specific.
-	c.Config.HandleAPIpath("", "/trash/{app}", c.aggregateTrash, "POST")
+	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
 
 	if c.Config.Plex.Configured() {
 		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
@@ -225,6 +227,15 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 	title := cases.Title(language.AmericanEnglish)
 
 	switch trigger {
+	case "clientlogs":
+		if content == "true" || content == "on" || content == "enable" {
+			share.Setup(c.website)
+			return http.StatusBadRequest, "Client log notifications enabled."
+		}
+
+		share.StopLogs()
+
+		return http.StatusBadRequest, "Client log notifications disabled."
 	case "command":
 		cmd := c.triggers.Commands.GetByHash(content)
 		if cmd == nil {

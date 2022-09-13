@@ -7,6 +7,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -43,8 +45,9 @@ type Client struct {
 	cookies   *securecookie.SecureCookie
 	templat   *template.Template
 	webauth   bool
+	reloading bool
 	// this locks anything that may be updated while running.
-	// at least "UIPassword" as of its creation.
+	// at least "UIPassword" and "reloading" as of its creation.
 	sync.RWMutex
 }
 
@@ -182,7 +185,13 @@ func (c *Client) loadConfiguration() (msg string, newPassword string, err error)
 func (c *Client) loadSiteConfig() *website.ClientInfo {
 	clientInfo, err := c.website.GetClientInfo()
 	if err != nil || clientInfo == nil {
-		c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
+		if errors.Is(err, website.ErrInvalidAPIKey) {
+			c.ErrorfNoShare("==> Problem validating API key: %v", err)
+			c.ErrorfNoShare("==> NOTICE! No Further requests will be sent to the website until you reload with a valid API Key!")
+		} else {
+			c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
+		}
+
 		return nil
 	}
 
@@ -209,17 +218,15 @@ func (c *Client) configureServices() *website.ClientInfo {
 	c.website.Start()
 
 	clientInfo := c.loadSiteConfig()
+	if clientInfo != nil && !clientInfo.User.StopLogs {
+		share.Setup(c.website)
+	}
+
 	c.configureServicesPlex()
 	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(clientInfo)
 	c.triggers.Start()
-	/* // debug stuff.
-	snap, err, _ := c.Config.Snapshot.GetSnapshot()
-	b, _ := json.MarshalIndent(snap, "", "   ")
-	c.Print(string(b), err)
-	os.Exit(1)
-	/**/
 	c.Config.Services.Start()
 
 	return clientInfo
@@ -305,6 +312,9 @@ func (c *Client) reloadConfiguration(event website.EventType, source string) err
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
 	}
+
+	// This doesn't need to lock because web server is not running.
+	c.reloading = false // We're done.
 
 	return nil
 }

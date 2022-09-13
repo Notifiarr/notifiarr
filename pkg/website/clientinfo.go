@@ -23,6 +23,7 @@ type ClientInfo struct {
 		Patron     bool    `json:"patron"`
 		DevAllowed bool    `json:"devAllowed"`
 		DateFormat PHPDate `json:"dateFormat"`
+		StopLogs   bool    `json:"stopLogs"`
 	} `json:"user"`
 	Actions struct {
 		Poll      bool             `json:"poll"`

@@ -88,7 +88,7 @@ func (c *Cmd) getLidarrState(instance int, app *apps.LidarrConfig) (*State, erro
 
 // getLidarrHistory is not done.
 func (c *Cmd) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistoryPage(&starr.Req{
+	history, err := app.GetHistoryPage(&starr.PageReq{
 		Page:     1,
 		PageSize: showLatest + 20, //nolint:gomnd // grab extra in case some are tracks and not albums.
 		SortDir:  starr.SortDescend,

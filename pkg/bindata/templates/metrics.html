@@ -59,7 +59,7 @@
                                         <h3>Requests to Notifiarr.com</h3>
                                         <div class="table-responsive">
                                             <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := .Expvar.NotifiarrCom }}
+                                                {{- range $key, $count := .Expvar.Website }}
                                                 <tr>
                                                     <td>{{ $key }}</td>
                                                     <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
