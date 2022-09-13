@@ -11,6 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
@@ -226,6 +227,14 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 	title := cases.Title(language.AmericanEnglish)
 
 	switch trigger {
+	case "clientlogs":
+		if content == "true" || content == "on" || content == "enable" {
+			share.Setup(c.website)
+			return http.StatusBadRequest, "Client log notifications enabled."
+		} else {
+			share.StopLogs()
+			return http.StatusBadRequest, "Client log notifications disabled."
+		}
 	case "command":
 		cmd := c.triggers.Commands.GetByHash(content)
 		if cmd == nil {

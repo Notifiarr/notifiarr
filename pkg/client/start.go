@@ -17,6 +17,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -210,17 +211,15 @@ func (c *Client) configureServices() *website.ClientInfo {
 	c.website.Start()
 
 	clientInfo := c.loadSiteConfig()
+	if clientInfo != nil && !clientInfo.User.StopLogs {
+		share.Setup(c.website)
+	}
+
 	c.configureServicesPlex()
 	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(clientInfo)
 	c.triggers.Start()
-	/* // debug stuff.
-	snap, err, _ := c.Config.Snapshot.GetSnapshot()
-	b, _ := json.MarshalIndent(snap, "", "   ")
-	c.Print(string(b), err)
-	os.Exit(1)
-	/**/
 	c.Config.Services.Start()
 
 	return clientInfo
