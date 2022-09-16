@@ -1,6 +1,7 @@
 package starrqueue
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -29,8 +30,8 @@ type sonarrApp struct {
 }
 
 // storeQueue runs at an interval and saves the queue for an app internally.
-func (app *sonarrApp) storeQueue(event website.EventType) {
-	queue, err := app.app.GetQueue(queueItemsMax, 1)
+func (app *sonarrApp) storeQueue(ctx context.Context, event website.EventType) {
+	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
 		app.cmd.Errorf("Getting Sonarr Queue (instance %d): %v", app.idx+1, err)
 		return
@@ -78,7 +79,7 @@ func (c *cmd) setupSonarr() bool {
 	return enable
 }
 
-func (c *cmd) getFinishedItemsSonarr() itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cyclop
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Sonarr {

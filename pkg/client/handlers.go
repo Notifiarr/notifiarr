@@ -132,7 +132,7 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 
 // slash is the GET handler for /.
 func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
-	c.indexPage(response, request, "")
+	c.indexPage(request.Context(), response, request, "")
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen

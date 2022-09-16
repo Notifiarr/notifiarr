@@ -52,12 +52,22 @@ echo '
    end tell
 ' | osascript
 
+sleep 1
 # Finalize.
 echo "Finalizing DMG."
 chmod -Rf go-w /Volumes/"${MACAPP}"
-sync
-sync
+
+sleep 1
+echo "Syncing."
+#sync
+#sync
+
+sleep 1
+echo "Detaching ${device}."
 hdiutil detach ${device}
+
+sleep 1
+echo "Converting DMG."
 mkdir -p release
 rm -f "release/${MACAPP}.dmg"
 hdiutil convert "pack.temp.dmg" -format UDZO -imagekey zlib-level=9 -o "release/${MACAPP}.dmg"

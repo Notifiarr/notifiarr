@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -82,7 +83,7 @@ func (c *Config) runChecks(forceAll bool) bool {
 	return somethingChanged
 }
 
-func (c *Config) updateStatesOnSite(force bool) {
+func (c *Config) updateStatesOnSite(ctx context.Context, force bool) {
 	if !force && time.Since(c.lastUpdate) < time.Hour || len(c.services) == 0 {
 		return
 	}
@@ -107,7 +108,7 @@ func (c *Config) updateStatesOnSite(force bool) {
 		return
 	}
 
-	if err := c.Website.SetValues(values); err != nil {
+	if err := c.Website.SetValuesContext(ctx, values); err != nil {
 		c.ErrorfNoShare("Setting Service States on website: %v", err)
 	} else {
 		c.lastUpdate = time.Now()

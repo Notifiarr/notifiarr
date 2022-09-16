@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -143,10 +144,10 @@ func (a *Action) Send(event website.EventType) {
 	a.cmd.Exec(event, TrigDashboard)
 }
 
-func (c *Cmd) sendDashboardState(event website.EventType) {
+func (c *Cmd) sendDashboardState(ctx context.Context, event website.EventType) {
 	var (
 		start  = time.Now()
-		states = c.getStates()
+		states = c.getStates(ctx)
 		apps   = time.Since(start).Round(time.Millisecond)
 	)
 
@@ -161,8 +162,8 @@ func (c *Cmd) sendDashboardState(event website.EventType) {
 }
 
 // getStates grabs data for each app.
-func (c *Cmd) getStates() *States {
-	sessions, _ := c.PlexCron.GetSessions()
+func (c *Cmd) getStates(ctx context.Context) *States {
+	sessions, _ := c.PlexCron.GetSessions(ctx)
 
 	return &States{
 		Deluge:   c.getDelugeStates(),
@@ -173,7 +174,7 @@ func (c *Cmd) getStates() *States {
 		Radarr:   c.getRadarrStates(),
 		Readarr:  c.getReadarrStates(),
 		Sonarr:   c.getSonarrStates(),
-		SabNZB:   c.getSabNZBStates(),
+		SabNZB:   c.getSabNZBStates(ctx),
 		Plex:     sessions,
 	}
 }

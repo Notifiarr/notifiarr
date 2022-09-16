@@ -1,6 +1,7 @@
 package plexcron
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Notifiarr/notifiarr/pkg/plex"
@@ -18,8 +19,8 @@ const (
 // sendSessionNew is used when the end user does not have or use Plex webhooks.
 // They can enable the plex session tracker to send notifications for new sessions.
 // event is either media.play or media.resume.
-func (c *cmd) sendSessionPlaying(session *plex.Session, sessions *plex.Sessions, event string) {
-	if err := c.checkPlexAgent(session); err != nil {
+func (c *cmd) sendSessionPlaying(ctx context.Context, session *plex.Session, sessions *plex.Sessions, event string) {
+	if err := c.checkPlexAgent(ctx, session); err != nil {
 		c.Errorf("Failed Plex Request: %v", err)
 		return
 	}
@@ -28,7 +29,7 @@ func (c *cmd) sendSessionPlaying(session *plex.Session, sessions *plex.Sessions,
 		Route: website.PlexRoute,
 		Event: website.EventHook,
 		Payload: &website.Payload{
-			Snap: c.getMetaSnap(),
+			Snap: c.getMetaSnap(ctx),
 			Plex: sessions,
 			Load: convertSessionsToWebhook(session, event),
 		},

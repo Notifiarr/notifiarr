@@ -1,6 +1,7 @@
 package plexcron
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -13,8 +14,8 @@ import (
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
-func (c *cmd) checkForFinishedItems(website.EventType) {
-	sessions, err := c.getSessions(time.Second)
+func (c *cmd) checkForFinishedItems(ctx context.Context, event website.EventType) {
+	sessions, err := c.getSessions(ctx, time.Second)
 	if err != nil {
 		c.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.URL, err)
 		return
@@ -31,7 +32,7 @@ func (c *cmd) checkForFinishedItems(website.EventType) {
 
 		// Make sure we didn't already send this session.
 		if _, ok := c.sent[session.Session.ID+session.SessionKey]; !ok {
-			msg = c.checkSessionDone(session, pct)
+			msg = c.checkSessionDone(ctx, session, pct)
 		}
 
 		//nolint:lll
@@ -50,7 +51,7 @@ func (c *cmd) checkForFinishedItems(website.EventType) {
 }
 
 // checkSessionDone checks a session's data to see if it is considered finished.
-func (c *cmd) checkSessionDone(session *plex.Session, pct float64) string {
+func (c *cmd) checkSessionDone(ctx context.Context, session *plex.Session, pct float64) string {
 	switch cfg := c.ClientInfo.Actions.Plex; {
 	case session.Duration == 0:
 		return statusIgnoring
@@ -61,21 +62,21 @@ func (c *cmd) checkSessionDone(session *plex.Session, pct float64) string {
 			return statusWatching
 		}
 
-		return c.sendSessionDone(session)
+		return c.sendSessionDone(ctx, session)
 	case cfg.SeriesPC > 0 && website.EventType(session.Type) == website.EventEpisode:
 		if pct < float64(cfg.SeriesPC) {
 			return statusWatching
 		}
 
-		return c.sendSessionDone(session)
+		return c.sendSessionDone(ctx, session)
 	default:
 		return statusIgnoring
 	}
 }
 
 // sendSessionDone is the last method to run that sends a finished session to the website.
-func (c *cmd) sendSessionDone(session *plex.Session) string {
-	if err := c.checkPlexAgent(session); err != nil {
+func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string {
+	if err := c.checkPlexAgent(ctx, session); err != nil {
 		return statusError + ": " + err.Error()
 	}
 
@@ -83,7 +84,7 @@ func (c *cmd) sendSessionDone(session *plex.Session) string {
 		Route: website.PlexRoute,
 		Event: website.EventType(session.Type),
 		Payload: &website.Payload{
-			Snap: c.getMetaSnap(),
+			Snap: c.getMetaSnap(ctx),
 			Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
 		},
 		LogMsg:     "Plex Completed Sessions",
@@ -98,12 +99,12 @@ func (c *cmd) sendSessionDone(session *plex.Session) string {
 
 // checkPlexAgent checks the plex agent and makes another request to find the section key.
 // This is because Plex servers using the Plex Agent do not provide the show Title in the session.
-func (c *cmd) checkPlexAgent(session *plex.Session) error {
+func (c *cmd) checkPlexAgent(ctx context.Context, session *plex.Session) error {
 	if !strings.Contains(session.GUID, "plex://") || session.Key == "" {
 		return nil
 	}
 
-	sections, err := c.Plex.GetPlexSectionKey(session.Key)
+	sections, err := c.Plex.GetPlexSectionKeyWithContext(ctx, session.Key)
 	if err != nil {
 		return fmt.Errorf("getting plex key %s: %w", session.Key, err)
 	}

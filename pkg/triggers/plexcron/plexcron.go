@@ -99,17 +99,22 @@ func (c *cmd) run() {
 
 // SendWebhook is called in a go routine after a plex media.play webhook is received.
 func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
-	a.cmd.sendWebhook(hook)
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		defer cancel()
+
+		a.cmd.sendWebhook(ctx, hook)
+	}()
 }
 
-func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
+func (c *cmd) sendWebhook(ctx context.Context, hook *plex.IncomingWebhook) {
 	sessions := &plex.Sessions{Name: c.Plex.Name}
 	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.
 	if c.ClientInfo != nil && !c.ClientInfo.Actions.Plex.NoActivity {
 		time.Sleep(c.ClientInfo.Actions.Plex.Delay.Duration)
 
 		var err error
-		if sessions, err = c.getSessions(time.Second); err != nil {
+		if sessions, err = c.getSessions(ctx, time.Second); err != nil {
 			c.Errorf("Getting Plex sessions: %v", err)
 		}
 	}
@@ -117,22 +122,19 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	c.SendData(&website.Request{
 		Route:      website.PlexRoute,
 		Event:      website.EventHook,
-		Payload:    &website.Payload{Snap: c.getMetaSnap(), Load: hook, Plex: sessions},
+		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Load: hook, Plex: sessions},
 		LogMsg:     "Plex Webhook (and sessions)",
 		LogPayload: true,
 	})
 }
 
 // GetSessions returns the plex sessions up to 1 minute old. This uses a channel so concurrent requests are avoided.
-func (a *Action) GetSessions() (*plex.Sessions, error) {
-	return a.cmd.getSessions(time.Minute)
+func (a *Action) GetSessions(ctx context.Context) (*plex.Sessions, error) {
+	return a.cmd.getSessions(ctx, time.Minute)
 }
 
 // getMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.
-func (c *cmd) getMetaSnap() *snapshot.Snapshot {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Snapshot.Timeout.Duration)
-	defer cancel()
-
+func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	var (
 		snap = &snapshot.Snapshot{}
 		wg   sync.WaitGroup

@@ -113,17 +113,17 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method == http.MethodGet: // dont handle login without POST
-		c.indexPage(response, request, "")
+		c.indexPage(request.Context(), response, request, "")
 	case c.webauth:
-		c.indexPage(response, request, "Logins Disabled")
+		c.indexPage(request.Context(), response, request, "Logins Disabled")
 	case len(request.FormValue("password")) < minPasswordLen:
-		c.indexPage(response, request, "Invalid Password Length")
+		c.indexPage(request.Context(), response, request, "Invalid Password Length")
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
 		c.setSession(providedUsername, response)
 		exp.HTTPRequests.Add("GUI Logins", 1)
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	default: // Start over.
-		c.indexPage(response, request, "Invalid Password")
+		c.indexPage(request.Context(), response, request, "Invalid Password")
 	}
 }
 
@@ -264,11 +264,11 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":
-		c.Config.Services.Stop()
+		c.Config.Services.Stop(req.Context())
 		c.Printf("[gui '%s' requested] Service Checks Stopped", user)
 		http.Error(response, "Service Checks Stopped", http.StatusOK)
 	case "start":
-		c.Config.Services.Start()
+		c.Config.Services.Start(req.Context())
 		c.Printf("[gui '%s' requested] Service Checks Started", user)
 		http.Error(response, "Service Checks Started", http.StatusOK)
 	default:
@@ -364,7 +364,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		return
 	}
 
-	if err := c.setUserPass(username, newPassw); err != nil {
+	if err := c.setUserPass(request.Context(), username, newPassw); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
@@ -415,7 +415,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 			}
 		}
 	case runtime.GOOS == mnd.Windows:
-		partitions, err := disk.Partitions(false)
+		partitions, err := disk.PartitionsWithContext(request.Context(), false)
 		if err != nil {
 			c.Errorf("Getting disk partitions: %v", err)
 		}
@@ -451,7 +451,7 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 
 // handleProcessList just returns the running process list for a human to view.
 func (c *Client) handleProcessList(response http.ResponseWriter, request *http.Request) {
-	if ps, err := getProcessList(); err != nil {
+	if ps, err := getProcessList(request.Context()); err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 	} else if _, err = ps.WriteTo(response); err != nil {
 		user, _ := c.getUserName(request)
@@ -552,7 +552,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	if err := c.saveNewConfig(config); err != nil {
+	if err := c.saveNewConfig(request.Context(), config); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
@@ -572,12 +572,12 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 }
 
 // saveNewConfig takes a fully built (copy) of config data, and saves it as the config file.
-func (c *Client) saveNewConfig(config *configfile.Config) error {
+func (c *Client) saveNewConfig(ctx context.Context, config *configfile.Config) error {
 	date := time.Now().Format("20060102T150405") // for file names.
 
 	// write new config file to temporary path.
 	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig."+date)
-	if _, err := config.Write(destFile); err != nil { // write our config file template.
+	if _, err := config.Write(ctx, destFile); err != nil { // write our config file template.
 		return fmt.Errorf("writing new config file: %w", err)
 	}
 
@@ -680,7 +680,7 @@ func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 	return nil
 }
 
-func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, msg string) {
+func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, request *http.Request, msg string) {
 	response.Header().Add("content-type", "text/html")
 
 	user, _ := c.getUserName(request)
@@ -688,11 +688,11 @@ func (c *Client) indexPage(response http.ResponseWriter, request *http.Request, 
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 
-	c.renderTemplate(response, request, "index.html", msg)
+	c.renderTemplate(ctx, response, request, "index.html", msg)
 }
 
 func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
-	c.renderTemplate(response, req, mux.Vars(req)["template"]+".html", "")
+	c.renderTemplate(req.Context(), response, req, mux.Vars(req)["template"]+".html", "")
 }
 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.

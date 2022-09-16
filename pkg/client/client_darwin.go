@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -15,7 +16,7 @@ func (c *Client) handleAptHook() error {
 }
 */
 
-func (c *Client) handleAptHook() error {
+func (c *Client) handleAptHook(_ context.Context) error {
 	return fmt.Errorf("this feature is not supported on this platform") //nolint:goerr113
 }
 
@@ -25,15 +26,15 @@ func (c *Client) upgradeWindows(_ interface{}) {}
 
 func (c *Client) AutoWatchUpdate() {}
 
-func (c *Client) checkReloadSignal(sigc os.Signal) error {
+func (c *Client) checkReloadSignal(ctx context.Context, sigc os.Signal) error {
 	if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {
 		c.Printf("Writing Config File! Caught Signal: %v", sigc)
 
-		if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
+		if _, err := c.Config.Write(ctx, c.Flags.ConfigFile); err != nil {
 			c.Errorf("Writing Config File: %v", err)
 		}
 	} else {
-		return c.reloadConfiguration(website.EventSignal, "Caught Signal: "+sigc.String())
+		return c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
 	}
 
 	return nil

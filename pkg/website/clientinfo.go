@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -142,7 +143,7 @@ func (s *Server) HaveClientInfo() bool {
 }
 
 // GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
-func (s *Server) GetClientInfo() (*ClientInfo, error) {
+func (s *Server) GetClientInfo(ctx context.Context) (*ClientInfo, error) {
 	if s.HaveClientInfo() {
 		return s.clientInfo, nil
 	}
@@ -150,7 +151,7 @@ func (s *Server) GetClientInfo() (*ClientInfo, error) {
 	body, err := s.GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventStart,
-		Payload:    s.Info(),
+		Payload:    s.Info(ctx),
 		LogPayload: true,
 	})
 	if err != nil {
@@ -171,7 +172,7 @@ func (s *Server) GetClientInfo() (*ClientInfo, error) {
 }
 
 // Info is used for JSON input for our outgoing client info.
-func (s *Server) Info() map[string]interface{} {
+func (s *Server) Info(ctx context.Context) map[string]interface{} {
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
 	if s.config.Plex.Configured() {
 		numPlex = 1
@@ -212,16 +213,16 @@ func (s *Server) Info() map[string]interface{} {
 		"config": map[string]interface{}{
 			"globalTimeout": s.config.Timeout.String(),
 			"retries":       s.config.Retries,
-			"apps":          s.getAppConfigs(),
+			"apps":          s.getAppConfigs(ctx),
 		},
 	}
 }
 
-func (s *Server) PollForReload(event EventType) {
+func (s *Server) PollForReload(ctx context.Context, event EventType) {
 	body, err := s.GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventPoll,
-		Payload:    s.Info(),
+		Payload:    s.Info(ctx),
 		LogPayload: true,
 	})
 	if err != nil {
@@ -250,7 +251,7 @@ func (s *Server) PollForReload(event EventType) {
 	}
 }
 
-func (s *Server) getAppConfigs() map[string]interface{} {
+func (s *Server) getAppConfigs(ctx context.Context) map[string]interface{} {
 	apps := make(map[string][]map[string]interface{})
 	add := func(i int, name string) map[string]interface{} {
 		return map[string]interface{}{
@@ -285,8 +286,9 @@ func (s *Server) getAppConfigs() map[string]interface{} {
 		reApps[k] = v
 	}
 
-	if u, err := s.config.Apps.Tautulli.GetUsers(context.Background()); err != nil {
-		s.config.Error("Getting Tautulli Users:", err)
+	if u, err := s.config.Apps.Tautulli.GetUsers(ctx); err != nil {
+		s.config.Error("Getting Tautulli Users:",
+			strings.ReplaceAll(s.config.Apps.Tautulli.APIKey, "<redacted>", err.Error()))
 	} else {
 		reApps["tautulli"] = map[string]interface{}{"users": u.MapEmailName()}
 	}

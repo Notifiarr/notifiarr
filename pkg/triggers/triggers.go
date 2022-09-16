@@ -3,6 +3,7 @@
 package triggers
 
 import (
+	"context"
 	"reflect"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -91,10 +92,10 @@ type run interface {
 }
 
 // Start creates all the triggers and runs the timers.
-func (a *Actions) Start() {
-	defer a.timers.Run() // unexported fields do not get picked up by reflection.
+func (a *Actions) Start(ctx context.Context) {
+	defer a.timers.Run(ctx)
 
-	a.timers.ClientInfo, _ = a.timers.GetClientInfo()
+	a.timers.ClientInfo, _ = a.timers.GetClientInfo(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
 	for i := 0; i < actions.NumField(); i++ {

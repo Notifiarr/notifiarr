@@ -35,8 +35,8 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 }
 
 // run executes this command and logs the output. This is executed from the trigger channel.
-func (c *Command) run(event website.EventType) {
-	_, _ = c.RunNow(context.Background(), event)
+func (c *Command) run(ctx context.Context, event website.EventType) {
+	_, _ = c.RunNow(ctx, event)
 }
 
 // RunNow runs the command immediately, waits for and returns the output.

@@ -6,6 +6,7 @@ package client
 */
 
 import (
+	"context"
 	"path"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -16,15 +17,15 @@ import (
 
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
-func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
+func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *website.ClientInfo) {
 	if clientInfo != nil {
 		c.Printf("==> %s", clientInfo)
-		c.printVersionChangeInfo()
+		c.printVersionChangeInfo(ctx)
 	} else {
 		clientInfo = &website.ClientInfo{}
 	}
 
-	switch hi, err := c.website.GetHostInfo(); {
+	switch hi, err := c.website.GetHostInfo(ctx); {
 	case err != nil:
 		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
 	case c.Config.HostID == "":
@@ -62,10 +63,10 @@ func (c *Client) PrintStartupInfo(clientInfo *website.ClientInfo) {
 	c.printLogFileInfo()
 }
 
-func (c *Client) printVersionChangeInfo() {
+func (c *Client) printVersionChangeInfo(ctx context.Context) {
 	const clientVersion = "clientVersion"
 
-	values, err := c.website.GetValue(clientVersion)
+	values, err := c.website.GetValueContext(ctx, clientVersion)
 	if err != nil {
 		c.Errorf("XX> Getting version from databse: %v", err)
 	}
@@ -80,7 +81,7 @@ func (c *Client) printVersionChangeInfo() {
 	c.Printf("==> Detected application version change! %s => %s", previousVersion, version.Version)
 
 	go func() { // in background to improve startup time.
-		err := c.website.SetValue(clientVersion, []byte(version.Version))
+		err := c.website.SetValueContext(ctx, clientVersion, []byte(version.Version))
 		if err != nil {
 			c.Errorf("Updating version in database: %v", err)
 		}

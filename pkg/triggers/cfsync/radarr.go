@@ -32,7 +32,7 @@ func (a *Action) SyncRadarrCF(event website.EventType) {
 }
 
 // syncRadarr triggers a custom format sync for Radarr.
-func (c *cmd) syncRadarr(event website.EventType) {
+func (c *cmd) syncRadarr(ctx context.Context, event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.RadarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. Website provided 0 instances.", event)
 		return
@@ -40,9 +40,6 @@ func (c *cmd) syncRadarr(event website.EventType) {
 		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. No Radarr instances configured.", event)
 		return
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), maxSyncTime)
-	defer cancel()
 
 	for i, app := range c.Apps.Radarr {
 		instance := i + 1

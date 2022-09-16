@@ -4,6 +4,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"strings"
@@ -19,7 +20,7 @@ import (
 
 /* This file contains methdos that are triggered from the GUI menu. */
 
-func (c *Client) toggleServer() {
+func (c *Client) toggleServer(ctx context.Context) {
 	if c.server == nil {
 		ui.Notify("Started web server") //nolint:errcheck
 		c.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
@@ -32,7 +33,7 @@ func (c *Client) toggleServer() {
 	ui.Notify("Paused web server") //nolint:errcheck
 	c.Print("[user requested] Pausing Web Server")
 
-	if err := c.StopWebServer(); err != nil {
+	if err := c.StopWebServer(ctx); err != nil {
 		c.Errorf("Unable to Pause Server: %v", err)
 	}
 }
@@ -49,10 +50,10 @@ func (c *Client) rotateLogs() {
 	}
 }
 
-func (c *Client) checkForUpdate() {
+func (c *Client) checkForUpdate(ctx context.Context) {
 	c.Print("[user requested] GitHub Update Check")
 
-	switch update, err := update.Check(mnd.UserRepo, version.Version); {
+	switch update, err := update.Check(ctx, mnd.UserRepo, version.Version); {
 	case err != nil:
 		c.Errorf("Update Check: %v", err)
 		_, _ = ui.Error(mnd.Title+" ERROR", "Checking version on GitHub: "+err.Error())
@@ -143,7 +144,7 @@ func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 	return s + "\n"
 }
 
-func (c *Client) writeConfigFile() {
+func (c *Client) writeConfigFile(ctx context.Context) {
 	val, _, _ := ui.Entry(mnd.Title, "Enter path to write config file:", c.Flags.ConfigFile)
 
 	if val == "" {
@@ -153,7 +154,7 @@ func (c *Client) writeConfigFile() {
 
 	c.Print("[user requested] Writing Config File:", val)
 
-	if _, err := c.Config.Write(val); err != nil {
+	if _, err := c.Config.Write(ctx, val); err != nil {
 		c.Errorf("Writing Config File: %v", err)
 		_, _ = ui.Error(mnd.Title+" Error", "Writing Config File: "+err.Error())
 
@@ -186,14 +187,14 @@ func (c *Client) openGUI() {
 	go ui.OpenURL(uri + ":" + port + c.Config.URLBase) //nolint:errcheck
 }
 
-func (c *Client) updatePassword() {
+func (c *Client) updatePassword(ctx context.Context) {
 	pass, _, err := ui.Entry(mnd.Title, "Enter new Web UI admin password (must be 9+ characters):", "")
 	if err != nil {
 		c.Errorf("err: %v", err)
 		return
 	}
 
-	if err := c.StopWebServer(); err != nil {
+	if err := c.StopWebServer(ctx); err != nil {
 		c.Errorf("Stopping web server: %v", err)
 
 		if err = ui.Notify("Stopping web server failed, password not updated."); err != nil {

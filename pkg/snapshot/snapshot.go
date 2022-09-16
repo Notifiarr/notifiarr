@@ -136,8 +136,8 @@ func (c *Config) Validate() {
 }
 
 // GetSnapshot returns a system snapshot based on requested data in the config.
-func (c *Config) GetSnapshot() (*Snapshot, []error, []error) {
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout.Duration)
+func (c *Config) GetSnapshot(ctx context.Context) (*Snapshot, []error, []error) {
+	ctx, cancel := context.WithTimeout(ctx, c.Timeout.Duration)
 	defer cancel()
 
 	snap := &Snapshot{Version: version.Version + "-" + version.Revision}

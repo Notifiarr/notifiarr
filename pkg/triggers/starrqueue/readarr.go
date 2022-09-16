@@ -1,6 +1,7 @@
 package starrqueue
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -28,8 +29,8 @@ func (a *Action) StoreReadarr(event website.EventType, instance int) {
 }
 
 // storeQueue runs at an interval and saves the queue for an app internally.
-func (app *readarrApp) storeQueue(event website.EventType) {
-	queue, err := app.app.GetQueue(queueItemsMax, 1)
+func (app *readarrApp) storeQueue(ctx context.Context, event website.EventType) {
+	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
 		app.cmd.Errorf("Getting Readarr Queue (instance %d): %v", app.idx+1, err)
 		return
@@ -78,7 +79,7 @@ func (c *cmd) setupReadarr() bool {
 	return enable
 }
 
-func (c *cmd) getFinishedItemsReadarr() itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyclop
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Readarr {

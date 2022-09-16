@@ -34,13 +34,10 @@ func (s *Server) hostInfoNoError() *host.InfoStat {
 }
 
 // GetHostInfo attempts to make a unique machine identifier...
-func (s *Server) GetHostInfo() (*host.InfoStat, error) { //nolint:cyclop
+func (s *Server) GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
 	if s.hostInfo != nil {
 		return s.hostInfoNoError(), nil
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second) //nolint:gomnd
-	defer cancel()
 
 	hostInfo, err := host.InfoWithContext(ctx)
 	if err != nil {

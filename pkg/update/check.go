@@ -44,8 +44,8 @@ type Update struct {
 }
 
 // Check checks if the app this library lives in has an updated version on GitHub.
-func Check(userRepo string, version string) (*Update, error) {
-	release, err := GetRelease(fmt.Sprintf(Latest, userRepo))
+func Check(ctx context.Context, userRepo string, version string) (*Update, error) {
+	release, err := GetRelease(ctx, fmt.Sprintf(Latest, userRepo))
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +54,8 @@ func Check(userRepo string, version string) (*Update, error) {
 }
 
 // GetRelease returns a GitHub release. See Check for an example on how to use it.
-func GetRelease(uri string) (*GitHubReleasesLatest, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+func GetRelease(ctx context.Context, uri string) (*GitHubReleasesLatest, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)

@@ -1,6 +1,7 @@
 package starrqueue
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -28,8 +29,8 @@ type lidarrApp struct {
 }
 
 // storeQueue runs at an interval and saves the queue for an app internally.
-func (app *lidarrApp) storeQueue(event website.EventType) {
-	queue, err := app.app.GetQueue(queueItemsMax, 1)
+func (app *lidarrApp) storeQueue(ctx context.Context, event website.EventType) {
+	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
 		app.cmd.Errorf("Getting Lidarr Queue (instance %d): %v", app.idx+1, err)
 		return
@@ -76,7 +77,7 @@ func (c *cmd) setupLidarr() bool {
 	return enabled
 }
 
-func (c *cmd) getFinishedItemsLidarr() itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cyclop
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Lidarr {
