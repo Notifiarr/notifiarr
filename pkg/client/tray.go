@@ -29,7 +29,7 @@ const timerPrefix = "TimErr"
 var menu = make(map[string]*systray.MenuItem) //nolint:gochecknoglobals
 
 // startTray Run()s readyTray to bring up the web server and the GUI app.
-func (c *Client) startTray(ctx context.Context, clientInfo *website.ClientInfo) {
+func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clientInfo *website.ClientInfo) {
 	systray.Run(func() {
 		defer os.Exit(0)
 		defer c.CapturePanic()
@@ -44,7 +44,7 @@ func (c *Client) startTray(ctx context.Context, clientInfo *website.ClientInfo) 
 		c.setupMenus(clientInfo)
 
 		// This starts the web server, and waits for reload/exit signals.
-		if err := c.Exit(ctx); err != nil {
+		if err := c.Exit(ctx, cancel); err != nil {
 			c.Errorf("Server: %v", err)
 			os.Exit(1) // web server problem
 		}

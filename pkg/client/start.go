@@ -113,6 +113,9 @@ func Start() error {
 func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 	msg, newPassword, err := c.loadConfiguration(ctx)
 
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	switch {
 	case c.Flags.AptHook:
 		return c.handleAptHook(ctx) // err?
@@ -154,11 +157,11 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 
 	if ui.HasGUI() {
 		// This starts the web server and calls os.Exit() when done.
-		c.startTray(ctx, clientInfo)
+		c.startTray(ctx, cancel, clientInfo)
 		return nil
 	}
 
-	return c.Exit(ctx)
+	return c.Exit(ctx, cancel)
 }
 
 func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
@@ -270,9 +273,10 @@ func (c *Client) triggerConfigReload(event website.EventType, source string) {
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
-func (c *Client) Exit(ctx context.Context) error {
+func (c *Client) Exit(ctx context.Context, cancel context.CancelFunc) error {
 	defer func() {
 		defer c.CapturePanic()
+		cancel()
 		//nolint:gomnd
 		c.Print(" ❌ Good bye! Uptime:", durafmt.Parse(time.Since(version.Started).Round(time.Second)).LimitFirstN(3))
 	}()
@@ -309,8 +313,6 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 		return fmt.Errorf("stoping web server: %w", err)
 	}
 
-	defer c.StartWebServer()
-
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
 	if c.website, c.triggers, err = c.Config.Get(c.Flags); err != nil {
@@ -321,10 +323,13 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 		return fmt.Errorf("closing logger(s): %w", errs[0])
 	}
 
+	defer c.StartWebServer()
+
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	clientInfo := c.configureServices(ctx)
 	c.setupMenus(clientInfo)
-	c.Print(" 🌀 Configuration Reloaded! Config File:", c.Flags.ConfigFile)
+	c.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s",
+		c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile)
 
 	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
