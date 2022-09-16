@@ -77,10 +77,10 @@ func (c *Client) runWebServer() {
 }
 
 // StopWebServer stops the web servers. Panics if that causes an error or timeout.
-func (c *Client) StopWebServer() error {
+func (c *Client) StopWebServer(ctx context.Context) error {
 	c.Print("==> Stopping Web Server!")
 
-	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, c.Config.Timeout.Duration)
 	defer cancel()
 
 	if menu["stat"] != nil {

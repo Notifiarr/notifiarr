@@ -39,10 +39,7 @@ type procExpect struct {
 const epochOffset = 1000
 
 // GetAllProcesses returns all running process on the host.
-func GetAllProcesses() ([]*ProcInfo, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
-	defer cancel()
-
+func GetAllProcesses(ctx context.Context) ([]*ProcInfo, error) {
 	processes, err := process.ProcessesWithContext(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting process list: %w", err)
@@ -68,8 +65,8 @@ func GetAllProcesses() ([]*ProcInfo, error) {
 }
 
 // start a loop through processes to find the one we care about.
-func (s *Service) checkProccess() *result {
-	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
+func (s *Service) checkProccess(ctx context.Context) *result {
+	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
 	processes, err := process.ProcessesWithContext(ctx)

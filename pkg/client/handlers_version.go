@@ -21,10 +21,10 @@ type conTest struct {
 
 // infoHandler is like the version handler except it doesn't poll all the apps.
 func (c *Client) infoHandler(r *http.Request) (int, interface{}) {
-	output := c.website.Info()
+	output := c.website.Info(r.Context())
 	output["commands"] = c.triggers.Commands.List()
 
-	if host, err := c.website.GetHostInfo(); err != nil {
+	if host, err := c.website.GetHostInfo(r.Context()); err != nil {
 		output["hostError"] = err.Error()
 	} else {
 		output["host"] = host
@@ -35,11 +35,11 @@ func (c *Client) infoHandler(r *http.Request) (int, interface{}) {
 
 // versionHandler returns application run and build time data and application statuses: /api/version.
 func (c *Client) versionHandler(r *http.Request) (int, interface{}) {
-	output := c.website.Info()
+	output := c.website.Info(r.Context())
 	output["appsStatus"] = c.appStatsForVersion(r.Context())
 	output["commands"] = c.triggers.Commands.List()
 
-	if host, err := c.website.GetHostInfo(); err != nil {
+	if host, err := c.website.GetHostInfo(r.Context()); err != nil {
 		output["hostError"] = err.Error()
 	} else {
 		output["host"] = host

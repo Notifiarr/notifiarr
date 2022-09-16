@@ -85,8 +85,8 @@ func (s *Service) Validate() error { //nolint:cyclop
 
 // CheckOnly runs a service check and returns the result immediately.
 // It is not otherwise stored anywhere.
-func (s *Service) CheckOnly() *CheckResult {
-	res := s.checkNow()
+func (s *Service) CheckOnly(ctx context.Context) *CheckResult {
+	res := s.checkNow(ctx)
 
 	return &CheckResult{
 		Output: res.output,
@@ -94,23 +94,23 @@ func (s *Service) CheckOnly() *CheckResult {
 	}
 }
 
-func (s *Service) checkNow() (res *result) {
+func (s *Service) checkNow(ctx context.Context) (res *result) {
 	switch s.Type {
 	case CheckHTTP:
-		return s.checkHTTP()
+		return s.checkHTTP(ctx)
 	case CheckTCP:
 		return s.checkTCP()
 	case CheckPING:
 		return s.checkPING()
 	case CheckPROC:
-		return s.checkProccess()
+		return s.checkProccess(ctx)
 	default:
 		return nil
 	}
 }
 
-func (s *Service) check() bool {
-	return s.update(s.checkNow())
+func (s *Service) check(ctx context.Context) bool {
+	return s.update(s.checkNow(ctx))
 }
 
 // Return true if the service state changed.
@@ -147,13 +147,13 @@ func (s *Service) update(res *result) bool {
 
 const maxBody = 150
 
-func (s *Service) checkHTTP() *result {
+func (s *Service) checkHTTP(ctx context.Context) *result {
 	res := &result{
 		state:  StateUnknown,
 		output: "unknown",
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), s.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.Value, nil)

@@ -1,6 +1,7 @@
 package starrqueue
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -89,11 +90,11 @@ func (i itemList) Empty() bool {
 }
 
 // sendStuckQueues gathers the stuck quues from cache and sends them.
-func (c *cmd) sendStuckQueues(event website.EventType) {
-	lidarr := c.getFinishedItemsLidarr()
-	radarr := c.getFinishedItemsRadarr()
-	readarr := c.getFinishedItemsReadarr()
-	sonarr := c.getFinishedItemsSonarr()
+func (c *cmd) sendStuckQueues(ctx context.Context, event website.EventType) {
+	lidarr := c.getFinishedItemsLidarr(ctx)
+	radarr := c.getFinishedItemsRadarr(ctx)
+	readarr := c.getFinishedItemsReadarr(ctx)
+	sonarr := c.getFinishedItemsSonarr(ctx)
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
 		c.Debugf("No stuck items found.")

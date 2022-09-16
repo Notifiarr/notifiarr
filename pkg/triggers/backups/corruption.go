@@ -156,9 +156,9 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 	})
 }
 
-func (c *cmd) sendLidarrCorruption(event website.EventType) {
+func (c *cmd) sendLidarrCorruption(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Lidarr {
-		c.lidarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
+		c.lidarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
 			event: event,
 			last:  c.lidarr[idx],
 			name:  starr.Lidarr,
@@ -170,9 +170,9 @@ func (c *cmd) sendLidarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendProwlarrCorruption(event website.EventType) {
+func (c *cmd) sendProwlarrCorruption(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Prowlarr {
-		c.prowlarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
+		c.prowlarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
 			event: event,
 			last:  c.prowlarr[idx],
 			name:  starr.Prowlarr,
@@ -184,9 +184,9 @@ func (c *cmd) sendProwlarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendRadarrCorruption(event website.EventType) {
+func (c *cmd) sendRadarrCorruption(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Radarr {
-		c.radarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
+		c.radarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
 			event: event,
 			last:  c.radarr[idx],
 			name:  starr.Radarr,
@@ -198,9 +198,9 @@ func (c *cmd) sendRadarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendReadarrCorruption(event website.EventType) {
+func (c *cmd) sendReadarrCorruption(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Readarr {
-		c.readarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
+		c.readarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
 			event: event,
 			last:  c.readarr[idx],
 			name:  starr.Readarr,
@@ -212,9 +212,9 @@ func (c *cmd) sendReadarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendSonarrCorruption(event website.EventType) {
+func (c *cmd) sendSonarrCorruption(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Sonarr {
-		c.sonarr[idx] = c.sendAndLogAppCorruption(&genericInstance{
+		c.sonarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
 			event: event,
 			last:  c.sonarr[idx],
 			name:  starr.Sonarr,
@@ -226,19 +226,16 @@ func (c *cmd) sendSonarrCorruption(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendAndLogAppCorruption(input *genericInstance) string { //nolint:cyclop
+func (c *cmd) sendAndLogAppCorruption(ctx context.Context, input *genericInstance) string { //nolint:cyclop
 	if input.skip {
 		return input.last
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), maxCheckTime)
-	defer cancel()
 
 	if (input.last == mnd.Disabled || input.last == "") && input.event == website.EventCron {
 		return input.last
 	}
 
-	fileList, err := input.app.GetBackupFiles()
+	fileList, err := input.app.GetBackupFilesContext(ctx)
 	if err != nil {
 		c.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
 		return input.last

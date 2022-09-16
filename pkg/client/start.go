@@ -85,6 +85,8 @@ func Start() error {
 	client := newDefaults()
 	client.Flags.ParseArgs(os.Args[1:])
 
+	ctx := context.Background()
+
 	//nolint:forbidigo,wrapcheck
 	switch {
 	case client.Flags.LongVerReq: // print version and exit.
@@ -94,26 +96,33 @@ func Start() error {
 		_, err := fmt.Println(client.Flags.Name() + " " + version.Version + "-" + version.Revision)
 		return err
 	case client.Flags.PSlist: // print process list and exit.
-		return printProcessList()
+		ctx, cancel := context.WithTimeout(ctx, time.Minute)
+		defer cancel()
+
+		return printProcessList(ctx)
 	case client.Flags.Fortune: // print fortune and exit.
 		_, err := fmt.Println(Fortune())
 		return err
 	case client.Flags.Curl != "": // curl a URL and exit.
 		return curlURL(client.Flags.Curl, client.Flags.Headers)
 	default:
-		return client.start()
+		return client.start(ctx)
 	}
 }
 
-func (c *Client) start() error { //nolint:cyclop
-	msg, newPassword, err := c.loadConfiguration()
+func (c *Client) start(ctx context.Context) error { //nolint:cyclop
+	msg, newPassword, err := c.loadConfiguration(ctx)
 
 	switch {
 	case c.Flags.AptHook:
-		return c.handleAptHook() // err?
+		return c.handleAptHook(ctx) // err?
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
 		c.Printf("==> %s", msg)
-		return c.forceWriteWithExit(c.Flags.Write)
+
+		ctx, cancel := context.WithTimeout(ctx, time.Minute)
+		defer cancel()
+
+		return c.forceWriteWithExit(ctx, c.Flags.Write)
 	case err != nil:
 		return fmt.Errorf("%s: %w", msg, err)
 	case c.Flags.Restart:
@@ -127,43 +136,51 @@ func (c *Client) start() error { //nolint:cyclop
 		mnd.TodaysEmoji(), c.Flags.Name(), version.Version, version.Revision, os.Getpid(),
 		version.Started.Format("Monday, January 2, 2006 @ 3:04:05 PM MST -0700"))
 	c.Printf("==> %s", msg)
-
 	c.printUpdateMessage()
 
-	if err := c.loadAssetsTemplates(); err != nil {
+	if err := c.loadAssetsTemplates(ctx); err != nil {
 		return err
 	}
 
-	clientInfo := c.configureServices()
+	clientInfo := c.configureServices(ctx)
 
 	if newPassword != "" {
-		_, _ = c.Config.Write(c.Flags.ConfigFile)
-		_ = ui.OpenFile(c.Flags.ConfigFile)
-		_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
-			c.Flags.ConfigFile+" - it should open in a text editor. "+
-			"Please edit the file and reload this application using the tray menu. "+
-			"Your Web UI password was set to "+newPassword+
-			" and was also printed in the log file '"+c.Config.LogFile+"' and/or app ouptput.")
+		// If newPassword is set it means we need to write out a new config file for a new installation. Do that now.
+		c.makeNewConfigFile(ctx, newPassword)
 	} else if c.Config.AutoUpdate != "" {
-		go c.AutoWatchUpdate() // do not run updater if there's a brand new config file.
+		// do not run updater if there's a brand new config file.
+		go c.AutoWatchUpdate()
 	}
 
 	if ui.HasGUI() {
 		// This starts the web server and calls os.Exit() when done.
-		c.startTray(clientInfo)
+		c.startTray(ctx, clientInfo)
 		return nil
 	}
 
-	return c.Exit()
+	return c.Exit(ctx)
+}
+
+func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
+	ctx, cancel := context.WithTimeout(ctx, time.Minute)
+	defer cancel()
+
+	_, _ = c.Config.Write(ctx, c.Flags.ConfigFile)
+	_ = ui.OpenFile(c.Flags.ConfigFile)
+	_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
+		c.Flags.ConfigFile+" - it should open in a text editor. "+
+		"Please edit the file and reload this application using the tray menu. "+
+		"Your Web UI password was set to "+newPassword+
+		" and was also printed in the log file '"+c.Config.LogFile+"' and/or app ouptput.")
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running confguration.
-func (c *Client) loadConfiguration() (msg string, newPassword string, err error) {
+func (c *Client) loadConfiguration(ctx context.Context) (msg string, newPassword string, err error) {
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.
 	write := (!c.Flags.Restart && ui.HasGUI()) || mnd.IsDocker
-	c.Flags.ConfigFile, newPassword, msg = c.Config.FindAndReturn(c.Flags.ConfigFile, write)
+	c.Flags.ConfigFile, newPassword, msg = c.Config.FindAndReturn(ctx, c.Flags.ConfigFile, write)
 
 	if c.Flags.Restart {
 		return msg, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
@@ -182,8 +199,8 @@ func (c *Client) loadConfiguration() (msg string, newPassword string, err error)
 }
 
 // Load configuration from the website.
-func (c *Client) loadSiteConfig() *website.ClientInfo {
-	clientInfo, err := c.website.GetClientInfo()
+func (c *Client) loadSiteConfig(ctx context.Context) *website.ClientInfo {
+	clientInfo, err := c.website.GetClientInfo(ctx)
 	if err != nil || clientInfo == nil {
 		if errors.Is(err, website.ErrInvalidAPIKey) {
 			c.ErrorfNoShare("==> Problem validating API key: %v", err)
@@ -214,30 +231,30 @@ func (c *Client) loadSiteConfig() *website.ClientInfo {
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices() *website.ClientInfo {
-	c.website.Start()
+func (c *Client) configureServices(ctx context.Context) *website.ClientInfo {
+	c.website.Start(ctx)
 
-	clientInfo := c.loadSiteConfig()
+	clientInfo := c.loadSiteConfig(ctx)
 	if clientInfo != nil && !clientInfo.User.StopLogs {
 		share.Setup(c.website)
 	}
 
-	c.configureServicesPlex()
+	c.configureServicesPlex(ctx)
 	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
-	c.PrintStartupInfo(clientInfo)
-	c.triggers.Start()
-	c.Config.Services.Start()
+	c.PrintStartupInfo(ctx, clientInfo)
+	c.triggers.Start(ctx)
+	c.Config.Services.Start(ctx)
 
 	return clientInfo
 }
 
-func (c *Client) configureServicesPlex() {
+func (c *Client) configureServicesPlex(ctx context.Context) {
 	if !c.Config.Plex.Configured() {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), c.Config.Plex.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, c.Config.Plex.Timeout.Duration)
 	defer cancel()
 
 	if info, err := c.Config.Plex.GetInfo(ctx); err != nil {
@@ -253,7 +270,7 @@ func (c *Client) triggerConfigReload(event website.EventType, source string) {
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
-func (c *Client) Exit() error {
+func (c *Client) Exit(ctx context.Context) error {
 	defer func() {
 		defer c.CapturePanic()
 		//nolint:gomnd
@@ -267,14 +284,14 @@ func (c *Client) Exit() error {
 	for {
 		select {
 		case data := <-c.reload:
-			if err := c.reloadConfiguration(data.event, data.msg); err != nil {
+			if err := c.reloadConfiguration(ctx, data.event, data.msg); err != nil {
 				return err
 			}
 		case sigc := <-c.sigkil:
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
-			return c.stop(website.EventSignal)
+			return c.stop(ctx, website.EventSignal)
 		case sigc := <-c.sighup:
-			if err := c.checkReloadSignal(sigc); err != nil {
+			if err := c.checkReloadSignal(ctx, sigc); err != nil {
 				return err // reloadConfiguration()
 			}
 		}
@@ -284,10 +301,10 @@ func (c *Client) Exit() error {
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
-func (c *Client) reloadConfiguration(event website.EventType, source string) error {
+func (c *Client) reloadConfiguration(ctx context.Context, event website.EventType, source string) error {
 	c.Printf("==> Reloading Configuration (%s): %s", event, source)
 
-	err := c.stop(event)
+	err := c.stop(ctx, event)
 	if err != nil {
 		return fmt.Errorf("stoping web server: %w", err)
 	}
@@ -305,7 +322,7 @@ func (c *Client) reloadConfiguration(event website.EventType, source string) err
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	clientInfo := c.configureServices()
+	clientInfo := c.configureServices(ctx)
 	c.setupMenus(clientInfo)
 	c.Print(" 🌀 Configuration Reloaded! Config File:", c.Flags.ConfigFile)
 
@@ -320,15 +337,15 @@ func (c *Client) reloadConfiguration(event website.EventType, source string) err
 }
 
 // stop is called from at least two different exit points and on reload.
-func (c *Client) stop(event website.EventType) error {
+func (c *Client) stop(ctx context.Context, event website.EventType) error {
 	defer func() {
 		defer c.CapturePanic()
 		c.closeDynamicTimerMenus()
 		c.triggers.Stop(event)
-		c.Config.Services.Stop()
+		c.Config.Services.Stop(ctx)
 		c.website.Stop()
 		c.Print("==> All systems powered down!")
 	}()
 
-	return c.StopWebServer()
+	return c.StopWebServer(ctx)
 }

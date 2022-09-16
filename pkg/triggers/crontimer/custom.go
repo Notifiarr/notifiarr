@@ -1,6 +1,7 @@
 package crontimer
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -56,7 +57,7 @@ func (t *Timer) Run(event website.EventType) {
 }
 
 // run responds to the channel that the timer fired into.
-func (t *Timer) run(event website.EventType) {
+func (t *Timer) run(ctx context.Context, event website.EventType) {
 	t.website.SendData(&website.Request{
 		Route:      website.Route(t.URI),
 		Event:      event,

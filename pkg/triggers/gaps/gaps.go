@@ -1,6 +1,7 @@
 package gaps
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -60,7 +61,7 @@ func (a *Action) Send(event website.EventType) {
 	a.cmd.Exec(event, TrigCollectionGaps)
 }
 
-func (c *cmd) sendGaps(event website.EventType) {
+func (c *cmd) sendGaps(ctx context.Context, event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
 		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
 			event, len(c.Apps.Radarr))
@@ -80,7 +81,7 @@ func (c *cmd) sendGaps(event website.EventType) {
 			Movies   []*radarr.Movie `json:"movies"`
 		}
 
-		movies, err := app.GetMovie(0)
+		movies, err := app.GetMovieContext(ctx, 0)
 		if err != nil {
 			c.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v", event, instance, app.URL, err)
 			continue

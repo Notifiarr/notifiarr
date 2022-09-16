@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"reflect"
 	"time"
 
@@ -14,7 +15,7 @@ const TrigStop TriggerName = "Stopping all triggers and timers (reload)."
 
 // Run converts all the tickers and triggers into []reflect.SelectCase.
 // This allows us to run a loop with a dynamic number of channels and tickers to watch.
-func (c *Config) Run() {
+func (c *Config) Run(ctx context.Context) {
 	if c.stop != nil {
 		panic("notifiarr timers cannot run more than once")
 	}
@@ -46,7 +47,7 @@ func (c *Config) Run() {
 		}
 	}
 
-	go c.runTimerLoop(combine, cases)
+	go c.runTimerLoop(ctx, combine, cases)
 	c.Printf("==> Started %d Notifiarr Timers with %d Triggers", timer, trigger)
 }
 
@@ -55,7 +56,7 @@ func (c *Config) Run() {
 // All of the actions this library runs are contained in this one go routine.
 // That means only 1 action can run at a time. If c.Serial is set to true, then
 // some of those actions (especially dashboard) will spawn their own go routines.
-func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) {
+func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []reflect.SelectCase) {
 	defer c.stopTimerLoop(actions)
 
 	// This is how you watch a slice of reflect.SelectCase.
@@ -78,11 +79,11 @@ func (c *Config) runTimerLoop(actions []*Action, cases []reflect.SelectCase) {
 			return // called by c.Stop(), calls c.stopTimerLoop().
 		}
 
-		c.runEventAction(event, action)
+		c.runEventAction(ctx, event, action)
 	}
 }
 
-func (c *Config) runEventAction(event website.EventType, action *Action) {
+func (c *Config) runEventAction(ctx context.Context, event website.EventType, action *Action) {
 	if event == website.EventUser && action.Name != "" {
 		if err := ui.Notify(string(action.Name)); err != nil {
 			c.Errorf("Displaying toast notification: %v", err)
@@ -94,7 +95,7 @@ func (c *Config) runEventAction(event website.EventType, action *Action) {
 	}
 
 	if action.Fn != nil {
-		action.Fn(event)
+		action.Fn(ctx, event)
 	}
 }
 

@@ -4,6 +4,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"strings"
 	"time"
@@ -54,7 +55,7 @@ func (c *Config) setup(services []*Service) error {
 
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
-func (c *Config) Start() {
+func (c *Config) Start(ctx context.Context) {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
 
@@ -66,7 +67,7 @@ func (c *Config) Start() {
 		c.services[name].svc.log = c.Logger
 	}
 
-	c.loadServiceStates()
+	c.loadServiceStates(ctx)
 	c.checks = make(chan *Service, DefaultBuffer)
 	c.done = make(chan bool)
 	c.stopChan = make(chan struct{})
@@ -85,12 +86,12 @@ func (c *Config) Start() {
 					return
 				}
 
-				c.done <- check.check()
+				c.done <- check.check(ctx)
 			}
 		}()
 	}
 
-	go c.runServiceChecker()
+	go c.runServiceChecker(ctx)
 
 	word := "Started"
 	if c.Disabled {
@@ -103,7 +104,7 @@ func (c *Config) Start() {
 
 // loadServiceStates brings service states from the website into the fold.
 // In other words, states are stored in the website's database.
-func (c *Config) loadServiceStates() {
+func (c *Config) loadServiceStates(ctx context.Context) {
 	names := []string{}
 	for name := range c.services {
 		names = append(names, valuePrefix+name)
@@ -113,7 +114,7 @@ func (c *Config) loadServiceStates() {
 		return
 	}
 
-	values, err := c.Website.GetValue(names...)
+	values, err := c.Website.GetValueContext(ctx, names...)
 	if err != nil {
 		c.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return
@@ -144,7 +145,7 @@ func (c *Config) loadServiceStates() {
 	}
 }
 
-func (c *Config) runServiceChecker() { //nolint:cyclop
+func (c *Config) runServiceChecker(ctx context.Context) { //nolint:cyclop
 	defer func() {
 		defer c.CapturePanic()
 		c.Printf("==> Service Checker Stopped!")
@@ -179,10 +180,10 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 		case event := <-c.checkChan:
 			c.Debugf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
-			c.updateStatesOnSite(c.runCheck(event.Service, true))
+			c.updateStatesOnSite(ctx, c.runCheck(event.Service, true))
 		case event := <-c.triggerChan:
 			c.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(c.checks), cap(c.checks))
-			c.updateStatesOnSite(c.runChecks(true))
+			c.updateStatesOnSite(ctx, c.runChecks(true))
 
 			if event != "log" {
 				c.SendResults(&Results{What: event, Svcs: c.GetResults()})
@@ -197,7 +198,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 
 			c.Debug("Service Checks Payload (log only):", string(data))
 		case <-second.C:
-			c.updateStatesOnSite(c.runChecks(false))
+			c.updateStatesOnSite(ctx, c.runChecks(false))
 		}
 	}
 }
@@ -210,11 +211,11 @@ func (c *Config) Running() bool {
 }
 
 // Stop sends current states to the website and ends all service checker routines.
-func (c *Config) Stop() {
+func (c *Config) Stop(ctx context.Context) {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
 
-	c.updateStatesOnSite(true)
+	c.updateStatesOnSite(ctx, true)
 
 	if c.stopChan == nil {
 		return

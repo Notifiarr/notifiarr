@@ -1,6 +1,7 @@
 package backups
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -32,7 +33,6 @@ var (
 const (
 	checkInterval = 5 * time.Hour
 	randomMinutes = 60
-	maxCheckTime  = 10 * time.Minute
 )
 
 // Trigger Types.
@@ -76,6 +76,7 @@ type genericInstance struct {
 	int   int         // instance ID: 1, 2, 3...
 	app   interface { // all starr apps satisfy this interface. yay!
 		GetBackupFiles() ([]*starr.BackupFile, error)
+		GetBackupFilesContext(ctx context.Context) ([]*starr.BackupFile, error)
 		starr.APIer
 	}
 }

@@ -202,14 +202,14 @@ func readBodyForLog(body io.Reader, max int64) string {
 	return string(bodyBytes)
 }
 
-func (s *Server) watchSendDataChan() {
+func (s *Server) watchSendDataChan(ctx context.Context) {
 	defer func() {
 		defer s.config.CapturePanic()
 		s.config.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
 	}()
 
 	for data := range s.sendData {
-		switch resp, elapsed, err := s.sendRequest(data); {
+		switch resp, elapsed, err := s.sendRequest(ctx, data); {
 		case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 			continue
 		case errors.Is(err, ErrNon200):
@@ -228,7 +228,7 @@ func (s *Server) watchSendDataChan() {
 	close(s.stopSendData)
 }
 
-func (s *Server) sendRequest(data *Request) (*Response, time.Duration, error) {
+func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, time.Duration, error) {
 	if err := s.validAPIKey(); err != nil {
 		if data.respChan != nil {
 			data.respChan <- &chResponse{
@@ -250,7 +250,7 @@ func (s *Server) sendRequest(data *Request) (*Response, time.Duration, error) {
 	}
 
 	start := time.Now()
-	resp, err := s.sendPayload(uri, data.Payload, data.LogPayload)
+	resp, err := s.sendPayload(ctx, uri, data.Payload, data.LogPayload)
 	elapsed := time.Since(start).Round(time.Millisecond)
 
 	if data.respChan != nil {

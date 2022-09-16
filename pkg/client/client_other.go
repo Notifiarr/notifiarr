@@ -4,6 +4,7 @@ package client
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -16,7 +17,7 @@ import (
 // handleAptHook takes a payload as stdin from dpkg and relays it to notifiarr.com.
 // only useful as an apt integration on Debian-based operating systems.
 // NEVER return an error, we don't want to hang up apt.
-func (c *Client) handleAptHook() error {
+func (c *Client) handleAptHook(ctx context.Context) error {
 	if !c.Config.EnableApt {
 		return nil // apt integration is not enabled, bail.
 	}
@@ -52,7 +53,7 @@ func (c *Client) handleAptHook() error {
 		} //nolint:wsl
 	}
 
-	resp, _, err := c.website.RawGetData(&website.Request{
+	resp, _, err := c.website.RawGetData(ctx, &website.Request{
 		Route:   website.PkgRoute,
 		Event:   "apt",
 		Payload: output,
@@ -79,23 +80,23 @@ func (f *fakeMenu) Uncheck()               {}
 func (f *fakeMenu) Check()                 {}
 func (f *fakeMenu) SetTooltip(interface{}) {}
 
-func (c *Client) printUpdateMessage()     {}
-func (c *Client) setupMenus(interface{})  {}
-func (c *Client) closeDynamicTimerMenus() {}
-func (c *Client) startTray(interface{})   {}
+func (c *Client) printUpdateMessage()                    {}
+func (c *Client) setupMenus(interface{})                 {}
+func (c *Client) closeDynamicTimerMenus()                {}
+func (c *Client) startTray(context.Context, interface{}) {}
 
 // AutoWatchUpdate is not used on this OS.
 func (c *Client) AutoWatchUpdate() {}
 
-func (c *Client) checkReloadSignal(sigc os.Signal) error {
+func (c *Client) checkReloadSignal(ctx context.Context, sigc os.Signal) error {
 	if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {
 		c.Printf("Writing Config File! Caught Signal: %v", sigc)
 
-		if _, err := c.Config.Write(c.Flags.ConfigFile); err != nil {
+		if _, err := c.Config.Write(ctx, c.Flags.ConfigFile); err != nil {
 			c.Errorf("Writing Config File: %v", err)
 		}
 	} else {
-		return c.reloadConfiguration(website.EventSignal, "Caught Signal: "+sigc.String())
+		return c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
 	}
 
 	return nil

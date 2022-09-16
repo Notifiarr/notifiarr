@@ -33,7 +33,7 @@ func (a *Action) SyncSonarrRP(event website.EventType) {
 }
 
 // syncSonarr triggers a custom format sync for Sonarr.
-func (c *cmd) syncSonarr(event website.EventType) {
+func (c *cmd) syncSonarr(ctx context.Context, event website.EventType) {
 	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Sonarr Release Profiles. Website provided 0 instances.", event)
 		return
@@ -41,9 +41,6 @@ func (c *cmd) syncSonarr(event website.EventType) {
 		c.Debugf("[%s requested] Cannot sync Sonarr Release Profiles. No Sonarr instances configured.", event)
 		return
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), maxSyncTime)
-	defer cancel()
 
 	for i, app := range c.Apps.Sonarr {
 		instance := i + 1

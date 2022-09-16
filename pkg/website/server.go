@@ -89,8 +89,8 @@ func (s *Server) ReloadCh(sighup chan os.Signal) {
 }
 
 // Start runs the website go routine.
-func (s *Server) Start() {
-	go s.watchSendDataChan()
+func (s *Server) Start(ctx context.Context) {
+	go s.watchSendDataChan(ctx)
 }
 
 // Stop stops the website go routine.
@@ -128,16 +128,16 @@ func (s *Server) GetData(req *Request) (*Response, error) {
 
 // RawGetData sends a request to the website without using a channel.
 // Avoid this method.
-func (s *Server) RawGetData(req *Request) (*Response, time.Duration, error) {
-	return s.sendRequest(req)
+func (s *Server) RawGetData(ctx context.Context, req *Request) (*Response, time.Duration, error) {
+	return s.sendRequest(ctx, req)
 }
 
-func (s *Server) sendPayload(uri string, payload interface{}, log bool) (*Response, error) {
+func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{}, log bool) (*Response, error) {
 	data, err := json.Marshal(payload)
 	if err == nil {
 		var torn map[string]interface{}
 		if err := json.Unmarshal(data, &torn); err == nil {
-			if torn["host"], err = s.GetHostInfo(); err != nil {
+			if torn["host"], err = s.GetHostInfo(ctx); err != nil {
 				s.config.Errorf("Host Info Unknown: %v", err)
 			}
 
@@ -157,7 +157,7 @@ func (s *Server) sendPayload(uri string, payload interface{}, log bool) (*Respon
 		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), s.config.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, s.config.Timeout.Duration)
 	defer cancel()
 
 	code, body, err := s.sendJSON(ctx, s.config.BaseURL+uri, post, log)

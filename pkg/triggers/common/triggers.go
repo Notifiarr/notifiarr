@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -35,10 +36,10 @@ type TriggerName string
 // Action defines a trigger/timer that can be executed.
 type Action struct {
 	Name TriggerName
-	Fn   func(website.EventType) // most actions use this for triggers.
-	C    chan website.EventType  // if provided, T is optional.
-	T    *time.Ticker            // if provided, C is optional.
-	Hide bool                    // prevent logging.
+	Fn   func(context.Context, website.EventType) // most actions use this for triggers.
+	C    chan website.EventType                   // if provided, T is optional.
+	T    *time.Ticker                             // if provided, C is optional.
+	Hide bool                                     // prevent logging.
 }
 
 // Exec runs a trigger. This is abastraction method used in a bunch of places.

@@ -15,7 +15,6 @@ import (
 
 const (
 	randomMilliseconds = 5000
-	maxSyncTime        = 2 * time.Minute // used as trigger time limit.
 )
 
 // New configures the library.

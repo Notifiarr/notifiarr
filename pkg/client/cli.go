@@ -28,7 +28,7 @@ var (
 )
 
 // forceWriteWithExit is called only when a user passes --write on the command line.
-func (c *Client) forceWriteWithExit(fileName string) error {
+func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error {
 	if fileName == "example" || fileName == "---" {
 		// Bubilding a default template.
 		fileName = c.Flags.ConfigFile + ".new"
@@ -40,7 +40,7 @@ func (c *Client) forceWriteWithExit(fileName string) error {
 		configfile.ForceAllTmpl = true
 	}
 
-	f, err := c.Config.Write(fileName)
+	f, err := c.Config.Write(ctx, fileName)
 	if err != nil {
 		return fmt.Errorf("writing config: %w", err)
 	}
@@ -51,8 +51,8 @@ func (c *Client) forceWriteWithExit(fileName string) error {
 }
 
 // printProcessList is triggered by the --ps command line arg.
-func printProcessList() error {
-	ps, err := getProcessList()
+func printProcessList(ctx context.Context) error {
+	ps, err := getProcessList(ctx)
 	if err != nil {
 		return err
 	}
@@ -62,8 +62,8 @@ func printProcessList() error {
 	return nil
 }
 
-func getProcessList() (*bytes.Buffer, error) {
-	pslist, err := services.GetAllProcesses()
+func getProcessList(ctx context.Context) (*bytes.Buffer, error) {
+	pslist, err := services.GetAllProcesses(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get processes: %w", err)
 	}

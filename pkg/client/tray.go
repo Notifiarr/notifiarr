@@ -3,11 +3,13 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"reflect"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -27,7 +29,7 @@ const timerPrefix = "TimErr"
 var menu = make(map[string]*systray.MenuItem) //nolint:gochecknoglobals
 
 // startTray Run()s readyTray to bring up the web server and the GUI app.
-func (c *Client) startTray(clientInfo *website.ClientInfo) {
+func (c *Client) startTray(ctx context.Context, clientInfo *website.ClientInfo) {
 	systray.Run(func() {
 		defer os.Exit(0)
 		defer c.CapturePanic()
@@ -37,18 +39,18 @@ func (c *Client) startTray(clientInfo *website.ClientInfo) {
 		systray.SetTooltip(c.Flags.Name() + " v" + version.Version)
 		c.makeChannels() // make these before starting the web server.
 		c.makeMoreChannels()
-		c.setupChannels(c.watchKillerChannels, c.watchNotifiarrMenu, c.watchLogsChannels,
+		c.setupChannels(ctx, c.watchKillerChannels, c.watchNotifiarrMenu, c.watchLogsChannels,
 			c.watchConfigChannels, c.watchGuiChannels, c.watchTopChannels)
 		c.setupMenus(clientInfo)
 
 		// This starts the web server, and waits for reload/exit signals.
-		if err := c.Exit(); err != nil {
+		if err := c.Exit(ctx); err != nil {
 			c.Errorf("Server: %v", err)
 			os.Exit(1) // web server problem
 		}
 	}, func() {
 		// This code only fires from menu->quit.
-		if err := c.stop(website.EventUser); err != nil {
+		if err := c.stop(ctx, website.EventUser); err != nil {
 			c.Errorf("Server: %v", err)
 			os.Exit(1) // web server problem
 		}
@@ -107,12 +109,12 @@ func (c *Client) setupMenus(clientInfo *website.ClientInfo) {
 }
 
 // setupChannels runs the channel watcher loops in go routines with a panic catcher.
-func (c *Client) setupChannels(funcs ...func()) {
+func (c *Client) setupChannels(ctx context.Context, funcs ...func(ctx context.Context)) {
 	for _, f := range funcs {
-		go func(f func()) {
+		go func(ctx context.Context, fn func(context.Context)) {
 			defer c.CapturePanic()
-			f()
-		}(f)
+			fn(ctx)
+		}(ctx, f)
 	}
 }
 
@@ -192,7 +194,7 @@ func (c *Client) makeMoreChannels() {
 }
 
 // Listen to the top-menu-item channels so they don't back up with junk.
-func (c *Client) watchTopChannels() {
+func (c *Client) watchTopChannels(ctx context.Context) {
 	for {
 		select {
 		case <-menu["conf"].ClickedCh: // unused, top menu.
@@ -270,7 +272,7 @@ func (c *Client) buildDynamicTimerMenus() {
 	}
 }
 
-func (c *Client) watchKillerChannels() {
+func (c *Client) watchKillerChannels(ctx context.Context) {
 	defer systray.Quit() // this kills the app
 
 	for {
@@ -287,11 +289,11 @@ func (c *Client) watchKillerChannels() {
 }
 
 //nolint:errcheck
-func (c *Client) watchGuiChannels() {
+func (c *Client) watchGuiChannels(ctx context.Context) {
 	for {
 		select {
 		case <-menu["stat"].ClickedCh:
-			c.toggleServer()
+			c.toggleServer(ctx)
 		case <-menu["gh"].ClickedCh:
 			go ui.OpenURL("https://github.com/Notifiarr/notifiarr/")
 		case <-menu["hp"].ClickedCh:
@@ -311,18 +313,20 @@ func (c *Client) watchGuiChannels() {
 }
 
 //nolint:errcheck
-func (c *Client) watchConfigChannels() {
+func (c *Client) watchConfigChannels(ctx context.Context) {
 	for {
 		select {
 		case <-menu["view"].ClickedCh:
 			go ui.Info(mnd.Title+": Configuration", c.displayConfig())
 		case <-menu["pass"].ClickedCh:
-			c.updatePassword()
+			c.updatePassword(ctx)
 		case <-menu["edit"].ClickedCh:
 			go ui.OpenFile(c.Flags.ConfigFile)
 			c.Print("user requested] Editing Config File:", c.Flags.ConfigFile)
 		case <-menu["write"].ClickedCh:
-			go c.writeConfigFile()
+			ctx, cancel := context.WithTimeout(ctx, time.Minute)
+			c.writeConfigFile(ctx)
+			cancel()
 		case <-menu["console"].ClickedCh:
 			if menu["console"].Checked() {
 				menu["console"].Uncheck()
@@ -334,11 +338,11 @@ func (c *Client) watchConfigChannels() {
 		case <-menu["svcs"].ClickedCh:
 			if menu["svcs"].Checked() {
 				menu["svcs"].Uncheck()
-				c.Config.Services.Stop()
+				c.Config.Services.Stop(ctx)
 				ui.Notify("Stopped checking services!")
 			} else {
 				menu["svcs"].Check()
-				c.Config.Services.Start()
+				c.Config.Services.Start(ctx)
 				ui.Notify("Service checks started!")
 			}
 		}
@@ -346,7 +350,7 @@ func (c *Client) watchConfigChannels() {
 }
 
 //nolint:errcheck
-func (c *Client) watchLogsChannels() {
+func (c *Client) watchLogsChannels(ctx context.Context) {
 	for {
 		select {
 		case <-menu["logs_view"].ClickedCh:
@@ -367,7 +371,7 @@ func (c *Client) watchLogsChannels() {
 		case <-menu["logs_rotate"].ClickedCh:
 			c.rotateLogs()
 		case <-menu["update"].ClickedCh:
-			go c.checkForUpdate()
+			go c.checkForUpdate(ctx)
 		case <-menu["gui"].ClickedCh:
 			c.openGUI()
 		}
@@ -375,7 +379,7 @@ func (c *Client) watchLogsChannels() {
 }
 
 //nolint:errcheck,cyclop
-func (c *Client) watchNotifiarrMenu() {
+func (c *Client) watchNotifiarrMenu(ctx context.Context) {
 	for {
 		select {
 		case <-menu["gaps"].ClickedCh:

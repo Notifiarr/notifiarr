@@ -1,6 +1,7 @@
 package backups
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -149,11 +150,11 @@ func (c *cmd) makeBackupTriggersProwlarr() {
 	})
 }
 
-func (c *cmd) sendLidarrBackups(event website.EventType) {
+func (c *cmd) sendLidarrBackups(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Lidarr {
 		if event != website.EventCron ||
 			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled) {
-			c.sendBackups(&genericInstance{
+			c.sendBackups(ctx, &genericInstance{
 				event: event,
 				name:  starr.Lidarr,
 				int:   idx + 1,
@@ -165,11 +166,11 @@ func (c *cmd) sendLidarrBackups(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendProwlarrBackups(event website.EventType) {
+func (c *cmd) sendProwlarrBackups(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Prowlarr {
 		if event != website.EventCron ||
 			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled) {
-			c.sendBackups(&genericInstance{
+			c.sendBackups(ctx, &genericInstance{
 				event: event,
 				name:  starr.Prowlarr,
 				int:   idx + 1,
@@ -181,11 +182,11 @@ func (c *cmd) sendProwlarrBackups(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendRadarrBackups(event website.EventType) {
+func (c *cmd) sendRadarrBackups(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Radarr {
 		if event != website.EventCron ||
 			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled) {
-			c.sendBackups(&genericInstance{
+			c.sendBackups(ctx, &genericInstance{
 				event: event,
 				name:  starr.Radarr,
 				int:   idx + 1,
@@ -197,11 +198,11 @@ func (c *cmd) sendRadarrBackups(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendReadarrBackups(event website.EventType) {
+func (c *cmd) sendReadarrBackups(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Readarr {
 		if event != website.EventCron ||
 			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled) {
-			c.sendBackups(&genericInstance{
+			c.sendBackups(ctx, &genericInstance{
 				event: event,
 				name:  starr.Readarr,
 				int:   idx + 1,
@@ -213,11 +214,11 @@ func (c *cmd) sendReadarrBackups(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendSonarrBackups(event website.EventType) {
+func (c *cmd) sendSonarrBackups(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Sonarr {
 		if event != website.EventCron ||
 			(c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled) {
-			c.sendBackups(&genericInstance{
+			c.sendBackups(ctx, &genericInstance{
 				event: event,
 				name:  starr.Sonarr,
 				cName: app.Name,
@@ -229,12 +230,12 @@ func (c *cmd) sendSonarrBackups(event website.EventType) {
 	}
 }
 
-func (c *cmd) sendBackups(input *genericInstance) {
+func (c *cmd) sendBackups(ctx context.Context, input *genericInstance) {
 	if input.skip {
 		return
 	}
 
-	fileList, err := input.app.GetBackupFiles()
+	fileList, err := input.app.GetBackupFilesContext(ctx)
 	if err != nil {
 		c.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
 		return

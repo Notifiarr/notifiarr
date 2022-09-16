@@ -8,6 +8,7 @@ package configfile
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -222,7 +223,7 @@ func (c *Config) setup() *triggers.Actions {
 }
 
 // FindAndReturn return a config file. Write one if requested.
-func (c *Config) FindAndReturn(configFile string, write bool) (string, string, string) {
+func (c *Config) FindAndReturn(ctx context.Context, configFile string, write bool) (string, string, string) {
 	var confFile string
 
 	defaultConfigFile, configFileList := defaultLocactions()
@@ -250,7 +251,7 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, string, s
 	newPassword := generatePassword()
 	_ = c.UIPassword.Set(DefaultUsername + ":" + newPassword)
 
-	findFile, err := c.Write(defaultConfigFile)
+	findFile, err := c.Write(ctx, defaultConfigFile)
 	if err != nil {
 		return configFile, newPassword, MsgConfigFailed + err.Error()
 	} else if findFile == "" {
@@ -267,7 +268,7 @@ func (c *Config) FindAndReturn(configFile string, write bool) (string, string, s
 }
 
 // Write config to a file.
-func (c *Config) Write(file string) (string, error) {
+func (c *Config) Write(ctx context.Context, file string) (string, error) {
 	if file == "" {
 		return "", nil
 	}
@@ -297,7 +298,7 @@ func (c *Config) Write(file string) (string, error) {
 	defer newFile.Close()
 
 	if c.HostID == "" {
-		c.HostID, _ = host.HostID()
+		c.HostID, _ = host.HostIDWithContext(ctx)
 	}
 
 	if err := Template.Execute(newFile, c); err != nil {

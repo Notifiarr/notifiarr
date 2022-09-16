@@ -102,15 +102,15 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	// Services.
 	case "Tcp":
 		if len(config.Service) > index {
-			reply, code = testTCP(config.Service[index])
+			reply, code = testTCP(request.Context(), config.Service[index])
 		}
 	case "Http":
 		if len(config.Service) > index {
-			reply, code = testHTTP(config.Service[index])
+			reply, code = testHTTP(request.Context(), config.Service[index])
 		}
 	case "Process":
 		if len(config.Service) > index {
-			reply, code = testProcess(config.Service[index])
+			reply, code = testProcess(request.Context(), config.Service[index])
 		}
 	// Media
 	case "Plex":
@@ -285,12 +285,12 @@ func testNvidia(ctx context.Context, config *snapshot.NvidiaConfig) (string, int
 	return msg, http.StatusOK
 }
 
-func testTCP(svc *services.Service) (string, int) {
+func testTCP(ctx context.Context, svc *services.Service) (string, int) {
 	if err := svc.Validate(); err != nil {
 		return "Validation: " + err.Error(), http.StatusBadRequest
 	}
 
-	res := svc.CheckOnly()
+	res := svc.CheckOnly(ctx)
 	if res.State != services.StateOK {
 		return res.State.String() + " " + res.Output, http.StatusBadGateway
 	}
@@ -298,12 +298,12 @@ func testTCP(svc *services.Service) (string, int) {
 	return "TCP Port is OPEN and reachable: " + res.Output, http.StatusOK
 }
 
-func testHTTP(svc *services.Service) (string, int) {
+func testHTTP(ctx context.Context, svc *services.Service) (string, int) {
 	if err := svc.Validate(); err != nil {
 		return "Validation: " + err.Error(), http.StatusBadRequest
 	}
 
-	res := svc.CheckOnly()
+	res := svc.CheckOnly(ctx)
 	if res.State != services.StateOK {
 		return res.State.String() + " " + res.Output, http.StatusBadGateway
 	}
@@ -312,12 +312,12 @@ func testHTTP(svc *services.Service) (string, int) {
 	return "HTTP Response Code Acceptable! " + res.Output, http.StatusOK
 }
 
-func testProcess(svc *services.Service) (string, int) {
+func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 	if err := svc.Validate(); err != nil {
 		return "Validation: " + err.Error(), http.StatusBadRequest
 	}
 
-	res := svc.CheckOnly()
+	res := svc.CheckOnly(ctx)
 	if res.State != services.StateOK {
 		return res.State.String() + " " + res.Output, http.StatusBadGateway
 	}

@@ -1,6 +1,7 @@
 package snapcron
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -91,8 +92,8 @@ func (c *cmd) printLog() {
 		c.Snapshot.Interval, c.Snapshot.Timeout, ex)
 }
 
-func (c *cmd) sendSnapshot(event website.EventType) {
-	snapshot, errs, debug := c.Snapshot.GetSnapshot()
+func (c *cmd) sendSnapshot(ctx context.Context, event website.EventType) {
+	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx)
 	for _, err := range errs {
 		if err != nil {
 			c.ErrorfNoShare("[%s requested] Snapshot: %v", event, err)

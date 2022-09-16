@@ -1,6 +1,7 @@
 package plexcron
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -10,8 +11,8 @@ import (
 )
 
 // sendPlexSessions is fired by a timer if Plex Sessions feature has an interval defined.
-func (c *cmd) sendPlexSessions(event website.EventType) {
-	sessions, err := c.getSessions(time.Minute)
+func (c *cmd) sendPlexSessions(ctx context.Context, event website.EventType) {
+	sessions, err := c.getSessions(ctx, time.Minute)
 	if err != nil {
 		c.Errorf("Getting Plex sessions: %v", err)
 	}
@@ -19,7 +20,7 @@ func (c *cmd) sendPlexSessions(event website.EventType) {
 	c.SendData(&website.Request{
 		Route:      website.PlexRoute,
 		Event:      event,
-		Payload:    &website.Payload{Snap: c.getMetaSnap(), Plex: sessions},
+		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Plex: sessions},
 		LogMsg:     "Plex Sessions",
 		LogPayload: true,
 	})
@@ -28,7 +29,7 @@ func (c *cmd) sendPlexSessions(event website.EventType) {
 // getSessions interacts with the for loop/channels in runSessionHolder().
 // The Lock ensures only one request to Plex happens at once.
 // Because of the cache two requests may get the same answer.
-func (c *cmd) getSessions(allowedAge time.Duration) (*plex.Sessions, error) {
+func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.Sessions, error) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -37,15 +38,15 @@ func (c *cmd) getSessions(allowedAge time.Duration) (*plex.Sessions, error) {
 		return item.Data.(*plex.Sessions), nil //nolint:forcetypeassert
 	}
 
-	sessions, err := c.Plex.GetSessions()
+	sessions, err := c.Plex.GetSessionsWithContext(ctx)
 
 	switch {
 	case err != nil:
 		return &plex.Sessions{Name: c.Plex.Name}, fmt.Errorf("plex sessions: %w", err)
 	case item != nil && item.Data != nil:
-		c.plexSessionTracker(sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
+		c.plexSessionTracker(ctx, sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
 	default:
-		c.plexSessionTracker(sessions, nil)
+		c.plexSessionTracker(ctx, sessions, nil)
 	}
 
 	sessions.Name = c.Plex.Name
@@ -55,7 +56,7 @@ func (c *cmd) getSessions(allowedAge time.Duration) (*plex.Sessions, error) {
 
 // plexSessionTracker checks for state changes between the previous session pull
 // and the current session pull. if changes are present, a timestmp is added.
-func (c *cmd) plexSessionTracker(current, previous *plex.Sessions) {
+func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Sessions) {
 	now := time.Now()
 
 	// data.Save("plexPreviousSessions", previous)
@@ -68,16 +69,16 @@ func (c *cmd) plexSessionTracker(current, previous *plex.Sessions) {
 		switch {
 		case previous == nil:
 			continue // this only happens once.
-		case c.checkExistingSession(currSess, current, previous):
+		case c.checkExistingSession(ctx, currSess, current, previous):
 			continue // existing session.
 		case currSess.Player.State == playing && c.ClientInfo.Actions.Plex.TrackSess:
 			// We are tracking sessions (no webhooks); send this brand new session to website.
-			c.sendSessionPlaying(currSess, current, mediaPlay)
+			c.sendSessionPlaying(ctx, currSess, current, mediaPlay)
 		}
 	}
 }
 
-func (c *cmd) checkExistingSession(currSess *plex.Session, current, previous *plex.Sessions) bool {
+func (c *cmd) checkExistingSession(ctx context.Context, currSess *plex.Session, current, previous *plex.Sessions) bool {
 	// now check if a current session matches a previous session
 	for _, prevSess := range previous.Sessions {
 		if currSess.Session.ID != prevSess.Session.ID {
@@ -93,7 +94,7 @@ func (c *cmd) checkExistingSession(currSess *plex.Session, current, previous *pl
 		if currSess.Player.State == playing && prevSess.Player.State == paused &&
 			// Check if we're tracking sessions. If yes, send this resumed session.
 			c.ClientInfo.Actions.Plex.TrackSess {
-			c.sendSessionPlaying(currSess, current, mediaResume)
+			c.sendSessionPlaying(ctx, currSess, current, mediaResume)
 		}
 
 		// we found this current session in previous session list, so go to the next one.

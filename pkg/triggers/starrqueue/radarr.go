@@ -1,6 +1,7 @@
 package starrqueue
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -28,8 +29,8 @@ type radarrApp struct {
 }
 
 // storeQueue runs at an interval and saves the queue for an app internally.
-func (app *radarrApp) storeQueue(event website.EventType) {
-	queue, err := app.app.GetQueue(queueItemsMax, 1)
+func (app *radarrApp) storeQueue(ctx context.Context, event website.EventType) {
+	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
 		app.cmd.Errorf("Getting Radarr Queue (instance %d): %v", app.idx+1, err)
 		return
@@ -78,7 +79,7 @@ func (c *cmd) setupRadarr() bool {
 	return enabled
 }
 
-func (c *cmd) getFinishedItemsRadarr() itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cyclop
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Radarr {

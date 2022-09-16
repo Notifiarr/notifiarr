@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html/template"
 	"io"
@@ -34,8 +35,8 @@ import (
 )
 
 // loadAssetsTemplates watches for changs to template files, and loads them.
-func (c *Client) loadAssetsTemplates() error {
-	if err := c.ParseGUITemplates(); err != nil {
+func (c *Client) loadAssetsTemplates(ctx context.Context) error {
+	if err := c.ParseGUITemplates(ctx); err != nil {
 		return err
 	}
 
@@ -70,12 +71,12 @@ func (c *Client) loadAssetsTemplates() error {
 		}
 	}
 
-	go c.watchAssetsTemplates(fsn)
+	go c.watchAssetsTemplates(ctx, fsn)
 
 	return nil
 }
 
-func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
+func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher) {
 	defer c.CapturePanic()
 
 	for {
@@ -94,11 +95,11 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 
 			c.Debugf("Got event: %s on %s, reloading HTML templates!", event.Op, event.Name)
 
-			if err := c.StopWebServer(); err != nil {
+			if err := c.StopWebServer(ctx); err != nil {
 				panic("Stopping web server: " + err.Error())
 			}
 
-			if err := c.ParseGUITemplates(); err != nil {
+			if err := c.ParseGUITemplates(ctx); err != nil {
 				c.Errorf("fsnotify/parsing templates: %v", err)
 			}
 
@@ -107,12 +108,12 @@ func (c *Client) watchAssetsTemplates(fsn *fsnotify.Watcher) {
 	}
 }
 
-func (c *Client) getFuncMap() template.FuncMap {
+func (c *Client) getFuncMap(ctx context.Context) template.FuncMap {
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
 		"dateFmt": func(date time.Time) string {
-			if ci, _ := c.website.GetClientInfo(); ci != nil {
+			if ci, _ := c.website.GetClientInfo(ctx); ci != nil {
 				return ci.User.DateFormat.Format(date)
 			}
 
@@ -327,10 +328,10 @@ func since(t time.Time) string {
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
-func (c *Client) ParseGUITemplates() error {
+func (c *Client) ParseGUITemplates(ctx context.Context) error {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
-	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
+	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap(ctx))
 
 	var err error
 
@@ -401,19 +402,20 @@ type templateData struct {
 }
 
 func (c *Client) renderTemplate(
+	ctx context.Context,
 	response io.Writer,
 	req *http.Request,
 	templateName,
 	msg string,
 ) {
-	clientInfo, _ := c.website.GetClientInfo()
+	clientInfo, _ := c.website.GetClientInfo(ctx)
 	if clientInfo == nil {
 		clientInfo = &website.ClientInfo{}
 	}
 
 	binary, _ := os.Executable()
 	userName, dynamic := c.getUserName(req)
-	hostInfo, _ := c.website.GetHostInfo()
+	hostInfo, _ := c.website.GetHostInfo(ctx)
 
 	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
@@ -425,7 +427,7 @@ func (c *Client) renderTemplate(
 		LogFiles:    c.Logger.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
 		ClientInfo:  clientInfo,
-		Disks:       c.getDisks(),
+		Disks:       c.getDisks(ctx),
 		Cache: map[string]*cache.Item{
 			"dashboard": data.Get("dashboard"),
 			"sessions":  data.Get("plexCurrentSessions"),
@@ -472,7 +474,7 @@ func environ() map[string]string {
 	return out
 }
 
-func (c *Client) setUserPass(username, password string) error {
+func (c *Client) setUserPass(ctx context.Context, username, password string) error {
 	c.Lock()
 	defer c.Unlock()
 
@@ -484,7 +486,7 @@ func (c *Client) setUserPass(username, password string) error {
 		return fmt.Errorf("saving username and password: %w", err)
 	}
 
-	if err := c.saveNewConfig(c.Config); err != nil {
+	if err := c.saveNewConfig(ctx, c.Config); err != nil {
 		c.Config.UIPassword = current
 		return err
 	}
@@ -660,7 +662,7 @@ func revBytes(output bytes.Buffer) []byte {
 	return data
 }
 
-func (c *Client) getDisks() map[string]*snapshot.Partition {
+func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 	output := make(map[string]*snapshot.Partition)
 	snapcnfg := &snapshot.Config{
 		Plugins:   &snapshot.Plugins{},
@@ -670,7 +672,7 @@ func (c *Client) getDisks() map[string]*snapshot.Partition {
 		UseSudo:   c.Config.Snapshot.UseSudo,
 		//		Raid:      c.Config.Snapshot.Raid,
 	}
-	snapshot, _, _ := snapcnfg.GetSnapshot()
+	snapshot, _, _ := snapcnfg.GetSnapshot(ctx)
 
 	for k, v := range snapshot.DiskUsage {
 		output[k] = v
