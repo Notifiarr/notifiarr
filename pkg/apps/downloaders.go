@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/mrobinsn/go-rtorrent/xmlrpc"
 	"golift.io/cnfg"
@@ -46,11 +48,10 @@ type RtorrentConfig struct {
 }
 
 type TautulliConfig struct {
+	*tautulli.Config
 	Name      string        `toml:"name" xml:"name" json:"name"`
 	Interval  cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
-	URL       string        `toml:"url" xml:"url" json:"url"`
-	APIKey    string        `toml:"api_key" xml:"api_key" json:"apiKey"`
 	VerifySSL bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 }
 
@@ -61,6 +62,14 @@ type NZBGetConfig struct {
 	Timeout        cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
 	VerifySSL      bool          `toml:"verify_ssl" xml:"verify_ssl" json:"verifySsl"`
 	*nzbget.NZBGet `toml:"-" xml:"-" json:"-"`
+}
+
+type SabNZBConfig struct {
+	*sabnzbd.Config
+	Name      string        `toml:"name" xml:"name"`
+	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
+	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout"`
+	VerifySSL bool          `toml:"verify_ssl" xml:"verify_ssl"`
 }
 
 func (a *Apps) setupDeluge() error {
@@ -108,6 +117,32 @@ func (a *Apps) setupQbit() error {
 	}
 
 	return nil
+}
+
+func (a *Apps) setupSabNZBd() error {
+	for idx := range a.Rtorrent {
+		if a.SabNZB[idx] == nil || a.SabNZB[idx].URL == "" {
+			return fmt.Errorf("%w: missing url: SabNZBd config %d", ErrInvalidApp, idx+1)
+		}
+
+		a.SabNZB[idx].setup()
+	}
+
+	return nil
+}
+
+func (s *SabNZBConfig) setup() {
+	if s == nil {
+		return
+	}
+
+	s.Config.Client = &http.Client{
+		Timeout: s.Timeout.Duration,
+		Transport: exp.NewMetricsRoundTripper("SABnzbd", &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: s.VerifySSL}, //nolint:gosec
+		}),
+	}
+	s.URL = strings.TrimRight(s.URL, "/")
 }
 
 func (q *QbitConfig) setup() (err error) {
@@ -177,4 +212,18 @@ func (a *Apps) setupNZBGet() error {
 	}
 
 	return nil
+}
+
+func (t *TautulliConfig) setup() {
+	if t == nil {
+		return
+	}
+
+	t.Config.Client = &http.Client{
+		Timeout: t.Timeout.Duration,
+		Transport: exp.NewMetricsRoundTripper("Tautulli", &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: t.VerifySSL}, //nolint:gosec
+		}),
+	}
+	t.URL = strings.TrimRight(t.URL, "/")
 }

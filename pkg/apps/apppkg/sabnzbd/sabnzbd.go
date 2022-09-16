@@ -1,8 +1,7 @@
-package apps
+package sabnzbd
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,20 +11,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"golift.io/cnfg"
 )
 
 var ErrUnknownByteType = fmt.Errorf("unknown byte type")
 
-type SabNZBConfig struct {
-	Name      string        `toml:"name" xml:"name"`
-	Interval  cnfg.Duration `toml:"interval" xml:"interval"`
-	Timeout   cnfg.Duration `toml:"timeout" xml:"timeout"`
-	URL       string        `toml:"url" xml:"url"`
-	APIKey    string        `toml:"api_key" xml:"api_key"`
-	VerifySSL bool          `toml:"verify_ssl" xml:"verify_ssl"`
+type Config struct {
+	URL          string `toml:"url" xml:"url"`
+	APIKey       string `toml:"api_key" xml:"api_key"`
+	*http.Client `toml:"-" xml:"-" json:"-"`
 }
 
 // QueueSlots has the following data structure.
@@ -178,16 +172,8 @@ type Queue struct {
 	HaveQuota         bool         `json:"have_quota"`
 }
 
-func (s *SabNZBConfig) setup() {
-	if s == nil {
-		return
-	}
-
-	s.URL = strings.TrimRight(s.URL, "/")
-}
-
 // GetHistory returns the history items in SABnzbd.
-func (s *SabNZBConfig) GetHistory(ctx context.Context) (*History, error) {
+func (s *Config) GetHistory(ctx context.Context) (*History, error) {
 	if s == nil || s.URL == "" {
 		return &History{}, nil
 	}
@@ -201,7 +187,7 @@ func (s *SabNZBConfig) GetHistory(ctx context.Context) (*History, error) {
 		History *History `json:"history"`
 	}
 
-	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.VerifySSL, s.URL+"/api", params, &hist)
+	err := s.GetURLInto(ctx, params, &hist)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +196,7 @@ func (s *SabNZBConfig) GetHistory(ctx context.Context) (*History, error) {
 }
 
 // GetQueue returns the active queued items in SABnzbd.
-func (s *SabNZBConfig) GetQueue(ctx context.Context) (*Queue, error) {
+func (s *Config) GetQueue(ctx context.Context) (*Queue, error) {
 	if s == nil || s.URL == "" {
 		return &Queue{}, nil
 	}
@@ -224,7 +210,7 @@ func (s *SabNZBConfig) GetQueue(ctx context.Context) (*Queue, error) {
 		Queue *Queue `json:"queue"`
 	}
 
-	err := GetURLInto(ctx, "SabNZBD", s.Timeout.Duration, s.VerifySSL, s.URL+"/api", params, &que)
+	err := s.GetURLInto(ctx, params, &que)
 	if err != nil {
 		return nil, err
 	}
@@ -233,25 +219,15 @@ func (s *SabNZBConfig) GetQueue(ctx context.Context) (*Queue, error) {
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func GetURLInto(
-	ctx context.Context,
-	app string,
-	timeout time.Duration,
-	ssl bool,
-	url string,
-	params url.Values,
-	into interface{},
-) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+func (s *Config) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+"/api", nil)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)
 	}
 
 	req.URL.RawQuery = params.Encode()
 
-	resp, err := (&http.Client{Timeout: timeout, Transport: exp.NewMetricsRoundTripper(app, &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: !ssl}, //nolint:gosec
-	})}).Do(req)
+	resp, err := s.Client.Do(req)
 	if err != nil {
 		return fmt.Errorf("making request: %w", err)
 	}

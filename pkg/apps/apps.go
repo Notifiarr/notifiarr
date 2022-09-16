@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"path"
 	"strconv"
@@ -19,6 +18,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/cnfg"
 	"golift.io/datacounter"
@@ -31,29 +31,24 @@ import (
 
 // Apps is the input configuration to relay requests to Starr apps.
 type Apps struct {
-	APIKey   string            `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
-	ExKeys   []string          `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
-	URLBase  string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	MaxBody  int               `toml:"max_body" xml:"max_body" json:"maxBody"`
-	Sonarr   []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr   []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr   []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr  []*ReadarrConfig  `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Prowlarr []*ProwlarrConfig `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
-	Deluge   []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
-	Qbit     []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
-	Rtorrent []*RtorrentConfig `json:"rtorrent,omitempty" toml:"rtorrent" xml:"rtorrent" yaml:"rtorrent,omitempty"`
-	SabNZB   []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
-	NZBGet   []*NZBGetConfig   `json:"nzbget,omitempty" toml:"nzbget" xml:"nzbget" yaml:"nzbget,omitempty"`
-	Tautulli *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
-	Router   *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
-	Logger   `toml:"-" xml:"-" json:"-"`
-	keys     map[string]struct{} `toml:"-"` // for fast key lookup.
-}
-
-type Logger struct {
-	Errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
-	Debugf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	APIKey     string            `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
+	ExKeys     []string          `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
+	URLBase    string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
+	MaxBody    int               `toml:"max_body" xml:"max_body" json:"maxBody"`
+	Sonarr     []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
+	Radarr     []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
+	Lidarr     []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
+	Readarr    []*ReadarrConfig  `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
+	Prowlarr   []*ProwlarrConfig `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
+	Deluge     []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
+	Qbit       []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
+	Rtorrent   []*RtorrentConfig `json:"rtorrent,omitempty" toml:"rtorrent" xml:"rtorrent" yaml:"rtorrent,omitempty"`
+	SabNZB     []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
+	NZBGet     []*NZBGetConfig   `json:"nzbget,omitempty" toml:"nzbget" xml:"nzbget" yaml:"nzbget,omitempty"`
+	Tautulli   *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
+	Router     *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
+	mnd.Logger `toml:"-" xml:"-" json:"-"`
+	keys       map[string]struct{} `toml:"-"` // for fast key lookup.
 }
 
 type starrConfig struct {
@@ -206,14 +201,6 @@ func (a *Apps) InitHandlers() {
 func (a *Apps) Setup() error { //nolint:cyclop
 	a.APIKey = strings.TrimSpace(a.APIKey)
 
-	if a.Debugf == nil {
-		a.Debugf = log.New(io.Discard, "", 0).Printf
-	}
-
-	if a.Errorf == nil {
-		a.Errorf = log.New(io.Discard, "", 0).Printf
-	}
-
 	if err := a.setupLidarr(); err != nil {
 		return err
 	}
@@ -246,12 +233,12 @@ func (a *Apps) Setup() error { //nolint:cyclop
 		return err
 	}
 
-	if err := a.setupRtorrent(); err != nil {
+	if err := a.setupSabNZBd(); err != nil {
 		return err
 	}
 
-	for i := range a.SabNZB {
-		a.SabNZB[i].setup()
+	if err := a.setupRtorrent(); err != nil {
+		return err
 	}
 
 	a.Tautulli.setup()
