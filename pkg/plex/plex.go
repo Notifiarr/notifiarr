@@ -28,7 +28,7 @@ type Server struct {
 	URL      string        `toml:"url" json:"url" xml:"url"`
 	Token    string        `toml:"token" json:"token" xml:"token"`
 	Name     string        `toml:"-" json:"-" xml:"-"`
-	ValidSSL bool          `toml:"valid_ssl" json:"ValidSsl" xml:"valid_ssl"`
+	ValidSSL bool          `toml:"valid_ssl" json:"validSsl" xml:"valid_ssl"`
 	client   *http.Client
 }
 
