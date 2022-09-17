@@ -266,8 +266,8 @@ retries = {{.Retries}}
   password = "{{.Password}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
-  {{- if .VerifySSL}}
-  verify_ssl = true
+  {{- if .ValidSSL}}
+  valid_ssl = true
   {{- end}}
 
 {{end}}
@@ -284,8 +284,8 @@ retries = {{.Retries}}
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
-  {{- if .VerifySSL}}
-  verify_ssl = true
+  {{- if .ValidSSL}}
+  valid_ssl = true
   {{- end}}
 
 {{end}}
@@ -303,8 +303,8 @@ retries = {{.Retries}}
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
-  {{- if .VerifySSL}}
-  verify_ssl = true
+  {{- if .ValidSSL}}
+  valid_ssl = true
   {{- end}}
 
 {{end}}
@@ -322,8 +322,8 @@ retries = {{.Retries}}
   pass     = "{{.Pass}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
-  {{- if .VerifySSL}}
-  verify_ssl = true
+  {{- if .ValidSSL}}
+  valid_ssl = true
   {{- end}}
 
 {{end}}
@@ -340,8 +340,8 @@ retries = {{.Retries}}
   api_key  = "{{.APIKey}}"
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
-  {{- if .VerifySSL}}
-  verify_ssl = true
+  {{- if .ValidSSL}}
+  valid_ssl = true
   {{- end}}
 
 {{end}}
@@ -363,8 +363,8 @@ retries = {{.Retries}}
   url     = "{{.Plex.URL}}"   # Your plex URL
   token   = "{{.Plex.Token}}"   # your plex token; get this from a web inspector
   timeout = "{{.Plex.Timeout}}"  # how long to wait for HTTP responses
-  {{- if .Plex.VerifySSL}}
-  verify_ssl = true
+  {{- if .Plex.ValidSSL}}
+  valid_ssl = true
   {{- end}}
 {{- else}}#[plex]
 #url     = "http://localhost:32400/" # Your plex URL
@@ -384,8 +384,8 @@ retries = {{.Retries}}
   api_key  = "{{.Tautulli.APIKey}}" # your tautulli api key; get this from settings
   timeout  = "{{.Tautulli.Timeout}}" # how long to wait for HTTP responses
   interval = "{{.Tautulli.Interval}}" # how often to send service checks
-  {{- if .Tautulli.VerifySSL}}
-  verify_ssl = true
+  {{- if .Tautulli.ValidSSL}}
+  valid_ssl = true
   {{- end}}
 {{- else}}
 #[tautulli]

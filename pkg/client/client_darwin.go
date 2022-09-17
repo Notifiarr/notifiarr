@@ -24,7 +24,7 @@ func (c *Client) printUpdateMessage() {}
 
 func (c *Client) upgradeWindows(_ interface{}) {}
 
-func (c *Client) AutoWatchUpdate() {}
+func (c *Client) AutoWatchUpdate(_ interface{}) {}
 
 func (c *Client) checkReloadSignal(ctx context.Context, sigc os.Signal) error {
 	if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {

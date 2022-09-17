@@ -24,12 +24,12 @@ import (
 // Server is the Plex configuration from a config file.
 // Without a URL or Token, nothing works and this package is unused.
 type Server struct {
-	Timeout   cnfg.Duration `toml:"timeout" json:"timeout" xml:"timeout"`
-	URL       string        `toml:"url" json:"url" xml:"url"`
-	Token     string        `toml:"token" json:"token" xml:"token"`
-	Name      string        `toml:"-" json:"-" xml:"-"`
-	VerifySSL bool          `toml:"verify_ssl" json:"verifySsl" xml:"verify_ssl"`
-	client    *http.Client
+	Timeout  cnfg.Duration `toml:"timeout" json:"timeout" xml:"timeout"`
+	URL      string        `toml:"url" json:"url" xml:"url"`
+	Token    string        `toml:"token" json:"token" xml:"token"`
+	Name     string        `toml:"-" json:"-" xml:"-"`
+	ValidSSL bool          `toml:"valid_ssl" json:"validSsl" xml:"valid_ssl"`
+	client   *http.Client
 }
 
 const (
@@ -113,7 +113,7 @@ func (s *Server) getClient() *http.Client {
 		s.client = &http.Client{
 			Timeout: s.Timeout.Duration,
 			Transport: exp.NewMetricsRoundTripper("Plex", &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: !s.VerifySSL}, //nolint:gosec
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: !s.ValidSSL}, //nolint:gosec
 			}),
 		}
 	}

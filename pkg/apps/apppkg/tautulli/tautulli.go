@@ -1,32 +1,61 @@
-package apps
+package tautulli
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"net/url"
-	"strings"
 )
 
-func (t *TautulliConfig) setup() {
-	if t == nil {
-		return
+// Config is the Tautulli configuration.
+type Config struct {
+	URL          string `toml:"url" xml:"url" json:"url"`
+	APIKey       string `toml:"api_key" xml:"api_key" json:"apiKey"`
+	*http.Client `toml:"-" xml:"-" json:"-"`
+}
+
+// GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
+func (c *Config) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.URL+"/api/v2", nil)
+	if err != nil {
+		return fmt.Errorf("creating request: %w", err)
 	}
 
-	t.URL = strings.TrimRight(t.URL, "/")
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return fmt.Errorf("making request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
+	}
+
+	if err := json.Unmarshal(body, into); err != nil {
+		return fmt.Errorf("decoding response (%s): %w: %s", resp.Status, err, string(body))
+	}
+
+	return nil
 }
 
 // GetUsers returns the Tautulli users.
-func (t *TautulliConfig) GetUsers(ctx context.Context) (*TautulliUsers, error) {
-	if t == nil || t.URL == "" {
-		return &TautulliUsers{}, nil
+func (c *Config) GetUsers(ctx context.Context) (*Users, error) {
+	if c == nil || c.URL == "" {
+		return &Users{}, nil
 	}
 
 	params := url.Values{}
 	params.Add("cmd", "get_users")
-	params.Add("apikey", t.APIKey)
+	params.Add("apikey", c.APIKey)
 
-	var users TautulliUsers
+	var users Users
 
-	err := GetURLInto(ctx, "Tautulli", t.Timeout.Duration, t.VerifySSL, t.URL+"/api/v2", params, &users)
+	err := c.GetURLInto(ctx, params, &users)
 	if err != nil {
 		return nil, err
 	}
@@ -34,19 +63,19 @@ func (t *TautulliConfig) GetUsers(ctx context.Context) (*TautulliUsers, error) {
 	return &users, nil
 }
 
-// TautulliUsers is the entire get_users API response.
-type TautulliUsers struct {
+// Users is the entire get_users API response.
+type Users struct {
 	Response struct {
-		Result  string         `json:"result"`  // success, error
-		Message string         `json:"message"` // error msg
-		Data    []TautulliUser `json:"data"`
+		Result  string `json:"result"`  // success, error
+		Message string `json:"message"` // error msg
+		Data    []User `json:"data"`
 	} `json:"response"`
 }
 
-// TautulliUser is the user data from the get_users API call.
+// User is the user data from the get_users API call.
 //
 //nolint:tagliatelle
-type TautulliUser struct {
+type User struct {
 	RowID           int64    `json:"row_id"`
 	UserID          int64    `json:"user_id"`
 	Username        string   `json:"username"`
@@ -71,14 +100,14 @@ type TautulliUser struct {
 }
 
 // MapEmailName returns a map of email => name for Tautulli users.
-func (t *TautulliUsers) MapEmailName() map[string]string {
-	if t == nil {
+func (u *Users) MapEmailName() map[string]string {
+	if u == nil {
 		return nil
 	}
 
 	nameMap := map[string]string{}
 
-	for _, user := range t.Response.Data {
+	for _, user := range u.Response.Data {
 		// user.FriendlyName always seems to be set, so this first if-block is safety only.
 		if user.FriendlyName == "" && user.Email != "" && user.Username != "" {
 			nameMap[user.Email] = user.Username

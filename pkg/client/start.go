@@ -152,7 +152,7 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 		c.makeNewConfigFile(ctx, newPassword)
 	} else if c.Config.AutoUpdate != "" {
 		// do not run updater if there's a brand new config file.
-		go c.AutoWatchUpdate()
+		go c.AutoWatchUpdate(ctx)
 	}
 
 	if ui.HasGUI() {

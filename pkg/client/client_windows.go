@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -42,7 +43,7 @@ func (c *Client) printUpdateMessage() {
 	}
 }
 
-func (c *Client) AutoWatchUpdate() {
+func (c *Client) AutoWatchUpdate(ctx context.Context) {
 	defer c.CapturePanic()
 
 	var dur time.Duration
@@ -73,23 +74,23 @@ func (c *Client) AutoWatchUpdate() {
 
 		time.Sleep(update.SleepTime)
 		// Check for update on startup.
-		if err := c.checkAndUpdate("startup check"); err != nil {
+		if err := c.checkAndUpdate(ctx, "startup check"); err != nil {
 			c.Errorf("Startup-Update Failed: %v", err)
 		}
 	}()
 
 	ticker := time.NewTicker(dur)
 	for range ticker.C {
-		if err := c.checkAndUpdate("automatic"); err != nil {
+		if err := c.checkAndUpdate(ctx, "automatic"); err != nil {
 			c.Errorf("Auto-Update Failed: %v", err)
 		}
 	}
 }
 
-func (c *Client) checkAndUpdate(how string) error {
+func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 	c.Debugf("Checking GitHub for Update.")
 
-	u, err := update.Check(mnd.UserRepo, version.Version)
+	u, err := update.Check(ctx, mnd.UserRepo, version.Version)
 	if err != nil {
 		return fmt.Errorf("checking GitHub for update: %w", err)
 	} else if !u.Outdate {
@@ -131,12 +132,12 @@ func (c *Client) updateNow(u *update.Update, msg string) error {
 	return nil
 }
 
-func (c *Client) handleAptHook() error {
+func (c *Client) handleAptHook(_ interface{}) error {
 	return fmt.Errorf("this feature is not supported on this platform") //nolint:goerr113
 }
 
-func (c *Client) checkReloadSignal(sigc os.Signal) error {
-	return c.reloadConfiguration(website.EventSignal, "Caught Signal: "+sigc.String())
+func (c *Client) checkReloadSignal(ctx context.Context, sigc os.Signal) error {
+	return c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
 }
 
 func (c *Client) setSignals() {

@@ -178,7 +178,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
-				validSSL: app.VerifySSL,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -211,7 +211,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
-				validSSL: app.VerifySSL,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -235,7 +235,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
-				validSSL: app.VerifySSL,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -259,7 +259,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 				Expect:   "200,401", // could not find a 200...
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
-				validSSL: app.VerifySSL,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -283,7 +283,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
-				validSSL: app.VerifySSL,
+				validSSL: app.ValidSSL,
 			})
 		}
 	}
@@ -310,7 +310,7 @@ func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 		Expect:   "200",
 		Timeout:  app.Timeout,
 		Interval: interval,
-		validSSL: app.VerifySSL,
+		validSSL: app.ValidSSL,
 	})
 
 	return svcs

@@ -73,10 +73,7 @@ func NewConfig(logger *logs.Logger) *Config {
 	return &Config{
 		Apps: &apps.Apps{
 			URLBase: "/",
-			Logger: apps.Logger{
-				Debugf: logger.Debugf,
-				Errorf: logger.Errorf,
-			},
+			Logger:  logger,
 		},
 		Services: &services.Config{
 			Interval: cnfg.Duration{Duration: services.DefaultSendInterval},

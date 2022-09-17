@@ -53,9 +53,14 @@ func (a *Apps) sonarrHandlers() {
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
 	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
-	starrConfig
+	extraConfig
 	*starr.Config
 	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+}
+
+func getSonarr(r *http.Request) *sonarr.Sonarr {
+	app, _ := r.Context().Value(starr.Sonarr).(*SonarrConfig)
+	return app.Sonarr
 }
 
 // Enabled returns true if the Sonarr instance is enabled and usable.

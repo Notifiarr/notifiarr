@@ -1,0 +1,1 @@
+This folder contains small libraries for integrated applications that do not have their own on GitHub.

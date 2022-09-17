@@ -30,6 +30,7 @@ import (
 //nolint:funlen,cyclop,gocognit,gocyclo
 func (c *Client) testInstance(response http.ResponseWriter, request *http.Request) {
 	config := configfile.Config{}
+
 	if err := configPostDecoder.Decode(&config, request.PostForm); err != nil {
 		http.Error(response, "Decoding POST data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
 		return
@@ -337,6 +338,8 @@ func testPlex(ctx context.Context, app *plex.Server) (string, int) {
 }
 
 func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
+	app.Setup()
+
 	users, err := app.GetUsers(ctx)
 	if err != nil {
 		return "Getting Users: " + err.Error(), http.StatusBadGateway

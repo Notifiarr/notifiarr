@@ -4,7 +4,7 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/nzbget.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">NZBGet</h2>
                                                     <div style="float: right;">
-                                                        <button id="download-NZBGet-addbutton" onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" data-sslname="VerifySSL" data-names='["Name","Config.URL","Config.User","Config.Pass","Interval","Timeout"]' type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="download-NZBGet-addbutton" onclick="addInstance('download', 'NZBGet')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","Config.URL","Config.User","Config.Pass","Interval","Timeout"]' type="button" title="Add another instance of NZBGet." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
@@ -94,7 +94,7 @@
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.NZBGet.{{$index}}.Config.URL" onChange="showhttps($(this).val(), '#NZBGet{{$index}}SSL');" name="Apps.NZBGet.{{$index}}.Config.URL" data-index="{{$index}}" data-app="NZBGet" class="client-parameter form-control input-sm" data-group="download" data-label="NZBGet {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                                 <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="NZBGet{{$index}}SSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Apps.NZBGet.{{$index}}.VerifySSL" name="Apps.NZBGet.{{$index}}.VerifySSL" data-index="{{$index}}" data-app="NZBGet" class="client-parameter" data-group="download" data-label="NZBGet {{instance $index}} SSL" data-original="{{$app.VerifySSL}}" {{if $app.VerifySSL}}checked {{end}}value="true">
+                                                                    <input type="checkbox" id="Apps.NZBGet.{{$index}}.ValidSSL" name="Apps.NZBGet.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="NZBGet" class="client-parameter" data-group="download" data-label="NZBGet {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
                                                                 </div>
                                                             </div>
                                                         </div>
