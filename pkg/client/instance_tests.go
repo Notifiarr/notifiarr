@@ -164,7 +164,7 @@ func testQbit(ctx context.Context, config *qbit.Config) (string, int) {
 }
 
 func testRtorrent(config *apps.RtorrentConfig) (string, int) {
-	config.Setup()
+	config.Setup(0, func(string, ...interface{}) {})
 
 	result, err := config.Client.Call("system.hostname")
 	if err != nil {
@@ -182,8 +182,10 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 	return "Getting Server Name: result was not a string?", http.StatusBadGateway
 }
 
-func testSabNZB(ctx context.Context, config *apps.SabNZBConfig) (string, int) {
-	sab, err := config.GetQueue(ctx)
+func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
+	app.Setup(0, func(string, ...interface{}) {})
+
+	sab, err := app.GetQueue(ctx)
 	if err != nil {
 		return "Getting Queue: " + err.Error(), http.StatusBadGateway
 	}
@@ -338,7 +340,7 @@ func testPlex(ctx context.Context, app *plex.Server) (string, int) {
 }
 
 func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
-	app.Setup()
+	app.Setup(0, func(string, ...interface{}) {})
 
 	users, err := app.GetUsers(ctx)
 	if err != nil {

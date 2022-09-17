@@ -65,7 +65,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		case app == starr.Lidarr && (aID >= len(a.Lidarr) || aID < 0):
 			msg = fmt.Errorf("%v: %w", aID, ErrNoLidarr)
 		case app == starr.Prowlarr && (aID >= len(a.Prowlarr) || aID < 0):
-			msg = fmt.Errorf("%v: %w", aID, ErrNoLidarr)
+			msg = fmt.Errorf("%v: %w", aID, ErrNoProwlarr)
 		case app == starr.Radarr && (aID >= len(a.Radarr) || aID < 0):
 			msg = fmt.Errorf("%v: %w", aID, ErrNoRadarr)
 		case app == starr.Readarr && (aID >= len(a.Readarr) || aID < 0):

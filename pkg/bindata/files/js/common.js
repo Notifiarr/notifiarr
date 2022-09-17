@@ -339,17 +339,21 @@ function savePendingChanges()
         success: function (data){
             $('.pending-change-container').remove();          // remove save button.
             toast('Config Saving', 'The page will reload when the client is finished reloading the changes.', 'success', 60000);
-            const ping = setInterval(function () {
-                $.ajax({
-                    url: URLBase+'ping',
-                    complete: function(xhr){
-                        if (xhr.status == 200) {
-                            clearInterval(ping);
-                            location.reload();
+            setTimeout(function() {
+                const ping = setInterval(function () {
+                    $.ajax({
+                        url: URLBase+'ping',
+                        complete: function(xhr){
+                            if (xhr.status == 200) {
+                                clearInterval(ping);
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 500);
+                            }
                         }
-                    }
-                });
-            }, 1000);
+                    });
+                }, 100);
+            }, 200);
         },
         error: function (response, status, error) {
             if (response.responseText === undefined) {
