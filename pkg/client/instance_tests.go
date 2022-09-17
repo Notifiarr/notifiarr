@@ -184,6 +184,7 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 
 func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
 	app.Setup(0, func(string, ...interface{}) {})
+
 	sab, err := app.GetQueue(ctx)
 	if err != nil {
 		return "Getting Queue: " + err.Error(), http.StatusBadGateway
