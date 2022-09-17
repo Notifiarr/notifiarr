@@ -4,7 +4,7 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/rtorrent.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">rTorrent</h2>
                                                     <div style="float: right;">
-                                                        <button id="download-Rtorrent-addbutton" onclick="addInstance('download', 'Rtorrent')" data-prefix="Apps" data-sslname="VerifySSL" data-names='["Name","URL","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of rTorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="download-Rtorrent-addbutton" onclick="addInstance('download', 'Rtorrent')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","URL","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of rTorrent." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
@@ -94,7 +94,7 @@
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Rtorrent.{{$index}}.URL" onChange="showhttps($(this).val(), '#Rtorrent{{$index}}SSL');" name="Apps.Rtorrent.{{$index}}.URL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                                 <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Rtorrent{{$index}}SSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Apps.Rtorrent.{{$index}}.VerifySSL" name="Apps.Rtorrent.{{$index}}.VerifySSL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter" data-group="download" data-label="Rtorrent {{instance $index}} SSL" data-original="{{$app.VerifySSL}}" {{if $app.VerifySSL}}checked {{end}}value="true">
+                                                                    <input type="checkbox" id="Apps.Rtorrent.{{$index}}.ValidSSL" name="Apps.Rtorrent.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter" data-group="download" data-label="Rtorrent {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
                                                                 </div>
                                                             </div>
                                                         </div>

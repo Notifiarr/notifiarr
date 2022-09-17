@@ -15,11 +15,17 @@ func (a *Apps) prowlarrHandlers() {
 
 // ProwlarrConfig represents the input data for a Prowlarr server.
 type ProwlarrConfig struct {
-	starrConfig
+	extraConfig
 	*starr.Config
 	*prowlarr.Prowlarr `toml:"-" xml:"-" json:"-"`
 	errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
+
+// will be used when we add http handlers for prowlarr.
+/* func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
+	app, _ := r.Context().Value(starr.Prowlarr).(*ProwlarrConfig)
+	return app.Prowlarr
+} */
 
 // Enabled returns true if the Prowlarr instance is enabled and usable.
 func (p *ProwlarrConfig) Enabled() bool {

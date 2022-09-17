@@ -48,10 +48,15 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	starrConfig
+	extraConfig
 	*starr.Config
 	*radarr.Radarr `toml:"-" xml:"-" json:"-"`
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+}
+
+func getRadarr(r *http.Request) *radarr.Radarr {
+	app, _ := r.Context().Value(starr.Radarr).(*RadarrConfig)
+	return app.Radarr
 }
 
 // Enabled returns true if the Radarr instance is enabled and usable.

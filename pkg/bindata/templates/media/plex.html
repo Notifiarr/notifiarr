@@ -61,7 +61,7 @@
                                                                 {{- end}}
                                                                 <input type="text" onChange="showhttps($(this).val(), '#PlexSSL');" id="Plex.URL" name="Plex.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}">
                                                                 <div style="width:30px; max-width:30px;{{if not (contains .Config.Plex.URL "https://")}}display:none;{{end}}" id="PlexSSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Plex.VerifySSL" name="Plex.VerifySSL" data-app="Plex" class="client-parameter" data-group="media" data-label="Plex SSL" data-original="{{.Config.Plex.VerifySSL}}" {{if .Config.Plex.VerifySSL}}checked {{end}}value="true">
+                                                                    <input type="checkbox" id="Plex.ValidSSL" name="Plex.ValidSSL" data-app="Plex" class="client-parameter" data-group="media" data-label="Plex SSL" data-original="{{.Config.Plex.ValidSSL}}" {{if .Config.Plex.ValidSSL}}checked {{end}}value="true">
                                                                 </div>
                                                             </div>
                                                         </div>

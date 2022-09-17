@@ -37,10 +37,15 @@ func (a *Apps) readarrHandlers() {
 
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
-	starrConfig
+	extraConfig
 	*starr.Config
 	*readarr.Readarr `toml:"-" xml:"-" json:"-"`
 	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+}
+
+func getReadarr(r *http.Request) *readarr.Readarr {
+	app, _ := r.Context().Value(starr.Readarr).(*ReadarrConfig)
+	return app.Readarr
 }
 
 // Enabled returns true if the Readarr instance is enabled and usable.

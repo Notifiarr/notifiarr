@@ -147,7 +147,7 @@ func (c *Client) printLidarr(app *website.InstanceConfig) {
 	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "server"+s)
 
 	for idx, f := range c.Config.Lidarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
@@ -163,7 +163,7 @@ func (c *Client) printProwlarr(app *website.InstanceConfig) {
 	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), "server"+s)
 
 	for idx, f := range c.Config.Prowlarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v corrupt:%v backup:%v",
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL,
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
@@ -179,7 +179,7 @@ func (c *Client) printRadarr(app *website.InstanceConfig) {
 	c.Print(" => Radarr Config:", len(c.Config.Radarr), "server"+s)
 
 	for idx, f := range c.Config.Radarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
@@ -195,7 +195,7 @@ func (c *Client) printReadarr(app *website.InstanceConfig) {
 	c.Print(" => Readarr Config:", len(c.Config.Readarr), "server"+s)
 
 	for idx, f := range c.Config.Readarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
@@ -211,7 +211,7 @@ func (c *Client) printSonarr(app *website.InstanceConfig) {
 	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "server"+s)
 
 	for idx, f := range c.Config.Sonarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s verify_ssl:%v stuck_items:%v corrupt:%v backup:%v",
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
@@ -227,8 +227,8 @@ func (c *Client) printDeluge() {
 	c.Print(" => Deluge Config:", len(c.Config.Deluge), "server"+s)
 
 	for i, f := range c.Config.Deluge {
-		c.Printf(" =>    Server %d: %s password:%v timeout:%s verify_ssl:%v",
-			i+1, f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+		c.Printf(" =>    Server %d: %s password:%v timeout:%s valid_ssl:%v",
+			i+1, f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 
@@ -242,8 +242,8 @@ func (c *Client) printNZBGet() {
 	c.Print(" => NZBGet Config:", len(c.Config.NZBGet), "server"+s)
 
 	for i, f := range c.Config.NZBGet {
-		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
+			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 
@@ -257,8 +257,8 @@ func (c *Client) printQbit() {
 	c.Print(" => Qbit Config:", len(c.Config.Qbit), "server"+s)
 
 	for i, f := range c.Config.Qbit {
-		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
+			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 
@@ -272,8 +272,8 @@ func (c *Client) printRtorrent() {
 	c.Print(" => rTorrent Config:", len(c.Config.Rtorrent), "server"+s)
 
 	for i, f := range c.Config.Rtorrent {
-		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s verify_ssl:%v",
-			i+1, f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.VerifySSL)
+		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
+			i+1, f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 

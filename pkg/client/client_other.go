@@ -80,10 +80,10 @@ func (f *fakeMenu) Uncheck()               {}
 func (f *fakeMenu) Check()                 {}
 func (f *fakeMenu) SetTooltip(interface{}) {}
 
-func (c *Client) printUpdateMessage()                    {}
-func (c *Client) setupMenus(interface{})                 {}
-func (c *Client) closeDynamicTimerMenus()                {}
-func (c *Client) startTray(context.Context, interface{}) {}
+func (c *Client) printUpdateMessage()           {}
+func (c *Client) setupMenus(interface{})        {}
+func (c *Client) closeDynamicTimerMenus()       {}
+func (c *Client) startTray(_, _, _ interface{}) {}
 
 // AutoWatchUpdate is not used on this OS.
 func (c *Client) AutoWatchUpdate() {}

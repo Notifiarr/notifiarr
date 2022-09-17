@@ -43,10 +43,15 @@ func (a *Apps) lidarrHandlers() {
 
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
-	starrConfig
+	extraConfig
 	*starr.Config
 	*lidarr.Lidarr `toml:"-" xml:"-" json:"-"`
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+}
+
+func getLidarr(r *http.Request) *lidarr.Lidarr {
+	app, _ := r.Context().Value(starr.Lidarr).(*LidarrConfig)
+	return app.Lidarr
 }
 
 // Enabled returns true if the Lidarr instance is enabled and usable.

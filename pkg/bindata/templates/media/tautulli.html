@@ -76,7 +76,7 @@
                                                                 {{- end}}
                                                                 <input type="text" onChange="showhttps($(this).val(), '#TautulliSSL');" id="Apps.Tautulli.URL" name="Apps.Tautulli.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli URL" data-original="{{.Config.Apps.Tautulli.URL}}" value="{{.Config.Apps.Tautulli.URL}}">
                                                                 <div style="width:30px; max-width:30px;{{if not (contains .Config.Apps.Tautulli.URL "https://")}}display:none;{{end}}" id="TautulliSSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Apps.Tautulli.VerifySSL" name="Apps.Tautulli.VerifySSL" data-app="Tautulli" class="client-parameter" data-group="media" data-label="Tautulli SSL" data-original="{{.Config.Apps.Tautulli.VerifySSL}}" {{if .Config.Apps.Tautulli.VerifySSL}}checked {{end}}value="true">
+                                                                    <input type="checkbox" id="Apps.Tautulli.ValidSSL" name="Apps.Tautulli.ValidSSL" data-app="Tautulli" class="client-parameter" data-group="media" data-label="Tautulli SSL" data-original="{{.Config.Apps.Tautulli.ValidSSL}}" {{if .Config.Apps.Tautulli.ValidSSL}}checked {{end}}value="true">
                                                                 </div>  
                                                             </div>
                                                         </div>
@@ -134,7 +134,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TAUTULLI_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="select" id="Apps.Tautulli.Timeout" name="Apps.Tautulli.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}">
+                                                                <select type="select" id="Apps.Tautulli.extraConfig.Timeout" name="Apps.Tautulli.extraConfig.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}">
                                                                     <option value="-1s" {{if eq $.Config.Tautulli.Timeout.Seconds (add -1 0)}}selected {{end}}>Disabled</option>
                                                                     <option value="0s" {{if eq $.Config.Tautulli.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
                                                                     {{- range $i := one259 }}
