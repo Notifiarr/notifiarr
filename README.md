@@ -31,7 +31,7 @@ sudo systemctl restart notifiarr
 
 This one is special; hope you know what you're doing.
 Build a package with `makepkg` using the `aur` source.
-Here: <https://github.com/golift/aur> 
+Here: <https://github.com/golift/aur>
 
 ### FreeBSD
 
