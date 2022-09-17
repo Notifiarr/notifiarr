@@ -4,7 +4,7 @@
                                                     <div style="float: left;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
                                                     <h2 class="mb-3" style="margin-bottom:-45px">SabNZB</h2>
                                                     <div style="float: right;">
-                                                        <button id="download-SabNZB-addbutton" onclick="addInstance('download','SabNZB')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","", "URL","APIKey","Interval","Timeout"]' type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="download-SabNZB-addbutton" onclick="addInstance('download','SabNZB')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","", "URL","APIKey","Interval","extraConfig.Timeout"]' type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
                                                 <td colspan="7" class="tablet-hide desktop-hide">
@@ -151,7 +151,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="select" id="Apps.SabNZB.{{$index}}.Timeout" name="Apps.SabNZB.{{$index}}.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                <select type="select" id="Apps.SabNZB.{{$index}}.extraConfig.Timeout" name="Apps.SabNZB.{{$index}}.extraConfig.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                                                     <option value="-1s" {{if eq $app.Timeout.Seconds (add 0 -1)}}selected {{end}}>Disabled</option>
                                                                     <option value="0s" {{if eq $app.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
                                                                     {{- range $i := one259 }}

@@ -159,6 +159,7 @@ function addInstance(section, app)
                 '</select>';
              break;
              case "Config.Timeout":
+             case "extraConfig.Timeout":
              case "Timeout":
                 nameori = "1m";
                 itype = "<select type=\"select\""

@@ -88,18 +88,23 @@ function reloadConfig()
     $.ajax({
         url: URLBase+'reload',
         success: function (data){
+            $('.pending-change-container').remove();          // remove save button.
             toast('Reloading', 'Page will refresh after reload finishes.', 'success', 60000);
-            const ping = setInterval(function () {
-                $.ajax({
-                    url: URLBase+'ping',
-                    complete: function(xhr){
-                        if (xhr.status == 200) {
-                            clearInterval(ping);
-                            location.reload();
+            setTimeout(function() {
+                const ping = setInterval(function () {
+                    $.ajax({
+                        url: URLBase+'ping',
+                        complete: function(xhr){
+                            if (xhr.status === 200) {
+                                clearInterval(ping);
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 200);
+                            }
                         }
-                    }
-                });
-            }, 1000);
+                    });
+                }, 200);
+            }, 200);
         },
          error: function (request, status, error) {
              if (error == "") {
