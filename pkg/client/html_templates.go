@@ -111,6 +111,7 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 
 func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 	title := cases.Title(language.AmericanEnglish)
+
 	return template.FuncMap{
 		"tojson": func(input any) string {
 			output, _ := json.MarshalIndent(input, "", " ")
