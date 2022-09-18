@@ -113,7 +113,7 @@ docker logs <container id from docker run>
 
 #### Docker Environment Variables
 
-See below for more information about which environment variables are available.
+See below for a list of which environment variables are available.
 You must set `--privileged` when `monitor drives` is enabled on the website.
 
 ```shell
