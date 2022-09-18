@@ -52,7 +52,9 @@ func (c *cmd) checkForFinishedItems(ctx context.Context, event website.EventType
 
 // checkSessionDone checks a session's data to see if it is considered finished.
 func (c *cmd) checkSessionDone(ctx context.Context, session *plex.Session, pct float64) string {
-	switch cfg := c.ClientInfo.Actions.Plex; {
+	ci := website.GetClientInfo()
+
+	switch cfg := ci.Actions.Plex; {
 	case session.Duration == 0:
 		return statusIgnoring
 	case session.Player.State != playing:

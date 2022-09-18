@@ -50,17 +50,18 @@ func (c *cmd) setupSonarr() bool {
 	var enable bool
 
 	for idx, app := range c.Apps.Sonarr {
-		if !app.Enabled() || !c.HaveClientInfo() {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil {
 			continue
 		}
 
 		var ticker *time.Ticker
 
 		instance := idx + 1
-		if c.ClientInfo.Actions.Apps.Sonarr.Finished(instance) {
+		if ci.Actions.Apps.Sonarr.Finished(instance) {
 			enable = true
 			ticker = time.NewTicker(finishedDuration)
-		} else if c.ClientInfo.Actions.Apps.Sonarr.Stuck(instance) {
+		} else if ci.Actions.Apps.Sonarr.Stuck(instance) {
 			enable = true
 			ticker = time.NewTicker(stuckDuration)
 		}
@@ -83,7 +84,8 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Sonarr {
-		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Sonarr.Stuck(idx+1) {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Sonarr.Stuck(idx+1) {
 			continue
 		}
 

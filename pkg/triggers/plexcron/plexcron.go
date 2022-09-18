@@ -63,14 +63,14 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) run() {
-	if !c.Plex.Configured() || c.ClientInfo == nil {
+	ci := website.GetClientInfo()
+	if !c.Plex.Configured() || ci == nil {
 		return
 	}
 
 	var ticker *time.Ticker
 
-	cfg := c.ClientInfo.Actions.Plex
-
+	cfg := ci.Actions.Plex
 	if cfg.Interval.Duration > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
 		ticker = time.NewTicker(cfg.Interval.Duration + randomTime)
@@ -109,9 +109,11 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 
 func (c *cmd) sendWebhook(ctx context.Context, hook *plex.IncomingWebhook) {
 	sessions := &plex.Sessions{Name: c.Plex.Name}
+	ci := website.GetClientInfo()
+
 	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.
-	if c.ClientInfo != nil && !c.ClientInfo.Actions.Plex.NoActivity {
-		time.Sleep(c.ClientInfo.Actions.Plex.Delay.Duration)
+	if ci != nil && !ci.Actions.Plex.NoActivity {
+		time.Sleep(ci.Actions.Plex.Delay.Duration)
 
 		var err error
 		if sessions, err = c.getSessions(ctx, time.Second); err != nil {

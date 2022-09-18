@@ -53,8 +53,6 @@ type Server struct {
 	config *Config
 	// Internal cruft.
 	sdMutex      sync.RWMutex // senddata/queuedata
-	ciMutex      sync.RWMutex // clientinfo
-	clientInfo   *ClientInfo
 	client       *httpClient
 	hostInfo     *host.InfoStat
 	sendData     chan *Request

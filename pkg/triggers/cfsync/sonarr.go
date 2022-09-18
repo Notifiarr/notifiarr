@@ -34,7 +34,8 @@ func (a *Action) SyncSonarrRP(event website.EventType) {
 
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *cmd) syncSonarr(ctx context.Context, event website.EventType) {
-	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Sync.SonarrInstances) < 1 {
+	ci := website.GetClientInfo()
+	if ci == nil || len(ci.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Sonarr Release Profiles. Website provided 0 instances.", event)
 		return
 	} else if len(c.Apps.Sonarr) < 1 {
@@ -44,9 +45,9 @@ func (c *cmd) syncSonarr(ctx context.Context, event website.EventType) {
 
 	for i, app := range c.Apps.Sonarr {
 		instance := i + 1
-		if !app.Enabled() || !c.ClientInfo.Actions.Sync.SonarrInstances.Has(instance) {
+		if !app.Enabled() || !ci.Actions.Sync.SonarrInstances.Has(instance) {
 			c.Debugf("[%s requested] CF Sync Skipping Sonarr instance %d. Not in sync list: %v",
-				event, instance, c.ClientInfo.Actions.Sync.SonarrInstances)
+				event, instance, ci.Actions.Sync.SonarrInstances)
 			continue
 		}
 

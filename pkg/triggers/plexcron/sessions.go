@@ -58,6 +58,7 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 // and the current session pull. if changes are present, a timestmp is added.
 func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Sessions) {
 	now := time.Now()
+	ci := website.GetClientInfo()
 
 	// data.Save("plexPreviousSessions", previous)
 	data.Save("plexCurrentSessions", current)
@@ -71,7 +72,7 @@ func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Se
 			continue // this only happens once.
 		case c.checkExistingSession(ctx, currSess, current, previous):
 			continue // existing session.
-		case currSess.Player.State == playing && c.ClientInfo.Actions.Plex.TrackSess:
+		case currSess.Player.State == playing && ci.Actions.Plex.TrackSess:
 			// We are tracking sessions (no webhooks); send this brand new session to website.
 			c.sendSessionPlaying(ctx, currSess, current, mediaPlay)
 		}
@@ -91,9 +92,9 @@ func (c *cmd) checkExistingSession(ctx context.Context, currSess *plex.Session, 
 			currSess.Player.StateTime.Time = prevSess.Player.StateTime.Time
 		} else
 		// Check for a session that was paused and is now playing (resumed).
-		if currSess.Player.State == playing && prevSess.Player.State == paused &&
+		if ci := website.GetClientInfo(); currSess.Player.State == playing &&
+			prevSess.Player.State == paused && ci.Actions.Plex.TrackSess {
 			// Check if we're tracking sessions. If yes, send this resumed session.
-			c.ClientInfo.Actions.Plex.TrackSess {
 			c.sendSessionPlaying(ctx, currSess, current, mediaResume)
 		}
 

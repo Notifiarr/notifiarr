@@ -51,7 +51,8 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Lidarr {
-		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Lidarr.Corrupt(idx+1) != mnd.Disabled {
+		if ci := website.GetClientInfo(); ci != nil &&
+			app.Enabled() && ci.Actions.Apps.Lidarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -73,7 +74,8 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Prowlarr {
-		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Prowlarr.Corrupt(idx+1) != mnd.Disabled {
+		if ci := website.GetClientInfo(); ci != nil &&
+			app.Enabled() && ci.Actions.Apps.Prowlarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -95,7 +97,8 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Radarr {
-		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Radarr.Corrupt(idx+1) != mnd.Disabled {
+		if ci := website.GetClientInfo(); ci != nil &&
+			app.Enabled() && ci.Actions.Apps.Radarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -117,7 +120,8 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Readarr {
-		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Readarr.Corrupt(idx+1) != mnd.Disabled {
+		if ci := website.GetClientInfo(); ci != nil &&
+			app.Enabled() && ci.Actions.Apps.Readarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
@@ -139,7 +143,8 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Sonarr {
-		if app.Enabled() && c.HaveClientInfo() && c.ClientInfo.Actions.Apps.Sonarr.Corrupt(idx+1) != mnd.Disabled {
+		if ci := website.GetClientInfo(); ci != nil &&
+			app.Enabled() && ci.Actions.Apps.Sonarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
 			ticker = time.NewTicker(checkInterval + randomTime)
