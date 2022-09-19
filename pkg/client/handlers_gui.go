@@ -532,7 +532,7 @@ func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Req
 	}
 }
 
-// reconfig
+// handleConfigPost handles the reconfig endpoint.
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
 	user, _ := c.getUserName(request)
 	// copy running config,
