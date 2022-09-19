@@ -53,7 +53,6 @@ type Config struct {
 	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
 	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Serial     bool                   `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
 	Retries    int                    `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
 	Snapshot   *snapshot.Config       `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
 	Services   *services.Config       `json:"services" toml:"services" xml:"services" yaml:"services"`
@@ -160,9 +159,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 		Logger:  c.Services.Logger,
 		BaseURL: website.BaseURL,
 		Timeout: c.Timeout,
-		MaxBody: c.MaxBody,
 		Retries: c.Retries,
-		Serial:  c.Serial,
 		HostID:  c.HostID,
 	})
 
@@ -196,12 +193,11 @@ func (c *Config) setup() *triggers.Actions {
 
 	return triggers.New(&triggers.Config{
 		Apps:       c.Apps,
-		Serial:     c.Serial,
+		Logger:     c.Services.Logger,
 		Website:    c.Services.Website,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
 		Commands:   c.Commands,
-		Logger:     c.Services.Logger,
 	})
 }
 

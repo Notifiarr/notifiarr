@@ -36,11 +36,9 @@ var (
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
 	Apps       *apps.Apps
-	Serial     bool
 	Retries    int
 	BaseURL    string
 	Timeout    cnfg.Duration
-	MaxBody    int
 	Sighup     chan os.Signal
 	HostID     string
 	mnd.Logger // log file writer

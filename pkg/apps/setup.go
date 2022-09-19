@@ -24,6 +24,7 @@ type Apps struct {
 	ExKeys     []string          `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
 	URLBase    string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
 	MaxBody    int               `toml:"max_body" xml:"max_body" json:"maxBody"`
+	Serial     bool              `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
 	Sonarr     []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
 	Radarr     []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
 	Lidarr     []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`

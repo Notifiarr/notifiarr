@@ -129,7 +129,7 @@ func (c *cmd) aggregateTrashSonarr(
 
 	// Grab data for each requested instance in parallel/go routine.
 	for idx := range output {
-		if c.Config.Serial {
+		if c.Config.Apps.Serial {
 			output[idx] = c.getSonarrProfiles(ctx, event, output[idx].Instance)
 			continue
 		}

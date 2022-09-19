@@ -25,7 +25,6 @@ import (
 
 // Config is the required input data. Everything is mandatory.
 type Config struct {
-	Serial     bool
 	Apps       *apps.Apps
 	Website    *website.Server
 	Snapshot   *snapshot.Config
@@ -57,7 +56,6 @@ func New(config *Config) *Actions {
 		Server:   config.Website,
 		Snapshot: config.Snapshot,
 		Apps:     config.Apps,
-		Serial:   config.Serial,
 		Logger:   config.Logger,
 	}
 	plex := plexcron.New(common, config.Apps.Plex)
