@@ -14,7 +14,7 @@ func (c *Cmd) getLidarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Lidarr {
-		if app.Timeout.Duration < 0 || app.URL == "" {
+		if !app.Enabled() {
 			continue
 		}
 

@@ -70,8 +70,7 @@ func (c *cmd) sendGaps(ctx context.Context, event website.EventType) {
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
-		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
-			!ci.Actions.Gaps.Instances.Has(instance) {
+		if !app.Enabled() || !ci.Actions.Gaps.Instances.Has(instance) {
 			continue
 		}
 

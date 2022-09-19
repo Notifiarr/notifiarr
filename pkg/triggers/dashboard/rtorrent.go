@@ -15,7 +15,7 @@ func (c *Cmd) getRtorrentStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Rtorrent {
-		if app.Timeout.Duration < 0 || app.URL == "" {
+		if !app.Enabled() {
 			continue
 		}
 

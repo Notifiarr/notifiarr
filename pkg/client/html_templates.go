@@ -175,13 +175,14 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 }
 
 type option struct {
-	Val string
-	Op  string
-	Sel bool
+	Val string // value (machine)
+	Op  string // option (human)
+	Sel bool   // selected
 }
 
 func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
 	times := []time.Duration{
+		-1 * time.Second, // Disable Service Checks
 		30 * time.Second,
 		45 * time.Second,
 		1 * time.Minute,
@@ -240,6 +241,7 @@ func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
 
 	for idx, dur := range times {
 		if idx != 0 && current.Duration < dur && current.Duration > times[idx-1] {
+			// This adds the current selected value in case it does not match one of the predefined options.
 			output = append(output, &option{
 				Val: current.String(),
 				Op:  durShort(current.Duration),
@@ -247,11 +249,20 @@ func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
 			})
 		}
 
-		output = append(output, &option{
-			Val: cnfg.Duration{Duration: dur}.String(),
-			Op:  durShort(dur),
-			Sel: current.Duration == dur,
-		})
+		if dur < 0 {
+			// We should only have 1 less than 0.
+			output = append(output, &option{
+				Val: cnfg.Duration{Duration: dur}.String(),
+				Op:  "Disabled",
+				Sel: true,
+			})
+		} else {
+			output = append(output, &option{
+				Val: cnfg.Duration{Duration: dur}.String(),
+				Op:  durShort(dur),
+				Sel: current.Duration == dur,
+			})
+		}
 	}
 
 	return output
@@ -304,7 +315,11 @@ func megabyte(size interface{}) string {
 	}
 
 	switch {
-	case val > mnd.Megabyte*mnd.Kilobyte*1000: // lul
+	case val > mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte*1000:
+		return fmt.Sprintf("%.2f Eb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Megabyte))
+	case val > mnd.Megabyte*mnd.Megabyte*1000:
+		return fmt.Sprintf("%.2f Pb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte))
+	case val > mnd.Megabyte*mnd.Kilobyte*1000:
 		return fmt.Sprintf("%.2f Tb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte))
 	case val > mnd.Megabyte*1000:
 		return fmt.Sprintf("%.2f Gb", float64(val)/float64(mnd.Megabyte*mnd.Kilobyte))

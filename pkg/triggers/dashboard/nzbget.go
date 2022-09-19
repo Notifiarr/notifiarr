@@ -15,7 +15,7 @@ func (c *Cmd) getNZBGetStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.NZBGet {
-		if app.Timeout.Duration < 0 || app.URL == "" {
+		if !app.Enabled() {
 			continue
 		}
 

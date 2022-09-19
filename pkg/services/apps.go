@@ -24,7 +24,7 @@ func (c *Config) collectApps() []*Service {
 
 func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Lidarr {
-		if !app.Enabled() || app.Name == "" {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -51,7 +51,7 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Prowlarr {
-		if !app.Enabled() || app.Name == "" {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -78,7 +78,7 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Radarr {
-		if !app.Enabled() || app.Name == "" {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -105,7 +105,7 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Readarr {
-		if !app.Enabled() || app.Name == "" {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -132,7 +132,7 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 
 func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 	for _, app := range c.Apps.Sonarr {
-		if !app.Enabled() || app.Name == "" {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -161,7 +161,7 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 	// Deluge instanceapp.
 	for _, app := range c.Apps.Deluge {
-		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -185,7 +185,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// NZBGet instances.
 	for _, app := range c.Apps.NZBGet {
-		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -218,7 +218,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// Qbittorrent instanceapp.
 	for _, app := range c.Apps.Qbit {
-		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -242,7 +242,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// rTorrent instanceapp.
 	for _, app := range c.Apps.Rtorrent {
-		if app == nil || app.Name == "" || app.Timeout.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -266,7 +266,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// SabNBZd instanceapp.
 	for _, app := range c.Apps.SabNZB {
-		if app == nil || app.Name == "" || app.Timeout.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -294,7 +294,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 	// Tautulli instance (1).
 	app := c.Apps.Tautulli
-	if app == nil || app.URL == "" || app.Name == "" || app.Timeout.Duration < 0 {
+	if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 		return svcs
 	}
 
@@ -321,20 +321,22 @@ func (c *Config) collectMySQLApps(svcs []*Service) []*Service { //nolint:cyclop
 		return svcs
 	}
 
-	for _, plugin := range c.Plugins.MySQL {
-		if plugin.Host == "" || plugin.Timeout.Duration < 0 {
+	for _, app := range c.Plugins.MySQL {
+		if app.Host == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
 			continue
-		} else if plugin.Timeout.Duration == 0 {
-			plugin.Timeout.Duration = DefaultTimeout
 		}
 
-		interval := plugin.Interval
+		if app.Timeout.Duration == 0 {
+			app.Timeout.Duration = DefaultTimeout
+		}
+
+		interval := app.Interval
 		if interval.Duration == 0 {
 			interval.Duration = DefaultCheckInterval
 		}
 
-		host := strings.TrimLeft(strings.TrimRight(plugin.Host, ")"), "@tcp(")
-		if plugin.Name == "" || host == "" || strings.HasPrefix(host, "@") {
+		host := strings.TrimLeft(strings.TrimRight(app.Host, ")"), "@tcp(")
+		if app.Name == "" || host == "" || strings.HasPrefix(host, "@") {
 			continue
 		}
 
@@ -343,10 +345,10 @@ func (c *Config) collectMySQLApps(svcs []*Service) []*Service { //nolint:cyclop
 		}
 
 		svcs = append(svcs, &Service{
-			Name:     plugin.Name,
+			Name:     app.Name,
 			Type:     CheckTCP,
 			Value:    host,
-			Timeout:  plugin.Timeout,
+			Timeout:  app.Timeout,
 			Interval: interval,
 		})
 	}

@@ -19,18 +19,23 @@ type TautulliConfig struct {
 	*tautulli.Config
 }
 
-func (t *TautulliConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
-	if t == nil || t.Config == nil {
+func (c *TautulliConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+	if !c.Enabled() {
 		return
 	}
 
-	t.Config.Client = starr.ClientWithDebug(t.Timeout.Duration, t.ValidSSL, debuglog.Config{
+	c.Config.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
 		Caller:  metricMaker("Tautulli"),
 	})
 
-	t.URL = strings.TrimRight(t.URL, "/")
+	c.URL = strings.TrimRight(c.URL, "/")
+}
+
+// Enabled returns true if the instance is enabled and usable.
+func (c *TautulliConfig) Enabled() bool {
+	return c != nil && c.Config != nil && c.URL != "" && c.APIKey != "" && c.Timeout.Duration >= 0
 }
 
 type DelugeConfig struct {
@@ -41,7 +46,7 @@ type DelugeConfig struct {
 
 func (a *Apps) setupDeluge() error {
 	for idx := range a.Deluge {
-		if a.Deluge[idx] == nil || a.Deluge[idx].Config == nil || a.Deluge[idx].Config.URL == "" {
+		if !a.Deluge[idx].Enabled() {
 			return fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, idx+1)
 		}
 
@@ -54,8 +59,8 @@ func (a *Apps) setupDeluge() error {
 	return nil
 }
 
-func (d *DelugeConfig) setup(maxBody int, debugf func(string, ...interface{})) error {
-	d.Client = starr.ClientWithDebug(d.Timeout.Duration, d.ValidSSL, debuglog.Config{
+func (c *DelugeConfig) setup(maxBody int, debugf func(string, ...interface{})) error {
+	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
 		Caller:  metricMaker("Deluge"),
@@ -63,11 +68,16 @@ func (d *DelugeConfig) setup(maxBody int, debugf func(string, ...interface{})) e
 
 	var err error
 
-	if d.Deluge, err = deluge.NewNoAuth(d.Config); err != nil {
+	if c.Deluge, err = deluge.NewNoAuth(c.Config); err != nil {
 		return fmt.Errorf("deluge setup failed: %w", err)
 	}
 
 	return nil
+}
+
+// Enabled returns true if the instance is enabled and usable.
+func (c *DelugeConfig) Enabled() bool {
+	return c != nil && c.Config != nil && c.URL != "" && c.Password != "" && c.Timeout.Duration >= 0
 }
 
 type SabNZBConfig struct {
@@ -77,7 +87,7 @@ type SabNZBConfig struct {
 
 func (a *Apps) setupSabNZBd() error {
 	for idx := range a.SabNZB {
-		if a.SabNZB[idx] == nil || a.SabNZB[idx].URL == "" {
+		if !a.SabNZB[idx].Enabled() {
 			return fmt.Errorf("%w: missing url: SabNZBd config %d", ErrInvalidApp, idx+1)
 		}
 
@@ -87,18 +97,23 @@ func (a *Apps) setupSabNZBd() error {
 	return nil
 }
 
-func (s *SabNZBConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
-	if s == nil || s.Config == nil {
+func (c *SabNZBConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+	if !c.Enabled() {
 		return
 	}
 
-	s.Client = starr.ClientWithDebug(s.Timeout.Duration, s.ValidSSL, debuglog.Config{
+	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
 		Caller:  metricMaker("SABnzbd"),
 	})
 
-	s.URL = strings.TrimRight(s.URL, "/")
+	c.URL = strings.TrimRight(c.URL, "/")
+}
+
+// Enabled returns true if the instance is enabled and usable.
+func (c *SabNZBConfig) Enabled() bool {
+	return c != nil && c.Config != nil && c.URL != "" && c.APIKey != "" && c.Timeout.Duration >= 0
 }
 
 type QbitConfig struct {
@@ -109,7 +124,7 @@ type QbitConfig struct {
 
 func (a *Apps) setupQbit() error {
 	for idx := range a.Qbit {
-		if a.Qbit[idx].Config == nil || a.Qbit[idx].URL == "" {
+		if !a.Qbit[idx].Enabled() {
 			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, idx+1)
 		}
 
@@ -122,19 +137,24 @@ func (a *Apps) setupQbit() error {
 	return nil
 }
 
-func (q *QbitConfig) Setup(maxBody int, debugf func(string, ...interface{})) error {
-	q.Client = starr.ClientWithDebug(q.Timeout.Duration, q.ValidSSL, debuglog.Config{
+func (c *QbitConfig) Setup(maxBody int, debugf func(string, ...interface{})) error {
+	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
 		Caller:  metricMaker("qBittorrent"),
 	})
 
 	var err error
-	if q.Qbit, err = qbit.NewNoAuth(q.Config); err != nil {
+	if c.Qbit, err = qbit.NewNoAuth(c.Config); err != nil {
 		return fmt.Errorf("qbit setup failed: %w", err)
 	}
 
 	return nil
+}
+
+// Enabled returns true if the instance is enabled and usable.
+func (c *QbitConfig) Enabled() bool {
+	return c != nil && c.Config != nil && c.URL != "" && c.Timeout.Duration >= 0
 }
 
 type RtorrentConfig struct {
@@ -147,7 +167,7 @@ type RtorrentConfig struct {
 
 func (a *Apps) setupRtorrent() error {
 	for idx := range a.Rtorrent {
-		if a.Rtorrent[idx] == nil || a.Rtorrent[idx].URL == "" {
+		if !a.Rtorrent[idx].Enabled() {
 			return fmt.Errorf("%w: missing url: rTorrent config %d", ErrInvalidApp, idx+1)
 		}
 
@@ -157,25 +177,30 @@ func (a *Apps) setupRtorrent() error {
 	return nil
 }
 
-func (r *RtorrentConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *RtorrentConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
 	prefix := "http://"
-	if strings.HasPrefix(r.URL, "https://") {
+	if strings.HasPrefix(c.URL, "https://") {
 		prefix = "https://"
 	}
 
 	// Append the username and password to the URL.
-	url := strings.TrimPrefix(strings.TrimPrefix(r.URL, "https://"), "http://")
-	if r.User != "" || r.Pass != "" {
-		url = prefix + r.User + ":" + r.Pass + "@" + url
+	url := strings.TrimPrefix(strings.TrimPrefix(c.URL, "https://"), "http://")
+	if c.User != "" || c.Pass != "" {
+		url = prefix + c.User + ":" + c.Pass + "@" + url
 	} else {
 		url = prefix + url
 	}
 
-	r.Client = xmlrpc.NewClientWithHTTPClient(url, starr.ClientWithDebug(r.Timeout.Duration, r.ValidSSL, debuglog.Config{
+	c.Client = xmlrpc.NewClientWithHTTPClient(url, starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
 		Caller:  metricMaker("rTorrent"),
 	}))
+}
+
+// Enabled returns true if the instance is enabled and usable.
+func (c *RtorrentConfig) Enabled() bool {
+	return c != nil && c.URL != "" && c.Timeout.Duration >= 0
 }
 
 type NZBGetConfig struct {
@@ -186,7 +211,7 @@ type NZBGetConfig struct {
 
 func (a *Apps) setupNZBGet() error {
 	for idx, nzb := range a.NZBGet {
-		if nzb.Config == nil || nzb.URL == "" {
+		if !nzb.Enabled() {
 			return fmt.Errorf("%w: missing url: NZBGet config %d", ErrInvalidApp, idx+1)
 		}
 
@@ -200,4 +225,9 @@ func (a *Apps) setupNZBGet() error {
 	}
 
 	return nil
+}
+
+// Enabled returns true if the instance is enabled and usable.
+func (c *NZBGetConfig) Enabled() bool {
+	return c != nil && c.Config != nil && c.URL != "" && c.Timeout.Duration >= 0
 }

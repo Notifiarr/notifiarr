@@ -165,7 +165,7 @@ func (c *cmd) sendLidarrBackups(ctx context.Context, event website.EventType) {
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
-				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+				skip:  !app.Enabled(),
 			})
 		}
 	}
@@ -181,7 +181,7 @@ func (c *cmd) sendProwlarrBackups(ctx context.Context, event website.EventType) 
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
-				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+				skip:  !app.Enabled(),
 			})
 		}
 	}
@@ -197,7 +197,7 @@ func (c *cmd) sendRadarrBackups(ctx context.Context, event website.EventType) {
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
-				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+				skip:  !app.Enabled(),
 			})
 		}
 	}
@@ -213,7 +213,7 @@ func (c *cmd) sendReadarrBackups(ctx context.Context, event website.EventType) {
 				int:   idx + 1,
 				app:   app,
 				cName: app.Name,
-				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+				skip:  !app.Enabled(),
 			})
 		}
 	}
@@ -229,7 +229,7 @@ func (c *cmd) sendSonarrBackups(ctx context.Context, event website.EventType) {
 				cName: app.Name,
 				int:   idx + 1,
 				app:   app,
-				skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+				skip:  !app.Enabled(),
 			})
 		}
 	}
