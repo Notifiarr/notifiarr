@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/mrobinsn/go-rtorrent/xmlrpc"
@@ -13,6 +14,32 @@ import (
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
 )
+
+type PlexConfig struct {
+	*plex.Config
+	*plex.Server
+	extraConfig
+}
+
+func (c *PlexConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+	if !c.Enabled() {
+		return
+	}
+
+	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
+		MaxBody: maxBody,
+		Debugf:  debugf,
+		Caller:  metricMaker(starr.Plex.String()),
+	})
+
+	c.URL = strings.TrimRight(c.URL, "/")
+	c.Server = plex.New(c.Config)
+}
+
+// Enabled returns true if the server is configured, false otherwise.
+func (c *PlexConfig) Enabled() bool {
+	return c != nil && c.Config != nil && c.Config.URL != "" && c.Config.Token != "" && c.Timeout.Duration >= 0
+}
 
 type TautulliConfig struct {
 	extraConfig
@@ -45,9 +72,11 @@ type DelugeConfig struct {
 }
 
 func (a *Apps) setupDeluge() error {
-	for idx := range a.Deluge {
+	for idx, app := range a.Deluge {
 		if !a.Deluge[idx].Enabled() {
-			return fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, idx+1)
+			return fmt.Errorf("%w: missing url or password: Deluge config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: Deluge config %d", ErrInvalidApp, idx+1)
 		}
 
 		// a.Deluge[i].Debugf = a.DebugLog.Printf
@@ -86,9 +115,11 @@ type SabNZBConfig struct {
 }
 
 func (a *Apps) setupSabNZBd() error {
-	for idx := range a.SabNZB {
+	for idx, app := range a.SabNZB {
 		if !a.SabNZB[idx].Enabled() {
-			return fmt.Errorf("%w: missing url: SabNZBd config %d", ErrInvalidApp, idx+1)
+			return fmt.Errorf("%w: missing url or api key: SABnzbd config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: SABnzbd config %d", ErrInvalidApp, idx+1)
 		}
 
 		a.SabNZB[idx].Setup(a.MaxBody, a.Debugf)
@@ -123,9 +154,11 @@ type QbitConfig struct {
 }
 
 func (a *Apps) setupQbit() error {
-	for idx := range a.Qbit {
+	for idx, app := range a.Qbit {
 		if !a.Qbit[idx].Enabled() {
 			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: Qbit config %d", ErrInvalidApp, idx+1)
 		}
 
 		// a.Qbit[i].Debugf = a.DebugLog.Printf
@@ -166,9 +199,11 @@ type RtorrentConfig struct {
 }
 
 func (a *Apps) setupRtorrent() error {
-	for idx := range a.Rtorrent {
+	for idx, app := range a.Rtorrent {
 		if !a.Rtorrent[idx].Enabled() {
 			return fmt.Errorf("%w: missing url: rTorrent config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(app.URL, "http://") && !strings.HasPrefix(app.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: rTorrent config %d", ErrInvalidApp, idx+1)
 		}
 
 		a.Rtorrent[idx].Setup(a.MaxBody, a.Debugf)
@@ -213,6 +248,8 @@ func (a *Apps) setupNZBGet() error {
 	for idx, nzb := range a.NZBGet {
 		if !nzb.Enabled() {
 			return fmt.Errorf("%w: missing url: NZBGet config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(nzb.Config.URL, "http://") && !strings.HasPrefix(nzb.Config.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: NZBGet config %d", ErrInvalidApp, idx+1)
 		}
 
 		nzb.Client = starr.ClientWithDebug(nzb.Timeout.Duration, nzb.ValidSSL, debuglog.Config{

@@ -17,6 +17,7 @@ func (c *Config) collectApps() []*Service {
 	svcs = c.collectSonarrApps(svcs)
 	svcs = c.collectDownloadApps(svcs)
 	svcs = c.collectTautulliApp(svcs)
+	svcs = c.collectPlexApp(svcs)
 	svcs = c.collectMySQLApps(svcs)
 
 	return svcs
@@ -307,6 +308,30 @@ func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 		Name:     app.Name,
 		Type:     CheckHTTP,
 		Value:    app.URL + "/api/v2?cmd=status&apikey=" + app.APIKey,
+		Expect:   "200",
+		Timeout:  app.Timeout,
+		Interval: interval,
+		validSSL: app.ValidSSL,
+	})
+
+	return svcs
+}
+
+func (c *Config) collectPlexApp(svcs []*Service) []*Service {
+	app := c.Apps.Plex
+	if !app.Enabled() || app.Interval.Duration < 0 {
+		return svcs
+	}
+
+	interval := app.Interval
+	if interval.Duration == 0 {
+		interval.Duration = DefaultCheckInterval
+	}
+
+	svcs = append(svcs, &Service{
+		Name:     "Plex Server",
+		Type:     CheckHTTP,
+		Value:    app.URL + "?X-Plex-Token=" + app.Token,
 		Expect:   "200",
 		Timeout:  app.Timeout,
 		Interval: interval,

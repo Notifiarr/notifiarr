@@ -22,14 +22,19 @@
                                                     <span class="dialogTitle">URL</span>
                                                     </td>
                                                 </td>
-                                                <td colspan="2">
+                                                <td>
                                                     <div style="display:none;" class="dialogText">
                                                         You may find directions for locating your Plex token at this <a target="_new" href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/">Plex Article</a>.
                                                     </div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Plex Token</span>
                                                 </td>
-                                                <td style="min-width:120px;width:120px">
+                                                <td style="min-width:110px;width:110px;">
+                                                    <div style="display:none;" class="dialogText">This controls how often to service-check Plex. Set this to Disabled to turn off service checks.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td>
                                                     <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
@@ -44,7 +49,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <input readonly type="text" id="Plex.Name" name="Plex.Name" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Name" data-original="{{.Config.Plex.Name}}" value="{{.Config.Plex.Name}}" style="width: 100%;">
+                                                    <input readonly type="text" class="form-control input-sm" value="{{.Config.Apps.Plex.Name}}" style="width: 100%;">
                                                 </td>
                                                 <td>
                                                     <form class="form-inline">
@@ -59,15 +64,15 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_URL" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" onChange="showhttps($(this).val(), '#PlexSSL');" id="Plex.URL" name="Plex.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL" data-original="{{.Config.Plex.URL}}" value="{{.Config.Plex.URL}}">
-                                                                <div style="width:30px; max-width:30px;{{if not (contains .Config.Plex.URL "https://")}}display:none;{{end}}" id="PlexSSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Plex.ValidSSL" name="Plex.ValidSSL" data-app="Plex" class="client-parameter" data-group="media" data-label="Plex SSL" data-original="{{.Config.Plex.ValidSSL}}" {{if .Config.Plex.ValidSSL}}checked {{end}}value="true">
+                                                                <input type="text" onChange="showhttps($(this).val(), '#PlexSSL');" id="Apps.Plex.URL" name="Apps.Plex.URL" class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL" data-original="{{.Config.Apps.Plex.URL}}" value="{{.Config.Apps.Plex.URL}}">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains .Config.Apps.Plex.URL "https://")}}display:none;{{end}}" id="PlexSSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.Plex.ValidSSL" name="Apps.Plex.ValidSSL" data-app="Plex" class="client-parameter" data-group="media" data-label="Plex SSL" data-original="{{.Config.Apps.Plex.ValidSSL}}" {{if .Config.Apps.Plex.ValidSSL}}checked {{end}}value="true">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td colspan="2">
+                                                <td>
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
@@ -80,8 +85,28 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_TOKEN" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Plex.Token" name="Plex.Token" data-app="Plex" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Token" data-original="{{.Config.Plex.Token}}" value="{{.Config.Plex.Token}}">
+                                                                <input type="password" autocomplete="off" id="Apps.Plex.Token" name="Apps.Plex.Token" data-app="Plex" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Token" data-original="{{.Config.Apps.Plex.Token}}" value="{{.Config.Apps.Plex.Token}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Plex.Token', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_PLEX_INTERVAL" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_INTERVAL" .Flags.EnvPrefix}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select type="select" id="Apps.Plex.Interval" name="Apps.Plex.Interval" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Interval" data-original="{{.Config.Apps.Plex.Interval}}">
+{{template "includes/intervaloptions.html" $.Config.Apps.Plex.Interval}}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -99,15 +124,15 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <select type="select" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Plex.Timeout}}">
-                                                                    <option value="-1s" {{if eq $.Config.Plex.Timeout.Seconds (add -1 0)}}selected {{end}}>Disabled</option>
-                                                                    <option value="0s" {{if eq $.Config.Plex.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
+                                                                <select type="select" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Apps.Plex.Timeout}}">
+                                                                    <option value="-1s" {{if eq $.Config.Apps.Plex.Timeout.Seconds (add -1 0)}}selected {{end}}>Disabled</option>
+                                                                    <option value="0s" {{if eq $.Config.Apps.Plex.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
                                                                     {{- range $i := one259 }}
-                                                                    <option {{if eq $.Config.Plex.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    <option {{if eq $.Config.Apps.Plex.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
                                                                     {{- end}}
-                                                                    <option {{if eq $.Config.Plex.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    <option {{if eq $.Config.Apps.Plex.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
                                                                     {{- range $i := one259 }}
-                                                                    <option {{if eq $.Config.Plex.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    <option {{if eq $.Config.Apps.Plex.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
                                                                     {{- end}}
                                                                 </select>
                                                             </div>

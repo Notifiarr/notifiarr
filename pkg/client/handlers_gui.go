@@ -553,9 +553,12 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	/* for key, item := range request.PostForm {
-		log.Println(key, "=", item)
-	} /**/
+	// Check app integration configs before saving.
+	config.Apps.Logger = c.Logger
+	if err := config.Apps.Setup(); err != nil {
+		http.Error(response, err.Error(), http.StatusNotAcceptable)
+		return
+	}
 
 	if err := c.saveNewConfig(request.Context(), config); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Config: %v", user, err)

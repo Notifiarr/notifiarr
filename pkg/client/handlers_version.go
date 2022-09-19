@@ -193,7 +193,7 @@ func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps
 	}
 }
 
-func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *plex.Server, plx *[]*conTest, fg bool) {
+func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *apps.PlexConfig, plx *[]*conTest, fg bool) {
 	if !plexServer.Enabled() {
 		return
 	}

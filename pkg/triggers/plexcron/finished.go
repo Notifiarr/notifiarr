@@ -87,7 +87,7 @@ func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string
 		Event: website.EventType(session.Type),
 		Payload: &website.Payload{
 			Snap: c.getMetaSnap(ctx),
-			Plex: &plex.Sessions{Name: c.Plex.Name, Sessions: []*plex.Session{session}},
+			Plex: &plex.Sessions{Name: c.Plex.Server.Name(), Sessions: []*plex.Session{session}},
 		},
 		LogMsg:     "Plex Completed Sessions",
 		LogPayload: true,

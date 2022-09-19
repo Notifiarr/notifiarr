@@ -186,7 +186,7 @@ func (s *Server) GetPlexSectionKey(keyPath string) (*MediaSection, error) {
 
 // GetPlexSectionKey gets a section key from Plex based on a key path.
 func (s *Server) GetPlexSectionKeyWithContext(ctx context.Context, keyPath string) (*MediaSection, error) {
-	url := s.URL + keyPath
+	url := s.config.URL + keyPath
 
 	data, err := s.getPlexURL(ctx, url, nil)
 	if err != nil {
@@ -211,7 +211,7 @@ func (s *Server) GetDirectory() (*SectionDirectory, error) {
 
 // GetDirectoryWithContext returns data about all the library sections.
 func (s *Server) GetDirectoryWithContext(ctx context.Context) (*SectionDirectory, error) {
-	url := s.URL + "/library/sections"
+	url := s.config.URL + "/library/sections"
 
 	data, err := s.getPlexURL(ctx, url, nil)
 	if err != nil {

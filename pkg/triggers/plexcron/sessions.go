@@ -42,14 +42,14 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 
 	switch {
 	case err != nil:
-		return &plex.Sessions{Name: c.Plex.Name}, fmt.Errorf("plex sessions: %w", err)
+		return &plex.Sessions{Name: c.Plex.Server.Name()}, fmt.Errorf("plex sessions: %w", err)
 	case item != nil && item.Data != nil:
 		c.plexSessionTracker(ctx, sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
 	default:
 		c.plexSessionTracker(ctx, sessions, nil)
 	}
 
-	sessions.Name = c.Plex.Name
+	sessions.Name = c.Plex.Server.Name()
 
 	return sessions, nil
 }

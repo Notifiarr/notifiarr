@@ -18,7 +18,6 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
@@ -193,16 +192,6 @@ func (c *Config) setup() *triggers.Actions {
 		// Setting AppName forces log files (even if not configured).
 		// Used for GUI apps that have no console output.
 		c.LogConfig.AppName = mnd.Title
-	}
-
-	if c.Plex.Enabled() {
-		c.Plex.Validate()
-	} else if c.Plex == nil {
-		c.Plex = &plex.Server{}
-	}
-
-	if c.Tautulli == nil {
-		c.Tautulli = &apps.TautulliConfig{}
 	}
 
 	return triggers.New(&triggers.Config{

@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -24,7 +25,7 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
-	Plex *plex.Server
+	Plex *apps.PlexConfig
 	sent map[string]struct{} // Tracks Finished sessions already sent.
 	sync.Mutex
 }
@@ -42,7 +43,7 @@ const (
 )
 
 // New configures the library.
-func New(config *common.Config, plex *plex.Server) *Action {
+func New(config *common.Config, plex *apps.PlexConfig) *Action {
 	return &Action{
 		cmd: &cmd{
 			Config: config,
@@ -108,7 +109,7 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 }
 
 func (c *cmd) sendWebhook(ctx context.Context, hook *plex.IncomingWebhook) {
-	sessions := &plex.Sessions{Name: c.Plex.Name}
+	sessions := &plex.Sessions{Name: c.Plex.Server.Name()}
 	ci := website.GetClientInfo()
 
 	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.

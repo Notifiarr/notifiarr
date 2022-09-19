@@ -129,12 +129,13 @@ func (c *Client) printPlex() {
 		return
 	}
 
-	name := plex.Name
+	name := plex.Server.Name()
 	if name == "" {
-		name = "<possible connection error>"
+		name = "<connection error?>"
 	}
 
-	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming APIs and webhook)", name, plex.URL)
+	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming APIs and webhook) timeout:%v check_interval:%s ",
+		name, plex.URL, plex.Timeout, plex.Interval)
 }
 
 // printLidarr is called on startup to print info about each configured server.
@@ -294,7 +295,7 @@ func (c *Client) printSABnzbd() {
 // printTautulli is called on startup to print info about configured Tautulli instance(s).
 func (c *Client) printTautulli() {
 	switch taut := c.Config.Apps.Tautulli; {
-	case taut == nil, taut.URL == "":
+	case !taut.Enabled():
 		c.Printf(" => Tautulli Config (enables name map): 0 servers")
 	case taut.Name != "":
 		c.Printf(" => Tautulli Config (enables name map): 1 server: %s timeout:%v check_interval:%s name:%s",

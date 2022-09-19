@@ -260,11 +260,8 @@ func (c *Client) configureServicesPlex(ctx context.Context) {
 	ctx, cancel := context.WithTimeout(ctx, c.Config.Plex.Timeout.Duration)
 	defer cancel()
 
-	if info, err := c.Config.Plex.GetInfo(ctx); err != nil {
-		c.Config.Plex.Name = ""
+	if _, err := c.Config.Plex.GetInfo(ctx); err != nil {
 		c.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
-	} else {
-		c.Config.Plex.Name = info.FriendlyName
 	}
 }
 

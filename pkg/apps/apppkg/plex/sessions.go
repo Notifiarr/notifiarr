@@ -25,10 +25,6 @@ func (s *Server) GetSessions() (*Sessions, error) {
 
 // GetSessionsWithContext returns the Plex sessions in JSON format.
 func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) {
-	if !s.Enabled() {
-		return nil, ErrNoURLToken
-	}
-
 	var (
 		v struct {
 			//nolint:tagliatelle
@@ -36,10 +32,10 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 				Sessions []*Session `json:"Metadata"`
 			} `json:"MediaContainer"`
 		}
-		sessions = &Sessions{Name: s.Name}
+		sessions = &Sessions{Name: s.name}
 	)
 
-	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
+	body, err := s.getPlexURL(ctx, s.config.URL+"/status/sessions", nil)
 	if err != nil {
 		return sessions, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -55,15 +51,11 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 
 // KillSessionWithContext kills a Plex session.
 func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) ([]byte, error) {
-	if !s.Enabled() {
-		return nil, ErrNoURLToken
-	}
-
 	params := make(url.Values)
 	params.Add("sessionId", sessionID)
 	params.Add("reason", reason)
 
-	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions/terminate", params)
+	body, err := s.getPlexURL(ctx, s.config.URL+"/status/sessions/terminate", params)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -78,18 +70,11 @@ func (s *Server) KillSession(sessionID, reason string) ([]byte, error) {
 
 // MarkPlayedWithContext marks a video as played.
 func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) ([]byte, error) {
-	if !s.Enabled() {
-		return nil, ErrNoURLToken
-	}
-
 	params := make(url.Values)
 	params.Add("identifier", "com.plexapp.plugins.library")
 	params.Add("key", key)
 
-	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
-	defer cancel()
-
-	body, err := s.getPlexURL(ctx, s.URL+"/:/scrobble", params)
+	body, err := s.getPlexURL(ctx, s.config.URL+"/:/scrobble", params)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -104,12 +89,8 @@ func (s *Server) MarkPlayed(key string) ([]byte, error) {
 
 // EmptyTrashWithContext deletes (a section's) trash.
 func (s *Server) EmptyTrashWithContext(ctx context.Context, libraryKey string) ([]byte, error) {
-	if !s.Enabled() {
-		return nil, ErrNoURLToken
-	}
-
 	// Requires PUT with no data.
-	body, err := s.putPlexURL(ctx, s.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
+	body, err := s.putPlexURL(ctx, s.config.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -124,10 +105,6 @@ func (s *Server) EmptyTrash(sectionKey string) ([]byte, error) {
 
 // EmptyAllTrashWithContext deletes the trash in all sections.
 func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
-	if !s.Enabled() {
-		return ErrNoURLToken
-	}
-
 	directory, err := s.GetDirectoryWithContext(ctx)
 	if err != nil {
 		return err

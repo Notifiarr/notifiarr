@@ -151,7 +151,7 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 	secrets := []string{c.Config.Apps.APIKey}
 	secrets = append(secrets, c.Config.ExKeys...)
 	// gather configured/known secrets.
-	if c.Config.Plex != nil {
+	if c.Config.Plex.Enabled() {
 		secrets = append(secrets, c.Config.Plex.Token)
 	}
 
