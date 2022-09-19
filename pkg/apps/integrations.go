@@ -22,10 +22,6 @@ type PlexConfig struct {
 }
 
 func (c *PlexConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
-	if !c.Enabled() {
-		return
-	}
-
 	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
