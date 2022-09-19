@@ -187,7 +187,8 @@ func (s *Server) Info(ctx context.Context) map[string]interface{} {
 	}
 
 	numTautulli := 0 // maybe one day we'll support more than 1 tautulli.
-	if s.config.Apps.Tautulli != nil && s.config.Apps.Tautulli.URL != "" && s.config.Apps.Tautulli.APIKey != "" {
+	if s.config.Apps.Tautulli != nil && s.config.Apps.Tautulli.Config != nil &&
+		s.config.Apps.Tautulli.URL != "" && s.config.Apps.Tautulli.APIKey != "" {
 		numTautulli = 1
 	}
 

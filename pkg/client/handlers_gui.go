@@ -532,6 +532,7 @@ func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Req
 	}
 }
 
+// reconfig
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
 	user, _ := c.getUserName(request)
 	// copy running config,
@@ -551,6 +552,10 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 		return
 	}
+
+	/* for key, item := range request.PostForm {
+		log.Println(key, "=", item)
+	} /**/
 
 	if err := c.saveNewConfig(request.Context(), config); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Config: %v", user, err)

@@ -109,7 +109,7 @@
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.URL" name="Apps.Sonarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Sonarr{{$index}}SSL');" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                                 <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Sonarr{{$index}}SSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Apps.Sonarr.{{$index}}.ValidSSL" name="Apps.Sonarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="download" data-label="Sonarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                                                                    <input type="checkbox" id="Apps.Sonarr.{{$index}}.ValidSSL" name="Apps.Sonarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Sonarr" class="client-parameter" data-group="starr" data-label="Sonarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
                                                                 </div>
                                                             </div>
                                                         </div>
