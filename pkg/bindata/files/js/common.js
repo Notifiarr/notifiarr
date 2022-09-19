@@ -352,8 +352,8 @@ function savePendingChanges()
                             }
                         }
                     });
-                }, 100);
-            }, 200);
+                }, 400);
+            }, 500);
         },
         error: function (response, status, error) {
             if (response.responseText === undefined) {

@@ -99,12 +99,12 @@ function reloadConfig()
                                 clearInterval(ping);
                                 setTimeout(function() {
                                     location.reload();
-                                }, 200);
+                                }, 500);
                             }
                         }
                     });
-                }, 200);
-            }, 200);
+                }, 400);
+            }, 500);
         },
          error: function (request, status, error) {
              if (error == "") {
