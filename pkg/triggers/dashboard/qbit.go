@@ -14,7 +14,7 @@ func (c *Cmd) getQbitStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Qbit {
-		if app.Timeout.Duration < 0 || app.URL == "" {
+		if !app.Enabled() {
 			continue
 		}
 

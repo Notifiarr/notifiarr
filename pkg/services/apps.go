@@ -161,7 +161,7 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 	// Deluge instanceapp.
 	for _, app := range c.Apps.Deluge {
-		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -185,7 +185,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// NZBGet instances.
 	for _, app := range c.Apps.NZBGet {
-		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -218,7 +218,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// Qbittorrent instanceapp.
 	for _, app := range c.Apps.Qbit {
-		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -242,7 +242,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// rTorrent instanceapp.
 	for _, app := range c.Apps.Rtorrent {
-		if app == nil || app.Name == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -266,7 +266,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 
 	// SabNBZd instanceapp.
 	for _, app := range c.Apps.SabNZB {
-		if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 			continue
 		}
 
@@ -294,7 +294,7 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 func (c *Config) collectTautulliApp(svcs []*Service) []*Service {
 	// Tautulli instance (1).
 	app := c.Apps.Tautulli
-	if app == nil || app.Config == nil || app.Name == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
+	if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
 		return svcs
 	}
 

@@ -170,7 +170,7 @@ func (c *cmd) sendLidarrCorruption(ctx context.Context, event website.EventType)
 			int:   idx + 1,
 			app:   app.Lidarr,
 			cName: app.Name,
-			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+			skip:  !app.Enabled(),
 		})
 	}
 }
@@ -184,7 +184,7 @@ func (c *cmd) sendProwlarrCorruption(ctx context.Context, event website.EventTyp
 			int:   idx + 1,
 			app:   app.Prowlarr,
 			cName: app.Name,
-			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+			skip:  !app.Enabled(),
 		})
 	}
 }
@@ -198,7 +198,7 @@ func (c *cmd) sendRadarrCorruption(ctx context.Context, event website.EventType)
 			int:   idx + 1,
 			app:   app.Radarr,
 			cName: app.Name,
-			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+			skip:  !app.Enabled(),
 		})
 	}
 }
@@ -212,7 +212,7 @@ func (c *cmd) sendReadarrCorruption(ctx context.Context, event website.EventType
 			int:   idx + 1,
 			app:   app.Readarr,
 			cName: app.Name,
-			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+			skip:  !app.Enabled(),
 		})
 	}
 }
@@ -226,7 +226,7 @@ func (c *cmd) sendSonarrCorruption(ctx context.Context, event website.EventType)
 			int:   idx + 1,
 			app:   app.Sonarr,
 			cName: app.Name,
-			skip:  app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0,
+			skip:  !app.Enabled(),
 		})
 	}
 }

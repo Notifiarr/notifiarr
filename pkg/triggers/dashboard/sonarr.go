@@ -14,7 +14,7 @@ func (c *Cmd) getSonarrStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Sonarr {
-		if app.Timeout.Duration < 0 || app.URL == "" {
+		if !app.Enabled() {
 			continue
 		}
 

@@ -14,7 +14,7 @@ func (c *Cmd) getSabNZBStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.SabNZB {
-		if app.Timeout.Duration < 0 || app.URL == "" {
+		if !app.Enabled() {
 			continue
 		}
 

@@ -80,7 +80,7 @@ func (c *Client) appStatsForVersion(ctx context.Context) map[string]interface{} 
 
 func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*conTest, fg bool) {
 	for idx, app := range lidarrs {
-		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+		if app.Enabled() {
 			lid[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
 		}
 
@@ -103,7 +103,7 @@ func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps
 
 func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*apps.ProwlarrConfig, prl []*conTest, fg bool) {
 	for idx, app := range prowlarrs {
-		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+		if app.Enabled() {
 			prl[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
 		}
 
@@ -126,7 +126,7 @@ func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*
 
 func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps.RadarrConfig, rad []*conTest, fg bool) {
 	for idx, app := range radarrs {
-		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+		if app.Enabled() {
 			rad[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
 		}
 
@@ -149,7 +149,7 @@ func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps
 
 func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*apps.ReadarrConfig, read []*conTest, fg bool) {
 	for idx, app := range readarrs {
-		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+		if app.Enabled() {
 			read[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
 		}
 
@@ -172,7 +172,7 @@ func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*ap
 
 func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps.SonarrConfig, son []*conTest, fg bool) {
 	for idx, app := range sonarrs {
-		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 {
+		if app.Enabled() {
 			son[idx] = &conTest{Instance: idx + 1, Up: false, Status: mnd.Disabled}
 		}
 
