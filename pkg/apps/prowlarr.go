@@ -36,6 +36,8 @@ func (a *Apps) setupProwlarr() error {
 	for idx, app := range a.Prowlarr {
 		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Prowlarr config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: Prowlarr config %d", ErrInvalidApp, idx+1)
 		}
 
 		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{

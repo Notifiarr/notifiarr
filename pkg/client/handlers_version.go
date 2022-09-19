@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
 
 /* The version handler gets the version from a bunch of apps and returns them. */
@@ -193,8 +193,8 @@ func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps
 	}
 }
 
-func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *plex.Server, plx *[]*conTest, fg bool) {
-	if !plexServer.Configured() {
+func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *apps.PlexConfig, plx *[]*conTest, fg bool) {
+	if !plexServer.Enabled() {
 		return
 	}
 

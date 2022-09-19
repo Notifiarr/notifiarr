@@ -166,16 +166,18 @@ func (s *Server) debughttplog(resp *http.Response, url string, start time.Time, 
 		}
 	}
 
-	if s.config.MaxBody > 0 && len(data) > s.config.MaxBody {
-		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:s.config.MaxBody], s.config.MaxBody)
+	if s.config.Apps.MaxBody > 0 && len(data) > s.config.Apps.MaxBody {
+		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:s.config.Apps.MaxBody], s.config.Apps.MaxBody)
 	}
 
 	if data == "" {
 		s.config.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), status, headers, readBodyForLog(body, int64(s.config.MaxBody)))
+			url, time.Since(start).Round(time.Microsecond), status,
+			headers, readBodyForLog(body, int64(s.config.Apps.MaxBody)))
 	} else {
 		s.config.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), data, status, headers, readBodyForLog(body, int64(s.config.MaxBody)))
+			url, time.Since(start).Round(time.Microsecond), data, status,
+			headers, readBodyForLog(body, int64(s.config.Apps.MaxBody)))
 	}
 }
 

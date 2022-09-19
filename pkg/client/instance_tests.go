@@ -10,7 +10,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
@@ -328,8 +327,8 @@ func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 	return "Process Tested OK: " + res.Output, http.StatusOK
 }
 
-func testPlex(ctx context.Context, app *plex.Server) (string, int) {
-	app.Validate()
+func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
+	app.Setup(0, func(string, ...interface{}) {})
 
 	info, err := app.GetInfo(ctx)
 	if err != nil {

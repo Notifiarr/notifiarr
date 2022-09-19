@@ -118,7 +118,7 @@ log_files = {{.LogFiles}}
 ## Missing, blank or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
 file_mode = "{{.FileMode.String}}"
 
-## Web server and application timeouts.
+## Web server and website timeout.
 ##
 timeout = "{{.Timeout}}"
 
@@ -150,6 +150,7 @@ retries = {{.Retries}}
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
+## Setting any application timeout to "-1s" will disable that application.
 
 {{if .Lidarr}}{{range .Lidarr}}[[lidarr]]
   name     = "{{.Name}}"
@@ -362,6 +363,7 @@ retries = {{.Retries}}
 {{if and .Plex (not force)}}[plex]
   url     = "{{.Plex.URL}}"   # Your plex URL
   token   = "{{.Plex.Token}}"   # your plex token; get this from a web inspector
+  interval = "{{.Plex.Interval}}" # Service check duration (if name is not empty).
   timeout = "{{.Plex.Timeout}}"  # how long to wait for HTTP responses
   {{- if .Plex.ValidSSL}}
   valid_ssl = true
@@ -439,6 +441,7 @@ bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
 ## This application performs service checks on configured services at the specified interval.
 ## The service states are sent to Notifiarr.com. Failed services generate a notification.
 ## Setting names on Starr apps (above) enables service checks for that app.
+## Setting the Interval to "-1s" (Disabled in UI) will disable service checks on that named instance.
 ## Use the [[service]] directive to add more service checks. Example below.
 
 [services]

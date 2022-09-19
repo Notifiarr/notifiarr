@@ -7,8 +7,9 @@ import (
 	"fmt"
 )
 
+// GetInfo retreives Plex Server Info. This also sets the friendly name, so s.Name() works.
 func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
-	data, err := s.getPlexURL(ctx, s.URL, nil)
+	data, err := s.getPlexURL(ctx, s.config.URL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -18,8 +19,10 @@ func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
 	}
 
 	if err := json.Unmarshal(data, &v); err != nil {
-		return nil, fmt.Errorf("unmarshaling main page from %s: %w", s.URL, err)
+		return nil, fmt.Errorf("unmarshaling main page from %s: %w", s.config.URL, err)
 	}
+
+	s.name = v.MediaContainer.FriendlyName
 
 	return v.MediaContainer, nil
 }

@@ -23,7 +23,6 @@ type Config struct {
 	*website.Server // send trigger responses to website.
 	Snapshot        *snapshot.Config
 	Apps            *apps.Apps
-	Serial          bool
 	mnd.Logger
 	stop *Action   // Triggered by calling Stop()
 	list []*Action // List of action triggers

@@ -57,6 +57,8 @@ func (a *Apps) setupReadarr() error {
 	for idx, app := range a.Readarr {
 		if app.Config == nil || app.Config.URL == "" {
 			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: Readarr config %d", ErrInvalidApp, idx+1)
 		}
 
 		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{

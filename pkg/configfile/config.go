@@ -20,7 +20,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
@@ -54,9 +53,7 @@ type Config struct {
 	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
 	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Serial     bool                   `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
 	Retries    int                    `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
-	Plex       *plex.Server           `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
 	Snapshot   *snapshot.Config       `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
 	Services   *services.Config       `json:"services" toml:"services" xml:"services" yaml:"services"`
 	Service    []*services.Service    `json:"service" toml:"service" xml:"service" yaml:"service"`
@@ -159,13 +156,10 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Website = website.New(&website.Config{
 		Apps:    c.Apps,
-		Plex:    c.Plex,
 		Logger:  c.Services.Logger,
 		BaseURL: website.BaseURL,
 		Timeout: c.Timeout,
-		MaxBody: c.MaxBody,
 		Retries: c.Retries,
-		Serial:  c.Serial,
 		HostID:  c.HostID,
 	})
 
@@ -197,25 +191,13 @@ func (c *Config) setup() *triggers.Actions {
 		c.LogConfig.AppName = mnd.Title
 	}
 
-	if c.Plex.Configured() {
-		c.Plex.Validate()
-	} else if c.Plex == nil {
-		c.Plex = &plex.Server{}
-	}
-
-	if c.Tautulli == nil {
-		c.Tautulli = &apps.TautulliConfig{}
-	}
-
 	return triggers.New(&triggers.Config{
 		Apps:       c.Apps,
-		Plex:       c.Plex,
-		Serial:     c.Serial,
+		Logger:     c.Services.Logger,
 		Website:    c.Services.Website,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
 		Commands:   c.Commands,
-		Logger:     c.Services.Logger,
 	})
 }
 

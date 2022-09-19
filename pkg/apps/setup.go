@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -22,6 +24,7 @@ type Apps struct {
 	ExKeys     []string          `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
 	URLBase    string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
 	MaxBody    int               `toml:"max_body" xml:"max_body" json:"maxBody"`
+	Serial     bool              `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
 	Sonarr     []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
 	Radarr     []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
 	Lidarr     []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
@@ -33,6 +36,7 @@ type Apps struct {
 	SabNZB     []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
 	NZBGet     []*NZBGetConfig   `json:"nzbget,omitempty" toml:"nzbget" xml:"nzbget" yaml:"nzbget,omitempty"`
 	Tautulli   *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
+	Plex       *PlexConfig       `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
 	Router     *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
 	mnd.Logger `toml:"-" xml:"-" json:"-"`
 	keys       map[string]struct{} `toml:"-"` // for fast key lookup.
@@ -108,7 +112,16 @@ func (a *Apps) Setup() error { //nolint:cyclop
 		return err
 	}
 
+	if a.Tautulli == nil {
+		a.Tautulli = &TautulliConfig{Config: &tautulli.Config{}}
+	}
+
+	if a.Plex == nil {
+		a.Plex = &PlexConfig{Config: &plex.Config{}}
+	}
+
 	a.Tautulli.Setup(a.MaxBody, a.Debugf)
+	a.Plex.Setup(a.MaxBody, a.Debugf)
 
 	return nil
 }

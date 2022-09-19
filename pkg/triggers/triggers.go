@@ -8,7 +8,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/cfsync"
@@ -26,9 +25,7 @@ import (
 
 // Config is the required input data. Everything is mandatory.
 type Config struct {
-	Serial     bool
 	Apps       *apps.Apps
-	Plex       *plex.Server
 	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
@@ -59,10 +56,9 @@ func New(config *Config) *Actions {
 		Server:   config.Website,
 		Snapshot: config.Snapshot,
 		Apps:     config.Apps,
-		Serial:   config.Serial,
 		Logger:   config.Logger,
 	}
-	plex := plexcron.New(common, config.Plex)
+	plex := plexcron.New(common, config.Apps.Plex)
 
 	return &Actions{
 		PlexCron:   plex,

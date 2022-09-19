@@ -182,13 +182,12 @@ func GetClientInfo() *ClientInfo {
 // Info is used for JSON input for our outgoing client info.
 func (s *Server) Info(ctx context.Context) map[string]interface{} {
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
-	if s.config.Plex.Configured() {
+	if s.config.Apps.Plex.Enabled() {
 		numPlex = 1
 	}
 
 	numTautulli := 0 // maybe one day we'll support more than 1 tautulli.
-	if s.config.Apps.Tautulli != nil && s.config.Apps.Tautulli.Config != nil &&
-		s.config.Apps.Tautulli.URL != "" && s.config.Apps.Tautulli.APIKey != "" {
+	if s.config.Apps.Tautulli.Enabled() {
 		numTautulli = 1
 	}
 

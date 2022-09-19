@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -78,7 +78,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 			Event:      website.EventHook,
 			LogPayload: true,
 			LogMsg:     fmt.Sprintf("Plex Webhhok: %s '%s' ~> %s", v.Account.Title, v.Event, v.Metadata.Title),
-			Payload:    &website.Payload{Load: &v, Plex: &plex.Sessions{Name: c.Config.Plex.Name}},
+			Payload:    &website.Payload{Load: &v, Plex: &plex.Sessions{Name: c.Config.Plex.Server.Name()}},
 		})
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "process", http.StatusAccepted)

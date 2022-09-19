@@ -95,7 +95,7 @@ func (c *Client) httpAPIHandlers() {
 	// Aggregate handlers. Non-app specific.
 	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
 
-	if c.Config.Plex.Configured() {
+	if c.Config.Plex.Enabled() {
 		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
 		c.Config.HandleAPIpath(starr.Plex, "directory", c.Config.Plex.HandleDirectory, "GET")
 		c.Config.HandleAPIpath(starr.Plex, "emptytrash/{key}", c.Config.Plex.HandleEmptyTrash, "GET")
@@ -151,7 +151,7 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 	secrets := []string{c.Config.Apps.APIKey}
 	secrets = append(secrets, c.Config.ExKeys...)
 	// gather configured/known secrets.
-	if c.Config.Plex != nil {
+	if c.Config.Plex.Enabled() {
 		secrets = append(secrets, c.Config.Plex.Token)
 	}
 
@@ -255,7 +255,7 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 		c.Config.Services.RunChecks(source)
 		return http.StatusOK, "All service checks rescheduled for immediate exeution."
 	case "sessions":
-		if !c.Config.Plex.Configured() {
+		if !c.Config.Plex.Enabled() {
 			return http.StatusNotImplemented, "Plex Sessions are not enabled."
 		}
 

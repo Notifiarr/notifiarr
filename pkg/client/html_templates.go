@@ -15,12 +15,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -240,7 +240,7 @@ func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
 	}
 
 	for idx, dur := range times {
-		if idx != 0 && current.Duration < dur && current.Duration > times[idx-1] {
+		if idx != 0 && current.Duration < dur && current.Duration > times[idx-1] && current.Duration != 0 {
 			// This adds the current selected value in case it does not match one of the predefined options.
 			output = append(output, &option{
 				Val: current.String(),
@@ -254,7 +254,7 @@ func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
 			output = append(output, &option{
 				Val: cnfg.Duration{Duration: dur}.String(),
 				Op:  "Disabled",
-				Sel: true,
+				Sel: current.Duration < 0,
 			})
 		} else {
 			output = append(output, &option{
