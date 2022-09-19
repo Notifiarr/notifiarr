@@ -50,16 +50,17 @@ func (c *cmd) setupRadarr() bool {
 	var enabled bool
 
 	for idx, app := range c.Apps.Radarr {
-		if !app.Enabled() || !c.HaveClientInfo() {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil {
 			continue
 		}
 
 		var ticker *time.Ticker
 
 		instance := idx + 1
-		if c.ClientInfo.Actions.Apps.Radarr.Finished(instance) {
+		if ci.Actions.Apps.Radarr.Finished(instance) {
 			ticker = time.NewTicker(finishedDuration)
-		} else if c.ClientInfo.Actions.Apps.Radarr.Stuck(instance) {
+		} else if ci.Actions.Apps.Radarr.Stuck(instance) {
 			ticker = time.NewTicker(stuckDuration)
 		}
 
@@ -83,7 +84,8 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Radarr {
-		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Radarr.Stuck(idx+1) {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Radarr.Stuck(idx+1) {
 			continue
 		}
 

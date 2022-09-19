@@ -76,7 +76,7 @@ type SabNZBConfig struct {
 }
 
 func (a *Apps) setupSabNZBd() error {
-	for idx := range a.Rtorrent {
+	for idx := range a.SabNZB {
 		if a.SabNZB[idx] == nil || a.SabNZB[idx].URL == "" {
 			return fmt.Errorf("%w: missing url: SabNZBd config %d", ErrInvalidApp, idx+1)
 		}

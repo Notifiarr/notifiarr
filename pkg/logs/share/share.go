@@ -10,7 +10,6 @@ import (
 
 type Website interface {
 	SendData(data *website.Request)
-	HaveClientInfo() bool
 }
 
 //nolint:gochecknoglobals
@@ -39,7 +38,7 @@ func Log(msg string) {
 	locker.RLock()
 	defer locker.RUnlock()
 
-	if config == nil || !config.HaveClientInfo() {
+	if config == nil || !website.HaveClientInfo() {
 		return
 	}
 

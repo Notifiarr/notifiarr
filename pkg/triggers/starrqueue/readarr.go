@@ -48,7 +48,8 @@ func (c *cmd) setupReadarr() bool {
 	var enable bool
 
 	for idx, app := range c.Apps.Readarr {
-		if !app.Enabled() || !c.HaveClientInfo() {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil {
 			continue
 		}
 
@@ -57,10 +58,10 @@ func (c *cmd) setupReadarr() bool {
 		instance := idx + 1
 
 		switch {
-		case c.ClientInfo.Actions.Apps.Readarr.Finished(instance):
+		case ci.Actions.Apps.Readarr.Finished(instance):
 			enable = true
 			ticker = time.NewTicker(finishedDuration)
-		case c.ClientInfo.Actions.Apps.Readarr.Stuck(instance):
+		case ci.Actions.Apps.Readarr.Stuck(instance):
 			enable = true
 			ticker = time.NewTicker(stuckDuration)
 		default:
@@ -83,7 +84,8 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Readarr {
-		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Readarr.Stuck(idx+1) {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Readarr.Stuck(idx+1) {
 			continue
 		}
 

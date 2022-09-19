@@ -21,10 +21,9 @@ var ErrNoChannel = fmt.Errorf("no channel to send request")
 // Everything is mandatory.
 type Config struct {
 	*website.Server // send trigger responses to website.
-	*website.ClientInfo
-	Snapshot *snapshot.Config
-	Apps     *apps.Apps
-	Serial   bool
+	Snapshot        *snapshot.Config
+	Apps            *apps.Apps
+	Serial          bool
 	mnd.Logger
 	stop *Action   // Triggered by calling Stop()
 	list []*Action // List of action triggers

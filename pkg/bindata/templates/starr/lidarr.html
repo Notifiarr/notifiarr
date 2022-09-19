@@ -108,7 +108,7 @@
                                                                 {{- end}}
                                                                 <input type="text" id="Apps.Lidarr.{{$index}}.URL" name="Apps.Lidarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Lidarr{{$index}}SSL');"  data-index="{{$index}}" data-app="Lidarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Lidarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
                                                                 <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Lidarr{{$index}}SSL" class="input-group-addon input-sm">
-                                                                    <input type="checkbox" id="Apps.Lidarr.{{$index}}.ValidSSL" name="Apps.Lidarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="download" data-label="Lidarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                                                                    <input type="checkbox" id="Apps.Lidarr.{{$index}}.ValidSSL" name="Apps.Lidarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Lidarr" class="client-parameter" data-group="starr" data-label="Lidarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
                                                                 </div>
                                                             </div>
                                                         </div>

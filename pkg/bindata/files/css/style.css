@@ -881,7 +881,7 @@ div .file-content .line-number {
 }
 @media only screen and (min-width: 700px) {
     .modal-body {
-        width: 630px !important;
+        width: 700px !important;
     }
 }
 

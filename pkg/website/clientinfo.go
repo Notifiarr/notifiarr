@@ -10,6 +10,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"golift.io/cnfg"
@@ -135,17 +136,10 @@ func (c *ClientInfo) IsPatron() bool {
 	return c != nil && c.User.Patron
 }
 
-func (s *Server) HaveClientInfo() bool {
-	s.ciMutex.RLock()
-	defer s.ciMutex.RUnlock()
-
-	return s.clientInfo != nil
-}
-
-// GetClientInfo returns an error if the API key is wrong. Returns client info otherwise.
-func (s *Server) GetClientInfo(ctx context.Context) (*ClientInfo, error) {
-	if s.HaveClientInfo() {
-		return s.clientInfo, nil
+// SaveClientInfo returns an error if the API key is wrong. Caches and returns client info otherwise.
+func (s *Server) SaveClientInfo(ctx context.Context) (*ClientInfo, error) {
+	if ci := GetClientInfo(); ci != nil {
+		return ci, nil
 	}
 
 	body, err := s.GetData(&Request{
@@ -163,12 +157,26 @@ func (s *Server) GetClientInfo(ctx context.Context) (*ClientInfo, error) {
 		return &clientInfo, fmt.Errorf("parsing response: %w, %s", err, string(body.Details.Response))
 	}
 
-	s.ciMutex.Lock()
-	defer s.ciMutex.Unlock()
 	// Only set this if there was no error.
-	s.clientInfo = &clientInfo
+	data.Save("clientInfo", &clientInfo)
 
-	return s.clientInfo, nil
+	return &clientInfo, nil
+}
+
+func HaveClientInfo() bool {
+	data := data.Get("clientInfo")
+	return data != nil && data.Data != nil
+}
+
+func GetClientInfo() *ClientInfo {
+	data := data.Get("clientInfo")
+	if data == nil || data.Data == nil {
+		return nil
+	}
+
+	cinfo, _ := data.Data.(*ClientInfo)
+
+	return cinfo
 }
 
 // Info is used for JSON input for our outgoing client info.
@@ -179,7 +187,8 @@ func (s *Server) Info(ctx context.Context) map[string]interface{} {
 	}
 
 	numTautulli := 0 // maybe one day we'll support more than 1 tautulli.
-	if s.config.Apps.Tautulli != nil && s.config.Apps.Tautulli.URL != "" && s.config.Apps.Tautulli.APIKey != "" {
+	if s.config.Apps.Tautulli != nil && s.config.Apps.Tautulli.Config != nil &&
+		s.config.Apps.Tautulli.URL != "" && s.config.Apps.Tautulli.APIKey != "" {
 		numTautulli = 1
 	}
 
@@ -245,7 +254,7 @@ func (s *Server) PollForReload(ctx context.Context, event EventType) {
 		s.config.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!"+
 			" Last Sync: %v, Last Change: %v, Diff: %v", event, v.LastSync, v.LastChange, v.LastSync.Sub(v.LastChange))
 		s.config.Sighup <- &update.Signal{Text: "poll triggered reload"}
-	} else if s.clientInfo == nil {
+	} else if ci := GetClientInfo(); ci == nil {
 		s.config.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", event)
 		s.config.Sighup <- &update.Signal{Text: "client info reload"}
 	}

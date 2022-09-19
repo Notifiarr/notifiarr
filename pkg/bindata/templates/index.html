@@ -193,6 +193,9 @@
                             <div class="navigation-item" id="template-processlist" style="display: none;">
 {{ template "processlist.html" . }}
                             </div>
+                            <div class="navigation-item" id="template-clientinfo" style="display: none;">
+{{ template "clientinfo.html" . }}
+                            </div>
 {{- else }}       {{- /* if .Username */}}
 {{ template "login.html" . }}
 {{- end}}         {{- /* if .Username */}}

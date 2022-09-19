@@ -64,6 +64,7 @@ function reindexList(group)
     let currentIndex = 0;
     let currentApp = '';
 
+
     // Loop each form element with this data group and with a non-empty id.
     $('[data-group='+ group+'][id]').each(function(index) {
         const rowIndex = $(this).data("index");
@@ -84,8 +85,9 @@ function reindexList(group)
         //-- CHANGE data-label ON INPUT FIELDS
         $(this).data('label', $(this).data('label').replace((rowIndex + 1), (counter + 1)));
 
-        //-- CHANGE id ATTR ON INPUT FIELDS
+        //-- CHANGE id AND name ATTR ON INPUT FIELDS
         $(this).attr('id', $(this).attr('id').replace(rowIndex, counter));
+        $(this).attr('name', $(this).attr('id')); // these are the same.
 
         //-- SET CURRENT VARIABLES
         $(this).data("index", counter)

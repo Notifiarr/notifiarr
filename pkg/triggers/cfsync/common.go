@@ -41,7 +41,7 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
-	ci := c.ClientInfo
+	ci := website.GetClientInfo()
 
 	var (
 		radarrTicker *time.Ticker

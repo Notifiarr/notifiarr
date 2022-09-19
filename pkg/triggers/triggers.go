@@ -95,8 +95,6 @@ type run interface {
 func (a *Actions) Start(ctx context.Context) {
 	defer a.timers.Run(ctx)
 
-	a.timers.ClientInfo, _ = a.timers.GetClientInfo(ctx)
-
 	actions := reflect.ValueOf(a).Elem()
 	for i := 0; i < actions.NumField(); i++ {
 		if !actions.Field(i).CanInterface() {

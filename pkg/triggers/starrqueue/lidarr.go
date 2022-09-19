@@ -48,16 +48,17 @@ func (c *cmd) setupLidarr() bool {
 	var enabled bool
 
 	for idx, app := range c.Apps.Lidarr {
-		if !app.Enabled() || !c.HaveClientInfo() {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil {
 			continue
 		}
 
 		var ticker *time.Ticker
 
 		instance := idx + 1
-		if c.ClientInfo.Actions.Apps.Lidarr.Finished(instance) {
+		if ci.Actions.Apps.Lidarr.Finished(instance) {
 			ticker = time.NewTicker(finishedDuration)
-		} else if c.ClientInfo.Actions.Apps.Lidarr.Stuck(instance) {
+		} else if ci.Actions.Apps.Lidarr.Stuck(instance) {
 			ticker = time.NewTicker(stuckDuration)
 		}
 
@@ -81,7 +82,8 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Lidarr {
-		if !app.Enabled() || !c.HaveClientInfo() || !c.ClientInfo.Actions.Apps.Lidarr.Stuck(idx+1) {
+		ci := website.GetClientInfo()
+		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Lidarr.Stuck(idx+1) {
 			continue
 		}
 

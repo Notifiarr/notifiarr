@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -36,7 +37,7 @@ import (
 
 // loadAssetsTemplates watches for changs to template files, and loads them.
 func (c *Client) loadAssetsTemplates(ctx context.Context) error {
-	if err := c.ParseGUITemplates(ctx); err != nil {
+	if err := c.ParseGUITemplates(); err != nil {
 		return err
 	}
 
@@ -99,7 +100,7 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 				panic("Stopping web server: " + err.Error())
 			}
 
-			if err := c.ParseGUITemplates(ctx); err != nil {
+			if err := c.ParseGUITemplates(); err != nil {
 				c.Errorf("fsnotify/parsing templates: %v", err)
 			}
 
@@ -108,12 +109,16 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 	}
 }
 
-func (c *Client) getFuncMap(ctx context.Context) template.FuncMap {
+func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
+		"tojson": func(input any) string {
+			output, _ := json.MarshalIndent(input, "", " ")
+			return string(output)
+		},
 		"dateFmt": func(date time.Time) string {
-			if ci, _ := c.website.GetClientInfo(ctx); ci != nil {
+			if ci := website.GetClientInfo(); ci != nil {
 				return ci.User.DateFormat.Format(date)
 			}
 
@@ -328,10 +333,10 @@ func since(t time.Time) string {
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
-func (c *Client) ParseGUITemplates(ctx context.Context) error {
+func (c *Client) ParseGUITemplates() error {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
-	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap(ctx))
+	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
 
 	var err error
 
@@ -408,7 +413,7 @@ func (c *Client) renderTemplate(
 	templateName,
 	msg string,
 ) {
-	clientInfo, _ := c.website.GetClientInfo(ctx)
+	clientInfo := website.GetClientInfo()
 	if clientInfo == nil {
 		clientInfo = &website.ClientInfo{}
 	}

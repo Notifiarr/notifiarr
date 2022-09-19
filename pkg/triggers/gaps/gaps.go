@@ -37,10 +37,9 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
-	ci := c.ClientInfo
-
 	var ticker *time.Ticker
 
+	ci := website.GetClientInfo()
 	//nolint:gosec
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
@@ -62,7 +61,8 @@ func (a *Action) Send(event website.EventType) {
 }
 
 func (c *cmd) sendGaps(ctx context.Context, event website.EventType) {
-	if c.ClientInfo == nil || len(c.ClientInfo.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
+	ci := website.GetClientInfo()
+	if ci == nil || len(ci.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
 		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
 			event, len(c.Apps.Radarr))
 		return
@@ -71,7 +71,7 @@ func (c *cmd) sendGaps(ctx context.Context, event website.EventType) {
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
 		if app.URL == "" || app.APIKey == "" || app.Timeout.Duration < 0 ||
-			!c.ClientInfo.Actions.Gaps.Instances.Has(instance) {
+			!ci.Actions.Gaps.Instances.Has(instance) {
 			continue
 		}
 

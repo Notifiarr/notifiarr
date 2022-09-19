@@ -122,10 +122,8 @@ func (a *Action) Create() {
 func (c *Cmd) create() {
 	var ticker *time.Ticker
 
-	ci := c.ClientInfo
-
 	//nolint:gosec
-	if ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
+	if ci := website.GetClientInfo(); ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
 		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration + randomTime)
 		c.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)

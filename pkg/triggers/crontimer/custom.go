@@ -78,10 +78,11 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
+	ci := website.GetClientInfo()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
-	if c.ClientInfo == nil || c.ClientInfo.Actions.Poll {
+	if ci == nil || ci.Actions.Poll {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s",
-			c.ClientInfo != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)})
+			ci != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)})
 		c.Add(&common.Action{
 			Name: TrigPollSite,
 			Fn:   c.PollForReload,
@@ -89,11 +90,11 @@ func (c *cmd) create() {
 		})
 	}
 
-	if c.ClientInfo == nil {
+	if ci == nil {
 		return
 	}
 
-	for _, custom := range c.ClientInfo.Actions.Custom {
+	for _, custom := range ci.Actions.Custom {
 		timer := &Timer{
 			CronConfig: custom,
 			ch:         make(chan website.EventType, 1),
@@ -121,5 +122,5 @@ func (c *cmd) create() {
 		})
 	}
 
-	c.Printf("==> Custom Timers Enabled: %d timers provided", len(c.ClientInfo.Actions.Custom))
+	c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Actions.Custom))
 }
