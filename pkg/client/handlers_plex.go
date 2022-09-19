@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 

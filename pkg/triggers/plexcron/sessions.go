@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )

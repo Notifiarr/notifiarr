@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -33,6 +34,7 @@ type Apps struct {
 	SabNZB     []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
 	NZBGet     []*NZBGetConfig   `json:"nzbget,omitempty" toml:"nzbget" xml:"nzbget" yaml:"nzbget,omitempty"`
 	Tautulli   *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
+	Plex       *plex.Server      `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
 	Router     *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
 	mnd.Logger `toml:"-" xml:"-" json:"-"`
 	keys       map[string]struct{} `toml:"-"` // for fast key lookup.

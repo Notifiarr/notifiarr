@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 )
 
 /* The version handler gets the version from a bunch of apps and returns them. */

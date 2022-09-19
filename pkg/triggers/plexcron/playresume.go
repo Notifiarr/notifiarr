@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 

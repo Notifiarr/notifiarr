@@ -9,8 +9,8 @@ import (
 	"strconv"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
-	"github.com/Notifiarr/notifiarr/pkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"

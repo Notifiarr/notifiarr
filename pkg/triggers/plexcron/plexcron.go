@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
