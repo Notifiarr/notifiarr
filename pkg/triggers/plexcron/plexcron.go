@@ -64,7 +64,7 @@ func (a *Action) Create() {
 
 func (c *cmd) run() {
 	ci := website.GetClientInfo()
-	if !c.Plex.Configured() || ci == nil {
+	if !c.Plex.Enabled() || ci == nil {
 		return
 	}
 

@@ -253,7 +253,7 @@ func (c *Client) configureServices(ctx context.Context) *website.ClientInfo {
 }
 
 func (c *Client) configureServicesPlex(ctx context.Context) {
-	if !c.Config.Plex.Configured() {
+	if !c.Config.Plex.Enabled() {
 		return
 	}
 

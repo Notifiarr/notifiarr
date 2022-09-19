@@ -195,7 +195,7 @@ func (c *Config) setup() *triggers.Actions {
 		c.LogConfig.AppName = mnd.Title
 	}
 
-	if c.Plex.Configured() {
+	if c.Plex.Enabled() {
 		c.Plex.Validate()
 	} else if c.Plex == nil {
 		c.Plex = &plex.Server{}

@@ -40,8 +40,8 @@ const (
 // ErrNoURLToken is returned when there is no token or URL.
 var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
 
-// Configured returns true ifthe server is configured, false otherwise.
-func (s *Server) Configured() bool {
+// Enabled returns true ifthe server is configured, false otherwise.
+func (s *Server) Enabled() bool {
 	return s != nil && s.URL != "" && s.Token != "" && s.Timeout.Duration >= 0
 }
 

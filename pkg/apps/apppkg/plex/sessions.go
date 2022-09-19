@@ -25,7 +25,7 @@ func (s *Server) GetSessions() (*Sessions, error) {
 
 // GetSessionsWithContext returns the Plex sessions in JSON format.
 func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) {
-	if !s.Configured() {
+	if !s.Enabled() {
 		return nil, ErrNoURLToken
 	}
 
@@ -55,7 +55,7 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 
 // KillSessionWithContext kills a Plex session.
 func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) ([]byte, error) {
-	if !s.Configured() {
+	if !s.Enabled() {
 		return nil, ErrNoURLToken
 	}
 
@@ -78,7 +78,7 @@ func (s *Server) KillSession(sessionID, reason string) ([]byte, error) {
 
 // MarkPlayedWithContext marks a video as played.
 func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) ([]byte, error) {
-	if !s.Configured() {
+	if !s.Enabled() {
 		return nil, ErrNoURLToken
 	}
 
@@ -104,7 +104,7 @@ func (s *Server) MarkPlayed(key string) ([]byte, error) {
 
 // EmptyTrashWithContext deletes (a section's) trash.
 func (s *Server) EmptyTrashWithContext(ctx context.Context, libraryKey string) ([]byte, error) {
-	if !s.Configured() {
+	if !s.Enabled() {
 		return nil, ErrNoURLToken
 	}
 
@@ -124,7 +124,7 @@ func (s *Server) EmptyTrash(sectionKey string) ([]byte, error) {
 
 // EmptyAllTrashWithContext deletes the trash in all sections.
 func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
-	if !s.Configured() {
+	if !s.Enabled() {
 		return ErrNoURLToken
 	}
 

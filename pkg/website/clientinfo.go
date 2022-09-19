@@ -182,7 +182,7 @@ func GetClientInfo() *ClientInfo {
 // Info is used for JSON input for our outgoing client info.
 func (s *Server) Info(ctx context.Context) map[string]interface{} {
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
-	if s.config.Apps.Plex.Configured() {
+	if s.config.Apps.Plex.Enabled() {
 		numPlex = 1
 	}
 

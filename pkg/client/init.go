@@ -125,7 +125,7 @@ func (c *Client) printLogFileInfo() { //nolint:cyclop
 // printPlex is called on startup to print info about configured Plex instance(s).
 func (c *Client) printPlex() {
 	plex := c.Config.Plex
-	if !plex.Configured() {
+	if !plex.Enabled() {
 		return
 	}
 
