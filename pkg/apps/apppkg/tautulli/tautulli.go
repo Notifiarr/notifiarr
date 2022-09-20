@@ -45,7 +45,7 @@ func (c *Config) GetURLInto(ctx context.Context, params url.Values, into interfa
 
 // GetUsers returns the Tautulli users.
 func (c *Config) GetUsers(ctx context.Context) (*Users, error) {
-	if c == nil || c.URL == "" {
+	if c == nil || c.Client == nil {
 		return &Users{}, nil
 	}
 

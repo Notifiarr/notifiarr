@@ -24,8 +24,9 @@ type Config struct {
 	Snapshot        *snapshot.Config
 	Apps            *apps.Apps
 	mnd.Logger
-	stop *Action   // Triggered by calling Stop()
-	list []*Action // List of action triggers
+	stop     *Action   // Triggered by calling Stop()
+	list     []*Action // List of action triggers
+	Services           // for running service checks.
 }
 
 // TriggerName makes sure triggers have a known name.
@@ -38,6 +39,11 @@ type Action struct {
 	C    chan website.EventType                   // if provided, T is optional.
 	T    *time.Ticker                             // if provided, C is optional.
 	Hide bool                                     // prevent logging.
+}
+
+// Services is the input interface to do things with services via triggers.
+type Services interface {
+	RunChecks(website.EventType)
 }
 
 // Exec runs a trigger. This is abastraction method used in a bunch of places.

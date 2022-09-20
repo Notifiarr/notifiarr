@@ -433,7 +433,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 }
 
 func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
-	code, data := c.runTrigger(website.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
+	code, data := c.triggers.RunTrigger(website.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
 	http.Error(response, data, code)
 }
 

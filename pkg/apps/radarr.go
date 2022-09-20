@@ -25,6 +25,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile", radarrAddQualityProfile, "POST")
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrDeleteQualityProfile, "DELETE")
+	a.HandleAPIpath(starr.Radarr, "/qualityProfiles/all", radarrDeleteAllQualityProfiles, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/rootFolder", radarrRootFolders, "GET")
 	a.HandleAPIpath(starr.Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(starr.Radarr, "/tag", radarrGetTags, "GET")
@@ -40,6 +41,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/qualitydefinitions", radarrGetQualityDefinitions, "GET")
 	a.HandleAPIpath(starr.Radarr, "/qualitydefinition", radarrUpdateQualityDefinition, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrDeleteCustomFormat, "DELETE")
+	a.HandleAPIpath(starr.Radarr, "/customformats/all", radarrDeleteAllCustomFormats, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrGetImportLists, "GET")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrAddImportList, "POST")
 	a.HandleAPIpath(starr.Radarr, "/importlist/{ilid:[0-9]+}", radarrUpdateImportList, "PUT")
@@ -259,6 +261,35 @@ func radarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
+func radarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
+	// Get all the profiles from radarr.
+	profiles, err := getRadarr(req).GetQualityProfilesContext(req.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+	}
+
+	var (
+		deleted int
+		errs    []string
+	)
+
+	// Delete each profile from radarr.
+	for _, profile := range profiles {
+		if err := getRadarr(req).DeleteQualityProfileContext(req.Context(), profile.ID); err != nil {
+			errs = append(errs, err.Error())
+			continue
+		}
+
+		deleted++
+	}
+
+	return http.StatusOK, map[string]any{
+		"found":   len(profiles),
+		"deleted": deleted,
+		"errors":  errs,
+	}
+}
+
 func radarrRootFolders(req *http.Request) (int, interface{}) {
 	// Get folder list from Radarr.
 	folders, err := getRadarr(req).GetRootFoldersContext(req.Context())
@@ -465,6 +496,34 @@ func radarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "OK"
+}
+
+func radarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
+	formats, err := getRadarr(req).GetCustomFormatsContext(req.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
+	}
+
+	var (
+		deleted int
+		errs    []string
+	)
+
+	for _, format := range formats {
+		err := getRadarr(req).DeleteCustomFormatContext(req.Context(), format.ID)
+		if err != nil {
+			errs = append(errs, err.Error())
+			continue
+		}
+
+		deleted++
+	}
+
+	return http.StatusOK, map[string]any{
+		"found":   len(formats),
+		"deleted": deleted,
+		"errors":  errs,
+	}
 }
 
 func radarrGetImportLists(req *http.Request) (int, interface{}) {

@@ -30,6 +30,7 @@ type Config struct {
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
 	Commands   []*commands.Command
+	common.Services
 	mnd.Logger
 }
 
