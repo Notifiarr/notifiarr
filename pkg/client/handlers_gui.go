@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -148,11 +147,13 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Request) {
 	var fileInfos *logs.LogFileInfos
 
+	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
+
 	switch mux.Vars(req)["source"] {
 	case fileSourceLogs:
 		fileInfos = c.Logger.GetAllLogFilePaths()
 	case fileSourceConfig:
-		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
+		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile, backupPath)
 	default:
 		http.Error(response, "invalid source", http.StatusBadRequest)
 		return
@@ -583,18 +584,15 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 func (c *Client) saveNewConfig(ctx context.Context, config *configfile.Config) error {
 	date := time.Now().Format("20060102T150405") // for file names.
 
+	// make config file backup.
+	if err := configfile.BackupFile(c.Flags.ConfigFile); err != nil {
+		return fmt.Errorf("backing up config file: %w", err)
+	}
+
 	// write new config file to temporary path.
 	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig."+date)
 	if _, err := config.Write(ctx, destFile); err != nil { // write our config file template.
 		return fmt.Errorf("writing new config file: %w", err)
-	}
-
-	// make config file backup.
-	bckupFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backup.notifiarr."+date+".conf")
-	if err := configfile.CopyFile(c.Flags.ConfigFile, bckupFile); err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			return fmt.Errorf("backing up config file: %w", err)
-		}
 	}
 
 	// move new config file to existing config file.
