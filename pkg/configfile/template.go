@@ -3,6 +3,7 @@ package configfile
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"text/template"
 	"time"
 
@@ -23,6 +24,9 @@ func Funcs() template.FuncMap {
 	return map[string]interface{}{
 		"os":    func() string { return runtime.GOOS },
 		"force": func() bool { return ForceAllTmpl },
+		"toml": func(v string) string {
+			return strings.ReplaceAll(v, "'''", `''`)
+		},
 		"version": func() string {
 			return fmt.Sprintf("v%-7s @ %s", version.Version, time.Now().UTC().Format("060201T1504"))
 		},
@@ -533,7 +537,7 @@ bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
 
 [[command]]
   name    = '{{$item.Name}}'
-  command = '''{{$item.Command}}'''
+  command = '''{{toml $item.Command}}'''
   shell   = {{$item.Shell}}
   log     = {{$item.Log}}
   notify  = {{$item.Notify}}
