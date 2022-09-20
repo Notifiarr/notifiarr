@@ -13,10 +13,12 @@ import (
 	"golift.io/starr"
 )
 
+// Handler is passed into the webserver so triggers can be executed from the API.
 func (a *Actions) Handler(r *http.Request) (int, interface{}) {
 	return a.runTrigger(website.EventAPI, mux.Vars(r)["trigger"], mux.Vars(r)["content"])
 }
 
+// RunTrigger is fired by GUI web requests and possibly other places.
 func (a *Actions) RunTrigger(source website.EventType, trigger, content string) (int, string) {
 	return a.runTrigger(source, trigger, content)
 }
