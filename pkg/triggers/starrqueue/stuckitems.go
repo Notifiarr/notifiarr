@@ -31,20 +31,13 @@ func (c *cmd) sendStuckQueues(ctx context.Context, event website.EventType) {
 		return
 	}
 
-	type stuckPaylod struct {
-		Lidarr  itemList `json:"lidarr"`
-		Radarr  itemList `json:"radarr"`
-		Readarr itemList `json:"readarr"`
-		Sonarr  itemList `json:"sonarr"`
-	}
-
 	c.SendData(&website.Request{
 		Route:      website.StuckRoute,
 		Event:      event,
 		LogPayload: true,
 		LogMsg: fmt.Sprintf("Stuck Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
-		Payload: stuckPaylod{
+		Payload: &QueuesPaylod{
 			Lidarr:  lidarr,
 			Radarr:  radarr,
 			Readarr: readarr,

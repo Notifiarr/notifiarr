@@ -24,21 +24,14 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, event website.EventType
 		return
 	}
 
-	type stuckPaylod struct {
-		Lidarr  itemList `json:"lidarr"`
-		Radarr  itemList `json:"radarr"`
-		Readarr itemList `json:"readarr"`
-		Sonarr  itemList `json:"sonarr"`
-	}
-
 	c.SendData(&website.Request{
-		Route:      website.StuckRoute,
+		Route:      website.DownloadRoute,
 		Event:      event,
 		LogPayload: true,
 		ErrorsOnly: true,
 		LogMsg: fmt.Sprintf("Downloading Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
-		Payload: stuckPaylod{
+		Payload: &QueuesPaylod{
 			Lidarr:  lidarr,
 			Radarr:  radarr,
 			Readarr: readarr,

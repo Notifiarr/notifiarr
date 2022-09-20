@@ -40,6 +40,14 @@ const (
 	TrigDownloadingItems common.TriggerName = "Sending cached downloading items to website."
 )
 
+// QueuesPaylod is what we send to the website.
+type QueuesPaylod struct {
+	Lidarr  itemList `json:"lidarr"`
+	Radarr  itemList `json:"radarr"`
+	Readarr itemList `json:"readarr"`
+	Sonarr  itemList `json:"sonarr"`
+}
+
 // New configures the library.
 func New(config *common.Config) *Action {
 	return &Action{cmd: &cmd{Config: config}}
