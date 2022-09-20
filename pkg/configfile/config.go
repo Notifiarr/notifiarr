@@ -198,6 +198,7 @@ func (c *Config) setup() *triggers.Actions {
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
 		Commands:   c.Commands,
+		Services:   c.Services,
 	})
 }
 

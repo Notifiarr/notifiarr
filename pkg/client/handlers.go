@@ -6,18 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/exp"
-	"github.com/Notifiarr/notifiarr/pkg/logs/share"
-	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"github.com/gorilla/mux"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	"golift.io/starr"
 )
 
@@ -90,8 +84,9 @@ func (c *Client) httpGuiHandlers(base string) {
 func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "info", c.infoHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.handleTrigger, "GET")
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.handleTrigger, "GET")
+	c.Config.HandleAPIpath("", "trigger/reload", c.handleConfigReload, "GET") // reload has to happen in client module.
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.Handler, "GET")
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.Handler, "GET")
 
 	// Aggregate handlers. Non-app specific.
 	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
@@ -214,112 +209,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
-func (c *Client) handleTrigger(r *http.Request) (int, interface{}) {
-	return c.runTrigger(website.EventAPI, mux.Vars(r)["trigger"], mux.Vars(r)["content"])
-}
-
-func (c *Client) runTrigger(source website.EventType, trigger, content string) (int, string) { //nolint:cyclop,funlen
-	if content != "" {
-		c.Logger.Debugf("Incoming API Trigger: %s (%s)", trigger, content)
-	} else {
-		c.Logger.Debugf("Incoming API Trigger: %s", trigger)
-	}
-
-	title := cases.Title(language.AmericanEnglish)
-
-	switch trigger {
-	case "clientlogs":
-		if content == "true" || content == "on" || content == "enable" {
-			share.Setup(c.website)
-			return http.StatusBadRequest, "Client log notifications enabled."
-		}
-
-		share.StopLogs()
-
-		return http.StatusBadRequest, "Client log notifications disabled."
-	case "command":
-		cmd := c.triggers.Commands.GetByHash(content)
-		if cmd == nil {
-			return http.StatusBadRequest, "No command hash provided."
-		}
-
-		cmd.Run(source)
-
-		return http.StatusOK, "Command triggered: " + cmd.Name
-	case "cfsync":
-		if content == "" {
-			c.triggers.CFSync.SyncRadarrCF(source)
-			return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated."
-		}
-
-		instance, _ := strconv.Atoi(content)
-		if err := c.triggers.CFSync.SyncRadarrInstanceCF(source, instance); err != nil {
-			return http.StatusBadRequest, "TRaSH Custom Formats Radarr Sync failed for instance " + content + ": " + err.Error()
-		}
-
-		return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated for instance " + content
-	case "rpsync":
-		if content == "" {
-			c.triggers.CFSync.SyncSonarrRP(source)
-			return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated."
-		}
-
-		instance, _ := strconv.Atoi(content)
-		if err := c.triggers.CFSync.SyncSonarrInstanceRP(source, instance); err != nil {
-			return http.StatusBadRequest, "TRaSH Release Profile Sonarr Sync failed for instance " + content + ": " + err.Error()
-		}
-
-		return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated for instance " + content
-	case "services":
-		c.Config.Services.RunChecks(source)
-		return http.StatusOK, "All service checks rescheduled for immediate exeution."
-	case "sessions":
-		if !c.Config.Plex.Enabled() {
-			return http.StatusNotImplemented, "Plex Sessions are not enabled."
-		}
-
-		c.triggers.PlexCron.Send(source)
-
-		return http.StatusOK, "Plex sessions triggered."
-	case "stuckitems":
-		c.triggers.StarrQueue.StuckItems(source)
-		return http.StatusOK, "Stuck Queue Items triggered."
-	case "dashboard":
-		c.triggers.Dashboard.Send(source)
-		return http.StatusOK, "Dashboard states triggered."
-	case "snapshot":
-		c.triggers.SnapCron.Send(source)
-		return http.StatusOK, "System Snapshot triggered."
-	case "gaps":
-		c.triggers.Gaps.Send(source)
-		return http.StatusOK, "Radarr Collections Gaps initiated."
-	case "corrupt":
-		err := c.triggers.Backups.Corruption(source, starr.App(title.String(content)))
-		if err != nil {
-			return http.StatusBadRequest, "Corruption trigger failed: " + err.Error()
-		}
-
-		return http.StatusOK, title.String(content) + " corruption checks initiated."
-	case "backup":
-		err := c.triggers.Backups.Backup(source, starr.App(title.String(content)))
-		if err != nil {
-			return http.StatusBadRequest, "Backup trigger failed: " + err.Error()
-		}
-
-		return http.StatusOK, title.String(content) + " backups check initiated."
-	case "reload":
-		defer c.triggerConfigReload(website.EventAPI, "HTTP Triggered Reload")
-		return http.StatusOK, "Application reload initiated."
-	case "notification":
-		if content != "" {
-			ui.Notify("Notification: %s", content) //nolint:errcheck
-			c.Logger.Printf("NOTIFICATION: %s", content)
-
-			return http.StatusOK, "Local Nntification sent."
-		}
-
-		return http.StatusBadRequest, "Missing notification content."
-	default:
-		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
-	}
+func (c *Client) handleConfigReload(r *http.Request) (int, interface{}) {
+	defer c.triggerConfigReload(website.EventAPI, "HTTP Triggered Reload")
+	return http.StatusOK, "Application reload initiated."
 }
