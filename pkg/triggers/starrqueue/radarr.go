@@ -2,14 +2,12 @@ package starrqueue
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"golift.io/starr/radarr"
 )
 
 const TrigRadarrQueue common.TriggerName = "Storing Radarr instance %d queue."
@@ -78,41 +76,4 @@ func (c *cmd) setupRadarr() bool {
 	}
 
 	return enabled
-}
-
-func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cyclop
-	stuck := make(itemList)
-
-	for idx, app := range c.Apps.Radarr {
-		ci := website.GetClientInfo()
-		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Radarr.Stuck(idx+1) {
-			continue
-		}
-
-		item := data.GetWithID("radarr", idx)
-		if item == nil || item.Data == nil {
-			continue
-		}
-
-		queue, _ := item.Data.(*radarr.Queue)
-		instance := idx + 1
-		stuckapp := stuck[instance]
-
-		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s != completed && s != warning &&
-				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
-				continue
-			}
-
-			stuckapp.Queue = append(stuckapp.Queue, item)
-		}
-
-		stuckapp.Name = c.Apps.Radarr[idx].Name // this should be safe.
-		stuck[instance] = stuckapp
-
-		c.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			instance, len(queue.Records), len(stuck[instance].Queue))
-	}
-
-	return stuck
 }
