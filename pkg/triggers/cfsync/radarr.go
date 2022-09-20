@@ -12,7 +12,10 @@ import (
 	"golift.io/starr/radarr"
 )
 
-const TrigCFSyncRadarr common.TriggerName = "Starting Radarr Custom Format TRaSH sync."
+const (
+	TrigCFSyncRadarr    common.TriggerName = "Starting Radarr Custom Format TRaSH sync."
+	TrigCFSyncRadarrInt common.TriggerName = "Starting Radarr %d Custom Format TRaSH sync."
+)
 
 // RadarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Radarr.
@@ -31,6 +34,15 @@ func (a *Action) SyncRadarrCF(event website.EventType) {
 	a.cmd.Exec(event, TrigCFSyncRadarr)
 }
 
+// SyncRadarrInstanceCF initializes a custom format sync with a specific radarr instance.
+func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) error {
+	if name := TrigCFSyncRadarrInt.WithInstance(instance); !a.cmd.Exec(event, name) {
+		return fmt.Errorf("%w: Radarr instance: %d", common.ErrInvalidApp, instance)
+	}
+
+	return nil
+}
+
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *cmd) syncRadarr(ctx context.Context, event website.EventType) {
 	ci := website.GetClientInfo()
@@ -42,26 +54,33 @@ func (c *cmd) syncRadarr(ctx context.Context, event website.EventType) {
 		return
 	}
 
-	for i, app := range c.Apps.Radarr {
-		instance := i + 1
+	for idx, app := range c.Apps.Radarr {
+		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Sync.RadarrInstances.Has(instance) {
 			c.Debugf("[%s requested] CF Sync Skipping Radarr instance %d. Not in sync list: %v",
 				event, instance, ci.Actions.Sync.RadarrInstances)
 			continue
 		}
 
-		start := time.Now()
-		payload := c.getRadarrProfiles(ctx, event, instance)
-		c.SendData(&website.Request{
-			Route:      website.CFSyncRoute,
-			Event:      event,
-			Params:     []string{"app=radarr"},
-			Payload:    payload,
-			LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
-			LogPayload: true,
-		})
-		c.Printf("[%s requested] Synced Custom Formats for Radarr instance %d (%s/%s)", event, instance, app.Name, app.URL)
+		(&radarrApp{app: app, cmd: c, idx: idx}).syncRadarr(ctx, event)
 	}
+}
+
+// syncRadarr sends the profiles for a single instance.
+func (c *radarrApp) syncRadarr(ctx context.Context, event website.EventType) {
+	start := time.Now()
+	payload := c.cmd.getRadarrProfiles(ctx, event, c.idx+1)
+
+	c.cmd.SendData(&website.Request{
+		Route:      website.CFSyncRoute,
+		Event:      event,
+		Params:     []string{"app=radarr"},
+		Payload:    payload,
+		LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
+		LogPayload: true,
+	})
+	c.cmd.Printf("[%s requested] Synced Custom Formats for Radarr instance %d (%s/%s)",
+		event, c.idx+1, c.app.Name, c.app.URL)
 }
 
 func (c *cmd) getRadarrProfiles(ctx context.Context, event website.EventType, instance int) *RadarrTrashPayload {

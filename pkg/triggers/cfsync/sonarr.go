@@ -13,7 +13,10 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-const TrigRPSyncSonarr common.TriggerName = "Starting Sonarr Release Profile TRaSH sync."
+const (
+	TrigRPSyncSonarr    common.TriggerName = "Starting Sonarr Release Profile TRaSH sync."
+	TrigRPSyncSonarrInt common.TriggerName = "Starting Sonarr %d Release Profile TRaSH sync."
+)
 
 // SonarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Sonarr.
@@ -32,6 +35,15 @@ func (a *Action) SyncSonarrRP(event website.EventType) {
 	a.cmd.Exec(event, TrigRPSyncSonarr)
 }
 
+// SyncSonarrInstanceRP initializes a release profile sync with a specific sonarr instance.
+func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) error {
+	if name := TrigRPSyncSonarrInt.WithInstance(instance); !a.cmd.Exec(event, name) {
+		return fmt.Errorf("%w: Sonarr instance: %d", common.ErrInvalidApp, instance)
+	}
+
+	return nil
+}
+
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *cmd) syncSonarr(ctx context.Context, event website.EventType) {
 	ci := website.GetClientInfo()
@@ -43,26 +55,32 @@ func (c *cmd) syncSonarr(ctx context.Context, event website.EventType) {
 		return
 	}
 
-	for i, app := range c.Apps.Sonarr {
-		instance := i + 1
+	for idx, app := range c.Apps.Sonarr {
+		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Sync.SonarrInstances.Has(instance) {
 			c.Debugf("[%s requested] CF Sync Skipping Sonarr instance %d. Not in sync list: %v",
 				event, instance, ci.Actions.Sync.SonarrInstances)
 			continue
 		}
 
-		start := time.Now()
-		payload := c.getSonarrProfiles(ctx, event, instance)
-		c.SendData(&website.Request{
-			Route:      website.CFSyncRoute,
-			Event:      event,
-			Params:     []string{"app=sonarr"},
-			Payload:    payload,
-			LogMsg:     fmt.Sprintf("Sonarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
-			LogPayload: true,
-		})
-		c.Printf("[%s requested] Synced Release Profiles for Sonarr instance %d (%s/%s)", event, instance, app.Name, app.URL)
+		(&sonarrApp{app: app, cmd: c, idx: idx}).syncSonarr(ctx, event)
 	}
+}
+
+// syncSonarr sends the profiles for a single instance.
+func (c *sonarrApp) syncSonarr(ctx context.Context, event website.EventType) {
+	start := time.Now()
+	payload := c.cmd.getSonarrProfiles(ctx, event, c.idx+1)
+	c.cmd.SendData(&website.Request{
+		Route:      website.CFSyncRoute,
+		Event:      event,
+		Params:     []string{"app=sonarr"},
+		Payload:    payload,
+		LogMsg:     fmt.Sprintf("Sonarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
+		LogPayload: true,
+	})
+	c.cmd.Printf("[%s requested] Synced Release Profiles for Sonarr instance %d (%s/%s)",
+		event, c.idx+1, c.app.Name, c.app.URL)
 }
 
 func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, instance int) *SonarrTrashPayload {

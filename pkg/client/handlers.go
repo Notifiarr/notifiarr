@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -246,11 +247,29 @@ func (c *Client) runTrigger(source website.EventType, trigger, content string) (
 
 		return http.StatusOK, "Command triggered: " + cmd.Name
 	case "cfsync":
-		c.triggers.CFSync.SyncRadarrCF(source)
-		return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated."
+		if content == "" {
+			c.triggers.CFSync.SyncRadarrCF(source)
+			return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated."
+		}
+
+		instance, _ := strconv.Atoi(content)
+		if err := c.triggers.CFSync.SyncRadarrInstanceCF(source, instance); err != nil {
+			return http.StatusBadRequest, "TRaSH Custom Formats Radarr Sync failed for instance " + content + ": " + err.Error()
+		}
+
+		return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated for instance " + content
 	case "rpsync":
-		c.triggers.CFSync.SyncSonarrRP(source)
-		return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated."
+		if content == "" {
+			c.triggers.CFSync.SyncSonarrRP(source)
+			return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated."
+		}
+
+		instance, _ := strconv.Atoi(content)
+		if err := c.triggers.CFSync.SyncSonarrInstanceRP(source, instance); err != nil {
+			return http.StatusBadRequest, "TRaSH Release Profile Sonarr Sync failed for instance " + content + ": " + err.Error()
+		}
+
+		return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated for instance " + content
 	case "services":
 		c.Config.Services.RunChecks(source)
 		return http.StatusOK, "All service checks rescheduled for immediate exeution."
