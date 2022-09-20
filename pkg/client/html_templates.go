@@ -436,6 +436,7 @@ func (c *Client) renderTemplate(
 	binary, _ := os.Executable()
 	userName, dynamic := c.getUserName(req)
 	hostInfo, _ := c.website.GetHostInfo(ctx)
+	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 
 	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
@@ -445,7 +446,7 @@ func (c *Client) renderTemplate(
 		Webauth:     c.webauth,
 		Msg:         msg,
 		LogFiles:    c.Logger.GetAllLogFilePaths(),
-		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile),
+		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(ctx),
 		Cache: map[string]*cache.Item{

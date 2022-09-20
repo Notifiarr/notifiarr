@@ -1,11 +1,15 @@
 package configfile
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
@@ -90,8 +94,62 @@ func CheckPort(addr string) (string, error) {
 	return addr, nil
 }
 
-// CopyFile can be used to make a config file backup.
-func CopyFile(src, dst string) error {
+// BackupFile makes a config file backup file.
+func BackupFile(configFile string) error {
+	date := time.Now().Format("20060102T150405") // for file names.
+	backupDir := filepath.Join(filepath.Dir(configFile), "backups")
+
+	if err := os.MkdirAll(backupDir, mnd.Mode0755); err != nil {
+		return fmt.Errorf("making config backup directory: %w", err)
+	}
+
+	deleteOldBackups(backupDir)
+
+	// make config file backup.
+	bckupFile := filepath.Join(backupDir, "backup.notifiarr."+date+".conf")
+	if err := copyFile(configFile, bckupFile); err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("backing up config file: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func deleteOldBackups(backupDir string) {
+	oldFiles, _ := filepath.Glob(filepath.Join(backupDir, "backup.notifiarr.*.conf"))
+	fileList := []fs.FileInfo{}
+
+	for _, file := range oldFiles {
+		fileStat, err := os.Stat(file)
+		if err != nil || fileStat.IsDir() {
+			continue
+		}
+
+		if len(fileList) == 0 {
+			fileList = []fs.FileInfo{fileStat} // first item
+			continue
+		} else if fileList[len(fileList)-1].ModTime().Before(fileStat.ModTime()) {
+			fileList = append(fileList, fileStat) // last item
+			continue
+		}
+
+		for idx, loopFile := range fileList { // somewhere in the middle.
+			if loopFile.ModTime().After(fileStat.ModTime()) {
+				fileList = append(fileList[:idx], append([]fs.FileInfo{fileStat}, fileList[idx:]...)...)
+				break
+			}
+		}
+	}
+
+	// Keep newest 10 files.
+	for i := 0; i < len(fileList)-9; i++ {
+		os.Remove(filepath.Join(backupDir, fileList[i].Name()))
+	}
+}
+
+// copyFile can be used to make a config file backup.
+func copyFile(src, dst string) error {
 	if _, err := os.Stat(dst); err == nil {
 		return fmt.Errorf("%w: cannot overwrite file: %s", os.ErrExist, dst)
 	}
