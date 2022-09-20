@@ -25,7 +25,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile", radarrAddQualityProfile, "POST")
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrDeleteQualityProfile, "DELETE")
-	a.HandleAPIpath(starr.Radarr, "/qualityProfile/all", radarrDeleteAllQualityProfile, "DELETE")
+	a.HandleAPIpath(starr.Radarr, "/qualityProfiles/all", radarrDeleteAllQualityProfiles, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/rootFolder", radarrRootFolders, "GET")
 	a.HandleAPIpath(starr.Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(starr.Radarr, "/tag", radarrGetTags, "GET")
@@ -41,7 +41,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/qualitydefinitions", radarrGetQualityDefinitions, "GET")
 	a.HandleAPIpath(starr.Radarr, "/qualitydefinition", radarrUpdateQualityDefinition, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrDeleteCustomFormat, "DELETE")
-	a.HandleAPIpath(starr.Radarr, "/customformats/all", radarrDeleteAllCustomFormat, "DELETE")
+	a.HandleAPIpath(starr.Radarr, "/customformats/all", radarrDeleteAllCustomFormats, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrGetImportLists, "GET")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrAddImportList, "POST")
 	a.HandleAPIpath(starr.Radarr, "/importlist/{ilid:[0-9]+}", radarrUpdateImportList, "PUT")
@@ -261,7 +261,7 @@ func radarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
-func radarrDeleteAllQualityProfile(req *http.Request) (int, interface{}) {
+func radarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get all the profiles from radarr.
 	profiles, err := getRadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -498,7 +498,7 @@ func radarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
-func radarrDeleteAllCustomFormat(req *http.Request) (int, interface{}) {
+func radarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 	formats, err := getRadarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)

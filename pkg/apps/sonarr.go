@@ -28,17 +28,17 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/qualityProfile", sonarrAddQualityProfile, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/qualityProfile/{profileID:[0-9]+}", sonarrUpdateQualityProfile, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/qualityProfile/{profileID:[0-9]+}", sonarrDeleteQualityProfile, "DELETE")
-	a.HandleAPIpath(starr.Sonarr, "/qualityProfile/all", sonarrDeleteAllQualityProfile, "DELETE")
+	a.HandleAPIpath(starr.Sonarr, "/qualityProfiles/all", sonarrDeleteAllQualityProfiles, "DELETE")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfiles", sonarrGetReleaseProfiles, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile", sonarrAddReleaseProfile, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile/{profileID:[0-9]+}", sonarrUpdateReleaseProfile, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/releaseProfile/{profileID:[0-9]+}", sonarrDeleteReleaseProfile, "DELETE")
-	a.HandleAPIpath(starr.Sonarr, "/releaseProfile/all", sonarrDeleteAllReleaseProfile, "DELETE")
+	a.HandleAPIpath(starr.Sonarr, "/releaseProfiles/all", sonarrDeleteAllReleaseProfiles, "DELETE")
 	a.HandleAPIpath(starr.Sonarr, "/customformats", sonarrGetCustomFormats, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/customformats", sonarrAddCustomFormat, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/customformats/{cfid:[0-9]+}", sonarrUpdateCustomFormat, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/customformats/{cfid:[0-9]+}", sonarrDeleteCustomFormat, "DELETE")
-	a.HandleAPIpath(starr.Sonarr, "/customformats/all", sonarrDeleteAllCustomFormat, "DELETE")
+	a.HandleAPIpath(starr.Sonarr, "/customformats/all", sonarrDeleteAllCustomFormats, "DELETE")
 	a.HandleAPIpath(starr.Sonarr, "/qualitydefinitions", sonarrGetQualityDefinitions, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/qualitydefinition", sonarrUpdateQualityDefinition, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/rootFolder", sonarrRootFolders, "GET")
@@ -321,7 +321,7 @@ func sonarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
-func sonarrDeleteAllQualityProfile(req *http.Request) (int, interface{}) {
+func sonarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get all the profiles from sonarr.
 	profiles, err := getSonarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -416,7 +416,7 @@ func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
-func sonarrDeleteAllReleaseProfile(req *http.Request) (int, interface{}) {
+func sonarrDeleteAllReleaseProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getSonarr(req).GetReleaseProfilesContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
@@ -624,7 +624,7 @@ func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
-func sonarrDeleteAllCustomFormat(req *http.Request) (int, interface{}) {
+func sonarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 	formats, err := getSonarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
