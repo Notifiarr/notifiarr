@@ -2,14 +2,12 @@ package starrqueue
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"golift.io/starr/readarr"
 )
 
 const TrigReadarrQueue common.TriggerName = "Storing Readarr instance %d queue."
@@ -78,41 +76,4 @@ func (c *cmd) setupReadarr() bool {
 	}
 
 	return enable
-}
-
-func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyclop
-	stuck := make(itemList)
-
-	for idx, app := range c.Apps.Readarr {
-		ci := website.GetClientInfo()
-		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Readarr.Stuck(idx+1) {
-			continue
-		}
-
-		item := data.GetWithID("readarr", idx)
-		if item == nil || item.Data == nil {
-			continue
-		}
-
-		queue, _ := item.Data.(*readarr.Queue)
-		instance := idx + 1
-		stuckapp := stuck[instance]
-
-		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s != completed && s != warning &&
-				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
-				continue
-			}
-
-			stuckapp.Queue = append(stuckapp.Queue, item)
-		}
-
-		stuckapp.Name = c.Apps.Readarr[idx].Name // this should be safe.
-		stuck[instance] = stuckapp
-
-		c.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			instance, len(queue.Records), len(stuck[instance].Queue))
-	}
-
-	return stuck
 }
