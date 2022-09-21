@@ -36,7 +36,7 @@ func (a *Action) Create() {
 
 // Send a snapshot to the website.
 func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(event, TrigSnapshot)
+	a.cmd.Exec(&common.ActionInput{Type: event}, TrigSnapshot)
 }
 
 func (c *cmd) create() {
@@ -52,7 +52,7 @@ func (c *cmd) create() {
 	c.Add(&common.Action{
 		Name: TrigSnapshot,
 		Fn:   c.sendSnapshot,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
@@ -92,11 +92,11 @@ func (c *cmd) printLog() {
 		c.Snapshot.Interval, c.Snapshot.Timeout, ex)
 }
 
-func (c *cmd) sendSnapshot(ctx context.Context, event website.EventType) {
+func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
 	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx)
 	for _, err := range errs {
 		if err != nil {
-			c.ErrorfNoShare("[%s requested] Snapshot: %v", event, err)
+			c.ErrorfNoShare("[%s requested] Snapshot: %v", input.Type, err)
 		}
 	}
 
@@ -110,7 +110,7 @@ func (c *cmd) sendSnapshot(ctx context.Context, event website.EventType) {
 	data.Save("snapshot", snapshot)
 	c.SendData(&website.Request{
 		Route:      website.SnapRoute,
-		Event:      event,
+		Event:      input.Type,
 		LogPayload: true,
 		LogMsg:     fmt.Sprintf("System Snapshot (interval: %v)", c.Snapshot.Interval),
 		Payload:    &website.Payload{Snap: snapshot},

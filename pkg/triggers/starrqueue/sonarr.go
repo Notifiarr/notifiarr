@@ -15,8 +15,8 @@ const TrigSonarrQueue common.TriggerName = "Storing Sonarr instance %d queue."
 // StoreSonarr fetches and stores the Sonarr queue immediately for the specified instance.
 // Does not send data to the website.
 func (a *Action) StoreSonarr(event website.EventType, instance int) {
-	if name := TrigSonarrQueue.WithInstance(instance); !a.cmd.Exec(event, name) {
-		a.cmd.Errorf("Failed! %s Disbled?", name)
+	if name := TrigSonarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
+		a.cmd.Errorf("[%s requested] Failed! %s Disbled?", event, name)
 	}
 }
 
@@ -28,10 +28,10 @@ type sonarrApp struct {
 }
 
 // storeQueue runs at an interval and saves the queue for an app internally.
-func (app *sonarrApp) storeQueue(ctx context.Context, event website.EventType) {
+func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		app.cmd.Errorf("Getting Sonarr Queue (instance %d): %v", app.idx+1, err)
+		app.cmd.Errorf("[%s requested] Getting Sonarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -40,7 +40,8 @@ func (app *sonarrApp) storeQueue(ctx context.Context, event website.EventType) {
 		record.Language = nil
 	}
 
-	app.cmd.Debugf("Stored Sonarr Queue (%d items), instance %d %s", len(queue.Records), app.idx+1, app.app.Name)
+	app.cmd.Debugf("[%s requested] Stored Sonarr Queue (%d items), instance %d %s",
+		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("sonarr", app.idx, queue)
 }
 
@@ -69,7 +70,7 @@ func (c *cmd) setupSonarr() bool {
 				Hide: true,
 				Name: TrigSonarrQueue.WithInstance(instance),
 				Fn:   (&sonarrApp{app: app, cmd: c, idx: idx}).storeQueue,
-				C:    make(chan website.EventType, 1),
+				C:    make(chan *common.ActionInput, 1),
 				T:    ticker,
 			})
 		}

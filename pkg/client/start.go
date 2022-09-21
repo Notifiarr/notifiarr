@@ -243,10 +243,9 @@ func (c *Client) configureServices(ctx context.Context) *website.ClientInfo {
 	}
 
 	c.configureServicesPlex(ctx)
-	c.website.ReloadCh(c.sighup)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(ctx, clientInfo)
-	c.triggers.Start(ctx)
+	c.triggers.Start(ctx, c.sighup)
 	c.Config.Services.Start(ctx)
 
 	return clientInfo

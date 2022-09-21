@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/hugelgupf/go-shlex"
 )
@@ -35,12 +36,12 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 }
 
 // run executes this command and logs the output. This is executed from the trigger channel.
-func (c *Command) run(ctx context.Context, event website.EventType) {
-	_, _ = c.RunNow(ctx, event)
+func (c *Command) run(ctx context.Context, input *common.ActionInput) {
+	_, _ = c.RunNow(ctx, input)
 }
 
 // RunNow runs the command immediately, waits for and returns the output.
-func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, error) {
+func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string, error) {
 	output, err := c.exec(ctx)
 	oLen := 0
 	oStr := output.String()
@@ -56,7 +57,7 @@ func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, 
 	if c.Notify {
 		c.website.SendData(&website.Request{
 			Route: website.CommandRoute,
-			Event: event,
+			Event: input.Type,
 			Payload: map[string]string{
 				"name":   c.Name,
 				"hash":   c.Hash,
@@ -79,12 +80,12 @@ func (c *Command) RunNow(ctx context.Context, event website.EventType) (string, 
 		c.output = eStr + ": " + oStr
 
 		if c.Log && oStr != "" {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v, Output: %s", event, c.Name, err, oStr)
+			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v, Output: %s", input.Type, c.Name, err, oStr)
 		} else {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v", event, c.Name, err)
+			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v", input.Type, c.Name, err)
 		}
 	} else if c.Log && oLen > 0 {
-		c.log.Printf("[%s requested] Custom Command '%s' Output: %s", event, c.Name, oStr)
+		c.log.Printf("[%s requested] Custom Command '%s' Output: %s", input.Type, c.Name, oStr)
 	}
 
 	return oStr, err

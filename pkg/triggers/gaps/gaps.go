@@ -50,21 +50,21 @@ func (c *cmd) create() {
 	c.Add(&common.Action{
 		Name: TrigCollectionGaps,
 		Fn:   c.sendGaps,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
 
 // Send radarr collection gaps to the website.
 func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(event, TrigCollectionGaps)
+	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCollectionGaps)
 }
 
-func (c *cmd) sendGaps(ctx context.Context, event website.EventType) {
+func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 	ci := website.GetClientInfo()
 	if ci == nil || len(ci.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
 		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
-			event, len(c.Apps.Radarr))
+			input.Type, len(c.Apps.Radarr))
 		return
 	}
 
@@ -82,13 +82,14 @@ func (c *cmd) sendGaps(ctx context.Context, event website.EventType) {
 
 		movies, err := app.GetMovieContext(ctx, 0)
 		if err != nil {
-			c.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v", event, instance, app.URL, err)
+			c.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v",
+				input.Type, instance, app.URL, err)
 			continue
 		}
 
 		c.SendData(&website.Request{
 			Route:      website.GapsRoute,
-			Event:      event,
+			Event:      input.Type,
 			LogPayload: true,
 			LogMsg:     fmt.Sprintf("Radarr Collection Gaps (%d:%s)", instance, app.URL),
 			Payload:    &radarrGapsPayload{Movies: movies, Name: app.Name, Instance: instance},

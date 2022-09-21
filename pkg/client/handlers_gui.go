@@ -433,11 +433,6 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	}
 }
 
-func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
-	code, data := c.triggers.RunTrigger(website.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
-	http.Error(response, data, code)
-}
-
 func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.Request) {
 	cID, _ := strconv.Atoi(mux.Vars(request)["command"])
 	if cID < 0 || cID >= len(c.triggers.Commands.List()) {

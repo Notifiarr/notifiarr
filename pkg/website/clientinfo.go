@@ -12,7 +12,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
-	"github.com/Notifiarr/notifiarr/pkg/update"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -163,11 +162,6 @@ func (s *Server) SaveClientInfo(ctx context.Context) (*ClientInfo, error) {
 	return &clientInfo, nil
 }
 
-func HaveClientInfo() bool {
-	data := data.Get("clientInfo")
-	return data != nil && data.Data != nil
-}
-
 func GetClientInfo() *ClientInfo {
 	data := data.Get("clientInfo")
 	if data == nil || data.Data == nil {
@@ -223,39 +217,6 @@ func (s *Server) Info(ctx context.Context) map[string]interface{} {
 			"retries":       s.config.Retries,
 			"apps":          s.getAppConfigs(ctx),
 		},
-	}
-}
-
-func (s *Server) PollForReload(ctx context.Context, event EventType) {
-	body, err := s.GetData(&Request{
-		Route:      ClientRoute,
-		Event:      EventPoll,
-		Payload:    s.Info(ctx),
-		LogPayload: true,
-	})
-	if err != nil {
-		s.config.Errorf("[%s requested] Polling Notifiarr: %v", event, err)
-		return
-	}
-
-	var v struct {
-		Reload     bool      `json:"reload"`
-		LastSync   time.Time `json:"lastSync"`
-		LastChange time.Time `json:"lastChange"`
-	}
-
-	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
-		s.config.Errorf("[%s requested] Polling Notifiarr: %v", event, err)
-		return
-	}
-
-	if v.Reload {
-		s.config.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!"+
-			" Last Sync: %v, Last Change: %v, Diff: %v", event, v.LastSync, v.LastChange, v.LastSync.Sub(v.LastChange))
-		s.config.Sighup <- &update.Signal{Text: "poll triggered reload"}
-	} else if ci := GetClientInfo(); ci == nil {
-		s.config.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", event)
-		s.config.Sighup <- &update.Signal{Text: "client info reload"}
 	}
 }
 

@@ -43,7 +43,7 @@ type Command struct {
 	output  string // last output logged
 	lastRun time.Time
 	mu      sync.RWMutex
-	ch      chan website.EventType
+	ch      chan *common.ActionInput
 	log     mnd.Logger
 	website *website.Server
 }
@@ -58,12 +58,12 @@ func New(config *common.Config, commands []*Command) *Action {
 }
 
 // Run fires a custom command.
-func (c *Command) Run(event website.EventType) {
+func (c *Command) Run(input *common.ActionInput) {
 	if c.ch == nil {
 		return
 	}
 
-	c.ch <- event
+	c.ch <- input
 }
 
 // List returns a list of active triggers that can be executed.
@@ -115,7 +115,7 @@ func (c *Command) Stats() Stats {
 
 func (c *cmd) create() {
 	for _, cmd := range c.cmdlist {
-		cmd.ch = make(chan website.EventType, 1)
+		cmd.ch = make(chan *common.ActionInput, 1)
 
 		c.Add(&common.Action{
 			Name: common.TriggerName(fmt.Sprintf("Running Custom Command '%s'", cmd.Name)),

@@ -15,8 +15,8 @@ const TrigRadarrQueue common.TriggerName = "Storing Radarr instance %d queue."
 // StoreRadarr fetches and stores the Radarr queue immediately for the specified instance.
 // Does not send data to the website.
 func (a *Action) StoreRadarr(event website.EventType, instance int) {
-	if name := TrigRadarrQueue.WithInstance(instance); !a.cmd.Exec(event, name) {
-		a.cmd.Errorf("Failed! %s Disbled?", name)
+	if name := TrigRadarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
+		a.cmd.Errorf("[%s requested] Failed! %s Disbled?", event, name)
 	}
 }
 
@@ -27,10 +27,10 @@ type radarrApp struct {
 }
 
 // storeQueue runs at an interval and saves the queue for an app internally.
-func (app *radarrApp) storeQueue(ctx context.Context, event website.EventType) {
+func (app *radarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		app.cmd.Errorf("Getting Radarr Queue (instance %d): %v", app.idx+1, err)
+		app.cmd.Errorf("[%s requested] Getting Radarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -40,7 +40,8 @@ func (app *radarrApp) storeQueue(ctx context.Context, event website.EventType) {
 		item.Languages = nil
 	}
 
-	app.cmd.Debugf("Stored Radarr Queue (%d items), instance %d %s", len(queue.Records), app.idx+1, app.app.Name)
+	app.cmd.Debugf("[%s requested] Stored Radarr Queue (%d items), instance %d %s",
+		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("radarr", app.idx, queue)
 }
 
@@ -69,7 +70,7 @@ func (c *cmd) setupRadarr() bool {
 				Hide: true,
 				Name: TrigRadarrQueue.WithInstance(instance),
 				Fn:   (&radarrApp{app: app, cmd: c, idx: idx}).storeQueue,
-				C:    make(chan website.EventType, 1),
+				C:    make(chan *common.ActionInput, 1),
 				T:    ticker,
 			})
 		}

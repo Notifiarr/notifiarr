@@ -15,8 +15,8 @@ const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
 // StoreLidarr fetches and stores the Lidarr queue immediately for the specified instance.
 // Does not send data to the website.
 func (a *Action) StoreLidarr(event website.EventType, instance int) {
-	if name := TrigLidarrQueue.WithInstance(instance); !a.cmd.Exec(event, name) {
-		a.cmd.Errorf("Failed! %s Disbled?", name)
+	if name := TrigLidarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
+		a.cmd.Errorf("[%s requested] Failed! %s Disbled?", event, name)
 	}
 }
 
@@ -27,10 +27,10 @@ type lidarrApp struct {
 }
 
 // storeQueue runs at an interval and saves the queue for an app internally.
-func (app *lidarrApp) storeQueue(ctx context.Context, event website.EventType) {
+func (app *lidarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		app.cmd.Errorf("Getting Lidarr Queue (instance %d): %v", app.idx+1, err)
+		app.cmd.Errorf("[%s requested] Getting Lidarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -38,7 +38,8 @@ func (app *lidarrApp) storeQueue(ctx context.Context, event website.EventType) {
 		record.Quality = nil
 	}
 
-	app.cmd.Debugf("Stored Lidarr Queue (%d items), instance %d %s", len(queue.Records), app.idx+1, app.app.Name)
+	app.cmd.Debugf("[%s requested] Stored Lidarr Queue (%d items), instance %d %s",
+		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("lidarr", app.idx, queue)
 }
 
@@ -67,7 +68,7 @@ func (c *cmd) setupLidarr() bool {
 				Hide: true,
 				Name: TrigLidarrQueue.WithInstance(instance),
 				Fn:   (&lidarrApp{app: app, cmd: c, idx: idx}).storeQueue,
-				C:    make(chan website.EventType, 1),
+				C:    make(chan *common.ActionInput, 1),
 				T:    ticker,
 			})
 		}

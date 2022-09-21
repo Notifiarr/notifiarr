@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 // sendPlexSessions is fired by a timer if Plex Sessions feature has an interval defined.
-func (c *cmd) sendPlexSessions(ctx context.Context, event website.EventType) {
+func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 	sessions, err := c.getSessions(ctx, time.Minute)
 	if err != nil {
 		c.Errorf("Getting Plex sessions: %v", err)
@@ -19,7 +20,7 @@ func (c *cmd) sendPlexSessions(ctx context.Context, event website.EventType) {
 
 	c.SendData(&website.Request{
 		Route:      website.PlexRoute,
-		Event:      event,
+		Event:      input.Type,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Plex: sessions},
 		LogMsg:     "Plex Sessions",
 		LogPayload: true,

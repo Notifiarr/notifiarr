@@ -13,6 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"golift.io/deluge"
@@ -41,9 +42,9 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	switch mux.Vars(request)["type"] {
 	case "Commands":
 		if len(c.Config.Commands) > index {
-			c.Config.Commands[index].Run(website.EventGUI)
+			c.Config.Commands[index].Run(&common.ActionInput{Type: website.EventGUI})
 			reply, code = fmt.Sprintf("Command Triggered: %s", c.Config.Commands[index].Name), http.StatusOK
-		} else if len(config.Commands) > index {
+		} else if len(config.Commands) > index { // check POST input for "new" command.
 			config.Commands[index].Setup(c.Logger, c.website)
 			reply, code = testCustomCommand(request.Context(), config.Commands[index])
 		}
@@ -144,7 +145,7 @@ func testCustomCommand(ctx context.Context, cmd *commands.Command) (string, int)
 	ctx, cancel := context.WithTimeout(ctx, cmd.Timeout.Duration)
 	defer cancel()
 
-	output, err := cmd.RunNow(ctx, website.EventGUI)
+	output, err := cmd.RunNow(ctx, &common.ActionInput{Type: website.EventGUI})
 	if err != nil {
 		return fmt.Sprintf("Command Failed! Error: %v", err), http.StatusInternalServerError
 	}

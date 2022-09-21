@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
@@ -39,7 +38,6 @@ type Config struct {
 	Retries    int
 	BaseURL    string
 	Timeout    cnfg.Duration
-	Sighup     chan os.Signal
 	HostID     string
 	mnd.Logger // log file writer
 }
@@ -76,10 +74,6 @@ func New(c *Config) *Server {
 		sendData:     make(chan *Request, mnd.Kilobyte),
 		stopSendData: make(chan struct{}),
 	}
-}
-
-func (s *Server) ReloadCh(sighup chan os.Signal) {
-	s.config.Sighup = sighup
 }
 
 // Start runs the website go routine.

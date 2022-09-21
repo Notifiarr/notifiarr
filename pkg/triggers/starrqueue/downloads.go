@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/lidarr"
@@ -14,7 +15,7 @@ import (
 )
 
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
-func (c *cmd) sendDownloadingQueues(ctx context.Context, event website.EventType) {
+func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
 	lidarr := c.getDownloadingItemsLidrr(ctx)
 	radarr := c.getDownloadingItemsRadarr(ctx)
 	readarr := c.getDownloadingItemsReadarr(ctx)
@@ -26,7 +27,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, event website.EventType
 
 	c.SendData(&website.Request{
 		Route:      website.DownloadRoute,
-		Event:      event,
+		Event:      input.Type,
 		LogPayload: true,
 		ErrorsOnly: true,
 		LogMsg: fmt.Sprintf("Downloading Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
