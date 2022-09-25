@@ -34,7 +34,7 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	if content != "" {
 		a.timers.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
 	} else {
-		a.timers.Debugf("[%s requested] Incoming Trigger: %s", event, input.Type, trigger)
+		a.timers.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
 	}
 
 	_ = req.ParseForm()
