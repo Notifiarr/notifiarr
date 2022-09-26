@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
@@ -10,7 +11,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-func (c *Cmd) getSonarrStates() []*State {
+func (c *Cmd) getSonarrStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Sonarr {
@@ -20,7 +21,7 @@ func (c *Cmd) getSonarrStates() []*State {
 
 		c.Debugf("Getting Sonarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getSonarrState(instance+1, app)
+		state, err := c.getSonarrState(ctx, instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
 			c.Errorf("Getting Sonarr Queue from %d:%s: %v", instance+1, app.URL, err)
@@ -32,11 +33,11 @@ func (c *Cmd) getSonarrStates() []*State {
 	return states
 }
 
-func (c *Cmd) getSonarrState(instance int, app *apps.SonarrConfig) (*State, error) {
+func (c *Cmd) getSonarrState(ctx context.Context, instance int, app *apps.SonarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
-	allshows, err := app.GetAllSeries()
+	allshows, err := app.GetAllSeriesContext(ctx)
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {

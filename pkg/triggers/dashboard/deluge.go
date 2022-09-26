@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
@@ -9,7 +10,7 @@ import (
 	"golift.io/cnfg"
 )
 
-func (c *Cmd) getDelugeStates() []*State {
+func (c *Cmd) getDelugeStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Deluge {
@@ -19,7 +20,7 @@ func (c *Cmd) getDelugeStates() []*State {
 
 		c.Debugf("Getting Deluge State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getDelugeState(instance+1, app)
+		state, err := c.getDelugeState(ctx, instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
 			c.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, app.URL, err)
@@ -31,9 +32,10 @@ func (c *Cmd) getDelugeStates() []*State {
 	return states
 }
 
-func (c *Cmd) getDelugeState(instance int, app *apps.DelugeConfig) (*State, error) { //nolint:funlen,cyclop
+//nolint:funlen,cyclop
+func (c *Cmd) getDelugeState(ctx context.Context, instance int, app *apps.DelugeConfig) (*State, error) {
 	start := time.Now()
-	xfers, err := app.GetXfersCompat()
+	xfers, err := app.GetXfersCompatContext(ctx)
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
 		Instance: instance,

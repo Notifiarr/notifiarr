@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
@@ -10,7 +11,7 @@ import (
 	"golift.io/starr/lidarr"
 )
 
-func (c *Cmd) getLidarrStates() []*State {
+func (c *Cmd) getLidarrStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Lidarr {
@@ -20,7 +21,7 @@ func (c *Cmd) getLidarrStates() []*State {
 
 		c.Debugf("Getting Lidarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getLidarrState(instance+1, app)
+		state, err := c.getLidarrState(ctx, instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
 			c.Errorf("Getting Lidarr Queue from %d:%s: %v", instance+1, app.URL, err)
@@ -32,11 +33,11 @@ func (c *Cmd) getLidarrStates() []*State {
 	return states
 }
 
-func (c *Cmd) getLidarrState(instance int, app *apps.LidarrConfig) (*State, error) {
+func (c *Cmd) getLidarrState(ctx context.Context, instance int, app *apps.LidarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
-	albums, err := app.GetAlbum("") // all albums
+	albums, err := app.GetAlbumContext(ctx, "") // all albums
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
@@ -79,7 +80,7 @@ func (c *Cmd) getLidarrState(instance int, app *apps.LidarrConfig) (*State, erro
 	sort.Sort(dateSorter(state.Next))
 	state.Next.Shrink(showNext)
 
-	if state.Latest, err = c.getLidarrHistory(app); err != nil {
+	if state.Latest, err = c.getLidarrHistory(ctx, app); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
@@ -87,8 +88,8 @@ func (c *Cmd) getLidarrState(instance int, app *apps.LidarrConfig) (*State, erro
 }
 
 // getLidarrHistory is not done.
-func (c *Cmd) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistoryPage(&starr.PageReq{
+func (c *Cmd) getLidarrHistory(ctx context.Context, app *apps.LidarrConfig) ([]*Sortable, error) {
+	history, err := app.GetHistoryPageContext(ctx, &starr.PageReq{
 		Page:     1,
 		PageSize: showLatest + 20, //nolint:gomnd // grab extra in case some are tracks and not albums.
 		SortDir:  starr.SortDescend,
@@ -112,7 +113,7 @@ func (c *Cmd) getLidarrHistory(app *apps.LidarrConfig) ([]*Sortable, error) {
 		albumIDs[rec.AlbumID] = &struct{}{}
 
 		// An error here gets swallowed.
-		if album, err := app.GetAlbumByID(rec.AlbumID); err == nil {
+		if album, err := app.GetAlbumByIDContext(ctx, rec.AlbumID); err == nil {
 			table = append(table, &Sortable{
 				Name: album.Title,
 				Sub:  album.Artist.ArtistName,

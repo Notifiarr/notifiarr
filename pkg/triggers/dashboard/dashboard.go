@@ -164,14 +164,14 @@ func (c *Cmd) getStates(ctx context.Context) *States {
 	sessions, _ := c.PlexCron.GetSessions(ctx)
 
 	return &States{
-		Deluge:   c.getDelugeStates(),
-		Lidarr:   c.getLidarrStates(),
-		Qbit:     c.getQbitStates(),
-		NZBGet:   c.getNZBGetStates(),
+		Deluge:   c.getDelugeStates(ctx),
+		Lidarr:   c.getLidarrStates(ctx),
+		Qbit:     c.getQbitStates(ctx),
+		NZBGet:   c.getNZBGetStates(ctx),
 		RTorrent: c.getRtorrentStates(),
-		Radarr:   c.getRadarrStates(),
-		Readarr:  c.getReadarrStates(),
-		Sonarr:   c.getSonarrStates(),
+		Radarr:   c.getRadarrStates(ctx),
+		Readarr:  c.getReadarrStates(ctx),
+		Sonarr:   c.getSonarrStates(ctx),
 		SabNZB:   c.getSabNZBStates(ctx),
 		Plex:     sessions,
 	}
