@@ -69,7 +69,7 @@ type DelugeConfig struct {
 
 func (a *Apps) setupDeluge() error {
 	for idx, app := range a.Deluge {
-		if !a.Deluge[idx].Enabled() {
+		if app == nil || app.Config == nil || app.URL == "" || app.Password == "" {
 			return fmt.Errorf("%w: missing url or password: Deluge config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Deluge config %d", ErrInvalidApp, idx+1)
@@ -112,7 +112,7 @@ type SabNZBConfig struct {
 
 func (a *Apps) setupSabNZBd() error {
 	for idx, app := range a.SabNZB {
-		if !a.SabNZB[idx].Enabled() {
+		if app == nil || app.Config == nil || app.URL == "" || app.APIKey == "" {
 			return fmt.Errorf("%w: missing url or api key: SABnzbd config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: SABnzbd config %d", ErrInvalidApp, idx+1)
@@ -151,7 +151,7 @@ type QbitConfig struct {
 
 func (a *Apps) setupQbit() error {
 	for idx, app := range a.Qbit {
-		if !a.Qbit[idx].Enabled() {
+		if app == nil || app.Config == nil || app.URL == "" {
 			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Qbit config %d", ErrInvalidApp, idx+1)
@@ -196,7 +196,7 @@ type RtorrentConfig struct {
 
 func (a *Apps) setupRtorrent() error {
 	for idx, app := range a.Rtorrent {
-		if !a.Rtorrent[idx].Enabled() {
+		if app == nil || app.URL == "" {
 			return fmt.Errorf("%w: missing url: rTorrent config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.URL, "http://") && !strings.HasPrefix(app.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: rTorrent config %d", ErrInvalidApp, idx+1)
@@ -241,14 +241,14 @@ type NZBGetConfig struct {
 }
 
 func (a *Apps) setupNZBGet() error {
-	for idx, nzb := range a.NZBGet {
-		if !nzb.Enabled() {
+	for idx, app := range a.NZBGet {
+		if app == nil || app.Config == nil || app.URL == "" {
 			return fmt.Errorf("%w: missing url: NZBGet config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(nzb.Config.URL, "http://") && !strings.HasPrefix(nzb.Config.URL, "https://") {
+		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: NZBGet config %d", ErrInvalidApp, idx+1)
 		}
 
-		nzb.Client = starr.ClientWithDebug(nzb.Timeout.Duration, nzb.ValidSSL, debuglog.Config{
+		app.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 			MaxBody: a.MaxBody,
 			Debugf:  a.Debugf,
 			Caller:  metricMaker("NZBGet"),
