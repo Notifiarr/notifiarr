@@ -57,7 +57,10 @@ func (c *Config) Run(ctx context.Context) {
 // That means only 1 action can run at a time. If c.Serial is set to true, then
 // some of those actions (especially dashboard) will spawn their own go routines.
 func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []reflect.SelectCase) {
-	defer c.stopTimerLoop(actions)
+	defer func() {
+		c.CapturePanic()
+		c.stopTimerLoop(actions)
+	}()
 
 	// This is how you watch a slice of reflect.SelectCase.
 	// This allows watching a dynamic amount of channels and tickers.
@@ -104,10 +107,7 @@ func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action 
 // This procedure closes all the timer channels and stops the tickers.
 // These cannot be restarted and must be fully initialized again.
 func (c *Config) stopTimerLoop(actions []*Action) {
-	defer func() {
-		defer c.CapturePanic()
-		close(c.stop.C) // signal that we're done.
-	}()
+	defer close(c.stop.C) // signal that we're done.
 
 	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
