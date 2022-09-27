@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/datacounter"
@@ -299,11 +298,11 @@ func map2list(input map[string]struct{}) []string {
 func logCounter(filename string, writer io.Writer) io.Writer {
 	counter := datacounter.NewWriterCounter(writer)
 
-	exp.LogFiles.Set("Lines Written: "+filename, expvar.Func(
+	mnd.LogFiles.Set("Lines Written: "+filename, expvar.Func(
 		func() interface{} { return int64(counter.Writes()) },
 	))
 
-	exp.LogFiles.Set("Bytes Written: "+filename, expvar.Func(
+	mnd.LogFiles.Set("Bytes Written: "+filename, expvar.Func(
 		func() interface{} { return int64(counter.Count()) },
 	))
 

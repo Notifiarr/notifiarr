@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/datacounter"
 	"golift.io/version"
@@ -41,7 +40,7 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 
 	defer func() {
 		body.Close()
-		exp.Website.Add("POST Bytes Received", int64(counter.Count()))
+		mnd.Website.Add("POST Bytes Received", int64(counter.Count()))
 	}()
 
 	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
@@ -110,7 +109,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 	timeout := time.Until(deadline).Round(time.Millisecond)
 
 	for retry := 0; ; retry++ {
-		exp.Website.Add(req.Method+" Requests", 1)
+		mnd.Website.Add(req.Method+" Requests", 1)
 
 		resp, err := h.Client.Do(req)
 		if err == nil {
@@ -120,7 +119,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 
 			if resp.StatusCode < http.StatusInternalServerError &&
 				(resp.StatusCode != http.StatusBadRequest || resp.Header.Get("content-type") != "text/html") {
-				exp.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
+				mnd.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
 				return resp, nil
 			}
 
@@ -128,9 +127,9 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 			// or resp.StatusCode is 400 and content-type is text/html (cloudflare error).
 			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                         // do not defer, because we're in a loop.
-			exp.Website.Add(req.Method+" Retries", 1)
-			exp.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
-			exp.Website.Add(req.Method+" Bytes Received", size)
+			mnd.Website.Add(req.Method+" Retries", 1)
+			mnd.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
+			mnd.Website.Add(req.Method+" Bytes Received", size)
 			// shoehorn a non-200 error into the empty http error.
 			err = fmt.Errorf("%w: %s: %d bytes, %s", ErrNon200, req.URL, size, resp.Status)
 		}

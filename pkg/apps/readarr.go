@@ -61,11 +61,17 @@ func (a *Apps) setupReadarr() error {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Readarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
-			MaxBody: a.MaxBody,
-			Debugf:  a.Debugf,
-			Caller:  metricMaker(string(starr.Readarr)),
-		})
+		if a.Logger.DebugEnabled() {
+			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+				MaxBody: a.MaxBody,
+				Debugf:  a.Debugf,
+				Caller:  metricMakerCallback(string(starr.Readarr)),
+			})
+		} else {
+			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), nil)
+		}
+
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Readarr = readarr.New(app.Config)

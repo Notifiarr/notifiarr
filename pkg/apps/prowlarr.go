@@ -40,11 +40,16 @@ func (a *Apps) setupProwlarr() error {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Prowlarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
-			MaxBody: a.MaxBody,
-			Debugf:  a.Debugf,
-			Caller:  metricMaker(string(starr.Prowlarr)),
-		})
+		if a.Logger.DebugEnabled() {
+			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+				MaxBody: a.MaxBody,
+				Debugf:  a.Debugf,
+				Caller:  metricMakerCallback(string(starr.Prowlarr)),
+			})
+		} else {
+			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Prowlarr.String(), nil)
+		}
 
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")

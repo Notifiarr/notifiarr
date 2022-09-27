@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -76,8 +76,8 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 			input.Type = "unknown"
 		}
 
-		exp.TimerEvents.Add(string(input.Type)+"&&"+string(action.Name), 1)
-		exp.TimerCounts.Add(string(action.Name), 1)
+		mnd.TimerEvents.Add(string(input.Type)+"&&"+string(action.Name), 1)
+		mnd.TimerCounts.Add(string(action.Name), 1)
 
 		if action.Fn == nil { // stop channel has no Function.
 			return // called by c.Stop(), calls c.stopTimerLoop().

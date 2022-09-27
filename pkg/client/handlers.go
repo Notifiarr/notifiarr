@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/starr"
 )
 
@@ -175,20 +175,20 @@ func (c *Client) addUsernameHeader(next http.Handler) http.Handler {
 
 func (c *Client) countRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
-		exp.HTTPRequests.Add("Total Requests", 1)
+		mnd.HTTPRequests.Add("Total Requests", 1)
 
 		switch {
 		case strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")):
-			exp.HTTPRequests.Add("/api Requests", 1)
+			mnd.HTTPRequests.Add("/api Requests", 1)
 		case strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "ws")):
-			exp.HTTPRequests.Add("Websocket Requests", 1)
+			mnd.HTTPRequests.Add("Websocket Requests", 1)
 		default:
-			exp.HTTPRequests.Add("Non-/api Requests", 1)
+			mnd.HTTPRequests.Add("Non-/api Requests", 1)
 		}
 
 		wrap := &responseWrapper{ResponseWriter: response, statusCode: http.StatusOK}
 		next.ServeHTTP(wrap, req)
-		exp.HTTPRequests.Add(fmt.Sprintf("Response %d %s", wrap.statusCode, http.StatusText(wrap.statusCode)), 1)
+		mnd.HTTPRequests.Add(fmt.Sprintf("Response %d %s", wrap.statusCode, http.StatusText(wrap.statusCode)), 1)
 	})
 }
 

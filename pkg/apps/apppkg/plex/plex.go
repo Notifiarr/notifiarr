@@ -14,8 +14,6 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 )
 
 // Server is the Plex configuration from a config file.
@@ -93,12 +91,10 @@ func (s *Server) reqPlexURL(
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return nil, fmt.Errorf("reading http response: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		exp.Apps.Add("Plex&&"+method+" Errors", 1)
 		return body, ErrBadStatus
 	}
 

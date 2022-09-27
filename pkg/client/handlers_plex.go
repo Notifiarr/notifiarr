@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -36,16 +36,16 @@ func (t *Timer) Active(d time.Duration) bool {
 
 // PlexHandler handles an incoming webhook from Plex.
 func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:cyclop,varnamelen,funlen
-	exp.Apps.Add("Plex&&Incoming Webhooks", 1)
+	mnd.Apps.Add("Plex&&Incoming Webhooks", 1)
 
 	start := time.Now()
 
-	r.Body = exp.NewFakeCloser("Plex", "Webhook", r.Body)
+	r.Body = apps.NewFakeCloser("Plex", "Webhook", r.Body)
 	defer r.Body.Close()
 
 	if err := r.ParseMultipartForm(mnd.Megabyte); err != nil {
 		c.Errorf("Parsing Multipart Form (plex): %v", err)
-		exp.Apps.Add("Plex&&Webhook Errors", 1)
+		mnd.Apps.Add("Plex&&Webhook Errors", 1)
 		http.Error(w, "form parse error", http.StatusBadRequest)
 
 		return
@@ -59,7 +59,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 
 	switch err := json.Unmarshal([]byte(payload), &v); {
 	case err != nil:
-		exp.Apps.Add("Plex&&Webhook Errors", 1)
+		mnd.Apps.Add("Plex&&Webhook Errors", 1)
 		http.Error(w, "payload error", http.StatusBadRequest)
 		c.Errorf("Unmarshalling Plex payload: %v", err)
 	case strings.EqualFold(v.Event, "admin.database.backup"):

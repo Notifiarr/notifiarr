@@ -11,7 +11,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	apachelog "github.com/lestrrat-go/apache-logformat"
 )
@@ -117,7 +117,7 @@ func (r *responseWrapper) WriteHeader(statusCode int) {
 }
 
 func (r *responseWrapper) Write(b []byte) (int, error) {
-	exp.HTTPRequests.Add("Response Bytes", int64(len(b)))
+	mnd.HTTPRequests.Add("Response Bytes", int64(len(b)))
 	return r.ResponseWriter.Write(b) //nolint:wrapcheck
 }
 
@@ -136,6 +136,6 @@ func (r *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 }
 
 func (n *netConnWrapper) Write(b []byte) (int, error) {
-	exp.HTTPRequests.Add("Response Bytes", int64(len(b)))
+	mnd.HTTPRequests.Add("Response Bytes", int64(len(b)))
 	return n.Conn.Write(b) //nolint:wrapcheck
 }

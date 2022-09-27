@@ -14,7 +14,6 @@ import (
 	"runtime/debug"
 	"sync"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -175,43 +174,43 @@ func (l *Logger) CapturePanic() {
 
 // Debug writes log lines... to stdout and/or a file.
 func (l *Logger) Debug(v ...interface{}) {
-	exp.LogFiles.Add("Debug Lines", 1)
+	mnd.LogFiles.Add("Debug Lines", 1)
 	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, false)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
 func (l *Logger) Debugf(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Debug Lines", 1)
+	mnd.LogFiles.Add("Debug Lines", 1)
 	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, false)
 }
 
 // Print writes log lines... to stdout and/or a file.
 func (l *Logger) Print(v ...interface{}) {
-	exp.LogFiles.Add("Info Lines", 1)
+	mnd.LogFiles.Add("Info Lines", 1)
 	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, false)
 }
 
 // Printf writes log lines... to stdout and/or a file.
 func (l *Logger) Printf(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Info Lines", 1)
+	mnd.LogFiles.Add("Info Lines", 1)
 	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, false)
 }
 
 // Error writes log lines... to stdout and/or a file.
 func (l *Logger) Error(v ...interface{}) {
-	exp.LogFiles.Add("Error Lines", 1)
+	mnd.LogFiles.Add("Error Lines", 1)
 	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, true)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
 func (l *Logger) Errorf(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Error Lines", 1)
+	mnd.LogFiles.Add("Error Lines", 1)
 	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, true)
 }
 
 // ErrorfNoShare writes log lines... to stdout and/or a file.
 func (l *Logger) ErrorfNoShare(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Error Lines", 1)
+	mnd.LogFiles.Add("Error Lines", 1)
 	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, false)
 }
 
@@ -284,7 +283,7 @@ func CustomLog(filePath, logName string) *Logger {
 
 func (l *Logger) postRotateCounter(fileName, newFile string) {
 	if fileName != "" {
-		exp.LogFiles.Add("Rotated: "+fileName, 1)
+		mnd.LogFiles.Add("Rotated: "+fileName, 1)
 	}
 
 	if newFile != "" && l != nil {

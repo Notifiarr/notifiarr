@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -40,11 +40,11 @@ func (c *Config) setup(services []*Service) error {
 			return err
 		}
 
-		exp.ServiceChecks.Add(check.Name+"&&Total", 0)
-		exp.ServiceChecks.Add(check.Name+"&&"+StateUnknown.String(), 0)
-		exp.ServiceChecks.Add(check.Name+"&&"+StateOK.String(), 0)
-		exp.ServiceChecks.Add(check.Name+"&&"+StateWarning.String(), 0)
-		exp.ServiceChecks.Add(check.Name+"&&"+StateCritical.String(), 0)
+		mnd.ServiceChecks.Add(check.Name+"&&Total", 0)
+		mnd.ServiceChecks.Add(check.Name+"&&"+StateUnknown.String(), 0)
+		mnd.ServiceChecks.Add(check.Name+"&&"+StateOK.String(), 0)
+		mnd.ServiceChecks.Add(check.Name+"&&"+StateWarning.String(), 0)
+		mnd.ServiceChecks.Add(check.Name+"&&"+StateCritical.String(), 0)
 
 		// Add this validated service to our service map.
 		c.services[services[idx].Name] = services[idx]

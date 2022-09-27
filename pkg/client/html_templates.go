@@ -18,7 +18,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
@@ -416,7 +415,7 @@ type templateData struct {
 	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
 	ClientInfo  *website.ClientInfo            `json:"clientInfo"`
-	Expvar      exp.AllData                    `json:"expvar"`
+	Expvar      mnd.AllData                    `json:"expvar"`
 	HostInfo    *host.InfoStat                 `json:"hostInfo"`
 	Disks       map[string]*snapshot.Partition `json:"disks"`
 }
@@ -475,7 +474,7 @@ func (c *Client) renderTemplate(
 			"uid":       os.Getuid(),
 			"gid":       os.Getgid(),
 		},
-		Expvar:   exp.GetAllData(),
+		Expvar:   mnd.GetAllData(),
 		HostInfo: hostInfo,
 	})
 	if err != nil {

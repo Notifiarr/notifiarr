@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/datacounter"
 	"golift.io/starr"
@@ -102,10 +102,10 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		}
 
 		wrote := a.Respond(w, code, msg)
-		exp.APIHits.Add(appName+" Bytes Sent", wrote)
-		exp.APIHits.Add(appName+" Bytes Received", int64(len(post)))
-		exp.APIHits.Add(appName+" Requests", 1)
-		exp.APIHits.Add("Total", 1)
+		mnd.APIHits.Add(appName+" Bytes Sent", wrote)
+		mnd.APIHits.Add(appName+" Bytes Received", int64(len(post)))
+		mnd.APIHits.Add(appName+" Requests", 1)
+		mnd.APIHits.Add("Total", 1)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 	}
 }
@@ -131,7 +131,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 		m, _ := msg.(string)
 		w.Header().Set("Location", m)
 		w.WriteHeader(stat)
-		exp.APIHits.Add(statusTxt, 1)
+		mnd.APIHits.Add(statusTxt, 1)
 
 		return 0
 	}
@@ -141,7 +141,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 		msg = m.Error()
 	}
 
-	exp.APIHits.Add(statusTxt, 1)
+	mnd.APIHits.Add(statusTxt, 1)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
 	counter := datacounter.NewResponseWriterCounter(w)
