@@ -183,7 +183,7 @@ Recommend not messing with these unless instructed to do so.
 | mode        | `DN_MODE`         | `production` / Change application mode: `development` or `production`                             |
 | debug       | `DN_DEBUG`        | `false` / Adds payloads and other stuff to the log output; very verbose/noisy                     |
 | debug_log   | `DN_DEBUG_LOG`    | `""` / Set a file system path to write debug logs to a dedicated file                             |
-| max_body    | `DN_MAX_BODY`     | Unlimited, `0` / Maximum debug-log body size (integer) for payloads to and from notifiarr.com     |
+| max_body    | `DN_MAX_BODY`     | Unlimited, `0` / Maximum debug-log body size (integer) for all debug payloads                     |
 |             | `TMPDIR`          | `%TMP%` on Windows. Varies depending on system; must be writable if using Backup Corruption Check |
 
 _Note: You may disable the GUI (menu item) on Windows by setting the env variable `USEGUI` to `false`._
@@ -281,7 +281,6 @@ You may report your GPU and memory Utilization for Nvidia cards. Automatic if `n
 | lidarr.password  | `DN_LIDARR_0_PASSWORD`  | Provide password if using backup corruption check and auth is enabled |
 | lidarr.http_user | `DN_LIDARR_0_HTTP_USER` | Provide username if Lidarr uses basic auth (uncommon) and BCC enabled |
 | lidarr.http_pass | `DN_LIDARR_0_HTTP_PASS` | Provide password if Lidarr uses basic auth (uncommon) and BCC enabled |
-| lidarr.max_body  | `DN_LIDARR_0_MAX_BODY`  | `0` (off) / How much of the response body is logged when debug is on  |
 
 - **BCC = Backup Corruption Check**
 
@@ -296,7 +295,6 @@ You may report your GPU and memory Utilization for Nvidia cards. Automatic if `n
 | prowlarr.password  | `DN_PROWLARR_0_PASSWORD`  | Provide password if using backup corruption check and auth is enabled   |
 | prowlarr.http_user | `DN_PROWLARR_0_HTTP_USER` | Provide username if Prowlarr uses basic auth (uncommon) and BCC enabled |
 | prowlarr.http_pass | `DN_PROWLARR_0_HTTP_PASS` | Provide password if Prowlarr uses basic auth (uncommon) and BCC enabled |
-| prowlarr.max_body  | `DN_PROWLARR_0_MAX_BODY`  | `0` (off) / How much of the response body is logged when debug is on    |
 
 ### Radarr
 
@@ -309,7 +307,6 @@ You may report your GPU and memory Utilization for Nvidia cards. Automatic if `n
 | radarr.password  | `DN_RADARR_0_PASSWORD`  | Provide password if using backup corruption check and auth is enabled |
 | radarr.http_user | `DN_RADARR_0_HTTP_USER` | Provide username if Radarr uses basic auth (uncommon) and BCC enabled |
 | radarr.http_pass | `DN_RADARR_0_HTTP_PASS` | Provide password if Radarr uses basic auth (uncommon) and BCC enabled |
-| radarr.max_body  | `DN_RADARR_0_MAX_BODY`  | `0` (off) / How much of the response body is logged when debug is on. |
 
 ### Readarr
 
@@ -322,7 +319,6 @@ You may report your GPU and memory Utilization for Nvidia cards. Automatic if `n
 | readarr.password  | `DN_READARR_0_PASSWORD`  | Provide password if using backup corruption check and auth is enabled  |
 | readarr.http_user | `DN_READARR_0_HTTP_USER` | Provide username if Readarr uses basic auth (uncommon) and BCC enabled |
 | readarr.http_pass | `DN_READARR_0_HTTP_PASS` | Provide password if Readarr uses basic auth (uncommon) and BCC enabled |
-| readarr.max_body  | `DN_READARR_0_MAX_BODY`  | `0` (off) / How much of the response body is logged when debug is on.  |
 
 ### Sonarr
 
@@ -335,7 +331,6 @@ You may report your GPU and memory Utilization for Nvidia cards. Automatic if `n
 | sonarr.password  | `DN_SONARR_0_PASSWORD`  | Provide password if using backup corruption check and auth is enabled |
 | sonarr.http_user | `DN_SONARR_0_HTTP_USER` | Provide username if Sonarr uses basic auth (uncommon) and BCC enabled |
 | sonarr.http_pass | `DN_SONARR_0_HTTP_PASS` | Provide password if Sonarr uses basic auth (uncommon) and BCC enabled |
-| sonarr.max_body  | `DN_SONARR_0_MAX_BODY`  | `0` (off) / How much of the response body is logged when debug is on. |
 
 ### Downloaders
 
@@ -343,8 +338,10 @@ You can add supported downloaders so they show up on the dashboard integration.
 You may easily add service checks to these downloaders by adding a name.
 Any number of downloaders of any type may be configured.
 
-These all also have `interval` and `timeout` represented as a Go Duration. 
-Examples: `1m`, `1m30s`, `3m15s`, 1h5m`. Valid units are `s`, `m`, and `h`. Combining units is additive.
+All application instances also have `interval` and `timeout` inputs represented as a Go Duration. 
+Setting `interval` to `-1s` disables service checks for that application.
+Setting `timeout` to `-1s` disables that instance entirely. Useful if an instacne is down temporarily.
+Example Go Durations: `1m`, `1m30s`, `3m15s`, 1h5m`. Valid units are `s`, `m`, and `h`. Combining units is additive.
 
 #### QbitTorrent
 
@@ -412,9 +409,9 @@ You may also need to add a webhook to Plex so it sends notices to this applicati
 - Replace `plex-token-here` with your plex token.
 - **The Notifiarr application uses the Plex token to authorize incoming webhooks.**
 
-| Config Name | Variable Name   | Note                                                                                                                                            |
-| ----------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| plex.url    | `DN_PLEX_URL`   | `http://localhost:32400` / local URL to your plex server                                                                                        |
+| Config Name | Variable Name   | Note                                                     |
+| ----------- | --------------- | -------------------------------------------------------  |
+| plex.url    | `DN_PLEX_URL`   | `http://localhost:32400` / local URL to your plex server |
 | plex.token  | `DN_PLEX_TOKEN` | Required. [Must provide Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/) for this to work. |
 
 ### Tautulli
@@ -513,20 +510,18 @@ Here are two more example Nginx configs:
 
 ## Troubleshooting
 
-- Find help on [GoLift Discord](https://golift.io/discord).
-- And/or on [Notifiarr Discord](https://notifiarr.com/discord).
+- Find help on [Notifiarr's Discord](https://notifiarr.com/discord).
+- And/or on the [GoLift Discord](https://golift.io/discord).
 
 ### Log files
 
 You can set a log file in the config. You should do that. Otherwise, find your logs here:
 
-- Linux: `/var/log/messages` or `/var/log/syslog` (w/ default syslog)
+- Linux: `/var/log/notifiarr/app.log`
 - FreeBSD: `/var/log/syslog` (w/ default syslog)
-- Homebrew: `/usr/local/var/log/notifiarr.log`
+- Homebrew: `/usr/local/var/log/notifiarr.log` or `/opt/homebrew/var/log/notifiarr.log`
 - macOS: `~/.notifiarr/notifiarr.log`
 - Windows: `<home folder>/.notifiarr/notifiarr.log`
-
-If transfers are in a Warning or Error state they will not be extracted.
 
 Still having problems?
 [Let us know!](https://github.com/Notifiarr/notifiarr/issues/new)
