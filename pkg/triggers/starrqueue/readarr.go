@@ -22,7 +22,7 @@ type readarrApp struct {
 // Does not send data to the website.
 func (a *Action) StoreReadarr(event website.EventType, instance int) {
 	if name := TrigReadarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		a.cmd.Errorf("[%s requested] Failed! %s Disbled?", event, name)
+		a.cmd.Errorf("[%s requested] Failed! %s Disabled?", event, name)
 	}
 }
 

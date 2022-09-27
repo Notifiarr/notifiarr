@@ -32,6 +32,7 @@ const (
 	warning     = "warning"
 	completed   = "completed"
 	downloading = "downloading"
+	delay       = "delay"
 )
 
 const (

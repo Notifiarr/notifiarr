@@ -64,7 +64,7 @@ func (c *cmd) getDownloadingItemsLidrr(_ context.Context) itemList {
 		app := items[instance]
 
 		for _, item := range queue.Records {
-			if strings.ToLower(item.Status) == downloading {
+			if s := strings.ToLower(item.Status); s == downloading || s == delay {
 				app.Queue = append(app.Queue, item)
 			}
 		}
@@ -96,7 +96,7 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 		app := items[instance]
 
 		for _, item := range queue.Records {
-			if strings.ToLower(item.Status) == downloading {
+			if s := strings.ToLower(item.Status); s == downloading || s == delay {
 				app.Queue = append(app.Queue, item)
 			}
 		}
@@ -128,7 +128,7 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 		app := items[instance]
 
 		for _, item := range queue.Records {
-			if strings.ToLower(item.Status) == downloading {
+			if s := strings.ToLower(item.Status); s == downloading || s == delay {
 				app.Queue = append(app.Queue, item)
 			}
 		}
@@ -137,7 +137,7 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 	return items
 }
 
-func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
 	ci := website.GetClientInfo()
@@ -162,7 +162,7 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList {
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if strings.ToLower(item.Status) == downloading && repeatStomper[item.DownloadID] == nil {
+			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
 				app.Queue = append(app.Queue, item)
 				repeatStomper[item.DownloadID] = item
 			}

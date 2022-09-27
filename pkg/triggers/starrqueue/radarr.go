@@ -16,7 +16,7 @@ const TrigRadarrQueue common.TriggerName = "Storing Radarr instance %d queue."
 // Does not send data to the website.
 func (a *Action) StoreRadarr(event website.EventType, instance int) {
 	if name := TrigRadarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		a.cmd.Errorf("[%s requested] Failed! %s Disbled?", event, name)
+		a.cmd.Errorf("[%s requested] Failed! %s Disabled?", event, name)
 	}
 }
 

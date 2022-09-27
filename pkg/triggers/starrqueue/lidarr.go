@@ -16,7 +16,7 @@ const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
 // Does not send data to the website.
 func (a *Action) StoreLidarr(event website.EventType, instance int) {
 	if name := TrigLidarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		a.cmd.Errorf("[%s requested] Failed! %s Disbled?", event, name)
+		a.cmd.Errorf("[%s requested] Failed! %s Disabled?", event, name)
 	}
 }
 
