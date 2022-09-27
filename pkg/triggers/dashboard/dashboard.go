@@ -132,17 +132,17 @@ func (c *Cmd) create() {
 	c.Add(&common.Action{
 		Name: TrigDashboard,
 		Fn:   c.sendDashboardState,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
 
 // Send the current states for the dashboard to the website.
 func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(event, TrigDashboard)
+	a.cmd.Exec(&common.ActionInput{Type: event}, TrigDashboard)
 }
 
-func (c *Cmd) sendDashboardState(ctx context.Context, event website.EventType) {
+func (c *Cmd) sendDashboardState(ctx context.Context, input *common.ActionInput) {
 	var (
 		start  = time.Now()
 		states = c.getStates(ctx)
@@ -152,7 +152,7 @@ func (c *Cmd) sendDashboardState(ctx context.Context, event website.EventType) {
 	data.Save("dashboard", states)
 	c.SendData(&website.Request{
 		Route:      website.DashRoute,
-		Event:      event,
+		Event:      input.Type,
 		LogPayload: true,
 		LogMsg:     fmt.Sprintf("Dashboard State (elapsed: %v)", apps),
 		Payload:    states,
@@ -164,14 +164,14 @@ func (c *Cmd) getStates(ctx context.Context) *States {
 	sessions, _ := c.PlexCron.GetSessions(ctx)
 
 	return &States{
-		Deluge:   c.getDelugeStates(),
-		Lidarr:   c.getLidarrStates(),
-		Qbit:     c.getQbitStates(),
-		NZBGet:   c.getNZBGetStates(),
+		Deluge:   c.getDelugeStates(ctx),
+		Lidarr:   c.getLidarrStates(ctx),
+		Qbit:     c.getQbitStates(ctx),
+		NZBGet:   c.getNZBGetStates(ctx),
 		RTorrent: c.getRtorrentStates(),
-		Radarr:   c.getRadarrStates(),
-		Readarr:  c.getReadarrStates(),
-		Sonarr:   c.getSonarrStates(),
+		Radarr:   c.getRadarrStates(ctx),
+		Readarr:  c.getReadarrStates(ctx),
+		Sonarr:   c.getSonarrStates(ctx),
 		SabNZB:   c.getSabNZBStates(ctx),
 		Plex:     sessions,
 	}

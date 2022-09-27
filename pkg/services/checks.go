@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -119,9 +119,9 @@ func (s *Service) update(res *result) bool {
 		return false
 	}
 
-	exp.ServiceChecks.Add(s.Name+"&&Total", 1)
-	exp.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
-	//	exp.ServiceChecks.Add("Total Checks Run", 1)
+	mnd.ServiceChecks.Add(s.Name+"&&Total", 1)
+	mnd.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
+	//	mnd.ServiceChecks.Add("Total Checks Run", 1)
 
 	s.svc.Lock()
 	defer s.svc.Unlock()

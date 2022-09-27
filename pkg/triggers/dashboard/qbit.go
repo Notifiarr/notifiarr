@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -10,7 +11,7 @@ import (
 	"golift.io/cnfg"
 )
 
-func (c *Cmd) getQbitStates() []*State {
+func (c *Cmd) getQbitStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Qbit {
@@ -20,7 +21,7 @@ func (c *Cmd) getQbitStates() []*State {
 
 		c.Debugf("Getting Qbit State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getQbitState(instance+1, app)
+		state, err := c.getQbitState(ctx, instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
 			c.Errorf("Getting Qbit Data from %d:%s: %v", instance+1, app.URL, err)
@@ -32,9 +33,9 @@ func (c *Cmd) getQbitStates() []*State {
 	return states
 }
 
-func (c *Cmd) getQbitState(instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop
+func (c *Cmd) getQbitState(ctx context.Context, instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop
 	start := time.Now()
-	xfers, err := app.GetXfers()
+	xfers, err := app.GetXfersContext(ctx)
 
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},

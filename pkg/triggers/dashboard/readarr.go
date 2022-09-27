@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
@@ -10,7 +11,7 @@ import (
 	"golift.io/starr/readarr"
 )
 
-func (c *Cmd) getReadarrStates() []*State {
+func (c *Cmd) getReadarrStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Readarr {
@@ -20,7 +21,7 @@ func (c *Cmd) getReadarrStates() []*State {
 
 		c.Debugf("Getting Readarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getReadarrState(instance+1, app)
+		state, err := c.getReadarrState(ctx, instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
 			c.Errorf("Getting Readarr Queue from %d:%s: %v", instance+1, app.URL, err)
@@ -32,11 +33,11 @@ func (c *Cmd) getReadarrStates() []*State {
 	return states
 }
 
-func (c *Cmd) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, error) {
+func (c *Cmd) getReadarrState(ctx context.Context, instance int, app *apps.ReadarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
-	books, err := app.GetBook("") // all books
+	books, err := app.GetBookContext(ctx, "") // all books
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {
@@ -79,7 +80,7 @@ func (c *Cmd) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, er
 	sort.Sort(dateSorter(state.Next))
 	state.Next.Shrink(showNext)
 
-	if state.Latest, err = c.getReadarrHistory(app); err != nil {
+	if state.Latest, err = c.getReadarrHistory(ctx, app); err != nil {
 		return state, fmt.Errorf("instance %d: %w", instance, err)
 	}
 
@@ -87,8 +88,8 @@ func (c *Cmd) getReadarrState(instance int, app *apps.ReadarrConfig) (*State, er
 }
 
 // getReadarrHistory is not done.
-func (c *Cmd) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
-	history, err := app.GetHistoryPage(&starr.PageReq{
+func (c *Cmd) getReadarrHistory(ctx context.Context, app *apps.ReadarrConfig) ([]*Sortable, error) {
+	history, err := app.GetHistoryPageContext(ctx, &starr.PageReq{
 		Page:     1,
 		PageSize: showLatest,
 		SortDir:  starr.SortDescend,
@@ -103,7 +104,7 @@ func (c *Cmd) getReadarrHistory(app *apps.ReadarrConfig) ([]*Sortable, error) {
 
 	for idx := 0; idx < len(history.Records) && len(table) < showLatest; idx++ {
 		// An error here gets swallowed.
-		if book, err := app.GetBookByID(history.Records[idx].BookID); err == nil {
+		if book, err := app.GetBookByIDContext(ctx, history.Records[idx].BookID); err == nil {
 			table = append(table, &Sortable{
 				Name: book.Title,
 				Sub:  book.AuthorTitle,

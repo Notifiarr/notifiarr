@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
@@ -9,7 +10,7 @@ import (
 	"golift.io/starr/radarr"
 )
 
-func (c *Cmd) getRadarrStates() []*State {
+func (c *Cmd) getRadarrStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Radarr {
@@ -19,7 +20,7 @@ func (c *Cmd) getRadarrStates() []*State {
 
 		c.Debugf("Getting Radarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getRadarrState(instance+1, app)
+		state, err := c.getRadarrState(ctx, instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
 			c.Errorf("Getting Radarr Queue from %d:%s: %v", instance+1, app.URL, err)
@@ -31,11 +32,11 @@ func (c *Cmd) getRadarrStates() []*State {
 	return states
 }
 
-func (c *Cmd) getRadarrState(instance int, r *apps.RadarrConfig) (*State, error) {
+func (c *Cmd) getRadarrState(ctx context.Context, instance int, r *apps.RadarrConfig) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Latest: []*Sortable{}, Name: r.Name}
 	start := time.Now()
 
-	movies, err := r.GetMovie(0)
+	movies, err := r.GetMovieContext(ctx, 0)
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {

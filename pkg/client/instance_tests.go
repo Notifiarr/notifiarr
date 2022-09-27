@@ -13,6 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"golift.io/deluge"
@@ -41,9 +42,9 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	switch mux.Vars(request)["type"] {
 	case "Commands":
 		if len(c.Config.Commands) > index {
-			c.Config.Commands[index].Run(website.EventGUI)
+			c.Config.Commands[index].Run(&common.ActionInput{Type: website.EventGUI})
 			reply, code = fmt.Sprintf("Command Triggered: %s", c.Config.Commands[index].Name), http.StatusOK
-		} else if len(config.Commands) > index {
+		} else if len(config.Commands) > index { // check POST input for "new" command.
 			config.Commands[index].Setup(c.Logger, c.website)
 			reply, code = testCustomCommand(request.Context(), config.Commands[index])
 		}
@@ -144,7 +145,7 @@ func testCustomCommand(ctx context.Context, cmd *commands.Command) (string, int)
 	ctx, cancel := context.WithTimeout(ctx, cmd.Timeout.Duration)
 	defer cancel()
 
-	output, err := cmd.RunNow(ctx, website.EventGUI)
+	output, err := cmd.RunNow(ctx, &common.ActionInput{Type: website.EventGUI})
 	if err != nil {
 		return fmt.Sprintf("Command Failed! Error: %v", err), http.StatusInternalServerError
 	}
@@ -163,7 +164,7 @@ func testQbit(ctx context.Context, config *qbit.Config) (string, int) {
 }
 
 func testRtorrent(config *apps.RtorrentConfig) (string, int) {
-	config.Setup(0, func(string, ...interface{}) {})
+	config.Setup(0, nil)
 
 	result, err := config.Client.Call("system.hostname")
 	if err != nil {
@@ -182,7 +183,7 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 }
 
 func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
-	app.Setup(0, func(string, ...interface{}) {})
+	app.Setup(0, nil)
 
 	sab, err := app.GetQueue(ctx)
 	if err != nil {
@@ -328,7 +329,7 @@ func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 }
 
 func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
-	app.Setup(0, func(string, ...interface{}) {})
+	app.Setup(0, nil)
 
 	info, err := app.GetInfo(ctx)
 	if err != nil {
@@ -339,7 +340,7 @@ func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
 }
 
 func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
-	app.Setup(0, func(string, ...interface{}) {})
+	app.Setup(0, nil)
 
 	users, err := app.GetUsers(ctx)
 	if err != nil {

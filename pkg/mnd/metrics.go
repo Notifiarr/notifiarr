@@ -1,10 +1,12 @@
 //nolint:gochecknoglobals
-package exp
+package mnd
 
 import (
 	"expvar"
 	"strings"
 )
+
+/* This file powers all the exported metrics. */
 
 var mainMap = expvar.NewMap("notifiarr").Init()
 

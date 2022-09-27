@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"golift.io/nzbget"
 )
 
-func (c *Cmd) getNZBGetStates() []*State {
+func (c *Cmd) getNZBGetStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.NZBGet {
@@ -21,7 +22,7 @@ func (c *Cmd) getNZBGetStates() []*State {
 
 		c.Debugf("Getting NZBGet State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getNZBGetState(instance+1, app)
+		state, err := c.getNZBGetState(ctx, instance+1, app)
 		if err != nil {
 			state.Error = err.Error()
 			c.Errorf("Getting NZBGet Data from %d:%s: %v", instance+1, app.URL, err)
@@ -33,11 +34,11 @@ func (c *Cmd) getNZBGetStates() []*State {
 	return states
 }
 
-func (c *Cmd) getNZBGetState(instance int, n *apps.NZBGetConfig) (*State, error) {
+func (c *Cmd) getNZBGetState(ctx context.Context, instance int, n *apps.NZBGetConfig) (*State, error) {
 	state := &State{Instance: instance, Name: n.Name}
 	start := time.Now()
 
-	queue, stat, hist, err := getNzbData(instance, n)
+	queue, stat, hist, err := getNzbData(ctx, instance, n)
 	if err != nil {
 		return state, err
 	}
@@ -86,18 +87,22 @@ func (c *Cmd) getNZBGetState(instance int, n *apps.NZBGetConfig) (*State, error)
 	return state, nil
 }
 
-func getNzbData(instance int, n *apps.NZBGetConfig) ([]*nzbget.Group, *nzbget.Status, []*nzbget.History, error) {
-	queue, err := n.ListGroups()
+func getNzbData(
+	ctx context.Context,
+	instance int,
+	n *apps.NZBGetConfig,
+) ([]*nzbget.Group, *nzbget.Status, []*nzbget.History, error) {
+	queue, err := n.ListGroupsContext(ctx)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting file groups (queue) from instance %d: %w", instance, err)
 	}
 
-	stat, err := n.Status()
+	stat, err := n.StatusContext(ctx)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}
 
-	hist, err := n.History(true)
+	hist, err := n.HistoryContext(ctx, true)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}

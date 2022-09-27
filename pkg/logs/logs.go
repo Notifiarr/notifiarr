@@ -7,13 +7,13 @@
 package logs
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
 	"runtime/debug"
 	"sync"
 
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -56,6 +56,9 @@ const (
 	callDepth = 2 // log the line that called us.
 	defExt    = ".log"
 	httpExt   = ".http.log"
+	errStr    = "Error"
+	infoStr   = "Info"
+	dbugStr   = "Debug"
 )
 
 // LogConfig allows sending logs to rotating files.
@@ -174,76 +177,66 @@ func (l *Logger) CapturePanic() {
 
 // Debug writes log lines... to stdout and/or a file.
 func (l *Logger) Debug(v ...interface{}) {
-	exp.LogFiles.Add("Debug Lines", 1)
-
-	err := l.DebugLog.Output(callDepth, fmt.Sprintln(v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, dbugStr)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
 func (l *Logger) Debugf(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Debug Lines", 1)
-
-	err := l.DebugLog.Output(callDepth, fmt.Sprintf(msg, v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, dbugStr)
 }
 
 // Print writes log lines... to stdout and/or a file.
 func (l *Logger) Print(v ...interface{}) {
-	exp.LogFiles.Add("Info Lines", 1)
-
-	err := l.InfoLog.Output(callDepth, fmt.Sprintln(v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, infoStr)
 }
 
 // Printf writes log lines... to stdout and/or a file.
 func (l *Logger) Printf(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Info Lines", 1)
-
-	err := l.InfoLog.Output(callDepth, fmt.Sprintf(msg, v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, infoStr)
 }
 
 // Error writes log lines... to stdout and/or a file.
 func (l *Logger) Error(v ...interface{}) {
-	exp.LogFiles.Add("Error Lines", 1)
-
-	msg := fmt.Sprintln(v...)
-	if err := l.ErrorLog.Output(callDepth, msg); err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
-
-	share.Log(msg)
+	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, errStr)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
 func (l *Logger) Errorf(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Error Lines", 1)
-
-	msg = fmt.Sprintf(msg, v...)
-	if err := l.ErrorLog.Output(callDepth, msg); err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
-
-	share.Log(msg)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr)
 }
 
 // ErrorfNoShare writes log lines... to stdout and/or a file.
 func (l *Logger) ErrorfNoShare(msg string, v ...interface{}) {
-	exp.LogFiles.Add("Error Lines", 1)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr)
+}
 
-	err := l.ErrorLog.Output(callDepth, fmt.Sprintf(msg, v...))
-	if err != nil {
+func (l *Logger) writeMsg(msg string, log *log.Logger, name string) {
+	if err := log.Output(callDepth, msg); err != nil {
+		if errors.Is(err, rotatorr.ErrWriteTooLarge) {
+			l.writeSplitMsg(msg, log, name)
+			return
+		}
+
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
+	} else {
+		mnd.LogFiles.Add(name+" Lines", 1)
 	}
+
+	if name == errStr { // we share errors with the website.
+		share.Log(msg)
+	}
+}
+
+// writeSplitMsg splits the message in half and attempts to write each half.
+// If the message is still too large, it'll be split again, and the process continues until it works.
+func (l *Logger) writeSplitMsg(msg string, log *log.Logger, name string) {
+	half := len(msg) / 2 //nolint:gomnd // split messages in half, recursively as needed.
+	part1 := msg[:half]
+	part2 := "...continuing: " + msg[half:]
+
+	mnd.LogFiles.Add(name+" Splits", 1)
+	l.writeMsg(part1, log, name)
+	l.writeMsg(part2, log, name)
 }
 
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
@@ -288,7 +281,7 @@ func CustomLog(filePath, logName string) *Logger {
 
 func (l *Logger) postRotateCounter(fileName, newFile string) {
 	if fileName != "" {
-		exp.LogFiles.Add("Rotated: "+fileName, 1)
+		mnd.LogFiles.Add("Rotated: "+fileName, 1)
 	}
 
 	if newFile != "" && l != nil {

@@ -72,12 +72,12 @@ func (c *cmd) create() {
 	c.Add(&common.Action{
 		Name: TrigCFSyncRadarr,
 		Fn:   c.syncRadarr,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    radarrTicker,
 	}, &common.Action{
 		Name: TrigRPSyncSonarr,
 		Fn:   c.syncSonarr,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    sonarrTicker,
 	})
 }
@@ -110,7 +110,7 @@ func (c *cmd) setupRadarr(ci *website.ClientInfo) {
 			Hide: true,
 			Name: TrigCFSyncRadarrInt.WithInstance(instance),
 			Fn:   (&radarrApp{app: app, cmd: c, idx: idx}).syncRadarr,
-			C:    make(chan website.EventType, 1),
+			C:    make(chan *common.ActionInput, 1),
 			T:    ticker,
 		})
 	}
@@ -144,7 +144,7 @@ func (c *cmd) setupSonarr(ci *website.ClientInfo) {
 			Hide: true,
 			Name: TrigRPSyncSonarrInt.WithInstance(instance),
 			Fn:   (&sonarrApp{app: app, cmd: c, idx: idx}).syncSonarr,
-			C:    make(chan website.EventType, 1),
+			C:    make(chan *common.ActionInput, 1),
 			T:    ticker,
 		})
 	}

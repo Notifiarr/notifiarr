@@ -20,7 +20,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
@@ -119,7 +118,7 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		c.indexPage(request.Context(), response, request, "Invalid Password Length")
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
 		c.setSession(providedUsername, response)
-		exp.HTTPRequests.Add("GUI Logins", 1)
+		mnd.HTTPRequests.Add("GUI Logins", 1)
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	default: // Start over.
 		c.indexPage(request.Context(), response, request, "Invalid Password")
@@ -431,11 +430,6 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	if err := json.NewEncoder(response).Encode(&output); err != nil {
 		c.Errorf("Encoding file browser directory: %v", err)
 	}
-}
-
-func (c *Client) handleGUITrigger(response http.ResponseWriter, request *http.Request) {
-	code, data := c.triggers.RunTrigger(website.EventGUI, mux.Vars(request)["action"], mux.Vars(request)["content"])
-	http.Error(response, data, code)
 }
 
 func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.Request) {

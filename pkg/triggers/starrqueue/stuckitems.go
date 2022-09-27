@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/starr/lidarr"
@@ -16,24 +17,24 @@ import (
 // StuckItems sends the stuck queues items for all apps.
 // Does not fetch fresh data first, uses cache.
 func (a *Action) StuckItems(event website.EventType) {
-	a.cmd.Exec(event, TrigStuckItems)
+	a.cmd.Exec(&common.ActionInput{Type: event}, TrigStuckItems)
 }
 
 // sendStuckQueues gathers the stuck queue from cache and sends them.
-func (c *cmd) sendStuckQueues(ctx context.Context, event website.EventType) {
+func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	lidarr := c.getFinishedItemsLidarr(ctx)
 	radarr := c.getFinishedItemsRadarr(ctx)
 	readarr := c.getFinishedItemsReadarr(ctx)
 	sonarr := c.getFinishedItemsSonarr(ctx)
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
-		c.Debugf("No stuck items found.")
+		c.Debugf("[%s requested] No stuck items found.", input.Type)
 		return
 	}
 
 	c.SendData(&website.Request{
 		Route:      website.StuckRoute,
-		Event:      event,
+		Event:      input.Type,
 		LogPayload: true,
 		LogMsg: fmt.Sprintf("Stuck Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),

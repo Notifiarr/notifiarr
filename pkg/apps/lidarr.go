@@ -67,11 +67,17 @@ func (a *Apps) setupLidarr() error {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Lidarr config %d", ErrInvalidApp, idx+1)
 		}
 
-		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
-			MaxBody: a.MaxBody,
-			Debugf:  a.Debugf,
-			Caller:  metricMaker(string(starr.Lidarr)),
-		})
+		if a.Logger.DebugEnabled() {
+			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+				MaxBody: a.MaxBody,
+				Debugf:  a.Debugf,
+				Caller:  metricMakerCallback(string(starr.Lidarr)),
+			})
+		} else {
+			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Lidarr.String(), nil)
+		}
+
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Lidarr = lidarr.New(app.Config)

@@ -11,7 +11,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/cnfg"
@@ -120,8 +119,8 @@ func (a *Apps) Setup() error { //nolint:cyclop
 		a.Plex = &PlexConfig{Config: &plex.Config{}}
 	}
 
-	a.Tautulli.Setup(a.MaxBody, a.Debugf)
-	a.Plex.Setup(a.MaxBody, a.Debugf)
+	a.Tautulli.Setup(a.MaxBody, a.Logger)
+	a.Plex.Setup(a.MaxBody, a.Logger)
 
 	return nil
 }
@@ -140,21 +139,4 @@ func (a *Apps) InitHandlers() {
 	a.radarrHandlers()
 	a.readarrHandlers()
 	a.sonarrHandlers()
-}
-
-func metricMaker(app string) func(string, string, int, int, error) {
-	return func(status, method string, sent, rcvd int, err error) {
-		exp.Apps.Add(app+"&&"+method+" Bytes Received", int64(rcvd))
-		exp.Apps.Add(app+"&&"+method+" Requests", 1)
-
-		if method != "GET" || sent > 0 {
-			exp.Apps.Add(app+"&&"+method+" Bytes Sent", int64(sent))
-		}
-
-		if err != nil {
-			exp.Apps.Add(app+"&&"+method+" Request Errors", 1)
-		} else {
-			exp.Apps.Add(app+"&&"+method+" Response: "+status, 1)
-		}
-	}
 }

@@ -2,6 +2,7 @@ package crontimer
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -39,7 +40,7 @@ type cmd struct {
 type Timer struct {
 	*website.CronConfig
 	website *website.Server
-	ch      chan website.EventType
+	ch      chan *common.ActionInput
 }
 
 // New configures the library.
@@ -48,19 +49,19 @@ func New(config *common.Config) *Action {
 }
 
 // Run fires a custom cron timer (GET).
-func (t *Timer) Run(event website.EventType) {
+func (t *Timer) Run(input *common.ActionInput) {
 	if t.ch == nil {
 		return
 	}
 
-	t.ch <- event
+	t.ch <- input
 }
 
 // run responds to the channel that the timer fired into.
-func (t *Timer) run(ctx context.Context, event website.EventType) {
+func (t *Timer) run(ctx context.Context, input *common.ActionInput) {
 	t.website.SendData(&website.Request{
 		Route:      website.Route(t.URI),
-		Event:      event,
+		Event:      input.Type,
 		Payload:    &struct{ Cron string }{Cron: "thingy"},
 		LogMsg:     "Custom Timer Request '" + t.Name + "'",
 		LogPayload: true,
@@ -97,7 +98,7 @@ func (c *cmd) create() {
 	for _, custom := range ci.Actions.Custom {
 		timer := &Timer{
 			CronConfig: custom,
-			ch:         make(chan website.EventType, 1),
+			ch:         make(chan *common.ActionInput, 1),
 			website:    c.Config.Server,
 		}
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
@@ -123,4 +124,38 @@ func (c *cmd) create() {
 	}
 
 	c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Actions.Custom))
+}
+
+// PollForReload checks if the website wants the client to reload (new settings).
+func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
+	body, err := c.GetData(&website.Request{
+		Route:      website.ClientRoute,
+		Event:      website.EventPoll,
+		Payload:    c.Server.Info(ctx),
+		LogPayload: true,
+	})
+	if err != nil {
+		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		return
+	}
+
+	var v struct {
+		Reload     bool      `json:"reload"`
+		LastSync   time.Time `json:"lastSync"`
+		LastChange time.Time `json:"lastChange"`
+	}
+
+	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
+		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		return
+	}
+
+	if v.Reload {
+		c.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!"+
+			" Last Sync: %v, Last Change: %v, Diff: %v", input.Type, v.LastSync, v.LastChange, v.LastSync.Sub(v.LastChange))
+		defer c.ReloadApp("poll triggered reload")
+	} else if ci := website.GetClientInfo(); ci == nil {
+		c.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", input.Type)
+		defer c.ReloadApp("client info reload")
+	}
 }

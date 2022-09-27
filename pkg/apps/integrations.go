@@ -7,6 +7,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/mrobinsn/go-rtorrent/xmlrpc"
 	"golift.io/deluge"
 	"golift.io/nzbget"
@@ -21,12 +22,17 @@ type PlexConfig struct {
 	extraConfig
 }
 
-func (c *PlexConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
-	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
-		MaxBody: maxBody,
-		Debugf:  debugf,
-		Caller:  metricMaker(starr.Plex.String()),
-	})
+func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
+	if logger != nil && logger.DebugEnabled() {
+		c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
+			MaxBody: maxBody,
+			Debugf:  logger.Debugf,
+			Caller:  metricMakerCallback(starr.Plex.String()),
+		})
+	} else {
+		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
+		c.Config.Client.Transport = NewMetricsRoundTripper(starr.Plex.String(), nil)
+	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
 	c.Server = plex.New(c.Config)
@@ -42,16 +48,21 @@ type TautulliConfig struct {
 	*tautulli.Config
 }
 
-func (c *TautulliConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
 	if !c.Enabled() {
 		return
 	}
 
-	c.Config.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
-		MaxBody: maxBody,
-		Debugf:  debugf,
-		Caller:  metricMaker("Tautulli"),
-	})
+	if logger != nil && logger.DebugEnabled() {
+		c.Config.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
+			MaxBody: maxBody,
+			Debugf:  logger.Debugf,
+			Caller:  metricMakerCallback("Tautulli"),
+		})
+	} else {
+		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
+		c.Config.Client.Transport = NewMetricsRoundTripper("Tautulli", nil)
+	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
 }
@@ -69,14 +80,14 @@ type DelugeConfig struct {
 
 func (a *Apps) setupDeluge() error {
 	for idx, app := range a.Deluge {
-		if !a.Deluge[idx].Enabled() {
+		if app == nil || app.Config == nil || app.URL == "" || app.Password == "" {
 			return fmt.Errorf("%w: missing url or password: Deluge config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Deluge config %d", ErrInvalidApp, idx+1)
 		}
 
 		// a.Deluge[i].Debugf = a.DebugLog.Printf
-		if err := a.Deluge[idx].setup(a.MaxBody, a.Debugf); err != nil {
+		if err := a.Deluge[idx].setup(a.MaxBody, a.Logger); err != nil {
 			return err
 		}
 	}
@@ -84,12 +95,17 @@ func (a *Apps) setupDeluge() error {
 	return nil
 }
 
-func (c *DelugeConfig) setup(maxBody int, debugf func(string, ...interface{})) error {
-	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
-		MaxBody: maxBody,
-		Debugf:  debugf,
-		Caller:  metricMaker("Deluge"),
-	})
+func (c *DelugeConfig) setup(maxBody int, logger mnd.Logger) error {
+	if logger != nil && logger.DebugEnabled() {
+		c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
+			MaxBody: maxBody,
+			Debugf:  logger.Debugf,
+			Caller:  metricMakerCallback("Deluge"),
+		})
+	} else {
+		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
+		c.Config.Client.Transport = NewMetricsRoundTripper("Deluge", nil)
+	}
 
 	var err error
 
@@ -112,28 +128,33 @@ type SabNZBConfig struct {
 
 func (a *Apps) setupSabNZBd() error {
 	for idx, app := range a.SabNZB {
-		if !a.SabNZB[idx].Enabled() {
+		if app == nil || app.Config == nil || app.URL == "" || app.APIKey == "" {
 			return fmt.Errorf("%w: missing url or api key: SABnzbd config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: SABnzbd config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.SabNZB[idx].Setup(a.MaxBody, a.Debugf)
+		a.SabNZB[idx].Setup(a.MaxBody, a.Logger)
 	}
 
 	return nil
 }
 
-func (c *SabNZBConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *SabNZBConfig) Setup(maxBody int, logger mnd.Logger) {
 	if !c.Enabled() {
 		return
 	}
 
-	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
-		MaxBody: maxBody,
-		Debugf:  debugf,
-		Caller:  metricMaker("SABnzbd"),
-	})
+	if logger != nil && logger.DebugEnabled() {
+		c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
+			MaxBody: maxBody,
+			Debugf:  logger.Debugf,
+			Caller:  metricMakerCallback("SABnzbd"),
+		})
+	} else {
+		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
+		c.Config.Client.Transport = NewMetricsRoundTripper("SABnzbd", nil)
+	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
 }
@@ -151,14 +172,14 @@ type QbitConfig struct {
 
 func (a *Apps) setupQbit() error {
 	for idx, app := range a.Qbit {
-		if !a.Qbit[idx].Enabled() {
+		if app == nil || app.Config == nil || app.URL == "" {
 			return fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Qbit config %d", ErrInvalidApp, idx+1)
 		}
 
 		// a.Qbit[i].Debugf = a.DebugLog.Printf
-		if err := a.Qbit[idx].Setup(a.MaxBody, a.Debugf); err != nil {
+		if err := a.Qbit[idx].Setup(a.MaxBody, a.Logger); err != nil {
 			return err
 		}
 	}
@@ -166,12 +187,17 @@ func (a *Apps) setupQbit() error {
 	return nil
 }
 
-func (c *QbitConfig) Setup(maxBody int, debugf func(string, ...interface{})) error {
-	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
-		MaxBody: maxBody,
-		Debugf:  debugf,
-		Caller:  metricMaker("qBittorrent"),
-	})
+func (c *QbitConfig) Setup(maxBody int, logger mnd.Logger) error {
+	if logger != nil && logger.DebugEnabled() {
+		c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
+			MaxBody: maxBody,
+			Debugf:  logger.Debugf,
+			Caller:  metricMakerCallback("qBittorrent"),
+		})
+	} else {
+		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
+		c.Config.Client.Transport = NewMetricsRoundTripper("qBittorrent", nil)
+	}
 
 	var err error
 	if c.Qbit, err = qbit.NewNoAuth(c.Config); err != nil {
@@ -196,19 +222,19 @@ type RtorrentConfig struct {
 
 func (a *Apps) setupRtorrent() error {
 	for idx, app := range a.Rtorrent {
-		if !a.Rtorrent[idx].Enabled() {
+		if app == nil || app.URL == "" {
 			return fmt.Errorf("%w: missing url: rTorrent config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.URL, "http://") && !strings.HasPrefix(app.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: rTorrent config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Rtorrent[idx].Setup(a.MaxBody, a.Debugf)
+		a.Rtorrent[idx].Setup(a.MaxBody, a.Logger)
 	}
 
 	return nil
 }
 
-func (c *RtorrentConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *RtorrentConfig) Setup(maxBody int, logger mnd.Logger) {
 	prefix := "http://"
 	if strings.HasPrefix(c.URL, "https://") {
 		prefix = "https://"
@@ -222,11 +248,18 @@ func (c *RtorrentConfig) Setup(maxBody int, debugf func(string, ...interface{}))
 		url = prefix + url
 	}
 
-	c.Client = xmlrpc.NewClientWithHTTPClient(url, starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
-		MaxBody: maxBody,
-		Debugf:  debugf,
-		Caller:  metricMaker("rTorrent"),
-	}))
+	client := starr.Client(c.Timeout.Duration, c.ValidSSL)
+	client.Transport = NewMetricsRoundTripper("rTorrent", nil)
+
+	if logger != nil && logger.DebugEnabled() {
+		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
+			MaxBody: maxBody,
+			Debugf:  logger.Debugf,
+			Caller:  metricMakerCallback("rTorrent"),
+		})
+	}
+
+	c.Client = xmlrpc.NewClientWithHTTPClient(url, client)
 }
 
 // Enabled returns true if the instance is enabled and usable.
@@ -241,18 +274,23 @@ type NZBGetConfig struct {
 }
 
 func (a *Apps) setupNZBGet() error {
-	for idx, nzb := range a.NZBGet {
-		if !nzb.Enabled() {
+	for idx, app := range a.NZBGet {
+		if app == nil || app.Config == nil || app.URL == "" {
 			return fmt.Errorf("%w: missing url: NZBGet config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(nzb.Config.URL, "http://") && !strings.HasPrefix(nzb.Config.URL, "https://") {
+		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: NZBGet config %d", ErrInvalidApp, idx+1)
 		}
 
-		nzb.Client = starr.ClientWithDebug(nzb.Timeout.Duration, nzb.ValidSSL, debuglog.Config{
-			MaxBody: a.MaxBody,
-			Debugf:  a.Debugf,
-			Caller:  metricMaker("NZBGet"),
-		})
+		if a.Logger != nil && a.Logger.DebugEnabled() {
+			app.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+				MaxBody: a.MaxBody,
+				Debugf:  a.Debugf,
+				Caller:  metricMakerCallback("NZBGet"),
+			})
+		} else {
+			app.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			app.Client.Transport = NewMetricsRoundTripper("NZBGet", nil)
+		}
 
 		a.NZBGet[idx].NZBGet = nzbget.New(a.NZBGet[idx].Config)
 	}

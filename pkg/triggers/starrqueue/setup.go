@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
-	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
@@ -33,6 +32,7 @@ const (
 	warning     = "warning"
 	completed   = "completed"
 	downloading = "downloading"
+	delay       = "delay"
 )
 
 const (
@@ -64,7 +64,7 @@ func (a *Action) Create() {
 		a.cmd.Add(&common.Action{
 			Name: TrigStuckItems,
 			Fn:   a.cmd.sendStuckQueues,
-			C:    make(chan website.EventType, 1),
+			C:    make(chan *common.ActionInput, 1),
 			T:    time.NewTicker(stuckDuration),
 		})
 
@@ -72,7 +72,7 @@ func (a *Action) Create() {
 			Hide: true,
 			Name: TrigDownloadingItems,
 			Fn:   a.cmd.sendDownloadingQueues,
-			C:    make(chan website.EventType, 1),
+			C:    make(chan *common.ActionInput, 1),
 			T:    time.NewTicker(finishedDuration),
 		})
 	}

@@ -38,7 +38,7 @@ func Log(msg string) {
 	locker.RLock()
 	defer locker.RUnlock()
 
-	if config == nil || !website.HaveClientInfo() {
+	if ci := website.GetClientInfo(); ci == nil || config == nil {
 		return
 	}
 

@@ -1,13 +1,17 @@
-package exp
+package apps
 
 import (
 	"io"
 	"net/http"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/datacounter"
 )
 
-/* The code in thie files powers the metrics collection for prety much every integrated app. */
+/*
+ * The code in this files powers the metrics collection for prety much every integrated app,
+ * but only when debug is disabled.
+ */
 
 type fakeCloser struct {
 	App     string
@@ -18,7 +22,7 @@ type fakeCloser struct {
 }
 
 func (f *fakeCloser) Close() error {
-	defer Apps.Add(f.App+"&&"+f.Method+" Bytes Received", int64(f.Rcvd()))
+	defer mnd.Apps.Add(f.App+"&&"+f.Method+" Bytes Received", int64(f.Rcvd()))
 	return f.CloseFn()
 }
 
@@ -52,7 +56,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		req.Body = io.NopCloser(sent)
 
 		defer func() {
-			Apps.Add(rt.app+"&&"+req.Method+" Bytes Sent", int64(sent.Count()))
+			mnd.Apps.Add(rt.app+"&&"+req.Method+" Bytes Sent", int64(sent.Count()))
 		}()
 	}
 
@@ -81,13 +85,33 @@ func NewFakeCloser(app, method string, body io.ReadCloser) io.ReadCloser {
 }
 
 func checkResp(app, method string, resp *http.Response, err error) {
-	Apps.Add(app+"&&"+method+" Requests", 1)
+	mnd.Apps.Add(app+"&&"+method+" Requests", 1)
 
 	if resp != nil {
-		Apps.Add(app+"&&"+method+" Response: "+resp.Status, 1)
+		mnd.Apps.Add(app+"&&"+method+" Response: "+resp.Status, 1)
 	}
 
 	if err != nil || resp == nil {
-		Apps.Add(app+"&&"+method+" Request Errors", 1)
+		mnd.Apps.Add(app+"&&"+method+" Request Errors", 1)
+	}
+}
+
+// metricMakerCallback is used as a callback function from the starr/debuglog package.
+// This is used when debug is enabled.
+// This does not interact with or use any other methods in this file.
+func metricMakerCallback(app string) func(string, string, int, int, error) {
+	return func(status, method string, sent, rcvd int, err error) {
+		mnd.Apps.Add(app+"&&"+method+" Bytes Received", int64(rcvd))
+		mnd.Apps.Add(app+"&&"+method+" Requests", 1)
+
+		if method != "GET" || sent > 0 {
+			mnd.Apps.Add(app+"&&"+method+" Bytes Sent", int64(sent))
+		}
+
+		if err != nil {
+			mnd.Apps.Add(app+"&&"+method+" Request Errors", 1)
+		} else {
+			mnd.Apps.Add(app+"&&"+method+" Response: "+status, 1)
+		}
 	}
 }

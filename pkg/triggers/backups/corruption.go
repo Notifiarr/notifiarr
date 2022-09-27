@@ -19,28 +19,28 @@ import (
 )
 
 // Corruption initializes a corruption check for all instances of the provided app.
-func (a *Action) Corruption(event website.EventType, app starr.App) error {
+func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
 	switch app {
 	default:
 		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
 	case "":
 		return fmt.Errorf("%w: <no app provided>", common.ErrInvalidApp)
 	case "All":
-		a.cmd.Exec(event, TrigLidarrCorrupt)
-		a.cmd.Exec(event, TrigProwlarrCorrupt)
-		a.cmd.Exec(event, TrigRadarrCorrupt)
-		a.cmd.Exec(event, TrigReadarrCorrupt)
-		a.cmd.Exec(event, TrigSonarrCorrupt)
+		a.cmd.Exec(input, TrigLidarrCorrupt)
+		a.cmd.Exec(input, TrigProwlarrCorrupt)
+		a.cmd.Exec(input, TrigRadarrCorrupt)
+		a.cmd.Exec(input, TrigReadarrCorrupt)
+		a.cmd.Exec(input, TrigSonarrCorrupt)
 	case starr.Lidarr:
-		a.cmd.Exec(event, TrigLidarrCorrupt)
+		a.cmd.Exec(input, TrigLidarrCorrupt)
 	case starr.Prowlarr:
-		a.cmd.Exec(event, TrigProwlarrCorrupt)
+		a.cmd.Exec(input, TrigProwlarrCorrupt)
 	case starr.Radarr:
-		a.cmd.Exec(event, TrigRadarrCorrupt)
+		a.cmd.Exec(input, TrigRadarrCorrupt)
 	case starr.Readarr:
-		a.cmd.Exec(event, TrigReadarrCorrupt)
+		a.cmd.Exec(input, TrigReadarrCorrupt)
 	case starr.Sonarr:
-		a.cmd.Exec(event, TrigSonarrCorrupt)
+		a.cmd.Exec(input, TrigSonarrCorrupt)
 	}
 
 	return nil
@@ -64,7 +64,7 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 	c.Add(&common.Action{
 		Name: TrigLidarrCorrupt,
 		Fn:   c.sendLidarrCorruption,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
@@ -87,7 +87,7 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 	c.Add(&common.Action{
 		Name: TrigProwlarrCorrupt,
 		Fn:   c.sendProwlarrCorruption,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
@@ -110,7 +110,7 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 	c.Add(&common.Action{
 		Name: TrigRadarrCorrupt,
 		Fn:   c.sendRadarrCorruption,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
@@ -133,7 +133,7 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 	c.Add(&common.Action{
 		Name: TrigReadarrCorrupt,
 		Fn:   c.sendReadarrCorruption,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
@@ -156,15 +156,15 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 	c.Add(&common.Action{
 		Name: TrigSonarrCorrupt,
 		Fn:   c.sendSonarrCorruption,
-		C:    make(chan website.EventType, 1),
+		C:    make(chan *common.ActionInput, 1),
 		T:    ticker,
 	})
 }
 
-func (c *cmd) sendLidarrCorruption(ctx context.Context, event website.EventType) {
+func (c *cmd) sendLidarrCorruption(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Lidarr {
 		c.lidarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
-			event: event,
+			event: input.Type,
 			last:  c.lidarr[idx],
 			name:  starr.Lidarr,
 			int:   idx + 1,
@@ -175,10 +175,10 @@ func (c *cmd) sendLidarrCorruption(ctx context.Context, event website.EventType)
 	}
 }
 
-func (c *cmd) sendProwlarrCorruption(ctx context.Context, event website.EventType) {
+func (c *cmd) sendProwlarrCorruption(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Prowlarr {
 		c.prowlarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
-			event: event,
+			event: input.Type,
 			last:  c.prowlarr[idx],
 			name:  starr.Prowlarr,
 			int:   idx + 1,
@@ -189,10 +189,10 @@ func (c *cmd) sendProwlarrCorruption(ctx context.Context, event website.EventTyp
 	}
 }
 
-func (c *cmd) sendRadarrCorruption(ctx context.Context, event website.EventType) {
+func (c *cmd) sendRadarrCorruption(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Radarr {
 		c.radarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
-			event: event,
+			event: input.Type,
 			last:  c.radarr[idx],
 			name:  starr.Radarr,
 			int:   idx + 1,
@@ -203,10 +203,10 @@ func (c *cmd) sendRadarrCorruption(ctx context.Context, event website.EventType)
 	}
 }
 
-func (c *cmd) sendReadarrCorruption(ctx context.Context, event website.EventType) {
+func (c *cmd) sendReadarrCorruption(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Readarr {
 		c.readarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
-			event: event,
+			event: input.Type,
 			last:  c.readarr[idx],
 			name:  starr.Readarr,
 			int:   idx + 1,
@@ -217,10 +217,10 @@ func (c *cmd) sendReadarrCorruption(ctx context.Context, event website.EventType
 	}
 }
 
-func (c *cmd) sendSonarrCorruption(ctx context.Context, event website.EventType) {
+func (c *cmd) sendSonarrCorruption(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Sonarr {
 		c.sonarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
-			event: event,
+			event: input.Type,
 			last:  c.sonarr[idx],
 			name:  starr.Sonarr,
 			int:   idx + 1,

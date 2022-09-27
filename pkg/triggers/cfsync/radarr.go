@@ -31,12 +31,12 @@ type RadarrTrashPayload struct {
 
 // SyncRadarrCF initializes a custom format sync with radarr.
 func (a *Action) SyncRadarrCF(event website.EventType) {
-	a.cmd.Exec(event, TrigCFSyncRadarr)
+	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCFSyncRadarr)
 }
 
 // SyncRadarrInstanceCF initializes a custom format sync with a specific radarr instance.
 func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) error {
-	if name := TrigCFSyncRadarrInt.WithInstance(instance); !a.cmd.Exec(event, name) {
+	if name := TrigCFSyncRadarrInt.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
 		return fmt.Errorf("%w: Radarr instance: %d", common.ErrInvalidApp, instance)
 	}
 
@@ -44,13 +44,13 @@ func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) err
 }
 
 // syncRadarr triggers a custom format sync for Radarr.
-func (c *cmd) syncRadarr(ctx context.Context, event website.EventType) {
+func (c *cmd) syncRadarr(ctx context.Context, input *common.ActionInput) {
 	ci := website.GetClientInfo()
 	if ci == nil || len(ci.Actions.Sync.RadarrInstances) < 1 {
-		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. Website provided 0 instances.", event)
+		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Radarr) < 1 {
-		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. No Radarr instances configured.", event)
+		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. No Radarr instances configured.", input.Type)
 		return
 	}
 
@@ -58,29 +58,29 @@ func (c *cmd) syncRadarr(ctx context.Context, event website.EventType) {
 		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Sync.RadarrInstances.Has(instance) {
 			c.Debugf("[%s requested] CF Sync Skipping Radarr instance %d. Not in sync list: %v",
-				event, instance, ci.Actions.Sync.RadarrInstances)
+				input.Type, instance, ci.Actions.Sync.RadarrInstances)
 			continue
 		}
 
-		(&radarrApp{app: app, cmd: c, idx: idx}).syncRadarr(ctx, event)
+		(&radarrApp{app: app, cmd: c, idx: idx}).syncRadarr(ctx, input)
 	}
 }
 
 // syncRadarr sends the profiles for a single instance.
-func (c *radarrApp) syncRadarr(ctx context.Context, event website.EventType) {
+func (c *radarrApp) syncRadarr(ctx context.Context, input *common.ActionInput) {
 	start := time.Now()
-	payload := c.cmd.getRadarrProfiles(ctx, event, c.idx+1)
+	payload := c.cmd.getRadarrProfiles(ctx, input.Type, c.idx+1)
 
 	c.cmd.SendData(&website.Request{
 		Route:      website.CFSyncRoute,
-		Event:      event,
+		Event:      input.Type,
 		Params:     []string{"app=radarr"},
 		Payload:    payload,
 		LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
 		LogPayload: true,
 	})
 	c.cmd.Printf("[%s requested] Synced Custom Formats for Radarr instance %d (%s/%s)",
-		event, c.idx+1, c.app.Name, c.app.URL)
+		input.Type, c.idx+1, c.app.Name, c.app.URL)
 }
 
 func (c *cmd) getRadarrProfiles(ctx context.Context, event website.EventType, instance int) *RadarrTrashPayload {

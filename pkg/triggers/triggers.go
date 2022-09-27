@@ -4,6 +4,7 @@ package triggers
 
 import (
 	"context"
+	"os"
 	"reflect"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -89,7 +90,8 @@ type run interface {
 }
 
 // Start creates all the triggers and runs the timers.
-func (a *Actions) Start(ctx context.Context) {
+func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
+	a.timers.SetReloadCh(reloadCh)
 	defer a.timers.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()

@@ -13,6 +13,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/getlantern/systray"
@@ -264,7 +265,7 @@ func (c *Client) buildDynamicTimerMenus() {
 
 	for {
 		if idx, _, ok := reflect.Select(cases); ok {
-			timers[idx].Run(website.EventUser)
+			timers[idx].Run(&common.ActionInput{Type: website.EventUser})
 		} else if cases = append(cases[:idx], cases[idx+1:]...); len(cases) < 1 {
 			// Channel cases[idx] has been closed, remove it.
 			return // no menus left to watch, exit.
@@ -403,25 +404,25 @@ func (c *Client) watchNotifiarrMenu(ctx context.Context) {
 		case <-menu["send_dash"].ClickedCh:
 			c.triggers.Dashboard.Send(website.EventUser)
 		case <-menu["corrLidarr"].ClickedCh:
-			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Lidarr)
+			_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Lidarr)
 		case <-menu["corrProwlarr"].ClickedCh:
-			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Prowlarr)
+			_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Prowlarr)
 		case <-menu["corrRadarr"].ClickedCh:
-			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Radarr)
+			_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Radarr)
 		case <-menu["corrReadarr"].ClickedCh:
-			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Readarr)
+			_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Readarr)
 		case <-menu["corrSonarr"].ClickedCh:
-			_ = c.triggers.Backups.Corruption(website.EventUser, starr.Sonarr)
+			_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Sonarr)
 		case <-menu["backLidarr"].ClickedCh:
-			_ = c.triggers.Backups.Backup(website.EventUser, starr.Lidarr)
+			_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Lidarr)
 		case <-menu["backProwlarr"].ClickedCh:
-			_ = c.triggers.Backups.Backup(website.EventUser, starr.Prowlarr)
+			_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Prowlarr)
 		case <-menu["backRadarr"].ClickedCh:
-			_ = c.triggers.Backups.Backup(website.EventUser, starr.Radarr)
+			_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Radarr)
 		case <-menu["backReadarr"].ClickedCh:
-			_ = c.triggers.Backups.Backup(website.EventUser, starr.Readarr)
+			_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Readarr)
 		case <-menu["backSonarr"].ClickedCh:
-			_ = c.triggers.Backups.Backup(website.EventUser, starr.Sonarr)
+			_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Sonarr)
 		}
 	}
 }

@@ -10,8 +10,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
-	"github.com/Notifiarr/notifiarr/pkg/exp"
-	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/starr"
 )
 
@@ -69,8 +68,8 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/services/{action:stop|start}", c.handleServicesStopStart).Methods("GET")
 	gui.HandleFunc("/shutdown", c.handleShutdown).Methods("GET")
 	gui.HandleFunc("/template/{template}", c.getTemplatePageHandler).Methods("GET")
-	gui.HandleFunc("/trigger/{action}/{content}", c.handleGUITrigger).Methods("GET")
-	gui.HandleFunc("/trigger/{action}", c.handleGUITrigger).Methods("GET")
+	gui.HandleFunc("/trigger/{trigger}/{content}", c.triggers.Handler).Methods("GET")
+	gui.HandleFunc("/trigger/{trigger}", c.triggers.Handler).Methods("GET")
 	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
 	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
 	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")
@@ -84,9 +83,8 @@ func (c *Client) httpGuiHandlers(base string) {
 func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "info", c.infoHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "trigger/reload", c.handleConfigReload, "GET") // reload has to happen in client module.
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.Handler, "GET")
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.Handler, "GET")
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET")
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET")
 
 	// Aggregate handlers. Non-app specific.
 	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
@@ -177,20 +175,20 @@ func (c *Client) addUsernameHeader(next http.Handler) http.Handler {
 
 func (c *Client) countRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
-		exp.HTTPRequests.Add("Total Requests", 1)
+		mnd.HTTPRequests.Add("Total Requests", 1)
 
 		switch {
 		case strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "api")):
-			exp.HTTPRequests.Add("/api Requests", 1)
+			mnd.HTTPRequests.Add("/api Requests", 1)
 		case strings.HasPrefix(req.RequestURI, path.Join(c.Config.URLBase, "ws")):
-			exp.HTTPRequests.Add("Websocket Requests", 1)
+			mnd.HTTPRequests.Add("Websocket Requests", 1)
 		default:
-			exp.HTTPRequests.Add("Non-/api Requests", 1)
+			mnd.HTTPRequests.Add("Non-/api Requests", 1)
 		}
 
 		wrap := &responseWrapper{ResponseWriter: response, statusCode: http.StatusOK}
 		next.ServeHTTP(wrap, req)
-		exp.HTTPRequests.Add(fmt.Sprintf("Response %d %s", wrap.statusCode, http.StatusText(wrap.statusCode)), 1)
+		mnd.HTTPRequests.Add(fmt.Sprintf("Response %d %s", wrap.statusCode, http.StatusText(wrap.statusCode)), 1)
 	})
 }
 
@@ -207,9 +205,4 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func (c *Client) handleConfigReload(r *http.Request) (int, interface{}) {
-	defer c.triggerConfigReload(website.EventAPI, "HTTP Triggered Reload")
-	return http.StatusOK, "Application reload initiated."
 }
