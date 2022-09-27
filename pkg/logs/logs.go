@@ -7,6 +7,7 @@
 package logs
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -175,75 +176,70 @@ func (l *Logger) CapturePanic() {
 // Debug writes log lines... to stdout and/or a file.
 func (l *Logger) Debug(v ...interface{}) {
 	exp.LogFiles.Add("Debug Lines", 1)
-
-	err := l.DebugLog.Output(callDepth, fmt.Sprintln(v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, false)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
 func (l *Logger) Debugf(msg string, v ...interface{}) {
 	exp.LogFiles.Add("Debug Lines", 1)
-
-	err := l.DebugLog.Output(callDepth, fmt.Sprintf(msg, v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, false)
 }
 
 // Print writes log lines... to stdout and/or a file.
 func (l *Logger) Print(v ...interface{}) {
 	exp.LogFiles.Add("Info Lines", 1)
-
-	err := l.InfoLog.Output(callDepth, fmt.Sprintln(v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, false)
 }
 
 // Printf writes log lines... to stdout and/or a file.
 func (l *Logger) Printf(msg string, v ...interface{}) {
 	exp.LogFiles.Add("Info Lines", 1)
-
-	err := l.InfoLog.Output(callDepth, fmt.Sprintf(msg, v...))
-	if err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
+	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, false)
 }
 
 // Error writes log lines... to stdout and/or a file.
 func (l *Logger) Error(v ...interface{}) {
 	exp.LogFiles.Add("Error Lines", 1)
-
-	msg := fmt.Sprintln(v...)
-	if err := l.ErrorLog.Output(callDepth, msg); err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
-
-	share.Log(msg)
+	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, true)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
 func (l *Logger) Errorf(msg string, v ...interface{}) {
 	exp.LogFiles.Add("Error Lines", 1)
-
-	msg = fmt.Sprintf(msg, v...)
-	if err := l.ErrorLog.Output(callDepth, msg); err != nil {
-		fmt.Println("Logger Error:", err) //nolint:forbidigo
-	}
-
-	share.Log(msg)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, true)
 }
 
 // ErrorfNoShare writes log lines... to stdout and/or a file.
 func (l *Logger) ErrorfNoShare(msg string, v ...interface{}) {
 	exp.LogFiles.Add("Error Lines", 1)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, false)
+}
 
-	err := l.ErrorLog.Output(callDepth, fmt.Sprintf(msg, v...))
-	if err != nil {
+func (l *Logger) writeMsg(msg string, log *log.Logger, isError bool) {
+	if err := log.Output(callDepth, msg); err != nil {
+		if errors.Is(err, rotatorr.ErrWriteTooLarge) {
+			l.writeSplitMsg(msg, log)
+			return // do not share messages this large with the website.
+		}
+
 		fmt.Println("Logger Error:", err) //nolint:forbidigo
 	}
+
+	if isError { // we share errors with the website.
+		share.Log(msg)
+	}
+}
+
+// writeSplitMsg splits the message in half and attempts to write each half.
+// If the message is still too large, it'll be split again, and the process continues until it works.
+func (l *Logger) writeSplitMsg(msg string, log *log.Logger) {
+	half := len(msg) / 2 //nolint:gomnd // split messages in half, recursively as needed.
+	part1 := msg[:half]
+	part2 := "...continuing: " + msg[half:]
+
+	// isError=false; do not share large messages.
+	l.writeMsg(part1, log, false)
+	l.writeMsg(part2, log, false)
 }
 
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
