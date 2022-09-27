@@ -120,8 +120,8 @@ func (a *Apps) Setup() error { //nolint:cyclop
 		a.Plex = &PlexConfig{Config: &plex.Config{}}
 	}
 
-	a.Tautulli.Setup(a.MaxBody, a.Debugf)
-	a.Plex.Setup(a.MaxBody, a.Debugf)
+	a.Tautulli.Setup(a.MaxBody, a.Logger)
+	a.Plex.Setup(a.MaxBody, a.Logger)
 
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/mrobinsn/go-rtorrent/xmlrpc"
 	"golift.io/deluge"
 	"golift.io/nzbget"
@@ -21,13 +22,17 @@ type PlexConfig struct {
 	extraConfig
 }
 
-func (c *PlexConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
+	debugf := func(string, ...interface{}) {}
+	if logger != nil && logger.DebugEnabled() {
+		debugf = logger.Debugf
+	}
+
 	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
 		Caller:  metricMaker(starr.Plex.String()),
 	})
-
 	c.URL = strings.TrimRight(c.URL, "/")
 	c.Server = plex.New(c.Config)
 }
@@ -42,9 +47,14 @@ type TautulliConfig struct {
 	*tautulli.Config
 }
 
-func (c *TautulliConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
 	if !c.Enabled() {
 		return
+	}
+
+	debugf := func(string, ...interface{}) {}
+	if logger != nil && logger.DebugEnabled() {
+		debugf = logger.Debugf
 	}
 
 	c.Config.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
@@ -76,7 +86,7 @@ func (a *Apps) setupDeluge() error {
 		}
 
 		// a.Deluge[i].Debugf = a.DebugLog.Printf
-		if err := a.Deluge[idx].setup(a.MaxBody, a.Debugf); err != nil {
+		if err := a.Deluge[idx].setup(a.MaxBody, a.Logger); err != nil {
 			return err
 		}
 	}
@@ -84,7 +94,12 @@ func (a *Apps) setupDeluge() error {
 	return nil
 }
 
-func (c *DelugeConfig) setup(maxBody int, debugf func(string, ...interface{})) error {
+func (c *DelugeConfig) setup(maxBody int, logger mnd.Logger) error {
+	debugf := func(string, ...interface{}) {}
+	if logger != nil && logger.DebugEnabled() {
+		debugf = logger.Debugf
+	}
+
 	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
@@ -118,15 +133,20 @@ func (a *Apps) setupSabNZBd() error {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: SABnzbd config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.SabNZB[idx].Setup(a.MaxBody, a.Debugf)
+		a.SabNZB[idx].Setup(a.MaxBody, a.Logger)
 	}
 
 	return nil
 }
 
-func (c *SabNZBConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *SabNZBConfig) Setup(maxBody int, logger mnd.Logger) {
 	if !c.Enabled() {
 		return
+	}
+
+	debugf := func(string, ...interface{}) {}
+	if logger != nil && logger.DebugEnabled() {
+		debugf = logger.Debugf
 	}
 
 	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
@@ -158,7 +178,7 @@ func (a *Apps) setupQbit() error {
 		}
 
 		// a.Qbit[i].Debugf = a.DebugLog.Printf
-		if err := a.Qbit[idx].Setup(a.MaxBody, a.Debugf); err != nil {
+		if err := a.Qbit[idx].Setup(a.MaxBody, a.Logger); err != nil {
 			return err
 		}
 	}
@@ -166,7 +186,12 @@ func (a *Apps) setupQbit() error {
 	return nil
 }
 
-func (c *QbitConfig) Setup(maxBody int, debugf func(string, ...interface{})) error {
+func (c *QbitConfig) Setup(maxBody int, logger mnd.Logger) error {
+	debugf := func(string, ...interface{}) {}
+	if logger != nil && logger.DebugEnabled() {
+		debugf = logger.Debugf
+	}
+
 	c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 		MaxBody: maxBody,
 		Debugf:  debugf,
@@ -202,13 +227,13 @@ func (a *Apps) setupRtorrent() error {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: rTorrent config %d", ErrInvalidApp, idx+1)
 		}
 
-		a.Rtorrent[idx].Setup(a.MaxBody, a.Debugf)
+		a.Rtorrent[idx].Setup(a.MaxBody, a.Logger)
 	}
 
 	return nil
 }
 
-func (c *RtorrentConfig) Setup(maxBody int, debugf func(string, ...interface{})) {
+func (c *RtorrentConfig) Setup(maxBody int, logger mnd.Logger) {
 	prefix := "http://"
 	if strings.HasPrefix(c.URL, "https://") {
 		prefix = "https://"
@@ -220,6 +245,11 @@ func (c *RtorrentConfig) Setup(maxBody int, debugf func(string, ...interface{}))
 		url = prefix + c.User + ":" + c.Pass + "@" + url
 	} else {
 		url = prefix + url
+	}
+
+	debugf := func(string, ...interface{}) {}
+	if logger != nil && logger.DebugEnabled() {
+		debugf = logger.Debugf
 	}
 
 	c.Client = xmlrpc.NewClientWithHTTPClient(url, starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
@@ -248,9 +278,14 @@ func (a *Apps) setupNZBGet() error {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: NZBGet config %d", ErrInvalidApp, idx+1)
 		}
 
+		debugf := func(string, ...interface{}) {}
+		if a.Logger != nil && a.Logger.DebugEnabled() {
+			debugf = a.Debugf
+		}
+
 		app.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 			MaxBody: a.MaxBody,
-			Debugf:  a.Debugf,
+			Debugf:  debugf,
 			Caller:  metricMaker("NZBGet"),
 		})
 

@@ -164,7 +164,7 @@ func testQbit(ctx context.Context, config *qbit.Config) (string, int) {
 }
 
 func testRtorrent(config *apps.RtorrentConfig) (string, int) {
-	config.Setup(0, func(string, ...interface{}) {})
+	config.Setup(0, nil)
 
 	result, err := config.Client.Call("system.hostname")
 	if err != nil {
@@ -183,7 +183,7 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 }
 
 func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
-	app.Setup(0, func(string, ...interface{}) {})
+	app.Setup(0, nil)
 
 	sab, err := app.GetQueue(ctx)
 	if err != nil {
@@ -329,7 +329,7 @@ func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 }
 
 func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
-	app.Setup(0, func(string, ...interface{}) {})
+	app.Setup(0, nil)
 
 	info, err := app.GetInfo(ctx)
 	if err != nil {
@@ -340,7 +340,7 @@ func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
 }
 
 func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
-	app.Setup(0, func(string, ...interface{}) {})
+	app.Setup(0, nil)
 
 	users, err := app.GetUsers(ctx)
 	if err != nil {
