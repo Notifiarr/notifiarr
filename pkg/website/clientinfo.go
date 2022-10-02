@@ -137,10 +137,6 @@ func (c *ClientInfo) IsPatron() bool {
 
 // SaveClientInfo returns an error if the API key is wrong. Caches and returns client info otherwise.
 func (s *Server) SaveClientInfo(ctx context.Context) (*ClientInfo, error) {
-	if ci := GetClientInfo(); ci != nil {
-		return ci, nil
-	}
-
 	body, err := s.GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventStart,
