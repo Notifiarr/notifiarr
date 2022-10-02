@@ -32,7 +32,7 @@
                                                     <td data-sort="{{$file.Size}}">{{megabyte $file.Size}}</td>
                                                     <td data-sort="{{$file.Time}}">{{since $file.Time}}</td>
                                                     <td>
-                                                        <a href="downloadFile/logs/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download log file."></a>
+                                                        <a href="ui/downloadFile/logs/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download log file."></a>
                                                         <i class="fas fa-cloud-upload-alt" onClick="triggerFileAction($(this), 'upload', 'logs', {{$file.ID}})" style="cursor: pointer; margin-right: 5px;" title="Upload log file."></i>
                                                         <i class="fas fa-stream socketLink" onClick="openWebsocket($(this), '{{$file.ID}}')" style="cursor: pointer; color: green; margin-right: 5px;" title="Tail log file."></i>
                                                         {{if not $file.Used}}<i class="fas fa-trash-alt" onClick="triggerFileAction($(this), 'delete', 'logs', {{$file.ID}})" style="cursor: pointer; color: rgb(169, 9, 9);" title="Delete log file."></i>{{end}}

@@ -32,7 +32,7 @@
                                                     <td data-sort="{{$file.Size}}">{{megabyte $file.Size}}</td>
                                                     <td data-sort="{{$file.Time}}">{{since $file.Time}}</td>
                                                     <td>
-                                                        <a href="downloadFile/config/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download config file."></a>
+                                                        <a href="ui/downloadFile/config/{{ $file.ID }}" class="fas fa-cloud-download-alt" style="margin-right: 5px;" title="Download config file."></a>
                                                         <i class="fas fa-cloud-upload-alt" onClick="triggerFileAction($(this), 'upload', 'config', {{$file.ID}})" style="cursor: pointer; margin-right: 5px;" title="Upload config file."></i>
                                                         {{if not $file.Used}}<i class="fas fa-trash-alt" onClick="triggerFileAction($(this), 'delete', 'config', {{$file.ID}})" style="cursor: pointer; color: red;" title="Delete config file."></i>{{end}}
                                                     </td>
