@@ -177,40 +177,40 @@ func (l *Logger) CapturePanic() {
 
 // Debug writes log lines... to stdout and/or a file.
 func (l *Logger) Debug(v ...interface{}) {
-	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, dbugStr)
+	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, dbugStr, false)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
 func (l *Logger) Debugf(msg string, v ...interface{}) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, dbugStr)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, dbugStr, false)
 }
 
 // Print writes log lines... to stdout and/or a file.
 func (l *Logger) Print(v ...interface{}) {
-	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, infoStr)
+	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, infoStr, false)
 }
 
 // Printf writes log lines... to stdout and/or a file.
 func (l *Logger) Printf(msg string, v ...interface{}) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, infoStr)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, infoStr, false)
 }
 
 // Error writes log lines... to stdout and/or a file.
 func (l *Logger) Error(v ...interface{}) {
-	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, errStr)
+	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, errStr, true)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
 func (l *Logger) Errorf(msg string, v ...interface{}) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, true)
 }
 
 // ErrorfNoShare writes log lines... to stdout and/or a file.
 func (l *Logger) ErrorfNoShare(msg string, v ...interface{}) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, false)
 }
 
-func (l *Logger) writeMsg(msg string, log *log.Logger, name string) {
+func (l *Logger) writeMsg(msg string, log *log.Logger, name string, shared bool) {
 	if err := log.Output(callDepth, msg); err != nil {
 		if errors.Is(err, rotatorr.ErrWriteTooLarge) {
 			l.writeSplitMsg(msg, log, name)
@@ -222,7 +222,7 @@ func (l *Logger) writeMsg(msg string, log *log.Logger, name string) {
 		mnd.LogFiles.Add(name+" Lines", 1)
 	}
 
-	if name == errStr { // we share errors with the website.
+	if shared { // we share errors with the website.
 		share.Log(msg)
 	}
 }
@@ -235,8 +235,8 @@ func (l *Logger) writeSplitMsg(msg string, log *log.Logger, name string) {
 	part2 := "...continuing: " + msg[half:]
 
 	mnd.LogFiles.Add(name+" Splits", 1)
-	l.writeMsg(part1, log, name)
-	l.writeMsg(part2, log, name)
+	l.writeMsg(part1, log, name, false)
+	l.writeMsg(part2, log, name, false)
 }
 
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
