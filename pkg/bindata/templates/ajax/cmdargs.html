@@ -1,0 +1,8 @@
+{{- $stats := .Stats}}
+<b>Regexp Args</b>:<br>
+{{range $i, $s := $stats.Args}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
+<table>
+{{- range $idx, $arg := $stats.Args }}
+    <tr><td>{{instance $idx}}</td><td><input name="args" type="text" plceholder="{{$arg}}"></td></tr>
+{{- end }}
+</table>

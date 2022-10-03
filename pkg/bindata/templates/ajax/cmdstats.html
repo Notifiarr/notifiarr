@@ -1,7 +1,12 @@
-<b>Name</b>: {{.Name}}<br>
-<b>Command</b>: {{.Command}}<br>
-<b>Hash</b>: {{.Hash}}<hr>
 {{- $stats := .Stats}}
+<b>Name</b>: {{.Name}}<br>
+<b>Command</b>: {{$stats.Command}}<br>
+<b>Hash</b>: {{.Hash}}<br>
+{{- if $stats.Args }}
+<b>Regexp Args</b>:<br>
+{{range $i, $s := $stats.Args}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
+{{- end }}
+<hr>
 <b>Runs</b>: {{$stats.Runs}}<br>
 <b>Failures</b>: {{$stats.Fails}}<br>
 <b>Last Run</b>: {{$stats.LastRun}}{{if not (eq $stats.LastRun "never")}} ago{{end}}<br>

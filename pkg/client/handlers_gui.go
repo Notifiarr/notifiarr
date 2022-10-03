@@ -432,6 +432,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	}
 }
 
+// handleCommandStats is for js getCmdStats.
 func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.Request) {
 	cID, _ := strconv.Atoi(mux.Vars(request)["command"])
 	if cID < 0 || cID >= len(c.triggers.Commands.List()) {
@@ -440,6 +441,19 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 
 	cmd := c.triggers.Commands.List()[cID]
 	if err := c.templat.ExecuteTemplate(response, "ajax/cmdstats.html", cmd); err != nil {
+		http.Error(response, "template error: "+err.Error(), http.StatusOK)
+	}
+}
+
+// handleCommandArgs
+func (c *Client) handleCommandArgs(response http.ResponseWriter, request *http.Request) {
+	cID, _ := strconv.Atoi(mux.Vars(request)["command"])
+	if cID < 0 || cID >= len(c.triggers.Commands.List()) {
+		http.Error(response, "Invalid command ID provided", http.StatusBadRequest)
+	}
+
+	cmd := c.triggers.Commands.List()[cID]
+	if err := c.templat.ExecuteTemplate(response, "ajax/cmdargs.html", cmd); err != nil {
 		http.Error(response, "template error: "+err.Error(), http.StatusOK)
 	}
 }

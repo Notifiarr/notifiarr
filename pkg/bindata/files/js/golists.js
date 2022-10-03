@@ -24,6 +24,30 @@ function removeInstance(name, index)
     },1000);
 }
 
+/*
+function testCommand(from, instanceType, index, args)
+{
+    if (args > 0) {
+        $.ajax({
+            url: URLBase+'cmdstats/'+index,
+            success: function (data){
+                $('#commandStats'+index).html(data);
+                dialog(caller, 'left');
+            },
+            error: function (response, status, error) {
+                if (error == "") {
+                    toast('Web Server Error',
+                        'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 20000);
+                } else {
+                    toast(error, response.responseText, 'error', 15000);
+                }
+            }
+        });
+        // dialog more shiz.
+    }
+}
+*/
+
 function testInstance(from, instanceType, index)
 {
     from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');

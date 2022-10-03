@@ -48,7 +48,7 @@ func (c *Config) ReloadApp(reason string) {
 	c.reloadCh <- &update.Signal{Text: reason}
 }
 
-// ActionInput is used to send data to an action.
+// ActionInput is used to send data to a trigger action.
 type ActionInput struct {
 	Type website.EventType
 	Args []string

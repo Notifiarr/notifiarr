@@ -80,7 +80,7 @@
                                                         <div style="display:none;" class="dialogText" id="commandStats{{$index}}">This gets filled in by an ajax query.</div>
                                                         <span class="dialogTitle" style="display:none;">Command Statistics</span>
                                                         <button id="CommandsIndexLabel{{$index}}" class="btn btn-sm btn-dgrey" onClick="getCmdStats($(this), '{{$index}}');" style="font-size:20px;width:40px;"><i class="fas fa-rocket"></i></button>
-                                                        <button onClick="testInstance($(this), 'Commands', '{{$index}}')" type="button" class="btn btn-brand btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-play-circle"></i></button>
+                                                        <button onClick="testInstance($(this), 'Commands', '{{$index}}', {{len $app.Stats.Args}})" type="button" class="btn btn-brand btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-play-circle"></i></button>
                                                     </div>
                                                 </td>
                                                 <td title="{{$app.Hash}}">
