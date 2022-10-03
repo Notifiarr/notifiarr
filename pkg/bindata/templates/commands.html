@@ -8,6 +8,19 @@
                                 <p>
                                     <h3><i class="fas fa-comment text-orange"></i> Notes</h3>
                                     <li><i class="fas fa-star text-dgrey"></i> The <span class="text-brand">purple</span> button will not run a command that has been modified. Save & Reload first!</li>
+                                    <li>
+                                        <span style="display:none;" class="dialogTitle">Custom Command Arguments</span>
+                                        <div style="display:none;" class="dialogText">
+                                            Commands may be given custom arguments. These arguments may be filled in by the person running the command.
+                                            If a command has an argument, it is required; if it has multiple custom arguments, they're all required.
+                                            Custom arguments must be wrapped in curly braces and parentheses, and contain a regular expression, ie. <code>({[a-z]})</code>
+                                            <h4>Example</h4>
+                                            Command using two arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br>
+                                            This command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>.
+                                        </div>
+                                        <a class="help-icon fas fa-star" onClick="dialog($(this), 'left')"></a>
+                                        Custom arguments may be defined with this format: <code>({regex})</code> - that is a regular expression wrapped in curly braces and parens.
+                                    </li>
                                 </p>
                                 <div class="table-responsive">
                                     <table class="table bk-dark table-bordered">

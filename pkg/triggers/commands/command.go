@@ -18,6 +18,11 @@ import (
 
 var ErrDisabled = fmt.Errorf("the command is disabled due to an error")
 
+const (
+	argPfx = "({"
+	argSfx = "})"
+)
+
 // Setup must run in the creation routine.
 func (c *Command) Setup(logger mnd.Logger, website *website.Server) error {
 	if c.Name == "" {
@@ -46,10 +51,10 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) error {
 func (c *Command) setupRegexpArgs() error {
 	c.cmd = c.Command
 
-	matches := regexp.MustCompile("{{([^}]*)}}").FindAllStringIndex(c.cmd, -1)
+	matches := regexp.MustCompile(`\({([^}]*)}\)`).FindAllStringIndex(c.cmd, -1)
 	if matches == nil {
-		if strings.Contains(c.Command, "{{") {
-			return fmt.Errorf("%w: missing custom argument regexp terminator: }}", ErrArgValue)
+		if strings.Contains(c.Command, argPfx) {
+			return fmt.Errorf("%w: missing custom argument regexp terminator: %s", ErrArgValue, argSfx)
 		}
 
 		return nil
@@ -66,7 +71,7 @@ func (c *Command) setupRegexpArgs() error {
 			return fmt.Errorf("parsing command '%s' arg %d regexp: %w", c.Name, instance, err)
 		}
 
-		c.cmd = c.cmd[:arg[0]] + fmt.Sprintf("{{%d}}", instance) + c.cmd[arg[1]:]
+		c.cmd = c.cmd[:arg[0]] + fmt.Sprintf("%s%d%s", argPfx, instance, argSfx) + c.cmd[arg[1]:]
 		c.args[idx] = re
 	}
 

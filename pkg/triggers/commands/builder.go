@@ -58,7 +58,7 @@ func (c *cmdBuilder) getArgs() ([]string, error) {
 
 	for idx, reg := range c.expectedArgs {
 		instance := idx + 1
-		cmd = strings.Replace(cmd, fmt.Sprintf("{{%d}}", instance), c.providedArgs[idx], 1)
+		cmd = strings.Replace(cmd, fmt.Sprintf("%s%d%s", argPfx, instance, argSfx), c.providedArgs[idx], 1)
 
 		if !reg.MatchString(c.providedArgs[idx]) {
 			return nil, fmt.Errorf("%w: arg %d '%s' failed regexp", ErrArgValue, instance, c.providedArgs[idx])

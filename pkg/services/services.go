@@ -178,7 +178,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 		case <-ticker.C:
 			c.SendResults(&Results{What: website.EventCron, Svcs: c.GetResults()})
 		case event := <-c.checkChan:
-			c.Debugf("Running service check '%s' via event: %s, buffer: %d/%d",
+			c.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
 			c.runCheck(event.Service, true)
 		case event := <-c.triggerChan:
