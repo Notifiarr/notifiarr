@@ -1,8 +1,22 @@
 {{- $stats := .Stats}}
+<b>Name</b>: {{.Name}}<br>
+<b>Command</b>: {{$stats.Command}}<br>
 <b>Regexp Args</b>:<br>
 {{range $i, $s := $stats.Args}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
-<table>
-{{- range $idx, $arg := $stats.Args }}
-    <tr><td>{{instance $idx}}</td><td><input name="args" type="text" plceholder="{{$arg}}"></td></tr>
-{{- end }}
-</table>
+<hr>
+<p>
+    This command requires {{len $stats.Args}} arguments. Please provide them below. They must match the regular expressions shown above.
+</p>
+<div class="table-responsive text-center">
+    <table class="table table-bordered">
+    {{- range $idx, $arg := $stats.Args }}
+        <tr>
+            <td style="width:30px;font-size: 18px;">{{instance $idx}}</td>
+            <td>
+                <input class="form-control input-sm" data-group="commands" id="args" name="args" type="text" placeholder="{{$arg}}">
+            </td>
+        </tr>
+    {{- end }}
+    <tr><td colspan="2"><button onClick="runCommand($(this), '{{.Hash}}');" class="btn btn-md btn-brand">Execute Command</button></td></tr>
+    </table>
+</div>

@@ -47,13 +47,13 @@ function testRegex()
 }
 
 // getCmdStats returns the cmdstats template for a specific command.
-function getCmdStats(caller, index)
+function getCmdStats(caller, hash)
 {
     toast('Working', 'Getting stats!', 'success', 2200);
     $.ajax({
-        url: URLBase+'cmdstats/'+index,
+        url: URLBase+'ajax/cmdstats/'+hash,
         success: function (data){
-            $('#commandStats'+index).html(data);
+            $('#commandStats'+hash).html(data);
             dialog(caller, 'left');
         },
         error: function (response, status, error) {
@@ -65,4 +65,50 @@ function getCmdStats(caller, index)
             }
         }
     });
+}
+
+function getCmdArgs(from, hash)
+{
+    $.ajax({
+        url: URLBase+'ajax/cmdargs/'+hash,
+        success: function (data){
+            $('#commandArgs'+hash).html(data);
+            dialog(from, 'left');
+        },
+        error: function (response, status, error) {
+            if (error == "") {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 20000);
+            } else {
+                toast(error, response.responseText, 'error', 15000);
+            }
+        }
+    });
+}
+
+function runCommand(from, hash)
+{
+    let fields = '';
+    from.closest('table').find('#args').each(function() {
+        fields += '&' + $(this).serialize();
+    });
+
+    $.ajax({
+        type: 'POST',
+        url: URLBase+'runCommand/'+hash,
+        data: fields,
+        success: function (data){
+            toast('Command Executed', data, 'success');
+        },
+        error: function (response, status, error) {
+            if (response.responseText === undefined) {
+                toast('Web Server Error',
+                    'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
+            } else {
+                toast('Command Execution Error', error+': '+response.responseText, 'error', 15000);
+            }
+        }
+    });
+    from.parents('.ui-dialog').find('.ui-dialog-content').dialog('close');
+    $('#commandArgs'+hash).html('');
 }

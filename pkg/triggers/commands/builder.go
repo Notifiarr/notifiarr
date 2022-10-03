@@ -61,7 +61,7 @@ func (c *cmdBuilder) getArgs() ([]string, error) {
 		cmd = strings.Replace(cmd, fmt.Sprintf("{{%d}}", instance), c.providedArgs[idx], 1)
 
 		if !reg.MatchString(c.providedArgs[idx]) {
-			return nil, fmt.Errorf("%w: arg %d failed regexp", ErrArgValue, instance)
+			return nil, fmt.Errorf("%w: arg %d '%s' failed regexp", ErrArgValue, instance, c.providedArgs[idx])
 		}
 	}
 

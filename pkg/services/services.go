@@ -211,7 +211,7 @@ func (c *Config) Running() bool {
 }
 
 // Stop sends current states to the website and ends all service checker routines.
-func (c *Config) Stop(ctx context.Context) {
+func (c *Config) Stop() {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
 

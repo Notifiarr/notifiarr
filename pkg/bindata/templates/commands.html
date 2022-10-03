@@ -77,10 +77,18 @@
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;font-size:18px;">
                                                         <button onclick="removeInstance('commands-Commands', '{{$index}}')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-trash-alt"></i></button>
-                                                        <div style="display:none;" class="dialogText" id="commandStats{{$index}}">This gets filled in by an ajax query.</div>
+                                                        <div style="display:none;" class="dialogText" id="commandStats{{$app.Hash}}">This gets filled in by an ajax query.</div>
                                                         <span class="dialogTitle" style="display:none;">Command Statistics</span>
-                                                        <button id="CommandsIndexLabel{{$index}}" class="btn btn-sm btn-dgrey" onClick="getCmdStats($(this), '{{$index}}');" style="font-size:20px;width:40px;"><i class="fas fa-rocket"></i></button>
-                                                        <button onClick="testInstance($(this), 'Commands', '{{$index}}', {{len $app.Stats.Args}})" type="button" class="btn btn-brand btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-play-circle"></i></button>
+                                                        <button id="CommandsIndexLabel{{$index}}" class="btn btn-sm btn-dgrey" onClick="getCmdStats($(this), '{{$app.Hash}}');" style="font-size:20px;width:40px;"><i class="fas fa-rocket"></i></button>
+                                                        <span>
+                                                            {{- if gt (len $app.Stats.Args) 0 }}
+                                                            <button onClick="getCmdArgs($(this), '{{$app.Hash}}');" type="button" class="btn btn-brand btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-play-circle"></i></button>
+                                                            {{- else }}
+                                                            <button onClick="runCommand($(this), '{{$app.Hash}}');" type="button" class="btn btn-brand btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-play-circle"></i></button>
+                                                            {{- end }}
+                                                            <div style="display:none;" class="dialogText" id="commandArgs{{$app.Hash}}">This gets filled in by an ajax query.</div>
+                                                            <span class="dialogTitle" style="display:none;">Run Command, with args</span>
+                                                        </span>
                                                     </div>
                                                 </td>
                                                 <td title="{{$app.Hash}}">
@@ -96,7 +104,8 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_NAME" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="text" id="Commands.{{$index}}.Name" name="Commands.{{$index}}.Name"  data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                                                                <input type="text" id="Commands.{{$index}}.Name" name="Commands.{{$index}}.Name"  data-index="{{$index}}" data-app="Commands" 
+                                                                class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
                                                         </div>
                                                     </form>

@@ -34,6 +34,7 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) error {
 	c.Hash = fmt.Sprintf("%x", hash)
 	c.log = logger
 	c.website = website
+	c.Args = len(c.args)
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = defaultTimeout
@@ -126,7 +127,7 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, err er
 
 	if err != nil {
 		c.fails++
-		c.output = eStr + ": " + oStr
+		c.output = "error: " + eStr + ", output: " + oStr
 
 		if c.Log && oStr != "" {
 			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v, Output: %s", input.Type, c.Name, err, oStr)

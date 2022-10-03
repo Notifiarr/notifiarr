@@ -39,6 +39,7 @@ type Command struct {
 	Notify  bool          `json:"notify" toml:"notify" xml:"notify" yaml:"notify"`
 	Timeout cnfg.Duration `json:"-" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Hash    string        `json:"hash" toml:"-" xml:"-" yaml:"-"`
+	Args    int           `json:"args" toml:"-" xml:"-" yaml:"-"`
 	cmd     string
 	args    []*regexp.Regexp
 	disable bool

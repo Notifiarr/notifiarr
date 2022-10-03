@@ -24,6 +24,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
@@ -264,7 +265,7 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":
-		c.Config.Services.Stop(req.Context())
+		c.Config.Services.Stop()
 		c.Printf("[gui '%s' requested] Service Checks Stopped", user)
 		http.Error(response, "Service Checks Stopped", http.StatusOK)
 	case "start":
@@ -434,28 +435,35 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 
 // handleCommandStats is for js getCmdStats.
 func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.Request) {
-	cID, _ := strconv.Atoi(mux.Vars(request)["command"])
-	if cID < 0 || cID >= len(c.triggers.Commands.List()) {
-		http.Error(response, "Invalid command ID provided", http.StatusBadRequest)
+	cmd := c.triggers.Commands.GetByHash(mux.Vars(request)["hash"])
+	if cmd == nil {
+		http.Error(response, "Invalid command Hash provided", http.StatusBadRequest)
+		return
 	}
 
-	cmd := c.triggers.Commands.List()[cID]
-	if err := c.templat.ExecuteTemplate(response, "ajax/cmdstats.html", cmd); err != nil {
+	uri := "ajax/" + mux.Vars(request)["path"] + ".html"
+
+	if err := c.templat.ExecuteTemplate(response, uri, cmd); err != nil {
 		http.Error(response, "template error: "+err.Error(), http.StatusOK)
 	}
 }
 
-// handleCommandArgs
-func (c *Client) handleCommandArgs(response http.ResponseWriter, request *http.Request) {
-	cID, _ := strconv.Atoi(mux.Vars(request)["command"])
-	if cID < 0 || cID >= len(c.triggers.Commands.List()) {
-		http.Error(response, "Invalid command ID provided", http.StatusBadRequest)
+// handleRunCommand only handles commands with arguments.
+// Commands without arguments are handled as an instance test.
+func (c *Client) handleRunCommand(response http.ResponseWriter, request *http.Request) {
+	cmd := c.triggers.Commands.GetByHash(mux.Vars(request)["hash"])
+	if cmd == nil {
+		http.Error(response, "Invalid command Hash provided", http.StatusBadRequest)
+		return
 	}
 
-	cmd := c.triggers.Commands.List()[cID]
-	if err := c.templat.ExecuteTemplate(response, "ajax/cmdargs.html", cmd); err != nil {
-		http.Error(response, "template error: "+err.Error(), http.StatusOK)
-	}
+	_ = request.ParseForm()
+
+	cmd.Run(&common.ActionInput{
+		Type: website.EventGUI,
+		Args: request.PostForm["args"],
+	})
+	http.Error(response, "Check command output after a few seconds.", http.StatusOK)
 }
 
 // handleProcessList just returns the running process list for a human to view.
