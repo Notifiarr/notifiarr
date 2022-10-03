@@ -27,6 +27,8 @@ const (
 	EventPoll    EventType = "poll"
 	EventSignal  EventType = "signal"
 	EventFile    EventType = "file"
+	EventSet     EventType = "setStates"
+	EventGet     EventType = "getStates"
 )
 
 // Payload is the outbound payload structure that is sent to Notifiarr for Plex and system snapshot data.
