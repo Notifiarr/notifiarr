@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-// SetValueContext sets a value stored in the website database.
-func (s *Server) SetValueContext(ctx context.Context, key string, value []byte) error {
-	return s.SetValuesContext(ctx, map[string][]byte{key: value})
+// SetState sets a value stored in the website database.
+func (s *Server) SetState(ctx context.Context, key string, value []byte) error {
+	return s.SetStates(ctx, map[string][]byte{key: value})
 }
 
-// SetValuesContext sets values stored in the website database.
-func (s *Server) SetValuesContext(ctx context.Context, values map[string][]byte) error {
+// SetStates sets values stored in the website database.
+func (s *Server) SetStates(ctx context.Context, values map[string][]byte) error {
 	for key, val := range values {
 		if val != nil { // ignore nil byte slices.
 			values[key] = []byte(base64.StdEncoding.EncodeToString(val))
@@ -23,7 +23,7 @@ func (s *Server) SetValuesContext(ctx context.Context, values map[string][]byte)
 
 	resp, err := s.GetData(&Request{
 		Route:      ClientRoute,
-		Event:      "setStates",
+		Event:      EventSet,
 		Payload:    map[string]interface{}{"fields": values},
 		LogPayload: true,
 	})
@@ -34,8 +34,8 @@ func (s *Server) SetValuesContext(ctx context.Context, values map[string][]byte)
 	return nil
 }
 
-// DelValueContext deletes a value stored in the website database.
-func (s *Server) DelValueContext(ctx context.Context, keys ...string) error {
+// DelState deletes a value stored in the website database.
+func (s *Server) DelState(ctx context.Context, keys ...string) error {
 	values := make(map[string]interface{})
 	for _, key := range keys {
 		values[key] = nil
@@ -43,7 +43,7 @@ func (s *Server) DelValueContext(ctx context.Context, keys ...string) error {
 
 	resp, err := s.GetData(&Request{
 		Route:      ClientRoute,
-		Event:      "setStates",
+		Event:      EventSet,
 		Payload:    map[string]interface{}{"fields": values},
 		LogPayload: true,
 	})
@@ -54,11 +54,11 @@ func (s *Server) DelValueContext(ctx context.Context, keys ...string) error {
 	return nil
 }
 
-// GetValueContext gets a value stored in the website database.
-func (s *Server) GetValueContext(ctx context.Context, keys ...string) (map[string][]byte, error) {
+// GetState gets a value stored in the website database.
+func (s *Server) GetState(ctx context.Context, keys ...string) (map[string][]byte, error) {
 	resp, err := s.GetData(&Request{
 		Route:      ClientRoute,
-		Event:      "getStates",
+		Event:      EventGet,
 		Payload:    map[string][]string{"fields": keys},
 		LogPayload: true,
 	})

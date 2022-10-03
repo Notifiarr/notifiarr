@@ -66,7 +66,7 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *website.Clien
 func (c *Client) printVersionChangeInfo(ctx context.Context) {
 	const clientVersion = "clientVersion"
 
-	values, err := c.website.GetValueContext(ctx, clientVersion)
+	values, err := c.website.GetState(ctx, clientVersion)
 	if err != nil {
 		c.Errorf("XX> Getting version from database: %v", err)
 	}
@@ -79,7 +79,7 @@ func (c *Client) printVersionChangeInfo(ctx context.Context) {
 
 	c.Printf("==> Detected application version change! %s => %s", previousVersion, version.Version)
 
-	err = c.website.SetValueContext(ctx, clientVersion, []byte(version.Version))
+	err = c.website.SetState(ctx, clientVersion, []byte(version.Version))
 	if err != nil {
 		c.Errorf("Updating version in database: %v", err)
 	}
