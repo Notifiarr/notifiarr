@@ -25,9 +25,7 @@ func (s *Server) SetValuesContext(ctx context.Context, values map[string][]byte)
 		Route:      ClientRoute,
 		Event:      "setStates",
 		Payload:    map[string]interface{}{"fields": values},
-		LogMsg:     "Setting States",
 		LogPayload: true,
-		ErrorsOnly: true,
 	})
 	if err != nil {
 		return fmt.Errorf("invalid response: %w: %s", err, resp)
@@ -47,9 +45,7 @@ func (s *Server) DelValueContext(ctx context.Context, keys ...string) error {
 		Route:      ClientRoute,
 		Event:      "setStates",
 		Payload:    map[string]interface{}{"fields": values},
-		LogMsg:     "Deleting States",
 		LogPayload: true,
-		ErrorsOnly: true,
 	})
 	if err != nil {
 		return fmt.Errorf("invalid response: %w: %s", err, resp)
@@ -64,9 +60,7 @@ func (s *Server) GetValueContext(ctx context.Context, keys ...string) (map[strin
 		Route:      ClientRoute,
 		Event:      "getStates",
 		Payload:    map[string][]string{"fields": keys},
-		LogMsg:     "Getting States",
 		LogPayload: true,
-		ErrorsOnly: true,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("invalid response: %w: %s", err, resp)
