@@ -1,8 +1,6 @@
 package services
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -56,9 +54,9 @@ func (c *Config) runCheck(svc *Service, force bool) bool {
 }
 
 // runChecks runs checks that are due. Passing true, runs them even if they're not due.
-func (c *Config) runChecks(forceAll bool) bool {
+func (c *Config) runChecks(forceAll bool) {
 	if c.checks == nil || c.done == nil {
-		return false
+		return
 	}
 
 	count := 0
@@ -73,46 +71,6 @@ func (c *Config) runChecks(forceAll bool) bool {
 				c.checks <- c.services[s]
 			}
 		}()
-	}
-
-	somethingChanged := false
-	for ; count > 0; count-- {
-		somethingChanged = <-c.done || somethingChanged
-	}
-
-	return somethingChanged
-}
-
-func (c *Config) updateStatesOnSite(ctx context.Context, force bool) {
-	if !force && time.Since(c.lastUpdate) < time.Hour || len(c.services) == 0 {
-		return
-	}
-
-	var (
-		err    error
-		values = make(map[string][]byte)
-	)
-
-	for _, svc := range c.services {
-		func() {
-			svc.svc.RLock()
-			defer svc.svc.RUnlock()
-
-			if values[valuePrefix+svc.Name], err = json.Marshal(&(svc.svc)); err != nil {
-				c.Errorf("Marshaling Service %s: %v", svc.Name, err)
-			}
-		}()
-	}
-
-	if len(values) == 0 {
-		return
-	}
-
-	if err := c.Website.SetValuesContext(ctx, values); err != nil {
-		c.ErrorfNoShare("Setting Service States on website: %v", err)
-	} else {
-		c.lastUpdate = time.Now()
-		c.Printf("==> Updated [internal] Service States on website.")
 	}
 }
 

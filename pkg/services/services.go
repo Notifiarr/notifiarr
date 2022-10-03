@@ -91,7 +91,7 @@ func (c *Config) Start(ctx context.Context) {
 		}()
 	}
 
-	go c.runServiceChecker(ctx)
+	go c.runServiceChecker()
 
 	word := "Started"
 	if c.Disabled {
@@ -145,7 +145,7 @@ func (c *Config) loadServiceStates(ctx context.Context) {
 	}
 }
 
-func (c *Config) runServiceChecker(ctx context.Context) { //nolint:cyclop
+func (c *Config) runServiceChecker() { //nolint:cyclop
 	defer func() {
 		defer c.CapturePanic()
 		c.Printf("==> Service Checker Stopped!")
@@ -180,10 +180,10 @@ func (c *Config) runServiceChecker(ctx context.Context) { //nolint:cyclop
 		case event := <-c.checkChan:
 			c.Debugf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
-			c.updateStatesOnSite(ctx, c.runCheck(event.Service, true))
+			c.runCheck(event.Service, true)
 		case event := <-c.triggerChan:
 			c.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(c.checks), cap(c.checks))
-			c.updateStatesOnSite(ctx, c.runChecks(true))
+			c.runChecks(true)
 
 			if event != "log" {
 				c.SendResults(&Results{What: event, Svcs: c.GetResults()})
@@ -198,7 +198,7 @@ func (c *Config) runServiceChecker(ctx context.Context) { //nolint:cyclop
 
 			c.Debug("Service Checks Payload (log only):", string(data))
 		case <-second.C:
-			c.updateStatesOnSite(ctx, c.runChecks(false))
+			c.runChecks(false)
 		}
 	}
 }
@@ -214,8 +214,6 @@ func (c *Config) Running() bool {
 func (c *Config) Stop(ctx context.Context) {
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
-
-	c.updateStatesOnSite(ctx, true)
 
 	if c.stopChan == nil {
 		return

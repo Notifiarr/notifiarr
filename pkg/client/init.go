@@ -68,24 +68,21 @@ func (c *Client) printVersionChangeInfo(ctx context.Context) {
 
 	values, err := c.website.GetValueContext(ctx, clientVersion)
 	if err != nil {
-		c.Errorf("XX> Getting version from databse: %v", err)
+		c.Errorf("XX> Getting version from database: %v", err)
 	}
 
 	previousVersion := string(values[clientVersion])
-	if previousVersion == "" ||
-		previousVersion == version.Version ||
+	if previousVersion == version.Version ||
 		version.Version == "" {
 		return
 	}
 
 	c.Printf("==> Detected application version change! %s => %s", previousVersion, version.Version)
 
-	go func() { // in background to improve startup time.
-		err := c.website.SetValueContext(ctx, clientVersion, []byte(version.Version))
-		if err != nil {
-			c.Errorf("Updating version in database: %v", err)
-		}
-	}()
+	err = c.website.SetValueContext(ctx, clientVersion, []byte(version.Version))
+	if err != nil {
+		c.Errorf("Updating version in database: %v", err)
+	}
 }
 
 func (c *Client) printLogFileInfo() { //nolint:cyclop

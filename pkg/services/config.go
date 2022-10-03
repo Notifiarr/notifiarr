@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
@@ -34,22 +34,21 @@ var (
 
 // Config for this Services plugin comes from a config file.
 type Config struct {
-	Interval     cnfg.Duration     `toml:"interval" xml:"interval" json:"interval"`
-	Parallel     uint              `toml:"parallel" xml:"parallel" json:"parallel"`
-	Disabled     bool              `toml:"disabled" xml:"disabled" json:"disabled"`
-	LogFile      string            `toml:"log_file" xml:"log_file" json:"logFile"`
-	Apps         *apps.Apps        `toml:"-" json:"-"`
-	Website      *website.Server   `toml:"-" json:"-"`
-	Plugins      *snapshot.Plugins `toml:"-" json:"-"`
-	*logs.Logger `json:"-"`        // log file writer
-	services     map[string]*Service
-	checks       chan *Service
-	done         chan bool
-	stopChan     chan struct{}
-	triggerChan  chan website.EventType
-	checkChan    chan triggerCheck
-	stopLock     sync.Mutex
-	lastUpdate   time.Time // last time we sent service states to website.
+	Interval    cnfg.Duration     `toml:"interval" xml:"interval" json:"interval"`
+	Parallel    uint              `toml:"parallel" xml:"parallel" json:"parallel"`
+	Disabled    bool              `toml:"disabled" xml:"disabled" json:"disabled"`
+	LogFile     string            `toml:"log_file" xml:"log_file" json:"logFile"`
+	Apps        *apps.Apps        `toml:"-" json:"-"`
+	Website     *website.Server   `toml:"-" json:"-"`
+	Plugins     *snapshot.Plugins `toml:"-" json:"-"`
+	mnd.Logger  `json:"-"`        // log file writer
+	services    map[string]*Service
+	checks      chan *Service
+	done        chan bool
+	stopChan    chan struct{}
+	triggerChan chan website.EventType
+	checkChan   chan triggerCheck
+	stopLock    sync.Mutex
 }
 
 // CheckType locks us into a few specific types of checks.
@@ -113,7 +112,7 @@ type service struct {
 	State        CheckState `json:"state"`
 	Since        time.Time  `json:"since"`
 	LastCheck    time.Time  `json:"lastCheck"`
-	log          *logs.Logger
+	log          mnd.Logger
 	proc         *procExpect // only used for process checks.
 	sync.RWMutex `json:"-"`
 }
