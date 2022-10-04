@@ -57,11 +57,7 @@ type Command struct {
 // New configures the library.
 func New(config *common.Config, commands []*Command) *Action {
 	for _, cmd := range commands {
-		err := cmd.Setup(config.Logger, config.Server)
-		if err != nil {
-			config.Errorf("Command Setup Failed: %v", err)
-			cmd.disable = true //nolint:wsl
-		}
+		cmd.Setup(config.Logger, config.Server)
 	}
 
 	return &Action{cmd: &cmd{Config: config, cmdlist: commands}}
@@ -131,6 +127,11 @@ func (c *Command) Stats() Stats {
 
 func (c *cmd) create() {
 	for _, cmd := range c.cmdlist {
+		if err := cmd.SetupRegexpArgs(); err != nil {
+			c.Errorf("Command Setup Failed: %v", err)
+			cmd.disable = true //nolint:wsl
+		}
+
 		cmd.ch = make(chan *common.ActionInput, 1)
 
 		c.Add(&common.Action{

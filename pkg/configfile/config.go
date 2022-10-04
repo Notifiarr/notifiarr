@@ -66,7 +66,7 @@ type Config struct {
 }
 
 // NewConfig returns a fresh config with only defaults and a logger ready to go.
-func NewConfig(logger *logs.Logger) *Config {
+func NewConfig(logger mnd.Logger) *Config {
 	return &Config{
 		Apps: &apps.Apps{
 			URLBase: "/",
@@ -118,7 +118,7 @@ func (c *Config) CopyConfig() (*Config, error) {
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 // You should only run this after getting a config with NewConfig().
-func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
+func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *triggers.Actions, error) {
 	if flag.ConfigFile != "" {
 		files := append([]string{flag.ConfigFile}, flag.ExtraConf...)
 		if err := cnfgfile.Unmarshal(c, files...); err != nil {
@@ -139,6 +139,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	}
 
 	c.fixConfig()
+	logger.LogConfig = c.LogConfig // this is sorta hacky.
 
 	err := c.Services.Setup(c.Service)
 	if err != nil {
@@ -156,7 +157,7 @@ func (c *Config) Get(flag *Flags) (*website.Server, *triggers.Actions, error) {
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Website = website.New(&website.Config{
 		Apps:    c.Apps,
-		Logger:  c.Services.Logger,
+		Logger:  c.Apps.Logger,
 		BaseURL: website.BaseURL,
 		Timeout: c.Timeout,
 		Retries: c.Retries,
@@ -193,7 +194,7 @@ func (c *Config) setup() *triggers.Actions {
 
 	return triggers.New(&triggers.Config{
 		Apps:       c.Apps,
-		Logger:     c.Services.Logger,
+		Logger:     c.Apps.Logger,
 		Website:    c.Services.Website,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,

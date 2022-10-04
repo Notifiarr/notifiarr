@@ -674,7 +674,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 
 func (c *Client) validateNewCommandConfig(config *configfile.Config) error {
 	for idx, cmd := range config.Commands {
-		if err := cmd.Setup(c.Logger, c.website); err != nil {
+		if err := cmd.SetupRegexpArgs(); err != nil {
 			return fmt.Errorf("command %d '%s' failed setup: %w", idx+1, cmd.Name, err)
 		}
 	}

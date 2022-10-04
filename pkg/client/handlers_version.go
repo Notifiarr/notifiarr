@@ -4,11 +4,13 @@ package client
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/gorilla/mux"
 )
 
 /* The version handler gets the version from a bunch of apps and returns them. */
@@ -36,7 +38,14 @@ func (c *Client) infoHandler(r *http.Request) (int, interface{}) {
 // versionHandler returns application run and build time data and application statuses: /api/version.
 func (c *Client) versionHandler(r *http.Request) (int, interface{}) {
 	output := c.website.Info(r.Context())
-	output["appsStatus"] = c.appStatsForVersion(r.Context())
+
+	instance, _ := strconv.Atoi(mux.Vars(r)["instance"])
+	if app := mux.Vars(r)["app"]; app != "" && instance > 0 {
+		output["appsStatus"] = c.appStatsForVersionInstance(r.Context(), app, instance)
+	} else {
+		output["appsStatus"] = c.appStatsForVersion(r.Context())
+	}
+
 	output["commands"] = c.triggers.Commands.List()
 
 	if host, err := c.website.GetHostInfo(r.Context()); err != nil {
@@ -60,7 +69,7 @@ func (c *Client) appStatsForVersion(ctx context.Context) map[string]interface{} 
 		wg   sync.WaitGroup
 	)
 
-	getPlexVersion(ctx, &wg, c.Config.Plex, &plx, c.Config.Serial)
+	getPlexVersion(ctx, &wg, c.Config.Apps.Plex, &plx, c.Config.Serial)
 	getLidarrVersion(ctx, &wg, c.Config.Apps.Lidarr, lid, c.Config.Serial)
 	getProwlarrVersion(ctx, &wg, c.Config.Apps.Prowlarr, prl, c.Config.Serial)
 	getRadarrVersion(ctx, &wg, c.Config.Apps.Radarr, rad, c.Config.Serial)
@@ -76,6 +85,44 @@ func (c *Client) appStatsForVersion(ctx context.Context) map[string]interface{} 
 		"prowlarr": prl,
 		"plex":     plx,
 	}
+}
+
+// appStatsForVersionInstance handles a single-app version request.
+func (c *Client) appStatsForVersionInstance(ctx context.Context, app string, instance int) map[string]interface{} { //nolint:cyclop
+	switch idx := instance - 1; app {
+	case "lidarr":
+		if instance <= len(c.Config.Apps.Lidarr) {
+			stat, err := c.Config.Apps.Lidarr[idx].GetSystemStatusContext(ctx)
+			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
+		}
+	case "radarr":
+		if instance <= len(c.Config.Apps.Radarr) {
+			stat, err := c.Config.Apps.Radarr[idx].GetSystemStatusContext(ctx)
+			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
+		}
+	case "readarr":
+		if instance <= len(c.Config.Apps.Readarr) {
+			stat, err := c.Config.Apps.Readarr[idx].GetSystemStatusContext(ctx)
+			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
+		}
+	case "sonarr":
+		if instance <= len(c.Config.Apps.Sonarr) {
+			stat, err := c.Config.Apps.Sonarr[idx].GetSystemStatusContext(ctx)
+			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
+		}
+	case "prowlarr":
+		if instance <= len(c.Config.Apps.Prowlarr) {
+			stat, err := c.Config.Apps.Prowlarr[idx].GetSystemStatusContext(ctx)
+			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
+		}
+	case "plex":
+		return map[string]any{app: plexVersionReply(c.Config.Plex.GetInfo(ctx))}
+	case "tautulli":
+		stat, err := c.Config.Apps.Tautulli.GetInfo(ctx)
+		return map[string]any{app: []*conTest{{Instance: 1, Up: err == nil, Status: stat}}}
+	}
+
+	return nil
 }
 
 func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*conTest, fg bool) {
