@@ -1,7 +1,7 @@
+                                {{- range $idx, $app := .Config.Apps.Radarr }}
+                                    {{- $appStatus := cacheID "radarrStatus" $idx }}
+                                    {{- $appQueue := cacheID "radarr" $idx }}
                                     <div class="col-sm-6 col-md-4 col-lg-4">
-                                        {{- range $idx, $app := .Config.Apps.Radarr }}
-                                            {{- $appStatus := cacheID "radarrStatus" $idx }}
-                                            {{- $appQueue := cacheID "radarr" $idx }}
                                         <div class="table-responsive">
                                             <table class="table table-striped table-bordered">  
                                                 <tr>
@@ -36,6 +36,6 @@
                                             {{- end }}
                                             </table>
                                         </div>
-                                        {{- end }}
                                     </div>
+                                {{- end }}
 {{- /* end of app integration (leave this comment) */ -}}
