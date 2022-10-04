@@ -14,9 +14,11 @@
                                             Commands may be given custom arguments. These arguments may be filled in by the person running the command.
                                             If a command has an argument, it is required; if it has multiple custom arguments, they're all required.
                                             Custom arguments must be wrapped in curly braces and parentheses, and contain a regular expression, ie. <code>({[a-z]})</code>
-                                            <h4>Example</h4>
-                                            Command using two arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br>
-                                            This command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>.
+                                            <h4>Examples</h4>
+                                            Command using two arguments: <pre>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</pre>
+                                            The above command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>.<br>
+                                            The following command can be used to curl websites from within a Docker container.
+                                            <pre>image --curl ({https?://[^ ;]+})</pre>
                                         </div>
                                         <a class="help-icon fas fa-star" onClick="dialog($(this), 'left')"></a>
                                         Custom arguments may be defined with this format: <code>({regex})</code> - that is a regular expression wrapped in curly braces and parens.

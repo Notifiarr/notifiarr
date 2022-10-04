@@ -117,12 +117,12 @@ func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string
 		})
 	}
 
-	c.logOutput(input, oStr, eStr, err)
+	c.logOutput(input, oStr, eStr, elapsed, err)
 
 	return oStr, err
 }
 
-func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, err error) {
+func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, elapsed time.Duration, err error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -144,12 +144,15 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, err er
 		c.output = "error: " + eStr + ", output: " + oStr
 
 		if c.Log && oStr != "" {
-			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed: %v, Output: %s", input.Type, c.Name, extra, err, oStr)
+			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v, Output:\n%s",
+				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err, oStr)
 		} else {
-			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed: %v", input.Type, c.Name, extra, err)
+			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v",
+				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err)
 		}
 	} else if c.Log && oStr != "" {
-		c.log.Printf("[%s requested] Custom Command '%s%s' Output: %s", input.Type, c.Name, extra, oStr)
+		c.log.Printf("[%s requested] Custom Command '%s%s' Output (elapsed: %s):\n%s",
+			input.Type, c.Name, extra, elapsed.Round(time.Millisecond), oStr)
 	}
 }
 
