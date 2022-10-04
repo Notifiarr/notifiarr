@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/gorilla/mux"
 )
 
@@ -93,32 +94,44 @@ func (c *Client) appStatsForVersionInstance(ctx context.Context, app string, ins
 	case "lidarr":
 		if instance <= len(c.Config.Apps.Lidarr) {
 			stat, err := c.Config.Apps.Lidarr[idx].GetSystemStatusContext(ctx)
+			data.SaveWithID(app+"Status", idx, stat)
+
 			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
 		}
 	case "radarr":
 		if instance <= len(c.Config.Apps.Radarr) {
 			stat, err := c.Config.Apps.Radarr[idx].GetSystemStatusContext(ctx)
+			data.SaveWithID(app+"Status", idx, stat)
+
 			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
 		}
 	case "readarr":
 		if instance <= len(c.Config.Apps.Readarr) {
 			stat, err := c.Config.Apps.Readarr[idx].GetSystemStatusContext(ctx)
+			data.SaveWithID(app+"Status", idx, stat)
+
 			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
 		}
 	case "sonarr":
 		if instance <= len(c.Config.Apps.Sonarr) {
 			stat, err := c.Config.Apps.Sonarr[idx].GetSystemStatusContext(ctx)
+			data.SaveWithID(app+"Status", idx, stat)
+
 			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
 		}
 	case "prowlarr":
 		if instance <= len(c.Config.Apps.Prowlarr) {
 			stat, err := c.Config.Apps.Prowlarr[idx].GetSystemStatusContext(ctx)
+			data.SaveWithID(app+"Status", idx, stat)
+
 			return map[string]any{app: []*conTest{{Instance: instance, Up: err == nil, Status: stat}}}
 		}
 	case "plex":
 		return map[string]any{app: plexVersionReply(c.Config.Plex.GetInfo(ctx))}
 	case "tautulli":
 		stat, err := c.Config.Apps.Tautulli.GetInfo(ctx)
+		data.SaveWithID(app+"Status", 1, stat)
+
 		return map[string]any{app: []*conTest{{Instance: 1, Up: err == nil, Status: stat}}}
 	}
 
@@ -133,6 +146,8 @@ func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps
 
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("lidarrStatus", idx, stat)
+
 			lid[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 			continue //nolint:wsl
 		}
@@ -143,6 +158,8 @@ func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("lidarrStatus", idx, stat)
+
 			lid[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 		}(idx, app)
 	}
@@ -156,6 +173,8 @@ func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*
 
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("prowlarrStatus", idx, stat)
+
 			prl[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 			continue //nolint:wsl
 		}
@@ -166,6 +185,8 @@ func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("prowlarrStatus", idx, stat)
+
 			prl[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 		}(idx, app)
 	}
@@ -179,6 +200,8 @@ func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps
 
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("radarrStatus", idx, stat)
+
 			rad[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 			continue //nolint:wsl
 		}
@@ -189,6 +212,8 @@ func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("radarrStatus", idx, stat)
+
 			rad[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 		}(idx, app)
 	}
@@ -202,6 +227,8 @@ func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*ap
 
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("readarrStatus", idx, stat)
+
 			read[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 			continue //nolint:wsl
 		}
@@ -212,6 +239,8 @@ func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*ap
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("readarrStatus", idx, stat)
+
 			read[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 		}(idx, app)
 	}
@@ -225,6 +254,8 @@ func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps
 
 		if fg {
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("sonarrStatus", idx, stat)
+
 			son[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 			continue //nolint:wsl
 		}
@@ -235,6 +266,8 @@ func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("sonarrStatus", idx, stat)
+
 			son[idx] = &conTest{Instance: idx + 1, Up: err == nil, Status: stat}
 		}(idx, app)
 	}
@@ -261,6 +294,8 @@ func getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *apps.
 func plexVersionReply(stat *plex.PMSInfo, err error) []*conTest {
 	if stat == nil {
 		stat = &plex.PMSInfo{}
+	} else {
+		data.Save("plexStatus", stat)
 	}
 
 	return []*conTest{{

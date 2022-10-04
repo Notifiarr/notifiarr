@@ -263,8 +263,8 @@ func (s *Server) getAppConfigs(ctx context.Context) map[string]interface{} {
 }
 
 func (s *Server) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
-	const key = "tautulliUsers"
-	cacheUsers := data.Get(key)
+	const tautulliUsersKey = "tautulliUsers"
+	cacheUsers := data.Get(tautulliUsersKey)
 
 	if cacheUsers != nil && cacheUsers.Data != nil && time.Since(cacheUsers.Time) < 10*time.Minute {
 		users, _ := cacheUsers.Data.(*tautulli.Users)
@@ -276,7 +276,7 @@ func (s *Server) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
 		return users, fmt.Errorf("tautulli failed: %w", err)
 	}
 
-	data.Save(key, users)
+	data.Save(tautulliUsersKey, users)
 
 	return users, nil
 }
