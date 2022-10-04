@@ -10,6 +10,8 @@
 <b>Runs</b>: {{$stats.Runs}}<br>
 <b>Failures</b>: {{$stats.Fails}}<br>
 <b>Last Run</b>: {{$stats.LastRun}}{{if not (eq $stats.LastRun "never")}} ago{{end}}<br>
+<b>Last Args</b>:<br>
+{{range $i, $s := $stats.LastArgs}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}
 {{- if $stats.LastOutput }}
 <b>Last Output</b>:<br><pre><code>{{$stats.LastOutput}}</code></pre>
 {{- end}}

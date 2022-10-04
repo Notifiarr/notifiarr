@@ -93,7 +93,7 @@ func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string
 		return "<command disabled>", ErrDisabled
 	}
 
-	output, err := c.exec(ctx, input)
+	output, elapsed, err := c.exec(ctx, input)
 	oStr := output.String()
 	eStr := ""
 
@@ -112,7 +112,7 @@ func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string
 				"output": oStr,
 				"error":  eStr,
 			},
-			LogMsg:     fmt.Sprintf("Custom Command '%s' Output", c.Name),
+			LogMsg:     fmt.Sprintf("Custom Command '%s' Output (elapsed: %s)", c.Name, elapsed.Round(time.Millisecond)),
 			LogPayload: c.Log,
 		})
 	}
@@ -129,23 +129,32 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, err er
 	c.runs++
 	c.lastRun = time.Now().Round(time.Second)
 	c.output = oStr
+	c.lastArg = input.Args
+
+	extra := ""
+	if len(c.lastArg) > 0 {
+		extra = ", args:"
+		for idx, arg := range c.lastArg {
+			extra += fmt.Sprintf(" %d: %q", idx+1, arg)
+		}
+	}
 
 	if err != nil {
 		c.fails++
 		c.output = "error: " + eStr + ", output: " + oStr
 
 		if c.Log && oStr != "" {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v, Output: %s", input.Type, c.Name, err, oStr)
+			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed: %v, Output: %s", input.Type, c.Name, extra, err, oStr)
 		} else {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v", input.Type, c.Name, err)
+			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed: %v", input.Type, c.Name, extra, err)
 		}
 	} else if c.Log && oStr != "" {
-		c.log.Printf("[%s requested] Custom Command '%s' Output: %s", input.Type, c.Name, oStr)
+		c.log.Printf("[%s requested] Custom Command '%s%s' Output: %s", input.Type, c.Name, extra, oStr)
 	}
 }
 
 // run read locks and runs the command then returns the output.
-func (c *Command) exec(ctx context.Context, input *common.ActionInput) (*bytes.Buffer, error) {
+func (c *Command) exec(ctx context.Context, input *common.ActionInput) (*bytes.Buffer, time.Duration, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -161,16 +170,17 @@ func (c *Command) exec(ctx context.Context, input *common.ActionInput) (*bytes.B
 
 	cmd, err := builder.getCmd(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 
+	start := time.Now()
 	if err := cmd.Run(); err != nil {
-		return &out, fmt.Errorf(`running cmd %s: %w`, cmd.Args, err)
+		return &out, time.Since(start), fmt.Errorf(`running cmd %s: %w`, cmd.Args, err)
 	}
 
-	return &out, nil
+	return &out, time.Since(start), nil
 }

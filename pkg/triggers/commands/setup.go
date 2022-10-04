@@ -47,6 +47,7 @@ type Command struct {
 	runs    int
 	output  string // last output logged
 	lastRun time.Time
+	lastArg []string
 	mu      sync.RWMutex
 	ch      chan *common.ActionInput
 	log     mnd.Logger
@@ -104,6 +105,7 @@ type Stats struct {
 	Fails      int              `json:"fails"`
 	LastOutput string           `json:"output"`
 	LastRun    string           `json:"last"`
+	LastArgs   []string         `json:"lastArgs"`
 }
 
 // Stats returns statistics about a command.
@@ -123,6 +125,7 @@ func (c *Command) Stats() Stats {
 		Fails:      c.fails,
 		LastOutput: c.output,
 		LastRun:    last,
+		LastArgs:   c.lastArg,
 	}
 }
 
