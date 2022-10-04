@@ -2,14 +2,17 @@
                                 <p>
                                     This page displays data from integrated applications.
                                     &nbsp;<a href="#integrations" class="fas fa-sync" onClick="refreshPage('integrations');"> Refresh</a>
-
                                 </p>
+{{- if .Config.Apps.Plex.Enabled }}
 {{ template "integrations/plex.html" .}}
+{{- end }}
 {{ template "integrations/lidarr.html" .}}
 {{ template "integrations/prowlarr.html" .}}
 {{ template "integrations/radarr.html" .}}
 {{ template "integrations/readarr.html" .}}
 {{ template "integrations/sonarr.html" .}}
+{{- if .Config.Apps.Tautulli.Enabled }}
 {{ template "integrations/tautulli.html" .}}
+{{- end }}
 {{- /* TODO: dashbaord (download clients), snapshot (system data, mysql data) */ -}}
 {{- /* end of integrations (leave this comment) */ -}}

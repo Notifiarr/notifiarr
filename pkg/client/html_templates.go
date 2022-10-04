@@ -111,6 +111,9 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
+		"pad": func(s any, i int) string {
+			return fmt.Sprintf("%0"+fmt.Sprint(i)+"v", s)
+		},
 		"cache":   data.Get,
 		"cacheID": data.GetWithID,
 		"tojson": func(input any) string {

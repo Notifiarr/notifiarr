@@ -68,7 +68,7 @@
                                                     {{- $codecs := plexmedia $session.Media}}
                                                     {{index $codecs 0}}, {{index $codecs 1}}
                                                 </td>
-                                                <td>{{ $session.GrandparentTitle }} {{ $session.Title }} {{if $session.Year}}({{ $session.Year }}){{end}}</td>
+                                                <td>{{ if $session.GrandparentTitle }}{{ $session.GrandparentTitle }}; {{end}}{{ $session.Title }} {{ if $session.GrandparentTitle }}(S{{pad $session.ParentIndex 2}}E{{pad $session.Index 2}}){{else if $session.Year}}({{ $session.Year }}){{end}}</td>
                                             </tr>
                                             {{- end }}
                                         </table>
