@@ -343,7 +343,7 @@ func (c *Client) stop(ctx context.Context, event website.EventType) error {
 		defer c.CapturePanic()
 		c.closeDynamicTimerMenus()
 		c.triggers.Stop(event)
-		c.Config.Services.Stop(ctx)
+		c.Config.Services.Stop()
 		c.website.Stop()
 		c.Print("==> All systems powered down!")
 	}()

@@ -5,10 +5,9 @@ import (
 	"bytes"
 	"context"
 	"crypto/md5" //nolint:gosec
-	"errors"
 	"fmt"
-	"os/exec"
-	"runtime"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -17,22 +16,68 @@ import (
 	"github.com/hugelgupf/go-shlex"
 )
 
+var ErrDisabled = fmt.Errorf("the command is disabled due to an error")
+
+const (
+	argPfx = "({"
+	argSfx = "})"
+)
+
 // Setup must run in the creation routine.
-func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
+func (c *Command) Setup(logger mnd.Logger, website *website.Server) error {
 	if c.Name == "" {
 		if args := shlex.Split(c.Command); len(args) > 0 {
 			c.Name = args[0]
 		}
 	}
 
+	if err := c.setupRegexpArgs(); err != nil {
+		return err
+	}
+
 	hash := md5.Sum([]byte(fmt.Sprint(c.Name, c.Command, c.Shell, c.Log, c.Notify, c.Timeout))) //nolint:gosec
 	c.Hash = fmt.Sprintf("%x", hash)
 	c.log = logger
 	c.website = website
+	c.Args = len(c.args)
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = defaultTimeout
 	}
+
+	return nil
+}
+
+func (c *Command) setupRegexpArgs() error {
+	c.cmd = c.Command
+
+	pfxs := strings.Count(c.Command, argPfx)
+	if sfxs := strings.Count(c.Command, argSfx); pfxs != sfxs {
+		return fmt.Errorf("%w: regexp pfx/sfx mismatch, pfx %s count %d, sfx %s count: %d",
+			ErrArgValue, argPfx, pfxs, argSfx, sfxs)
+	}
+
+	matches := regexp.MustCompile(`\({([^}]*)}\)`).FindAllStringIndex(c.cmd, -1)
+	if matches == nil {
+		return nil
+	}
+
+	c.args = make([]*regexp.Regexp, len(matches))
+
+	for idx := len(matches) - 1; idx >= 0; idx-- {
+		arg := matches[idx]
+		instance := idx + 1
+
+		re, err := regexp.Compile(c.cmd[arg[0]+2 : arg[1]-2])
+		if err != nil {
+			return fmt.Errorf("parsing command '%s' arg %d regexp: %w", c.Name, instance, err)
+		}
+
+		c.cmd = c.cmd[:arg[0]] + fmt.Sprintf("%s%d%s", argPfx, instance, argSfx) + c.cmd[arg[1]:]
+		c.args[idx] = re
+	}
+
+	return nil
 }
 
 // run executes this command and logs the output. This is executed from the trigger channel.
@@ -42,15 +87,20 @@ func (c *Command) run(ctx context.Context, input *common.ActionInput) {
 
 // RunNow runs the command immediately, waits for and returns the output.
 func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string, error) {
-	output, err := c.exec(ctx)
-	oLen := 0
-	oStr := output.String()
+	if c.disable {
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		c.output = ErrDisabled.Error()
 
+		return "<command disabled>", ErrDisabled
+	}
+
+	output, elapsed, err := c.exec(ctx, input)
+	oStr := output.String()
 	eStr := ""
+
 	if err != nil {
 		eStr = err.Error()
-	} else {
-		oLen = output.Len()
 	}
 
 	// Send the notification before the lock.
@@ -64,103 +114,78 @@ func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string
 				"output": oStr,
 				"error":  eStr,
 			},
-			LogMsg:     fmt.Sprintf("Custom Command '%s' Output", c.Name),
+			LogMsg:     fmt.Sprintf("Custom Command '%s' Output (elapsed: %s)", c.Name, elapsed.Round(time.Millisecond)),
 			LogPayload: c.Log,
 		})
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.runs++
-	c.lastRun = time.Now().Round(time.Second)
-	c.output = oStr
-
-	if err != nil {
-		c.fails++
-		c.output = eStr + ": " + oStr
-
-		if c.Log && oStr != "" {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v, Output: %s", input.Type, c.Name, err, oStr)
-		} else {
-			c.log.Errorf("[%s requested] Custom Command '%s' Failed: %v", input.Type, c.Name, err)
-		}
-	} else if c.Log && oLen > 0 {
-		c.log.Printf("[%s requested] Custom Command '%s' Output: %s", input.Type, c.Name, oStr)
-	}
+	c.logOutput(input, oStr, eStr, elapsed, err)
 
 	return oStr, err
 }
 
-// exec read-locks a command before running it and returning the output.
-func (c *Command) exec(ctx context.Context) (*bytes.Buffer, error) {
+func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, elapsed time.Duration, err error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.runs++
+	c.lastRun = time.Now().Round(time.Second)
+	c.output = oStr
+	c.lastArg = input.Args
+
+	extra := ""
+	if len(c.lastArg) > 0 {
+		extra = ", args:"
+		for idx, arg := range c.lastArg {
+			extra += fmt.Sprintf(" %d: %q", idx+1, arg)
+		}
+	}
+
+	if err != nil {
+		c.fails++
+		c.output = "error: " + eStr + ", output: " + oStr
+
+		if c.Log && oStr != "" {
+			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v, Output:\n%s",
+				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err, oStr)
+		} else {
+			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v",
+				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err)
+		}
+	} else if c.Log && oStr != "" {
+		c.log.Printf("[%s requested] Custom Command '%s%s' Output (elapsed: %s):\n%s",
+			input.Type, c.Name, extra, elapsed.Round(time.Millisecond), oStr)
+	}
+}
+
+// run read locks and runs the command then returns the output.
+func (c *Command) exec(ctx context.Context, input *common.ActionInput) (*bytes.Buffer, time.Duration, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
 	ctx, cancel := context.WithTimeout(ctx, c.Timeout.Duration)
 	defer cancel()
 
-	return run(ctx, c.Command, c.Shell)
-}
+	builder := &cmdBuilder{
+		cmd:          c.cmd,
+		expectedArgs: c.args,
+		providedArgs: input.Args,
+		shell:        c.Shell,
+	}
 
-// run runs any provided command and returns the output.
-func run(ctx context.Context, command string, shell bool) (*bytes.Buffer, error) {
-	cmd, err := getCmd(ctx, command, shell)
+	cmd, err := builder.getCmd(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var out bytes.Buffer
-
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 
+	start := time.Now()
 	if err := cmd.Run(); err != nil {
-		return &out, fmt.Errorf(`running cmd %s: %w`, cmd.Args, err)
+		return &out, time.Since(start), fmt.Errorf(`running cmd %s: %w`, cmd.Args, err)
 	}
 
-	return &out, nil
-}
-
-// getCmd returns the exec.Cmd for the provided arguments.
-func getCmd(ctx context.Context, command string, shell bool) (*exec.Cmd, error) {
-	args, err := getArgs(command, shell)
-	if err != nil {
-		return nil, err
-	}
-
-	var cmd *exec.Cmd
-	//nolint:gosec
-	switch len(args) {
-	case 0:
-		return nil, ErrNoCmd
-	case 1:
-		cmd = exec.CommandContext(ctx, args[0])
-	default:
-		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
-	}
-
-	return cmd, nil
-}
-
-func getArgs(command string, shell bool) ([]string, error) {
-	if runtime.GOOS != mnd.Windows && shell {
-		return []string{"/bin/sh", "-c", command}, nil
-	}
-
-	// Special shell-split command.
-	args := shlex.Split(command)
-	if len(args) == 0 {
-		return nil, ErrNoCmd
-	}
-
-	var err error
-	if args[0], err = exec.LookPath(args[0]); err != nil && !errors.Is(err, exec.ErrDot) {
-		return nil, fmt.Errorf("finding command path: %w", err)
-	}
-
-	if shell { // if shell is set, we know it's windows.
-		return append([]string{"cmd", "/C"}, args...), nil
-	}
-
-	return args, nil
+	return &out, time.Since(start), nil
 }

@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -62,15 +61,14 @@ func (c *Config) runChecks(forceAll bool) {
 	count := 0
 
 	for s := range c.services {
-		func() {
-			c.services[s].svc.RLock()
-			defer c.services[s].svc.RUnlock()
+		if forceAll || c.services[s].Due() {
+			count++
+			c.checks <- c.services[s]
+		}
+	}
 
-			if forceAll || c.services[s].svc.LastCheck.Add(c.services[s].Interval.Duration).Before(time.Now()) {
-				count++
-				c.checks <- c.services[s]
-			}
-		}()
+	for ; count > 0; count-- {
+		<-c.done
 	}
 }
 

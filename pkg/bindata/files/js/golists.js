@@ -24,6 +24,9 @@ function removeInstance(name, index)
     },1000);
 }
 
+
+
+
 function testInstance(from, instanceType, index)
 {
     from.css({'pointer-events':'none'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');

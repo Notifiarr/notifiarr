@@ -339,7 +339,7 @@ func (c *Client) watchConfigChannels(ctx context.Context) {
 		case <-menu["svcs"].ClickedCh:
 			if menu["svcs"].Checked() {
 				menu["svcs"].Uncheck()
-				c.Config.Services.Stop(ctx)
+				c.Config.Services.Stop()
 				ui.Notify("Stopped checking services!")
 			} else {
 				menu["svcs"].Check()

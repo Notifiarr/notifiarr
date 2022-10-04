@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 	"time"
 
@@ -38,10 +39,15 @@ type Command struct {
 	Notify  bool          `json:"notify" toml:"notify" xml:"notify" yaml:"notify"`
 	Timeout cnfg.Duration `json:"-" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Hash    string        `json:"hash" toml:"-" xml:"-" yaml:"-"`
+	Args    int           `json:"args" toml:"-" xml:"-" yaml:"-"`
+	cmd     string
+	args    []*regexp.Regexp
+	disable bool
 	fails   int
 	runs    int
 	output  string // last output logged
 	lastRun time.Time
+	lastArg []string
 	mu      sync.RWMutex
 	ch      chan *common.ActionInput
 	log     mnd.Logger
@@ -51,7 +57,11 @@ type Command struct {
 // New configures the library.
 func New(config *common.Config, commands []*Command) *Action {
 	for _, cmd := range commands {
-		cmd.Setup(config.Logger, config.Server)
+		err := cmd.Setup(config.Logger, config.Server)
+		if err != nil {
+			config.Errorf("Command Setup Failed: %v", err)
+			cmd.disable = true //nolint:wsl
+		}
 	}
 
 	return &Action{cmd: &cmd{Config: config, cmdlist: commands}}
@@ -89,10 +99,13 @@ func (a *Action) Create() {
 
 // Stats for a command's invocations.
 type Stats struct {
-	Runs       int    `json:"runs"`
-	Fails      int    `json:"fails"`
-	LastOutput string `json:"output"`
-	LastRun    string `json:"last"`
+	Args       []*regexp.Regexp `json:"-"`
+	Command    string           `json:"-"`
+	Runs       int              `json:"runs"`
+	Fails      int              `json:"fails"`
+	LastOutput string           `json:"output"`
+	LastRun    string           `json:"last"`
+	LastArgs   []string         `json:"lastArgs"`
 }
 
 // Stats returns statistics about a command.
@@ -106,10 +119,13 @@ func (c *Command) Stats() Stats {
 	}
 
 	return Stats{
+		Args:       c.args,
+		Command:    c.cmd,
 		Runs:       c.runs,
 		Fails:      c.fails,
 		LastOutput: c.output,
 		LastRun:    last,
+		LastArgs:   c.lastArg,
 	}
 }
 

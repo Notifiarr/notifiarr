@@ -74,7 +74,8 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
 	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")
 	gui.HandleFunc("/browse", c.handleFileBrowser).Queries("dir", "{dir}").Methods("GET")
-	gui.HandleFunc("/cmdstats/{command}", c.handleCommandStats).Methods("GET")
+	gui.HandleFunc("/ajax/{path:cmdstats|cmdargs}/{hash}", c.handleCommandStats).Methods("GET")
+	gui.HandleFunc("/runCommand/{hash}", c.handleRunCommand).Methods("POST")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }
@@ -83,8 +84,8 @@ func (c *Client) httpGuiHandlers(base string) {
 func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "info", c.infoHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET")
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET")
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
+	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
 
 	// Aggregate handlers. Non-app specific.
 	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")

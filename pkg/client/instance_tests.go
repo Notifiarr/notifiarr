@@ -45,8 +45,12 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 			c.Config.Commands[index].Run(&common.ActionInput{Type: website.EventGUI})
 			reply, code = fmt.Sprintf("Command Triggered: %s", c.Config.Commands[index].Name), http.StatusOK
 		} else if len(config.Commands) > index { // check POST input for "new" command.
-			config.Commands[index].Setup(c.Logger, c.website)
-			reply, code = testCustomCommand(request.Context(), config.Commands[index])
+			err := config.Commands[index].Setup(c.Logger, c.website)
+			if err != nil {
+				reply, code = err.Error(), http.StatusInternalServerError
+			} else {
+				reply, code = testCustomCommand(request.Context(), config.Commands[index])
+			}
 		}
 	// Downloaders.
 	case "NZBGet":
