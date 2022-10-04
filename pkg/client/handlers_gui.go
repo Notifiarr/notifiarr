@@ -728,7 +728,12 @@ func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, re
 }
 
 func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
-	c.renderTemplate(req.Context(), response, req, mux.Vars(req)["template"]+".html", "")
+	page := mux.Vars(req)["template"] + ".html"
+	if c.templat.Lookup(page) == nil {
+		page = filepath.Join(mux.Vars(req)["template"], "index.html")
+	}
+
+	c.renderTemplate(req.Context(), response, req, page, "")
 }
 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
