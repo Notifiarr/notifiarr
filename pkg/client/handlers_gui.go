@@ -665,7 +665,21 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
 	}
 
+	if err := c.validateNewCommandConfig(config); err != nil {
+		return err
+	}
+
 	return c.validateNewServiceConfig(config)
+}
+
+func (c *Client) validateNewCommandConfig(config *configfile.Config) error {
+	for idx, cmd := range config.Commands {
+		if err := cmd.Setup(c.Logger, c.website); err != nil {
+			return fmt.Errorf("command %d '%s' failed setup: %w", idx+1, cmd.Name, err)
+		}
+	}
+
+	return nil
 }
 
 func (c *Client) validateNewServiceConfig(config *configfile.Config) error {

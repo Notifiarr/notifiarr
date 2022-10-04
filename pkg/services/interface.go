@@ -54,9 +54,9 @@ func (c *Config) runCheck(svc *Service, force bool) bool {
 }
 
 // runChecks runs checks that are due. Passing true, runs them even if they're not due.
-func (c *Config) runChecks(forceAll bool) bool {
+func (c *Config) runChecks(forceAll bool) {
 	if c.checks == nil || c.done == nil {
-		return false
+		return
 	}
 
 	count := 0
@@ -73,12 +73,9 @@ func (c *Config) runChecks(forceAll bool) bool {
 		}()
 	}
 
-	somethingChanged := false
 	for ; count > 0; count-- {
-		somethingChanged = <-c.done || somethingChanged
+		<-c.done
 	}
-
-	return somethingChanged
 }
 
 // GetResults creates a copy of all the results and returns them.

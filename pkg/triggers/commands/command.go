@@ -51,12 +51,14 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) error {
 func (c *Command) setupRegexpArgs() error {
 	c.cmd = c.Command
 
+	pfxs := strings.Count(c.Command, argPfx)
+	if sfxs := strings.Count(c.Command, argSfx); pfxs != sfxs {
+		return fmt.Errorf("%w: regexp pfx/sfx mismatch, pfx %s count %d, sfx %s count: %d",
+			ErrArgValue, argPfx, pfxs, argSfx, sfxs)
+	}
+
 	matches := regexp.MustCompile(`\({([^}]*)}\)`).FindAllStringIndex(c.cmd, -1)
 	if matches == nil {
-		if strings.Contains(c.Command, argPfx) {
-			return fmt.Errorf("%w: missing custom argument regexp terminator: %s", ErrArgValue, argSfx)
-		}
-
 		return nil
 	}
 
