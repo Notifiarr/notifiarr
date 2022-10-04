@@ -517,12 +517,17 @@ bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
 {{end}}{{end}}
 
 
-######################
+###################
 # Custom Commands #
-######################
+###################
 
 ## Run and trigger custom commands.
-## Example:
+## Commands may have required arguments thet can be passed in when the command is run.
+## These use the format ({regex}) - a regular expression wrapped by curly braces and parens.
+## The example below allows a user to run any combination of ls -la on /usr, /home, or /tmp:
+## command = "/bin/ls ({-la|-al|-l|-a}) ({/usr|/home|/tmp})"
+##
+## Full Example (remove the leading # hashes to use it):
 
 #[[command]]
 #  name    = 'some-name-for-logs'
