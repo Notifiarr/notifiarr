@@ -1,0 +1,155 @@
+{{- /* TODO: iostat, processes link, mysql, nvidia */ -}}
+{{template "includes/system-header.html" .}}
+{{- $snapshot := cache "snapshot" }}
+                                    | <a href="#system" class="fas fa-arrow-left" onclick="swapNavigationTemplate('system');"> System Data</a> |
+                                    &nbsp;<a href="#system-snapshot" class="fas fa-sync" onClick="refreshPage('system-snapshot');"> Refresh</a> |
+                                    <h4>Snapshot Data</h4>
+                                    <a class="nav-link" href="#processlist" onClick="refreshPage('processlist', false);showProcessList();">View the running process list here.</a><br>  
+{{- if not (and $snapshot $snapshot.Data) }}
+                                    No snapshot data.
+{{- else }}
+                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered">
+                                                <tr>
+                                                    <td style="width:135px;">System Info</td>
+                                                    <td style="width:25px;min-width:25px;">
+                                                        <i class="fas fa-microchip"></i>
+                                                    </td>
+                                                    <td>{{$snapshot.Data.System.InfoStat.Hostname}}</td>
+                                                </tr>                                
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <a href="#integrations" onClick="dialog($(this), 'left')">Snapshot Age</a>
+                                                        <span style="display:none;" class="dialogTitle">Snapshot</span>
+                                                        <div style="display:none;" class="dialogText">
+                                                            <pre>{{tojson $snapshot.Data}}</pre>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{since $snapshot.Time}}</td>
+                                                </tr>
+                                                <tr><td colspan="2">Username</td><td>{{$snapshot.Data.System.Username}}</td></tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <a href="#integrations" onClick="dialog($(this), 'left')">CPU</a>
+                                                        <span style="display:none;" class="dialogTitle">CPU Time Stats</span>
+                                                        <div style="display:none;" class="dialogText table-responsive">
+                                                            Time units are in seconds.
+                                                            <table class="table table-striped">
+                                                                <tr><td>CPU</td><td>{{$snapshot.Data.System.CPUTime.CPU}}</td></tr>
+                                                                <tr><td>User</td><td>{{$snapshot.Data.System.CPUTime.User}}</td></tr>
+                                                                <tr><td>System</td><td>{{$snapshot.Data.System.CPUTime.System}}</td></tr>
+                                                                <tr><td>Idle</td><td>{{$snapshot.Data.System.CPUTime.Idle}}</td></tr>
+                                                                <tr><td>Nice</td><td>{{$snapshot.Data.System.CPUTime.Nice}}</td></tr>
+                                                                <tr><td>IO Wait</td><td>{{$snapshot.Data.System.CPUTime.Iowait}}</td></tr>
+                                                                <tr><td>IRQ</td><td>{{$snapshot.Data.System.CPUTime.Irq}}</td></tr>
+                                                                <tr><td>SoftIRQ</td><td>{{$snapshot.Data.System.CPUTime.Softirq}}</td></tr>
+                                                                <tr><td>Steal</td><td>{{$snapshot.Data.System.CPUTime.Steal}}</td></tr>
+                                                                <tr><td>Guest</td><td>{{$snapshot.Data.System.CPUTime.Guest}}</td></tr>
+                                                                <tr><td>GuestNice</td><td>{{$snapshot.Data.System.CPUTime.GuestNice}}</td></tr>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{printf "%0.2f" $snapshot.Data.System.CPU}}%</td>
+                                                </tr>
+                                                <tr><td colspan="2">Load Averages</td><td>{{printf "%0.3f" $snapshot.Data.System.Load1}}, {{printf "%0.3f" $snapshot.Data.System.Load5}}, {{printf "%0.3f" $snapshot.Data.System.Load15}} </td></tr>
+                                                <tr><td colspan="2">Mem Free, Used, Total</td><td>{{megabyte $snapshot.Data.System.MemFree}}, {{megabyte $snapshot.Data.System.MemUsed}}, {{megabyte $snapshot.Data.System.MemTotal}} </td></tr>
+                                                <tr><td colspan="2">Users Logged-In</td><td>{{$snapshot.Data.System.Users}}</td></tr>
+                                            {{- if and $snapshot.Data.Raid (or $snapshot.Data.Raid.MDstat $snapshot.Data.Raid.MegaCLI) }}
+                                                {{- range $idx, $megacli := $snapshot.Data.Raid.MegaCLI }}
+                                                <tr>
+                                                    <td colspan="2">MegaCLI A.T.D.</td>
+                                                    <td>
+                                                        <a href="#integrations" onClick="dialog($(this), 'left')">{{$megacli.Adapter}}:{{$megacli.Target}}:{{$megacli.Drive}}</a>
+                                                        <span style="display:none;" class="dialogTitle">Mega CLI Drive {{$megacli.Drive}}</span>
+                                                        <div style="display:none;" class="dialogText table-responsive">
+                                                            <table class="table table-striped">
+                                                                {{- range $name, $value := $megacli.Data }}
+                                                                <tr><td>{{$name}}</td><td>{{$value}}</td></tr>
+                                                                {{- end }}
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {{- end }}
+                                                <tr>
+                                                    <td colspan="2">MDstat</td>
+                                                    <td>
+                                                        <a href="#integrations" onClick="dialog($(this), 'left')">data</a>
+                                                        <span style="display:none;" class="dialogTitle">MD Stat</span>
+                                                        <div style="display:none;" class="dialogText">
+                                                            <pre>{{$snapshot.Data.Raid.MDstat}}</pre>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {{- end }}
+                                            </table>
+                                        </div>
+                                    </div>
+                                    {{- if or $snapshot.Data.System.Temps $snapshot.Data.DriveTemps }}
+                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered">
+                                                <tr>
+                                                    <td style="width:135px;">Temperatures</td>
+                                                    <td style="width:25px;min-width:25px;">
+                                                        <i class="fas fa-thermometer"></i>
+                                                    </td>
+                                                    <td>{{$snapshot.Data.System.InfoStat.Hostname}}</td>
+                                                </tr>
+                                                {{- range $name, $temp := $snapshot.Data.System.Temps }}
+                                                <tr><td colspan="2">Temp '{{$name}}'</td><td>{{$temp}}</td></tr>
+                                                {{- end }}
+                                                {{- range $name, $temp := $snapshot.Data.DriveTemps }}
+                                                <tr><td colspan="2">Drive '{{$name}}'</td><td>{{$temp}}</td></tr>
+                                                {{- end }}
+                                            </table>
+                                        </div>       
+                                    </div>
+                                    {{- end }}
+                                    {{- if or $snapshot.Data.DriveAges $snapshot.Data.DiskHealth }}
+                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered">
+                                                <tr>
+                                                    <td style="width:135px;">Drives</td>
+                                                    <td style="width:25px;min-width:25px;">
+                                                        <i class="fas fa-hdd"></i>
+                                                    </td>
+                                                    <td>{{$snapshot.Data.System.InfoStat.Hostname}}</td>
+                                                </tr>
+                                                {{- range $name, $value := $snapshot.Data.DriveAges }}
+                                                <tr><td colspan="2">'{{$name}}' Age</td><td>{{$value}}</td></tr>
+                                                {{- end }}
+                                                {{- range $name, $value := $snapshot.Data.DiskHealth }}
+                                                <tr><td colspan="2">'{{$name}}' Health</td><td>{{$value}}</td></tr>
+                                                {{- end }}
+                                            </table>
+                                        </div>       
+                                    </div>
+                                    {{- end }}
+                                    {{- if or $snapshot.Data.IOTop }}
+                                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 col-xxl-4">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-bordered">
+                                                <tr>
+                                                    <td style="width:135px;">I/O Top</td>
+                                                    <td style="width:25px;min-width:25px;">
+                                                        <i class="fas fa-rev"></i>
+                                                    </td>
+                                                    <td>{{$snapshot.Data.System.InfoStat.Hostname}}</td>
+                                                </tr>
+                                                {{- if $snapshot.Data.IOTop }}
+                                                <tr><td colspan="2">Total Read</td><td>{{megabyte $snapshot.Data.IOTopData.TotalRead}}</td></tr>                                                
+                                                <tr><td colspan="2">Total Write</td><td>{{megabyte $snapshot.Data.IOTopData.TotalWrite}}</td></tr>                                                
+                                                <tr><td colspan="2">Curr Read</td><td>{{megabyte $snapshot.Data.IOTopData.CurrRead}}</td></tr>                                                
+                                                <tr><td colspan="2">Curr Write</td><td>{{megabyte $snapshot.Data.IOTopData.CurrWrite}}</td></tr>                                                
+                                                <tr><td colspan="2">Processes</td><td>{{len $snapshot.Data.IOTopData.Processes}}</td></tr>                                                
+                                                {{- end }}
+                                            </table>
+                                        </div>       
+                                    </div>
+                                    {{- end }}
+                                    <hr>
+{{- end }}
+{{- /* end of snapshot integration (leave this comment) */ -}}

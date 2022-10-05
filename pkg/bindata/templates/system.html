@@ -1,9 +1,6 @@
-                                <h1>{{if eq .Version.os "windows"}}<i class="fab fa-windows"></i>
-                                 {{else if .Version.docker }}<i class="fab fa-docker"></i>
-                                 {{else if eq .Version.os "linux"}}<i class="fab fa-linux"></i>
-                                 {{else if eq .Version.os "freebsd"}}<i class="fab fa-freebsd"></i>
-                                 {{else if eq .Version.os "darwin"}}<i class="fab fa-apple"></i>
-                                 {{else}}<i class="fas fa-microchip"></i>{{end}} System</h1>
+{{template "includes/system-header.html" .}}
+                               | <a href="#system-snapshot" onclick="swapNavigationTemplate('system-snapshot');">Snapshot Data <i class="fas fa-arrow-right" ></i></a> |
+                               &nbsp;<a href="#system" class="fas fa-sync" onClick="refreshPage('system');"> Refresh</a> |
                                 <div class="table-responsive">
                                     <table style="width:99%;" class="table table-bordered configtable">
                                         <thead style="display:none;">
