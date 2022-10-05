@@ -30,10 +30,11 @@
                                                 <tr><td colspan="2">Downloading</td><td>{{$app.Downloading}}</td></tr>
                                                 <tr><td colspan="2">Paused</td><td>{{$app.Paused}}</td></tr>
                                                 <tr><td colspan="2">Errors</td><td>{{$app.Errors}}</td></tr>
-                                                <tr><td colspan="2">Size</td><td>{{megabyte $app.Size}}</td></tr>
+                                                <tr><td colspan="2">Total Size</td><td>{{megabyte $app.Size}}</td></tr>
                                                 <tr><td colspan="2">Month</td><td>{{megabyte $app.Month}}</td></tr>
                                                 <tr><td colspan="2">Week</td><td>{{megabyte $app.Week}}</td></tr>
-                                                <tr><td colspan="2">Downloaded</td><td>{{megabyte $app.Downloaded}}</td></tr>
+                                                <tr><td colspan="2">Day</td><td>{{megabyte $app.Day}}</td></tr>
+                                                <tr><td colspan="2">Downloaded</td><td>{{$app.Downloaded}}</td></tr>
                                                     {{- end}}
                                                 {{- end }}
                                             {{- end }}
