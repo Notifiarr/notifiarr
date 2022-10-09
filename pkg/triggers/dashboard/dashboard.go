@@ -88,6 +88,7 @@ type State struct {
 	Errors      int64 `json:"errors,omitempty"`
 	Month       int64 `json:"month,omitempty"`
 	Week        int64 `json:"week,omitempty"`
+	Day         int64 `json:"day,omitempty"`
 }
 
 // States is our compiled states for the dashboard.

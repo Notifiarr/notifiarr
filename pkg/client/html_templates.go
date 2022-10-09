@@ -29,7 +29,6 @@ import (
 	"github.com/shirou/gopsutil/v3/host"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"golift.io/cache"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -112,6 +111,8 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
+		"cache":   data.Get,
+		"cacheID": data.GetWithID,
 		"tojson": func(input any) string {
 			output, _ := json.MarshalIndent(input, "", " ")
 			return string(output)
@@ -411,7 +412,6 @@ type templateData struct {
 	Webauth     bool                           `json:"webauth"`
 	Msg         string                         `json:"msg,omitempty"`
 	Version     map[string]interface{}         `json:"version"`
-	Cache       map[string]*cache.Item         `json:"cache"`
 	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
 	ClientInfo  *website.ClientInfo            `json:"clientInfo"`
@@ -448,15 +448,6 @@ func (c *Client) renderTemplate(
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(ctx),
-		Cache: map[string]*cache.Item{
-			"dashboard": data.Get("dashboard"),
-			"sessions":  data.Get("plexCurrentSessions"),
-			"snapshot":  data.Get("snapshot"),
-			"lidarr":    data.Get("lidarr"),
-			"radarr":    data.Get("radarr"),
-			"readarr":   data.Get("readarr"),
-			"sonarr":    data.Get("sonarr"),
-		},
 		Version: map[string]interface{}{
 			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),

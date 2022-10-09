@@ -1,0 +1,24 @@
+                                <h1><i class="fas fa-bezier-curve"></i> Integration Insights</h1>
+                                <p>
+                                    This page displays data from integrated applications.
+                                    &nbsp;<a href="#integrations" class="fas fa-sync" onClick="refreshPage('integrations');"> Refresh</a>
+                                </p>
+{{- if .Config.Apps.Plex.Enabled }}
+{{ template "integrations/plex.html" .}}
+{{- end }}
+                                <div class="row g-2">
+{{- if .Config.Apps.Tautulli.Enabled }}
+{{ template "integrations/tautulli.html" .}}
+{{- end }}
+{{ template "integrations/prowlarr.html" .}}
+{{ template "integrations/lidarr.html" .}}
+{{ template "integrations/radarr.html" .}}
+{{ template "integrations/readarr.html" .}}
+{{ template "integrations/sonarr.html" .}}
+{{ template "integrations/deluge.html" .}}
+{{ template "integrations/nzbget.html" .}}
+{{ template "integrations/qbit.html" .}}
+{{ template "integrations/rtorrent.html" .}}
+{{ template "integrations/sabnzb.html" .}}
+                                </div>
+{{- /* end of integrations (leave this comment) */ -}}

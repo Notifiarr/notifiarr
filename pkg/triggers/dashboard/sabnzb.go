@@ -48,6 +48,7 @@ func (c *Cmd) getSabNZBState(ctx context.Context, instance int, s *apps.SabNZBCo
 	state.Size = hist.TotalSize.Bytes
 	state.Month = hist.MonthSize.Bytes
 	state.Week = hist.WeekSize.Bytes
+	state.Day = hist.DaySize.Bytes
 
 	state.Downloads = len(queue.Slots) + hist.Noofslots
 	state.Next = []*Sortable{}

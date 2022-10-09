@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
@@ -251,7 +252,7 @@ func (s *Server) getAppConfigs(ctx context.Context) map[string]interface{} {
 		reApps[k] = v
 	}
 
-	if u, err := s.config.Apps.Tautulli.GetUsers(ctx); err != nil {
+	if u, err := s.tautulliUsers(ctx); err != nil {
 		s.config.Error("Getting Tautulli Users:",
 			strings.ReplaceAll(s.config.Apps.Tautulli.APIKey, "<redacted>", err.Error()))
 	} else {
@@ -259,6 +260,25 @@ func (s *Server) getAppConfigs(ctx context.Context) map[string]interface{} {
 	}
 
 	return reApps
+}
+
+func (s *Server) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
+	const tautulliUsersKey = "tautulliUsers"
+	cacheUsers := data.Get(tautulliUsersKey)
+
+	if cacheUsers != nil && cacheUsers.Data != nil && time.Since(cacheUsers.Time) < 10*time.Minute {
+		users, _ := cacheUsers.Data.(*tautulli.Users)
+		return users, nil
+	}
+
+	users, err := s.config.Apps.Tautulli.GetUsers(ctx)
+	if err != nil {
+		return users, fmt.Errorf("tautulli failed: %w", err)
+	}
+
+	data.Save(tautulliUsersKey, users)
+
+	return users, nil
 }
 
 func (i InstanceConfig) Finished(instance int) bool {

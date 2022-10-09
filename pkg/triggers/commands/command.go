@@ -24,15 +24,11 @@ const (
 )
 
 // Setup must run in the creation routine.
-func (c *Command) Setup(logger mnd.Logger, website *website.Server) error {
+func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 	if c.Name == "" {
 		if args := shlex.Split(c.Command); len(args) > 0 {
 			c.Name = args[0]
 		}
-	}
-
-	if err := c.setupRegexpArgs(); err != nil {
-		return err
 	}
 
 	hash := md5.Sum([]byte(fmt.Sprint(c.Name, c.Command, c.Shell, c.Log, c.Notify, c.Timeout))) //nolint:gosec
@@ -44,11 +40,9 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) error {
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = defaultTimeout
 	}
-
-	return nil
 }
 
-func (c *Command) setupRegexpArgs() error {
+func (c *Command) SetupRegexpArgs() error {
 	c.cmd = c.Command
 
 	pfxs := strings.Count(c.Command, argPfx)

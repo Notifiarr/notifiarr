@@ -674,7 +674,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 
 func (c *Client) validateNewCommandConfig(config *configfile.Config) error {
 	for idx, cmd := range config.Commands {
-		if err := cmd.Setup(c.Logger, c.website); err != nil {
+		if err := cmd.SetupRegexpArgs(); err != nil {
 			return fmt.Errorf("command %d '%s' failed setup: %w", idx+1, cmd.Name, err)
 		}
 	}
@@ -728,7 +728,12 @@ func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, re
 }
 
 func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
-	c.renderTemplate(req.Context(), response, req, mux.Vars(req)["template"]+".html", "")
+	page := mux.Vars(req)["template"] + ".html"
+	if c.templat.Lookup(page) == nil {
+		page = filepath.Join(mux.Vars(req)["template"], "index.html")
+	}
+
+	c.renderTemplate(req.Context(), response, req, page, "")
 }
 
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.

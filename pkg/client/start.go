@@ -193,7 +193,7 @@ func (c *Client) loadConfiguration(ctx context.Context) (msg string, newPassword
 	}
 
 	// Parse the config file and environment variables.
-	c.website, c.triggers, err = c.Config.Get(c.Flags)
+	c.website, c.triggers, err = c.Config.Get(c.Flags, c.Logger)
 	if err != nil {
 		return msg, newPassword, fmt.Errorf("getting config: %w", err)
 	}
@@ -311,7 +311,7 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
-	if c.website, c.triggers, err = c.Config.Get(c.Flags); err != nil {
+	if c.website, c.triggers, err = c.Config.Get(c.Flags, c.Logger); err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}
 

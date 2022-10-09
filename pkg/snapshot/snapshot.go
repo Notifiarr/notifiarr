@@ -85,14 +85,14 @@ type Snapshot struct {
 	Raid       *RaidData                      `json:"raid,omitempty"`
 	DriveAges  map[string]int                 `json:"driveAges,omitempty"`
 	DriveTemps map[string]int                 `json:"driveTemps,omitempty"`
+	DiskHealth map[string]string              `json:"driveHealth,omitempty"`
 	DiskUsage  map[string]*Partition          `json:"diskUsage,omitempty"`
 	Quotas     map[string]*Partition          `json:"quotas,omitempty"`
-	DiskHealth map[string]string              `json:"driveHealth,omitempty"`
+	ZFSPool    map[string]*Partition          `json:"zfsPools,omitempty"`
 	IOTop      *IOTopData                     `json:"ioTop,omitempty"`
 	IOStat     *IoStatDisks                   `json:"ioStat,omitempty"`
 	IOStat2    map[string]disk.IOCountersStat `json:"ioStat2,omitempty"`
 	Processes  Processes                      `json:"processes,omitempty"`
-	ZFSPool    map[string]*Partition          `json:"zfsPools,omitempty"`
 	MySQL      map[string]*MySQLServerData    `json:"mysql,omitempty"`
 	Nvidia     []*NvidiaOutput                `json:"nvidia,omitempty"`
 }

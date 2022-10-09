@@ -63,6 +63,46 @@ func (c *Config) GetUsers(ctx context.Context) (*Users, error) {
 	return &users, nil
 }
 
+// Info represent the data returned by the get_tautulli_info command.
+//
+//nolint:tagliatelle
+type Info struct {
+	InstallType         string `json:"tautulli_install_type"`
+	Version             string `json:"tautulli_version"`
+	Branch              string `json:"tautulli_branch"`
+	Commit              string `json:"tautulli_commit"`
+	Platform            string `json:"tautulli_platform"`
+	PlatformRelease     string `json:"tautulli_platform_release"`
+	PlatformVersion     string `json:"tautulli_platform_version"`
+	PlatformLinuxDistro string `json:"tautulli_platform_linux_distro"`
+	PlatformDeviceName  string `json:"tautulli_platform_device_name"`
+	PythonVersion       string `json:"tautulli_python_version"`
+}
+
+// GetInfo returns the Tautulli app info.
+func (c *Config) GetInfo(ctx context.Context) (*Info, error) {
+	if c == nil || c.Client == nil {
+		return nil, nil //nolint:nilnil
+	}
+
+	params := url.Values{}
+	params.Add("cmd", "get_tautulli_info")
+	params.Add("apikey", c.APIKey)
+
+	var output struct {
+		Resp struct {
+			Result string `json:"result"`
+			Data   *Info  `json:"data"`
+		} `json:"response"`
+	}
+
+	if err := c.GetURLInto(ctx, params, &output); err != nil {
+		return nil, err
+	}
+
+	return output.Resp.Data, nil
+}
+
 // Users is the entire get_users API response.
 type Users struct {
 	Response struct {
