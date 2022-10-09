@@ -44,6 +44,7 @@ install:
   - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.48.0
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm install 2.6.0; fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do gem install --no-document fpm -v 1.11.0; fi
+  - go get github.com/swaggo/swag/cmd/swag
   - make generate
 before_script:
   # Create your own deploy key, tar it, and encrypt the file to make this work. Optionally add a bitly_token file to the archive.

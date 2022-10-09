@@ -39,7 +39,7 @@ func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
 // @Description  Retrieve client info.
 // @Tags         client
 // @Produce      json
-// @Success      200  {object} "contains app info included appStatus"
+// @Success      200  {object} AppInfo "contains app info included appStatus"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/version [get]
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {

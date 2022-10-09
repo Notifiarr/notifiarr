@@ -17,7 +17,8 @@ ARG BINARY
 ARG TARGETARCH
 
 # For megacli. All the *'s are to deal with multiarch. :(
-RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates && \
+RUN go install github.com/swaggo/swag/cmd/swag && \
+    apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates && \
     curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
     mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \

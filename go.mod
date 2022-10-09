@@ -96,7 +96,7 @@ require (
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.9 // indirect
-	modernc.org/libc v1.20.2 // indirect
+	modernc.org/libc v1.20.3 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.4.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
@@ -130,6 +130,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
 )
 
+// api docs.
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
@@ -139,6 +140,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
-	github.com/swaggo/http-swagger v1.3.3 // indirect
+	github.com/swaggo/http-swagger v1.3.3
 	github.com/swaggo/swag v1.8.6 // indirect
 )

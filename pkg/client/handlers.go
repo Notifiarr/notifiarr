@@ -37,13 +37,6 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.HandleFunc(base, c.loginHandler).Methods("POST")
 	}
 
-	c.Config.Router.PathPrefix(path.Join(base, "docs") + "/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(path.Join(base, "docs", "doc.json")),
-		httpSwagger.DeepLinking(true),
-		httpSwagger.DocExpansion("none"),
-		httpSwagger.DomID("swagger-ui"),
-	)).Methods(http.MethodGet)
-
 	if c.Config.UIPassword == "" {
 		return
 	}
@@ -86,6 +79,13 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/ajax/{path:cmdstats|cmdargs}/{hash}", c.handleCommandStats).Methods("GET")
 	gui.HandleFunc("/runCommand/{hash}", c.handleRunCommand).Methods("POST")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
+	gui.PathPrefix("/api").Handler(httpSwagger.Handler(
+		httpSwagger.URL(path.Join(base, "docs", "doc.json")),
+		httpSwagger.DeepLinking(true),
+		httpSwagger.DocExpansion("none"),
+		httpSwagger.DomID("swagger-ui"),
+	)).Methods(http.MethodGet)
+
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }
 
