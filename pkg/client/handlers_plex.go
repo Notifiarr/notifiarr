@@ -39,7 +39,7 @@ func (t *Timer) Active(d time.Duration) bool {
 // PlexHandler handles an incoming webhook from Plex.
 // @Summary      Accepts a Plex Media Server Webhook
 // @Description  Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,
-// @Description  and may include snapshot data and/or fetched session data.
+// @Description  and may include snapshot data and/or fetched session data. Does not require X-API-Key header.
 // @Tags         plex
 // @Accept       json
 // @Produce      text/html
@@ -104,7 +104,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "media.play"), strings.EqualFold(v.Event, "playback.started"):
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
-		c.triggers.PlexCron.SendWebhook(&v)
+		c.triggers.PlexCron.SendWebhook(&v) //nolint:contextcheck,nolintlint
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))

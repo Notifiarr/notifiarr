@@ -77,7 +77,7 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/ajax/{path:cmdstats|cmdargs}/{hash}", c.handleCommandStats).Methods("GET")
 	gui.HandleFunc("/runCommand/{hash}", c.handleRunCommand).Methods("POST")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
-	gui.Path("/docs").Handler(http.RedirectHandler(path.Join(base, "ui", "docs"), http.StatusFound))
+	gui.Path("/docs").Handler(http.RedirectHandler(path.Join(base, "ui", "docs")+"/", http.StatusFound))
 	gui.PathPrefix("/docs/").
 		Handler(http.StripPrefix(strings.TrimSuffix(path.Join(base, "ui"), "/"), http.HandlerFunc(c.handleStaticAssets))).
 		Methods("GET")
@@ -88,7 +88,6 @@ func (c *Client) httpGuiHandlers(base string) {
 func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "info", c.clientinfo.InfoHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version", c.clientinfo.VersionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.clientinfo.VersionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.clientinfo.VersionHandlerInstance, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")

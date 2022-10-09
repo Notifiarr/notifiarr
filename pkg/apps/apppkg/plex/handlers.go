@@ -10,6 +10,14 @@ import (
 
 // HandleSessions provides a web handler to the notifiarr client that returns
 // the current Plex sessions. The handler satisfies apps.APIHandler, sorry.
+// @Description  Returns Plex sessions.
+// @Summary      Retrieve Plex sessions.
+// @Tags         plex
+// @Produce      json
+// @Success      200  {object} Sessions "contains app info included appStatus"
+// @Failure      500  {object} string "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/sessions [get]
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -23,7 +31,16 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 
 // HandleKillSession provides a web handler to the notifiarr client allows
 // notifiarr.com (via Discord request) to end a Plex session.
-// The handler satisfies apps.APIHandler, sorry.
+// @Description  Kill a Plex session.
+// @Summary      Kill a Plex session.
+// @Tags         plex
+// @Produce      text/plain
+// @Param        sessionId  query   string  true  "Plex session ID"
+// @Param        reason     query   string  true  "Reason the session is being terminated. Sent to the user."
+// @Success      200  {object} string "success"
+// @Failure      500  {object} string "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/kill [get]
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
 		ctx       = r.Context()
@@ -40,6 +57,14 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	return http.StatusOK, fmt.Sprintf("kilt session '%s' with reason: %s", sessionID, reason)
 }
 
+// @Description  Returns the Plex Library Directory.
+// @Summary      Retrieve the Plex Library Directory.
+// @Tags         plex
+// @Produce      json
+// @Success      200  {object} SectionDirectory "Plex Library Directory"
+// @Failure      500  {object} string "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/directory [get]
 func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -51,6 +76,15 @@ func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 	return http.StatusOK, directory
 }
 
+// @Description  Returns the Plex Library Directory.
+// @Summary      Retrieve the Plex Library Directory.
+// @Tags         plex
+// @Produce      text/plain
+// @Param        libraryKey   path    string true  "Plex Library Section Key"
+// @Success      200  {object} string "ok"
+// @Failure      500  {object} string "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/emptytrash/{libraryKey} [get]
 func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -62,6 +96,15 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	return http.StatusOK, "ok: " + string(body)
 }
 
+// @Description  Mark a movie or show as watched.
+// @Summary      Marks a Plex item as watched.
+// @Tags         plex
+// @Produce      text/plain
+// @Param        itemKey  path    string true  "Plex Item Key"
+// @Success      200  {object} string "ok"
+// @Failure      500  {object} string "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/markwatched/{itemKey} [get]
 func (s *Server) HandleMarkWatched(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 

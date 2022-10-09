@@ -23,5 +23,6 @@ linters:
     - varnamelen
     - ifshort
     - nosnakecase # broken on syscall.
+    - godot
 run:
   timeout: 5m
