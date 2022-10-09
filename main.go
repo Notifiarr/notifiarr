@@ -9,6 +9,17 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
+// @title Notifiarr Client API
+// @version 1.0
+// @description Monitors local services and sends notifications.
+// @termsOfService https://notifiarr.com
+// @contact.name Notifiarr Support
+// @contact.url https://notifiarr.com/discord
+// @contact.email support@notifiarr.com
+// @license.name MIT
+// @license.url https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
+// @host 127.0.0.1
+// @BasePath /api
 func main() {
 	ui.HideConsoleWindow()
 	// setup log package in case we throw an error in main.go before logging is setup.

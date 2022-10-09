@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr"
 	"golift.io/xtractr"
 )
@@ -51,7 +52,7 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Lidarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			app.Enabled() && ci.Actions.Apps.Lidarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -74,7 +75,7 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Prowlarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			app.Enabled() && ci.Actions.Apps.Prowlarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -97,7 +98,7 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Radarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			app.Enabled() && ci.Actions.Apps.Radarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -120,7 +121,7 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Readarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			app.Enabled() && ci.Actions.Apps.Readarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -143,7 +144,7 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Sonarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			app.Enabled() && ci.Actions.Apps.Sonarr.Corrupt(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute

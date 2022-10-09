@@ -8,6 +8,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr/radarr"
 )
 
@@ -39,7 +40,7 @@ func (a *Action) Create() {
 func (c *cmd) create() {
 	var ticker *time.Ticker
 
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	//nolint:gosec
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
@@ -61,7 +62,7 @@ func (a *Action) Send(event website.EventType) {
 }
 
 func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if ci == nil || len(ci.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
 		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
 			input.Type, len(c.Apps.Radarr))

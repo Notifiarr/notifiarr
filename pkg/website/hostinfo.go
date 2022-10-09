@@ -67,8 +67,8 @@ func (s *Server) GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //no
 		}
 	}
 
-	if s.config.HostID != "" {
-		hostInfo.HostID = s.config.HostID
+	if s.Config.HostID != "" {
+		hostInfo.HostID = s.Config.HostID
 	}
 
 	// This only happens once.

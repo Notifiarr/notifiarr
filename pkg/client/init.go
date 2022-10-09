@@ -10,19 +10,19 @@ import (
 	"path"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
 
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
-func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *website.ClientInfo) {
+func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.ClientInfo) {
 	if clientInfo != nil {
 		c.Printf("==> %s", clientInfo)
 		c.printVersionChangeInfo(ctx)
 	} else {
-		clientInfo = &website.ClientInfo{}
+		clientInfo = &clientinfo.ClientInfo{}
 	}
 
 	switch hi, err := c.website.GetHostInfo(ctx); {
@@ -136,7 +136,7 @@ func (c *Client) printPlex() {
 }
 
 // printLidarr is called on startup to print info about each configured server.
-func (c *Client) printLidarr(app *website.InstanceConfig) {
+func (c *Client) printLidarr(app *clientinfo.InstanceConfig) {
 	s := "s"
 	if len(c.Config.Lidarr) == 1 {
 		s = ""
@@ -152,7 +152,7 @@ func (c *Client) printLidarr(app *website.InstanceConfig) {
 }
 
 // printProwlarr is called on startup to print info about each configured server.
-func (c *Client) printProwlarr(app *website.InstanceConfig) {
+func (c *Client) printProwlarr(app *clientinfo.InstanceConfig) {
 	s := "s"
 	if len(c.Config.Prowlarr) == 1 {
 		s = ""
@@ -168,7 +168,7 @@ func (c *Client) printProwlarr(app *website.InstanceConfig) {
 }
 
 // printRadarr is called on startup to print info about each configured server.
-func (c *Client) printRadarr(app *website.InstanceConfig) {
+func (c *Client) printRadarr(app *clientinfo.InstanceConfig) {
 	s := "s"
 	if len(c.Config.Radarr) == 1 {
 		s = ""
@@ -184,7 +184,7 @@ func (c *Client) printRadarr(app *website.InstanceConfig) {
 }
 
 // printReadarr is called on startup to print info about each configured server.
-func (c *Client) printReadarr(app *website.InstanceConfig) {
+func (c *Client) printReadarr(app *clientinfo.InstanceConfig) {
 	s := "s"
 	if len(c.Config.Readarr) == 1 {
 		s = ""
@@ -200,7 +200,7 @@ func (c *Client) printReadarr(app *website.InstanceConfig) {
 }
 
 // printSonarr is called on startup to print info about each configured server.
-func (c *Client) printSonarr(app *website.InstanceConfig) {
+func (c *Client) printSonarr(app *clientinfo.InstanceConfig) {
 	s := "s"
 	if len(c.Config.Sonarr) == 1 {
 		s = ""

@@ -16,6 +16,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/getlantern/systray"
 	"golift.io/starr"
 	"golift.io/version"
@@ -30,7 +31,7 @@ const timerPrefix = "TimErr"
 var menu = make(map[string]*systray.MenuItem) //nolint:gochecknoglobals
 
 // startTray Run()s readyTray to bring up the web server and the GUI app.
-func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clientInfo *website.ClientInfo) {
+func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clientInfo *clientinfo.ClientInfo) {
 	systray.Run(func() {
 		defer os.Exit(0)
 		defer c.CapturePanic()
@@ -60,7 +61,7 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 	})
 }
 
-func (c *Client) setupMenus(clientInfo *website.ClientInfo) {
+func (c *Client) setupMenus(clientInfo *clientinfo.ClientInfo) {
 	if !ui.HasGUI() {
 		return
 	}

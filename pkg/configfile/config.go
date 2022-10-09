@@ -27,6 +27,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/cnfg"
@@ -192,7 +193,12 @@ func (c *Config) setup() *triggers.Actions {
 		c.LogConfig.AppName = mnd.Title
 	}
 
-	return triggers.New(&triggers.Config{
+	// Ordering.....
+	cic := &clientinfo.Config{
+		Server: c.Services.Website,
+		Apps:   c.Apps,
+	}
+	triggers := triggers.New(&triggers.Config{
 		Apps:       c.Apps,
 		Logger:     c.Apps.Logger,
 		Website:    c.Services.Website,
@@ -200,7 +206,11 @@ func (c *Config) setup() *triggers.Actions {
 		WatchFiles: c.WatchFiles,
 		Commands:   c.Commands,
 		Services:   c.Services,
+		CIC:        cic,
 	})
+	cic.CmdList = triggers.Commands.List()
+
+	return triggers
 }
 
 // FindAndReturn return a config file. Write one if requested.

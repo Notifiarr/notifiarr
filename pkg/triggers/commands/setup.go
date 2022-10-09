@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"golift.io/cnfg"
 )
 
 // Errors produced by this file.
@@ -32,14 +32,7 @@ type cmd struct {
 // Command contains the input data for a defined command.
 // It also contains some saved data about the command being run.
 type Command struct {
-	Name    string        `json:"name" toml:"name" xml:"name" yaml:"name"`
-	Command string        `json:"-" toml:"command" xml:"command" yaml:"command"`
-	Shell   bool          `json:"shell" toml:"shell" xml:"shell" yaml:"shell"`
-	Log     bool          `json:"log" toml:"log" xml:"log" yaml:"log"`
-	Notify  bool          `json:"notify" toml:"notify" xml:"notify" yaml:"notify"`
-	Timeout cnfg.Duration `json:"-" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Hash    string        `json:"hash" toml:"-" xml:"-" yaml:"-"`
-	Args    int           `json:"args" toml:"-" xml:"-" yaml:"-"`
+	cmdconfig.Config
 	cmd     string
 	args    []*regexp.Regexp
 	disable bool
@@ -73,8 +66,14 @@ func (c *Command) Run(input *common.ActionInput) {
 }
 
 // List returns a list of active triggers that can be executed.
-func (a *Action) List() []*Command {
-	return a.cmd.cmdlist
+func (a *Action) List() []*cmdconfig.Config {
+	output := []*cmdconfig.Config{}
+
+	for _, c := range a.cmd.cmdlist {
+		output = append(output, &c.Config)
+	}
+
+	return output
 }
 
 // GetByHash returns a command by the hash ID.

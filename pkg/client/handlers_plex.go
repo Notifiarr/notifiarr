@@ -12,6 +12,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 // Timer is used to set a cooldown time.
@@ -35,6 +36,19 @@ func (t *Timer) Active(d time.Duration) bool {
 }
 
 // PlexHandler handles an incoming webhook from Plex.
+// @Summary      Accepts a Plex Media Server Webhook
+// @Description  Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,
+// @Description  and may include snapshot data and/or fetched session data.
+// @Tags         plex
+// @Accept       json
+// @Produce      text/html
+// @Param        token   query      string  true  "Plex Token or Client API Key"
+// @Param        request body plex.IncomingWebhook true "webhook payload"
+// @Success      202  {string} string "accepted"
+// @Success      208  {string} string "ignored"
+// @Failure      400  {string} string "bad input"
+// @Failure      404  {string} string "bad token or api key"
+// @Router       /plex [post]
 func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:cyclop,varnamelen,funlen
 	mnd.Apps.Add("Plex&&Incoming Webhooks", 1)
 
@@ -102,7 +116,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 }
 
 func (c *Client) plexCooldown() time.Duration {
-	if ci := website.GetClientInfo(); ci != nil {
+	if ci := clientinfo.Get(); ci != nil {
 		return ci.Actions.Plex.Cooldown.Duration
 	}
 

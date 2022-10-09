@@ -1,20 +1,15 @@
-package website
+package clientinfo
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"runtime"
-	"strings"
-	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
-	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
-	"golift.io/version"
 )
 
 // ClientInfo is the client's startup data received from the website.
@@ -137,11 +132,11 @@ func (c *ClientInfo) IsPatron() bool {
 }
 
 // SaveClientInfo returns an error if the API key is wrong. Caches and returns client info otherwise.
-func (s *Server) SaveClientInfo(ctx context.Context) (*ClientInfo, error) {
-	body, err := s.GetData(&Request{
-		Route:      ClientRoute,
-		Event:      EventStart,
-		Payload:    s.Info(ctx),
+func (c *Config) SaveClientInfo(ctx context.Context) (*ClientInfo, error) {
+	body, err := c.GetData(&website.Request{
+		Route:      website.ClientRoute,
+		Event:      website.EventStart,
+		Payload:    c.Info(ctx),
 		LogPayload: true,
 	})
 	if err != nil {
@@ -159,7 +154,7 @@ func (s *Server) SaveClientInfo(ctx context.Context) (*ClientInfo, error) {
 	return &clientInfo, nil
 }
 
-func GetClientInfo() *ClientInfo {
+func Get() *ClientInfo {
 	data := data.Get("clientInfo")
 	if data == nil || data.Data == nil {
 		return nil
@@ -168,117 +163,6 @@ func GetClientInfo() *ClientInfo {
 	cinfo, _ := data.Data.(*ClientInfo)
 
 	return cinfo
-}
-
-// Info is used for JSON input for our outgoing client info.
-func (s *Server) Info(ctx context.Context) map[string]interface{} {
-	numPlex := 0 // maybe one day we'll support more than 1 plex.
-	if s.config.Apps.Plex.Enabled() {
-		numPlex = 1
-	}
-
-	numTautulli := 0 // maybe one day we'll support more than 1 tautulli.
-	if s.config.Apps.Tautulli.Enabled() {
-		numTautulli = 1
-	}
-
-	return map[string]interface{}{
-		"client": map[string]interface{}{
-			"arch":      runtime.GOARCH,
-			"buildDate": version.BuildDate,
-			"goVersion": version.GoVersion,
-			"os":        runtime.GOOS,
-			"revision":  version.Revision,
-			"version":   version.Version,
-			"uptimeSec": time.Since(version.Started).Round(time.Second).Seconds(),
-			"started":   version.Started,
-			"docker":    mnd.IsDocker,
-			"gui":       ui.HasGUI(),
-		},
-		"num": map[string]interface{}{
-			"nzbget":   len(s.config.Apps.NZBGet),
-			"deluge":   len(s.config.Apps.Deluge),
-			"lidarr":   len(s.config.Apps.Lidarr),
-			"plex":     numPlex,
-			"prowlarr": len(s.config.Apps.Prowlarr),
-			"qbit":     len(s.config.Apps.Qbit),
-			"rtorrent": len(s.config.Apps.Rtorrent),
-			"radarr":   len(s.config.Apps.Radarr),
-			"readarr":  len(s.config.Apps.Readarr),
-			"tautulli": numTautulli,
-			"sabnzbd":  len(s.config.Apps.SabNZB),
-			"sonarr":   len(s.config.Apps.Sonarr),
-		},
-		"config": map[string]interface{}{
-			"globalTimeout": s.config.Timeout.String(),
-			"retries":       s.config.Retries,
-			"apps":          s.getAppConfigs(ctx),
-		},
-	}
-}
-
-func (s *Server) getAppConfigs(ctx context.Context) map[string]interface{} {
-	apps := make(map[string][]map[string]interface{})
-	add := func(i int, name string) map[string]interface{} {
-		return map[string]interface{}{
-			"name":     name,
-			"instance": i + 1,
-		}
-	}
-
-	for i, app := range s.config.Apps.Lidarr {
-		apps["lidarr"] = append(apps["lidarr"], add(i, app.Name))
-	}
-
-	for i, app := range s.config.Apps.Prowlarr {
-		apps["prowlarr"] = append(apps["prowlarr"], add(i, app.Name))
-	}
-
-	for i, app := range s.config.Apps.Radarr {
-		apps["radarr"] = append(apps["radarr"], add(i, app.Name))
-	}
-
-	for i, app := range s.config.Apps.Readarr {
-		apps["readarr"] = append(apps["readarr"], add(i, app.Name))
-	}
-
-	for i, app := range s.config.Apps.Sonarr {
-		apps["sonarr"] = append(apps["sonarr"], add(i, app.Name))
-	}
-
-	// We do this so more apps can be added later (Tautulli).
-	reApps := make(map[string]interface{})
-	for k, v := range apps {
-		reApps[k] = v
-	}
-
-	if u, err := s.tautulliUsers(ctx); err != nil {
-		s.config.Error("Getting Tautulli Users:",
-			strings.ReplaceAll(s.config.Apps.Tautulli.APIKey, "<redacted>", err.Error()))
-	} else {
-		reApps["tautulli"] = map[string]interface{}{"users": u.MapEmailName()}
-	}
-
-	return reApps
-}
-
-func (s *Server) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
-	const tautulliUsersKey = "tautulliUsers"
-	cacheUsers := data.Get(tautulliUsersKey)
-
-	if cacheUsers != nil && cacheUsers.Data != nil && time.Since(cacheUsers.Time) < 10*time.Minute {
-		users, _ := cacheUsers.Data.(*tautulli.Users)
-		return users, nil
-	}
-
-	users, err := s.config.Apps.Tautulli.GetUsers(ctx)
-	if err != nil {
-		return users, fmt.Errorf("tautulli failed: %w", err)
-	}
-
-	data.Save(tautulliUsersKey, users)
-
-	return users, nil
 }
 
 func (i InstanceConfig) Finished(instance int) bool {

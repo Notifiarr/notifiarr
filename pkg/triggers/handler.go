@@ -32,9 +32,9 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	content := mux.Vars(req)["content"]
 
 	if content != "" {
-		a.timers.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
+		a.Timers.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
 	} else {
-		a.timers.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
+		a.Timers.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
 	}
 
 	_ = req.ParseForm()
@@ -80,7 +80,7 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 
 func (a *Actions) clientLogs(content string) (int, string) {
 	if content == "true" || content == "on" || content == "enable" {
-		share.Setup(a.timers.Server)
+		share.Setup(a.Timers.Server)
 		return http.StatusBadRequest, "Client log notifications enabled."
 	}
 
@@ -129,12 +129,12 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 }
 
 func (a *Actions) services(input *common.ActionInput) (int, string) {
-	a.timers.RunChecks(input.Type)
+	a.Timers.RunChecks(input.Type)
 	return http.StatusOK, "All service checks rescheduled for immediate exeution."
 }
 
 func (a *Actions) sessions(input *common.ActionInput) (int, string) {
-	if !a.timers.Apps.Plex.Enabled() {
+	if !a.Timers.Apps.Plex.Enabled() {
 		return http.StatusNotImplemented, "Plex Sessions are not enabled."
 	}
 
@@ -186,14 +186,14 @@ func (a *Actions) backup(input *common.ActionInput, content string) (int, string
 }
 
 func (a *Actions) handleConfigReload() (int, string) {
-	defer a.timers.ReloadApp("HTTP Triggered Reload")
+	defer a.Timers.ReloadApp("HTTP Triggered Reload")
 	return http.StatusOK, "Application reload initiated."
 }
 
 func (a *Actions) notification(content string) (int, string) {
 	if content != "" {
 		ui.Notify("Notification: %s", content) //nolint:errcheck
-		a.timers.Printf("NOTIFICATION: %s", content)
+		a.Timers.Printf("NOTIFICATION: %s", content)
 
 		return http.StatusOK, "Local Nntification sent."
 	}

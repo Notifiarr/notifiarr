@@ -23,7 +23,7 @@ type httpClient struct {
 }
 
 func (s *Server) validAPIKey() error {
-	if len(s.config.Apps.APIKey) != APIKeyLength {
+	if len(s.Config.Apps.APIKey) != APIKeyLength {
 		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
 	}
 
@@ -69,7 +69,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", s.config.Apps.APIKey)
+	req.Header.Set("X-API-Key", s.Config.Apps.APIKey)
 
 	start := time.Now()
 
@@ -79,7 +79,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 
-	if !s.config.DebugEnabled() { // no debug, just return the body.
+	if !s.Config.DebugEnabled() { // no debug, just return the body.
 		return resp.StatusCode, resp.Body, nil
 	}
 
@@ -165,18 +165,18 @@ func (s *Server) debughttplog(resp *http.Response, url string, start time.Time, 
 		}
 	}
 
-	if s.config.Apps.MaxBody > 0 && len(data) > s.config.Apps.MaxBody {
-		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:s.config.Apps.MaxBody], s.config.Apps.MaxBody)
+	if s.Config.Apps.MaxBody > 0 && len(data) > s.Config.Apps.MaxBody {
+		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:s.Config.Apps.MaxBody], s.Config.Apps.MaxBody)
 	}
 
 	if data == "" {
-		s.config.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
+		s.Config.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
 			url, time.Since(start).Round(time.Microsecond), status,
-			headers, readBodyForLog(body, int64(s.config.Apps.MaxBody)))
+			headers, readBodyForLog(body, int64(s.Config.Apps.MaxBody)))
 	} else {
-		s.config.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
+		s.Config.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
 			url, time.Since(start).Round(time.Microsecond), data, status,
-			headers, readBodyForLog(body, int64(s.config.Apps.MaxBody)))
+			headers, readBodyForLog(body, int64(s.Config.Apps.MaxBody)))
 	}
 }
 
@@ -205,8 +205,8 @@ func readBodyForLog(body io.Reader, max int64) string {
 
 func (s *Server) watchSendDataChan(ctx context.Context) {
 	defer func() {
-		defer s.config.CapturePanic()
-		s.config.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
+		defer s.Config.CapturePanic()
+		s.Config.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
 	}()
 
 	for data := range s.sendData {
@@ -214,13 +214,13 @@ func (s *Server) watchSendDataChan(ctx context.Context) {
 		case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 			continue
 		case errors.Is(err, ErrNon200):
-			s.config.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+			s.Config.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
 				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 		case err != nil:
-			s.config.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+			s.Config.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
 				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 		case !data.ErrorsOnly:
-			s.config.Printf("[%s requested] Sent (%v, buf=%d/%d): %s%s",
+			s.Config.Printf("[%s requested] Sent (%v, buf=%d/%d): %s%s",
 				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
 		default:
 		}

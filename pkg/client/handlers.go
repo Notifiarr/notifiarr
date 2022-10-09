@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	_ "github.com/Notifiarr/notifiarr/pkg/docs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"golift.io/starr"
 )
 
@@ -34,6 +36,13 @@ func (c *Client) httpHandlers() {
 		c.Config.Router.HandleFunc(base, c.slash).Methods("GET")
 		c.Config.Router.HandleFunc(base, c.loginHandler).Methods("POST")
 	}
+
+	c.Config.Router.PathPrefix(path.Join(base, "docs") + "/").Handler(httpSwagger.Handler(
+		httpSwagger.URL(path.Join(base, "docs", "doc.json")),
+		httpSwagger.DeepLinking(true),
+		httpSwagger.DocExpansion("none"),
+		httpSwagger.DomID("swagger-ui"),
+	)).Methods(http.MethodGet)
 
 	if c.Config.UIPassword == "" {
 		return
@@ -82,9 +91,9 @@ func (c *Client) httpGuiHandlers(base string) {
 
 // httpAPIHandlers initializes API routes.
 func (c *Client) httpAPIHandlers() {
-	c.Config.HandleAPIpath("", "info", c.infoHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version", c.versionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.versionHandler, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "info", c.clientinfo.InfoHandler, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version", c.clientinfo.VersionHandler, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.clientinfo.VersionHandler, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
 

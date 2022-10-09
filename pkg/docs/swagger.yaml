@@ -1,0 +1,198 @@
+basePath: /api
+definitions:
+  plex.GUID:
+    properties:
+      id:
+        type: string
+    type: object
+  plex.IncomingWebhook:
+    properties:
+      Account:
+        properties:
+          id:
+            type: integer
+          thumb:
+            type: string
+          title:
+            type: string
+        type: object
+      Metadata:
+        $ref: '#/definitions/plex.WebhookMetadata'
+      Player:
+        properties:
+          local:
+            type: boolean
+          publicAddress:
+            type: string
+          title:
+            type: string
+          uuid:
+            type: string
+        type: object
+      Server:
+        properties:
+          title:
+            type: string
+          uuid:
+            type: string
+        type: object
+      event:
+        type: string
+      owner:
+        type: boolean
+      rating:
+        type: number
+      user:
+        type: boolean
+    type: object
+  plex.WebhookMetadata:
+    properties:
+      Guid:
+        items:
+          $ref: '#/definitions/plex.GUID'
+        type: array
+      Rating:
+        description: bullshit.
+      addedAt:
+        type: integer
+      art:
+        type: string
+      audienceRating:
+        type: number
+      audienceRatingImage:
+        type: string
+      contentRating:
+        type: string
+      duration:
+        type: number
+      grandparentArt:
+        type: string
+      grandparentGuid:
+        type: string
+      grandparentKey:
+        type: string
+      grandparentRatingKey:
+        type: string
+      grandparentTheme:
+        type: string
+      grandparentThumb:
+        type: string
+      grandparentTitle:
+        type: string
+      guid:
+        type: string
+      index:
+        type: integer
+      key:
+        type: string
+      lastViewedAt:
+        type: integer
+      librarySectionID:
+        description: int (plex) or string (session tracker)
+      librarySectionKey:
+        type: string
+      librarySectionTitle:
+        type: string
+      librarySectionType:
+        type: string
+      originallyAvailableAt:
+        type: string
+      parentGuid:
+        type: string
+      parentIndex:
+        type: integer
+      parentKey:
+        type: string
+      parentRatingKey:
+        type: string
+      parentThumb:
+        type: string
+      parentTitle:
+        type: string
+      parentYear:
+        type: integer
+      primaryExtraKey:
+        type: string
+      rating:
+        type: number
+      ratingImage:
+        type: string
+      ratingKey:
+        type: string
+      studio:
+        type: string
+      summary:
+        type: string
+      tagline:
+        type: string
+      thumb:
+        type: string
+      title:
+        type: string
+      titleSort:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: integer
+      viewOffset:
+        type: number
+      year:
+        type: integer
+    type: object
+host: 127.0.0.1
+info:
+  contact:
+    email: support@notifiarr.com
+    name: Notifiarr Support
+    url: https://notifiarr.com/discord
+  description: Monitors local services and sends notifications.
+  license:
+    name: MIT
+    url: https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
+  termsOfService: https://notifiarr.com
+  title: Notifiarr Client API
+  version: "1.0"
+paths:
+  /plex:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,
+        and may include snapshot data and/or fetched session data.
+      parameters:
+      - description: Plex Token or Client API Key
+        in: query
+        name: token
+        required: true
+        type: string
+      - description: webhook payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/plex.IncomingWebhook'
+      produces:
+      - text/html
+      responses:
+        "202":
+          description: accepted
+          schema:
+            type: string
+        "208":
+          description: ignored
+          schema:
+            type: string
+        "400":
+          description: bad input
+          schema:
+            type: string
+        "404":
+          description: bad token or api key
+          schema:
+            type: string
+      summary: Accepts a Plex Media Server Webhook
+      tags:
+      - plex
+swagger: "2.0"

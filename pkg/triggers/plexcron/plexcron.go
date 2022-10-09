@@ -11,6 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 const (
@@ -64,7 +65,7 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) run() {
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if !c.Plex.Enabled() || ci == nil {
 		return
 	}
@@ -110,7 +111,7 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 
 func (c *cmd) sendWebhook(ctx context.Context, hook *plex.IncomingWebhook) {
 	sessions := &plex.Sessions{Name: c.Plex.Server.Name()}
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 
 	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.
 	if ci != nil && !ci.Actions.Plex.NoActivity {

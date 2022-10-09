@@ -9,6 +9,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
@@ -46,7 +47,7 @@ func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) err
 
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *cmd) syncSonarr(ctx context.Context, input *common.ActionInput) {
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if ci == nil || len(ci.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Sonarr Release Profiles. Website provided 0 instances.", input.Type)
 		return
@@ -129,7 +130,7 @@ func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, in
 func (c *cmd) aggregateTrashSonarr(
 	ctx context.Context,
 	wait *sync.WaitGroup,
-	instances website.IntList,
+	instances clientinfo.IntList,
 ) []*SonarrTrashPayload {
 	output := []*SonarrTrashPayload{}
 	event := website.EventAPI

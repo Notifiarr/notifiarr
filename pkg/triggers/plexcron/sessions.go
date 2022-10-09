@@ -9,6 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 // sendPlexSessions is fired by a timer if Plex Sessions feature has an interval defined.
@@ -59,7 +60,7 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 // and the current session pull. if changes are present, a timestmp is added.
 func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Sessions) {
 	now := time.Now()
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 
 	// data.Save("plexPreviousSessions", previous)
 	data.Save("plexCurrentSessions", current)
@@ -93,7 +94,7 @@ func (c *cmd) checkExistingSession(ctx context.Context, currSess *plex.Session, 
 			currSess.Player.StateTime.Time = prevSess.Player.StateTime.Time
 		} else
 		// Check for a session that was paused and is now playing (resumed).
-		if ci := website.GetClientInfo(); currSess.Player.State == playing &&
+		if ci := clientinfo.Get(); currSess.Player.State == playing &&
 			prevSess.Player.State == paused && ci.Actions.Plex.TrackSess {
 			// Check if we're tracking sessions. If yes, send this resumed session.
 			c.sendSessionPlaying(ctx, currSess, current, mediaResume)

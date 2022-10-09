@@ -20,11 +20,11 @@ require (
 // menu-ui
 require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
-	github.com/gen2brain/beeep v0.0.0-20220518085355-d7852edf42fc
+	github.com/gen2brain/beeep v0.0.0-20220909211152-5a9ec94374f6
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
 	github.com/getlantern/context v0.0.0-20220418194847-3d5e7a086201 // indirect
-	github.com/getlantern/errors v1.0.1 // indirect
-	github.com/getlantern/golog v0.0.0-20211223150227-d4d95a44d873 // indirect
+	github.com/getlantern/errors v1.0.3 // indirect
+	github.com/getlantern/golog v0.0.0-20221005122140-90163e7271a3 // indirect
 	github.com/getlantern/hex v0.0.0-20220104173244-ad7e4b9194dc // indirect
 	github.com/getlantern/hidden v0.0.0-20220104173330-f221c5a24770 // indirect
 	github.com/getlantern/ops v0.0.0-20220713155959-1315d978fff7 // indirect
@@ -45,8 +45,8 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-stack/stack v1.8.1 // indirect
-	github.com/google/cabbie v1.0.3 // indirect
-	github.com/google/glazier v0.0.0-20220819164153-1900c52877bf // indirect
+	github.com/google/cabbie v1.0.4 // indirect
+	github.com/google/glazier v0.0.0-20221006113806-9dbda5974a74 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
@@ -55,20 +55,20 @@ require (
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/lestrrat-go/apache-logformat v0.0.0-20200929122403-cd9b7dc018c7
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
-	github.com/lufia/plan9stats v0.0.0-20220517141722-cf486979b281 // indirect
+	github.com/lufia/plan9stats v0.0.0-20220913051719-115f729f3c8c // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20220216144756-c35f1ee13d7c // indirect
 	github.com/scjalliance/comshim v0.0.0-20190308082608-cf06d2532c4e // indirect
-	github.com/shirou/gopsutil/v3 v3.22.7
+	github.com/shirou/gopsutil/v3 v3.22.9
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.5.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
-	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
-	golang.org/x/sys v0.0.0-20220818161305-2296e01440c6
+	golang.org/x/net v0.0.0-20221004154528-8021a29435af // indirect
+	golang.org/x/sys v0.0.0-20221006211917-84dc82d7e875
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
@@ -88,21 +88,21 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
-	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20220927061507-ef77025ab5aa // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	go.uber.org/zap v1.22.0 // indirect
+	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
-	modernc.org/cc/v3 v3.36.2 // indirect
-	modernc.org/ccgo/v3 v3.16.8 // indirect
-	modernc.org/libc v1.17.0 // indirect
-	modernc.org/mathutil v1.4.1 // indirect
-	modernc.org/memory v1.2.0 // indirect
+	modernc.org/cc/v3 v3.40.0 // indirect
+	modernc.org/ccgo/v3 v3.16.9 // indirect
+	modernc.org/libc v1.20.2 // indirect
+	modernc.org/mathutil v1.5.0 // indirect
+	modernc.org/memory v1.4.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.18.1
-	modernc.org/strutil v1.1.2 // indirect
-	modernc.org/token v1.0.0 // indirect
+	modernc.org/sqlite v1.19.1
+	modernc.org/strutil v1.1.3 // indirect
+	modernc.org/token v1.0.1 // indirect
 )
 
 // file watcher stuff.
@@ -112,7 +112,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
-	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8
+	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b
 	golang.org/x/text v0.3.7
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
@@ -126,6 +126,19 @@ require (
 	github.com/mrobinsn/go-rtorrent v1.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
-	go.opentelemetry.io/otel v1.9.0 // indirect
-	go.opentelemetry.io/otel/trace v1.9.0 // indirect
+	go.opentelemetry.io/otel v1.10.0 // indirect
+	go.opentelemetry.io/otel/trace v1.10.0 // indirect
+)
+
+require (
+	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/go-openapi/jsonpointer v0.19.5 // indirect
+	github.com/go-openapi/jsonreference v0.20.0 // indirect
+	github.com/go-openapi/spec v0.20.7 // indirect
+	github.com/go-openapi/swag v0.22.3 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
+	github.com/swaggo/http-swagger v1.3.3 // indirect
+	github.com/swaggo/swag v1.8.6 // indirect
 )

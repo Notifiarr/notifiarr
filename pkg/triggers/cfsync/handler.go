@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
 )
 
@@ -27,12 +27,12 @@ func (c *cmd) aggregateTrash(req *http.Request) (int, interface{}) {
 
 	var input struct {
 		Radarr struct { // used for "all"
-			Instances website.IntList `json:"instances"`
+			Instances clientinfo.IntList `json:"instances"`
 		} `json:"radarr"`
 		Sonarr struct { // used for "all"
-			Instances website.IntList `json:"instances"`
+			Instances clientinfo.IntList `json:"instances"`
 		} `json:"sonarr"`
-		Instances website.IntList `json:"instances"`
+		Instances clientinfo.IntList `json:"instances"`
 	}
 	// Extract POST payload.
 	err := json.NewDecoder(req.Body).Decode(&input)

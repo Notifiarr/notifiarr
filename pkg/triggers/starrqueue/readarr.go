@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 const TrigReadarrQueue common.TriggerName = "Storing Readarr instance %d queue."
@@ -47,7 +48,7 @@ func (c *cmd) setupReadarr() bool {
 	var enable bool
 
 	for idx, app := range c.Apps.Readarr {
-		ci := website.GetClientInfo()
+		ci := clientinfo.Get()
 		if !app.Enabled() || ci == nil {
 			continue
 		}
