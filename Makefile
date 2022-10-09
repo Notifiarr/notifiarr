@@ -476,12 +476,16 @@ mockgen: $(shell go env GOPATH)/bin/mockgen
 $(shell go env GOPATH)/bin/mockgen:
 	cd /tmp ; go install github.com/golang/mock/mockgen@latest
 
+swag: $(shell go env GOPATH)/bin/swag
+$(shell go env GOPATH)/bin/swag:
+	cd /tmp ; go install github.com/swaggo/swag/cmd/swag@latest
+
 bindata: $(shell go env GOPATH)/bin/go-bindata
 $(shell go env GOPATH)/bin/go-bindata:
 	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
 #generate: mockgen bindata pkg/bindata/bindata.go
-generate: bindata pkg/bindata/bindata.go
+generate: swag bindata pkg/bindata/bindata.go
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/

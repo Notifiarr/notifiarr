@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
-	_ "github.com/Notifiarr/notifiarr/pkg/docs" // provides api documentaton from auto-generated content
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/starr"
 )
@@ -78,7 +77,7 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/ajax/{path:cmdstats|cmdargs}/{hash}", c.handleCommandStats).Methods("GET")
 	gui.HandleFunc("/runCommand/{hash}", c.handleRunCommand).Methods("POST")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
-	gui.Handle("/docs", http.RedirectHandler("/docs/", http.StatusMovedPermanently))
+	gui.Handle("/docs", http.RedirectHandler("/ui/docs/", http.StatusMovedPermanently))
 	gui.PathPrefix("/docs/").
 		Handler(http.StripPrefix(strings.TrimSuffix(path.Join(base, "ui"), "/"), http.HandlerFunc(c.handleStaticAssets))).
 		Methods("GET")

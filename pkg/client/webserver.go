@@ -11,7 +11,7 @@ import (
 	"path"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/docs"
+	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	apachelog "github.com/lestrrat-go/apache-logformat"
