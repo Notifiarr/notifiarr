@@ -98,6 +98,21 @@ func (a *Apps) setupSonarr() error {
 	return nil
 }
 
+// @Description  Adds a new Series to Sonarr.
+// @Summary      Add Sonarr Series
+// @Tags         sonarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body sonarr.AddSeriesInput true "new item content"
+// @Accept       json
+// @Success      201  {object} sonarr.Series "created"
+// @Failure      400  {object} string "bad json payload"
+// @Failure      409  {object} string "item alrady exists"
+// @Failure      422  {object} string "no item ID provided"
+// @Failure      503  {object} string "instance error during check"
+// @Failure      500  {object} string "instance error during add"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/add [post]
 func sonarrAddSeries(req *http.Request) (int, interface{}) {
 	var payload sonarr.AddSeriesInput
 	// Extract payload and check for TVDB ID.

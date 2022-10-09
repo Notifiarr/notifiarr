@@ -86,6 +86,21 @@ func (a *Apps) setupLidarr() error {
 	return nil
 }
 
+// @Description  Adds a new Album to Lidarr.
+// @Summary      Add Lidarr Album
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body lidarr.AddAlbumInput true "new item content"
+// @Accept       json
+// @Success      201  {object} lidarr.Album "created"
+// @Failure      400  {object} string "bad json payload"
+// @Failure      409  {object} string "item alrady exists"
+// @Failure      422  {object} string "no item ID provided"
+// @Failure      503  {object} string "instance error during check"
+// @Failure      500  {object} string "instance error during add"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/add [post]
 func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 	var payload lidarr.AddAlbumInput
 

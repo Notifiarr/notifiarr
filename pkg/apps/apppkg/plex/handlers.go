@@ -17,7 +17,7 @@ import (
 // @Success      200  {object} Sessions "contains app info included appStatus"
 // @Failure      500  {object} string "Plex error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/sessions [get]
+// @Router       /api/plex/1/sessions [get]
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -40,7 +40,7 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 // @Success      200  {object} string "success"
 // @Failure      500  {object} string "Plex error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/kill [get]
+// @Router       /api/plex/1/kill [get]
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
 		ctx       = r.Context()
@@ -64,7 +64,7 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 // @Success      200  {object} SectionDirectory "Plex Library Directory"
 // @Failure      500  {object} string "Plex error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/directory [get]
+// @Router       /api/plex/1/directory [get]
 func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -84,7 +84,7 @@ func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 // @Success      200  {object} string "ok"
 // @Failure      500  {object} string "Plex error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/emptytrash/{libraryKey} [get]
+// @Router       /api/plex/1/emptytrash/{libraryKey} [get]
 func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -104,7 +104,7 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 // @Success      200  {object} string "ok"
 // @Failure      500  {object} string "Plex error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/markwatched/{itemKey} [get]
+// @Router       /api/plex/1/markwatched/{itemKey} [get]
 func (s *Server) HandleMarkWatched(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 

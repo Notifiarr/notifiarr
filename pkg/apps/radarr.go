@@ -93,6 +93,21 @@ func (a *Apps) setupRadarr() error {
 	return nil
 }
 
+// @Description  Adds a new Movie to Radarr.
+// @Summary      Add Radarr Movie
+// @Tags         radarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body radarr.AddMovieInput true "new item content"
+// @Accept       json
+// @Success      201  {object} radarr.Movie "created"
+// @Failure      400  {object} string "bad json payload"
+// @Failure      409  {object} string "item alrady exists"
+// @Failure      422  {object} string "no item ID provided"
+// @Failure      503  {object} string "instance error during check"
+// @Failure      500  {object} string "instance error during add"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/radarr/{instance}/add [post]
 func radarrAddMovie(req *http.Request) (int, interface{}) {
 	var payload radarr.AddMovieInput
 	// Extract payload and check for TMDB ID.

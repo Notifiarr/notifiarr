@@ -80,6 +80,21 @@ func (a *Apps) setupReadarr() error {
 	return nil
 }
 
+// @Description  Adds a new Book to Readarr.
+// @Summary      Add Readarr Book
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body readarr.AddBookInput true "new item content"
+// @Accept       json
+// @Success      201  {object} readarr.Book "created"
+// @Failure      400  {object} string "bad json payload"
+// @Failure      409  {object} string "item alrady exists"
+// @Failure      422  {object} string "no valid editions provided"
+// @Failure      503  {object} string "instance error during check"
+// @Failure      500  {object} string "instance error during add"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/add [post]
 func readarrAddBook(req *http.Request) (int, interface{}) {
 	payload := &readarr.AddBookInput{}
 	// Extract payload and check for GRID ID.
