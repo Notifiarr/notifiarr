@@ -47,25 +47,25 @@ type AppInfo struct {
 // AppInfoClient contains the client's exported host info.
 type AppInfoClient struct {
 	// Architecture.
-	Arch string `jsno:"arch"`
+	Arch string `json:"arch"`
 	// Application Build Date.
-	BuildDate string `jsno:"buildDate"`
+	BuildDate string `json:"buildDate"`
 	// Go Version app built with.
-	GoVersion string `jsno:"goVersion"`
+	GoVersion string `json:"goVersion"`
 	// OS app is running on.
-	OS string `jsno:"os"`
+	OS string `json:"os"`
 	// Application Revision (part of the version).
-	Revision string `jsno:"revision"`
+	Revision string `json:"revision"`
 	// Application Version.
-	Version string `jsno:"version"`
+	Version string `json:"version"`
 	// Uptime in seconds.
-	UptimeSec int64 `jsno:"uptimeSec"`
+	UptimeSec int64 `json:"uptimeSec"`
 	// Application start time.
-	Started time.Time `jsno:"started"`
+	Started time.Time `json:"started"`
 	// Running in docker?
-	Docker bool `jsno:"docker"`
+	Docker bool `json:"docker"`
 	// Application has a GUI? (windows/mac only)
-	HasGUI bool `jsno:"hasGUI"`
+	HasGUI bool `json:"hasGui"`
 }
 
 // AppInfoConfig contains exported running configuration information for this app.
