@@ -11,7 +11,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	apachelog "github.com/lestrrat-go/apache-logformat"
@@ -46,8 +45,6 @@ func (c *Client) StartWebServer() {
 		ReadHeaderTimeout: c.Config.Timeout.Duration,
 		ErrorLog:          c.Logger.ErrorLog,
 	}
-	docs.SwaggerInfo.BasePath = c.Config.URLBase
-	docs.SwaggerInfo.Host = ""
 
 	// Initialize all the application API paths.
 	c.Config.Apps.InitHandlers()

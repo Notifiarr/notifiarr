@@ -10,13 +10,12 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
-// @title Notifiarr Client API
+// @title Notifiarr Client API Documentation
 // @version 1.0
 // @description Monitors local services and sends notifications.
 // @termsOfService https://notifiarr.com
-// @contact.name Notifiarr Support
+// @contact.name Notifiarr Discord
 // @contact.url https://notifiarr.com/discord
-// @contact.email support@notifiarr.com
 // @license.name MIT
 // @license.url https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
 // @BasePath /
