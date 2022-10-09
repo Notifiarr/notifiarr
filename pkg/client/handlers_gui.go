@@ -746,6 +746,10 @@ func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.
 		}
 	}
 
+	if request.URL.Path == "/docs/" || request.URL.Path == "/docs" {
+		request.URL.Path = "/docs/index.html"
+	}
+
 	if c.Flags.Assets == "" {
 		c.handleInternalAsset(response, request)
 		return

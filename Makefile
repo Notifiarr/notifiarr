@@ -481,12 +481,10 @@ $(shell go env GOPATH)/bin/go-bindata:
 	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
 #generate: mockgen bindata pkg/bindata/bindata.go
-generate: bindata pkg/bindata/bindata.go pkg/docs/swagger.json
+generate: bindata pkg/bindata/bindata.go
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/
-pkg/docs/swagger.json:
-	go generate ./pkg/docs/
 
 
 ##################
