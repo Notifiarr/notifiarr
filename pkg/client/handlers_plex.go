@@ -1,3 +1,4 @@
+//nolint:godot
 package client
 
 import (

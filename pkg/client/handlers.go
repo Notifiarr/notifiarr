@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
-	_ "github.com/Notifiarr/notifiarr/pkg/docs"
+	_ "github.com/Notifiarr/notifiarr/pkg/docs" // provides api documentaton from auto-generated content
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"golift.io/starr"

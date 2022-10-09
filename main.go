@@ -1,3 +1,4 @@
+//nolint:godot
 package main
 
 import (
@@ -18,8 +19,7 @@ import (
 // @contact.email support@notifiarr.com
 // @license.name MIT
 // @license.url https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
-// @host 127.0.0.1
-// @BasePath /api
+// @BasePath /
 func main() {
 	ui.HideConsoleWindow()
 	// setup log package in case we throw an error in main.go before logging is setup.
