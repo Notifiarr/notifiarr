@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -125,6 +126,16 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 	return http.StatusCreated, book
 }
 
+// @Description  Fetches an Author from Readarr.
+// @Summary      Get Readarr Author
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        authorID  path   int64  true  "author ID"
+// @Success      200  {object} readarr.Author "author content"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/author/{authorID} [get]
 func readarrGetAuthor(req *http.Request) (int, interface{}) {
 	authorID, _ := strconv.ParseInt(mux.Vars(req)["authorid"], mnd.Base10, mnd.Bits64)
 
@@ -151,6 +162,17 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 }
 
 // Check for existing book.
+// @Description  Checks if a book already exists in Readarr.
+// @Summary      Check Readarr Book
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        gridID    path   int64  true  "Good Reads ID"
+// @Success      200  {object} string "not found"
+// @Failure      503  {object} string "instance error"
+// @Failure      409  {object} string "already exists"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/check/{gridID} [get]
 func readarrCheckBook(req *http.Request) (int, interface{}) {
 	grid := mux.Vars(req)["grid"]
 
@@ -164,6 +186,16 @@ func readarrCheckBook(req *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
+// @Description  Returns a book from Readarr.
+// @Summary      Get Readarr Book
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        bookID    path   int64  true  "Book ID"
+// @Success      200  {object} string "not found"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/get/{bookID} [get]
 func readarrGetBook(req *http.Request) (int, interface{}) {
 	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
@@ -190,6 +222,15 @@ func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 }
 
 // Get the metadata profiles from readarr.
+// @Description  Fetches all Metadata Profiles from Readarr.
+// @Summary      Get Readarr Metadata Profiles
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} map[int64]string "map of ID to name"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/metadataProfiles [get]
 func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetMetadataProfilesContext(req.Context())
 	if err != nil {
@@ -206,6 +247,15 @@ func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 }
 
 // Get the quality profiles from readarr.
+// @Description  Fetches all Quality Profiles from Readarr.
+// @Summary      Get Readarr Quality Profiles
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} map[int64]string "map of ID to name"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/qualityProfiles [get]
 func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -222,6 +272,15 @@ func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 }
 
 // Get the all quality profiles data from readarr.
+// @Description  Fetches all Quality Profiles Data from Readarr.
+// @Summary      Get Readarr Quality Profile Data
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} []readarr.QualityProfile "all profiles"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/qualityProfile [get]
 func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -231,6 +290,18 @@ func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, profiles
 }
 
+// @Description  Creates a new Readarr Quality Profile.
+// @Summary      Add Readarr Quality Profile
+// @Tags         readarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body readarr.QualityProfile true "new item content"
+// @Success      200  {object} int64 "new profile ID"
+// @Failure      400  {object} string "json input error"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/qualityProfile [post]
 func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	var profile readarr.QualityProfile
 
@@ -249,6 +320,20 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, id
 }
 
+// @Description  Updates a Readarr Quality Profile.
+// @Summary      Update Readarr Quality Profile
+// @Tags         readarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        profileID  path   int64  true  "profile ID to update"
+// @Param        PUT body readarr.QualityProfile true "new item content"
+// @Success      200  {object} string "ok"
+// @Failure      400  {object} string "json input error"
+// @Failure      422  {object} string "no profile ID"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/qualityProfile/{profileID} [put]
 func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	var profile readarr.QualityProfile
 
@@ -260,7 +345,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 
 	profile.ID, _ = strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
-		return http.StatusBadRequest, ErrNonZeroID
+		return http.StatusUnprocessableEntity, ErrNonZeroID
 	}
 
 	// Get the profiles from radarr.
@@ -273,6 +358,15 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 }
 
 // Get folder list from Readarr.
+// @Description  Returns all Readarr Root Folders paths and free space.
+// @Summary      Retrieve Readarr Root Folders
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} map[string]int64 "map of path->space free"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/rootFolder [get]
 func readarrRootFolders(req *http.Request) (int, interface{}) {
 	folders, err := getReadarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
@@ -288,33 +382,64 @@ func readarrRootFolders(req *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// @Description  Searches all Book Titles for the search term provided.
+// @Summary      Search for Readarr Books
+// @Tags         readarr
+// @Produce      json
+// @Param        query     path   string  true  "title search string"
+// @Param        instance  path   int64   true  "instance ID"
+// @Success      200  {object} []apps.readarrSearchBook.bookData  "minimal book data"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/search/{query} [get]
 func readarrSearchBook(req *http.Request) (int, interface{}) {
 	books, err := getReadarr(req).GetBookContext(req.Context(), "")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
 	}
 
+	type bookData struct {
+		// Book ID
+		ID int64 `json:"id"`
+		// Book Title
+		Title string `json:"title"`
+		// Release Date
+		Release time.Time `json:"release"`
+		// Author ID
+		AuthorID int64 `json:"authorId"`
+		// Author Name
+		Author string `json:"author"`
+		// Book Overview
+		Overview string `json:"overview"`
+		// Rating Value
+		Ratings float64 `json:"ratings"`
+		// Book Page count
+		Pages int `json:"pages"`
+		// Exists on disk or not?
+		Exists bool `json:"exists"`
+		// Number of files on disk for this book.
+		Files int `json:"files"`
+	}
+
 	query := strings.TrimSpace(strings.ToLower(mux.Vars(req)["query"])) // in
-	returnBooks := make([]map[string]interface{}, 0)                    // out
+	returnBooks := make([]*bookData, 0)                                 // out
 
 	for _, book := range books {
 		if bookSearch(query, book.Title, book.Editions) {
-			item := map[string]interface{}{
-				"id":       book.ID,
-				"title":    book.Title,
-				"release":  book.ReleaseDate,
-				"author":   book.AuthorTitle,
-				"authorId": book.AuthorID,
-				"overview": book.Overview,
-				"ratings":  book.Ratings.Value,
-				"pages":    book.PageCount,
-				"exists":   false,
-				"files":    0,
+			item := &bookData{
+				ID:       book.ID,
+				Title:    book.Title,
+				Release:  book.ReleaseDate,
+				Author:   book.AuthorTitle,
+				AuthorID: book.AuthorID,
+				Overview: book.Overview,
+				Ratings:  book.Ratings.Value,
+				Pages:    book.PageCount,
 			}
 
 			if book.Statistics != nil {
-				item["files"] = book.Statistics.BookFileCount
-				item["exists"] = book.Statistics.SizeOnDisk > 0
+				item.Files = book.Statistics.BookFileCount
+				item.Exists = book.Statistics.SizeOnDisk > 0
 			}
 
 			returnBooks = append(returnBooks, item)
@@ -338,6 +463,15 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 	return false
 }
 
+// @Description  Returns all Readarr Tags
+// @Summary      Retrieve Readarr Tags
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} []starr.Tag "map of path->space free"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/tag [get]
 func readarrGetTags(req *http.Request) (int, interface{}) {
 	tags, err := getReadarr(req).GetTagsContext(req.Context())
 	if err != nil {
@@ -347,6 +481,17 @@ func readarrGetTags(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tags
 }
 
+// @Description  Updates the label for a an existing tag.
+// @Summary      Update Readarr Tag Label
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        tagID     path   int64  true  "tag ID to update"
+// @Param        label     path   string  true  "new label"
+// @Success      200  {object} int64  "tag ID"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/tag/{tagID}/{label} [put]
 func readarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
@@ -358,6 +503,16 @@ func readarrUpdateTag(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tag.ID
 }
 
+// @Description  Creates a new tag with the provided label.
+// @Summary      Create Readarr Tag
+// @Tags         readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        label     path   string true  "new tag's label"
+// @Success      200  {object} int64  "tag ID"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/tag/{label} [put]
 func readarrSetTag(req *http.Request) (int, interface{}) {
 	tag, err := getReadarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
@@ -367,6 +522,18 @@ func readarrSetTag(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tag.ID
 }
 
+// @Description  Updates a Book in Readarr.
+// @Summary      Update Readarr Book
+// @Tags         readarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path  int64  true  "instance ID"
+// @Param        PUT body readarr.Book  true  "book content"
+// @Success      200  {object} string "ok"
+// @Failure      400  {object} string "bad json input"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/update [put]
 func readarrUpdateBook(req *http.Request) (int, interface{}) {
 	var book readarr.Book
 
@@ -383,6 +550,18 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "readarr seems to have worked"
 }
 
+// @Description  Updates an Author in Readarr.
+// @Summary      Update Readarr Author
+// @Tags         readarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path  int64  true  "instance ID"
+// @Param        PUT body readarr.Author  true  "author content"
+// @Success      200  {object} string "ok"
+// @Failure      400  {object} string "bad json input"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/updateauthor [put]
 func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 	var author readarr.Author
 

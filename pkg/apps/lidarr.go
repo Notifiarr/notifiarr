@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -127,6 +128,16 @@ func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 	return http.StatusCreated, album
 }
 
+// @Description  Fetches an Artist from Lidarr.
+// @Summary      Get Lidarr Artist
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        artistID  path   int64  true  "artist ID"
+// @Success      200  {object} lidarr.Artist "ok"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/artist/{artistID} [get]
 func lidarrGetArtist(req *http.Request) (int, interface{}) {
 	artistID, _ := strconv.ParseInt(mux.Vars(req)["artistid"], mnd.Base10, mnd.Bits64)
 
@@ -152,6 +163,17 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 	}
 }
 
+// @Description  Checks if an album already exists in Lidarr.
+// @Summary      Check for Lidarr Album existence
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        mbid  path   int64  true  "movie brains ID"
+// @Success      200  {object} string "not found"
+// @Failure      409  {object} string "already exists"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/check/{mbid} [get]
 func lidarrCheckAlbum(req *http.Request) (int, interface{}) {
 	id := mux.Vars(req)["mbid"]
 
@@ -165,6 +187,16 @@ func lidarrCheckAlbum(req *http.Request) (int, interface{}) {
 	return http.StatusOK, http.StatusText(http.StatusNotFound)
 }
 
+// @Description  Fetches an Album from Lidarr.
+// @Summary      Get Lidarr Album
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        albumID  path   int64  true  "album ID"
+// @Success      200  {object} lidarr.Album "ok"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/get/{albumID} [get]
 func lidarrGetAlbum(req *http.Request) (int, interface{}) {
 	albumID, _ := strconv.ParseInt(mux.Vars(req)["albumid"], mnd.Base10, mnd.Bits64)
 
@@ -176,6 +208,16 @@ func lidarrGetAlbum(req *http.Request) (int, interface{}) {
 	return http.StatusOK, album
 }
 
+// @Description  Returns the search status of an album ID.
+// @Summary      Search Lidarr Album ID
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        albumID  path   int64  true  "album ID"
+// @Success      200  {object} string "status"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/command/search/{albumID} [get]
 func lidarrTriggerSearchAlbum(req *http.Request) (int, interface{}) {
 	albumID, _ := strconv.ParseInt(mux.Vars(req)["albumid"], mnd.Base10, mnd.Bits64)
 
@@ -190,6 +232,15 @@ func lidarrTriggerSearchAlbum(req *http.Request) (int, interface{}) {
 	return http.StatusOK, output.Status
 }
 
+// @Description  Fetches all Metadata Profiles from Lidarr.
+// @Summary      Get Lidarr Metadata Profiles
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} map[int64]string "map of ID to name"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/metadataProfiles [get]
 func lidarrMetadata(req *http.Request) (int, interface{}) {
 	profiles, err := getLidarr(req).GetMetadataProfilesContext(req.Context())
 	if err != nil {
@@ -205,6 +256,15 @@ func lidarrMetadata(req *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// @Description  Fetches all Quality Definitions from Lidarr.
+// @Summary      Get Lidarr Quality Definitions
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} map[int64]string "map of ID to name"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/qualityDefinitions [get]
 func lidarrQualityDefs(req *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
 	definitions, err := getLidarr(req).GetQualityDefinitionContext(req.Context())
@@ -221,6 +281,15 @@ func lidarrQualityDefs(req *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// @Description  Fetches all Quality Profiles from Lidarr.
+// @Summary      Get Lidarr Quality Profiles
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} map[int64]string "map of ID to name"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/qualityProfiles [get]
 func lidarrQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
 	profiles, err := getLidarr(req).GetQualityProfilesContext(req.Context())
@@ -237,6 +306,15 @@ func lidarrQualityProfiles(req *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// @Description  Fetches all Quality Profiles Data from Lidarr.
+// @Summary      Get Lidarr Quality Profile Data
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} []lidarr.QualityProfile "all profiles"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/qualityProfile [get]
 func lidarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
 	profiles, err := getLidarr(req).GetQualityProfilesContext(req.Context())
@@ -247,6 +325,18 @@ func lidarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, profiles
 }
 
+// @Description  Creates a new Lidarr Quality Profile.
+// @Summary      Add Lidarr Quality Profile
+// @Tags         lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body lidarr.QualityProfile true "new item content"
+// @Success      200  {object} int64 "new profile ID"
+// @Failure      400  {object} string "json input error"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/qualityProfile [post]
 func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	var profile lidarr.QualityProfile
 
@@ -265,6 +355,20 @@ func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, id
 }
 
+// @Description  Updates a Lidarr Quality Profile.
+// @Summary      Update Lidarr Quality Profile
+// @Tags         lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        profileID  path   int64  true  "profile ID to update"
+// @Param        PUT body lidarr.QualityProfile true "new item content"
+// @Success      200  {object} string "ok"
+// @Failure      400  {object} string "json input error"
+// @Failure      422  {object} string "no profile ID"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/qualityProfile/{profileID} [put]
 func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	var profile lidarr.QualityProfile
 
@@ -276,7 +380,7 @@ func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 
 	profile.ID, _ = strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
 	if profile.ID == 0 {
-		return http.StatusBadRequest, ErrNonZeroID
+		return http.StatusUnprocessableEntity, ErrNonZeroID
 	}
 
 	// Get the profiles from radarr.
@@ -288,6 +392,15 @@ func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "OK"
 }
 
+// @Description  Returns all Lidarr Root Folders paths and free space.
+// @Summary      Retrieve Lidarr Root Folders
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} map[string]int64 "map of path->space free"
+// @Failure      500  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/rootFolder [get]
 func lidarrRootFolders(req *http.Request) (int, interface{}) {
 	// Get folder list from Lidarr.
 	folders, err := getLidarr(req).GetRootFoldersContext(req.Context())
@@ -304,32 +417,59 @@ func lidarrRootFolders(req *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// @Description  Searches all Album Titles for the search term provided.
+// @Summary      Search for Lidarr Albums
+// @Tags         lidarr
+// @Produce      json
+// @Param        query     path   string  true  "title search string"
+// @Param        instance  path   int64   true  "instance ID"
+// @Success      200  {object} []apps.lidarrSearchAlbum.albumData  "minimal album data"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/search/{query} [get]
 func lidarrSearchAlbum(req *http.Request) (int, interface{}) {
 	albums, err := getLidarr(req).GetAlbumContext(req.Context(), "")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting albums: %w", err)
 	}
 
+	type albumData struct {
+		ID         int64     `json:"id"`
+		MBID       string    `json:"mbid"`
+		MetadataID int64     `json:"metadataId"`
+		QualityID  int64     `json:"qualityId"`
+		Title      string    `json:"title"`
+		Release    time.Time `json:"release"`
+		ArtistID   int64     `json:"artistId"`
+		ArtistName string    `json:"artistName"`
+		ProfileID  int64     `json:"profileId"`
+		Overview   string    `json:"overview"`
+		Ratings    float64   `json:"ratings"`
+		Type       string    `json:"type"`
+		Exists     bool      `json:"exists"`
+		Files      int64     `json:"files"`
+	}
+
 	query := strings.TrimSpace(mux.Vars(req)["query"]) // in
-	output := make([]map[string]interface{}, 0)        // out
+	output := make([]*albumData, 0)                    // out
 
 	for _, album := range albums {
 		if albumSearch(query, album.Title, album.Releases) {
-			output = append(output, map[string]interface{}{
-				"id":         album.ID,
-				"mbid":       album.ForeignAlbumID,
-				"metadataId": album.Artist.MetadataProfileID,
-				"qualityId":  album.Artist.QualityProfileID,
-				"title":      album.Title,
-				"release":    album.ReleaseDate,
-				"artistId":   album.ArtistID,
-				"artistName": album.Artist.ArtistName,
-				"profileId":  album.ProfileID,
-				"overview":   album.Overview,
-				"ratings":    album.Ratings.Value,
-				"type":       album.AlbumType,
-				"exists":     album.Statistics != nil && album.Statistics.SizeOnDisk > 0,
-				"files":      0,
+			output = append(output, &albumData{
+				ID:         album.ID,
+				MBID:       album.ForeignAlbumID,
+				MetadataID: album.Artist.MetadataProfileID,
+				QualityID:  album.Artist.QualityProfileID,
+				Title:      album.Title,
+				Release:    album.ReleaseDate,
+				ArtistID:   album.ArtistID,
+				ArtistName: album.Artist.ArtistName,
+				ProfileID:  album.ProfileID,
+				Overview:   album.Overview,
+				Ratings:    album.Ratings.Value,
+				Type:       album.AlbumType,
+				Exists:     album.Statistics != nil && album.Statistics.SizeOnDisk > 0,
+				Files:      0,
 			})
 		}
 	}
@@ -351,6 +491,15 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 	return false
 }
 
+// @Description  Returns all Lidarr Tags
+// @Summary      Retrieve Lidarr Tags
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} []starr.Tag "map of path->space free"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/tag [get]
 func lidarrGetTags(req *http.Request) (int, interface{}) {
 	tags, err := getLidarr(req).GetTagsContext(req.Context())
 	if err != nil {
@@ -360,6 +509,17 @@ func lidarrGetTags(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tags
 }
 
+// @Description  Updates the label for a an existing tag.
+// @Summary      Update Lidarr Tag Label
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        tagID     path   int64  true  "tag ID to update"
+// @Param        label     path   string  true  "new label"
+// @Success      200  {object} int64  "tag ID"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/tag/{tagID}/{label} [put]
 func lidarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
@@ -371,6 +531,16 @@ func lidarrUpdateTag(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tag.ID
 }
 
+// @Description  Creates a new tag with the provided label.
+// @Summary      Create Lidarr Tag
+// @Tags         lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        label     path   string true  "new tag's label"
+// @Success      200  {object} int64  "tag ID"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/tag/{label} [put]
 func lidarrSetTag(req *http.Request) (int, interface{}) {
 	tag, err := getLidarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
@@ -380,6 +550,18 @@ func lidarrSetTag(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tag.ID
 }
 
+// @Description  Updates an Album in Lidarr.
+// @Summary      Update Lidarr Album
+// @Tags         lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path  int64  true  "instance ID"
+// @Param        PUT body lidarr.Album  true  "album content"
+// @Success      200  {object} string "ok"
+// @Failure      400  {object} string "bad json input"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/update [put]
 func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 	var album lidarr.Album
 
@@ -396,6 +578,18 @@ func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 	return http.StatusOK, "success"
 }
 
+// @Description  Updates an Artist in Lidarr.
+// @Summary      Update Lidarr Artist
+// @Tags         lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path  int64  true  "instance ID"
+// @Param        PUT body lidarr.Artist  true  "album content"
+// @Success      200  {object} string "ok"
+// @Failure      400  {object} string "bad json input"
+// @Failure      503  {object} string "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/updateartist [put]
 func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
 	var artist lidarr.Artist
 

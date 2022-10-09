@@ -43,8 +43,8 @@ func (t *Timer) Active(d time.Duration) bool {
 // @Tags         plex
 // @Accept       json
 // @Produce      text/html
-// @Param        token   query      string  true  "Plex Token or Client API Key"
-// @Param        request body plex.IncomingWebhook true "webhook payload"
+// @Param        token query   string               true "Plex Token or Client API Key"
+// @Param        POST  body    plex.IncomingWebhook true "webhook payload"
 // @Success      202  {string} string "accepted"
 // @Success      208  {string} string "ignored"
 // @Failure      400  {string} string "bad input"
