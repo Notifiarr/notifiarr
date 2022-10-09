@@ -26,35 +26,56 @@ type Config struct {
 	CmdList []*cmdconfig.Config
 }
 
+// AppInfo contains exported info about this app and its host.
 type AppInfo struct {
-	Client    *AppInfoClient      `json:"client"` // contains running client information.
-	Num       map[string]int      `json:"num"`    // contains configured application counters.
-	Config    AppInfoConfig       `json:"config"` // contains running configuration information.
-	Commands  []*cmdconfig.Config `json:"commands"`
-	Host      *host.InfoStat      `json:"host"`      // contains host info.
-	HostError string              `json:"hostError"` // returned if hostinfo has an error.
-	AppStatus map[string]any      `json:"appStatus"` // only returned on version endpoint.
+	// Client contains running client information.
+	Client *AppInfoClient `json:"client"`
+	// Num contains configured application counters.
+	Num map[string]int `json:"num"`
+	// Config contains running configuration information.
+	Config AppInfoConfig `json:"config"`
+	// Commands is the list of available commands.
+	Commands []*cmdconfig.Config `json:"commands"`
+	// Host contains host info.
+	Host *host.InfoStat `json:"host"`
+	// HostError has data if hostinfo has an error.
+	HostError string `json:"hostError"`
+	// AppStatus is only returned on the version endpoint.
+	AppStatus *AppStatuses `json:"appStatus"`
 }
 
+// AppInfoClient contains the client's exported host info.
 type AppInfoClient struct {
-	Arch      string    `jsno:"arch"`
-	BuildDate string    `jsno:"buildDate"`
-	GoVersion string    `jsno:"goVersion"`
-	OS        string    `jsno:"os"`
-	Revision  string    `jsno:"revision"`
-	Version   string    `jsno:"version"`
-	UptimeSec int64     `jsno:"uptimeSec"`
-	Started   time.Time `jsno:"started"`
-	Docker    bool      `jsno:"docker"`
-	HasGUI    bool      `jsno:"hasGUI"`
+	// Architecture.
+	Arch string `jsno:"arch"`
+	// Application Build Date.
+	BuildDate string `jsno:"buildDate"`
+	// Go Version app built with.
+	GoVersion string `jsno:"goVersion"`
+	// OS app is running on.
+	OS string `jsno:"os"`
+	// Application Revision (part of the version).
+	Revision string `jsno:"revision"`
+	// Application Version.
+	Version string `jsno:"version"`
+	// Uptime in seconds.
+	UptimeSec int64 `jsno:"uptimeSec"`
+	// Application start time.
+	Started time.Time `jsno:"started"`
+	// Running in docker?
+	Docker bool `jsno:"docker"`
+	// Application has a GUI? (windows/mac only)
+	HasGUI bool `jsno:"hasGUI"`
 }
 
+// AppInfoConfig contains exported running configuration information for this app.
 type AppInfoConfig struct {
 	WebsiteTimeout string      `json:"websiteTimeout"`
 	Retries        int         `json:"retries"`
 	Apps           *AppConfigs `json:"apps"`
 }
 
+// AppConfigs contains exported configuations for various integrations.
 type AppConfigs struct {
 	Lidarr   []*AppInfoAppConfig `json:"lidarr"`
 	Prowlarr []*AppInfoAppConfig `json:"prowlarr"`
@@ -64,12 +85,17 @@ type AppConfigs struct {
 	Tautulli *AppInfoTautulli    `json:"tautulli"`
 }
 
+// AppInfoAppConfig Maps an instnce to a name and/or other properties.
 type AppInfoAppConfig struct {
-	Instance int    `json:"instance"`
-	Name     string `json:"name"`
+	// The site-ID for the instance (1-index).
+	Instance int `json:"instance"`
+	// Instance name as configured in the client.
+	Name string `json:"name"`
 }
 
+// AppInfoTautulli contains the Tautulli user map, fetched from Tautulli.
 type AppInfoTautulli struct {
+	// Tautulli user -> email map.
 	Users map[string]string `json:"users"`
 }
 
@@ -122,7 +148,7 @@ func (c *Config) Info(ctx context.Context) *AppInfo {
 			Retries:        c.Server.Config.Retries,
 			Apps:           c.getAppConfigs(ctx),
 		},
-		// Commands:  c.Actions.Commands.List(),
+		Commands:  c.CmdList,
 		Host:      host,
 		HostError: err.Error(),
 	}
