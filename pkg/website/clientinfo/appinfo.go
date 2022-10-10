@@ -40,8 +40,8 @@ type AppInfo struct {
 	Host *host.InfoStat `json:"host"`
 	// HostError has data if hostinfo has an error.
 	HostError string `json:"hostError"`
-	// AppStatus is only returned on the version endpoint.
-	AppStatus *AppStatuses `json:"appStatus"`
+	// AppsStatus is only returned on the version endpoint.
+	AppsStatus *AppStatuses `json:"appsStatus"`
 }
 
 // AppInfoClient contains the client's exported host info.

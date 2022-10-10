@@ -116,7 +116,7 @@ func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
 // @Router       /api/version [get]
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 	output := c.Info(r.Context())
-	output.AppStatus = c.appStatsForVersion(r.Context())
+	output.AppsStatus = c.appStatsForVersion(r.Context())
 
 	return http.StatusOK, output
 }
@@ -134,7 +134,7 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 func (c *Config) VersionHandlerInstance(r *http.Request) (int, interface{}) {
 	output := c.Info(r.Context())
 	instance, _ := strconv.Atoi(mux.Vars(r)["instance"])
-	output.AppStatus = c.appStatsForVersionInstance(r.Context(), mux.Vars(r)["app"], instance)
+	output.AppsStatus = c.appStatsForVersionInstance(r.Context(), mux.Vars(r)["app"], instance)
 
 	return http.StatusOK, output
 }
