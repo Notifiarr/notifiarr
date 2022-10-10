@@ -6331,7 +6331,7 @@ const docTemplateapi = `{
                 }
             }
         },
-        "/api/trigger/backup/{content}": {
+        "/api/trigger/backup/{app}": {
             "get": {
                 "security": [
                     {
@@ -6658,7 +6658,7 @@ const docTemplateapi = `{
                 }
             }
         },
-        "/api/trigger/corrupt/{content}": {
+        "/api/trigger/corrupt/{app}": {
             "get": {
                 "security": [
                     {

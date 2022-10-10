@@ -772,6 +772,10 @@ func (c *Client) handlerSwaggerDoc(response http.ResponseWriter, request *http.R
 	_, _ = response.Write([]byte(doc))
 }
 
+func (c *Client) handleSwaggerIndex(response http.ResponseWriter, request *http.Request) {
+	c.renderTemplate(request.Context(), response, request, "swagger/index.html", "")
+}
+
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
 func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.Request) {
 	if request.URL.Path == "/files/css/custom.css" {
@@ -780,15 +784,6 @@ func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.
 			http.StripPrefix("/files/css", http.FileServer(http.Dir(filepath.Dir(cssFileDir)))).ServeHTTP(response, request)
 			return
 		}
-	}
-
-	if request.URL.Path == "/docs/" || request.URL.Path == "/docs" {
-		request.URL.Path = "/docs/index.html"
-	}
-
-	if request.URL.Path == "/docs/index.html" {
-		c.renderTemplate(request.Context(), response, request, "swagger/index.html", "")
-		return
 	}
 
 	if c.Flags.Assets == "" {

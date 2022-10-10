@@ -80,9 +80,7 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/docs/json/{instance}", c.handlerSwaggerDoc).Methods("GET")
 	gui.HandleFunc("/ui.json", c.handlerSwaggerDoc).Methods("GET")
 	gui.Handle("/docs", http.RedirectHandler(path.Join(base, "ui", "docs")+"/", http.StatusFound))
-	gui.PathPrefix("/docs/").
-		Handler(http.StripPrefix(path.Join(base, "ui"), http.HandlerFunc(c.handleStaticAssets))).
-		Methods("GET")
+	gui.HandleFunc("/docs/", c.handleSwaggerIndex).Methods("GET")
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }
 
