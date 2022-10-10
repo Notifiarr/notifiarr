@@ -274,7 +274,7 @@ func (a *Actions) gaps(input *common.ActionInput) (int, string) {
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "missing app"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/trigger/corrupt/{content} [get]
+// @Router       /api/trigger/corrupt/{app} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) corrupt(input *common.ActionInput, content string) (int, string) {
 	title := cases.Title(language.AmericanEnglish)
@@ -295,7 +295,7 @@ func (a *Actions) corrupt(input *common.ActionInput, content string) (int, strin
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "missing app"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/trigger/backup/{content} [get]
+// @Router       /api/trigger/backup/{app} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) backup(input *common.ActionInput, content string) (int, string) {
 	title := cases.Title(language.AmericanEnglish)

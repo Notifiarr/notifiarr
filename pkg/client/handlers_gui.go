@@ -35,6 +35,15 @@ import (
 	"golift.io/version"
 )
 
+// @title Notifiarr Client GUI API Documentation
+// @description Monitors local services and sends notifications.
+// @termsOfService https://notifiarr.com
+// @contact.name Notifiarr Discord
+// @contact.url https://notifiarr.com/discord
+// @license.name MIT
+// @license.url https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
+// @BasePath /
+
 const (
 	minPasswordLen   = 9
 	fileSourceLogs   = "logs"

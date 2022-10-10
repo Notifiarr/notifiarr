@@ -898,7 +898,7 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "description": "new item content",
+                        "description": "updated item content",
                         "name": "PUT",
                         "in": "body",
                         "required": true,
@@ -1241,7 +1241,7 @@ const docTemplateapi = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "tags",
                         "schema": {
                             "allOf": [
                                 {
@@ -2289,6 +2289,429 @@ const docTemplateapi = `{
                 }
             }
         },
+        "/api/radarr/{instance}/customformats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Custom Format from Radarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Get Radarr Custom Formats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "custom format",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/radarr.CustomFormat"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Custom Format in Radarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Create Radarr Custom Format",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Custom Format content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/radarr.CustomFormat"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "custom format",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/radarr.CustomFormat"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/radarr/{instance}/customformats/all": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete all Custom Formats from Radarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Delete all Radarr Custom Formats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "item delete counters",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/apps.deleteResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/radarr/{instance}/customformats/{formatID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Custom Format in Radarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Create Radarr Custom Format",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Custom Format ID",
+                        "name": "formatID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Custom Format content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/radarr.CustomFormat"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "custom format",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/radarr.CustomFormat"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a Custom Format from Radarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Delete Radarr Custom Format",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Custom Format ID",
+                        "name": "formatID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/radarr/{instance}/exclusions": {
             "get": {
                 "security": [
@@ -2693,6 +3116,284 @@ const docTemplateapi = `{
                 }
             }
         },
+        "/api/radarr/{instance}/importlist": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Import Lists from Radarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Get Radarr Import Lists",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "import list list",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/radarr.ImportList"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Import List in Radarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Create Radarr Import List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Import List",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/radarr.ImportList"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "import list returns",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/radarr.ImportList"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/radarr/{instance}/importlist/{listID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates an Import List in Radarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Update Radarr Import List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Import List ID",
+                        "name": "listID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Import Listcontent",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/radarr.ImportList"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "import list returns",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/radarr.ImportList"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/radarr/{instance}/qualityProfile": {
             "get": {
                 "security": [
@@ -2898,7 +3599,7 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "description": "new item content",
+                        "description": "updated item content",
                         "name": "PUT",
                         "in": "body",
                         "required": true,
@@ -3191,7 +3892,7 @@ const docTemplateapi = `{
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "$ref": "#/definitions/apps.radarrDeleteAllQualityProfiles.qpDelReturn"
+                                            "$ref": "#/definitions/apps.deleteResponse"
                                         }
                                     }
                                 }
@@ -3206,6 +3907,192 @@ const docTemplateapi = `{
                     },
                     "500": {
                         "description": "instance error getting profiles",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/radarr/{instance}/qualitydefinition": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Quality Definitions from Radarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Get Radarr Quality Definitions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "quality definitions list",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/radarr.QualityDefinition"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/radarr/{instance}/qualitydefinition/{definitionID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates all Quality Definitions in Radarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "radarr"
+                ],
+                "summary": "Update Radarr Quality Definitions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Import List ID",
+                        "name": "definitionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Import Listcontent",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/radarr.QualityDefinition"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "quality definitions return",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/radarr.QualityDefinition"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
                         "schema": {
                             "allOf": [
                                 {
@@ -3385,7 +4272,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Returns all Radarr Tags",
+                "description": "Returns all Radarr Tags.",
                 "produces": [
                     "application/json"
                 ],
@@ -3404,7 +4291,7 @@ const docTemplateapi = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "tags",
                         "schema": {
                             "allOf": [
                                 {
@@ -4393,7 +5280,7 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "description": "new item content",
+                        "description": "updated item content",
                         "name": "PUT",
                         "in": "body",
                         "required": true,
@@ -4724,7 +5611,7 @@ const docTemplateapi = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "tags",
                         "schema": {
                             "allOf": [
                                 {
@@ -6454,6 +7341,26 @@ const docTemplateapi = `{
                 }
             }
         },
+        "apps.deleteResponse": {
+            "type": "object",
+            "properties": {
+                "deleted": {
+                    "description": "How many items were deleted.",
+                    "type": "integer"
+                },
+                "errors": {
+                    "description": "Errors returned from the delete queries.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "found": {
+                    "description": "How many items are found and attempted to be deleted.",
+                    "type": "integer"
+                }
+            }
+        },
         "apps.lidarrSearchAlbum.albumData": {
             "type": "object",
             "properties": {
@@ -6498,26 +7405,6 @@ const docTemplateapi = `{
                 },
                 "type": {
                     "type": "string"
-                }
-            }
-        },
-        "apps.radarrDeleteAllQualityProfiles.qpDelReturn": {
-            "type": "object",
-            "properties": {
-                "deleted": {
-                    "description": "How mahy profiles were deleted",
-                    "type": "integer"
-                },
-                "errors": {
-                    "description": "Errors returned from the delete queries.",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "found": {
-                    "description": "How many profiles are found and attempted to be deleted.",
-                    "type": "integer"
                 }
             }
         },
@@ -8762,6 +9649,100 @@ const docTemplateapi = `{
                 }
             }
         },
+        "radarr.Field": {
+            "type": "object",
+            "properties": {
+                "advanced": {
+                    "type": "boolean"
+                },
+                "helpText": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "selectOptions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/radarr.SelectOption"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "description": "sometimes number, sometimes string. 'Type' may tell you."
+                }
+            }
+        },
+        "radarr.ImportList": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "enableAuto": {
+                    "type": "boolean"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/radarr.Field"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "implementationName": {
+                    "type": "string"
+                },
+                "infoLink": {
+                    "type": "string"
+                },
+                "listOrder": {
+                    "type": "integer"
+                },
+                "listType": {
+                    "type": "string"
+                },
+                "minimumAvailability": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "qualityProfileId": {
+                    "type": "integer"
+                },
+                "rootFolderPath": {
+                    "type": "string"
+                },
+                "searchOnAdd": {
+                    "type": "boolean"
+                },
+                "shouldMonitor": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "radarr.MediaInfo": {
             "type": "object",
             "properties": {
@@ -9046,6 +10027,23 @@ const docTemplateapi = `{
                 },
                 "upgradeAllowed": {
                     "type": "boolean"
+                }
+            }
+        },
+        "radarr.SelectOption": {
+            "type": "object",
+            "properties": {
+                "dividerAfter": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
                 }
             }
         },
@@ -10427,8 +11425,8 @@ var SwaggerInfoapi = &swag.Spec{
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Notifiarr Client API Documentation",
-	Description:      "Monitors local services and sends notifications.",
+	Title:            "Notifiarr Client API Docs",
+	Description:      "Notifiarr Client monitors local services and sends notifications.",
 	InfoInstanceName: "api",
 	SwaggerTemplate:  docTemplateapi,
 }

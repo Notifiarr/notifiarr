@@ -10,9 +10,9 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
-// @title Notifiarr Client API Documentation
+// @title Notifiarr Client API Docs
 // @version 1.0
-// @description Monitors local services and sends notifications.
+// @description Notifiarr Client monitors local services and sends notifications.
 // @termsOfService https://notifiarr.com
 // @contact.name Notifiarr Discord
 // @contact.url https://notifiarr.com/discord
