@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -30,6 +31,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/swaggo/swag"
+	"golift.io/version"
 )
 
 const (
@@ -736,6 +739,25 @@ func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.
 	c.renderTemplate(req.Context(), response, req, page, "")
 }
 
+func (c *Client) handlerSwaggerDoc(response http.ResponseWriter, request *http.Request) {
+	instance := strings.TrimSuffix(mux.Vars(request)["instance"], ".json")
+	if instance == "" {
+		instance = "api"
+	}
+
+	docs.SwaggerInfoapi.Version = version.Version + "-" + version.Revision
+	docs.SwaggerInfoapi.BasePath = c.Config.URLBase
+	docs.SwaggerInfoapi.Host = request.Host
+
+	doc, err := swag.ReadDoc(instance)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = response.Write([]byte(doc))
+}
+
 // handleStaticAssets checks for a file on disk then falls back to compiled-in files.
 func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.Request) {
 	if request.URL.Path == "/files/css/custom.css" {
@@ -748,6 +770,11 @@ func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.
 
 	if request.URL.Path == "/docs/" || request.URL.Path == "/docs" {
 		request.URL.Path = "/docs/index.html"
+	}
+
+	if request.URL.Path == "/docs/index.html" {
+		c.renderTemplate(request.Context(), response, request, "swagger/index.html", "")
+		return
 	}
 
 	if c.Flags.Assets == "" {

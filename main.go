@@ -19,6 +19,9 @@ import (
 // @license.name MIT
 // @license.url https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
 // @BasePath /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name X-API-Key
 func main() {
 	ui.HideConsoleWindow()
 	// setup log package in case we throw an error in main.go before logging is setup.

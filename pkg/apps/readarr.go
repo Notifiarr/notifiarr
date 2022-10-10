@@ -88,14 +88,15 @@ func (a *Apps) setupReadarr() error {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body readarr.AddBookInput true "new item content"
 // @Accept       json
-// @Success      201  {object} readarr.Book "created"
-// @Failure      400  {object} string "bad json payload"
-// @Failure      409  {object} string "item alrady exists"
-// @Failure      422  {object} string "no valid editions provided"
-// @Failure      503  {object} string "instance error during check"
-// @Failure      500  {object} string "instance error during add"
+// @Success      201  {object} apps.Respond.apiResponse{message=readarr.Book} "created"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json payload"
+// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item alrady exists"
+// @Failure      422  {object} apps.Respond.apiResponse{message=string} "no valid editions provided"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error during check"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error during add"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/add [post]
+// @Security     ApiKeyAuth
 func readarrAddBook(req *http.Request) (int, interface{}) {
 	payload := &readarr.AddBookInput{}
 	// Extract payload and check for GRID ID.
@@ -132,10 +133,11 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        authorID  path   int64  true  "author ID"
-// @Success      200  {object} readarr.Author "author content"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=readarr.Author} "author content"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/author/{authorID} [get]
+// @Security     ApiKeyAuth
 func readarrGetAuthor(req *http.Request) (int, interface{}) {
 	authorID, _ := strconv.ParseInt(mux.Vars(req)["authorid"], mnd.Base10, mnd.Bits64)
 
@@ -168,11 +170,12 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        gridID    path   int64  true  "Good Reads ID"
-// @Success      200  {object} string "not found"
-// @Failure      503  {object} string "instance error"
-// @Failure      409  {object} string "already exists"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "not found"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      409  {object} apps.Respond.apiResponse{message=string} "already exists"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/check/{gridID} [get]
+// @Security     ApiKeyAuth
 func readarrCheckBook(req *http.Request) (int, interface{}) {
 	grid := mux.Vars(req)["grid"]
 
@@ -192,10 +195,11 @@ func readarrCheckBook(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        bookID    path   int64  true  "Book ID"
-// @Success      200  {object} string "not found"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "not found"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/get/{bookID} [get]
+// @Security     ApiKeyAuth
 func readarrGetBook(req *http.Request) (int, interface{}) {
 	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
@@ -227,10 +231,11 @@ func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 // @Tags         readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} map[int64]string "map of ID to name"
-// @Failure      500  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/metadataProfiles [get]
+// @Security     ApiKeyAuth
 func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetMetadataProfilesContext(req.Context())
 	if err != nil {
@@ -252,10 +257,11 @@ func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 // @Tags         readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} map[int64]string "map of ID to name"
-// @Failure      500  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/qualityProfiles [get]
+// @Security     ApiKeyAuth
 func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -277,10 +283,11 @@ func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 // @Tags         readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} []readarr.QualityProfile "all profiles"
-// @Failure      500  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]readarr.QualityProfile} "all profiles"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/qualityProfile [get]
+// @Security     ApiKeyAuth
 func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -297,11 +304,12 @@ func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body readarr.QualityProfile true "new item content"
-// @Success      200  {object} int64 "new profile ID"
-// @Failure      400  {object} string "json input error"
-// @Failure      500  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new profile ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/qualityProfile [post]
+// @Security     ApiKeyAuth
 func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	var profile readarr.QualityProfile
 
@@ -329,11 +337,12 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Param        profileID  path   int64  true  "profile ID to update"
 // @Param        PUT body readarr.QualityProfile true "new item content"
 // @Success      200  {object} string "ok"
-// @Failure      400  {object} string "json input error"
-// @Failure      422  {object} string "no profile ID"
-// @Failure      500  {object} string "instance error"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
+// @Failure      422  {object} apps.Respond.apiResponse{message=string} "no profile ID"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/qualityProfile/{profileID} [put]
+// @Security     ApiKeyAuth
 func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	var profile readarr.QualityProfile
 
@@ -363,10 +372,11 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // @Tags         readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} map[string]int64 "map of path->space free"
-// @Failure      500  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=map[string]int64} "map of path->space free"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/rootFolder [get]
+// @Security     ApiKeyAuth
 func readarrRootFolders(req *http.Request) (int, interface{}) {
 	folders, err := getReadarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
@@ -388,10 +398,11 @@ func readarrRootFolders(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        query     path   string  true  "title search string"
 // @Param        instance  path   int64   true  "instance ID"
-// @Success      200  {object} []apps.readarrSearchBook.bookData  "minimal book data"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]apps.readarrSearchBook.bookData}  "minimal book data"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/search/{query} [get]
+// @Security     ApiKeyAuth
 func readarrSearchBook(req *http.Request) (int, interface{}) {
 	books, err := getReadarr(req).GetBookContext(req.Context(), "")
 	if err != nil {
@@ -468,10 +479,11 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 // @Tags         readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} []starr.Tag "map of path->space free"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "map of path->space free"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/tag [get]
+// @Security     ApiKeyAuth
 func readarrGetTags(req *http.Request) (int, interface{}) {
 	tags, err := getReadarr(req).GetTagsContext(req.Context())
 	if err != nil {
@@ -488,10 +500,11 @@ func readarrGetTags(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tagID     path   int64  true  "tag ID to update"
 // @Param        label     path   string  true  "new label"
-// @Success      200  {object} int64  "tag ID"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/tag/{tagID}/{label} [put]
+// @Security     ApiKeyAuth
 func readarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
@@ -509,10 +522,11 @@ func readarrUpdateTag(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        label     path   string true  "new tag's label"
-// @Success      200  {object} int64  "tag ID"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/tag/{label} [put]
+// @Security     ApiKeyAuth
 func readarrSetTag(req *http.Request) (int, interface{}) {
 	tag, err := getReadarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
@@ -529,11 +543,12 @@ func readarrSetTag(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
 // @Param        PUT body readarr.Book  true  "book content"
-// @Success      200  {object} string "ok"
-// @Failure      400  {object} string "bad json input"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/update [put]
+// @Security     ApiKeyAuth
 func readarrUpdateBook(req *http.Request) (int, interface{}) {
 	var book readarr.Book
 
@@ -557,11 +572,12 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
 // @Param        PUT body readarr.Author  true  "author content"
-// @Success      200  {object} string "ok"
-// @Failure      400  {object} string "bad json input"
-// @Failure      503  {object} string "instance error"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/updateauthor [put]
+// @Security     ApiKeyAuth
 func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 	var author readarr.Author
 

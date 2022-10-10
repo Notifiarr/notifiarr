@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Notifiarr Client API Docs</title>
+    <link rel="icon" type="image/png" href="{{files}}/images/favicon.png" />
+    <link rel="stylesheet" type="text/css" href="swagger-ui.css" />
+    <link rel="stylesheet" type="text/css" href="index.css" />
+  </head>
+  <body>
+    <a href ="{{.Config.URLBase}}">Go back to client.</a><br>
+    <div id="swagger-ui"></div>
+    <script src="swagger-ui-bundle.js" charset="UTF-8"> </script>
+    <script src="swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
+    <script>
+        window.onload = function() {
+            // Build a system
+            const ui = SwaggerUIBundle({
+                url: "json/api",
+                urls: [{url: "json/api", name: "API"},{url: "json/gui", name: "GUI"}],
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+            window.ui = ui
+        }
+    </script>
+  </body>
+</html>
+`

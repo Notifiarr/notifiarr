@@ -84,9 +84,10 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 // @Tags         triggers
 // @Produce      text/plain
 // @Param        enabled  path   bool  true  "Enable or disable client error log sharing."
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/clientlogs/{enabled} [get]
+// @Security     ApiKeyAuth
 func (a *Actions) clientLogs(content string) (int, string) {
 	if content == "true" || content == "on" || content == "enable" {
 		share.Setup(a.Timers.Server)
@@ -101,14 +102,15 @@ func (a *Actions) clientLogs(content string) (int, string) {
 // @Description  Execute a pre-programmed command with arguments.
 // @Summary      Execute Command w/ args
 // @Tags         triggers
-// @Produce      text/plain
+// @Produce      json
 // @Param        hash  path   bool  true  "Unique hash for command being executed"
 // @Param        args formData []string true "provide args as multiple 'args' paramers in POST body" collectionFormat(multi) example(args=/tmp&args=/var)
 // @Accept       application/x-www-form-urlencoded
-// @Success      200  {object} string "success"
-// @Failure      400  {object} string "bad or missing hash"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad or missing hash"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/command/{hash} [post]
+// @Security     ApiKeyAuth
 //
 //nolint:lll
 func _() {}
@@ -116,12 +118,13 @@ func _() {}
 // @Description  Execute a pre-programmed command.
 // @Summary      Execute Command
 // @Tags         triggers
-// @Produce      text/plain
+// @Produce      json
 // @Param        hash  path   bool  true  "Unique hash for command being executed"
-// @Success      200  {object} string "success"
-// @Failure      400  {object} string "bad or missing hash"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad or missing hash"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/command/{hash} [get]
+// @Security     ApiKeyAuth
 func (a *Actions) command(input *common.ActionInput, content string) (int, string) {
 	cmd := a.Commands.GetByHash(content)
 	if cmd == nil {
@@ -138,9 +141,10 @@ func (a *Actions) command(input *common.ActionInput, content string) (int, strin
 // @Tags         triggers,trash
 // @Produce      text/plain
 // @Param        instance  path   bool  false  "Triggers sync on this instance if provided, otherwise all instances"
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/cfsync/{instance} [get]
+// @Security     ApiKeyAuth
 func (a *Actions) cfsync(input *common.ActionInput, content string) (int, string) {
 	if content == "" {
 		a.CFSync.SyncRadarrCF(input.Type)
@@ -160,9 +164,10 @@ func (a *Actions) cfsync(input *common.ActionInput, content string) (int, string
 // @Tags         triggers,trash
 // @Produce      text/plain
 // @Param        instance  path   bool  false  "Triggers sync on this instance if provided, otherwise all instances"
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/rpsync/{instance} [get]
+// @Security     ApiKeyAuth
 func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string) {
 	if content == "" {
 		a.CFSync.SyncSonarrRP(input.Type)
@@ -181,9 +186,10 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 // @Summary      Run all service checks
 // @Tags         triggers
 // @Produce      text/plain
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/services [get]
+// @Security     ApiKeyAuth
 func (a *Actions) services(input *common.ActionInput) (int, string) {
 	a.Timers.RunChecks(input.Type)
 	return http.StatusOK, "All service checks rescheduled for immediate exeution."
@@ -193,10 +199,11 @@ func (a *Actions) services(input *common.ActionInput) (int, string) {
 // @Summary      Collect Plex Sessions
 // @Tags         triggers
 // @Produce      text/plain
-// @Success      200  {object} string "success"
-// @Failure      501  {object} string "plex is disabled"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      501  {object} apps.Respond.apiResponse{message=string} "plex is disabled"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/sessions [get]
+// @Security     ApiKeyAuth
 func (a *Actions) sessions(input *common.ActionInput) (int, string) {
 	if !a.Timers.Apps.Plex.Enabled() {
 		return http.StatusNotImplemented, "Plex Sessions are not enabled."
@@ -211,9 +218,10 @@ func (a *Actions) sessions(input *common.ActionInput) (int, string) {
 // @Summary      Send a stuck items notification
 // @Tags         triggers
 // @Produce      text/plain
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/stuckitems [get]
+// @Security     ApiKeyAuth
 func (a *Actions) stuckitems(input *common.ActionInput) (int, string) {
 	a.StarrQueue.StuckItems(input.Type)
 	return http.StatusOK, "Stuck Queue Items triggered."
@@ -223,9 +231,10 @@ func (a *Actions) stuckitems(input *common.ActionInput) (int, string) {
 // @Summary      Send a dashboard notification
 // @Tags         triggers
 // @Produce      text/plain
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/dashboard [get]
+// @Security     ApiKeyAuth
 func (a *Actions) dashboard(input *common.ActionInput) (int, string) {
 	a.Dashboard.Send(input.Type)
 	return http.StatusOK, "Dashboard states triggered."
@@ -235,9 +244,10 @@ func (a *Actions) dashboard(input *common.ActionInput) (int, string) {
 // @Summary      Send a system snapshot notification
 // @Tags         triggers
 // @Produce      text/plain
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/snapshot [get]
+// @Security     ApiKeyAuth
 func (a *Actions) snapshot(input *common.ActionInput) (int, string) {
 	a.SnapCron.Send(input.Type)
 	return http.StatusOK, "System Snapshot triggered."
@@ -247,9 +257,10 @@ func (a *Actions) snapshot(input *common.ActionInput) (int, string) {
 // @Summary      Send Collections Gaps Notification
 // @Tags         triggers
 // @Produce      text/plain
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/gaps [get]
+// @Security     ApiKeyAuth
 func (a *Actions) gaps(input *common.ActionInput) (int, string) {
 	a.Gaps.Send(input.Type)
 	return http.StatusOK, "Radarr Collections Gaps initiated."
@@ -260,10 +271,11 @@ func (a *Actions) gaps(input *common.ActionInput) (int, string) {
 // @Tags         triggers
 // @Produce      text/plain
 // @Param        app  path   string  true  "app type to check" Enum(lidarr, prowlarr, radarr, readarr, sonarr)
-// @Success      200  {object} string "success"
-// @Failure      400  {object} string "missing app"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "missing app"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/corrupt/{content} [get]
+// @Security     ApiKeyAuth
 func (a *Actions) corrupt(input *common.ActionInput, content string) (int, string) {
 	title := cases.Title(language.AmericanEnglish)
 
@@ -280,10 +292,11 @@ func (a *Actions) corrupt(input *common.ActionInput, content string) (int, strin
 // @Tags         triggers
 // @Produce      text/plain
 // @Param        app  path   string  true  "app type to check" Enum(lidarr, prowlarr, radarr, readarr, sonarr)
-// @Success      200  {object} string "success"
-// @Failure      400  {object} string "missing app"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "missing app"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/backup/{content} [get]
+// @Security     ApiKeyAuth
 func (a *Actions) backup(input *common.ActionInput, content string) (int, string) {
 	title := cases.Title(language.AmericanEnglish)
 
@@ -299,9 +312,10 @@ func (a *Actions) backup(input *common.ActionInput, content string) (int, string
 // @Summary      Reload Client
 // @Tags         triggers
 // @Produce      text/plain
-// @Success      200  {object} string "success"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/reload [get]
+// @Security     ApiKeyAuth
 func (a *Actions) handleConfigReload() (int, string) {
 	defer a.Timers.ReloadApp("HTTP Triggered Reload")
 	return http.StatusOK, "Application reload initiated."
@@ -312,10 +326,11 @@ func (a *Actions) handleConfigReload() (int, string) {
 // @Tags         triggers
 // @Produce      text/plain
 // @Param        content  path   string  true  "Data for the notification."
-// @Success      200  {object} string "success"
-// @Failure      400  {object} string "no content"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "no content"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/notification/{content} [get]
+// @Security     ApiKeyAuth
 func (a *Actions) notification(content string) (int, string) {
 	if content != "" {
 		ui.Notify("Notification: %s", content) //nolint:errcheck
