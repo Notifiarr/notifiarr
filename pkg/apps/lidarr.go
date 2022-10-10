@@ -372,7 +372,7 @@ func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
-// @Param        PUT body lidarr.QualityProfile true "new item content"
+// @Param        PUT body lidarr.QualityProfile true "updated item content"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
 // @Failure      422  {object} apps.Respond.apiResponse{message=string} "no profile ID"
@@ -511,7 +511,7 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 // @Tags         lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "map of path->space free"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "tags"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/tag [get]

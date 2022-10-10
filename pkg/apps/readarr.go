@@ -335,7 +335,7 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
-// @Param        PUT body readarr.QualityProfile true "new item content"
+// @Param        PUT body readarr.QualityProfile true "updated item content"
 // @Success      200  {object} string "ok"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
 // @Failure      422  {object} apps.Respond.apiResponse{message=string} "no profile ID"
@@ -479,7 +479,7 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 // @Tags         readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "map of path->space free"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "tags"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/readarr/{instance}/tag [get]

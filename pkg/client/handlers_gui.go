@@ -745,7 +745,12 @@ func (c *Client) handlerSwaggerDoc(response http.ResponseWriter, request *http.R
 		instance = "api"
 	}
 
-	docs.SwaggerInfoapi.Version = version.Version + "-" + version.Revision
+	if version.Version == "" {
+		docs.SwaggerInfoapi.Version = "v.dev"
+	} else {
+		docs.SwaggerInfoapi.Version = "v" + version.Version + "-" + version.Revision
+	}
+
 	docs.SwaggerInfoapi.BasePath = c.Config.URLBase
 	docs.SwaggerInfoapi.Host = request.Host
 
