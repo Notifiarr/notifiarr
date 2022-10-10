@@ -83,7 +83,7 @@ func (a *Apps) setupReadarr() error {
 
 // @Description  Adds a new Book to Readarr.
 // @Summary      Add Readarr Book
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body readarr.AddBookInput true "new item content"
@@ -129,7 +129,7 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches an Author from Readarr.
 // @Summary      Get Readarr Author
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        authorID  path   int64  true  "author ID"
@@ -166,7 +166,7 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 // Check for existing book.
 // @Description  Checks if a book already exists in Readarr.
 // @Summary      Check Readarr Book
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        gridID    path   int64  true  "Good Reads ID"
@@ -191,7 +191,7 @@ func readarrCheckBook(req *http.Request) (int, interface{}) {
 
 // @Description  Returns a book from Readarr.
 // @Summary      Get Readarr Book
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        bookID    path   int64  true  "Book ID"
@@ -228,7 +228,7 @@ func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 // Get the metadata profiles from readarr.
 // @Description  Fetches all Metadata Profiles from Readarr.
 // @Summary      Get Readarr Metadata Profiles
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
@@ -254,7 +254,7 @@ func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 // Get the quality profiles from readarr.
 // @Description  Fetches all Quality Profiles from Readarr.
 // @Summary      Get Readarr Quality Profiles
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
@@ -280,7 +280,7 @@ func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 // Get the all quality profiles data from readarr.
 // @Description  Fetches all Quality Profiles Data from Readarr.
 // @Summary      Get Readarr Quality Profile Data
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]readarr.QualityProfile} "all profiles"
@@ -299,7 +299,7 @@ func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new Readarr Quality Profile.
 // @Summary      Add Readarr Quality Profile
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -330,7 +330,7 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Updates a Readarr Quality Profile.
 // @Summary      Update Readarr Quality Profile
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -369,7 +369,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // Get folder list from Readarr.
 // @Description  Returns all Readarr Root Folders paths and free space.
 // @Summary      Retrieve Readarr Root Folders
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[string]int64} "map of path->space free"
@@ -394,7 +394,7 @@ func readarrRootFolders(req *http.Request) (int, interface{}) {
 
 // @Description  Searches all Book Titles for the search term provided.
 // @Summary      Search for Readarr Books
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        query     path   string  true  "title search string"
 // @Param        instance  path   int64   true  "instance ID"
@@ -476,7 +476,7 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 
 // @Description  Returns all Readarr Tags
 // @Summary      Retrieve Readarr Tags
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "tags"
@@ -495,7 +495,7 @@ func readarrGetTags(req *http.Request) (int, interface{}) {
 
 // @Description  Updates the label for a an existing tag.
 // @Summary      Update Readarr Tag Label
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tagID     path   int64  true  "tag ID to update"
@@ -518,7 +518,7 @@ func readarrUpdateTag(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new tag with the provided label.
 // @Summary      Create Readarr Tag
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        label     path   string true  "new tag's label"
@@ -538,7 +538,7 @@ func readarrSetTag(req *http.Request) (int, interface{}) {
 
 // @Description  Updates a Book in Readarr.
 // @Summary      Update Readarr Book
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
@@ -567,7 +567,7 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 
 // @Description  Updates an Author in Readarr.
 // @Summary      Update Readarr Author
-// @Tags         readarr
+// @Tags         Readarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"

@@ -31,14 +31,14 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve client info.",
+                "description": "Returns information about the client's configuration. This endpoint returns all the instance IDs (and instance names if present). Use the returned instance IDs with endpoints that accept an instance ID.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "client"
+                    "Client"
                 ],
-                "summary": "Returns information about the client's configuration.",
+                "summary": "Retrieve client info.",
                 "responses": {
                     "200": {
                         "description": "contains all info except appStatus",
@@ -82,7 +82,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Add Lidarr Album",
                 "parameters": [
@@ -233,7 +233,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Get Lidarr Artist",
                 "parameters": [
@@ -310,7 +310,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Check for Lidarr Album existence",
                 "parameters": [
@@ -405,7 +405,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Search Lidarr Album ID",
                 "parameters": [
@@ -482,7 +482,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Get Lidarr Album",
                 "parameters": [
@@ -559,7 +559,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Get Lidarr Metadata Profiles",
                 "parameters": [
@@ -632,7 +632,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Get Lidarr Quality Definitions",
                 "parameters": [
@@ -705,7 +705,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Get Lidarr Quality Profile Data",
                 "parameters": [
@@ -779,7 +779,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Add Lidarr Quality Profile",
                 "parameters": [
@@ -879,7 +879,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Update Lidarr Quality Profile",
                 "parameters": [
@@ -1001,7 +1001,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Get Lidarr Quality Profiles",
                 "parameters": [
@@ -1074,7 +1074,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Retrieve Lidarr Root Folders",
                 "parameters": [
@@ -1147,7 +1147,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Search for Lidarr Albums",
                 "parameters": [
@@ -1227,7 +1227,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Retrieve Lidarr Tags",
                 "parameters": [
@@ -1300,7 +1300,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Create Lidarr Tag",
                 "parameters": [
@@ -1377,7 +1377,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Update Lidarr Tag Label",
                 "parameters": [
@@ -1464,7 +1464,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Update Lidarr Album",
                 "parameters": [
@@ -1564,7 +1564,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "lidarr"
+                    "Lidarr"
                 ],
                 "summary": "Update Lidarr Artist",
                 "parameters": [
@@ -1656,7 +1656,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "plex"
+                    "Plex"
                 ],
                 "summary": "Retrieve the Plex Library Directory.",
                 "responses": {
@@ -1707,14 +1707,14 @@ const docTemplateapi = `{
         },
         "/api/plex/1/emptytrash/{libraryKey}": {
             "get": {
-                "description": "Returns the Plex Library Directory.",
+                "description": "Empties the Plex library trash for the provided library key. Get the library key from the Directory.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
-                    "plex"
+                    "Plex"
                 ],
-                "summary": "Retrieve the Plex Library Directory.",
+                "summary": "Empty Plex Trash",
                 "parameters": [
                     {
                         "type": "string",
@@ -1772,12 +1772,12 @@ const docTemplateapi = `{
         },
         "/api/plex/1/kill": {
             "get": {
-                "description": "Kill a Plex session.",
+                "description": "Kills a Plex session by ID and sends a message to the user.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
-                    "plex"
+                    "Plex"
                 ],
                 "summary": "Kill a Plex session.",
                 "parameters": [
@@ -1844,14 +1844,14 @@ const docTemplateapi = `{
         },
         "/api/plex/1/markwatched/{itemKey}": {
             "get": {
-                "description": "Mark a movie or show as watched.",
+                "description": "Marks a movie or show or audio trash as watched.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
-                    "plex"
+                    "Plex"
                 ],
-                "summary": "Marks a Plex item as watched.",
+                "summary": "Mark a Plex item as watched.",
                 "parameters": [
                     {
                         "type": "string",
@@ -1881,7 +1881,7 @@ const docTemplateapi = `{
                         }
                     },
                     "404": {
-                        "description": "bad token or api key",
+                        "description": "bad token or api key\" example(NOT FOUND! Check your request parameters and try again.)",
                         "schema": {
                             "type": "string"
                         }
@@ -1914,7 +1914,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "plex"
+                    "Plex"
                 ],
                 "summary": "Retrieve Plex sessions.",
                 "responses": {
@@ -1978,7 +1978,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Add Radarr Movie",
                 "parameters": [
@@ -2124,12 +2124,12 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Checks if a Radarr mvoie alrady exists.",
+                "description": "Checks if a Radarr movie already exists.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Check Radarr Movie Existence",
                 "parameters": [
@@ -2224,7 +2224,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Search for Radarr Movie",
                 "parameters": [
@@ -2296,14 +2296,14 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Returns all Custom Format from Radarr.",
+                "description": "Returns all Custom Formats Data from Radarr.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
-                "summary": "Get Radarr Custom Formats",
+                "summary": "Get Radarr Custom Formats Data",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2315,7 +2315,7 @@ const docTemplateapi = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "custom format",
+                        "description": "custom formats",
                         "schema": {
                             "allOf": [
                                 {
@@ -2375,7 +2375,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Create Radarr Custom Format",
                 "parameters": [
@@ -2472,7 +2472,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Delete all Radarr Custom Formats",
                 "parameters": [
@@ -2537,7 +2537,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new Custom Format in Radarr.",
+                "description": "Updates a Custom Format in Radarr.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2545,9 +2545,9 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
-                "summary": "Create Radarr Custom Format",
+                "summary": "Update Radarr Custom Format",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2647,7 +2647,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Delete Radarr Custom Format",
                 "parameters": [
@@ -2724,7 +2724,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Get Radarr Exclusions",
                 "parameters": [
@@ -2798,7 +2798,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Create Radarr Exclusion",
                 "parameters": [
@@ -2898,7 +2898,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Remove Radarr Exclusion(s)",
                 "parameters": [
@@ -2978,7 +2978,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Get all Radarr Movies",
                 "parameters": [
@@ -3051,7 +3051,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Get Radarr Movie",
                 "parameters": [
@@ -3128,7 +3128,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Get Radarr Import Lists",
                 "parameters": [
@@ -3202,7 +3202,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Create Radarr Import List",
                 "parameters": [
@@ -3302,7 +3302,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Update Radarr Import List",
                 "parameters": [
@@ -3406,7 +3406,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Get Radarr Quality Profile Data",
                 "parameters": [
@@ -3480,7 +3480,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Add Radarr Quality Profile",
                 "parameters": [
@@ -3580,7 +3580,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Update Radarr Quality Profile",
                 "parameters": [
@@ -3700,7 +3700,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Remove Radarr Quality Profile",
                 "parameters": [
@@ -3795,7 +3795,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Get Radarr Quality Profiles",
                 "parameters": [
@@ -3819,9 +3819,9 @@ const docTemplateapi = `{
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/radarr.Movie"
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
                                             }
                                         }
                                     }
@@ -3868,7 +3868,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Remove Radarr Quality Profiles",
                 "parameters": [
@@ -3938,7 +3938,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Get Radarr Quality Definitions",
                 "parameters": [
@@ -3997,9 +3997,7 @@ const docTemplateapi = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/radarr/{instance}/qualitydefinition/{definitionID}": {
+            },
             "put": {
                 "security": [
                     {
@@ -4014,7 +4012,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Update Radarr Quality Definitions",
                 "parameters": [
@@ -4022,13 +4020,6 @@ const docTemplateapi = `{
                         "type": "integer",
                         "description": "instance ID",
                         "name": "instance",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Import List ID",
-                        "name": "definitionID",
                         "in": "path",
                         "required": true
                     },
@@ -4124,7 +4115,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Retrieve Radarr Root Folders",
                 "parameters": [
@@ -4192,12 +4183,12 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Searches all Radarr Movie Titles for the search term provided.",
+                "description": "Searches all Radarr Movie Titles for the search term provided. Returns a minimal amount of data for each found item.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Search for Radarr Movies",
                 "parameters": [
@@ -4277,7 +4268,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Retrieve Radarr Tags",
                 "parameters": [
@@ -4345,12 +4336,12 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new tag with the provided label.",
+                "description": "Creates a new Radarr tag with the provided label.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Create Radarr Tag",
                 "parameters": [
@@ -4422,12 +4413,12 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates the label for a an existing tag.",
+                "description": "Updates the label for a an existing Radarr tag.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Update Radarr Tag Label",
                 "parameters": [
@@ -4514,7 +4505,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "radarr"
+                    "Radarr"
                 ],
                 "summary": "Update Radarr Movie",
                 "parameters": [
@@ -4614,7 +4605,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Add Readarr Book",
                 "parameters": [
@@ -4765,7 +4756,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Get Readarr Author",
                 "parameters": [
@@ -4842,7 +4833,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Check Readarr Book",
                 "parameters": [
@@ -4937,7 +4928,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Get Readarr Book",
                 "parameters": [
@@ -5014,7 +5005,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Get Readarr Metadata Profiles",
                 "parameters": [
@@ -5087,7 +5078,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Get Readarr Quality Profile Data",
                 "parameters": [
@@ -5161,7 +5152,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Add Readarr Quality Profile",
                 "parameters": [
@@ -5261,7 +5252,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Update Readarr Quality Profile",
                 "parameters": [
@@ -5371,7 +5362,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Get Readarr Quality Profiles",
                 "parameters": [
@@ -5444,7 +5435,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Retrieve Readarr Root Folders",
                 "parameters": [
@@ -5517,7 +5508,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Search for Readarr Books",
                 "parameters": [
@@ -5597,7 +5588,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Retrieve Readarr Tags",
                 "parameters": [
@@ -5670,7 +5661,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Create Readarr Tag",
                 "parameters": [
@@ -5747,7 +5738,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Update Readarr Tag Label",
                 "parameters": [
@@ -5834,7 +5825,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Update Readarr Book",
                 "parameters": [
@@ -5934,7 +5925,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "readarr"
+                    "Readarr"
                 ],
                 "summary": "Update Readarr Author",
                 "parameters": [
@@ -6034,7 +6025,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "sonarr"
+                    "Sonarr"
                 ],
                 "summary": "Add Sonarr Series",
                 "parameters": [
@@ -6173,6 +6164,2740 @@ const docTemplateapi = `{
                 }
             }
         },
+        "/api/sonarr/{instance}/check/{tvdbid}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Checks if a Sonarr Series alrady exists.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Check Sonarr Series Existence",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "TVDB ID",
+                        "name": "tvdbid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "series does not exist",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "409": {
+                        "description": "item alrady exists",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/command": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Execute any command in Sonarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Execute Sonarr Command",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "command content, must include series ID",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.CommandRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "command response",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/sonarr.CommandResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/command/search/{seriesID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Trigger an Internet search for a Sonarr Series.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Search for Sonarr Series",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Series ID",
+                        "name": "seriesID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "search status",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/command/{commandID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Check the status of an executed Sonarr Command.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Sonar Command Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Command ID returned by executing a command",
+                        "name": "commandID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "command status",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/sonarr.CommandResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/customformats": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Custom Format from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Custom Formats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "custom formats",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.CustomFormat"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Custom Format in Sonarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Create Sonarr Custom Format",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Custom Format content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.CustomFormat"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "custom format",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/sonarr.CustomFormat"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/customformats/all": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete all Custom Formats from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Delete all Sonarr Custom Formats",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "item delete counters",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/apps.deleteResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/customformats/{formatID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a Custom Format in Sonarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Custom Format",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Custom Format ID",
+                        "name": "formatID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Custom Format content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.CustomFormat"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "custom format",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/sonarr.CustomFormat"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a Custom Format from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Delete Sonarr Custom Format",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Custom Format ID",
+                        "name": "formatID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/get/{seriesID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns a Sonarr Series by ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Series",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Series ID",
+                        "name": "seriesID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "series content",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/sonarr.Series"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/getEpisodes/{seriesID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns a Sonarr Series Episodes by Series ID.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Series Episodes",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Series ID",
+                        "name": "seriesID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "episodes content",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.Episode"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/languageProfiles": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetches all Language Profiles from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Language Profiles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "map of ID to name",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/qualityProfile": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetches all Quality Profiles Data from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Quality Profile Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "all profiles",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.QualityProfile"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Sonarr Quality Profile.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Add Sonarr Quality Profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "new item content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.QualityProfile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "new profile ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/qualityProfile/{profileID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a Sonarr Quality Profile.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Quality Profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "profile ID to update",
+                        "name": "profileID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "updated item content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.QualityProfile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "no profile ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Removes a Sonarr Quality Profile.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Remove Sonarr Quality Profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "profile ID to update",
+                        "name": "profileID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "no profile ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/qualityProfiles": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetches all Quality Profiles from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Quality Profiles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "map of ID to name",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/qualityProfiles/all": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Removes all Sonarr Quality Profiles.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Remove Sonarr Quality Profiles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "delete status",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/apps.deleteResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error getting profiles",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/qualitydefinition": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Quality Definitions from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Quality Definitions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "quality definitions list",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.QualityDefinition"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates all Quality Definitions in Sonarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Quality Definitions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Import Listcontent",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/sonarr.QualityDefinition"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "quality definitions return",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.QualityDefinition"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/releaseProfile": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetches all Release Profile Data from Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Get Sonarr Release Profile Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "all profiles",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.ReleaseProfile"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Sonarr Release Profile.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Add Sonarr Release Profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "new item content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.ReleaseProfile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "new profile ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/releaseProfile/all": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Removes all Sonarr Release Profiles.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Remove Sonarr Release Profiles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "delete status",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/apps.deleteResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error getting profiles",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/releaseProfile/{profileID}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a Sonarr Release Profile.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Release Profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "profile ID to update",
+                        "name": "profileID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "updated item content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.ReleaseProfile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "no profile ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Removes a Sonarr Release Profile.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Remove Sonarr Release Profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "profile ID to update",
+                        "name": "profileID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "no profile ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/rootFolder": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Sonarr Root Folders paths and free space.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Retrieve Sonarr Root Folders",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "map of path-\u003espace free",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/search/{query}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Searches all Sonarr Series Titles for the search term provided. Returns a minimal amount of data for each found item.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Search for Sonarr Series",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "title search string",
+                        "name": "query",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "minimal series data",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/apps.sonarrSearchSeries.seriesData"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/seasonPass": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Season Pass allows you to mass-edit items in Sonarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Publish Sonarr Season Pass",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Season pass content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.SeasonPass"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "invalid json provided",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/tag": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Sonarr Tags.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Retrieve Sonarr Tags",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "tags",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/starr.Tag"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/tag/{label}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Sonarr tag with the provided label.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Create Sonarr Tag",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "new tag's label",
+                        "name": "label",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "tag ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/tag/{tagID}/{label}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates the label for a an existing Sonarr tag.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Tag Label",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "tag ID to update",
+                        "name": "tagID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "new label",
+                        "name": "label",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "tag ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/unmonitor/{episodeID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Unmonnitors and returns a Sonarr Series Episode.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Unmonnitors Sonarr Series Episode",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Episode ID",
+                        "name": "episodeID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "episode content",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/sonarr.Episode"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/trash/radarr": {
             "post": {
                 "security": [
@@ -6188,8 +8913,8 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "trash",
-                    "radarr"
+                    "TRaSH",
+                    "Radarr"
                 ],
                 "summary": "Retrieve custom format data from multiple Radarr instances.",
                 "parameters": [
@@ -6267,8 +8992,8 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "trash",
-                    "sonarr"
+                    "TRaSH",
+                    "Sonarr"
                 ],
                 "summary": "Retrieve custom format data from multiple Sonarr instances.",
                 "parameters": [
@@ -6343,7 +9068,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Start app-specific backup check",
                 "parameters": [
@@ -6413,8 +9138,8 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers",
-                    "trash"
+                    "Triggers",
+                    "TRaSH"
                 ],
                 "summary": "Sync TRaSH Radarr data",
                 "parameters": [
@@ -6465,7 +9190,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Toggle client error log sharing",
                 "parameters": [
@@ -6517,7 +9242,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Execute Command",
                 "parameters": [
@@ -6588,7 +9313,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Execute Command w/ args",
                 "parameters": [
@@ -6670,7 +9395,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Start app-specific corruption check",
                 "parameters": [
@@ -6740,7 +9465,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Send a dashboard notification",
                 "responses": {
@@ -6783,7 +9508,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Send Collections Gaps Notification",
                 "responses": {
@@ -6826,7 +9551,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Send Client User Notification",
                 "parameters": [
@@ -6896,7 +9621,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Reload Client",
                 "responses": {
@@ -6939,8 +9664,8 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers",
-                    "trash"
+                    "Triggers",
+                    "TRaSH"
                 ],
                 "summary": "Sync TRaSH Sonarr data",
                 "parameters": [
@@ -6991,7 +9716,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Run all service checks",
                 "responses": {
@@ -7034,7 +9759,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Collect Plex Sessions",
                 "responses": {
@@ -7095,7 +9820,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Send a system snapshot notification",
                 "responses": {
@@ -7138,7 +9863,7 @@ const docTemplateapi = `{
                     "text/plain"
                 ],
                 "tags": [
-                    "triggers"
+                    "Triggers"
                 ],
                 "summary": "Send a stuck items notification",
                 "responses": {
@@ -7176,14 +9901,14 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve client info.",
+                "description": "Returns information about the client's configuration, and polls multiple applications for up-status and version.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "client"
+                    "Client"
                 ],
-                "summary": "Returns information about the client's configuration, and polls multiple applications for up-status and version.",
+                "summary": "Retrieve client info + starr/plex info.",
                 "responses": {
                     "200": {
                         "description": "contains app info included appStatus",
@@ -7219,18 +9944,27 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve client info.",
+                "description": "Returns information about the client's configuration, and polls 1 application instance for up-status and version.\nPlex and Tautulli only support app instance 1.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "client"
+                    "Client"
                 ],
-                "summary": "Returns information about the client's configuration, and polls 1 application instance for up-status and version.",
+                "summary": "Retrieve client info + 1 app's info.",
                 "parameters": [
                     {
+                        "enum": [
+                            "lidarr",
+                            "prowlarr",
+                            "radarr",
+                            "readarr",
+                            "sonarr",
+                            "plex",
+                            "tautulli"
+                        ],
                         "type": "string",
-                        "description": "Application, ie. lidarr",
+                        "description": "Application",
                         "name": "app",
                         "in": "path",
                         "required": true
@@ -7281,9 +10015,9 @@ const docTemplateapi = `{
                     "text/html"
                 ],
                 "tags": [
-                    "plex"
+                    "Plex"
                 ],
-                "summary": "Accepts a Plex Media Server Webhook",
+                "summary": "Accept Plex Media Server Webhook",
                 "parameters": [
                     {
                         "type": "string",
@@ -7335,8 +10069,11 @@ const docTemplateapi = `{
         "apps.Respond.apiResponse": {
             "type": "object",
             "properties": {
-                "message": {},
+                "message": {
+                    "description": "This message contains the request-specific response payload."
+                },
                 "status": {
+                    "description": "The status always matches the HTTP response.",
                     "type": "string"
                 }
             }
@@ -7500,6 +10237,62 @@ const docTemplateapi = `{
                 "title": {
                     "description": "Book Title",
                     "type": "string"
+                }
+            }
+        },
+        "apps.sonarrSearchSeries.seriesData": {
+            "type": "object",
+            "properties": {
+                "added": {
+                    "type": "string"
+                },
+                "exists": {
+                    "type": "boolean"
+                },
+                "first": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "languageProfileId": {
+                    "type": "integer"
+                },
+                "monitored": {
+                    "type": "boolean"
+                },
+                "next": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "prev": {
+                    "type": "string"
+                },
+                "qualityId": {
+                    "type": "integer"
+                },
+                "seasonFolder": {
+                    "type": "boolean"
+                },
+                "seasons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sonarr.Season"
+                    }
+                },
+                "seriesType": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tvdbId": {
+                    "type": "integer"
                 }
             }
         },
@@ -10777,6 +13570,84 @@ const docTemplateapi = `{
                 }
             }
         },
+        "sonarr.CommandRequest": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "description": "RenameFiles only",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "seriesId": {
+                    "type": "integer"
+                },
+                "seriesIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "sonarr.CommandResponse": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "commandName": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "ended": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastExecutionTime": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "string"
+                },
+                "queued": {
+                    "type": "string"
+                },
+                "sendUpdatesToClient": {
+                    "type": "boolean"
+                },
+                "started": {
+                    "type": "string"
+                },
+                "stateChangeTime": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "trigger": {
+                    "type": "string"
+                },
+                "updateScheduledTask": {
+                    "type": "boolean"
+                }
+            }
+        },
         "sonarr.CustomFormat": {
             "type": "object",
             "properties": {
@@ -10846,6 +13717,70 @@ const docTemplateapi = `{
                 },
                 "required": {
                     "type": "boolean"
+                }
+            }
+        },
+        "sonarr.Episode": {
+            "type": "object",
+            "properties": {
+                "absoluteEpisodeNumber": {
+                    "type": "integer"
+                },
+                "airDate": {
+                    "type": "string"
+                },
+                "airDateUtc": {
+                    "type": "string"
+                },
+                "episodeFileId": {
+                    "type": "integer"
+                },
+                "episodeNumber": {
+                    "type": "integer"
+                },
+                "hasFile": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "monitored": {
+                    "type": "boolean"
+                },
+                "overview": {
+                    "type": "string"
+                },
+                "seasonNumber": {
+                    "type": "integer"
+                },
+                "seriesId": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "unverifiedSceneNumbering": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "sonarr.MonitoredSeries": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "monitored": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "sonarr.MonitoringOptions": {
+            "type": "object",
+            "properties": {
+                "monitor": {
+                    "description": "Valid values for Monitor are: all, future, missing, existing, firstSeason, latestSeason, and none.",
+                    "type": "string"
                 }
             }
         },
@@ -10976,6 +13911,20 @@ const docTemplateapi = `{
                 },
                 "statistics": {
                     "$ref": "#/definitions/sonarr.Statistics"
+                }
+            }
+        },
+        "sonarr.SeasonPass": {
+            "type": "object",
+            "properties": {
+                "monitoringOptions": {
+                    "$ref": "#/definitions/sonarr.MonitoringOptions"
+                },
+                "series": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sonarr.MonitoredSeries"
+                    }
                 }
             }
         },

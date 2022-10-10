@@ -16,9 +16,9 @@ import (
  * So we made this file to aggregate responses from each of the app types.
  */
 
-// @Description   Returns custom format and related data for multiple Radarr instances at once. May be slow.
+// @Description  Returns custom format and related data for multiple Radarr instances at once. May be slow.
 // @Summary      Retrieve custom format data from multiple Radarr instances.
-// @Tags         trash,radarr
+// @Tags         TRaSH,Radarr
 // @Produce      json
 // @Accept       json
 // @Param        request body TrashAggInput true "list of instances"
@@ -34,7 +34,7 @@ func _() {}
 // Handler is passed into the webserver as an HTTP handler.
 // @Description  Returns custom format and related data for multiple Sonarr instances at once. May be slow.
 // @Summary      Retrieve custom format data from multiple Sonarr instances.
-// @Tags         trash,sonarr
+// @Tags         TRaSH,Sonarr
 // @Produce      json
 // @Accept       json
 // @Param        request body TrashAggInput true "list of instances"

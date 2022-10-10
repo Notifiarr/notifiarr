@@ -12,7 +12,7 @@ import (
 // the current Plex sessions. The handler satisfies apps.APIHandler, sorry.
 // @Description  Returns Plex sessions.
 // @Summary      Retrieve Plex sessions.
-// @Tags         plex
+// @Tags         Plex
 // @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=Sessions} "contains app info included appStatus"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
@@ -31,10 +31,10 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 
 // HandleKillSession provides a web handler to the notifiarr client allows
 // notifiarr.com (via Discord request) to end a Plex session.
-// @Description  Kill a Plex session.
+// @Description  Kills a Plex session by ID and sends a message to the user.
 // @Summary      Kill a Plex session.
-// @Tags         plex
-// @Produce      text/plain
+// @Tags         Plex
+// @Produce      json
 // @Param        sessionId  query   string  true  "Plex session ID"
 // @Param        reason     query   string  true  "Reason the session is being terminated. Sent to the user."
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
@@ -59,7 +59,7 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 
 // @Description  Returns the Plex Library Directory.
 // @Summary      Retrieve the Plex Library Directory.
-// @Tags         plex
+// @Tags         Plex
 // @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=SectionDirectory} "Plex Library Directory"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
@@ -76,10 +76,10 @@ func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 	return http.StatusOK, directory
 }
 
-// @Description  Returns the Plex Library Directory.
-// @Summary      Retrieve the Plex Library Directory.
-// @Tags         plex
-// @Produce      text/plain
+// @Description  Empties the Plex library trash for the provided library key. Get the library key from the Directory.
+// @Summary      Empty Plex Trash
+// @Tags         Plex
+// @Produce      json
 // @Param        libraryKey   path    string true  "Plex Library Section Key"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
@@ -96,10 +96,10 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	return http.StatusOK, "ok: " + string(body)
 }
 
-// @Description  Mark a movie or show as watched.
-// @Summary      Marks a Plex item as watched.
-// @Tags         plex
-// @Produce      text/plain
+// @Description  Marks a movie or show or audio track as watched.
+// @Summary      Mark a Plex item as watched.
+// @Tags         Plex
+// @Produce      json
 // @Param        itemKey  path    string true  "Plex Item Key"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"

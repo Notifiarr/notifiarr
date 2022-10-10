@@ -37,12 +37,12 @@ func (t *Timer) Active(d time.Duration) bool {
 }
 
 // PlexHandler handles an incoming webhook from Plex.
-// @Summary      Accepts a Plex Media Server Webhook
+// @Summary      Accept Plex Media Server Webhook
 // @Description  Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,
 // @Description  and may include snapshot data and/or fetched session data. Does not require X-API-Key header.
-// @Tags         plex
+// @Tags         Plex
 // @Accept       json
-// @Produce      text/html
+// @Produce      text/plain
 // @Param        token query   string               true "Plex Token or Client API Key"
 // @Param        POST  body    plex.IncomingWebhook true "webhook payload"
 // @Success      202  {string} string "accepted"

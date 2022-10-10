@@ -81,8 +81,8 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 // @Description  Toggle client error log sharing.
 // @Description  This allows enabling and disabling of client error logs being shared with the website.
 // @Summary      Toggle client error log sharing
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Param        enabled  path   bool  true  "Enable or disable client error log sharing."
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
@@ -101,7 +101,7 @@ func (a *Actions) clientLogs(content string) (int, string) {
 
 // @Description  Execute a pre-programmed command with arguments.
 // @Summary      Execute Command w/ args
-// @Tags         triggers
+// @Tags         Triggers
 // @Produce      json
 // @Param        hash  path   bool  true  "Unique hash for command being executed"
 // @Param        args formData []string true "provide args as multiple 'args' paramers in POST body" collectionFormat(multi) example(args=/tmp&args=/var)
@@ -117,7 +117,7 @@ func _() {}
 
 // @Description  Execute a pre-programmed command.
 // @Summary      Execute Command
-// @Tags         triggers
+// @Tags         Triggers
 // @Produce      json
 // @Param        hash  path   bool  true  "Unique hash for command being executed"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
@@ -138,8 +138,8 @@ func (a *Actions) command(input *common.ActionInput, content string) (int, strin
 
 // @Description  Sync TRaSH Radarr data.
 // @Summary      Sync TRaSH Radarr data
-// @Tags         triggers,trash
-// @Produce      text/plain
+// @Tags         Triggers,TRaSH
+// @Produce      json
 // @Param        instance  path   bool  false  "Triggers sync on this instance if provided, otherwise all instances"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
@@ -161,8 +161,8 @@ func (a *Actions) cfsync(input *common.ActionInput, content string) (int, string
 
 // @Description  Sync TRaSH Sonarr data.
 // @Summary      Sync TRaSH Sonarr data
-// @Tags         triggers,trash
-// @Produce      text/plain
+// @Tags         Triggers,TRaSH
+// @Produce      json
 // @Param        instance  path   bool  false  "Triggers sync on this instance if provided, otherwise all instances"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
@@ -184,8 +184,8 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 
 // @Description  Reschedule all service checks to run immediately.
 // @Summary      Run all service checks
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/services [get]
@@ -197,8 +197,8 @@ func (a *Actions) services(input *common.ActionInput) (int, string) {
 
 // @Description  Collect Plex sessions and send a notifciation.
 // @Summary      Collect Plex Sessions
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      501  {object} apps.Respond.apiResponse{message=string} "plex is disabled"
 // @Failure      404  {object} string "bad token or api key"
@@ -216,8 +216,8 @@ func (a *Actions) sessions(input *common.ActionInput) (int, string) {
 
 // @Description  Sends cached stuck items notification.
 // @Summary      Send a stuck items notification
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/stuckitems [get]
@@ -229,8 +229,8 @@ func (a *Actions) stuckitems(input *common.ActionInput) (int, string) {
 
 // @Description  Collects dashboard data and sends a notification.
 // @Summary      Send a dashboard notification
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/dashboard [get]
@@ -242,8 +242,8 @@ func (a *Actions) dashboard(input *common.ActionInput) (int, string) {
 
 // @Description  Collects system snapshot data and sends a notification.
 // @Summary      Send a system snapshot notification
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/snapshot [get]
@@ -255,8 +255,8 @@ func (a *Actions) snapshot(input *common.ActionInput) (int, string) {
 
 // @Description  Send Radarr Library Collection Gaps notification.
 // @Summary      Send Collections Gaps Notification
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/gaps [get]
@@ -268,8 +268,8 @@ func (a *Actions) gaps(input *common.ActionInput) (int, string) {
 
 // @Description  Start corruption check on all application backups of a specific type.
 // @Summary      Start app-specific corruption check
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Param        app  path   string  true  "app type to check" Enum(lidarr, prowlarr, radarr, readarr, sonarr)
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "missing app"
@@ -289,8 +289,8 @@ func (a *Actions) corrupt(input *common.ActionInput, content string) (int, strin
 
 // @Description  Start backup file check on all applications of a specific type.
 // @Summary      Start app-specific backup check
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Param        app  path   string  true  "app type to check" Enum(lidarr, prowlarr, radarr, readarr, sonarr)
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "missing app"
@@ -310,8 +310,8 @@ func (a *Actions) backup(input *common.ActionInput, content string) (int, string
 
 // @Description  Reload application configuration immediately.
 // @Summary      Reload Client
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/reload [get]
@@ -323,8 +323,8 @@ func (a *Actions) handleConfigReload() (int, string) {
 
 // @Description  Write log entry, and send GUI notification if client has GUI enabled (mac/windows only).
 // @Summary      Send Client User Notification
-// @Tags         triggers
-// @Produce      text/plain
+// @Tags         Triggers
+// @Produce      json
 // @Param        content  path   string  true  "Data for the notification."
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "no content"

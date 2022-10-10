@@ -89,7 +89,7 @@ func (a *Apps) setupLidarr() error {
 
 // @Description  Adds a new Album to Lidarr.
 // @Summary      Add Lidarr Album
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body lidarr.AddAlbumInput true "new item content"
@@ -131,7 +131,7 @@ func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches an Artist from Lidarr.
 // @Summary      Get Lidarr Artist
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        artistID  path   int64  true  "artist ID"
@@ -167,7 +167,7 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 
 // @Description  Checks if an album already exists in Lidarr.
 // @Summary      Check for Lidarr Album existence
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        mbid  path   int64  true  "movie brains ID"
@@ -192,7 +192,7 @@ func lidarrCheckAlbum(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches an Album from Lidarr.
 // @Summary      Get Lidarr Album
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        albumID  path   int64  true  "album ID"
@@ -214,7 +214,7 @@ func lidarrGetAlbum(req *http.Request) (int, interface{}) {
 
 // @Description  Returns the search status of an album ID.
 // @Summary      Search Lidarr Album ID
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        albumID  path   int64  true  "album ID"
@@ -239,7 +239,7 @@ func lidarrTriggerSearchAlbum(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches all Metadata Profiles from Lidarr.
 // @Summary      Get Lidarr Metadata Profiles
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
@@ -264,7 +264,7 @@ func lidarrMetadata(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches all Quality Definitions from Lidarr.
 // @Summary      Get Lidarr Quality Definitions
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
@@ -290,7 +290,7 @@ func lidarrQualityDefs(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches all Quality Profiles from Lidarr.
 // @Summary      Get Lidarr Quality Profiles
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
@@ -316,7 +316,7 @@ func lidarrQualityProfiles(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches all Quality Profiles Data from Lidarr.
 // @Summary      Get Lidarr Quality Profile Data
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.QualityProfile} "all profiles"
@@ -336,7 +336,7 @@ func lidarrGetQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new Lidarr Quality Profile.
 // @Summary      Add Lidarr Quality Profile
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -367,7 +367,7 @@ func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Updates a Lidarr Quality Profile.
 // @Summary      Update Lidarr Quality Profile
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -405,7 +405,7 @@ func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Returns all Lidarr Root Folders paths and free space.
 // @Summary      Retrieve Lidarr Root Folders
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[string]int64} "map of path->space free"
@@ -431,7 +431,7 @@ func lidarrRootFolders(req *http.Request) (int, interface{}) {
 
 // @Description  Searches all Album Titles for the search term provided.
 // @Summary      Search for Lidarr Albums
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        query     path   string  true  "title search string"
 // @Param        instance  path   int64   true  "instance ID"
@@ -508,7 +508,7 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 
 // @Description  Returns all Lidarr Tags
 // @Summary      Retrieve Lidarr Tags
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "tags"
@@ -527,7 +527,7 @@ func lidarrGetTags(req *http.Request) (int, interface{}) {
 
 // @Description  Updates the label for a an existing tag.
 // @Summary      Update Lidarr Tag Label
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tagID     path   int64  true  "tag ID to update"
@@ -550,7 +550,7 @@ func lidarrUpdateTag(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new tag with the provided label.
 // @Summary      Create Lidarr Tag
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        label     path   string true  "new tag's label"
@@ -570,7 +570,7 @@ func lidarrSetTag(req *http.Request) (int, interface{}) {
 
 // @Description  Updates an Album in Lidarr.
 // @Summary      Update Lidarr Album
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
@@ -599,7 +599,7 @@ func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 
 // @Description  Updates an Artist in Lidarr.
 // @Summary      Update Lidarr Artist
-// @Tags         lidarr
+// @Tags         Lidarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"

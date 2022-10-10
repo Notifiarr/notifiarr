@@ -141,9 +141,12 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 		msg = m.Error()
 	}
 
+	//
 	type apiResponse struct {
-		Status string      `json:"status"`
-		Msg    interface{} `json:"message"`
+		// The status always matches the HTTP response.
+		Status string `json:"status"`
+		// This message contains the request-specific response payload.
+		Msg interface{} `json:"message"`
 	}
 
 	mnd.APIHits.Add(statusTxt, 1)

@@ -96,7 +96,7 @@ func (a *Apps) setupRadarr() error {
 
 // @Description  Adds a new Movie to Radarr.
 // @Summary      Add Radarr Movie
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body radarr.AddMovieInput true "new item content"
@@ -155,9 +155,9 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 	}
 }
 
-// @Description  Checks if a Radarr mvoie alrady exists.
+// @Description  Checks if a Radarr movie already exists.
 // @Summary      Check Radarr Movie Existence
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tmdbid    path   int64  true  "TMDB ID"
@@ -182,7 +182,7 @@ func radarrCheckMovie(req *http.Request) (int, interface{}) {
 
 // @Description  Returns a Radarr Movie by ID.
 // @Summary      Get Radarr Movie
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        movieID   path   int64  true  "Movie ID"
@@ -204,7 +204,7 @@ func radarrGetMovie(req *http.Request) (int, interface{}) {
 
 // @Description  Trigger an Internet search for a Radarr Movie.
 // @Summary      Search for Radarr Movie
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        movieID   path   int64  true  "Movie ID"
@@ -229,7 +229,7 @@ func radarrTriggerSearchMovie(req *http.Request) (int, interface{}) {
 
 // @Description  Returns all Radarr Movies.
 // @Summary      Get all Radarr Movies
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      201  {object} apps.Respond.apiResponse{message=[]radarr.Movie} "movies content"
@@ -248,7 +248,7 @@ func radarrGetAllMovies(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches all Quality Profiles Data from Radarr.
 // @Summary      Get Radarr Quality Profile Data
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      201  {object} apps.Respond.apiResponse{message=[]radarr.QualityProfile} "all profiles"
@@ -268,10 +268,10 @@ func radarrQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Fetches all Quality Profiles from Radarr.
 // @Summary      Get Radarr Quality Profiles
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=[]radarr.Movie} "map of ID to name"
+// @Success      201  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/qualityProfiles [get]
@@ -294,7 +294,7 @@ func radarrQualityProfiles(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new Radarr Quality Profile.
 // @Summary      Add Radarr Quality Profile
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -325,7 +325,7 @@ func radarrAddQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Updates a Radarr Quality Profile.
 // @Summary      Update Radarr Quality Profile
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -363,7 +363,7 @@ func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 
 // @Description  Removes a Radarr Quality Profile.
 // @Summary      Remove Radarr Quality Profile
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
@@ -399,7 +399,7 @@ type deleteResponse struct {
 
 // @Description  Removes all Radarr Quality Profiles.
 // @Summary      Remove Radarr Quality Profiles
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=apps.deleteResponse} "delete status"
@@ -438,7 +438,7 @@ func radarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 
 // @Description  Returns all Radarr Root Folders paths and free space.
 // @Summary      Retrieve Radarr Root Folders
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=map[string]int64} "map of path->space free"
@@ -462,9 +462,9 @@ func radarrRootFolders(req *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
-// @Description  Searches all Radarr Movie Titles for the search term provided.
+// @Description  Searches all Radarr Movie Titles for the search term provided. Returns a minimal amount of data for each found item.
 // @Summary      Search for Radarr Movies
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        query     path   string  true  "title search string"
 // @Param        instance  path   int64   true  "instance ID"
@@ -545,7 +545,7 @@ func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle)
 
 // @Description  Returns all Radarr Tags.
 // @Summary      Retrieve Radarr Tags
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "tags"
@@ -562,9 +562,9 @@ func radarrGetTags(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tags
 }
 
-// @Description  Updates the label for a an existing tag.
+// @Description  Updates the label for a an existing Radarr tag.
 // @Summary      Update Radarr Tag Label
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tagID     path   int64  true  "tag ID to update"
@@ -585,9 +585,9 @@ func radarrUpdateTag(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tag.ID
 }
 
-// @Description  Creates a new tag with the provided label.
+// @Description  Creates a new Radarr tag with the provided label.
 // @Summary      Create Radarr Tag
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        label     path   string true  "new tag's label"
@@ -607,7 +607,7 @@ func radarrSetTag(req *http.Request) (int, interface{}) {
 
 // @Description  Updates a Movie in Radarr.
 // @Summary      Update Radarr Movie
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
@@ -637,7 +637,7 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new exclusion in Radarr.
 // @Summary      Create Radarr Exclusion
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -667,7 +667,7 @@ func radarrAddExclusions(req *http.Request) (int, interface{}) {
 
 // @Description  Retrieve all Radarr Exclusions.
 // @Summary      Get Radarr Exclusions
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.Exclusion}  "exclusion list"
@@ -686,7 +686,7 @@ func radarrGetExclusions(req *http.Request) (int, interface{}) {
 
 // @Description  Delete Exclusion(s) from Radarr.
 // @Summary      Remove Radarr Exclusion(s)
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        exclusionIDs  path   []int64  true  "exclusion IDs to delete, comma separated"
@@ -715,7 +715,7 @@ func radarrDelExclusions(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new Custom Format in Radarr.
 // @Summary      Create Radarr Custom Format
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -742,12 +742,12 @@ func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
 	return http.StatusOK, resp
 }
 
-// @Description  Returns all Custom Format from Radarr.
-// @Summary      Get Radarr Custom Formats
-// @Tags         radarr
+// @Description  Returns all Custom Formats Data from Radarr.
+// @Summary      Get Radarr Custom Formats Data
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.CustomFormat}  "custom format"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.CustomFormat}  "custom formats"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/customformats [get]
@@ -761,9 +761,9 @@ func radarrGetCustomFormats(req *http.Request) (int, interface{}) {
 	return http.StatusOK, cusform
 }
 
-// @Description  Creates a new Custom Format in Radarr.
-// @Summary      Create Radarr Custom Format
-// @Tags         radarr
+// @Description  Updates a Custom Format in Radarr.
+// @Summary      Update Radarr Custom Format
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -793,7 +793,7 @@ func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 
 // @Description  Delete a Custom Format from Radarr.
 // @Summary      Delete Radarr Custom Format
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        formatID  path   int64  true  "Custom Format ID"
@@ -815,7 +815,7 @@ func radarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 
 // @Description  Delete all Custom Formats from Radarr.
 // @Summary      Delete all Radarr Custom Formats
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=apps.deleteResponse}  "item delete counters"
@@ -853,7 +853,7 @@ func radarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 
 // @Description  Returns all Import Lists from Radarr.
 // @Summary      Get Radarr Import Lists
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.ImportList}  "import list list"
@@ -872,7 +872,7 @@ func radarrGetImportLists(req *http.Request) (int, interface{}) {
 
 // @Description  Updates an Import List in Radarr.
 // @Summary      Update Radarr Import List
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -902,7 +902,7 @@ func radarrUpdateImportList(req *http.Request) (int, interface{}) {
 
 // @Description  Creates a new Import List in Radarr.
 // @Summary      Create Radarr Import List
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
@@ -929,7 +929,7 @@ func radarrAddImportList(req *http.Request) (int, interface{}) {
 
 // @Description  Returns all Quality Definitions from Radarr.
 // @Summary      Get Radarr Quality Definitions
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.QualityDefinition}  "quality definitions list"
@@ -948,17 +948,16 @@ func radarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 
 // @Description  Updates all Quality Definitions in Radarr.
 // @Summary      Update Radarr Quality Definitions
-// @Tags         radarr
+// @Tags         Radarr
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        definitionID  path   int64  true  "Import List ID"
 // @Param        PUT body []radarr.QualityDefinition  true  "Updated Import Listcontent"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.QualityDefinition}  "quality definitions return"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/radarr/{instance}/qualitydefinition/{definitionID} [put]
+// @Router       /api/radarr/{instance}/qualitydefinition [put]
 // @Security     ApiKeyAuth
 //
 //nolint:lll
