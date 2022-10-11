@@ -16,6 +16,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/crontimer"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/emptytrash"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
@@ -52,6 +53,7 @@ type Actions struct {
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
 	Commands   *commands.Action
+	EmptyTrash *emptytrash.Action
 }
 
 // New turns a populated Config into a pile of Actions.
@@ -76,6 +78,7 @@ func New(config *Config) *Actions {
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
 		Commands:   commands.New(common, config.Commands),
+		EmptyTrash: emptytrash.New(common),
 		Timers:     common,
 	}
 }

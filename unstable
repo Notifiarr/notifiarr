@@ -2,5 +2,5 @@
 make clean windows signdmg
 scp release/Notifiarr.dmg notifiarr.amd64.exe notifiarr.com:/home/swag/config/www/unstable
 pushd init/docker
-./build
+SOURCE_BRANCH=unstable ./build
 popd

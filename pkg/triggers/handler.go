@@ -73,6 +73,8 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 		return a.handleConfigReload()
 	case "notification":
 		return a.notification(content)
+	case "emptyplextrash":
+		return a.emptyplextrash(input, content)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
@@ -340,4 +342,23 @@ func (a *Actions) notification(content string) (int, string) {
 	}
 
 	return http.StatusBadRequest, "Missing notification content."
+}
+
+// @Description  Empties a single Plex library's trash can.
+// @Summary      Empty Plex Trash
+// @Tags         Triggers
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "started"
+// @Failure      501  {object} apps.Respond.apiResponse{message=string} "plex not enabled"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trigger/emptyplextrash/{libraryKey} [get]
+// @Security     ApiKeyAuth
+func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int, string) {
+	if !a.Timers.Apps.Plex.Enabled() {
+		return http.StatusNotImplemented, "Plex is not enabled."
+	}
+
+	a.EmptyTrash.Plex(input.Type, content)
+
+	return http.StatusOK, "Emptying Plex Trash for library " + content
 }
