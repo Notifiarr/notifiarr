@@ -10,6 +10,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 )
 
@@ -38,7 +39,7 @@ type cmd struct {
 
 // Timer is used to trigger actions.
 type Timer struct {
-	*website.CronConfig
+	*clientinfo.CronConfig
 	website *website.Server
 	ch      chan *common.ActionInput
 }
@@ -79,7 +80,7 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
 	if ci == nil || ci.Actions.Poll {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s",
@@ -131,7 +132,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 	body, err := c.GetData(&website.Request{
 		Route:      website.ClientRoute,
 		Event:      website.EventPoll,
-		Payload:    c.Server.Info(ctx),
+		Payload:    c.CIC.Info(ctx),
 		LogPayload: true,
 	})
 	if err != nil {
@@ -154,7 +155,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 		c.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!"+
 			" Last Sync: %v, Last Change: %v, Diff: %v", input.Type, v.LastSync, v.LastChange, v.LastSync.Sub(v.LastChange))
 		defer c.ReloadApp("poll triggered reload")
-	} else if ci := website.GetClientInfo(); ci == nil {
+	} else if ci := clientinfo.Get(); ci == nil {
 		c.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", input.Type)
 		defer c.ReloadApp("client info reload")
 	}

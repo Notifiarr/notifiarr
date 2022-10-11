@@ -10,6 +10,14 @@ import (
 
 // HandleSessions provides a web handler to the notifiarr client that returns
 // the current Plex sessions. The handler satisfies apps.APIHandler, sorry.
+// @Description  Returns Plex sessions.
+// @Summary      Retrieve Plex sessions.
+// @Tags         Plex
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=Sessions} "contains app info included appStatus"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/1/sessions [get]
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -23,7 +31,16 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 
 // HandleKillSession provides a web handler to the notifiarr client allows
 // notifiarr.com (via Discord request) to end a Plex session.
-// The handler satisfies apps.APIHandler, sorry.
+// @Description  Kills a Plex session by ID and sends a message to the user.
+// @Summary      Kill a Plex session.
+// @Tags         Plex
+// @Produce      json
+// @Param        sessionId  query   string  true  "Plex session ID"
+// @Param        reason     query   string  true  "Reason the session is being terminated. Sent to the user."
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/1/kill [get]
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
 		ctx       = r.Context()
@@ -40,6 +57,14 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	return http.StatusOK, fmt.Sprintf("kilt session '%s' with reason: %s", sessionID, reason)
 }
 
+// @Description  Returns the Plex Library Directory.
+// @Summary      Retrieve the Plex Library Directory.
+// @Tags         Plex
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=SectionDirectory} "Plex Library Directory"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/1/directory [get]
 func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -51,6 +76,15 @@ func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 	return http.StatusOK, directory
 }
 
+// @Description  Empties the Plex library trash for the provided library key. Get the library key from the Directory.
+// @Summary      Empty Plex Trash
+// @Tags         Plex
+// @Produce      json
+// @Param        libraryKey   path    string true  "Plex Library Section Key"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/1/emptytrash/{libraryKey} [get]
 func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -62,6 +96,15 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	return http.StatusOK, "ok: " + string(body)
 }
 
+// @Description  Marks a movie or show or audio track as watched.
+// @Summary      Mark a Plex item as watched.
+// @Tags         Plex
+// @Produce      json
+// @Param        itemKey  path    string true  "Plex Item Key"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "Plex error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/plex/1/markwatched/{itemKey} [get]
 func (s *Server) HandleMarkWatched(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 

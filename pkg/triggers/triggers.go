@@ -22,6 +22,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/snapcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/starrqueue"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 // Config is the required input data. Everything is mandatory.
@@ -31,6 +32,7 @@ type Config struct {
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
 	Commands   []*commands.Command
+	CIC        *clientinfo.Config
 	common.Services
 	mnd.Logger
 }
@@ -38,7 +40,7 @@ type Config struct {
 // Actions defines all our triggers and timers.
 // Any action here will automatically have its interface methods called.
 type Actions struct {
-	timers *common.Config
+	Timers *common.Config
 	// Order is important here.
 	PlexCron   *plexcron.Action
 	Backups    *backups.Action
@@ -59,6 +61,7 @@ func New(config *Config) *Actions {
 		Snapshot: config.Snapshot,
 		Apps:     config.Apps,
 		Logger:   config.Logger,
+		CIC:      config.CIC,
 	}
 	plex := plexcron.New(common, config.Apps.Plex)
 
@@ -73,7 +76,7 @@ func New(config *Config) *Actions {
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
 		Commands:   commands.New(common, config.Commands),
-		timers:     common,
+		Timers:     common,
 	}
 }
 
@@ -91,8 +94,8 @@ type run interface {
 
 // Start creates all the triggers and runs the timers.
 func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
-	a.timers.SetReloadCh(reloadCh)
-	defer a.timers.Run(ctx)
+	a.Timers.SetReloadCh(reloadCh)
+	defer a.Timers.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
 	for i := 0; i < actions.NumField(); i++ {
@@ -113,7 +116,7 @@ func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
 
 // Stop all internal cron timers and Triggers.
 func (a *Actions) Stop(event website.EventType) {
-	a.timers.Stop(event)
+	a.Timers.Stop(event)
 
 	actions := reflect.ValueOf(a).Elem()
 	// Stop them in reverse order they were started.

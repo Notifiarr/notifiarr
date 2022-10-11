@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Notifiarr Client API Docs</title>
+    <link rel="icon" type="image/png" href="{{files}}/images/favicon.png" />
+    <link rel="stylesheet" type="text/css" href="{{files}}/libraries/swagger/swagger-ui.css" />
+    <link rel="stylesheet" type="text/css" href="{{files}}/libraries/swagger/index.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <div id="custom-topbar">
+      <img style="height:50px;margin-right:10px;" src="{{files}}/images/favicon.png"> API
+      <small style="margin-left: 5px;"><a href ="{{.Config.URLBase}}">Go back</a></small>
+    </div>
+    <script src="{{files}}/libraries/swagger/swagger-ui-bundle.js" charset="UTF-8"> </script>
+    <script src="{{files}}/libraries/swagger/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
+    <script src="{{files}}/libraries/jquery/jquery.min.js" type="text/javascript"></script>
+    <script>
+        window.onload = function() {
+            // Build a system
+            const ui = SwaggerUIBundle({
+                url: "json/api",
+                /*urls: [{url: "json/api", name: "API"},{url: "json/gui", name: "GUI"}],*/
+                urls: [{url: "json/api", name: "API"}],
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+            window.ui = ui
+            $('.topbar-wrapper a').html($('#custom-topbar').html());
+        }
+    </script>
+  </body>
+</html>
+`

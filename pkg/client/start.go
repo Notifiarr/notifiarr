@@ -24,6 +24,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/securecookie"
 	"github.com/hako/durafmt"
 	flag "github.com/spf13/pflag"
@@ -33,19 +34,20 @@ import (
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	plexTimer Timer
-	Flags     *configfile.Flags
-	Config    *configfile.Config
-	server    *http.Server
-	sigkil    chan os.Signal
-	sighup    chan os.Signal
-	reload    chan customReload
-	website   *website.Server
-	triggers  *triggers.Actions
-	cookies   *securecookie.SecureCookie
-	templat   *template.Template
-	webauth   bool
-	reloading bool
+	plexTimer  Timer
+	Flags      *configfile.Flags
+	Config     *configfile.Config
+	server     *http.Server
+	sigkil     chan os.Signal
+	sighup     chan os.Signal
+	reload     chan customReload
+	website    *website.Server
+	clientinfo *clientinfo.Config
+	triggers   *triggers.Actions
+	cookies    *securecookie.SecureCookie
+	templat    *template.Template
+	webauth    bool
+	reloading  bool
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" and "reloading" as of its creation.
 	sync.RWMutex
@@ -198,12 +200,14 @@ func (c *Client) loadConfiguration(ctx context.Context) (msg string, newPassword
 		return msg, newPassword, fmt.Errorf("getting config: %w", err)
 	}
 
+	c.clientinfo = c.triggers.Timers.CIC
+
 	return msg, newPassword, nil
 }
 
 // Load configuration from the website.
-func (c *Client) loadSiteConfig(ctx context.Context) *website.ClientInfo {
-	clientInfo, err := c.website.SaveClientInfo(ctx)
+func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
+	clientInfo, err := c.clientinfo.SaveClientInfo(ctx)
 	if err != nil || clientInfo == nil {
 		if errors.Is(err, website.ErrInvalidAPIKey) {
 			c.ErrorfNoShare("==> Problem validating API key: %v", err)
@@ -234,7 +238,7 @@ func (c *Client) loadSiteConfig(ctx context.Context) *website.ClientInfo {
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices(ctx context.Context) *website.ClientInfo {
+func (c *Client) configureServices(ctx context.Context) *clientinfo.ClientInfo {
 	c.website.Start(ctx)
 
 	clientInfo := c.loadSiteConfig(ctx)
@@ -314,6 +318,8 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 	if c.website, c.triggers, err = c.Config.Get(c.Flags, c.Logger); err != nil {
 		return fmt.Errorf("getting configuration: %w", err)
 	}
+
+	c.clientinfo = c.triggers.Timers.CIC
 
 	if errs := c.Logger.Close(); len(errs) > 0 {
 		return fmt.Errorf("closing logger(s): %w", errs[0])

@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
 )
 
@@ -16,24 +16,50 @@ import (
  * So we made this file to aggregate responses from each of the app types.
  */
 
+// @Description  Returns custom format and related data for multiple Radarr instances at once. May be slow.
+// @Summary      Retrieve custom format data from multiple Radarr instances.
+// @Tags         TRaSH,Radarr
+// @Produce      json
+// @Accept       json
+// @Param        request body TrashAggInput true "list of instances"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]RadarrTrashPayload} "contains app info included appStatus"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad input payload or missing app"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trash/radarr [post]
+// @Security     ApiKeyAuth
+//
+//nolint:lll
+func _() {}
+
 // Handler is passed into the webserver as an HTTP handler.
+// @Description  Returns custom format and related data for multiple Sonarr instances at once. May be slow.
+// @Summary      Retrieve custom format data from multiple Sonarr instances.
+// @Tags         TRaSH,Sonarr
+// @Produce      json
+// @Accept       json
+// @Param        request body TrashAggInput true "list of instances"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]SonarrTrashPayload} "contains app info included appStatus"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad input payload or missing app"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trash/sonarr [post]
+// @Security     ApiKeyAuth
+//
+//nolint:lll
 func (a *Action) Handler(req *http.Request) (int, interface{}) {
 	return a.cmd.aggregateTrash(req)
+}
+
+// TrashAggInput is the data input for a Trash aggregate request.
+type TrashAggInput struct {
+	Instances clientinfo.IntList `json:"instances"`
 }
 
 func (c *cmd) aggregateTrash(req *http.Request) (int, interface{}) {
 	var wait sync.WaitGroup
 	defer wait.Wait()
 
-	var input struct {
-		Radarr struct { // used for "all"
-			Instances website.IntList `json:"instances"`
-		} `json:"radarr"`
-		Sonarr struct { // used for "all"
-			Instances website.IntList `json:"instances"`
-		} `json:"sonarr"`
-		Instances website.IntList `json:"instances"`
-	}
+	var input TrashAggInput
+
 	// Extract POST payload.
 	err := json.NewDecoder(req.Body).Decode(&input)
 
@@ -43,13 +69,10 @@ func (c *cmd) aggregateTrash(req *http.Request) (int, interface{}) {
 	case err != nil:
 		return http.StatusBadRequest, fmt.Errorf("decoding POST payload: (app: %s) %w", app, err)
 	case app == "sonarr":
+		//	return http.StatusOK, &TrashAggOutput{Sonarr: c.aggregateTrashSonarr(req.Context(), &wait, input.Instances)}
 		return http.StatusOK, c.aggregateTrashSonarr(req.Context(), &wait, input.Instances)
 	case app == "radarr":
+		// return http.StatusOK, &TrashAggOutput{Radarr: c.aggregateTrashRadarr(req.Context(), &wait, input.Instances)}
 		return http.StatusOK, c.aggregateTrashRadarr(req.Context(), &wait, input.Instances)
-	case app == "all":
-		return http.StatusOK, map[string]interface{}{
-			"radarr": c.aggregateTrashRadarr(req.Context(), &wait, input.Radarr.Instances),
-			"sonarr": c.aggregateTrashSonarr(req.Context(), &wait, input.Sonarr.Instances),
-		}
 	}
 }

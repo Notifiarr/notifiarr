@@ -9,6 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 // This cron tab runs every minute to send a report when a user gets to the end of a movie or tv show.
@@ -53,7 +54,7 @@ func (c *cmd) checkForFinishedItems(ctx context.Context, input *common.ActionInp
 
 // checkSessionDone checks a session's data to see if it is considered finished.
 func (c *cmd) checkSessionDone(ctx context.Context, session *plex.Session, pct float64) string {
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 
 	switch cfg := ci.Actions.Plex; {
 	case session.Duration == 0:

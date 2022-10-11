@@ -9,6 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr"
 )
 
@@ -45,7 +46,7 @@ func (c *cmd) makeBackupTriggersLidarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Lidarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			ci.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -68,7 +69,7 @@ func (c *cmd) makeBackupTriggersRadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Radarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			ci.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -91,7 +92,7 @@ func (c *cmd) makeBackupTriggersReadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Readarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			ci.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -114,7 +115,7 @@ func (c *cmd) makeBackupTriggersSonarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Sonarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			ci.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -137,7 +138,7 @@ func (c *cmd) makeBackupTriggersProwlarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Prowlarr {
-		if ci := website.GetClientInfo(); ci != nil &&
+		if ci := clientinfo.Get(); ci != nil &&
 			ci.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
@@ -157,7 +158,7 @@ func (c *cmd) makeBackupTriggersProwlarr() {
 
 func (c *cmd) sendLidarrBackups(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Lidarr {
-		if ci := website.GetClientInfo(); input.Type != website.EventCron ||
+		if ci := clientinfo.Get(); input.Type != website.EventCron ||
 			(ci != nil && ci.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(ctx, &genericInstance{
 				event: input.Type,
@@ -173,7 +174,7 @@ func (c *cmd) sendLidarrBackups(ctx context.Context, input *common.ActionInput) 
 
 func (c *cmd) sendProwlarrBackups(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Prowlarr {
-		if ci := website.GetClientInfo(); input.Type != website.EventCron ||
+		if ci := clientinfo.Get(); input.Type != website.EventCron ||
 			(ci != nil && ci.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(ctx, &genericInstance{
 				event: input.Type,
@@ -189,7 +190,7 @@ func (c *cmd) sendProwlarrBackups(ctx context.Context, input *common.ActionInput
 
 func (c *cmd) sendRadarrBackups(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Radarr {
-		if ci := website.GetClientInfo(); input.Type != website.EventCron ||
+		if ci := clientinfo.Get(); input.Type != website.EventCron ||
 			(ci != nil && ci.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(ctx, &genericInstance{
 				event: input.Type,
@@ -205,7 +206,7 @@ func (c *cmd) sendRadarrBackups(ctx context.Context, input *common.ActionInput) 
 
 func (c *cmd) sendReadarrBackups(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Readarr {
-		if ci := website.GetClientInfo(); input.Type != website.EventCron ||
+		if ci := clientinfo.Get(); input.Type != website.EventCron ||
 			(ci != nil && ci.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(ctx, &genericInstance{
 				event: input.Type,
@@ -221,7 +222,7 @@ func (c *cmd) sendReadarrBackups(ctx context.Context, input *common.ActionInput)
 
 func (c *cmd) sendSonarrBackups(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Sonarr {
-		if ci := website.GetClientInfo(); input.Type != website.EventCron ||
+		if ci := clientinfo.Get(); input.Type != website.EventCron ||
 			(ci != nil && ci.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled) {
 			c.sendBackups(ctx, &genericInstance{
 				event: input.Type,

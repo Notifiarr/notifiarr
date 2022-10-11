@@ -44,7 +44,7 @@ type Config struct {
 
 // Server is what you get for providing a Config to New().
 type Server struct {
-	config *Config
+	Config *Config
 	// Internal cruft.
 	sdMutex      sync.RWMutex // senddata/queuedata
 	client       *httpClient
@@ -63,7 +63,7 @@ func New(c *Config) *Server {
 	}
 
 	return &Server{
-		config: c,
+		Config: c,
 		// clientInfo:   &ClientInfo{},
 		client: &httpClient{
 			Retries: c.Retries,
@@ -126,7 +126,7 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{
 		var torn map[string]interface{}
 		if err := json.Unmarshal(data, &torn); err == nil {
 			if torn["host"], err = s.GetHostInfo(ctx); err != nil {
-				s.config.Errorf("Host Info Unknown: %v", err)
+				s.Config.Errorf("Host Info Unknown: %v", err)
 			}
 
 			payload = torn
@@ -145,15 +145,15 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{
 		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, s.config.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, s.Config.Timeout.Duration)
 	defer cancel()
 
-	code, body, err := s.sendJSON(ctx, s.config.BaseURL+uri, post, log)
+	code, body, err := s.sendJSON(ctx, s.Config.BaseURL+uri, post, log)
 	if err != nil {
 		return nil, err
 	}
 
-	return unmarshalResponse(s.config.BaseURL+uri, code, body)
+	return unmarshalResponse(s.Config.BaseURL+uri, code, body)
 }
 
 // SendData puts a send-data request to notifiarr.com into a channel queue.

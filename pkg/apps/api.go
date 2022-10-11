@@ -141,6 +141,14 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 		msg = m.Error()
 	}
 
+	//
+	type apiResponse struct {
+		// The status always matches the HTTP response.
+		Status string `json:"status"`
+		// This message contains the request-specific response payload.
+		Msg interface{} `json:"message"`
+	}
+
 	mnd.APIHits.Add(statusTxt, 1)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(stat)
@@ -148,7 +156,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 	json := json.NewEncoder(counter)
 	json.SetEscapeHTML(false)
 
-	err := json.Encode(map[string]interface{}{"status": statusTxt, "message": msg})
+	err := json.Encode(&apiResponse{Status: statusTxt, Msg: msg})
 	if err != nil {
 		a.Errorf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}

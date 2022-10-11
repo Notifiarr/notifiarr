@@ -11,6 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 // ErrInvalidApp is returned by triggers when a non-existent app is requested.
@@ -22,6 +23,7 @@ var ErrNoChannel = fmt.Errorf("no channel to send request")
 // Config is the input data shared by most triggers.
 // Everything is mandatory.
 type Config struct {
+	CIC             *clientinfo.Config
 	*website.Server // send trigger responses to website.
 	Snapshot        *snapshot.Config
 	Apps            *apps.Apps

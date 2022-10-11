@@ -6,7 +6,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
-	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 /* CF Sync means Custom Format Sync. This is a premium feature that allows syncing
@@ -42,7 +42,7 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	c.setupRadarr(ci)
 	c.setupSonarr(ci)
 
@@ -88,7 +88,7 @@ type radarrApp struct {
 	idx int
 }
 
-func (c *cmd) setupRadarr(ci *website.ClientInfo) {
+func (c *cmd) setupRadarr(ci *clientinfo.ClientInfo) {
 	if ci == nil {
 		return
 	}
@@ -122,7 +122,7 @@ type sonarrApp struct {
 	idx int
 }
 
-func (c *cmd) setupSonarr(ci *website.ClientInfo) {
+func (c *cmd) setupSonarr(ci *clientinfo.ClientInfo) {
 	if ci == nil {
 		return
 	}

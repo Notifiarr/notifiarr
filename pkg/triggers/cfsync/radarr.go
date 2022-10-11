@@ -9,6 +9,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr/radarr"
 )
 
@@ -45,7 +46,7 @@ func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) err
 
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *cmd) syncRadarr(ctx context.Context, input *common.ActionInput) {
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if ci == nil || len(ci.Actions.Sync.RadarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. Website provided 0 instances.", input.Type)
 		return
@@ -118,7 +119,7 @@ func (c *cmd) getRadarrProfiles(ctx context.Context, event website.EventType, in
 func (c *cmd) aggregateTrashRadarr(
 	ctx context.Context,
 	wait *sync.WaitGroup,
-	instances website.IntList,
+	instances clientinfo.IntList,
 ) []*RadarrTrashPayload {
 	output := []*RadarrTrashPayload{}
 	event := website.EventAPI

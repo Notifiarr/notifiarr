@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 const TrigSonarrQueue common.TriggerName = "Storing Sonarr instance %d queue."
@@ -49,7 +50,7 @@ func (c *cmd) setupSonarr() bool {
 	var enable bool
 
 	for idx, app := range c.Apps.Sonarr {
-		ci := website.GetClientInfo()
+		ci := clientinfo.Get()
 		if !app.Enabled() || ci == nil {
 			continue
 		}

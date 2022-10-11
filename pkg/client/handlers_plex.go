@@ -1,3 +1,4 @@
+//nolint:godot
 package client
 
 import (
@@ -12,6 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 // Timer is used to set a cooldown time.
@@ -35,6 +37,19 @@ func (t *Timer) Active(d time.Duration) bool {
 }
 
 // PlexHandler handles an incoming webhook from Plex.
+// @Summary      Accept Plex Media Server Webhook
+// @Description  Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,
+// @Description  and may include snapshot data and/or fetched session data. Does not require X-API-Key header.
+// @Tags         Plex
+// @Accept       json
+// @Produce      text/plain
+// @Param        token query   string               true "Plex Token or Client API Key"
+// @Param        POST  body    plex.IncomingWebhook true "webhook payload"
+// @Success      202  {string} string "accepted"
+// @Success      208  {string} string "ignored"
+// @Failure      400  {string} string "bad input"
+// @Failure      404  {string} string "bad token or api key"
+// @Router       /plex [post]
 func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:cyclop,varnamelen,funlen
 	mnd.Apps.Add("Plex&&Incoming Webhooks", 1)
 
@@ -89,7 +104,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(v.Event, "media.play"), strings.EqualFold(v.Event, "playback.started"):
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
-		c.triggers.PlexCron.SendWebhook(&v)
+		c.triggers.PlexCron.SendWebhook(&v) //nolint:contextcheck,nolintlint
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
@@ -102,7 +117,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 }
 
 func (c *Client) plexCooldown() time.Duration {
-	if ci := website.GetClientInfo(); ci != nil {
+	if ci := clientinfo.Get(); ci != nil {
 		return ci.Actions.Plex.Cooldown.Duration
 	}
 

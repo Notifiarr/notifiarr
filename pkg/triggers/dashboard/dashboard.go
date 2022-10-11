@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 )
 
@@ -124,7 +125,7 @@ func (c *Cmd) create() {
 	var ticker *time.Ticker
 
 	//nolint:gosec
-	if ci := website.GetClientInfo(); ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
+	if ci := clientinfo.Get(); ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
 		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration + randomTime)
 		c.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)

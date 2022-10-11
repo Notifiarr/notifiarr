@@ -22,7 +22,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
-	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
 	"github.com/mitchellh/go-homedir"
@@ -118,7 +118,7 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 			return string(output)
 		},
 		"dateFmt": func(date time.Time) string {
-			if ci := website.GetClientInfo(); ci != nil {
+			if ci := clientinfo.Get(); ci != nil {
 				return ci.User.DateFormat.Format(date)
 			}
 
@@ -414,7 +414,7 @@ type templateData struct {
 	Version     map[string]interface{}         `json:"version"`
 	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
-	ClientInfo  *website.ClientInfo            `json:"clientInfo"`
+	ClientInfo  *clientinfo.ClientInfo         `json:"clientInfo"`
 	Expvar      mnd.AllData                    `json:"expvar"`
 	HostInfo    *host.InfoStat                 `json:"hostInfo"`
 	Disks       map[string]*snapshot.Partition `json:"disks"`
@@ -427,9 +427,9 @@ func (c *Client) renderTemplate(
 	templateName,
 	msg string,
 ) {
-	clientInfo := website.GetClientInfo()
+	clientInfo := clientinfo.Get()
 	if clientInfo == nil {
-		clientInfo = &website.ClientInfo{}
+		clientInfo = &clientinfo.ClientInfo{}
 	}
 
 	binary, _ := os.Executable()

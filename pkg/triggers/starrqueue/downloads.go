@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
@@ -44,7 +45,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 func (c *cmd) getDownloadingItemsLidrr(_ context.Context) itemList {
 	items := make(itemList)
 
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if ci == nil {
 		return items
 	}
@@ -76,7 +77,7 @@ func (c *cmd) getDownloadingItemsLidrr(_ context.Context) itemList {
 func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 	items := make(itemList)
 
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if ci == nil {
 		return items
 	}
@@ -108,7 +109,7 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 	items := make(itemList)
 
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if ci == nil {
 		return items
 	}
@@ -140,7 +141,7 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
-	ci := website.GetClientInfo()
+	ci := clientinfo.Get()
 	if ci == nil {
 		return items
 	}

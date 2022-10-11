@@ -4,7 +4,7 @@ package share
 import (
 	"sync"
 
-	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -33,17 +33,24 @@ func StopLogs() {
 	config = nil
 }
 
+// Match is what we send to the website.
+type Match struct {
+	File    string   `json:"file"`
+	Matches []string `json:"matches"`
+	Line    string   `json:"line"`
+}
+
 // Log sends an error message to the website.
 func Log(msg string) {
 	locker.RLock()
 	defer locker.RUnlock()
 
-	if ci := website.GetClientInfo(); ci == nil || config == nil {
+	if ci := data.Get("clientInfo"); ci == nil || ci.Data == nil || config == nil {
 		return
 	}
 
 	config.SendData(&website.Request{
-		Payload:    &filewatch.Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
+		Payload:    &Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
 		LogPayload: true,

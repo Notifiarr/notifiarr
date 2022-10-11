@@ -6,4 +6,6 @@
 // See: https://github.com/kevinburke/go-bindata or the README.md file.
 package bindata
 
+//nolint:lll
+//go:generate swag i --parseDependency --instanceName api --outputTypes go --exclude ../client/handlers_gui.go --parseInternal --dir ../../ -g main.go --output docs
 //go:generate go-bindata -pkg bindata -modtime 1587356420 -o bindata.go files/... templates/... other/...

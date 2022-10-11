@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
@@ -51,7 +52,7 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Lidarr {
-		ci := website.GetClientInfo()
+		ci := clientinfo.Get()
 		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Lidarr.Stuck(idx+1) {
 			continue
 		}
@@ -88,7 +89,7 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Radarr {
-		ci := website.GetClientInfo()
+		ci := clientinfo.Get()
 		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Radarr.Stuck(idx+1) {
 			continue
 		}
@@ -125,7 +126,7 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Readarr {
-		ci := website.GetClientInfo()
+		ci := clientinfo.Get()
 		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Readarr.Stuck(idx+1) {
 			continue
 		}
@@ -162,7 +163,7 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Sonarr {
-		ci := website.GetClientInfo()
+		ci := clientinfo.Get()
 		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Sonarr.Stuck(idx+1) {
 			continue
 		}

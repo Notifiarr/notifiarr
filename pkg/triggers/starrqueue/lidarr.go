@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
 
 const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
@@ -47,7 +48,7 @@ func (c *cmd) setupLidarr() bool {
 	var enabled bool
 
 	for idx, app := range c.Apps.Lidarr {
-		ci := website.GetClientInfo()
+		ci := clientinfo.Get()
 		if !app.Enabled() || ci == nil {
 			continue
 		}
