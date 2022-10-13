@@ -3,6 +3,7 @@ package triggers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -310,14 +311,16 @@ func (a *Actions) backup(input *common.ActionInput, content string) (int, string
 	return http.StatusOK, title.String(content) + " backups check initiated."
 }
 
-// @Description  Reload application configuration immediately.
-// @Summary      Reload Client
+// @Description  Reload this application's configuration immediately. Reload shuts down everything re-reads the config file and starts back up.
+// @Summary      Reload Application
 // @Tags         Triggers
 // @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/reload [get]
 // @Security     ApiKeyAuth
+//
+//nolint:lll
 func (a *Actions) handleConfigReload() (int, string) {
 	defer a.Timers.ReloadApp("HTTP Triggered Reload")
 	return http.StatusOK, "Application reload initiated."
@@ -344,21 +347,22 @@ func (a *Actions) notification(content string) (int, string) {
 	return http.StatusBadRequest, "Missing notification content."
 }
 
-// @Description  Empties a single Plex library's trash can.
-// @Summary      Empty Plex Trash
-// @Tags         Triggers
+// @Description  Empties one or more Plex library trash cans.
+// @Summary      Empty Plex Trashes
+// @Tags         Triggers,Plex
 // @Produce      json
+// @Param        libraryKeys  path   []string  true  "List of library keys, comma separated."
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "started"
 // @Failure      501  {object} apps.Respond.apiResponse{message=string} "plex not enabled"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/trigger/emptyplextrash/{libraryKey} [get]
+// @Router       /api/trigger/emptyplextrash/{libraryKeys} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int, string) {
 	if !a.Timers.Apps.Plex.Enabled() {
 		return http.StatusNotImplemented, "Plex is not enabled."
 	}
 
-	a.EmptyTrash.Plex(input.Type, content)
+	a.EmptyTrash.Plex(input.Type, strings.Split(content, ","))
 
 	return http.StatusOK, "Emptying Plex Trash for library " + content
 }

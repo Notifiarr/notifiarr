@@ -2,6 +2,7 @@ package emptytrash
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -44,16 +45,35 @@ func (a *Action) Send(input *common.ActionInput) {
 }
 
 // Plex empties the trash for a Library in Plex.
-func (a *Action) Plex(event website.EventType, libraryKey string) {
-	a.cmd.Exec(&common.ActionInput{Type: event, Args: []string{libraryKey}}, TrigPlexEmptyTrash)
+func (a *Action) Plex(event website.EventType, libraryKeys []string) {
+	a.cmd.Exec(&common.ActionInput{Type: event, Args: libraryKeys}, TrigPlexEmptyTrash)
 }
 
 func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
-	_, err := c.Apps.Plex.EmptyTrashWithContext(ctx, input.Args[0])
-	if err != nil {
-		c.Errorf("[%s requested] Emptying Plex trash for library '%s' failed: %v", input.Type, input.Args[0], err)
-		return
+	status := make(map[string]string)
+	errors := 0
+
+	for _, key := range input.Args {
+		if _, err := c.Apps.Plex.EmptyTrashWithContext(ctx, key); err != nil {
+			c.ErrorfNoShare("[%s requested] Emptying Plex trash for library '%s' failed: %v", input.Type, key, err)
+
+			status[key] = err.Error()
+			errors++
+		} else {
+			status[key] = "ok"
+		}
 	}
 
-	c.Printf("[%s requested] Emptied Plex library '%s' trash.", input.Type, input.Args[0])
+	if len(status) > 0 {
+		c.SendData(&website.Request{
+			Route:      website.PlexRoute,
+			Event:      input.Type,
+			Params:     []string{"emptylibrary=true"},
+			Payload:    status,
+			LogMsg:     fmt.Sprintf("Emptied %d Plex library trashes with %d errors.", len(status), errors),
+			LogPayload: true,
+		})
+	} else {
+		c.Printf("[%s requested] Emptied %d Plex library trashes with %d errors.", input.Type, len(status), errors)
+	}
 }
