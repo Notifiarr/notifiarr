@@ -9496,21 +9496,34 @@ const docTemplateapi = `{
                 }
             }
         },
-        "/api/trigger/emptyplextrash/{libraryKey}": {
+        "/api/trigger/emptyplextrash/{libraryKeys}": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Empties a single Plex library's trash can.",
+                "description": "Empties one or more Plex library trash cans.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Triggers"
+                    "Triggers",
+                    "Plex"
                 ],
-                "summary": "Empty Plex Trash",
+                "summary": "Empty Plex Trashes",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of library keys, comma separated.",
+                        "name": "libraryKeys",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "started",
@@ -9677,14 +9690,14 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Reload application configuration immediately.",
+                "description": "Reload this application's configuration immediately. Reload shuts down everything re-reads the config file and starts back up.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Triggers"
                 ],
-                "summary": "Reload Client",
+                "summary": "Reload Application",
                 "responses": {
                     "200": {
                         "description": "success",
