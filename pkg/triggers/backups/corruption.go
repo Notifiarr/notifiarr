@@ -52,13 +52,14 @@ func (c *cmd) makeCorruptionTriggersLidarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Lidarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			app.Enabled() && ci.Actions.Apps.Lidarr.Corrupt(idx+1) != mnd.Disabled {
-			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
+			if c.lidarr[idx] = ci.Actions.Apps.Lidarr.Corrupt(idx + 1); c.lidarr[idx] != mnd.Disabled {
+				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				ticker = time.NewTicker(checkInterval + randomTime)
 
-			break
+				break
+			}
 		}
 	}
 
@@ -75,13 +76,14 @@ func (c *cmd) makeCorruptionTriggersProwlarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Prowlarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			app.Enabled() && ci.Actions.Apps.Prowlarr.Corrupt(idx+1) != mnd.Disabled {
-			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
+			if c.prowlarr[idx] = ci.Actions.Apps.Prowlarr.Corrupt(idx + 1); c.prowlarr[idx] != mnd.Disabled {
+				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				ticker = time.NewTicker(checkInterval + randomTime)
 
-			break
+				break
+			}
 		}
 	}
 
@@ -98,13 +100,14 @@ func (c *cmd) makeCorruptionTriggersRadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Radarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			app.Enabled() && ci.Actions.Apps.Radarr.Corrupt(idx+1) != mnd.Disabled {
-			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
+			if c.radarr[idx] = ci.Actions.Apps.Radarr.Corrupt(idx + 1); c.radarr[idx] != mnd.Disabled {
+				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				ticker = time.NewTicker(checkInterval + randomTime)
 
-			break
+				break
+			}
 		}
 	}
 
@@ -121,13 +124,14 @@ func (c *cmd) makeCorruptionTriggersReadarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Readarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			app.Enabled() && ci.Actions.Apps.Readarr.Corrupt(idx+1) != mnd.Disabled {
-			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
+			if c.readarr[idx] = ci.Actions.Apps.Readarr.Corrupt(idx + 1); c.readarr[idx] != mnd.Disabled {
+				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				ticker = time.NewTicker(checkInterval + randomTime)
 
-			break
+				break
+			}
 		}
 	}
 
@@ -144,13 +148,14 @@ func (c *cmd) makeCorruptionTriggersSonarr() {
 
 	//nolint:gosec
 	for idx, app := range c.Apps.Sonarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			app.Enabled() && ci.Actions.Apps.Sonarr.Corrupt(idx+1) != mnd.Disabled {
-			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
+			if c.sonarr[idx] = ci.Actions.Apps.Sonarr.Corrupt(idx + 1); c.sonarr[idx] != mnd.Disabled {
+				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				ticker = time.NewTicker(checkInterval + randomTime)
 
-			break
+				break
+			}
 		}
 	}
 
@@ -234,10 +239,13 @@ func (c *cmd) sendSonarrCorruption(ctx context.Context, input *common.ActionInpu
 
 func (c *cmd) sendAndLogAppCorruption(ctx context.Context, input *genericInstance) string { //nolint:cyclop
 	if input.skip {
+		c.Debugf("Skipping corruption check on %s: %s (%d), instance disabled.", input.name, input.cName, input.int)
 		return input.last
 	}
 
 	if (input.last == mnd.Disabled || input.last == "") && input.event == website.EventCron {
+		c.Debugf("Skipping corruption check on %s: %s (%d), corruption checking disabled, last: %s",
+			input.name, input.cName, input.int, input.last)
 		return input.last
 	}
 
