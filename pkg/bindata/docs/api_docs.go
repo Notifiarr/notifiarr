@@ -1844,7 +1844,7 @@ const docTemplateapi = `{
         },
         "/api/plex/1/markwatched/{itemKey}": {
             "get": {
-                "description": "Marks a movie or show or audio trash as watched.",
+                "description": "Marks a movie or show or audio track as watched.",
                 "produces": [
                     "application/json"
                 ],
@@ -1881,7 +1881,7 @@ const docTemplateapi = `{
                         }
                     },
                     "404": {
-                        "description": "bad token or api key\" example(NOT FOUND! Check your request parameters and try again.)",
+                        "description": "bad token or api key",
                         "schema": {
                             "type": "string"
                         }
@@ -9065,7 +9065,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Start backup file check on all applications of a specific type.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9135,7 +9135,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Sync TRaSH Radarr data.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers",
@@ -9187,7 +9187,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Toggle client error log sharing.\nThis allows enabling and disabling of client error logs being shared with the website.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9392,7 +9392,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Start corruption check on all application backups of a specific type.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9462,7 +9462,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Collects dashboard data and sends a notification.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9496,6 +9496,80 @@ const docTemplateapi = `{
                 }
             }
         },
+        "/api/trigger/emptyplextrash/{libraryKeys}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Empties one or more Plex library trash cans.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Triggers",
+                    "Plex"
+                ],
+                "summary": "Empty Plex Trashes",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of library keys, comma separated.",
+                        "name": "libraryKeys",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "started",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "501": {
+                        "description": "plex not enabled",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/trigger/gaps": {
             "get": {
                 "security": [
@@ -9505,7 +9579,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Send Radarr Library Collection Gaps notification.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9548,7 +9622,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Write log entry, and send GUI notification if client has GUI enabled (mac/windows only).",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9616,14 +9690,14 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Reload application configuration immediately.",
+                "description": "Reload this application's configuration immediately. Reload shuts down everything re-reads the config file and starts back up.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
                 ],
-                "summary": "Reload Client",
+                "summary": "Reload Application",
                 "responses": {
                     "200": {
                         "description": "success",
@@ -9661,7 +9735,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Sync TRaSH Sonarr data.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers",
@@ -9713,7 +9787,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Reschedule all service checks to run immediately.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9756,7 +9830,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Collect Plex sessions and send a notifciation.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9817,7 +9891,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Collects system snapshot data and sends a notification.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -9860,7 +9934,7 @@ const docTemplateapi = `{
                 ],
                 "description": "Sends cached stuck items notification.",
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "Triggers"
@@ -10012,7 +10086,7 @@ const docTemplateapi = `{
                     "application/json"
                 ],
                 "produces": [
-                    "text/html"
+                    "text/plain"
                 ],
                 "tags": [
                     "Plex"
