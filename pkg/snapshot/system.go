@@ -86,25 +86,21 @@ func (s *Snapshot) GetLocalData(ctx context.Context) (errs []error) {
 }
 
 // GetProcesses collects 'count' processes by CPU usage.
-func (s *Snapshot) GetProcesses(ctx context.Context, count int) (errs []error) {
+func (s *Snapshot) GetProcesses(ctx context.Context, count int) error {
 	if count < 1 {
 		return nil
 	}
 
 	procs, err := process.ProcessesWithContext(ctx)
 	if err != nil {
-		return []error{fmt.Errorf("process list: %w", err)}
+		return fmt.Errorf("process list: %w", err)
 	}
 
 	s.Processes = make(Processes, len(procs))
 
 	for idx, proc := range procs {
 		s.Processes[idx] = &Process{Pid: proc.Pid}
-
-		if s.Processes[idx].Name, err = proc.NameWithContext(ctx); err != nil {
-			errs = append(errs, fmt.Errorf("pid %d, no name: %w", proc.Pid, err))
-		}
-
+		s.Processes[idx].Name, _ = proc.NameWithContext(ctx)
 		// This for loop primes the second run of PercentWithContext.
 		// Then sleep a moment, and gather the cpu samples for all PIDs across that moment.
 		_, _ = proc.PercentWithContext(ctx, 0)
@@ -113,21 +109,14 @@ func (s *Snapshot) GetProcesses(ctx context.Context, count int) (errs []error) {
 	time.Sleep(4 * time.Second) //nolint:gomnd
 
 	for idx, proc := range procs {
-		s.Processes[idx].CPUPercent, err = proc.PercentWithContext(ctx, 0)
-		if err != nil && !errors.Is(err, os.ErrNotExist) {
-			errs = append(errs, fmt.Errorf("pid %d, cpu percent: %w", proc.Pid, err))
-		}
-
-		s.Processes[idx].MemPercent, err = proc.MemoryPercentWithContext(ctx)
-		if err != nil && !errors.Is(err, os.ErrNotExist) {
-			errs = append(errs, fmt.Errorf("pid %d, mem percent: %w", proc.Pid, err))
-		}
+		s.Processes[idx].CPUPercent, _ = proc.PercentWithContext(ctx, 0)
+		s.Processes[idx].MemPercent, _ = proc.MemoryPercentWithContext(ctx)
 	}
 
 	sort.Sort(s.Processes)
 	s.Processes.Shrink(count)
 
-	return errs
+	return nil
 }
 
 // Len allows us to sort Processes.
