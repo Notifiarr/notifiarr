@@ -31,16 +31,17 @@ function testRegex()
     $.ajax({
         type: 'POST',
         data: fields,
+        cache: false,
         url: URLBase+'regexTest',
         success: function (data){
             toast('Matched!', data, 'success');
         },
         error: function (response, status, error) {
-            if (error == "") {
+            if (response.status == 0) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 20000);
             } else {
-                toast(error, response.responseText, 'error', 15000);
+                toast(error!=''?error:'Bad Request', response.responseText, 'error', 15000);
             }
         }
     });
