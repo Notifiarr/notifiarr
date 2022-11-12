@@ -64,6 +64,7 @@ func New(config *Config) *Actions {
 		Apps:     config.Apps,
 		Logger:   config.Logger,
 		CIC:      config.CIC,
+		Services: config.Services,
 	}
 	plex := plexcron.New(common, config.Apps.Plex)
 

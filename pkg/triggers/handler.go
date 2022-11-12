@@ -195,7 +195,7 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 // @Security     ApiKeyAuth
 func (a *Actions) services(input *common.ActionInput) (int, string) {
 	a.Timers.RunChecks(input.Type)
-	return http.StatusOK, "All service checks rescheduled for immediate exeution."
+	return http.StatusOK, "All service checks rescheduled for immediate execution."
 }
 
 // @Description  Collect Plex sessions and send a notifciation.
