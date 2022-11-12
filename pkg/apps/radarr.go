@@ -483,21 +483,21 @@ func radarrSearchMovie(req *http.Request) (int, interface{}) {
 	}
 
 	type movieData struct {
-		ID                  int64     `json:"id"`
-		Title               string    `json:"title"`
-		Release             time.Time `json:"release"`
-		InCinemas           time.Time `json:"cinemas"`
-		DigitalRelease      time.Time `json:"digital"`
-		PhysicalRelease     time.Time `json:"physical"`
-		Status              string    `json:"status"`
-		Exists              bool      `json:"exists"`
-		Added               time.Time `json:"added"`
-		Year                int       `json:"year"`
-		Path                string    `json:"path"`
-		TmdbID              int64     `json:"tmdbId"`
-		QualityProfileID    int64     `json:"qualityId"`
-		Monitored           bool      `json:"monitored"`
-		MinimumAvailability string    `json:"metadataId"`
+		ID                  int64               `json:"id"`
+		Title               string              `json:"title"`
+		Release             time.Time           `json:"release"`
+		InCinemas           time.Time           `json:"cinemas"`
+		DigitalRelease      time.Time           `json:"digital"`
+		PhysicalRelease     time.Time           `json:"physical"`
+		Status              string              `json:"status"`
+		Exists              bool                `json:"exists"`
+		Added               time.Time           `json:"added"`
+		Year                int                 `json:"year"`
+		Path                string              `json:"path"`
+		TmdbID              int64               `json:"tmdbId"`
+		QualityProfileID    int64               `json:"qualityId"`
+		Monitored           bool                `json:"monitored"`
+		MinimumAvailability radarr.Availability `json:"metadataId"`
 	}
 
 	query := strings.TrimSpace(strings.ToLower(mux.Vars(req)["query"])) // in
@@ -627,7 +627,7 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 	}
 
 	// Check for existing movie.
-	err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie)
+	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, false)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating movie: %w", err)
 	}

@@ -480,7 +480,7 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // @Router       /api/sonarr/{instance}/qualityProfile/{profileID} [delete]
 // @Security     ApiKeyAuth
 func sonarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
-	profileID, _ := strconv.Atoi(mux.Vars(req)["profileID"])
+	profileID, _ := strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
 	if profileID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
@@ -518,7 +518,7 @@ func sonarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 
 	// Delete each profile from sonarr.
 	for _, profile := range profiles {
-		if err := getSonarr(req).DeleteQualityProfileContext(req.Context(), int(profile.ID)); err != nil {
+		if err := getSonarr(req).DeleteQualityProfileContext(req.Context(), profile.ID); err != nil {
 			errs = append(errs, err.Error())
 			continue
 		}
@@ -635,7 +635,7 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 // @Router       /api/sonarr/{instance}/releaseProfile/{profileID} [delete]
 // @Security     ApiKeyAuth
 func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
-	profileID, _ := strconv.Atoi(mux.Vars(req)["profileID"])
+	profileID, _ := strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
 	if profileID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
 	}
@@ -672,7 +672,7 @@ func sonarrDeleteAllReleaseProfiles(req *http.Request) (int, interface{}) {
 
 	for _, profile := range profiles {
 		// Delete the profile from sonarr.
-		err := getSonarr(req).DeleteReleaseProfileContext(req.Context(), int(profile.ID))
+		err := getSonarr(req).DeleteReleaseProfileContext(req.Context(), profile.ID)
 		if err != nil {
 			errs = append(errs, err.Error())
 			continue
