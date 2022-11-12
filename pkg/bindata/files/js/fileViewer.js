@@ -75,10 +75,10 @@ function fileSelectorChange(caller, fileID)
             updateFileContentCounters();
         },
         error: function (request, status, error) {
-            if (error == "") {
+            if (response.status == 0) {
                 toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
             } else {
-                toast(error, request.responseText, 'error', 10000);
+                toast(error!=''?error:'Bad Request', request.responseText, 'error', 10000);
             }
         },
     });
@@ -118,10 +118,10 @@ function triggerFileAction(caller, action, source, fileID)
                 toast('Deleted File', filename, 'success', 8000)         // give the user a success message.
             },
             error: function (request, status, error){
-                if (error == "") {
+                if (response.status == 0) {
                     toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
                 } else {
-                    toast(error, request.responseText, 'error', 10000);
+                    toast(error!=''?error:'Bad Request', request.responseText, 'error', 10000);
                 }
             },
         });
@@ -187,10 +187,10 @@ function triggerFileLoad(caller)
                 ctl.find('.file-small-msg').html('');
             },
             error: function (request, status, error){
-                if (error == "") {
+                if (response.status == 0) {
                     toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
                 } else {
-                    toast(error, request.responseText, 'error', 10000);
+                    toast(error!=''?error:'Bad Request', request.responseText, 'error', 10000);
                 }
             },
         });
@@ -214,10 +214,10 @@ function triggerFileLoad(caller)
                 ctl.find('.file-small-msg').html('');
             },
             error: function (request, status, error){
-                if (error == "") {
+                if (response.status == 0) {
                     toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
                 } else {
-                    toast(error, request.responseText, 'error', 10000);
+                    toast(error!=''?error:'Bad Request', request.responseText, 'error', 10000);
                 }
             },
         });

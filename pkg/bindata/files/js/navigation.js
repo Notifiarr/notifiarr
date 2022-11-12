@@ -52,11 +52,11 @@ function refreshPage(template, notice = true)
 
         },
         error: function (request, status, error) {
-            if (error == "") {
+            if (response.status == 0) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
-                toast('Template Error', error+': '+response.responseText, 'error', 10000);
+                toast('Template Error', (error!=''?error:'Bad Request')+': '+response.responseText, 'error', 10000);
             }
         },
     });
@@ -72,11 +72,11 @@ function shutDownApp()
                 toast('Shuting Down', 'Application Shutdown Initiated', 'success', 15000);
             },
              error: function (request, status, error) {
-                 if (error == "") {
+                 if (response.status == 0) {
                      toast('Web Server Error',
                          'Notifiarr client appears to be down aleady.', 'error', 30000);
                  } else {
-                     toast('Shutdown Error', error+': '+response.responseText, 'error', 10000);
+                     toast('Shutdown Error', (error!=''?error:'Bad Request')+': '+response.responseText, 'error', 10000);
                  }
              },
          });
@@ -107,11 +107,11 @@ function reloadConfig()
             }, 500);
         },
          error: function (request, status, error) {
-             if (error == "") {
+             if (response.status == 0) {
                  toast('Web Server Error',
                  'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
              } else {
-                 toast('Reload Error', error+': '+response.responseText, 'error', 10000);
+                 toast('Reload Error', (error!=''?error:'Bad Request')+': '+response.responseText, 'error', 10000);
              }
          },
      });

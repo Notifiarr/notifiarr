@@ -65,10 +65,10 @@ function showProcessList()
             updateFileContentCounters();
         },
         error: function (request, status, error) {
-            if (error == "") {
+            if (response.status == 0) {
                 $('#process-list-content').html('<h4>Web Server Error</h4>Notifiarr client appears to be down! Hard refresh recommended.');
             } else {
-                $('#process-list-content').html('<h4>'+ error +'</h4>'+ request.responseText);
+                $('#process-list-content').html('<h4>'+ (error!=''?error:'Bad Request') +'</h4>'+ request.responseText);
             }
         },
     });
@@ -85,11 +85,11 @@ function servicesAction(action, refresh, refreshDelay = 0) {
             toast('Yay!', data, 'success')
         },
         error: function (request, status, error) {
-            if (error == "") {
+            if (response.status == 0) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
-                toast('Error', error+': '+request.responseText, 'error', 10000);
+                toast('Error', (error!=''?error:'Bad Request')+': '+request.responseText, 'error', 10000);
             }
         },
     });
@@ -361,11 +361,11 @@ function testService(from, index)
         },
         error: function (response, status, error) {
             from.css({'pointer-events':'auto'}).find('i').toggleClass('fa-cog fa-spin fa-check-double');
-            if (status === undefined) {
+            if (response.status == 0) {
                 toast('Web Server Error',
                     'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 30000);
             } else {
-                toast(checkType+' Check Error', error+': '+response.responseText, 'error', 15000);
+                toast(checkType+' Check Error', (error!=''?error:'Bad Request')+': '+response.responseText, 'error', 15000);
             }
         }
     });
