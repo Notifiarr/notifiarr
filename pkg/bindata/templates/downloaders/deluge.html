@@ -52,7 +52,7 @@
                                         <tbody id="download-Deluge-container">
                                         {{- range $index, $app := .Config.Apps.Deluge}}
                                             <input disabled style="display: none;" class="client-parameter download-Deluge{{$index}}-deleted" data-group="download" data-label="Deluge {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="download-Deluge" id="download-Deluge-{{$index}}">
+                                            <tr class="download-Deluge {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="download-Deluge-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('download-Deluge', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>

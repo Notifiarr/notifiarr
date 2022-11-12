@@ -52,7 +52,7 @@
                                         <tbody id="download-SabNZB-container">
                                         {{- range $index, $app := .Config.Apps.SabNZB}}
                                             <input disabled style="display: none;" class="client-parameter download-SabNZB{{$index}}-deleted" data-group="download" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="download-SabNZB" id="download-SabNZB-{{$index}}">
+                                            <tr class="download-SabNZB {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="download-SabNZB-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('download-SabNZB', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>

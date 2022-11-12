@@ -53,7 +53,7 @@
                                         <tbody id="download-Qbit-container">
                                         {{- range $index, $app := .Config.Apps.Qbit}}
                                             <input disabled style="display: none;" class="client-parameter download-Qbit{{$index}}-deleted" data-group="download" data-label="Qbit {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="download-Qbit" id="download-Qbit-{{$index}}">
+                                            <tr class="download-Qbit {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="download-Qbit-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('download-Qbit', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>

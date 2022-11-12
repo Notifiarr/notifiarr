@@ -42,7 +42,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            <tr{{if (lt .Config.Apps.Plex.Timeout.Seconds (add 0 0))}} class="bk-danger"{{end}}>
                                                 <td>
                                                     <div class="btn-group" role="group" style="display:flex;font-size:18px;">
                                                         <button onClick="testInstance($(this), 'Plex', '1')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
