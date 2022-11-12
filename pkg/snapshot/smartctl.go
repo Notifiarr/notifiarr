@@ -153,12 +153,19 @@ func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bo
 	return runCommand(cmd, waitg)
 }
 
+// scanSmartctl attempts to parse the varying outputs of smartctl disk health, age and temperature.
+// Some disks seem to output in a completely different format than others, using the same tool.
+//
 //nolint:cyclop
 func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.WaitGroup) {
 	for stdout.Scan() {
 		text := stdout.Text()
 
 		switch fields := strings.Fields(text); {
+		case strings.HasPrefix(text, "Current Drive Temperature:"):
+			s.DriveTemps[name], _ = strconv.Atoi(fields[3])
+		case strings.HasPrefix(text, "Accumulated power on time, hours:minutes"):
+			s.DriveAges[name], _ = strconv.Atoi(strings.Split(fields[5], ":")[0])
 		case len(fields) > 1 && fields[0] == "Temperature:":
 			s.DriveTemps[name], _ = strconv.Atoi(fields[1])
 		case len(fields) > 3 && fields[0]+fields[1]+fields[2] == "PowerOnHours:":
