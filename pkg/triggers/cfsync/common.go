@@ -2,6 +2,7 @@ package cfsync
 
 import (
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -57,15 +58,15 @@ func (c *cmd) create() {
 		if len(ci.Actions.Sync.RadarrInstances) > 0 {
 			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
 			radarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
-			c.Printf("==> Keeping %d Radarr Custom Formats synced, interval:%s",
-				ci.Actions.Sync.Radarr, ci.Actions.Sync.Interval)
+			c.Printf("==> Radarr TRaSH Sync: interval: %s, %s ",
+				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.RadarrSync, ", "))
 		}
 
 		if len(ci.Actions.Sync.SonarrInstances) > 0 {
 			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
 			sonarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
-			c.Printf("==> Keeping %d Sonarr Release Profiles synced, interval:%s",
-				ci.Actions.Sync.Sonarr, ci.Actions.Sync.Interval)
+			c.Printf("==> Sonarr TRaSH Sync: interval: %s, %s ",
+				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
 		}
 	}
 
