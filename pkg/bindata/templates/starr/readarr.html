@@ -67,7 +67,7 @@
                                         <tbody id="starr-Readarr-container">
                                             {{- range $index, $app := .Config.Apps.Readarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Readarr{{$index}}-deleted" data-group="starr" data-label="Readarr {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="starr-Readarr" id="starr-Readarr-{{$index}}">
+                                            <tr class="starr-Readarr {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="starr-Readarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('starr-Readarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>

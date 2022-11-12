@@ -53,7 +53,7 @@
                                         <tbody id="download-Rtorrent-container">
                                         {{- range $index, $app := .Config.Apps.Rtorrent}}
                                             <input disabled style="display: none;" class="client-parameter download-Rtorrent{{$index}}-deleted" data-group="download" data-label="rTorrent {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="download-Rtorrent" id="download-Rtorrent-{{$index}}">
+                                            <tr class="download-Rtorrent {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="download-Rtorrent-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('download-Rtorrent', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>

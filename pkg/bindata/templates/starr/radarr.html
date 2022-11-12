@@ -67,7 +67,7 @@
                                         <tbody id="starr-Radarr-container">
                                             {{- range $index, $app := .Config.Apps.Radarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Radarr{{$index}}-deleted" data-group="starr" data-label="Radarr {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="starr-Radarr" id="starr-Radarr-{{$index}}">
+                                            <tr class="starr-Radarr {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="starr-Radarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('starr-Radarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>

@@ -53,7 +53,7 @@
                                         <tbody id="download-NZBGet-container">
                                         {{- range $index, $app := .Config.Apps.NZBGet}}
                                             <input disabled style="display: none;" class="client-parameter download-NZBGet{{$index}}-deleted" data-group="download" data-label="NZBGet {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="download-NZBGet" id="download-NZBGet-{{$index}}">
+                                            <tr class="download-NZBGet {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="download-NZBGet-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('download-NZBGet', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>

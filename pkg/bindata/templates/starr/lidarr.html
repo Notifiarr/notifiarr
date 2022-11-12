@@ -67,7 +67,7 @@
                                         <tbody id="starr-Lidarr-container">
                                         {{- range $index, $app := .Config.Apps.Lidarr}}
                                             <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Lidarr{{$index}}-deleted" data-group="starr" data-label="Lidarr {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="starr-Lidarr" id="starr-Lidarr-{{$index}}">
+                                            <tr class="starr-Lidarr {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="starr-Lidarr-{{$index}}">
                                                 <td style="white-space:nowrap;">
                                                     <div class="btn-group" role="group" style="display:flex;">
                                                         <button onclick="removeInstance('starr-Lidarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
