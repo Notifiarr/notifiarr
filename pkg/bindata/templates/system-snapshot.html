@@ -140,11 +140,11 @@
                                                     <td>{{$snapshot.Data.System.InfoStat.Hostname}}</td>
                                                 </tr>
                                                 {{- if $snapshot.Data.IOTop }}
-                                                <tr><td colspan="2">Total Read</td><td>{{megabyte $snapshot.Data.IOTopData.TotalRead}}</td></tr>                                                
-                                                <tr><td colspan="2">Total Write</td><td>{{megabyte $snapshot.Data.IOTopData.TotalWrite}}</td></tr>                                                
-                                                <tr><td colspan="2">Curr Read</td><td>{{megabyte $snapshot.Data.IOTopData.CurrRead}}</td></tr>                                                
-                                                <tr><td colspan="2">Curr Write</td><td>{{megabyte $snapshot.Data.IOTopData.CurrWrite}}</td></tr>                                                
-                                                <tr><td colspan="2">Processes</td><td>{{len $snapshot.Data.IOTopData.Processes}}</td></tr>                                                
+                                                <tr><td colspan="2">Total Read</td><td>{{megabyte $snapshot.Data.IOTop.TotalRead}}</td></tr>
+                                                <tr><td colspan="2">Total Write</td><td>{{megabyte $snapshot.Data.IOTop.TotalWrite}}</td></tr>
+                                                <tr><td colspan="2">Curr Read</td><td>{{megabyte $snapshot.Data.IOTop.CurrRead}}</td></tr>
+                                                <tr><td colspan="2">Curr Write</td><td>{{megabyte $snapshot.Data.IOTop.CurrWrite}}</td></tr>
+                                                <tr><td colspan="2">Processes</td><td>{{len $snapshot.Data.IOTop.Processes}}</td></tr>
                                                 {{- end }}
                                             </table>
                                         </div>       
