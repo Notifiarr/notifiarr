@@ -43,6 +43,8 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/qualitydefinitions", sonarrGetQualityDefinitions, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/qualitydefinition", sonarrUpdateQualityDefinition, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/rootFolder", sonarrRootFolders, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/naming", sonarrGetNaming, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/naming", sonarrUpdateNaming, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/search/{query}", sonarrSearchSeries, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/tag", sonarrGetTags, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/tag/{tid:[0-9]+}/{label}", sonarrUpdateTag, "PUT")
@@ -712,6 +714,53 @@ func sonarrRootFolders(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+// @Description  Returns Sonarr series naming conventions.
+// @Summary      Retrieve Sonarr Series Naming
+// @Tags         Sonarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.Naming} "naming conventions"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/naming [get]
+// @Security     ApiKeyAuth
+func sonarrGetNaming(req *http.Request) (int, interface{}) {
+	naming, err := getSonarr(req).GetNamingContext(req.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting naming: %w", err)
+	}
+
+	return http.StatusOK, naming
+}
+
+// @Description  Updates the Sonarr series naming conventions.
+// @Summary      Update Sonarr Series Naming
+// @Tags         Sonarr
+// @Produce      json
+// @Accept       json
+// @Param        PUT body sonarr.Naming  true  "naming conventions"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "naming ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/naming [put]
+// @Security     ApiKeyAuth
+func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
+	var naming sonarr.Naming
+
+	err := json.NewDecoder(req.Body).Decode(&naming)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	output, err := getSonarr(req).UpdateNamingContext(req.Context(), &naming)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating naming: %w", err)
+	}
+
+	return http.StatusOK, output.ID
 }
 
 // @Description  Searches all Sonarr Series Titles for the search term provided. Returns a minimal amount of data for each found item.

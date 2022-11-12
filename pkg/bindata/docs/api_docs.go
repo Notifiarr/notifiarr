@@ -3394,6 +3394,167 @@ const docTemplateapi = `{
                 }
             }
         },
+        "/api/radarr/{instance}/naming": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns Radarr movie naming conventions.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Radarr"
+                ],
+                "summary": "Retrieve Radarr Movie Naming",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "naming conventions",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/radarr.Naming"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates the Radarr movie naming conventions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Radarr"
+                ],
+                "summary": "Update Radarr Movie Naming",
+                "parameters": [
+                    {
+                        "description": "naming conventions",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/radarr.Naming"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "naming ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/radarr/{instance}/qualityProfile": {
             "get": {
                 "security": [
@@ -7133,6 +7294,167 @@ const docTemplateapi = `{
                                             "additionalProperties": {
                                                 "type": "string"
                                             }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/naming": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns Sonarr series naming conventions.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Retrieve Sonarr Series Naming",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "naming conventions",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/sonarr.Naming"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates the Sonarr series naming conventions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Series Naming",
+                "parameters": [
+                    {
+                        "description": "naming conventions",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.Naming"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "naming ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -11265,6 +11587,9 @@ const docTemplateapi = `{
                 "appData": {
                     "type": "string"
                 },
+                "appName": {
+                    "type": "string"
+                },
                 "authentication": {
                     "type": "string"
                 },
@@ -11272,6 +11597,9 @@ const docTemplateapi = `{
                     "type": "string"
                 },
                 "buildTime": {
+                    "type": "string"
+                },
+                "instanceName": {
                     "type": "string"
                 },
                 "isAdmin": {
@@ -11286,10 +11614,7 @@ const docTemplateapi = `{
                 "isLinux": {
                     "type": "boolean"
                 },
-                "isMono": {
-                    "type": "boolean"
-                },
-                "isMonoRuntime": {
+                "isNetCore": {
                     "type": "boolean"
                 },
                 "isOsx": {
@@ -11313,7 +11638,13 @@ const docTemplateapi = `{
                 "osName": {
                     "type": "string"
                 },
-                "osVersion": {
+                "packageAuthor": {
+                    "type": "string"
+                },
+                "packageUpdateMechanism": {
+                    "type": "string"
+                },
+                "packageVersion": {
                     "type": "string"
                 },
                 "runtimeName": {
@@ -12240,6 +12571,9 @@ const docTemplateapi = `{
                 "appData": {
                     "type": "string"
                 },
+                "appName": {
+                    "type": "string"
+                },
                 "authentication": {
                     "type": "string"
                 },
@@ -12253,6 +12587,9 @@ const docTemplateapi = `{
                     "type": "string"
                 },
                 "databaseVersion": {
+                    "type": "string"
+                },
+                "instanceName": {
                     "type": "string"
                 },
                 "isAdmin": {
@@ -12391,6 +12728,9 @@ const docTemplateapi = `{
                     "$ref": "#/definitions/starr.Value"
                 },
                 "movieId": {
+                    "type": "integer"
+                },
+                "movieMetadataId": {
                     "type": "integer"
                 },
                 "sourceId": {
@@ -12652,6 +12992,9 @@ const docTemplateapi = `{
                 "videoCodec": {
                     "type": "string"
                 },
+                "videoDynamicRangeType": {
+                    "type": "string"
+                },
                 "videoFps": {
                     "type": "number"
                 }
@@ -12660,6 +13003,10 @@ const docTemplateapi = `{
         "radarr.Movie": {
             "type": "object",
             "properties": {
+                "addOptions": {
+                    "description": "only available upon adding a movie.",
+                    "$ref": "#/definitions/radarr.AddMovieOptions"
+                },
                 "added": {
                     "type": "string"
                 },
@@ -12720,6 +13067,9 @@ const docTemplateapi = `{
                 "movieFile": {
                     "$ref": "#/definitions/radarr.MovieFile"
                 },
+                "originalLanguage": {
+                    "$ref": "#/definitions/starr.Value"
+                },
                 "originalTitle": {
                     "type": "string"
                 },
@@ -12732,11 +13082,14 @@ const docTemplateapi = `{
                 "physicalRelease": {
                     "type": "string"
                 },
+                "popularity": {
+                    "type": "number"
+                },
                 "qualityProfileId": {
                     "type": "integer"
                 },
                 "ratings": {
-                    "$ref": "#/definitions/starr.Ratings"
+                    "$ref": "#/definitions/starr.OpenRatings"
                 },
                 "runtime": {
                     "type": "integer"
@@ -12809,6 +13162,9 @@ const docTemplateapi = `{
                 "movieId": {
                     "type": "integer"
                 },
+                "originalFilePath": {
+                    "type": "string"
+                },
                 "path": {
                     "type": "string"
                 },
@@ -12829,6 +13185,44 @@ const docTemplateapi = `{
                 },
                 "size": {
                     "type": "integer"
+                }
+            }
+        },
+        "radarr.Naming": {
+            "type": "object",
+            "properties": {
+                "colonReplacementFormat": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "ID must always be 1 (Oct 10, 2022)",
+                    "type": "integer"
+                },
+                "includeQuality": {
+                    "type": "boolean"
+                },
+                "movieFolderFormat": {
+                    "description": "required",
+                    "type": "string"
+                },
+                "numberStylet": {
+                    "type": "string"
+                },
+                "renameMovies": {
+                    "type": "boolean"
+                },
+                "replaceIllegalCharacters": {
+                    "type": "boolean"
+                },
+                "replaceSpaces": {
+                    "type": "boolean"
+                },
+                "separatort": {
+                    "type": "string"
+                },
+                "standardMovieFormat": {
+                    "description": "required",
+                    "type": "string"
                 }
             }
         },
@@ -12920,6 +13314,9 @@ const docTemplateapi = `{
                 "appData": {
                     "type": "string"
                 },
+                "appName": {
+                    "type": "string"
+                },
                 "authentication": {
                     "type": "string"
                 },
@@ -12929,16 +13326,25 @@ const docTemplateapi = `{
                 "buildTime": {
                     "type": "string"
                 },
+                "databaseType": {
+                    "type": "string"
+                },
+                "databaseVersion": {
+                    "type": "string"
+                },
+                "instanceName": {
+                    "type": "string"
+                },
                 "isAdmin": {
                     "type": "boolean"
                 },
                 "isDebug": {
                     "type": "boolean"
                 },
-                "isLinux": {
+                "isDocker": {
                     "type": "boolean"
                 },
-                "isMono": {
+                "isLinux": {
                     "type": "boolean"
                 },
                 "isNetCore": {
@@ -12959,10 +13365,19 @@ const docTemplateapi = `{
                 "migrationVersion": {
                     "type": "integer"
                 },
+                "mode": {
+                    "type": "string"
+                },
                 "osName": {
                     "type": "string"
                 },
-                "osVersion": {
+                "packageAuthor": {
+                    "type": "string"
+                },
+                "packageUpdateMechanism": {
+                    "type": "string"
+                },
+                "packageVersion": {
                     "type": "string"
                 },
                 "runtimeName": {
@@ -12971,7 +13386,7 @@ const docTemplateapi = `{
                 "runtimeVersion": {
                     "type": "string"
                 },
-                "sqliteVersion": {
+                "startTime": {
                     "type": "string"
                 },
                 "startupPath": {
@@ -13066,7 +13481,8 @@ const docTemplateapi = `{
                     "type": "string"
                 },
                 "titleSlug": {
-                    "description": "Slugs are dumb"
+                    "description": "Slugs are dumb",
+                    "type": "string"
                 }
             }
         },
@@ -13120,7 +13536,13 @@ const docTemplateapi = `{
                 "added": {
                     "type": "string"
                 },
+                "authorMetadataId": {
+                    "type": "integer"
+                },
                 "authorName": {
+                    "type": "string"
+                },
+                "authorNameLastFirst": {
                     "type": "string"
                 },
                 "cleanName": {
@@ -13134,7 +13556,9 @@ const docTemplateapi = `{
                 },
                 "genres": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "id": {
                     "type": "integer"
@@ -13157,6 +13581,9 @@ const docTemplateapi = `{
                 "metadataProfileId": {
                     "type": "integer"
                 },
+                "monitorNewItems": {
+                    "type": "string"
+                },
                 "monitored": {
                     "type": "boolean"
                 },
@@ -13176,6 +13603,9 @@ const docTemplateapi = `{
                     "$ref": "#/definitions/starr.Ratings"
                 },
                 "sortName": {
+                    "type": "string"
+                },
+                "sortNameLastFirst": {
                     "type": "string"
                 },
                 "statistics": {
@@ -13230,7 +13660,9 @@ const docTemplateapi = `{
                 },
                 "genres": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "id": {
                     "type": "integer"
@@ -13273,6 +13705,9 @@ const docTemplateapi = `{
                 "anyEditionOk": {
                     "type": "boolean"
                 },
+                "author": {
+                    "$ref": "#/definitions/readarr.Author"
+                },
                 "authorId": {
                     "type": "integer"
                 },
@@ -13296,6 +13731,9 @@ const docTemplateapi = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "grabbed": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"
@@ -13461,6 +13899,9 @@ const docTemplateapi = `{
                 "appData": {
                     "type": "string"
                 },
+                "appName": {
+                    "type": "string"
+                },
                 "authentication": {
                     "type": "string"
                 },
@@ -13468,6 +13909,15 @@ const docTemplateapi = `{
                     "type": "string"
                 },
                 "buildTime": {
+                    "type": "string"
+                },
+                "databaseType": {
+                    "type": "string"
+                },
+                "databaseVersion": {
+                    "type": "string"
+                },
+                "instanceName": {
                     "type": "string"
                 },
                 "isAdmin": {
@@ -13525,9 +13975,6 @@ const docTemplateapi = `{
                     "type": "string"
                 },
                 "runtimeVersion": {
-                    "type": "string"
-                },
-                "sqliteVersion": {
                     "type": "string"
                 },
                 "startTime": {
@@ -13647,6 +14094,15 @@ const docTemplateapi = `{
         "sonarr.CommandRequest": {
             "type": "object",
             "properties": {
+                "episodeId": {
+                    "type": "integer"
+                },
+                "episodeIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "files": {
                     "description": "RenameFiles only",
                     "type": "array",
@@ -13818,6 +14274,12 @@ const docTemplateapi = `{
                 "id": {
                     "type": "integer"
                 },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.Image"
+                    }
+                },
                 "monitored": {
                     "type": "boolean"
                 },
@@ -13827,11 +14289,17 @@ const docTemplateapi = `{
                 "seasonNumber": {
                     "type": "integer"
                 },
+                "series": {
+                    "$ref": "#/definitions/sonarr.Series"
+                },
                 "seriesId": {
                     "type": "integer"
                 },
                 "title": {
                     "type": "string"
+                },
+                "tvdbId": {
+                    "type": "integer"
                 },
                 "unverifiedSceneNumbering": {
                     "type": "boolean"
@@ -13854,6 +14322,59 @@ const docTemplateapi = `{
             "properties": {
                 "monitor": {
                     "description": "Valid values for Monitor are: all, future, missing, existing, firstSeason, latestSeason, and none.",
+                    "type": "string"
+                }
+            }
+        },
+        "sonarr.Naming": {
+            "type": "object",
+            "properties": {
+                "animeEpisodeFormat": {
+                    "type": "string"
+                },
+                "dailyEpisodeFormat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "includeEpisodeTitle": {
+                    "type": "boolean"
+                },
+                "includeQuality": {
+                    "type": "boolean"
+                },
+                "includeSeriesTitle": {
+                    "type": "boolean"
+                },
+                "multiEpisodeStyle": {
+                    "type": "integer"
+                },
+                "numberStyle": {
+                    "type": "string"
+                },
+                "renameEpisodes": {
+                    "type": "boolean"
+                },
+                "replaceIllegalCharacters": {
+                    "type": "boolean"
+                },
+                "replaceSpaces": {
+                    "type": "boolean"
+                },
+                "seasonFolderFormat": {
+                    "type": "string"
+                },
+                "separator": {
+                    "type": "string"
+                },
+                "seriesFolderFormat": {
+                    "type": "string"
+                },
+                "specialsFolderFormat": {
+                    "type": "string"
+                },
+                "standardEpisodeFormat": {
                     "type": "string"
                 }
             }
@@ -14162,6 +14683,9 @@ const docTemplateapi = `{
                 "appData": {
                     "type": "string"
                 },
+                "appName": {
+                    "type": "string"
+                },
                 "authentication": {
                     "type": "string"
                 },
@@ -14169,6 +14693,9 @@ const docTemplateapi = `{
                     "type": "string"
                 },
                 "buildTime": {
+                    "type": "string"
+                },
+                "instanceName": {
                     "type": "string"
                 },
                 "isAdmin": {
@@ -14320,6 +14847,12 @@ const docTemplateapi = `{
                 }
             }
         },
+        "starr.OpenRatings": {
+            "type": "object",
+            "additionalProperties": {
+                "$ref": "#/definitions/starr.Ratings"
+            }
+        },
         "starr.Quality": {
             "type": "object",
             "properties": {
@@ -14366,6 +14899,9 @@ const docTemplateapi = `{
             "properties": {
                 "popularity": {
                     "type": "number"
+                },
+                "type": {
+                    "type": "string"
                 },
                 "value": {
                     "type": "number"

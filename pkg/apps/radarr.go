@@ -28,6 +28,8 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/qualityProfile/{profileID:[0-9]+}", radarrDeleteQualityProfile, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/qualityProfiles/all", radarrDeleteAllQualityProfiles, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/rootFolder", radarrRootFolders, "GET")
+	a.HandleAPIpath(starr.Radarr, "/naming", radarrGetNaming, "GET")
+	a.HandleAPIpath(starr.Radarr, "/naming", radarrUpdateNaming, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/search/{query}", radarrSearchMovie, "GET")
 	a.HandleAPIpath(starr.Radarr, "/tag", radarrGetTags, "GET")
 	a.HandleAPIpath(starr.Radarr, "/tag/{tid:[0-9]+}/{label}", radarrUpdateTag, "PUT")
@@ -460,6 +462,53 @@ func radarrRootFolders(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, p
+}
+
+// @Description  Returns Radarr movie naming conventions.
+// @Summary      Retrieve Radarr Movie Naming
+// @Tags         Radarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=radarr.Naming} "naming conventions"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/radarr/{instance}/naming [get]
+// @Security     ApiKeyAuth
+func radarrGetNaming(req *http.Request) (int, interface{}) {
+	naming, err := getRadarr(req).GetNamingContext(req.Context())
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("getting naming: %w", err)
+	}
+
+	return http.StatusOK, naming
+}
+
+// @Description  Updates the Radarr movie naming conventions.
+// @Summary      Update Radarr Movie Naming
+// @Tags         Radarr
+// @Produce      json
+// @Accept       json
+// @Param        PUT body radarr.Naming  true  "naming conventions"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "naming ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/radarr/{instance}/naming [put]
+// @Security     ApiKeyAuth
+func radarrUpdateNaming(req *http.Request) (int, interface{}) {
+	var naming radarr.Naming
+
+	err := json.NewDecoder(req.Body).Decode(&naming)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	output, err := getRadarr(req).UpdateNamingContext(req.Context(), &naming)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating naming: %w", err)
+	}
+
+	return http.StatusOK, output.ID
 }
 
 // @Description  Searches all Radarr Movie Titles for the search term provided. Returns a minimal amount of data for each found item.
