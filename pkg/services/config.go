@@ -28,8 +28,9 @@ const (
 var (
 	ErrNoName      = fmt.Errorf("service check is missing a unique name")
 	ErrNoCheck     = fmt.Errorf("service check is missing a check value")
-	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s, %s, %s, %s", CheckTCP, CheckHTTP, CheckPROC, CheckPING, CheckICMP)
-	ErrBadTCP      = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
+	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s, %s, %s, %s",
+		CheckTCP, CheckHTTP, CheckPROC, CheckPING, CheckICMP)
+	ErrBadTCP = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
 )
 
 // Config for this Services plugin comes from a config file.
