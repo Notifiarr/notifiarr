@@ -59,6 +59,7 @@ const (
 	CheckHTTP CheckType = "http"
 	CheckTCP  CheckType = "tcp"
 	CheckPING CheckType = "ping"
+	CheckICMP CheckType = "icmp"
 	CheckPROC CheckType = "process"
 )
 
@@ -114,5 +115,6 @@ type service struct {
 	LastCheck    time.Time  `json:"lastCheck"`
 	log          mnd.Logger
 	proc         *procExpect // only used for process checks.
+	ping         *pingExpect // only used for icmp/udp ping checks.
 	sync.RWMutex `json:"-"`
 }

@@ -117,6 +117,10 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 		if len(config.Service) > index {
 			reply, code = testProcess(request.Context(), config.Service[index])
 		}
+	case "Ping", "Icmp":
+		if len(config.Service) > index {
+			reply, code = testPing(request.Context(), config.Service[index])
+		}
 	// Media
 	case "Plex":
 		reply, code = testPlex(request.Context(), config.Plex)
@@ -330,6 +334,19 @@ func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 	}
 
 	return "Process Tested OK: " + res.Output, http.StatusOK
+}
+
+func testPing(ctx context.Context, svc *services.Service) (string, int) {
+	if err := svc.Validate(); err != nil {
+		return "Validation: " + err.Error(), http.StatusBadRequest
+	}
+
+	res := svc.CheckOnly(ctx)
+	if res.State != services.StateOK {
+		return res.State.String() + " " + res.Output, http.StatusBadGateway
+	}
+
+	return "Ping Tested OK: " + res.Output, http.StatusOK
 }
 
 func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {

@@ -134,6 +134,8 @@ function addServiceCheck()
                     '<option value="process">Process</option>'+
                     '<option value="http" selected>HTTP</option>'+
                     '<option value="tcp">TCP Port</option>'+
+                    '<option value="ping">UDP Ping</option>'+
+                    '<option value="icmp">ICMP Ping</option>'+
                 '</select>'+
             '</div>'+
         '</div>'+
@@ -223,6 +225,9 @@ function addServiceCheck()
                         'Running'+
                     '</option>'+
                 '</select>'+
+                '<input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Count of packets to sent." class="form-control input-sm servicePingParam servicePingParamCount" value="3" style="width:30%;display:none;">'+
+                '<input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Packets that must be received." class="form-control input-sm servicePingParam servicePingParamMin" value="2" style="width:30%;display:none;">'+
+                '<input type="number" min="100" max=10000 onChange="checkExpectChange($(this));" title="Interval in milliseonds between packets." class="form-control input-sm servicePingParam servicePingParamInt" value="500" style="width:40%;display:none;">'+
                 '<input type="number" min="0" onChange="checkExpectChange($(this));" title="Minimum number of proesses allowed to run." placeholder="Min" data-index="'+ index +'" data-app="checks" class="form-control input-sm serviceProcessParam serviceProcessParamMin" value="0" style="width:30%;display:none;">'+
                 '<input type="number" min="0" onChange="checkExpectChange($(this));" title="Maximm number of process allowed to run." placeholder="Max" data-index="'+ index +'" data-app="checks" class="form-control input-sm serviceProcessParam serviceProcessParamMax" value="0" style="width:30%;display:none;">'+
                 '<input disabled type="text" data-app="checks" value="unused" class="form-control input-sm serviceTCPParam" style="display:none;">'+
@@ -288,6 +293,7 @@ function checkTypeChange(from)
     ctl.find('.serviceProcessParam').hide();
     ctl.find('.serviceHTTPParam').hide();
     ctl.find('.serviceTCPParam').hide();
+    ctl.find('.servicePingParam').hide();
 
     switch (from.val()) {
         case "process":
@@ -299,6 +305,10 @@ function checkTypeChange(from)
         case "tcp":
             checkExpectChange(ctl.find('.serviceTCPParam').show());
             break;
+        case "ping":
+        case "icmp":
+            checkExpectChange(ctl.find('.servicePingParam').show());
+            break;
     }
 
     toggleServiceTypeSelects();
@@ -307,13 +317,16 @@ function checkTypeChange(from)
 // This fires when an expect value (for process type) is changed.
 // Some values are incompatible with others, and the whole thing is copied
 // into the "real" value, so it can be POSTed properly (it's a string).
-function checkExpectChange(from)
-{
+function checkExpectChange(from) {
     const ctl = from.closest('.services-Checks'); // just this row.
     const run = ctl.find('.serviceProcessParamSelector').val() == 'running';
     const expect = ctl.find('.serviceProcessParamExpect')
 
-    if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.
+    if (from.hasClass('servicePingParam')) { // it's a "ping" or "icmp" check.
+        expect.val(ctl.find('.servicePingParamCount').val() +':'+ 
+            ctl.find('.servicePingParamMin').val() + ':'+ 
+            ctl.find('.servicePingParamInt').val());
+    } else if (from.hasClass('serviceHTTPParam')) { // it's an "http" check.
         // Copy comma-concatenated values into real 'expect' value.
         expect.val(from.val().join());
     } else if (from.hasClass('serviceTCPParam')) { // it's a "tcp" check.

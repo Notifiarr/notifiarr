@@ -27,6 +27,14 @@
                                         This check type does not take any special arguments and does not use the expect value.
                                         Simply provide a host (or IP) and port in the format <code>host:port</code>, example: <code>127.0.0.1:22</code>
                                     </p>
+                                    <h3>UDP and ICMP Ping Check Types</h3>
+                                    <li style="list-style: disc;">Both Ping check types allows you to monitor an IP or host for reachability.</li>
+                                    <li style="list-style: disc;">UDP check type may not work on Windows, use ICMP instead.</li>
+                                    <li style="list-style: disc;">To allow UDP checks to work on Linux, you must enable them with this command:<br>
+                                        <code>sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"</code></li>
+                                    <li style="list-style: disc;">To allow ICMP checks in Linux, you must give the notifiarr binary capabilities with this command:<br>
+                                        <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code></li>
+                                    <li style="list-style: disc;">Easiest way to make both work in Docker is to enable privileged mode, but you can set capabailities too.</li>
                                 </div>
                                 <div class="col-sm-12 col-md-12">
                                     <div class="table-responsive">
@@ -116,6 +124,8 @@
                                                                         <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
                                                                         <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
                                                                         <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
+                                                                        <option value="ping"{{if eq $svc.Type "ping"}} selected{{end}}>UDP Ping</option>
+                                                                        <option value="icmp"{{if eq $svc.Type "icmp"}} selected{{end}}>ICMP Ping</option>
                                                                     </select>
                                                                 </div>
                                                             </div>
@@ -214,6 +224,9 @@
                                                                         <option value="510"{{if and (eq $svc.Type "http") (contains $svc.Expect "510")}} selected{{end}}>510: NotExtended</option>
                                                                         <option value="511"{{if and (eq $svc.Type "http") (contains $svc.Expect "511")}} selected{{end}}>511: NetworkAuthenticationRequired</option>
                                                                     </select>
+                                                                    <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Count of packets to sent." class="form-control input-sm servicePingParam servicePingParamCount" value="{{cutindex $svc.Expect ":" "3" 0}}" style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
+                                                                    <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Packets that must be received." class="form-control input-sm servicePingParam servicePingParamMin" value="{{cutindex $svc.Expect ":" "2" 1}}" style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
+                                                                    <input type="number" min="100" max=10000 onChange="checkExpectChange($(this));" title="Interval in milliseonds between packets." class="form-control input-sm servicePingParam servicePingParamInt" value="{{cutindex $svc.Expect ":" "500" 2}}" style="width:40%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
                                                                     <select onChange="checkExpectChange($(this));" style="width:40%;{{if ne $svc.Type "process"}}display:none;{{end}}" class="form-control input-sm serviceProcessParam serviceProcessParamSelector">
                                                                         <option value="">None</option>
                                                                         <option value="restart"{{if contains $svc.Expect "restart"}} selected{{end}}>

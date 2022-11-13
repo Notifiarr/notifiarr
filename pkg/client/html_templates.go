@@ -111,6 +111,13 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
+		"cutindex": func(str, delim, def string, idx int) string {
+			split := strings.Split(str, delim)
+			if idx >= len(split) {
+				return def
+			}
+			return split[idx]
+		},
 		"cache":   data.Get,
 		"cacheID": data.GetWithID,
 		"tojson": func(input any) string {
