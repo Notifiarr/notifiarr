@@ -19,6 +19,9 @@ func (s *Snapshot) getSystemTemps(ctx context.Context) error {
 	}
 
 	/*
+		https://github.com/shirou/gopsutil/issues/1377
+		^^ see this for why this code is now commented out.
+
 		if err == nil {
 			return nil
 		}

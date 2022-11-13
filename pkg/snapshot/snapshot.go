@@ -147,8 +147,7 @@ func (c *Config) GetSnapshot(ctx context.Context) (*Snapshot, []error, []error) 
 }
 
 func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []error) {
-	errs := snap.GetProcesses(ctx, c.PSTop)
-	errs = append(errs, snap.GetCPUSample(ctx))
+	errs := []error{snap.GetProcesses(ctx, c.PSTop), snap.GetCPUSample(ctx)}
 
 	if err := snap.GetLocalData(ctx); len(err) != 0 {
 		errs = append(errs, err...)
