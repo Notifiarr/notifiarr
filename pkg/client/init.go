@@ -145,8 +145,8 @@ func (c *Client) printLidarr(app *clientinfo.InstanceConfig) {
 	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "server"+s)
 
 	for idx, f := range c.Config.Lidarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v",
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
@@ -177,8 +177,8 @@ func (c *Client) printRadarr(app *clientinfo.InstanceConfig) {
 	c.Print(" => Radarr Config:", len(c.Config.Radarr), "server"+s)
 
 	for idx, f := range c.Config.Radarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v",
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
@@ -193,8 +193,8 @@ func (c *Client) printReadarr(app *clientinfo.InstanceConfig) {
 	c.Print(" => Readarr Config:", len(c.Config.Readarr), "server"+s)
 
 	for idx, f := range c.Config.Readarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v",
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }
@@ -209,8 +209,8 @@ func (c *Client) printSonarr(app *clientinfo.InstanceConfig) {
 	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "server"+s)
 
 	for idx, f := range c.Config.Sonarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck_items:%v corrupt:%v backup:%v",
-			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1),
+		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v",
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled)
 	}
 }

@@ -17,20 +17,22 @@ import (
 
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
 func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
-	lidarr := c.getDownloadingItemsLidrr(ctx)
+	lidarr := c.getDownloadingItemsLidarr(ctx)
 	radarr := c.getDownloadingItemsRadarr(ctx)
 	readarr := c.getDownloadingItemsReadarr(ctx)
 	sonarr := c.getDownloadingItemsSonarr(ctx)
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
+		c.Debugf("[%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
+			input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
 		return
 	}
 
 	c.SendData(&website.Request{
 		Route:      website.DownloadRoute,
 		Event:      input.Type,
-		LogPayload: true,
-		ErrorsOnly: true,
+		LogPayload: false,
+		ErrorsOnly: false,
 		LogMsg: fmt.Sprintf("Downloading Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
 		Payload: &QueuesPaylod{
@@ -42,7 +44,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	})
 }
 
-func (c *cmd) getDownloadingItemsLidrr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList {
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -62,13 +64,15 @@ func (c *cmd) getDownloadingItemsLidrr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*lidarr.Queue)
-		app := items[instance]
+		app := listItem{}
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay {
 				app.Queue = append(app.Queue, item)
 			}
 		}
+
+		items[instance] = app
 	}
 
 	return items
@@ -94,13 +98,15 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*radarr.Queue)
-		app := items[instance]
+		app := listItem{}
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay {
 				app.Queue = append(app.Queue, item)
 			}
 		}
+
+		items[instance] = app
 	}
 
 	return items
@@ -126,13 +132,15 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*readarr.Queue)
-		app := items[instance]
+		app := listItem{}
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay {
 				app.Queue = append(app.Queue, item)
 			}
 		}
+
+		items[instance] = app
 	}
 
 	return items
@@ -158,7 +166,7 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 		}
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
-		app := items[instance]
+		app := listItem{}
 		// repeatStomper is used to collapse duplicate download IDs.
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
 
@@ -168,6 +176,8 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 				repeatStomper[item.DownloadID] = item
 			}
 		}
+
+		items[instance] = app
 	}
 
 	return items
