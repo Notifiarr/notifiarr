@@ -31,8 +31,8 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	c.SendData(&website.Request{
 		Route:      website.DownloadRoute,
 		Event:      input.Type,
-		LogPayload: false,
-		ErrorsOnly: false,
+		LogPayload: true,
+		ErrorsOnly: true,
 		LogMsg: fmt.Sprintf("Downloading Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
 		Payload: &QueuesPaylod{
