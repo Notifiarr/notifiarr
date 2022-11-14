@@ -63,7 +63,10 @@ func (s *Service) Validate() error { //nolint:cyclop
 		if err := s.checkProcValues(); err != nil {
 			return err
 		}
-	case CheckPING:
+	case CheckPING, CheckICMP:
+		if err := s.checkPingValues(s.Type == CheckICMP); err != nil {
+			return err
+		}
 	default:
 		return ErrInvalidType
 	}
@@ -100,7 +103,7 @@ func (s *Service) checkNow(ctx context.Context) (res *result) {
 		return s.checkHTTP(ctx)
 	case CheckTCP:
 		return s.checkTCP()
-	case CheckPING:
+	case CheckPING, CheckICMP:
 		return s.checkPING()
 	case CheckPROC:
 		return s.checkProccess(ctx)
@@ -234,13 +237,6 @@ func (s *Service) checkTCP() *result {
 	}
 
 	return res
-}
-
-func (s *Service) checkPING() *result {
-	return &result{
-		state:  StateUnknown,
-		output: "ping does not work yet",
-	}
 }
 
 func (s *Service) Due() bool {

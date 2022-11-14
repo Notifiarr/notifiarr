@@ -438,14 +438,30 @@ If you provide a log file for service checks, those logs will no longer write to
 
 You can also create ad-hoc service checks for things like Bazarr.
 
-| Config Name      | Variable Name           | Note                                         |
-| ---------------- | ----------------------- | -------------------------------------------- |
-| service.name     | `DN_SERVICE_0_NAME`     | Services must have a unique name             |
-| service.type     | `DN_SERVICE_0_TYPE`     | Type must be one of `http`, `tcp`, `process` |
-| service.check    | `DN_SERVICE_0_CHECK`    | The `URL`, or `host/ip:port` to check        |
-| service.expect   | `DN_SERVICE_0_EXPECT`   | `200`, For HTTP, the return code to expect   |
-| service.timeout  | `DN_SERVICE_0_TIMEOUT`  | `15s`, How long to wait for service response |
-| service.interval | `DN_SERVICE_0_INTERVAL` | `5m`, How often to check the service         |
+| Config Name      | Variable Name           | Note                                                         |
+| ---------------- | ----------------------- | -----------------------------------------------------------  |
+| service.name     | `DN_SERVICE_0_NAME`     | Services must have a unique name                             |
+| service.type     | `DN_SERVICE_0_TYPE`     | Type must be one of `http`, `tcp`, `process`, `ping`, `icmp` |
+| service.check    | `DN_SERVICE_0_CHECK`    | The `URL`, `ip`, `host`, or `host/ip:port` to check          |
+| service.expect   | `DN_SERVICE_0_EXPECT`   | `200`, For HTTP, the return code to expect                   |
+| service.timeout  | `DN_SERVICE_0_TIMEOUT`  | `15s`, How long to wait for service response                 |
+| service.interval | `DN_SERVICE_0_INTERVAL` | `5m`, How often to check the service                         |
+
+#### Ping and ICMP Service Checks
+
+When `type` is set to `ping` a UDP ping check is performed, and when type is `icmp` an ICMP ping check is performed.
+With both settings, the `expect` parameter must be three integers seperated by colons. ie. `3:2:500`.
+This example means send 3 packets every 500 milliseconds, and expect at least 2 in return.
+
+To enable unprivileged UDP pings on Linux you must run this command:
+```bash
+sudo sysctl -w net.ipv4.ping_group_range="0 2147483647"
+```
+
+To give the notifiarr binary access to send ICMP pings on Linux, run this command:
+```
+sudo setcap cap_net_raw=+ep /usr/bin/notifiarr
+```
 
 #### Process Service Checks
 

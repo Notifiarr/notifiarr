@@ -28,8 +28,9 @@ const (
 var (
 	ErrNoName      = fmt.Errorf("service check is missing a unique name")
 	ErrNoCheck     = fmt.Errorf("service check is missing a check value")
-	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s, %s", CheckTCP, CheckHTTP, CheckPROC)
-	ErrBadTCP      = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
+	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s, %s, %s, %s",
+		CheckTCP, CheckHTTP, CheckPROC, CheckPING, CheckICMP)
+	ErrBadTCP = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
 )
 
 // Config for this Services plugin comes from a config file.
@@ -59,6 +60,7 @@ const (
 	CheckHTTP CheckType = "http"
 	CheckTCP  CheckType = "tcp"
 	CheckPING CheckType = "ping"
+	CheckICMP CheckType = "icmp"
 	CheckPROC CheckType = "process"
 )
 
@@ -114,5 +116,6 @@ type service struct {
 	LastCheck    time.Time  `json:"lastCheck"`
 	log          mnd.Logger
 	proc         *procExpect // only used for process checks.
+	ping         *pingExpect // only used for icmp/udp ping checks.
 	sync.RWMutex `json:"-"`
 }
