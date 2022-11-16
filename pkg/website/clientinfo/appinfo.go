@@ -188,7 +188,7 @@ func (c *Config) getAppConfigs(ctx context.Context) *AppConfigs {
 			strings.ReplaceAll(c.Apps.Tautulli.APIKey, "<redacted>", err.Error()))
 	} else {
 		apps.Tautulli = &AppInfoTautulli{
-			Users: u.MapEmailName(),
+			Users: u.MapIdName(),
 		}
 	}
 
