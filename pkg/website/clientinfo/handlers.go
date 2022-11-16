@@ -106,7 +106,7 @@ type AppStatuses struct {
 //
 //nolint:lll
 func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
-	return http.StatusOK, c.Info(r.Context())
+	return http.StatusOK, c.Info(r.Context(), false)
 }
 
 // VersionHandler returns application run and build time data and application statuses.
@@ -119,7 +119,7 @@ func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
 // @Router       /api/version [get]
 // @Security     ApiKeyAuth
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
-	output := c.Info(r.Context())
+	output := c.Info(r.Context(), false)
 	output.AppsStatus = c.appStatsForVersion(r.Context())
 
 	return http.StatusOK, output
@@ -138,7 +138,7 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 // @Router       /api/version/{app}/{instance} [get]
 // @Security     ApiKeyAuth
 func (c *Config) VersionHandlerInstance(r *http.Request) (int, interface{}) {
-	output := c.Info(r.Context())
+	output := c.Info(r.Context(), false)
 	instance, _ := strconv.Atoi(mux.Vars(r)["instance"])
 	output.AppsStatus = c.appStatsForVersionInstance(r.Context(), mux.Vars(r)["app"], instance)
 

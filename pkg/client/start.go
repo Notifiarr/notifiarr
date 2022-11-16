@@ -207,7 +207,7 @@ func (c *Client) loadConfiguration(ctx context.Context) (msg string, newPassword
 
 // Load configuration from the website.
 func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
-	clientInfo, err := c.clientinfo.SaveClientInfo(ctx)
+	clientInfo, err := c.clientinfo.SaveClientInfo(ctx, true)
 	if err != nil || clientInfo == nil {
 		if errors.Is(err, website.ErrInvalidAPIKey) {
 			c.ErrorfNoShare("==> Problem validating API key: %v", err)

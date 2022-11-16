@@ -139,30 +139,21 @@ type User struct {
 	AllowGuest      int      `json:"allow_guest"`   // 1,0 (bool)
 }
 
-// MapEmailName returns a map of email => name for Tautulli users.
-func (u *Users) MapEmailName() map[string]string {
+// MapIDName returns a map of plex user ID => Feiendly Name (or username) for Tautulli users.
+func (u *Users) MapIDName() map[int64]string {
 	if u == nil {
 		return nil
 	}
 
-	nameMap := map[string]string{}
+	nameMap := map[int64]string{}
 
 	for _, user := range u.Response.Data {
-		// user.FriendlyName always seems to be set, so this first if-block is safety only.
-		if user.FriendlyName == "" && user.Email != "" && user.Username != "" {
-			nameMap[user.Email] = user.Username
-			continue
-		} else if user.FriendlyName == "" {
-			// This user has no mapability.
-			continue
+		if user.FriendlyName == "" {
+			nameMap[user.UserID] = user.Username
+		} else {
+			nameMap[user.UserID] = user.FriendlyName
 		}
 
-		// We only need username or email, not both, but in the order username then email.
-		if user.Username != "" {
-			nameMap[user.Username] = user.FriendlyName
-		} else if user.Email != "" {
-			nameMap[user.Email] = user.FriendlyName
-		}
 	}
 
 	return nameMap

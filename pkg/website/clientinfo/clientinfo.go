@@ -134,11 +134,11 @@ func (c *ClientInfo) IsPatron() bool {
 }
 
 // SaveClientInfo returns an error if the API key is wrong. Caches and returns client info otherwise.
-func (c *Config) SaveClientInfo(ctx context.Context) (*ClientInfo, error) {
+func (c *Config) SaveClientInfo(ctx context.Context, startup bool) (*ClientInfo, error) {
 	body, err := c.GetData(&website.Request{
 		Route:      website.ClientRoute,
 		Event:      website.EventStart,
-		Payload:    c.Info(ctx),
+		Payload:    c.Info(ctx, startup),
 		LogPayload: true,
 	})
 	if err != nil {
