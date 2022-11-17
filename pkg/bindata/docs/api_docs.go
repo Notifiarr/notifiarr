@@ -10926,7 +10926,7 @@ const docTemplateapi = `{
             "type": "object",
             "properties": {
                 "users": {
-                    "description": "Tautulli user -\u003e email map.",
+                    "description": "Tautulli userID -\u003e email map.",
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"

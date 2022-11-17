@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // Config is the Tautulli configuration.
@@ -18,26 +19,33 @@ type Config struct {
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
 func (c *Config) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.URL+"/api/v2", nil)
+	err := func() error {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.URL+"/api/v2", nil)
+		if err != nil {
+			return fmt.Errorf("creating request: %w", err)
+		}
+
+		req.URL.RawQuery = params.Encode()
+
+		resp, err := c.Client.Do(req)
+		if err != nil {
+			return fmt.Errorf("making request: %w", err)
+		}
+		defer resp.Body.Close()
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
+		}
+
+		if err := json.Unmarshal(body, into); err != nil {
+			return fmt.Errorf("decoding response (%s): %w: %s", resp.Status, err, string(body))
+		}
+
+		return nil
+	}()
 	if err != nil {
-		return fmt.Errorf("creating request: %w", err)
-	}
-
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := c.Client.Do(req)
-	if err != nil {
-		return fmt.Errorf("making request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("reading response (%s): %w: %s", resp.Status, err, string(body))
-	}
-
-	if err := json.Unmarshal(body, into); err != nil {
-		return fmt.Errorf("decoding response (%s): %w: %s", resp.Status, err, string(body))
+		return fmt.Errorf("%s", strings.ReplaceAll(err.Error(), c.APIKey, "<redacted>")) //nolint:goerr113
 	}
 
 	return nil

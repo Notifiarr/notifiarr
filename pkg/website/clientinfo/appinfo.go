@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -185,12 +184,9 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 
 	if !startup {
 		if u, err := c.tautulliUsers(ctx); err != nil {
-			c.Error("Getting Tautulli Users:",
-				strings.ReplaceAll(c.Apps.Tautulli.APIKey, "<redacted>", err.Error()))
+			c.Error("Getting Tautulli Users:", err)
 		} else {
-			apps.Tautulli = &AppInfoTautulli{
-				Users: u.MapIDName(),
-			}
+			apps.Tautulli = &AppInfoTautulli{Users: u.MapIDName()}
 		}
 	}
 
