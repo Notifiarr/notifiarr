@@ -103,7 +103,7 @@ func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action 
 	}
 }
 
-// stopTimerLoop is defered by runTimerLoop.
+// stopTimerLoop is deferred by runTimerLoop.
 // This procedure closes all the timer channels and stops the tickers.
 // These cannot be restarted and must be fully initialized again.
 func (c *Config) stopTimerLoop(actions []*Action) {

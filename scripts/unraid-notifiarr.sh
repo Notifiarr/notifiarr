@@ -35,7 +35,7 @@ UPTIME=$(cut -d. -f1 /proc/uptime)
 LOADAV=$(uptime | cut -d: -f5)
 KERNEL=$(uname -s -r)
 RUNNING=$(docker ps -q 2>&1 | wc -l)
-STOPED=$(echo "$(docker ps -aq 2>&1 | wc -l) ${RUNNING}" | awk '{printf($1-$2)}')
+STOPPED=$(echo "$(docker ps -aq 2>&1 | wc -l) ${RUNNING}" | awk '{printf($1-$2)}')
 UNRAIDVER=$(head -n1 /etc/issue | grep -o '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?$')
 MEMTOTAL=$(grep MemTotal /proc/meminfo | awk '{printf($2)}')
 MEMAVAIL=$(grep MemAvailable /proc/meminfo | awk '{printf($2)}')
@@ -52,7 +52,7 @@ POST=$(cat <<EOF
     "extra": {
       "uptime":   ${UPTIME},
       "running":  ${RUNNING},
-      "stopped":  ${STOPED},
+      "stopped":  ${STOPPED},
       "cpu":      ${CPUPERC},
       "load":     "${LOADAV}",
       "kernel":   "${KERNEL}",

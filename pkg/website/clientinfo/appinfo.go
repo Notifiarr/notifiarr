@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"runtime"
-	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -75,7 +74,7 @@ type AppInfoConfig struct {
 	Apps           *AppConfigs `json:"apps"`
 }
 
-// AppConfigs contains exported configuations for various integrations.
+// AppConfigs contains exported configurations for various integrations.
 type AppConfigs struct {
 	Lidarr   []*AppInfoAppConfig `json:"lidarr"`
 	Prowlarr []*AppInfoAppConfig `json:"prowlarr"`
@@ -85,7 +84,7 @@ type AppConfigs struct {
 	Tautulli *AppInfoTautulli    `json:"tautulli"`
 }
 
-// AppInfoAppConfig Maps an instnce to a name and/or other properties.
+// AppInfoAppConfig Maps an instance to a name and/or other properties.
 type AppInfoAppConfig struct {
 	// The site-ID for the instance (1-index).
 	Instance int `json:"instance"`
@@ -95,12 +94,12 @@ type AppInfoAppConfig struct {
 
 // AppInfoTautulli contains the Tautulli user map, fetched from Tautulli.
 type AppInfoTautulli struct {
-	// Tautulli user -> email map.
-	Users map[string]string `json:"users"`
+	// Tautulli userID -> email map.
+	Users map[int64]string `json:"users"`
 }
 
 // Info is used for JSON input for our outgoing app info.
-func (c *Config) Info(ctx context.Context) *AppInfo {
+func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
 	if c.Apps.Plex.Enabled() {
 		numPlex = 1
@@ -146,7 +145,7 @@ func (c *Config) Info(ctx context.Context) *AppInfo {
 		Config: AppInfoConfig{
 			WebsiteTimeout: c.Server.Config.Timeout.String(),
 			Retries:        c.Server.Config.Retries,
-			Apps:           c.getAppConfigs(ctx),
+			Apps:           c.getAppConfigs(ctx, startup),
 		},
 		Commands:  c.CmdList,
 		Host:      host,
@@ -154,7 +153,7 @@ func (c *Config) Info(ctx context.Context) *AppInfo {
 	}
 }
 
-func (c *Config) getAppConfigs(ctx context.Context) *AppConfigs {
+func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 	apps := new(AppConfigs)
 	add := func(i int, name string) *AppInfoAppConfig {
 		return &AppInfoAppConfig{
@@ -183,12 +182,11 @@ func (c *Config) getAppConfigs(ctx context.Context) *AppConfigs {
 		apps.Sonarr = append(apps.Sonarr, add(i, app.Name))
 	}
 
-	if u, err := c.tautulliUsers(ctx); err != nil {
-		c.Error("Getting Tautulli Users:",
-			strings.ReplaceAll(c.Apps.Tautulli.APIKey, "<redacted>", err.Error()))
-	} else {
-		apps.Tautulli = &AppInfoTautulli{
-			Users: u.MapEmailName(),
+	if !startup {
+		if u, err := c.tautulliUsers(ctx); err != nil {
+			c.Error("Getting Tautulli Users:", err)
+		} else {
+			apps.Tautulli = &AppInfoTautulli{Users: u.MapIDName()}
 		}
 	}
 

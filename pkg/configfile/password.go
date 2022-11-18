@@ -40,7 +40,7 @@ func (c *Config) setupPassword() error {
 	return nil
 }
 
-// Set sets a crypted password.
+// Set sets a encrypted password.
 func (p *CryptPass) Set(pass string) error {
 	if strings.HasPrefix(pass, cryptedPassPfx) {
 		*p = CryptPass(pass)

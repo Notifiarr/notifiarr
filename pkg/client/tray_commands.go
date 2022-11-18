@@ -18,7 +18,7 @@ import (
 	"golift.io/version"
 )
 
-/* This file contains methdos that are triggered from the GUI menu. */
+/* This file contains methods that are triggered from the GUI menu. */
 
 func (c *Client) toggleServer(ctx context.Context) {
 	if c.server == nil {

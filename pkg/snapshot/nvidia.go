@@ -15,7 +15,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-// NvidiaConfig is our intput data.
+// NvidiaConfig is our input data.
 type NvidiaConfig struct {
 	SMIPath  string   `toml:"smi_path" xml:"smi_path" json:"smiPath"`
 	BusIDs   []string `toml:"bus_ids" xml:"bus_id" json:"busIDs"`

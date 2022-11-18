@@ -91,7 +91,7 @@ A sample docker compose file is [found in Examples](https://github.com/Notifiarr
 
 **Unraid Users** - You must configure a Notifiarr API Key in the Unraid Template. If you wish to use Plex then you'll also need to set the Plex Token and Plex URL in the template as well.
 
-**Docker Users** - Note that Docker Enviormental Variables - and thus the Unraid Template - override the Config file.
+**Docker Users** - Note that Docker Environmental Variables - and thus the Unraid Template - override the Config file.
 
 #### Docker Config File
 
@@ -450,7 +450,7 @@ You can also create ad-hoc service checks for things like Bazarr.
 #### Ping and ICMP Service Checks
 
 When `type` is set to `ping` a UDP ping check is performed, and when type is `icmp` an ICMP ping check is performed.
-With both settings, the `expect` parameter must be three integers seperated by colons. ie. `3:2:500`.
+With both settings, the `expect` parameter must be three integers separated by colons. ie. `3:2:500`.
 This example means send 3 packets every 500 milliseconds, and expect at least 2 in return.
 
 To enable unprivileged UDP pings on Linux you must run this command:

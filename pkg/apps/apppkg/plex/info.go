@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-// GetInfo retreives Plex Server Info. This also sets the friendly name, so s.Name() works.
+// GetInfo retrieves Plex Server Info. This also sets the friendly name, so s.Name() works.
 func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
 	data, err := s.getPlexURL(ctx, s.config.URL, nil)
 	if err != nil {

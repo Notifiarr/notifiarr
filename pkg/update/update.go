@@ -1,7 +1,7 @@
 // Package update checks for an available update on GitHub.
 // It has baked in assumptions, but is mostly portable.
 // Makes it easy for the notifiarr client application to send a
-// notifiation when a new version is available.
+// notification when a new version is available.
 package update
 
 import (
@@ -102,7 +102,7 @@ func NowWithContext(ctx context.Context, update *Command) (string, error) {
 func (u *Command) replaceFile(ctx context.Context) (string, error) {
 	tempFolderPath, err := filepath.Abs(filepath.Dir(u.Path))
 	if err != nil {
-		return "", fmt.Errorf("getting appliction folder: %w", err)
+		return "", fmt.Errorf("getting application folder: %w", err)
 	}
 
 	tempFile, err := u.writeFile(ctx, tempFolderPath)
