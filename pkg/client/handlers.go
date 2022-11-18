@@ -125,7 +125,7 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 
 	response.WriteHeader(http.StatusNotFound)
 
-	if err := c.templat.ExecuteTemplate(response, "404.html", nil); err != nil {
+	if err := c.template.ExecuteTemplate(response, "404.html", nil); err != nil {
 		c.Logger.Errorf("Sending HTTP Reply: %v", err)
 	}
 }

@@ -2,7 +2,7 @@
 // It creates several logging channels for debug, info, errors, http, etc.
 // These channels are directed to log files and/or stdout depending on how
 // the application is configured. This package reads its configuration
-// directly from a config file. In here you will find the log roatation
+// directly from a config file. In here you will find the log rotation
 // config for rotatorr, panic redirection, and external logging methods.
 package logs
 
@@ -164,7 +164,7 @@ func (l *Logger) Close() (errors []error) {
 	return errors
 }
 
-// CapturePanic can be defered in any go routine to log any panic that occurs.
+// CapturePanic can be deferred in any go routine to log any panic that occurs.
 func (l *Logger) CapturePanic() {
 	if r := recover(); r != nil {
 		ui.ShowConsoleWindow()

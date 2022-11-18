@@ -36,7 +36,7 @@ else
 	ITERATION:=$(_ITERATION)
 endif
 
-# rpm is wierd and changes - to _ in versions.
+# rpm is weird and changes - to _ in versions.
 RPMVERSION:=$(shell echo $(VERSION) | tr -- - _)
 # used for freebsd packages.
 BINARYU:=$(shell echo $(BINARY) | tr -- - _)
@@ -517,7 +517,7 @@ docker:
 
 # This builds a Homebrew formula file that can be used to install this app from source.
 # The source used comes from the released version on GitHub. This will not work with local source.
-# This target is used by Travis CI to update the released Forumla when a new tag is created.
+# This target is used by Travis CI to update the released Formula when a new tag is created.
 formula: $(BINARY).rb
 v$(VERSION).tar.gz.sha256:
 	# Calculate the SHA from the Github source file.

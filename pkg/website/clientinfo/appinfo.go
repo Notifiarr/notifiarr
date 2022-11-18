@@ -74,7 +74,7 @@ type AppInfoConfig struct {
 	Apps           *AppConfigs `json:"apps"`
 }
 
-// AppConfigs contains exported configuations for various integrations.
+// AppConfigs contains exported configurations for various integrations.
 type AppConfigs struct {
 	Lidarr   []*AppInfoAppConfig `json:"lidarr"`
 	Prowlarr []*AppInfoAppConfig `json:"prowlarr"`
@@ -84,7 +84,7 @@ type AppConfigs struct {
 	Tautulli *AppInfoTautulli    `json:"tautulli"`
 }
 
-// AppInfoAppConfig Maps an instnce to a name and/or other properties.
+// AppInfoAppConfig Maps an instance to a name and/or other properties.
 type AppInfoAppConfig struct {
 	// The site-ID for the instance (1-index).
 	Instance int `json:"instance"`

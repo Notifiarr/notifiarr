@@ -45,7 +45,7 @@ type Client struct {
 	clientinfo *clientinfo.Config
 	triggers   *triggers.Actions
 	cookies    *securecookie.SecureCookie
-	templat    *template.Template
+	template   *template.Template
 	webauth    bool
 	reloading  bool
 	// this locks anything that may be updated while running.
@@ -179,7 +179,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 		" and was also printed in the log file '"+c.Config.LogFile+"' and/or app ouptput.")
 }
 
-// loadConfiguration brings in, and sometimes creates, the initial running confguration.
+// loadConfiguration brings in, and sometimes creates, the initial running configuration.
 func (c *Client) loadConfiguration(ctx context.Context) (msg string, newPassword string, err error) {
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
@@ -310,7 +310,7 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 
 	err := c.stop(ctx, event)
 	if err != nil {
-		return fmt.Errorf("stoping web server: %w", err)
+		return fmt.Errorf("stopping web server: %w", err)
 	}
 
 	// start over.

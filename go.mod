@@ -74,7 +74,7 @@ require (
 	howett.net/plist v1.0.0 // indirect
 )
 
-// zip extraction for databsae corruption checks.
+// zip extraction for database corruption checks.
 require (
 	github.com/nwaples/rardecode v1.1.3 // indirect
 	github.com/saracen/go7z v0.0.0-20191010121135-9c09b6bd7fda // indirect
@@ -83,7 +83,7 @@ require (
 	github.com/ulikunitz/xz v0.5.10 // indirect
 )
 
-// sqlite3 abstraction for databsae corruption checks.
+// sqlite3 abstraction for database corruption checks.
 require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect

@@ -48,7 +48,7 @@ package() {
     "${pkgdir}/usr/share/licenses/${pkgname}" "${pkgdir}/etc/${pkgname}"
   # Man file.
   install -Dm644 "${pkgname}.1.gz" "${pkgdir}/share/man/man1/${pkgname}.1.gz"
-  # Config file, ane example config file.
+  # Config file, and example config file.
   install -m644 "examples/${configfile}.example" "${pkgdir}/etc/$pkgname/${configfile}.example"
   install -m644 "examples/${configfile}.example" "${pkgdir}/etc/${pkgname}/${configfile}"
   # Extra documentation.

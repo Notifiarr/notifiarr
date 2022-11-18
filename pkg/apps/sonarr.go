@@ -110,7 +110,7 @@ func (a *Apps) setupSonarr() error {
 // @Param        POST body sonarr.AddSeriesInput true "new item content"
 // @Success      201  {object} apps.Respond.apiResponse{message=sonarr.Series} "series content"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json payload"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item alrady exists"
+// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
 // @Failure      422  {object} apps.Respond.apiResponse{message=string} "no item ID provided"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error during check"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error during add"
@@ -157,14 +157,14 @@ func sonarrData(series *sonarr.Series) map[string]interface{} {
 	}
 }
 
-// @Description  Checks if a Sonarr Series alrady exists.
+// @Description  Checks if a Sonarr Series already exists.
 // @Summary      Check Sonarr Series Existence
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tvdbid    path   int64  true  "TVDB ID"
 // @Success      201  {object} apps.Respond.apiResponse{message=string} "series does not exist"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item alrady exists"
+// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/check/{tvdbid} [get]

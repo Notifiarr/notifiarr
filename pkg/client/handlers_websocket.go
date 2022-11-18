@@ -132,7 +132,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 
 			if err := socket.WriteMessage(websocket.TextMessage, []byte(text)); err != nil {
 				c.Debugf("websocket closed, write error: %v", err)
-				return // ded sock
+				return // dead sock
 			}
 		case <-pingTicker.C:
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))

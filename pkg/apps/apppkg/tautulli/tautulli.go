@@ -161,7 +161,6 @@ func (u *Users) MapIDName() map[int64]string {
 		} else {
 			nameMap[user.UserID] = user.FriendlyName
 		}
-
 	}
 
 	return nameMap

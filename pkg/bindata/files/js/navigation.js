@@ -74,7 +74,7 @@ function shutDownApp()
              error: function (request, status, error) {
                  if (response.status == 0) {
                      toast('Web Server Error',
-                         'Notifiarr client appears to be down aleady.', 'error', 30000);
+                         'Notifiarr client appears to be down already.', 'error', 30000);
                  } else {
                      toast('Shutdown Error', (error!=''?error:'Bad Request')+': '+response.responseText, 'error', 10000);
                  }
