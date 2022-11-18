@@ -147,7 +147,7 @@ const docTemplateapi = `{
                         }
                     },
                     "409": {
-                        "description": "item alrady exists",
+                        "description": "item already exists",
                         "schema": {
                             "allOf": [
                                 {
@@ -2043,7 +2043,7 @@ const docTemplateapi = `{
                         }
                     },
                     "409": {
-                        "description": "item alrady exists",
+                        "description": "item already exists",
                         "schema": {
                             "allOf": [
                                 {
@@ -2174,7 +2174,7 @@ const docTemplateapi = `{
                         }
                     },
                     "409": {
-                        "description": "item alrady exists",
+                        "description": "item already exists",
                         "schema": {
                             "allOf": [
                                 {
@@ -4831,7 +4831,7 @@ const docTemplateapi = `{
                         }
                     },
                     "409": {
-                        "description": "item alrady exists",
+                        "description": "item already exists",
                         "schema": {
                             "allOf": [
                                 {
@@ -6251,7 +6251,7 @@ const docTemplateapi = `{
                         }
                     },
                     "409": {
-                        "description": "item alrady exists",
+                        "description": "item already exists",
                         "schema": {
                             "allOf": [
                                 {
@@ -6332,7 +6332,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Checks if a Sonarr Series alrady exists.",
+                "description": "Checks if a Sonarr Series already exists.",
                 "produces": [
                     "application/json"
                 ],
@@ -6382,7 +6382,7 @@ const docTemplateapi = `{
                         }
                     },
                     "409": {
-                        "description": "item alrady exists",
+                        "description": "item already exists",
                         "schema": {
                             "allOf": [
                                 {

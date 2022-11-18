@@ -44,7 +44,7 @@ func (f FileMode) String() string {
 	return fmt.Sprintf("%04o", f)
 }
 
-// Mode returns the compatable os.FileMode.
+// Mode returns the compatible os.FileMode.
 func (f FileMode) Mode() os.FileMode {
 	return os.FileMode(f)
 }

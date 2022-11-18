@@ -20,7 +20,7 @@ var ErrNotSynology = fmt.Errorf("the running host is not a Synology")
 type Synology struct {
 	Build   string `json:"last_admin_login_build"` // 254263
 	Manager string `json:"manager"`                // Synology DiskStation
-	Vendor  string `json:"vender"`                 // Synology Inc.
+	Vendor  string `json:"vendor"`                 // Synology Inc.
 	Model   string `json:"upnpmodelname"`          // DS1517+
 	Version string `json:"udc_check_state"`        // 6.2.3
 }
@@ -67,7 +67,7 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 			syn.Build = strings.Trim(lsplit[1], "\n\"")
 		case "manager":
 			syn.Manager = strings.Trim(lsplit[1], "\n\"")
-		case "vender":
+		case "vendor":
 			syn.Vendor = strings.Trim(lsplit[1], "\n\"")
 		case "upnpmodelname":
 			syn.Model = strings.Trim(lsplit[1], "\n\"")

@@ -31,7 +31,7 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context) error {
 		}
 	}
 
-	// Not defered because we want it closed before calling s.getMemoryUsageShared().
+	// Not deferred because we want it closed before calling s.getMemoryUsageShared().
 	_ = file.Close()
 
 	s.System.MemTotal *= 1024

@@ -58,9 +58,9 @@ var userNameStr interface{} = userNameValue(1)
 
 func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-		userName, dyanmic := c.getUserName(request)
+		userName, dynamic := c.getUserName(request)
 		if userName != "" {
-			ctx := context.WithValue(request.Context(), userNameStr, []interface{}{userName, dyanmic})
+			ctx := context.WithValue(request.Context(), userNameStr, []interface{}{userName, dynamic})
 			next.ServeHTTP(response, request.WithContext(ctx))
 		} else {
 			http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
@@ -301,7 +301,7 @@ func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Req
 	http.Error(response, "Service Check Initiated", http.StatusOK)
 }
 
-// getFileHandler returns portions of a config or log file based on request paraeters.
+// getFileHandler returns portions of a config or log file based on request parameters.
 func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request) {
 	var fileInfos *logs.LogFileInfos
 
@@ -455,7 +455,7 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 
 	uri := "ajax/" + mux.Vars(request)["path"] + ".html"
 
-	if err := c.templat.ExecuteTemplate(response, uri, cmd); err != nil {
+	if err := c.template.ExecuteTemplate(response, uri, cmd); err != nil {
 		http.Error(response, "template error: "+err.Error(), http.StatusOK)
 	}
 }
@@ -741,7 +741,7 @@ func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, re
 
 func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
 	page := mux.Vars(req)["template"] + ".html"
-	if c.templat.Lookup(page) == nil {
+	if c.template.Lookup(page) == nil {
 		page = filepath.Join(mux.Vars(req)["template"], "index.html")
 	}
 

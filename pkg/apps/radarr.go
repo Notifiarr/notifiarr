@@ -105,7 +105,7 @@ func (a *Apps) setupRadarr() error {
 // @Accept       json
 // @Success      201  {object} apps.Respond.apiResponse{message=radarr.Movie} "created"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json payload"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item alrady exists"
+// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
 // @Failure      422  {object} apps.Respond.apiResponse{message=string} "no item ID provided"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error during check"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error during add"
@@ -164,7 +164,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tmdbid    path   int64  true  "TMDB ID"
 // @Success      201  {object} apps.Respond.apiResponse{message=string} "movie does not exist"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item alrady exists"
+// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/check/{tmdbid} [get]

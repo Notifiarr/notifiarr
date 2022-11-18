@@ -358,7 +358,7 @@ func since(t time.Time) string {
 func (c *Client) ParseGUITemplates() error {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
-	c.templat = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
+	c.template = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
 
 	var err error
 
@@ -366,7 +366,7 @@ func (c *Client) ParseGUITemplates() error {
 	for _, name := range bindata.AssetNames() {
 		if strings.HasPrefix(name, "templates/") {
 			trim := strings.TrimPrefix(name, "templates/")
-			if c.templat, err = c.templat.New(trim).Parse(bindata.MustAssetString(name)); err != nil {
+			if c.template, err = c.template.New(trim).Parse(bindata.MustAssetString(name)); err != nil {
 				return fmt.Errorf("bug parsing internal template: %w", err)
 			}
 		}
@@ -402,7 +402,7 @@ func (c *Client) parseCustomTemplates() error {
 			return fmt.Errorf("reading custom template: %w", err)
 		}
 
-		c.templat, err = c.templat.New(trim).Parse(string(data))
+		c.template, err = c.template.New(trim).Parse(string(data))
 		if err != nil {
 			return fmt.Errorf("parsing custom template: %w", err)
 		}
@@ -444,7 +444,7 @@ func (c *Client) renderTemplate(
 	hostInfo, _ := c.website.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 
-	err := c.templat.ExecuteTemplate(response, templateName, &templateData{
+	err := c.template.ExecuteTemplate(response, templateName, &templateData{
 		Config:      c.Config,
 		Flags:       c.Flags,
 		Username:    userName,

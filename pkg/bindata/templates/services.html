@@ -7,7 +7,7 @@
                                    </p>
                                     <p>
                                        Disable and Enable service checks on the <a href="#config" onClick="swapNavigationTemplate('config')">Configuration page</a>.
-                                       View running service check inforation on the <a href="#monitoring" onClick="swapNavigationTemplate('monitoring')">Monitoring page</a>.
+                                       View running service check information on the <a href="#monitoring" onClick="swapNavigationTemplate('monitoring')">Monitoring page</a>.
                                    </p>
                                     <h3>Process Check Type</h3>
                                     <p>The Process check type allows you to monitor that a process is running.
@@ -226,7 +226,7 @@
                                                                     </select>
                                                                     <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Count of packets to sent." class="form-control input-sm servicePingParam servicePingParamCount" value="{{cutindex $svc.Expect ":" "3" 0}}" style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
                                                                     <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Packets that must be received." class="form-control input-sm servicePingParam servicePingParamMin" value="{{cutindex $svc.Expect ":" "2" 1}}" style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
-                                                                    <input type="number" min="100" max=10000 onChange="checkExpectChange($(this));" title="Interval in milliseonds between packets." class="form-control input-sm servicePingParam servicePingParamInt" value="{{cutindex $svc.Expect ":" "500" 2}}" style="width:40%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
+                                                                    <input type="number" min="100" max=10000 onChange="checkExpectChange($(this));" title="Interval in milliseconds between packets." class="form-control input-sm servicePingParam servicePingParamInt" value="{{cutindex $svc.Expect ":" "500" 2}}" style="width:40%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
                                                                     <select onChange="checkExpectChange($(this));" style="width:40%;{{if ne $svc.Type "process"}}display:none;{{end}}" class="form-control input-sm serviceProcessParam serviceProcessParamSelector">
                                                                         <option value="">None</option>
                                                                         <option value="restart"{{if contains $svc.Expect "restart"}} selected{{end}}>

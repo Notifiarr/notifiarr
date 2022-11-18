@@ -96,7 +96,7 @@ func (a *Apps) setupLidarr() error {
 // @Accept       json
 // @Success      201  {object} apps.Respond.apiResponse{message=lidarr.Album} "created"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json payload"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item alrady exists"
+// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
 // @Failure      422  {object} apps.Respond.apiResponse{message=string} "no item ID provided"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error during check"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error during add"
