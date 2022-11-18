@@ -45,7 +45,7 @@ type Client struct {
 	clientinfo *clientinfo.Config
 	triggers   *triggers.Actions
 	cookies    *securecookie.SecureCookie
-	template    *template.Template
+	template   *template.Template
 	webauth    bool
 	reloading  bool
 	// this locks anything that may be updated while running.
