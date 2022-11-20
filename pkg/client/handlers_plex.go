@@ -23,11 +23,11 @@ type Timer struct {
 }
 
 // Active returns true if a timer is active, otherwise it becomes active.
-func (t *Timer) Active(d time.Duration) bool {
+func (t *Timer) Active(dur time.Duration) bool {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	if time.Since(t.start) < d {
+	if time.Since(t.start) < dur {
 		return true
 	}
 
