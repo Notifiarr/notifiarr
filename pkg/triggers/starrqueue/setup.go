@@ -15,6 +15,8 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
+	// We set empty to true after we send 1 "empty downloads" payload.
+	empty bool
 }
 
 const (

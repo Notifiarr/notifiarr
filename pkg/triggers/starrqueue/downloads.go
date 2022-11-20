@@ -25,7 +25,14 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
 		c.Debugf("[%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
-		return
+
+		if c.empty {
+			return
+		}
+
+		c.empty = true
+	} else {
+		c.empty = false
 	}
 
 	c.SendData(&website.Request{
