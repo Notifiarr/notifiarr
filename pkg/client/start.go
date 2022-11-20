@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/cooldown"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -34,7 +35,7 @@ import (
 // Client stores all the running data.
 type Client struct {
 	*logs.Logger
-	plexTimer  Timer
+	plexTimer  *cooldown.Timer
 	Flags      *configfile.Flags
 	Config     *configfile.Config
 	server     *http.Server
@@ -68,11 +69,12 @@ func newDefaults() *Client {
 	logger := logs.New() // This persists throughout the app.
 
 	return &Client{
-		sigkil: make(chan os.Signal, 1),
-		sighup: make(chan os.Signal, 1),
-		reload: make(chan customReload, 1),
-		Logger: logger,
-		Config: configfile.NewConfig(logger),
+		sigkil:    make(chan os.Signal, 1),
+		sighup:    make(chan os.Signal, 1),
+		reload:    make(chan customReload, 1),
+		Logger:    logger,
+		plexTimer: &cooldown.Timer{},
+		Config:    configfile.NewConfig(logger),
 		Flags: &configfile.Flags{
 			FlagSet:    flag.NewFlagSet(mnd.DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
