@@ -71,15 +71,16 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*lidarr.Queue)
-		app := listItem{}
+		appList := listItem{}
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay {
-				app.Queue = append(app.Queue, item)
+				appList.Queue = append(appList.Queue, item)
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items
@@ -105,15 +106,16 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*radarr.Queue)
-		app := listItem{}
+		appList := listItem{}
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay {
-				app.Queue = append(app.Queue, item)
+				appList.Queue = append(appList.Queue, item)
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items
@@ -139,15 +141,16 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*readarr.Queue)
-		app := listItem{}
+		appList := listItem{}
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay {
-				app.Queue = append(app.Queue, item)
+				appList.Queue = append(appList.Queue, item)
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items
@@ -173,18 +176,19 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 		}
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
-		app := listItem{}
+		appList := listItem{}
 		// repeatStomper is used to collapse duplicate download IDs.
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
-				app.Queue = append(app.Queue, item)
+				appList.Queue = append(appList.Queue, item)
 				repeatStomper[item.DownloadID] = item
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items
