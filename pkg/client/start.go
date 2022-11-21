@@ -73,7 +73,7 @@ func newDefaults() *Client {
 		sighup:    make(chan os.Signal, 1),
 		reload:    make(chan customReload, 1),
 		Logger:    logger,
-		plexTimer: &cooldown.Timer{},
+		plexTimer: cooldown.NewTimer(false, time.Hour),
 		Config:    configfile.NewConfig(logger),
 		Flags: &configfile.Flags{
 			FlagSet:    flag.NewFlagSet(mnd.DefaultName, flag.ExitOnError),
