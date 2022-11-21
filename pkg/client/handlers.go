@@ -134,6 +134,7 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
 	if !strings.HasSuffix(request.URL.Path, "/") {
 		http.Redirect(response, request, request.URL.Path+"/", http.StatusPermanentRedirect)
+		return
 	}
 
 	c.indexPage(request.Context(), response, request, "")
