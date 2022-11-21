@@ -10988,6 +10988,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/lidarr.SystemStatus"
                 },
@@ -11003,6 +11007,10 @@ const docTemplateapi = `{
                 "instance": {
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
+                },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
                 },
                 "systemStatus": {
                     "$ref": "#/definitions/clientinfo.PlexInfo"
@@ -11053,6 +11061,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/prowlarr.SystemStatus"
                 },
@@ -11068,6 +11080,10 @@ const docTemplateapi = `{
                 "instance": {
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
+                },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
                 },
                 "systemStatus": {
                     "$ref": "#/definitions/radarr.SystemStatus"
@@ -11085,6 +11101,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/readarr.SystemStatus"
                 },
@@ -11101,6 +11121,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/sonarr.SystemStatus"
                 },
@@ -11116,6 +11140,10 @@ const docTemplateapi = `{
                 "instance": {
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
+                },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
                 },
                 "systemStatus": {
                     "$ref": "#/definitions/tautulli.Info"

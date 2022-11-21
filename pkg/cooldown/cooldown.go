@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-const defaultCleanTimer = time.Minute
+const defaultTickerInterval = time.Minute
 
 type cooler struct {
 	// Key we are cooling down.
@@ -17,7 +17,7 @@ type cooler struct {
 // Timer is used to set a cooldown timer on a key.
 type Timer struct {
 	skipCleanup bool
-	cleanTimer  time.Duration
+	ticker      time.Duration
 	track       map[string]*cooler
 	ch          chan *cooler
 	rep         chan bool
@@ -27,7 +27,7 @@ type Timer struct {
 func NewTimer(skipCleanup bool, cleanTimer time.Duration) *Timer {
 	t := &Timer{
 		skipCleanup: skipCleanup,
-		cleanTimer:  cleanTimer,
+		ticker:      cleanTimer,
 	}
 	t.start()
 
@@ -40,51 +40,50 @@ func (t *Timer) Active(key string, coolFor time.Duration) bool {
 	return <-t.rep
 }
 
-// StopTimer kills the active cooler. Do not call Activ() after you call this method.
+// StopTimer kills the active cooler. Do not call Active() after you call this method.
 func (t *Timer) StopTimer() {
-	t.ch <- nil // stop signal is nil
-	<-t.rep
-	close(t.rep)
-	t.rep = nil
+	t.ch <- nil // stop signal is nil.
+	<-t.rep     // wait until finished.
+	t.rep = nil // last but not least.
 }
 
 // start sets up the Timer.
 func (t *Timer) start() {
-	cleanTimer := defaultCleanTimer
-	if t.cleanTimer > 0 {
-		cleanTimer = t.cleanTimer
+	tickerInterval := defaultTickerInterval
+	if t.ticker > 0 {
+		tickerInterval = t.ticker
 	}
 
 	t.track = make(map[string]*cooler)
 	t.ch = make(chan *cooler)
 	t.rep = make(chan bool)
 
-	timer := time.NewTicker(cleanTimer)
+	ticker := time.NewTicker(tickerInterval)
 	if t.skipCleanup {
-		timer.Stop()
+		ticker.Stop()
 	}
 
-	go t.chanWatcher(timer)
+	go t.chanWatcher(ticker)
 }
 
 // stop closes everything.
-func (t *Timer) stop(timer *time.Ticker) {
+func (t *Timer) stop(ticker *time.Ticker) {
+	ticker.Stop()
+
 	for key := range t.track {
 		t.track[key] = nil
 		delete(t.track, key)
 	}
 
-	timer.Stop()
-
 	t.track = nil
 	close(t.ch)
 	t.ch = nil
-	t.rep <- true
+	close(t.rep)
 }
 
 // chanWatcher runs a loop, and deletes any keys older than the last cooldown we had for that key.
-func (t *Timer) chanWatcher(timer *time.Ticker) {
-	defer t.stop(timer)
+func (t *Timer) chanWatcher(ticker *time.Ticker) {
+	defer t.stop(ticker)
 
 	for {
 		select {
@@ -101,9 +100,10 @@ func (t *Timer) chanWatcher(timer *time.Ticker) {
 			cooler.Last = time.Now()
 			t.track[cooler.Key] = cooler
 			t.rep <- false
-		case tick := <-timer.C:
+		case now := <-ticker.C:
 			for key, val := range t.track {
-				if tick.After(val.Last.Add(val.Dur)) {
+				if now.After(val.Last.Add(val.Dur)) {
+					t.track[key] = nil
 					delete(t.track, key)
 				}
 			}
@@ -116,7 +116,7 @@ func (t *Timer) Running() bool {
 	return t.ch != nil
 }
 
-// Len returns the tracked item length and the channel queue length.
-func (t *Timer) Len() (int, int) {
+// Sizes returns the tracked item length and the channel queue length.
+func (t *Timer) Sizes() (int, int) {
 	return len(t.track), len(t.ch)
 }
