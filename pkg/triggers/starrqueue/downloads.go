@@ -51,7 +51,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	})
 }
 
-func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -72,10 +72,13 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList {
 
 		queue, _ := cacheItem.Data.(*lidarr.Queue)
 		appList := listItem{}
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*lidarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s == downloading || s == delay {
+			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
 				appList.Queue = append(appList.Queue, item)
+				repeatStomper[item.DownloadID] = item
 				appList.Name = app.Name
 			}
 		}
@@ -86,7 +89,7 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList {
 	return items
 }
 
-func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -107,10 +110,13 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 
 		queue, _ := cacheItem.Data.(*radarr.Queue)
 		appList := listItem{}
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*radarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s == downloading || s == delay {
+			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
 				appList.Queue = append(appList.Queue, item)
+				repeatStomper[item.DownloadID] = item
 				appList.Name = app.Name
 			}
 		}
@@ -121,7 +127,7 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 	return items
 }
 
-func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -142,10 +148,13 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 
 		queue, _ := cacheItem.Data.(*readarr.Queue)
 		appList := listItem{}
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*readarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s == downloading || s == delay {
+			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
 				appList.Queue = append(appList.Queue, item)
+				repeatStomper[item.DownloadID] = item
 				appList.Name = app.Name
 			}
 		}

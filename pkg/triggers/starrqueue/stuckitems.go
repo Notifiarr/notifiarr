@@ -65,13 +65,18 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 		queue, _ := item.Data.(*lidarr.Queue)
 		instance := idx + 1
 		stuckapp := stuck[instance]
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*lidarr.QueueRecord)
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
 				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
 				continue
+			} else if repeatStomper[item.DownloadID] != nil {
+				continue
 			}
 
+			repeatStomper[item.DownloadID] = item
 			stuckapp.Queue = append(stuckapp.Queue, item)
 		}
 
@@ -102,13 +107,18 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 		queue, _ := item.Data.(*radarr.Queue)
 		instance := idx + 1
 		stuckapp := stuck[instance]
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*radarr.QueueRecord)
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
 				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
 				continue
+			} else if repeatStomper[item.DownloadID] != nil {
+				continue
 			}
 
+			repeatStomper[item.DownloadID] = item
 			stuckapp.Queue = append(stuckapp.Queue, item)
 		}
 
@@ -139,13 +149,18 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 		queue, _ := item.Data.(*readarr.Queue)
 		instance := idx + 1
 		stuckapp := stuck[instance]
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*readarr.QueueRecord)
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
 				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
 				continue
+			} else if repeatStomper[item.DownloadID] != nil {
+				continue
 			}
 
+			repeatStomper[item.DownloadID] = item
 			stuckapp.Queue = append(stuckapp.Queue, item)
 		}
 
