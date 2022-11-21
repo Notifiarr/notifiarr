@@ -132,6 +132,10 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 
 // slash is the GET handler for /.
 func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
+	if !strings.HasSuffix(request.URL.Path, "/") {
+		http.Redirect(response, request, request.URL.Path+"/", http.StatusPermanentRedirect)
+	}
+
 	c.indexPage(request.Context(), response, request, "")
 }
 
