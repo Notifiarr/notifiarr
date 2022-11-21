@@ -355,7 +355,7 @@ func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getRadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
+	_, err = getRadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}

@@ -12741,6 +12741,10 @@ const docTemplateapi = `{
         "radarr.AddMovieOptions": {
             "type": "object",
             "properties": {
+                "monitored": {
+                    "description": "https://github.com/Radarr/Radarr/blob/f80272a65987b635b07448e6b959df0ad8c105d2/frontend/src/Utilities/Movie/monitorOptions.js",
+                    "type": "string"
+                },
                 "searchForMovie": {
                     "type": "boolean"
                 }
