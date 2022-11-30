@@ -660,7 +660,7 @@ func radarrSetTag(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
-// @Param        PUT body radarr.Movie  true  "album content"
+// @Param        PUT body radarr.Movie  true  "movie content"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
