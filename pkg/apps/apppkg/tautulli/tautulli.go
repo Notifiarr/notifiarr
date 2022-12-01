@@ -148,18 +148,20 @@ type User struct {
 }
 
 // MapIDName returns a map of plex user ID => Feiendly Name (or username) for Tautulli users.
-func (u *Users) MapIDName() map[int64]string {
+func (u *Users) MapIDName() map[string]string {
 	if u == nil {
 		return nil
 	}
 
-	nameMap := map[int64]string{}
+	nameMap := map[string]string{}
 
 	for _, user := range u.Response.Data {
 		if user.FriendlyName == "" {
-			nameMap[user.UserID] = user.Username
+			nameMap[fmt.Sprint(user.UserID)] = user.Username
+			nameMap[user.Username] = user.Username
 		} else {
-			nameMap[user.UserID] = user.FriendlyName
+			nameMap[fmt.Sprint(user.UserID)] = user.FriendlyName
+			nameMap[user.Username] = user.FriendlyName
 		}
 	}
 
