@@ -557,7 +557,7 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getReadarr(req).UpdateBookContext(req.Context(), book.ID, &book, mux.Vars(req)["moveFiles"] == "true")
+	err = getReadarr(req).UpdateBookContext(req.Context(), book.ID, &book, mux.Vars(req)["moveFiles"] == fmt.Sprint(true))
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating book: %w", err)
 	}
