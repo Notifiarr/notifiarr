@@ -915,7 +915,9 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series, mux.Vars(req)["moveFiles"] == fmt.Sprint(true))
+	moveFiles := mux.Vars(req)["moveFiles"] == fmt.Sprint(true)
+
+	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series, moveFiles)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating series: %w", err)
 	}

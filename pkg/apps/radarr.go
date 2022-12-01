@@ -675,8 +675,10 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
+	moveFiles := mux.Vars(req)["moveFiles"] == fmt.Sprint(true)
+
 	// Check for existing movie.
-	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, mux.Vars(req)["moveFiles"] == fmt.Sprint(true))
+	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, moveFiles)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating movie: %w", err)
 	}
