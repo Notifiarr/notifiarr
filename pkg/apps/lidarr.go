@@ -574,6 +574,7 @@ func lidarrSetTag(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
+// @Param        moveFiles query int64  true  "move files? true/false"
 // @Param        PUT body lidarr.Album  true  "album content"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"

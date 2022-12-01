@@ -1476,6 +1476,13 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "description": "album content",
                         "name": "PUT",
                         "in": "body",
@@ -2810,7 +2817,7 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "description": "album content",
+                        "description": "movie content",
                         "name": "POST",
                         "in": "body",
                         "required": true,
@@ -4678,7 +4685,14 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "description": "album content",
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "movie content",
                         "name": "PUT",
                         "in": "body",
                         "required": true,
@@ -5998,6 +6012,13 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "description": "book content",
                         "name": "PUT",
                         "in": "body",
@@ -6128,6 +6149,92 @@ const docTemplateapi = `{
                     },
                     "400": {
                         "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a series in Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Series",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "series content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.Series"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "allOf": [
                                 {
@@ -8989,7 +9096,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new Sonarr tag with the provided label.",
+                "description": "Create a brand new tag in Sonarr.",
                 "produces": [
                     "application/json"
                 ],
@@ -9007,7 +9114,7 @@ const docTemplateapi = `{
                     },
                     {
                         "type": "string",
-                        "description": "new tag's label",
+                        "description": "tag label",
                         "name": "label",
                         "in": "path",
                         "required": true
@@ -9066,7 +9173,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates the label for a an existing Sonarr tag.",
+                "description": "Updates the label for an existing Sonarr tag.",
                 "produces": [
                     "application/json"
                 ],

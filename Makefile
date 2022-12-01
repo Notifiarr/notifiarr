@@ -478,7 +478,7 @@ $(shell go env GOPATH)/bin/mockgen:
 
 swag: $(shell go env GOPATH)/bin/swag
 $(shell go env GOPATH)/bin/swag:
-	cd /tmp ; go install github.com/swaggo/swag/cmd/swag@latest
+	cd /tmp ; go install github.com/swaggo/swag/cmd/swag@v1.8.7
 
 bindata: $(shell go env GOPATH)/bin/go-bindata
 $(shell go env GOPATH)/bin/go-bindata:
