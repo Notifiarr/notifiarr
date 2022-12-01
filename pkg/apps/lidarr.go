@@ -589,7 +589,7 @@ func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	_, err = getLidarr(req).UpdateAlbumContext(req.Context(), album.ID, &album)
+	_, err = getLidarr(req).UpdateAlbumContext(req.Context(), album.ID, &album, mux.Vars(req)["moveFiles"] == "true")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating album: %w", err)
 	}

@@ -676,7 +676,7 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 	}
 
 	// Check for existing movie.
-	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, false)
+	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, mux.Vars(req)["moveFiles"] == "true")
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating movie: %w", err)
 	}
