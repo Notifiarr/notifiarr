@@ -27,6 +27,7 @@ type RadarrTrashPayload struct {
 	CustomFormats      []*radarr.CustomFormat      `json:"customFormats,omitempty"`
 	QualityProfiles    []*radarr.QualityProfile    `json:"qualityProfiles,omitempty"`
 	QualityDefinitions []*radarr.QualityDefinition `json:"qualityDefinitions,omitempty"`
+	Naming             *radarr.Naming              `json:"naming"`
 	Error              string                      `json:"error"`
 }
 
@@ -108,6 +109,13 @@ func (c *cmd) getRadarrProfiles(ctx context.Context, event website.EventType, in
 	payload.QualityDefinitions, err = app.GetQualityDefinitionsContext(ctx)
 	if err != nil {
 		errStr := fmt.Sprintf("getting quality definitions: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+	}
+
+	payload.Naming, err = app.GetNamingContext(ctx)
+	if err != nil {
+		errStr := fmt.Sprintf("getting naming: %v ", err)
 		payload.Error += errStr
 		c.Errorf("[%s requested] Getting Radarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}

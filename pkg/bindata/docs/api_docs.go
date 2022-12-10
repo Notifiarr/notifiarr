@@ -10817,6 +10817,9 @@ const docTemplateapi = `{
                 "name": {
                     "type": "string"
                 },
+                "naming": {
+                    "$ref": "#/definitions/radarr.Naming"
+                },
                 "qualityDefinitions": {
                     "type": "array",
                     "items": {
@@ -10848,6 +10851,9 @@ const docTemplateapi = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "naming": {
+                    "$ref": "#/definitions/sonarr.Naming"
                 },
                 "qualityDefinitions": {
                     "type": "array",
