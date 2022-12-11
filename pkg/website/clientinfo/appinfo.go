@@ -95,7 +95,7 @@ type AppInfoAppConfig struct {
 // AppInfoTautulli contains the Tautulli user map, fetched from Tautulli.
 type AppInfoTautulli struct {
 	// Tautulli userID -> email map.
-	Users map[int64]string `json:"users"`
+	Users map[string]string `json:"users"`
 }
 
 // Info is used for JSON input for our outgoing app info.

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -15,26 +14,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 )
-
-// Timer is used to set a cooldown time.
-type Timer struct {
-	lock  sync.Mutex
-	start time.Time
-}
-
-// Active returns true if a timer is active, otherwise it becomes active.
-func (t *Timer) Active(d time.Duration) bool {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
-	if time.Since(t.start) < d {
-		return true
-	}
-
-	t.start = time.Now()
-
-	return false
-}
 
 // PlexHandler handles an incoming webhook from Plex.
 // @Summary      Accept Plex Media Server Webhook
@@ -97,11 +76,19 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		})
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "process", http.StatusAccepted)
-	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(c.plexCooldown()):
+	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(v.Metadata.Key+"resume", c.plexCooldown()):
 		c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
 			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
 		http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
 	case strings.EqualFold(v.Event, "media.play"), strings.EqualFold(v.Event, "playback.started"):
+		if c.plexTimer.Active(v.Metadata.Key+"play", c.plexCooldown()) {
+			c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
+				v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+			http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
+
+			return
+		}
+
 		fallthrough
 	case strings.EqualFold(v.Event, "media.resume"):
 		c.triggers.PlexCron.SendWebhook(&v) //nolint:contextcheck,nolintlint

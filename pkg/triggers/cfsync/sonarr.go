@@ -28,6 +28,7 @@ type SonarrTrashPayload struct {
 	QualityProfiles    []*sonarr.QualityProfile    `json:"qualityProfiles,omitempty"`
 	CustomFormats      []*sonarr.CustomFormat      `json:"customFormats,omitempty"`
 	QualityDefinitions []*sonarr.QualityDefinition `json:"qualityDefinitions,omitempty"`
+	Naming             *sonarr.Naming              `json:"naming"`
 	Error              string                      `json:"error"`
 }
 
@@ -121,6 +122,13 @@ func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, in
 		// This error is required so the site knows it's sonarr v3.
 		errStr := fmt.Sprintf("getting custom formats: %v ", err)
 		payload.Error += errStr
+	}
+
+	payload.Naming, err = app.GetNamingContext(ctx)
+	if err != nil {
+		errStr := fmt.Sprintf("getting naming: %v ", err)
+		payload.Error += errStr
+		c.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
 	return &payload

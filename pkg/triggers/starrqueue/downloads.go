@@ -25,7 +25,14 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
 		c.Debugf("[%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
-		return
+
+		if c.empty {
+			return
+		}
+
+		c.empty = true
+	} else {
+		c.empty = false
 	}
 
 	c.SendData(&website.Request{
@@ -44,7 +51,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	})
 }
 
-func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -64,21 +71,25 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*lidarr.Queue)
-		app := listItem{}
+		appList := listItem{}
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*lidarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s == downloading || s == delay {
-				app.Queue = append(app.Queue, item)
+			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
+				appList.Queue = append(appList.Queue, item)
+				repeatStomper[item.DownloadID] = item
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items
 }
 
-func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -98,21 +109,25 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*radarr.Queue)
-		app := listItem{}
+		appList := listItem{}
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*radarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s == downloading || s == delay {
-				app.Queue = append(app.Queue, item)
+			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
+				appList.Queue = append(appList.Queue, item)
+				repeatStomper[item.DownloadID] = item
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items
 }
 
-func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
+func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:cyclop
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -132,15 +147,19 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*readarr.Queue)
-		app := listItem{}
+		appList := listItem{}
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]*readarr.QueueRecord)
 
 		for _, item := range queue.Records {
-			if s := strings.ToLower(item.Status); s == downloading || s == delay {
-				app.Queue = append(app.Queue, item)
+			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
+				appList.Queue = append(appList.Queue, item)
+				repeatStomper[item.DownloadID] = item
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items
@@ -166,18 +185,19 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 		}
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
-		app := listItem{}
+		appList := listItem{}
 		// repeatStomper is used to collapse duplicate download IDs.
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s == downloading || s == delay && repeatStomper[item.DownloadID] == nil {
-				app.Queue = append(app.Queue, item)
+				appList.Queue = append(appList.Queue, item)
 				repeatStomper[item.DownloadID] = item
+				appList.Name = app.Name
 			}
 		}
 
-		items[instance] = app
+		items[instance] = appList
 	}
 
 	return items

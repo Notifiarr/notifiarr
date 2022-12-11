@@ -355,7 +355,7 @@ func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getRadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
+	_, err = getRadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
@@ -660,6 +660,7 @@ func radarrSetTag(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
+// @Param        moveFiles query int64  true  "move files? true/false"
 // @Param        PUT body radarr.Movie  true  "movie content"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
@@ -675,8 +676,10 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
+	moveFiles := mux.Vars(req)["moveFiles"] == fmt.Sprint(true)
+
 	// Check for existing movie.
-	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, false)
+	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, moveFiles)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating movie: %w", err)
 	}
@@ -690,7 +693,7 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        POST body []radarr.Exclusion  true  "album content"
+// @Param        POST body []radarr.Exclusion  true  "movie content"
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"

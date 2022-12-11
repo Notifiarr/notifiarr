@@ -542,6 +542,7 @@ func readarrSetTag(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
+// @Param        moveFiles query int64  true  "move files? true/false"
 // @Param        PUT body readarr.Book  true  "book content"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
@@ -557,7 +558,9 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getReadarr(req).UpdateBookContext(req.Context(), book.ID, &book)
+	moveFiles := mux.Vars(req)["moveFiles"] == fmt.Sprint(true)
+
+	err = getReadarr(req).UpdateBookContext(req.Context(), book.ID, &book, moveFiles)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating book: %w", err)
 	}

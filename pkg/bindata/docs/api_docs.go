@@ -1476,6 +1476,13 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "description": "album content",
                         "name": "PUT",
                         "in": "body",
@@ -2810,7 +2817,7 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "description": "album content",
+                        "description": "movie content",
                         "name": "POST",
                         "in": "body",
                         "required": true,
@@ -4678,7 +4685,14 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "description": "album content",
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "movie content",
                         "name": "PUT",
                         "in": "body",
                         "required": true,
@@ -5998,6 +6012,13 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "description": "book content",
                         "name": "PUT",
                         "in": "body",
@@ -6128,6 +6149,92 @@ const docTemplateapi = `{
                     },
                     "400": {
                         "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a series in Sonarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Series",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "series content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.Series"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "allOf": [
                                 {
@@ -8989,7 +9096,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new Sonarr tag with the provided label.",
+                "description": "Create a brand new tag in Sonarr.",
                 "produces": [
                     "application/json"
                 ],
@@ -9007,7 +9114,7 @@ const docTemplateapi = `{
                     },
                     {
                         "type": "string",
-                        "description": "new tag's label",
+                        "description": "tag label",
                         "name": "label",
                         "in": "path",
                         "required": true
@@ -9066,7 +9173,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates the label for a an existing Sonarr tag.",
+                "description": "Updates the label for an existing Sonarr tag.",
                 "produces": [
                     "application/json"
                 ],
@@ -10710,6 +10817,9 @@ const docTemplateapi = `{
                 "name": {
                     "type": "string"
                 },
+                "naming": {
+                    "$ref": "#/definitions/radarr.Naming"
+                },
                 "qualityDefinitions": {
                     "type": "array",
                     "items": {
@@ -10741,6 +10851,9 @@ const docTemplateapi = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "naming": {
+                    "$ref": "#/definitions/sonarr.Naming"
                 },
                 "qualityDefinitions": {
                     "type": "array",
@@ -10988,6 +11101,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/lidarr.SystemStatus"
                 },
@@ -11003,6 +11120,10 @@ const docTemplateapi = `{
                 "instance": {
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
+                },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
                 },
                 "systemStatus": {
                     "$ref": "#/definitions/clientinfo.PlexInfo"
@@ -11053,6 +11174,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/prowlarr.SystemStatus"
                 },
@@ -11068,6 +11193,10 @@ const docTemplateapi = `{
                 "instance": {
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
+                },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
                 },
                 "systemStatus": {
                     "$ref": "#/definitions/radarr.SystemStatus"
@@ -11085,6 +11214,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/readarr.SystemStatus"
                 },
@@ -11101,6 +11234,10 @@ const docTemplateapi = `{
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
                 },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
+                },
                 "systemStatus": {
                     "$ref": "#/definitions/sonarr.SystemStatus"
                 },
@@ -11116,6 +11253,10 @@ const docTemplateapi = `{
                 "instance": {
                     "description": "The site-ID for the instance (1-index).",
                     "type": "integer"
+                },
+                "name": {
+                    "description": "user-provided name of the instance.",
+                    "type": "string"
                 },
                 "systemStatus": {
                     "$ref": "#/definitions/tautulli.Info"
@@ -12713,6 +12854,10 @@ const docTemplateapi = `{
         "radarr.AddMovieOptions": {
             "type": "object",
             "properties": {
+                "monitor": {
+                    "description": "Allowed values: \"movieOnly\", \"movieAndCollection\", \"none\"",
+                    "type": "string"
+                },
                 "searchForMovie": {
                     "type": "boolean"
                 }

@@ -864,7 +864,7 @@ func sonarrGetTags(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tags
 }
 
-// @Description  Updates the label for a an existing Sonarr tag.
+// @Description  Updates the label for an existing Sonarr tag.
 // @Summary      Update Sonarr Tag Label
 // @Tags         Sonarr
 // @Produce      json
@@ -887,6 +887,17 @@ func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tag.ID
 }
 
+// @Description  Create a brand new tag in Sonarr.
+// @Summary      Create Sonarr Tag
+// @Tags         Sonarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        label     path   string  true  "tag label"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/tag/{label} [put]
+// @Security     ApiKeyAuth
 func sonarrSetTag(req *http.Request) (int, interface{}) {
 	tag, err := getSonarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
@@ -896,16 +907,17 @@ func sonarrSetTag(req *http.Request) (int, interface{}) {
 	return http.StatusOK, tag.ID
 }
 
-// @Description  Creates a new Sonarr tag with the provided label.
-// @Summary      Create Sonarr Tag
+// @Description  Updates a series in Sonarr.
+// @Summary      Update Sonarr Series
 // @Tags         Sonarr
 // @Produce      json
-// @Param        instance  path   int64  true  "instance ID"
-// @Param        label     path   string true  "new tag's label"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
+// @Param        instance  path  int64  true  "instance ID"
+// @Param        moveFiles query int64  true  "move files? true/false"
+// @Param        PUT body sonarr.Series true  "series content"
+// @Success      200  {object} apps.Respond.apiResponse{message=string}  "OK"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/sonarr/{instance}/tag/{label} [put]
+// @Router       /api/sonarr/{instance} [put]
 // @Security     ApiKeyAuth
 func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 	var series sonarr.AddSeriesInput
@@ -915,7 +927,9 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series)
+	moveFiles := mux.Vars(req)["moveFiles"] == fmt.Sprint(true)
+
+	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series, moveFiles)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating series: %w", err)
 	}

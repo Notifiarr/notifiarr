@@ -24,6 +24,8 @@ import (
 type conTest struct {
 	// The site-ID for the instance (1-index).
 	Instance int `json:"instance"`
+	// user-provided name of the instance.
+	Name string `json:"name"`
 	// Up is true if the instance is reachable.
 	Up bool `json:"up"`
 }
@@ -183,43 +185,46 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			stat, err := c.Apps.Lidarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+"Status", idx, stat)
 
-			return &AppStatuses{Lidarr: []*LidarrConTest{{conTest{Instance: instance, Up: err == nil}, stat}}}
+			return &AppStatuses{Lidarr: []*LidarrConTest{{conTest{Instance: instance, Up: err == nil, Name: c.Apps.Lidarr[idx].Name}, stat}}}
 		}
 	case "radarr":
 		if instance <= len(c.Apps.Radarr) {
 			stat, err := c.Apps.Radarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+"Status", idx, stat)
 
-			return &AppStatuses{Radarr: []*RadarrConTest{{conTest{Instance: instance, Up: err == nil}, stat}}}
+			return &AppStatuses{Radarr: []*RadarrConTest{{conTest{Instance: instance, Up: err == nil, Name: c.Apps.Radarr[idx].Name}, stat}}}
 		}
 	case "readarr":
 		if instance <= len(c.Apps.Readarr) {
 			stat, err := c.Apps.Readarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+"Status", idx, stat)
 
-			return &AppStatuses{Readarr: []*ReadarrConTest{{conTest{Instance: instance, Up: err == nil}, stat}}}
+			return &AppStatuses{Readarr: []*ReadarrConTest{{conTest{Instance: instance, Up: err == nil, Name: c.Apps.Readarr[idx].Name}, stat}}}
 		}
 	case "sonarr":
 		if instance <= len(c.Apps.Sonarr) {
 			stat, err := c.Apps.Sonarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+"Status", idx, stat)
 
-			return &AppStatuses{Sonarr: []*SonarrConTest{{conTest{Instance: instance, Up: err == nil}, stat}}}
+			return &AppStatuses{Sonarr: []*SonarrConTest{{conTest{Instance: instance, Up: err == nil, Name: c.Apps.Sonarr[idx].Name}, stat}}}
 		}
 	case "prowlarr":
 		if instance <= len(c.Apps.Prowlarr) {
 			stat, err := c.Apps.Prowlarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+"Status", idx, stat)
 
-			return &AppStatuses{Prowlarr: []*ProwlarrConTest{{conTest{Instance: instance, Up: err == nil}, stat}}}
+			return &AppStatuses{Prowlarr: []*ProwlarrConTest{{conTest{Instance: instance, Up: err == nil, Name: c.Apps.Prowlarr[idx].Name}, stat}}}
 		}
 	case "plex":
-		return &AppStatuses{Plex: plexVersionReply(c.Apps.Plex.GetInfo(ctx))}
+		stat := &AppStatuses{Plex: plexVersionReply(c.Apps.Plex.GetInfo(ctx))}
+		stat.Plex[0].Name = c.Apps.Plex.Server.Name()
+
+		return stat
 	case "tautulli":
 		stat, err := c.Apps.Tautulli.GetInfo(ctx)
 		data.SaveWithID(app+"Status", 1, stat)
 
-		return &AppStatuses{Tautulli: []*TautulliConTest{{conTest{Instance: 1, Up: err == nil}, stat}}}
+		return &AppStatuses{Tautulli: []*TautulliConTest{{conTest{Instance: 1, Up: err == nil, Name: c.Apps.Tautulli.Name}, stat}}}
 	}
 
 	return nil
@@ -228,7 +233,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*LidarrConTest) {
 	for idx, app := range lidarrs {
 		if app.Enabled() {
-			lid[idx] = &LidarrConTest{conTest: conTest{Instance: idx + 1, Up: false}}
+			lid[idx] = &LidarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 		}
 
 		wait.Add(1)
@@ -239,7 +244,7 @@ func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("lidarrStatus", idx, stat)
 
-			lid[idx] = &LidarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil}, Status: stat}
+			lid[idx] = &LidarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil, Name: app.Name}, Status: stat}
 		}(idx, app)
 	}
 }
@@ -247,7 +252,7 @@ func getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps
 func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*apps.ProwlarrConfig, prl []*ProwlarrConTest) {
 	for idx, app := range prowlarrs {
 		if app.Enabled() {
-			prl[idx] = &ProwlarrConTest{conTest: conTest{Instance: idx + 1, Up: false}}
+			prl[idx] = &ProwlarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 		}
 
 		wait.Add(1)
@@ -258,7 +263,7 @@ func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("prowlarrStatus", idx, stat)
 
-			prl[idx] = &ProwlarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil}, Status: stat}
+			prl[idx] = &ProwlarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil, Name: app.Name}, Status: stat}
 		}(idx, app)
 	}
 }
@@ -266,7 +271,7 @@ func getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*
 func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps.RadarrConfig, rad []*RadarrConTest) {
 	for idx, app := range radarrs {
 		if app.Enabled() {
-			rad[idx] = &RadarrConTest{conTest: conTest{Instance: idx + 1, Up: false}}
+			rad[idx] = &RadarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 		}
 
 		wait.Add(1)
@@ -277,7 +282,7 @@ func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("radarrStatus", idx, stat)
 
-			rad[idx] = &RadarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil}, Status: stat}
+			rad[idx] = &RadarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil, Name: app.Name}, Status: stat}
 		}(idx, app)
 	}
 }
@@ -285,7 +290,7 @@ func getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps
 func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*apps.ReadarrConfig, read []*ReadarrConTest) {
 	for idx, app := range readarrs {
 		if app.Enabled() {
-			read[idx] = &ReadarrConTest{conTest: conTest{Instance: idx + 1, Up: false}}
+			read[idx] = &ReadarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 		}
 
 		wait.Add(1)
@@ -296,7 +301,7 @@ func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*ap
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("readarrStatus", idx, stat)
 
-			read[idx] = &ReadarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil}, Status: stat}
+			read[idx] = &ReadarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil, Name: app.Name}, Status: stat}
 		}(idx, app)
 	}
 }
@@ -304,7 +309,7 @@ func getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*ap
 func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps.SonarrConfig, son []*SonarrConTest) {
 	for idx, app := range sonarrs {
 		if app.Enabled() {
-			son[idx] = &SonarrConTest{conTest: conTest{Instance: idx + 1, Up: false}}
+			son[idx] = &SonarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 		}
 
 		wait.Add(1)
@@ -315,7 +320,7 @@ func getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("sonarrStatus", idx, stat)
 
-			son[idx] = &SonarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil}, Status: stat}
+			son[idx] = &SonarrConTest{conTest: conTest{Instance: idx + 1, Up: err == nil, Name: app.Name}, Status: stat}
 		}(idx, app)
 	}
 }
