@@ -25,7 +25,7 @@ type conTest struct {
 	// The site-ID for the instance (1-index).
 	Instance int `json:"instance"`
 	// user-provided name of the instance.
-	Name string
+	Name string `json:"name"`
 	// Up is true if the instance is reachable.
 	Up bool `json:"up"`
 }
