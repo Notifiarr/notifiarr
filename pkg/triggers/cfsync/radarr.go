@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	TrigCFSyncRadarr    common.TriggerName = "Starting Radarr Custom Format TRaSH sync."
-	TrigCFSyncRadarrInt common.TriggerName = "Starting Radarr %d Custom Format TRaSH sync."
+	TrigCFSyncRadarr    common.TriggerName = "Starting Radarr TRaSH Profiles sync."
+	TrigCFSyncRadarrInt common.TriggerName = "Starting Radarr %d TRaSH Profiles sync."
 )
 
 // RadarrTrashPayload is the payload sent and received

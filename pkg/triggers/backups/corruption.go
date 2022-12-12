@@ -47,124 +47,129 @@ func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
 	return nil
 }
 
-func (c *cmd) makeCorruptionTriggersLidarr() {
-	var ticker *time.Ticker
-
-	//nolint:gosec
-	for idx, app := range c.Apps.Lidarr {
-		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
-			if c.lidarr[idx] = ci.Actions.Apps.Lidarr.Corrupt(idx + 1); c.lidarr[idx] != mnd.Disabled {
-				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-					time.Duration(rand.Intn(randomMinutes))*time.Minute
-				ticker = time.NewTicker(checkInterval + randomTime)
-
-				break
-			}
-		}
-	}
-
-	c.Add(&common.Action{
+func (c *cmd) makeCorruptionTriggersLidarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigLidarrCorrupt,
 		Fn:   c.sendLidarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeCorruptionTriggersProwlarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Prowlarr {
-		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
-			if c.prowlarr[idx] = ci.Actions.Apps.Prowlarr.Corrupt(idx + 1); c.prowlarr[idx] != mnd.Disabled {
+	for idx, app := range c.Apps.Lidarr {
+		if app.Enabled() {
+			c.lidarr[idx] = ci.Actions.Apps.Lidarr.Corrupt(idx + 1) // mandatory
+			if c.lidarr[idx] != mnd.Disabled && action.T == nil {
 				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 					time.Duration(rand.Intn(randomMinutes))*time.Minute
-				ticker = time.NewTicker(checkInterval + randomTime)
-
-				break
+				action.T = time.NewTicker(checkInterval + randomTime)
 			}
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeCorruptionTriggersProwlarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigProwlarrCorrupt,
 		Fn:   c.sendProwlarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeCorruptionTriggersRadarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Radarr {
-		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
-			if c.radarr[idx] = ci.Actions.Apps.Radarr.Corrupt(idx + 1); c.radarr[idx] != mnd.Disabled {
+	for idx, app := range c.Apps.Prowlarr {
+		if app.Enabled() {
+			c.prowlarr[idx] = ci.Actions.Apps.Prowlarr.Corrupt(idx + 1) // mandatory
+			if c.prowlarr[idx] != mnd.Disabled && action.T == nil {
 				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 					time.Duration(rand.Intn(randomMinutes))*time.Minute
-				ticker = time.NewTicker(checkInterval + randomTime)
-
-				break
+				action.T = time.NewTicker(checkInterval + randomTime)
 			}
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeCorruptionTriggersRadarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigRadarrCorrupt,
 		Fn:   c.sendRadarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeCorruptionTriggersReadarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Readarr {
-		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
-			if c.readarr[idx] = ci.Actions.Apps.Readarr.Corrupt(idx + 1); c.readarr[idx] != mnd.Disabled {
+	for idx, app := range c.Apps.Radarr {
+		if app.Enabled() {
+			c.radarr[idx] = ci.Actions.Apps.Radarr.Corrupt(idx + 1) // mandatory
+			if c.radarr[idx] != mnd.Disabled && action.T == nil {
 				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 					time.Duration(rand.Intn(randomMinutes))*time.Minute
-				ticker = time.NewTicker(checkInterval + randomTime)
-
-				break
+				action.T = time.NewTicker(checkInterval + randomTime)
 			}
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeCorruptionTriggersReadarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigReadarrCorrupt,
 		Fn:   c.sendReadarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeCorruptionTriggersSonarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Sonarr {
-		if ci := clientinfo.Get(); ci != nil && app.Enabled() {
-			if c.sonarr[idx] = ci.Actions.Apps.Sonarr.Corrupt(idx + 1); c.sonarr[idx] != mnd.Disabled {
+	for idx, app := range c.Apps.Readarr {
+		if app.Enabled() {
+			c.readarr[idx] = ci.Actions.Apps.Readarr.Corrupt(idx + 1) // mandatory
+			if c.readarr[idx] != mnd.Disabled && action.T == nil {
 				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 					time.Duration(rand.Intn(randomMinutes))*time.Minute
-				ticker = time.NewTicker(checkInterval + randomTime)
-
-				break
+				action.T = time.NewTicker(checkInterval + randomTime)
 			}
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeCorruptionTriggersSonarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigSonarrCorrupt,
 		Fn:   c.sendSonarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
+	}
+	defer c.Add(action)
+
+	if ci == nil {
+		return
+	}
+
+	//nolint:gosec
+	for idx, app := range c.Apps.Sonarr {
+		if app.Enabled() {
+			c.sonarr[idx] = ci.Actions.Apps.Sonarr.Corrupt(idx + 1)
+			if c.sonarr[idx] != mnd.Disabled && action.T == nil {
+				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				action.T = time.NewTicker(checkInterval + randomTime)
+			}
+		}
+	}
 }
 
 func (c *cmd) sendLidarrCorruption(ctx context.Context, input *common.ActionInput) {

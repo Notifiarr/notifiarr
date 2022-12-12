@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	TrigRPSyncSonarr    common.TriggerName = "Starting Sonarr Release Profile TRaSH sync."
-	TrigRPSyncSonarrInt common.TriggerName = "Starting Sonarr %d Release Profile TRaSH sync."
+	TrigRPSyncSonarr    common.TriggerName = "Starting Sonarr TRaSH Profiles sync."
+	TrigRPSyncSonarrInt common.TriggerName = "Starting Sonarr %d TRaSH Profiles sync."
 )
 
 // SonarrTrashPayload is the payload sent and received

@@ -41,119 +41,124 @@ func (a *Action) Backup(input *common.ActionInput, app starr.App) error {
 	return nil
 }
 
-func (c *cmd) makeBackupTriggersLidarr() {
-	var ticker *time.Ticker
-
-	//nolint:gosec
-	for idx, app := range c.Apps.Lidarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			ci.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
-			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
-
-			break
-		}
-	}
-
-	c.Add(&common.Action{
+func (c *cmd) makeBackupTriggersLidarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigLidarrBackup,
 		Fn:   c.sendLidarrBackups,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeBackupTriggersRadarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Radarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			ci.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
+	for idx, app := range c.Apps.Lidarr {
+		if app.Enabled() && ci.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+			action.T = time.NewTicker(checkInterval + randomTime)
 
 			break
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeBackupTriggersRadarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigRadarrBackup,
 		Fn:   c.sendRadarrBackups,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeBackupTriggersReadarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Readarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			ci.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
+	for idx, app := range c.Apps.Radarr {
+		if app.Enabled() && ci.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+			action.T = time.NewTicker(checkInterval + randomTime)
 
 			break
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeBackupTriggersReadarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigReadarrBackup,
 		Fn:   c.sendReadarrBackups,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeBackupTriggersSonarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Sonarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			ci.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
+	for idx, app := range c.Apps.Readarr {
+		if app.Enabled() && ci.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+			action.T = time.NewTicker(checkInterval + randomTime)
 
 			break
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeBackupTriggersSonarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigSonarrBackup,
 		Fn:   c.sendSonarrBackups,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
-}
+	}
+	defer c.Add(action)
 
-func (c *cmd) makeBackupTriggersProwlarr() {
-	var ticker *time.Ticker
+	if ci == nil {
+		return
+	}
 
 	//nolint:gosec
-	for idx, app := range c.Apps.Prowlarr {
-		if ci := clientinfo.Get(); ci != nil &&
-			ci.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled && app.Enabled() {
+	for idx, app := range c.Apps.Sonarr {
+		if app.Enabled() && ci.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			ticker = time.NewTicker(checkInterval + randomTime)
+			action.T = time.NewTicker(checkInterval + randomTime)
 
 			break
 		}
 	}
+}
 
-	c.Add(&common.Action{
+func (c *cmd) makeBackupTriggersProwlarr(ci *clientinfo.ClientInfo) {
+	action := &common.Action{
 		Name: TrigProwlarrBackup,
 		Fn:   c.sendProwlarrBackups,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
-	})
+	}
+	defer c.Add(action)
+
+	if ci == nil {
+		return
+	}
+
+	//nolint:gosec
+	for idx, app := range c.Apps.Prowlarr {
+		if app.Enabled() && ci.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled {
+			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
+				time.Duration(rand.Intn(randomMinutes))*time.Minute
+			action.T = time.NewTicker(checkInterval + randomTime)
+
+			break
+		}
+	}
 }
 
 func (c *cmd) sendLidarrBackups(ctx context.Context, input *common.ActionInput) {
