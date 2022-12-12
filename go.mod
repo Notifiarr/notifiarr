@@ -12,7 +12,7 @@ require (
 	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
 	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
-	golift.io/starr v0.14.1-0.20221201035612-2177f20269c8
+	golift.io/starr v0.14.1-0.20221212084058-3f88524766d7
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.1.2
 )
@@ -125,7 +125,7 @@ require (
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
 	github.com/mrobinsn/go-rtorrent v1.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
+	github.com/stretchr/testify v1.8.1
 	go.opentelemetry.io/otel v1.11.1 // indirect
 	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 )

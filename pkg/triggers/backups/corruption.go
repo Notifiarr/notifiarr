@@ -3,6 +3,7 @@ package backups
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -347,21 +348,19 @@ func (c *genericInstance) saveBackupFile(
 	localPath string,
 ) (string, error) {
 	resp, err := c.app.Get(ctx, starr.Request{URI: remotePath})
-	if err != nil {
+	if err != nil && !errors.Is(err, starr.ErrInvalidStatusCode) {
 		return "", fmt.Errorf("getting http response body: %w", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode >= http.StatusMultipleChoices && resp.StatusCode <= http.StatusPermanentRedirect {
-		if err := c.app.Login(ctx); err != nil {
-			return "", fmt.Errorf("(%s) %w: you may need to set a username and password to download backup files: %s",
-				resp.Status, err, remotePath)
-		}
-
+	if !errors.Is(err, starr.ErrInvalidStatusCode) {
+		defer resp.Body.Close()
+	} else if err := c.app.Login(ctx); err != nil {
+		return "", fmt.Errorf("%w: you may need to set a username and password to download backup files: %s", err, remotePath)
+	} else {
 		// Try again after logging in.
 		resp, err = c.app.Get(ctx, starr.Request{URI: remotePath})
 		if err != nil {
-			return "", fmt.Errorf("getting http response body: %w", err)
+			return "", fmt.Errorf("getting http response body after logging in: %w", err)
 		}
 		defer resp.Body.Close()
 	}
