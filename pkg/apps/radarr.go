@@ -50,6 +50,9 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrAddImportList, "POST")
 	a.HandleAPIpath(starr.Radarr, "/importlist/{ilid:[0-9]+}", radarrUpdateImportList, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/command/search/{movieid:[0-9]+}", radarrTriggerSearchMovie, "GET")
+	a.HandleAPIpath(starr.Radarr, "/notification", radarrGetNotifications, "GET")
+	a.HandleAPIpath(starr.Radarr, "/notification", radarrUpdateNotification, "PUT")
+	a.HandleAPIpath(starr.Radarr, "/notification", radarrAddNotification, "POST")
 }
 
 // RadarrConfig represents the input data for a Radarr server.
@@ -1023,4 +1026,88 @@ func radarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, output
+}
+
+// @Description  Returns Radarr Notifications with a name that matches 'notifiar'.
+// @Summary      Retrieve Radarr Notifications
+// @Tags         Radarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.NotificationOutput} "notifications"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/radarr/{instance}/notifications [get]
+// @Security     ApiKeyAuth
+func radarrGetNotifications(req *http.Request) (int, interface{}) {
+	notifs, err := getRadarr(req).GetNotificationsContext(req.Context())
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting notifications: %w", err)
+	}
+
+	output := []*radarr.NotificationOutput{}
+	for _, notif := range notifs {
+		if strings.Contains(strings.ToLower(notif.Name), "notifiar") {
+			output = append(output, notif)
+		}
+	}
+
+	return http.StatusOK, output
+}
+
+// @Description  Updates a Notifcation in Radarr.
+// @Summary      Update Radarr Notification
+// @Tags         Radarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        PUT body radarr.NotificationInput  true  "notification content"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/radarr/{instance}/notification [put]
+// @Security     ApiKeyAuth
+func radarrUpdateNotification(req *http.Request) (int, interface{}) {
+	var notif radarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getRadarr(req).UpdateNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
+	}
+
+	return http.StatusOK, "success"
+}
+
+// @Description  Creates a new Radarr Notification.
+// @Summary      Add Radarr Notification
+// @Tags         Radarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body radarr.NotificationInput true "new item content"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new notification ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/radarr/{instance}/notification [post]
+// @Security     ApiKeyAuth
+func radarrAddNotification(req *http.Request) (int, interface{}) {
+	var notif radarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	id, err := getRadarr(req).AddNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("adding notification: %w", err)
+	}
+
+	return http.StatusOK, id
 }

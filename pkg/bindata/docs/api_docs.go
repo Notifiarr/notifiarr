@@ -620,6 +620,277 @@ const docTemplateapi = `{
                 }
             }
         },
+        "/api/lidarr/{instance}/notification": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a Notifcation in Lidarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lidarr"
+                ],
+                "summary": "Update Lidarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "notification content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lidarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Lidarr Notification.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lidarr"
+                ],
+                "summary": "Add Lidarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "new item content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/lidarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "new notification ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lidarr/{instance}/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns Lidarr Notifications with a name that matches 'notifiar'.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lidarr"
+                ],
+                "summary": "Retrieve Lidarr Notifications",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "notifications",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/lidarr.NotificationOutput"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/lidarr/{instance}/qualityDefinitions": {
             "get": {
                 "security": [
@@ -1222,7 +1493,7 @@ const docTemplateapi = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Returns all Lidarr Tags",
+                "description": "Returns all Lidarr Tags.",
                 "produces": [
                     "application/json"
                 ],
@@ -3555,6 +3826,277 @@ const docTemplateapi = `{
                 }
             }
         },
+        "/api/radarr/{instance}/notification": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a Notifcation in Radarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Radarr"
+                ],
+                "summary": "Update Radarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "notification content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/radarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Radarr Notification.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Radarr"
+                ],
+                "summary": "Add Radarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "new item content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/radarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "new notification ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/radarr/{instance}/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns Radarr Notifications with a name that matches 'notifiar'.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Radarr"
+                ],
+                "summary": "Retrieve Radarr Notifications",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "notifications",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/radarr.NotificationOutput"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/radarr/{instance}/qualityProfile": {
             "get": {
                 "security": [
@@ -5214,6 +5756,277 @@ const docTemplateapi = `{
                         }
                     },
                     "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/readarr/{instance}/notification": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a Notifcation in Readarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Readarr"
+                ],
+                "summary": "Update Readarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "notification content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/readarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Readarr Notification.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Readarr"
+                ],
+                "summary": "Add Readarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "new item content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/readarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "new notification ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/readarr/{instance}/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns Readarr Notifications with a name that matches 'notifiar'.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Readarr"
+                ],
+                "summary": "Retrieve Readarr Notifications",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "notifications",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/readarr.NotificationOutput"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
                         "description": "instance error",
                         "schema": {
                             "allOf": [
@@ -7568,6 +8381,277 @@ const docTemplateapi = `{
                         }
                     },
                     "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/notification": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a Notifcation in Sonarr.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Update Sonarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "notification content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a new Sonarr Notification.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Add Sonarr Notification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "new item content",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.NotificationInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "new notification ID",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "json input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sonarr/{instance}/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns Sonarr Notifications with a name that matches 'notifiar'.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sonarr"
+                ],
+                "summary": "Retrieve Sonarr Notifications",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "notifications",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.Respond.apiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.NotificationOutput"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
                         "description": "instance error",
                         "schema": {
                             "allOf": [
@@ -11613,6 +12697,157 @@ const docTemplateapi = `{
                 }
             }
         },
+        "lidarr.NotificationInput": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldInput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onDownloadFailure": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onImportFailure": {
+                    "type": "boolean"
+                },
+                "onReleaseImport": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onTrackRetag": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "lidarr.NotificationOutput": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldOutput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "implementationName": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "infoLink": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onDownloadFailure": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onImportFailure": {
+                    "type": "boolean"
+                },
+                "onReleaseImport": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onTrackRetag": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "supportsOnApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "supportsOnDownloadFailure": {
+                    "type": "boolean"
+                },
+                "supportsOnGrab": {
+                    "type": "boolean"
+                },
+                "supportsOnHealthIssue": {
+                    "type": "boolean"
+                },
+                "supportsOnImportFailure": {
+                    "type": "boolean"
+                },
+                "supportsOnReleaseImport": {
+                    "type": "boolean"
+                },
+                "supportsOnRename": {
+                    "type": "boolean"
+                },
+                "supportsOnTrackRetag": {
+                    "type": "boolean"
+                },
+                "supportsOnUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "lidarr.QualityProfile": {
             "type": "object",
             "properties": {
@@ -13384,6 +14619,166 @@ const docTemplateapi = `{
                 }
             }
         },
+        "radarr.NotificationInput": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldInput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onDownload": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onMovieAdded": {
+                    "type": "boolean"
+                },
+                "onMovieDelete": {
+                    "type": "boolean"
+                },
+                "onMovieFileDelete": {
+                    "type": "boolean"
+                },
+                "onMovieFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "radarr.NotificationOutput": {
+            "type": "object",
+            "properties": {
+                "SupportsOnMovieDelete": {
+                    "type": "boolean"
+                },
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldOutput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "implementationName": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "infoLink": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onDownload": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onMovieAdded": {
+                    "type": "boolean"
+                },
+                "onMovieDelete": {
+                    "type": "boolean"
+                },
+                "onMovieFileDelete": {
+                    "type": "boolean"
+                },
+                "onMovieFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "supportsOnApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "supportsOnDownload": {
+                    "type": "boolean"
+                },
+                "supportsOnGrab": {
+                    "type": "boolean"
+                },
+                "supportsOnHealthIssue": {
+                    "type": "boolean"
+                },
+                "supportsOnMovieAdded": {
+                    "type": "boolean"
+                },
+                "supportsOnMovieFileDelete": {
+                    "type": "boolean"
+                },
+                "supportsOnMovieFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "supportsOnRename": {
+                    "type": "boolean"
+                },
+                "supportsOnUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "radarr.QualityDefinition": {
             "type": "object",
             "properties": {
@@ -14005,6 +15400,193 @@ const docTemplateapi = `{
                 }
             }
         },
+        "readarr.NotificationInput": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldInput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onAuthorDelete": {
+                    "type": "boolean"
+                },
+                "onBookDelete": {
+                    "type": "boolean"
+                },
+                "onBookFileDelete": {
+                    "type": "boolean"
+                },
+                "onBookFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "onBookRetag": {
+                    "type": "boolean"
+                },
+                "onDownloadFailure": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onImportFailure": {
+                    "type": "boolean"
+                },
+                "onReleaseImport": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "readarr.NotificationOutput": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldOutput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "implementationName": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "infoLink": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onAuthorDelete": {
+                    "type": "boolean"
+                },
+                "onBookDelete": {
+                    "type": "boolean"
+                },
+                "onBookFileDelete": {
+                    "type": "boolean"
+                },
+                "onBookFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "onBookRetag": {
+                    "type": "boolean"
+                },
+                "onDownloadFailure": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onImportFailure": {
+                    "type": "boolean"
+                },
+                "onReleaseImport": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "supportsOnApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "supportsOnAuthorDelete": {
+                    "type": "boolean"
+                },
+                "supportsOnBookDelete": {
+                    "type": "boolean"
+                },
+                "supportsOnBookFileDelete": {
+                    "type": "boolean"
+                },
+                "supportsOnBookFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "supportsOnBookRetag": {
+                    "type": "boolean"
+                },
+                "supportsOnDownloadFailure": {
+                    "type": "boolean"
+                },
+                "supportsOnGrab": {
+                    "type": "boolean"
+                },
+                "supportsOnHealthIssue": {
+                    "type": "boolean"
+                },
+                "supportsOnImportFailure": {
+                    "type": "boolean"
+                },
+                "supportsOnReleaseImport": {
+                    "type": "boolean"
+                },
+                "supportsOnRename": {
+                    "type": "boolean"
+                },
+                "supportsOnUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "readarr.QualityProfile": {
             "type": "object",
             "properties": {
@@ -14534,6 +16116,157 @@ const docTemplateapi = `{
                 },
                 "standardEpisodeFormat": {
                     "type": "string"
+                }
+            }
+        },
+        "sonarr.NotificationInput": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldInput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onDownload": {
+                    "type": "boolean"
+                },
+                "onEpisodeFileDelete": {
+                    "type": "boolean"
+                },
+                "onEpisodeFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onSeriesDelete": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "sonarr.NotificationOutput": {
+            "type": "object",
+            "properties": {
+                "configContract": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldOutput"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "implementationName": {
+                    "type": "string"
+                },
+                "includeHealthWarnings": {
+                    "type": "boolean"
+                },
+                "infoLink": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "onDownload": {
+                    "type": "boolean"
+                },
+                "onEpisodeFileDelete": {
+                    "type": "boolean"
+                },
+                "onEpisodeFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "onGrab": {
+                    "type": "boolean"
+                },
+                "onHealthIssue": {
+                    "type": "boolean"
+                },
+                "onRename": {
+                    "type": "boolean"
+                },
+                "onSeriesDelete": {
+                    "type": "boolean"
+                },
+                "onUpgrade": {
+                    "type": "boolean"
+                },
+                "supportsOnApplicationUpdate": {
+                    "type": "boolean"
+                },
+                "supportsOnDownload": {
+                    "type": "boolean"
+                },
+                "supportsOnEpisodeFileDelete": {
+                    "type": "boolean"
+                },
+                "supportsOnEpisodeFileDeleteForUpgrade": {
+                    "type": "boolean"
+                },
+                "supportsOnGrab": {
+                    "type": "boolean"
+                },
+                "supportsOnHealthIssue": {
+                    "type": "boolean"
+                },
+                "supportsOnRename": {
+                    "type": "boolean"
+                },
+                "supportsOnSeriesDelete": {
+                    "type": "boolean"
+                },
+                "supportsOnUpgrade": {
+                    "type": "boolean"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

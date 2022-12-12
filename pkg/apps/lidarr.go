@@ -40,6 +40,10 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/update", lidarrUpdateAlbum, "PUT")
 	a.HandleAPIpath(starr.Lidarr, "/updateartist", lidarrUpdateArtist, "PUT")
 	a.HandleAPIpath(starr.Lidarr, "/command/search/{albumid:[0-9]+}", lidarrTriggerSearchAlbum, "GET")
+	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrGetNotifications, "GET")
+	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrUpdateNotification, "PUT")
+	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrAddNotification, "POST")
+
 }
 
 // LidarrConfig represents the input data for a Lidarr server.
@@ -506,7 +510,7 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 	return false
 }
 
-// @Description  Returns all Lidarr Tags
+// @Description  Returns all Lidarr Tags.
 // @Summary      Retrieve Lidarr Tags
 // @Tags         Lidarr
 // @Produce      json
@@ -627,4 +631,88 @@ func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "success"
+}
+
+// @Description  Returns Lidarr Notifications with a name that matches 'notifiar'.
+// @Summary      Retrieve Lidarr Notifications
+// @Tags         Lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.NotificationOutput} "notifications"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/notifications [get]
+// @Security     ApiKeyAuth
+func lidarrGetNotifications(req *http.Request) (int, interface{}) {
+	notifs, err := getLidarr(req).GetNotificationsContext(req.Context())
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting notifications: %w", err)
+	}
+
+	output := []*lidarr.NotificationOutput{}
+	for _, notif := range notifs {
+		if strings.Contains(strings.ToLower(notif.Name), "notifiar") {
+			output = append(output, notif)
+		}
+	}
+
+	return http.StatusOK, output
+}
+
+// @Description  Updates a Notifcation in Lidarr.
+// @Summary      Update Lidarr Notification
+// @Tags         Lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        PUT body lidarr.NotificationInput  true  "notification content"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/notification [put]
+// @Security     ApiKeyAuth
+func lidarrUpdateNotification(req *http.Request) (int, interface{}) {
+	var notif lidarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getLidarr(req).UpdateNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
+	}
+
+	return http.StatusOK, "success"
+}
+
+// @Description  Creates a new Lidarr Notification.
+// @Summary      Add Lidarr Notification
+// @Tags         Lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body lidarr.NotificationInput true "new item content"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new notification ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/notification [post]
+// @Security     ApiKeyAuth
+func lidarrAddNotification(req *http.Request) (int, interface{}) {
+	var notif lidarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	id, err := getLidarr(req).AddNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("adding notification: %w", err)
+	}
+
+	return http.StatusOK, id
 }
