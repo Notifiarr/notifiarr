@@ -617,6 +617,7 @@ func readarrGetNotifications(req *http.Request) (int, interface{}) {
 	}
 
 	output := []*readarr.NotificationOutput{}
+
 	for _, notif := range notifs {
 		if strings.Contains(strings.ToLower(notif.Name), "notifiar") {
 			output = append(output, notif)
@@ -652,7 +653,7 @@ func readarrUpdateNotification(req *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
 	}
 
-	return http.StatusOK, "success"
+	return http.StatusOK, mnd.Success
 }
 
 // @Description  Creates a new Readarr Notification.
