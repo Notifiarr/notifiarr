@@ -22,13 +22,13 @@ const (
 // to/from notifarr.com when updating custom formats for Radarr.
 // This is used in other places, like the trash API handler in the 'client' module.
 type RadarrTrashPayload struct {
-	Instance           int                         `json:"instance"`
-	Name               string                      `json:"name"`
-	CustomFormats      []*radarr.CustomFormat      `json:"customFormats,omitempty"`
-	QualityProfiles    []*radarr.QualityProfile    `json:"qualityProfiles,omitempty"`
-	QualityDefinitions []*radarr.QualityDefinition `json:"qualityDefinitions,omitempty"`
-	Naming             *radarr.Naming              `json:"naming"`
-	Error              string                      `json:"error"`
+	Instance           int                          `json:"instance"`
+	Name               string                       `json:"name"`
+	CustomFormats      []*radarr.CustomFormatOutput `json:"customFormats,omitempty"`
+	QualityProfiles    []*radarr.QualityProfile     `json:"qualityProfiles,omitempty"`
+	QualityDefinitions []*radarr.QualityDefinition  `json:"qualityDefinitions,omitempty"`
+	Naming             *radarr.Naming               `json:"naming"`
+	Error              string                       `json:"error"`
 }
 
 // SyncRadarrCF initializes a custom format sync with radarr.

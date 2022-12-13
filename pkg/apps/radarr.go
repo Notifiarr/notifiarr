@@ -40,6 +40,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/exclusions/{eid:(?:[0-9],?)+}", radarrDelExclusions, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrGetCustomFormats, "GET")
 	a.HandleAPIpath(starr.Radarr, "/customformats", radarrAddCustomFormat, "POST")
+	a.HandleAPIpath(starr.Radarr, "/customformats", radarrUpdateCustomFormat, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrUpdateCustomFormat, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/customformats/{cfid:[0-9]+}", radarrDeleteCustomFormat, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/qualitydefinitions", radarrGetQualityDefinitions, "GET")
@@ -771,15 +772,15 @@ func radarrDelExclusions(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        POST body radarr.CustomFormat  true  "New Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=radarr.CustomFormat}  "custom format"
+// @Param        POST body radarr.CustomFormatInput  true  "New Custom Format content"
+// @Success      200  {object} apps.Respond.apiResponse{message=radarr.CustomFormatOutput}  "custom format"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/customformats [post]
 // @Security     ApiKeyAuth
 func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
-	var cusform radarr.CustomFormat
+	var cusform radarr.CustomFormatInput
 
 	err := json.NewDecoder(req.Body).Decode(&cusform)
 	if err != nil {
@@ -799,7 +800,7 @@ func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
 // @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.CustomFormat}  "custom formats"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.CustomFormatOutput}  "custom formats"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/customformats [get]
@@ -819,23 +820,20 @@ func radarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        formatID  path   int64  true  "Custom Format ID"
-// @Param        PUT body radarr.CustomFormat  true  "Updated Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=radarr.CustomFormat}  "custom format"
+// @Param        PUT body radarr.CustomFormatInput  true  "Updated Custom Format content"
+// @Success      200  {object} apps.Respond.apiResponse{message=radarr.CustomFormatOutput}  "custom format"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/customformats/{formatID} [put]
 // @Security     ApiKeyAuth
 func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
-	var cusform radarr.CustomFormat
+	var cusform radarr.CustomFormatInput
 	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
-
-	output, err := getRadarr(req).UpdateCustomFormatContext(req.Context(), &cusform, cfID)
+	output, err := getRadarr(req).UpdateCustomFormatContext(req.Context(), &cusform)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
 	}
@@ -855,7 +853,7 @@ func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 // @Router       /api/radarr/{instance}/customformats/{formatID} [delete]
 // @Security     ApiKeyAuth
 func radarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
-	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
+	cfID, _ := strconv.ParseInt(mux.Vars(req)["cfid"], mnd.Base10, mnd.Bits64)
 
 	err := getRadarr(req).DeleteCustomFormatContext(req.Context(), cfID)
 	if err != nil {

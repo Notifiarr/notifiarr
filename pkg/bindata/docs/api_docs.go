@@ -2334,7 +2334,7 @@ const docTemplateapi = `{
                                         "message": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/radarr.CustomFormat"
+                                                "$ref": "#/definitions/radarr.CustomFormatOutput"
                                             }
                                         }
                                     }
@@ -2399,7 +2399,7 @@ const docTemplateapi = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/radarr.CustomFormat"
+                            "$ref": "#/definitions/radarr.CustomFormatInput"
                         }
                     }
                 ],
@@ -2415,7 +2415,7 @@ const docTemplateapi = `{
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "$ref": "#/definitions/radarr.CustomFormat"
+                                            "$ref": "#/definitions/radarr.CustomFormatOutput"
                                         }
                                     }
                                 }
@@ -2564,19 +2564,12 @@ const docTemplateapi = `{
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "Custom Format ID",
-                        "name": "formatID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Updated Custom Format content",
                         "name": "PUT",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/radarr.CustomFormat"
+                            "$ref": "#/definitions/radarr.CustomFormatInput"
                         }
                     }
                 ],
@@ -2592,7 +2585,7 @@ const docTemplateapi = `{
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "$ref": "#/definitions/radarr.CustomFormat"
+                                            "$ref": "#/definitions/radarr.CustomFormatOutput"
                                         }
                                     }
                                 }
@@ -10805,7 +10798,7 @@ const docTemplateapi = `{
                 "customFormats": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/radarr.CustomFormat"
+                        "$ref": "#/definitions/radarr.CustomFormatOutput"
                     }
                 },
                 "error": {
@@ -12912,7 +12905,7 @@ const docTemplateapi = `{
                 }
             }
         },
-        "radarr.CustomFormat": {
+        "radarr.CustomFormatInput": {
             "type": "object",
             "properties": {
                 "id": {
@@ -12927,41 +12920,61 @@ const docTemplateapi = `{
                 "specifications": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/radarr.CustomFormatSpec"
+                        "$ref": "#/definitions/radarr.CustomFormatInputSpec"
                     }
                 }
             }
         },
-        "radarr.CustomFormatField": {
-            "type": "object",
-            "properties": {
-                "advanced": {
-                    "type": "boolean"
-                },
-                "label": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "order": {
-                    "type": "integer"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "value": {
-                    "description": "should be a string, but sometimes it's a number."
-                }
-            }
-        },
-        "radarr.CustomFormatSpec": {
+        "radarr.CustomFormatInputSpec": {
             "type": "object",
             "properties": {
                 "fields": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/radarr.CustomFormatField"
+                        "$ref": "#/definitions/starr.FieldInput"
+                    }
+                },
+                "implementation": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "negate": {
+                    "type": "boolean"
+                },
+                "required": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "radarr.CustomFormatOutput": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "includeCustomFormatWhenRenaming": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "specifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/radarr.CustomFormatOutputSpec"
+                    }
+                }
+            }
+        },
+        "radarr.CustomFormatOutputSpec": {
+            "type": "object",
+            "properties": {
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.FieldOutput"
                     }
                 },
                 "implementation": {
@@ -14931,6 +14944,54 @@ const docTemplateapi = `{
                 }
             }
         },
+        "starr.FieldInput": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {}
+            }
+        },
+        "starr.FieldOutput": {
+            "type": "object",
+            "properties": {
+                "advanced": {
+                    "type": "boolean"
+                },
+                "helpLink": {
+                    "type": "string"
+                },
+                "helpText": {
+                    "type": "string"
+                },
+                "hidden": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "selectOptions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/starr.SelectOption"
+                    }
+                },
+                "selectOptionsProviderAction": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {}
+            }
+        },
         "starr.FormatItem": {
             "type": "object",
             "properties": {
@@ -15052,6 +15113,26 @@ const docTemplateapi = `{
                     "type": "number"
                 },
                 "votes": {
+                    "type": "integer"
+                }
+            }
+        },
+        "starr.SelectOption": {
+            "type": "object",
+            "properties": {
+                "dividerAfter": {
+                    "type": "boolean"
+                },
+                "hint": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                },
+                "value": {
                     "type": "integer"
                 }
             }
