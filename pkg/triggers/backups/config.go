@@ -7,6 +7,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/starr"
 )
 
@@ -103,14 +104,15 @@ func New(config *common.Config) *Action {
 
 // Create sets up all the triggers.
 func (a *Action) Create() {
-	a.cmd.makeBackupTriggersLidarr()
-	a.cmd.makeBackupTriggersRadarr()
-	a.cmd.makeBackupTriggersReadarr()
-	a.cmd.makeBackupTriggersSonarr()
-	a.cmd.makeBackupTriggersProwlarr()
-	a.cmd.makeCorruptionTriggersLidarr()
-	a.cmd.makeCorruptionTriggersRadarr()
-	a.cmd.makeCorruptionTriggersReadarr()
-	a.cmd.makeCorruptionTriggersSonarr()
-	a.cmd.makeCorruptionTriggersProwlarr()
+	ci := clientinfo.Get()
+	a.cmd.makeBackupTriggersLidarr(ci)
+	a.cmd.makeBackupTriggersRadarr(ci)
+	a.cmd.makeBackupTriggersReadarr(ci)
+	a.cmd.makeBackupTriggersSonarr(ci)
+	a.cmd.makeBackupTriggersProwlarr(ci)
+	a.cmd.makeCorruptionTriggersLidarr(ci)
+	a.cmd.makeCorruptionTriggersRadarr(ci)
+	a.cmd.makeCorruptionTriggersReadarr(ci)
+	a.cmd.makeCorruptionTriggersSonarr(ci)
+	a.cmd.makeCorruptionTriggersProwlarr(ci)
 }
