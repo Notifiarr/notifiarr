@@ -54,6 +54,9 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/command/{commandid:[0-9]+}", sonarrStatusCommand, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/command", sonarrTriggerCommand, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/command/search/{seriesid:[0-9]+}", sonarrTriggerSearchSeries, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrGetNotifications, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrUpdateNotification, "PUT")
+	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrAddNotification, "POST")
 }
 
 // SonarrConfig represents the input data for a Sonarr server.
@@ -1150,4 +1153,88 @@ func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, output
+}
+
+// @Description  Returns Sonarr Notifications with a name that matches 'notifiar'.
+// @Summary      Retrieve Sonarr Notifications
+// @Tags         Sonarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.NotificationOutput} "notifications"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/notifications [get]
+// @Security     ApiKeyAuth
+func sonarrGetNotifications(req *http.Request) (int, interface{}) {
+	notifs, err := getSonarr(req).GetNotificationsContext(req.Context())
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting notifications: %w", err)
+	}
+
+	output := []*sonarr.NotificationOutput{}
+	for _, notif := range notifs {
+		if strings.Contains(strings.ToLower(notif.Name), "notifiar") {
+			output = append(output, notif)
+		}
+	}
+
+	return http.StatusOK, output
+}
+
+// @Description  Updates a Notifcation in Sonarr.
+// @Summary      Update Sonarr Notification
+// @Tags         Sonarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        PUT body sonarr.NotificationInput  true  "notification content"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/notification [put]
+// @Security     ApiKeyAuth
+func sonarrUpdateNotification(req *http.Request) (int, interface{}) {
+	var notif sonarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getSonarr(req).UpdateNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
+	}
+
+	return http.StatusOK, "success"
+}
+
+// @Description  Creates a new Sonarr Notification.
+// @Summary      Add Sonarr Notification
+// @Tags         Sonarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body sonarr.NotificationInput true "new item content"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new notification ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/notification [post]
+// @Security     ApiKeyAuth
+func sonarrAddNotification(req *http.Request) (int, interface{}) {
+	var notif sonarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	id, err := getSonarr(req).AddNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("adding notification: %w", err)
+	}
+
+	return http.StatusOK, id
 }

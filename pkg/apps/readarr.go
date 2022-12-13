@@ -34,6 +34,9 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(starr.Readarr, "/tag/{label}", readarrSetTag, "PUT")
 	a.HandleAPIpath(starr.Readarr, "/updateauthor", readarrUpdateAuthor, "PUT")
 	a.HandleAPIpath(starr.Readarr, "/command/search/{bookid:[0-9]+}", readarrTriggerSearchBook, "GET")
+	a.HandleAPIpath(starr.Readarr, "/notification", readarrGetNotifications, "GET")
+	a.HandleAPIpath(starr.Readarr, "/notification", readarrUpdateNotification, "PUT")
+	a.HandleAPIpath(starr.Readarr, "/notification", readarrAddNotification, "POST")
 }
 
 // ReadarrConfig represents the input data for a Readarr server.
@@ -595,4 +598,88 @@ func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, "readarr seems to have worked"
+}
+
+// @Description  Returns Readarr Notifications with a name that matches 'notifiar'.
+// @Summary      Retrieve Readarr Notifications
+// @Tags         Readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]readarr.NotificationOutput} "notifications"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/notifications [get]
+// @Security     ApiKeyAuth
+func readarrGetNotifications(req *http.Request) (int, interface{}) {
+	notifs, err := getReadarr(req).GetNotificationsContext(req.Context())
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting notifications: %w", err)
+	}
+
+	output := []*readarr.NotificationOutput{}
+	for _, notif := range notifs {
+		if strings.Contains(strings.ToLower(notif.Name), "notifiar") {
+			output = append(output, notif)
+		}
+	}
+
+	return http.StatusOK, output
+}
+
+// @Description  Updates a Notifcation in Readarr.
+// @Summary      Update Readarr Notification
+// @Tags         Readarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        PUT body readarr.NotificationInput  true  "notification content"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/notification [put]
+// @Security     ApiKeyAuth
+func readarrUpdateNotification(req *http.Request) (int, interface{}) {
+	var notif readarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	_, err = getReadarr(req).UpdateNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
+	}
+
+	return http.StatusOK, "success"
+}
+
+// @Description  Creates a new Readarr Notification.
+// @Summary      Add Readarr Notification
+// @Tags         Readarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body readarr.NotificationInput true "new item content"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new notification ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/readarr/{instance}/notification [post]
+// @Security     ApiKeyAuth
+func readarrAddNotification(req *http.Request) (int, interface{}) {
+	var notif readarr.NotificationInput
+
+	err := json.NewDecoder(req.Body).Decode(&notif)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+	}
+
+	id, err := getReadarr(req).AddNotificationContext(req.Context(), &notif)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("adding notification: %w", err)
+	}
+
+	return http.StatusOK, id
 }
