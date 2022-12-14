@@ -1172,6 +1172,7 @@ func sonarrGetNotifications(req *http.Request) (int, interface{}) {
 	}
 
 	output := []*sonarr.NotificationOutput{}
+
 	for _, notif := range notifs {
 		if strings.Contains(strings.ToLower(notif.Name), "notifiar") {
 			output = append(output, notif)
@@ -1207,7 +1208,7 @@ func sonarrUpdateNotification(req *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
 	}
 
-	return http.StatusOK, "success"
+	return http.StatusOK, mnd.Success
 }
 
 // @Description  Creates a new Sonarr Notification.

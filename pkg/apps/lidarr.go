@@ -43,7 +43,6 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrAddNotification, "POST")
-
 }
 
 // LidarrConfig represents the input data for a Lidarr server.
@@ -601,7 +600,7 @@ func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating album: %w", err)
 	}
 
-	return http.StatusOK, "success"
+	return http.StatusOK, mnd.Success
 }
 
 // @Description  Updates an Artist in Lidarr.
@@ -630,7 +629,7 @@ func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating artist: %w", err)
 	}
 
-	return http.StatusOK, "success"
+	return http.StatusOK, mnd.Success
 }
 
 // @Description  Returns Lidarr Notifications with a name that matches 'notifiar'.
@@ -650,6 +649,7 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 	}
 
 	output := []*lidarr.NotificationOutput{}
+
 	for _, notif := range notifs {
 		if strings.Contains(strings.ToLower(notif.Name), "notifiar") {
 			output = append(output, notif)
@@ -685,7 +685,7 @@ func lidarrUpdateNotification(req *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
 	}
 
-	return http.StatusOK, "success"
+	return http.StatusOK, mnd.Success
 }
 
 // @Description  Creates a new Lidarr Notification.
