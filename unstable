@@ -1,9 +1,0 @@
-#!/bin/bash -x
-make clean windows signdmg
-scp release/Notifiarr.dmg notifiarr.amd64.exe notifiarr.com:/home/swag/config/www/unstable
-make clean linux
-gzip -9 notifiarr.amd64.linux
-scp notifiarr.amd64.linux.gz notifiarr.com:/home/swag/config/www/unstable
-pushd init/docker
-SOURCE_BRANCH=unstable ./build
-popd
