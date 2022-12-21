@@ -9,23 +9,22 @@ source settings.sh
 
 # If we are running in Travis, make a new keychain and import the certificate.
 if [ -n "$TRAVIS_OS_NAME" ]; then
-  echo "Creating new keychain"
-  security create-keychain -p secret ios-build.keychain
+  KEYCHAIN="ios-build.keychain"
 
-  KEYCHAIN="~/Library/Keychains/ios-build.keychain"
+  echo "Creating new keychain: $KEYCHAIN"
+  security create-keychain -p secret $KEYCHAIN
 
   echo "Importing certificate into ${KEYCHAIN}"
-  mv apple.signing.key apple.signing.key.p12
-  security import apple.signing.key.p12 -k "$KEYCHAIN" -T /usr/local/bin/gon
+  security import apple.signing.key -f pkcs12 -k $KEYCHAIN -T /usr/local/bin/gon
 
   echo "Unlocking keychain ${KEYCHAIN}"
-  security unlock-keychain -p secret ios-build.keychain
+  security unlock-keychain -p secret $KEYCHAIN
 
   echo "Increase keychain unlock timeout to 1 hour."
-  security set-keychain-settings -lut 3600 ios-build.keychain
+  security set-keychain-settings -lut 3600 $KEYCHAIN
 
   echo "Add keychain to keychain-list"
-  security list-keychains -s ios-build.keychain
+  security list-keychains -s $KEYCHAIN
 fi
 
 echo "Signing App."
