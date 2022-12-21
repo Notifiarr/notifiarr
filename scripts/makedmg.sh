@@ -34,4 +34,4 @@ gon init/macos/sign.json
 
 # Creating non-notarized DMG.
 mkdir -p release
-hdiutil create release/$(MACAPP)-unsigned.dmg -srcfolder $(MACAPP).app -ov
+hdiutil create release/${MACAPP}-unsigned.dmg -srcfolder ${MACAPP}.app -ov

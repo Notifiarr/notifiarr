@@ -4,23 +4,23 @@ env:
 jobs:
   include:
   - os: osx
-   # if: tag IS present
+  - if: tag IS present OR branch = unstable
     osx_image: xcode13.2
     language: go
     go: 1.19.x
-  # - if: tag IS NOT present AND branch != unstable
-  #   os: linux
-  #   dist: bionic
-  #   services: docker
-  #   language: go
-  #   go: 1.19.x
-  # - if: tag IS present OR branch = unstable
-  #   os: linux
-  #   dist: bionic
-  #   services: docker
-  #   language: go
-  #   go: 1.19.x
-  #   env: MAKEBUILD=release
+  - if: tag IS NOT present AND branch != unstable
+    os: linux
+    dist: bionic
+    services: docker
+    language: go
+    go: 1.19.x
+  - if: tag IS present OR branch = unstable
+    os: linux
+    dist: bionic
+    services: docker
+    language: go
+    go: 1.19.x
+    env: MAKEBUILD=release
 git:
   depth: false
 addons:
@@ -54,7 +54,7 @@ before_script:
   - source settings.sh
 script:
   # Test Go.
-  #- make test
+  - if [ "$TRAVIS_OS_NAME" != "osx" ]; make test; fi
   # Test Docker. Docker rate limits and breaks my builds.
   - #if [ "$TRAVIS_OS_NAME" == "linux" ]; then make docker; fi
   # Test built docker image.
