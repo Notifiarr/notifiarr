@@ -7,9 +7,7 @@ source settings.sh
 
 docker buildx create --use
 
-read -r -d '' CMD << EOF 
- docker buildx build --load --tag current \
-  --platform linux/amd64,linux/arm64/v8,linux/arm \
+read -r -d '' BUILD_ARGS << EOF 
   --build-arg "BUILD_DATE=${DATE}" \
   --build-arg "BUILD_FLAGS=${BUILD_FLAGS}" \
   --build-arg "COMMIT=${COMMIT}" \
@@ -23,7 +21,7 @@ read -r -d '' CMD << EOF
   --file ${DOCKERFILE_PATH} .
 EOF
 
-echo "Running command: ${CMD}"
-eval $CMD
+docker buildx build --load --tag current:amd64 --platform linux/amd64 $BUILD_ARGS
+docker buildx build --load --tag current:arm64 --platform linux/arm64/v8 $BUILD_ARGS
+docker buildx build --load --tag current:arm --platform linux/arm $BUILD_ARGS
 
-popd
