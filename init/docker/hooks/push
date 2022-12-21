@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# This file is designed to run as build hook for Automated Builds on Docker.com.
+# This always run local to the Dockerfile folder, so the path is ../..
+pushd ../..
 source settings.sh
 
 if [ "v$VERSION" = "$SOURCE_BRANCH" ]; then

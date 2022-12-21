@@ -1,4 +1,4 @@
-<img src="https://docs.notifiarr.com/img/repo-logo.png"> 
+<img src="https://docs.notifiarr.com/img/repo-logo.png">
 
 This is the unified client for [Notifiarr.com](https://notifiarr.com).
 The client enables content requests from Media Bot in your Discord Server and also provides reports for Plex usage and system health among many other features.
