@@ -5,16 +5,18 @@
 pushd ../..
 source settings.sh
 
+TAGS="${SOURCE_BRANCH}"
+
 if [ "v$VERSION" = "$SOURCE_BRANCH" ]; then
-  TAGS="--tag $VERSION"
+  TAGS="$VERSION"
 
   echo $SOURCE_BRANCH | grep -q -- -
   if [ "$?" = "1" ]; then
     # tag does not contain a dash, so assume it's a prod tag.
-    TAGS="$TAGS --tag latest --tag stable --tag $(echo $VERSION | cut -d. -f1,2) --tag $(echo $VERSION | cut -d. -f1)"
+    TAGS="$TAGS latest stable $(echo $VERSION | cut -d. -f1,2) $(echo $VERSION | cut -d. -f1)"
   fi
-else
-  TAGS="--tag ${SOURCE_BRANCH}"
 fi
 
-docker push $TAGS
+for tag in $TAGS; do
+  docker push $tag
+done
