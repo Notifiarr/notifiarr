@@ -16,7 +16,7 @@ echo "Uploading unstable files."
 for file in release/*.{zip,dmg,gz,txz}; do
   if [ -f "$file" ]; then
     echo "Uploading: $file"
-    curl -H "X-API-KEY: ${UNSTABLE_UPLOAD_KEY}" "$URL" -XPOST -F "file=@$file;filename=$(basename $file)"
+    curl -H "X-API-KEY: ${UNSTABLE_UPLOAD_KEY}" "$URL" -F "file=@$file;filename=$(basename $file)" -F submit=true
     echo
   fi
 done
