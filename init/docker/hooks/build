@@ -20,7 +20,7 @@ fi
 docker buildx create --use
 
 read -r -d '' CMD << EOF 
- docker buildx build ${TAGS} \
+ docker buildx build --push ${TAGS} \
   --platform linux/amd64,linux/arm64/v8,linux/arm \
   --build-arg "BUILD_DATE=${DATE}" \
   --build-arg "BUILD_FLAGS=${BUILD_FLAGS}" \
