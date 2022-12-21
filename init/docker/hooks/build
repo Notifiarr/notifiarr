@@ -26,3 +26,17 @@ eval "docker buildx build --load --tag current:amd64 --platform linux/amd64 $BUI
 eval "docker buildx build --load --tag current:arm64 --platform linux/arm64/v8 $BUILD_ARGS"
 eval "docker buildx build --load --tag current:arm --platform linux/arm $BUILD_ARGS"
 
+TAGS="$DOCKER_REPO:${SOURCE_BRANCH}"
+if [ "v$VERSION" = "$SOURCE_BRANCH" ]; then
+  TAGS="$DOCKER_REPO:$VERSION"
+
+  echo $SOURCE_BRANCH | grep -q -- -
+  if [ "$?" = "1" ]; then
+    # tag does not contain a dash, so assume it's a prod tag.
+    TAGS="$TAGS $DOCKER_REPO:latest $DOCKER_REPO:stable $DOCKER_REPO:$(echo $VERSION | cut -d. -f1,2) $DOCKER_REPO:$(echo $VERSION | cut -d. -f1)"
+  fi
+fi
+
+for tag in $TAGS; do
+  docker buildx build --push --platform linux/amd64,linux/arm64/v8,linux/arm $tag --file ${DOCKERFILE_PATH} .
+done
