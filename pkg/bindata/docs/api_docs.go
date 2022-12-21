@@ -11744,7 +11744,7 @@ const docTemplateapi = `{
                     "type": "integer"
                 },
                 "metadataId": {
-                    "$ref": "#/definitions/radarr.Availability"
+                    "type": "string"
                 },
                 "monitored": {
                     "type": "boolean"
@@ -12006,19 +12006,11 @@ const docTemplateapi = `{
             "properties": {
                 "appsStatus": {
                     "description": "AppsStatus is only returned on the version endpoint.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/clientinfo.AppStatuses"
-                        }
-                    ]
+                    "$ref": "#/definitions/clientinfo.AppStatuses"
                 },
                 "client": {
                     "description": "Client contains running client information.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/clientinfo.AppInfoClient"
-                        }
-                    ]
+                    "$ref": "#/definitions/clientinfo.AppInfoClient"
                 },
                 "commands": {
                     "description": "Commands is the list of available commands.",
@@ -12029,19 +12021,11 @@ const docTemplateapi = `{
                 },
                 "config": {
                     "description": "Config contains running configuration information.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/clientinfo.AppInfoConfig"
-                        }
-                    ]
+                    "$ref": "#/definitions/clientinfo.AppInfoConfig"
                 },
                 "host": {
                     "description": "Host contains host info.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/host.InfoStat"
-                        }
-                    ]
+                    "$ref": "#/definitions/host.InfoStat"
                 },
                 "hostError": {
                     "description": "HostError has data if hostinfo has an error.",
@@ -13474,11 +13458,7 @@ const docTemplateapi = `{
                 },
                 "stateTime": {
                     "description": "this is not a plex item. We calculate this.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/plex.structDur"
-                        }
-                    ]
+                    "$ref": "#/definitions/plex.structDur"
                 },
                 "title": {
                     "type": "string"
@@ -14065,7 +14045,7 @@ const docTemplateapi = `{
                     }
                 },
                 "minimumAvailability": {
-                    "$ref": "#/definitions/radarr.Availability"
+                    "type": "string"
                 },
                 "monitored": {
                     "type": "boolean"
@@ -14142,23 +14122,6 @@ const docTemplateapi = `{
                     "type": "integer"
                 }
             }
-        },
-        "radarr.Availability": {
-            "type": "string",
-            "enum": [
-                "tba",
-                "announced",
-                "inCinemas",
-                "released",
-                "deleted"
-            ],
-            "x-enum-varnames": [
-                "AvailabilityToBeAnnounced",
-                "AvailabilityAnnounced",
-                "AvailabilityInCinemas",
-                "AvailabilityReleased",
-                "AvailabilityDeleted"
-            ]
         },
         "radarr.Collection": {
             "type": "object",
@@ -14355,7 +14318,7 @@ const docTemplateapi = `{
                     "type": "string"
                 },
                 "minimumAvailability": {
-                    "$ref": "#/definitions/radarr.Availability"
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -14435,11 +14398,7 @@ const docTemplateapi = `{
             "properties": {
                 "addOptions": {
                     "description": "only available upon adding a movie.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/radarr.AddMovieOptions"
-                        }
-                    ]
+                    "$ref": "#/definitions/radarr.AddMovieOptions"
                 },
                 "added": {
                     "type": "string"
@@ -14493,7 +14452,7 @@ const docTemplateapi = `{
                     "type": "boolean"
                 },
                 "minimumAvailability": {
-                    "$ref": "#/definitions/radarr.Availability"
+                    "type": "string"
                 },
                 "monitored": {
                     "type": "boolean"
@@ -15085,19 +15044,11 @@ const docTemplateapi = `{
             "properties": {
                 "addOptions": {
                     "description": "Contains Search.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/readarr.AddBookOptions"
-                        }
-                    ]
+                    "$ref": "#/definitions/readarr.AddBookOptions"
                 },
                 "author": {
                     "description": "Contains Author ID",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/readarr.AddBookAuthor"
-                        }
-                    ]
+                    "$ref": "#/definitions/readarr.AddBookAuthor"
                 },
                 "editions": {
                     "description": "contains GRID Edition ID",
@@ -15785,11 +15736,7 @@ const docTemplateapi = `{
             "properties": {
                 "addOptions": {
                     "description": "to be used only on POST, not for PUT",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/sonarr.AddSeriesOptions"
-                        }
-                    ]
+                    "$ref": "#/definitions/sonarr.AddSeriesOptions"
                 },
                 "id": {
                     "type": "integer"
@@ -16379,11 +16326,7 @@ const docTemplateapi = `{
                 },
                 "language": {
                     "description": "v4 only.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/starr.Value"
-                        }
-                    ]
+                    "$ref": "#/definitions/starr.Value"
                 },
                 "minFormatScore": {
                     "description": "v4 only.",
@@ -16872,11 +16815,7 @@ const docTemplateapi = `{
                 },
                 "revision": {
                     "description": "Not sure which app had this....",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/starr.QualityRevision"
-                        }
-                    ]
+                    "$ref": "#/definitions/starr.QualityRevision"
                 }
             }
         },
