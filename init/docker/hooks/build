@@ -21,22 +21,25 @@ read -r -d '' BUILD_ARGS << EOF
 --file ${DOCKERFILE_PATH} .
 EOF
 
-echo "Builds Args: ${BUILD_ARGS}"
+echo "Build Args: ${BUILD_ARGS}"
 eval "docker buildx build --load --tag current:amd64 --platform linux/amd64 $BUILD_ARGS"
 eval "docker buildx build --load --tag current:arm64 --platform linux/arm64/v8 $BUILD_ARGS"
 eval "docker buildx build --load --tag current:arm --platform linux/arm $BUILD_ARGS"
+echo "Done Building."
 
-TAGS="$DOCKER_REPO:${SOURCE_BRANCH}"
+TAGS="$SOURCE_BRANCH"
 if [ "v$VERSION" = "$SOURCE_BRANCH" ]; then
-  TAGS="$DOCKER_REPO:$VERSION"
+  TAGS="$VERSION"
 
   echo $SOURCE_BRANCH | grep -q -- -
   if [ "$?" = "1" ]; then
     # tag does not contain a dash, so assume it's a prod tag.
-    TAGS="$TAGS $DOCKER_REPO:latest $DOCKER_REPO:stable $DOCKER_REPO:$(echo $VERSION | cut -d. -f1,2) $DOCKER_REPO:$(echo $VERSION | cut -d. -f1)"
+    TAGS="$TAGS latest stable $(echo $VERSION | cut -d. -f1,2) $(echo $VERSION | cut -d. -f1)"
   fi
 fi
 
+
 for tag in $TAGS; do
-  docker buildx build --push --platform linux/amd64,linux/arm64/v8,linux/arm -t $tag --file ${DOCKERFILE_PATH} .
+  echo "Pushing tag: $DOCKER_REPO:$tag"
+  docker buildx build --push --platform linux/amd64,linux/arm64/v8,linux/arm -t $DOCKER_REPO:$tag --file ${DOCKERFILE_PATH} .
 done

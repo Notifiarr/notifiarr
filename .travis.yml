@@ -119,6 +119,12 @@ deploy:
     on:
       branch: unstable
       condition: "$TRAVIS_OS_NAME = linux"
+  - provider: script
+    skip_cleanup: true
+    cleanup: false
+    script: bash scripts/unstable-deploy.sh
+    on:
+      branch: unstable
   # Stable packages (releases).
   - provider: packagecloud
     repository: pkgs
@@ -163,12 +169,6 @@ deploy:
     on:
       tags: true
       condition: "$TRAVIS_OS_NAME = osx"
-  - provider: script
-    skip_cleanup: true
-    cleanup: false
-    script: bash scripts/unstable-deploy.sh
-    on:
-      branch: unstable
   # Upload aur PKGBUILD file to a special repo.
   - provider: script
     script: bash scripts/aur-deploy.sh
