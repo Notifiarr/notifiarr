@@ -15,7 +15,8 @@ if [ -n "$TRAVIS_OS_NAME" ]; then
   security create-keychain -p secret $KEYCHAIN
 
   echo "Importing certificate into ${KEYCHAIN}"
-  security import apple.signing.key -f pkcs12 -k $KEYCHAIN -T /usr/local/bin/gon
+  echo | openssl pkcs12 -in apple.signing.key -clcerts -nokeys -out certificate.cer -password stdin
+  security import certificate.cer -f pkcs12 -k $KEYCHAIN -T /usr/local/bin/gon
 
   echo "Unlocking keychain ${KEYCHAIN}"
   security unlock-keychain -p secret $KEYCHAIN
