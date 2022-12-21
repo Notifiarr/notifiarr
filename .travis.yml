@@ -4,29 +4,30 @@ env:
 jobs:
   include:
   - os: osx
-    if: tag IS present
+   # if: tag IS present
     osx_image: xcode13.2
     language: go
     go: 1.19.x
-  - if: tag IS NOT present AND branch != unstable
-    os: linux
-    dist: bionic
-    services: docker
-    language: go
-    go: 1.19.x
-  - if: tag IS present OR branch = unstable
-    os: linux
-    dist: bionic
-    services: docker
-    language: go
-    go: 1.19.x
-    env: MAKEBUILD=release
+  # - if: tag IS NOT present AND branch != unstable
+  #   os: linux
+  #   dist: bionic
+  #   services: docker
+  #   language: go
+  #   go: 1.19.x
+  # - if: tag IS present OR branch = unstable
+  #   os: linux
+  #   dist: bionic
+  #   services: docker
+  #   language: go
+  #   go: 1.19.x
+  #   env: MAKEBUILD=release
 git:
   depth: false
 addons:
   homebrew:
     packages:
     - upx
+    - mitchellh/gon/gon
   apt:
     packages:
     - ruby-dev
@@ -62,7 +63,7 @@ script:
   # Build everything
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make $MAKEBUILD; fi
   # Build mac binary or image.
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make dmg; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make signdmg; fi
   # Test homebrew (with make install).
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make install VERSION=$VERSION ITERATION=$ITERATION PREFIX=/tmp/ab-$VERSION ETC=/tmp/ab-$VERSION/etc; fi
 after_success:

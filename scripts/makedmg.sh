@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This file builds a beautiful DMG installer for macOS.
 # This only works on macOS.
 ###########################################
@@ -6,6 +6,26 @@
 source settings.sh
 
 [ -n "$MACAPP" ] || exit 1
+
+# If we are running in Travis, make a new keychain and import the certificate.
+if [ -n "$TRAVIS_OS_NAME" ]; then
+  echo "Creating new keychain"
+  security create-keychain -p secret ios-build.keychain
+
+  KEYCHAIN="~/Library/Keychains/ios-build.keychain"
+
+  echo "Importing certificate into ${KEYCHAIN}"
+  security import apple.signing.key -k "$KEYCHAIN" -T /usr/local/bin/gon
+
+  echo "Unlocking keychain ${KEYCHAIN}"
+  security unlock-keychain -p secret ios-build.keychain
+
+  echo "Increase keychain unlock timeout to 1 hour."
+  security set-keychain-settings -lut 3600 ios-build.keychain
+
+  echo "Add keychain to keychain-list"
+  security list-keychains -s ios-build.keychain
+done
 
 echo "Signing App."
 gon init/macos/sign.json
