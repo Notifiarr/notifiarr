@@ -164,6 +164,8 @@ deploy:
       tags: true
       condition: "$TRAVIS_OS_NAME = osx"
   - provider: script
+    skip_cleanup: true
+    cleanup: false
     script: bash scripts/unstable-deploy.sh
     on:
       branch: unstable
