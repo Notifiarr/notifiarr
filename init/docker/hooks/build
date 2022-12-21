@@ -5,22 +5,10 @@
 pushd ../..
 source settings.sh
 
-if [ "v$VERSION" = "$SOURCE_BRANCH" ]; then
-  TAGS="--tag $VERSION"
-
-  echo $SOURCE_BRANCH | grep -q -- -
-  if [ "$?" = "1" ]; then
-    # tag does not contain a dash, so assume it's a prod tag.
-    TAGS="$TAGS --tag latest --tag stable --tag $(echo $VERSION | cut -d. -f1,2) --tag $(echo $VERSION | cut -d. -f1)"
-  fi
-else
-  TAGS="--tag ${SOURCE_BRANCH}"
-fi
-
 docker buildx create --use
 
 read -r -d '' CMD << EOF 
- docker buildx build --push ${TAGS} \
+ docker buildx build --load --tag current \
   --platform linux/amd64,linux/arm64/v8,linux/arm \
   --build-arg "BUILD_DATE=${DATE}" \
   --build-arg "BUILD_FLAGS=${BUILD_FLAGS}" \
