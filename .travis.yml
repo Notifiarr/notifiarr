@@ -164,6 +164,10 @@ deploy:
     on:
       tags: true
       condition: "$TRAVIS_OS_NAME = osx"
+  - provider: script
+    script: bash scripts/unstable-deploy.sh
+    on:
+      branch: unstable
   # Upload aur PKGBUILD file to a special repo.
   - provider: script
     script: bash scripts/aur-deploy.sh

@@ -25,7 +25,7 @@ if [ -n "$TRAVIS_OS_NAME" ]; then
 
   echo "Add keychain to keychain-list"
   security list-keychains -s ios-build.keychain
-done
+fi
 
 echo "Signing App."
 gon init/macos/sign.json
