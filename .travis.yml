@@ -26,7 +26,6 @@ git:
 addons:
   homebrew:
     packages:
-    - upx
     - mitchellh/gon/gon
   apt:
     packages:
@@ -55,7 +54,7 @@ before_script:
   - source settings.sh
 script:
   # Test Go.
-  - make test
+  #- make test
   # Test Docker. Docker rate limits and breaks my builds.
   - #if [ "$TRAVIS_OS_NAME" == "linux" ]; then make docker; fi
   # Test built docker image.

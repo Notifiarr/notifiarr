@@ -15,7 +15,8 @@ if [ -n "$TRAVIS_OS_NAME" ]; then
   KEYCHAIN="~/Library/Keychains/ios-build.keychain"
 
   echo "Importing certificate into ${KEYCHAIN}"
-  security import apple.signing.key -k "$KEYCHAIN" -T /usr/local/bin/gon
+  mv apple.signing.key apple.signing.key.p12
+  security import apple.signing.key.p12 -k "$KEYCHAIN" -T /usr/local/bin/gon
 
   echo "Unlocking keychain ${KEYCHAIN}"
   security unlock-keychain -p secret ios-build.keychain

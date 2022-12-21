@@ -38,6 +38,7 @@ README.html
 /homebrew-mugs
 .secret*files.tar
 *key*
+*.p12
 aur_deploy_key*
 .metadata.make
 /*-rendered.sh
