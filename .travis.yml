@@ -54,7 +54,7 @@ before_script:
   - source settings.sh
 script:
   # Test Go.
-  - if [ "$TRAVIS_OS_NAME" != "osx" ]; make test; fi
+  - if [ "$TRAVIS_OS_NAME" != "osx" ]; then make test; fi
   # Test Docker. Docker rate limits and breaks my builds.
   - #if [ "$TRAVIS_OS_NAME" == "linux" ]; then make docker; fi
   # Test built docker image.
