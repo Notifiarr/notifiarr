@@ -68,8 +68,8 @@ var (
 // And that prcoedure relaunches the app; this allows "in-place" upgrades.
 // This also makes sure the new file works before this app exits.
 // This is not required though, and you can totally upgrade "a different app".
-func Now(u *Command) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), downloadTimeout)
+func Now(ctx context.Context, u *Command) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, downloadTimeout)
 	defer cancel()
 
 	return NowWithContext(ctx, u)

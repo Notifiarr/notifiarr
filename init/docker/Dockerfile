@@ -3,24 +3,26 @@
 # https://github.com/golift/application-builder
 #
 
-FROM golang:1-buster as builder
+FROM golang:1-bullseye as builder
 
 # Build speed magic! 
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
-COPY go.mod go.sum .
+COPY main.go settings.sh go.mod go.sum ./
 RUN go mod download
-COPY . .
+COPY init init
+COPY pkg pkg
 
-ARG TARGETOS
-ARG BINARY
+RUN apt update
+RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
+
 ARG TARGETARCH
 
+RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
+    tar -zxf /notifiarr.tgz -C /
+
 # For megacli. All the *'s are to deal with multiarch. :(
-RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates && \
-    curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
-    tar -zxf /notifiarr.tgz -C / && \
-    mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
+RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
     /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
     /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
     /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
@@ -31,15 +33,50 @@ RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-c
     ln -s /usr/lib /tmp/lib_link/lib64 && \
     ln -s /usr/lib /tmp/lib_link/lib
 
+ARG TARGETOS
+ARG BUILD_DATE
+ARG BRANCH
+ARG VERSION
+ARG ITERATION
+ARG COMMIT
+
 # Build the app.
-RUN CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
+        -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
+        -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
+        -X \"golift.io/version.BuildUser=docker\" \
+        -X \"golift.io/version.Revision=${ITERATION}\" \
+        -X \"golift.io/version.Version=${VERSION}\""
 
 FROM scratch
+
+# Make sure we have an ssl cert chain and timezone data.
+COPY --from=builder /etc/ssl /etc/ssl
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+
+COPY --from=builder /tmp/image /image
+
+# For megacli.
+COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
+COPY --from=builder /tmp/lib /usr/lib
+COPY --from=builder /tmp/lib_link/ /
+
+ENV TZ=UTC
+
+# Notifiarr specific.
+ENV PATH=/
+ENV USER=root
+ENV NOTIFIARR_IN_DOCKER=true
+
+EXPOSE 5454
+ENTRYPOINT [ "/image" ]
+
 ARG TARGETOS
 ARG TARGETARCH
 ARG BUILD_DATE
 ARG COMMIT
 ARG VERSION
+ARG ITERATION
 ARG LICENSE=MIT
 ARG BINARY
 ARG SOURCE_URL=http://github.com/golift/application-builder
@@ -59,25 +96,4 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.authors="${AUTHOR}" \
       org.opencontainers.image.architecture="${TARGETOS} ${TARGETARCH}" \
       org.opencontainers.image.licenses="${LICENSE}" \
-      org.opencontainers.image.version="${VERSION}"
-
-COPY --from=builder /src/${BINARY}.${TARGETARCH}.${TARGETOS} /image
-
-# For megacli.
-COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
-COPY --from=builder /tmp/lib /usr/lib
-COPY --from=builder /tmp/lib_link/ /
-
-# Make sure we have an ssl cert chain and timezone data.
-COPY --from=builder /etc/ssl /etc/ssl
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-
-ENV TZ=UTC
-
-# Notifiarr specific.
-ENV PATH=/
-ENV USER=root
-ENV NOTIFIARR_IN_DOCKER=true
-
-EXPOSE 5454
-ENTRYPOINT [ "/image" ]
+      org.opencontainers.image.version="${VERSION}-${ITERATION}"

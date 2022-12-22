@@ -3,7 +3,7 @@
 # See more: https://github.com/golift/application-builder
 
 # Suck in our application information.
-IGNORED:=$(shell bash -c "source settings.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > .metadata.make")
+IGNORED:=$(shell bash -c "source settings.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > /tmp/.metadata.make")
 
 # md2roff turns markdown into man files and html files.
 MD2ROFF_BIN=github.com/davidnewhall/md2roff@v0.0.1
@@ -24,14 +24,18 @@ ifeq ($(shell grep -o 'Arch Linux' /etc/issue 2>/dev/null),Arch Linux)
   UPXPATH=
 endif
 
+ifeq ($(OUTPUTDIR),)
+     OUTPUTDIR=.
+endif
+
 # Travis CI passes the version in. Local builds get it from the current git tag.
 ifeq ($(VERSION),)
-	include .metadata.make
+	include /tmp/.metadata.make
 else
 	# Preserve the passed-in version & iteration (homebrew).
 	_VERSION:=$(VERSION)
 	_ITERATION:=$(ITERATION)
-	include .metadata.make
+	include /tmp/.metadata.make
 	VERSION:=$(_VERSION)
 	ITERATION:=$(_ITERATION)
 endif
@@ -83,7 +87,7 @@ all: clean build
 ####################
 
 # Prepare a release. Called in Travis CI.
-release: clean linux_packages freebsd_packages windows
+release: clean generate linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
 	mv $(BINARY).*.linux $(BINARY).*.freebsd $@/
@@ -101,7 +105,7 @@ dmg: clean $(MACAPP).app
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
-signdmg: generate $(MACAPP).app
+signdmg: $(MACAPP).app
 	bash scripts/makedmg.sh
 
 # Delete all build assets.
@@ -112,7 +116,7 @@ clean:
 	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go pack.temp.dmg
 	rm -f before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh 
 	rm -rf aur package_build_* release $(MACAPP).*.app $(MACAPP).app
-	rm -f pkg/docs/swagger.* docs.go
+	rm -f pkg/bindata/docs/api_docs.go
 
 ####################
 ##### Sidecars #####
@@ -150,41 +154,41 @@ $(shell go env GOPATH)/bin/rsrc:
 
 build: $(BINARY)
 $(BINARY): generate main.go
-	go build $(BUILD_FLAGS) -o $(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux: $(BINARY).amd64.linux
-$(BINARY).amd64.linux: generate main.go
+$(BINARY).amd64.linux:  main.go
 	# Building linux 64-bit x86 binary.
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux386: $(BINARY).386.linux
-$(BINARY).386.linux: generate main.go
+$(BINARY).386.linux:  main.go
 	# Building linux 32-bit x86 binary.
-	GOOS=linux GOARCH=386 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 arm: arm64 armhf
 
 arm64: $(BINARY).arm64.linux
-$(BINARY).arm64.linux: generate main.go
+$(BINARY).arm64.linux:  main.go
 	# Building linux 64-bit ARM binary.
-	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	# https://github.com/upx/upx/issues/351#issuecomment-599116973
 	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 armhf: $(BINARY).arm.linux
-$(BINARY).arm.linux: generate main.go
+$(BINARY).arm.linux:  main.go
 	# Building linux 32-bit ARM binary.
-	GOOS=linux GOARCH=arm GOARM=6 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=linux GOARCH=arm GOARM=6 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 macos: $(BINARY).universal.macos
 $(BINARY).universal.macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
 	# Building darwin 64-bit universal binary.
 	lipo -create -output $@ $(BINARY).amd64.macos $(BINARY).arm64.macos
-$(BINARY).amd64.macos: generate main.go
+$(BINARY).amd64.macos:  main.go
 	# Building darwin 64-bit x86 binary.
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 $(BINARY).arm64.macos: generate main.go
@@ -194,22 +198,22 @@ $(BINARY).arm64.macos: generate main.go
 
 freebsd: $(BINARY).amd64.freebsd
 $(BINARY).amd64.freebsd: generate main.go
-	GOOS=freebsd GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 freebsd386: $(BINARY).i386.freebsd
 $(BINARY).i386.freebsd: generate main.go
-	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@ || true
 
 freebsdarm: $(BINARY).armhf.freebsd
 $(BINARY).armhf.freebsd: generate main.go
-	GOOS=freebsd GOARCH=arm go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=arm go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 exe: $(BINARY).amd64.exe
 windows: $(BINARY).amd64.exe
 $(BINARY).amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
-	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
+	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 ####################
@@ -467,7 +471,7 @@ lint: generate
 	$(shell go env GOPATH)/bin/golangci-lint version
 	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint run
 	GOOS=freebsd $(shell go env GOPATH)/bin/golangci-lint run
-	#GOOS=windows $(shell go env GOPATH)/bin/golangci-lint run
+	GOOS=windows $(shell go env GOPATH)/bin/golangci-lint run
 
 # Mockgen and bindata are examples.
 # Your `go generate` may require other tools; add them!
@@ -485,8 +489,10 @@ $(shell go env GOPATH)/bin/go-bindata:
 	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
 #generate: mockgen bindata pkg/bindata/bindata.go
-generate: swag bindata pkg/bindata/bindata.go
-pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
+generate: pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
+pkg/bindata/docs/api_docs.go: $(shell go env GOPATH)/bin/swag
+	go generate ./pkg/bindata/docs
+pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/* $(shell go env GOPATH)/bin/go-bindata
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/
 
@@ -500,15 +506,15 @@ docker:
 		--platform linux/amd64 \
 		--build-arg "BUILD_DATE=$(DATE)" \
 		--build-arg "COMMIT=$(COMMIT)" \
-		--build-arg "VERSION=$(VERSION)-$(ITERATION)" \
+		--build-arg "BRANCH=$(BRANCH)" \
+		--build-arg "VERSION=$(VERSION)" \
+		--build-arg "ITERATION=$(ITERATION)" \
 		--build-arg "LICENSE=$(LICENSE)" \
 		--build-arg "DESC=$(DESC)" \
 		--build-arg "VENDOR=$(VENDOR)" \
 		--build-arg "AUTHOR=$(MAINT)" \
 		--build-arg "BINARY=$(BINARY)" \
 		--build-arg "SOURCE_URL=$(SOURCE_URL)" \
-		--build-arg "CONFIG_FILE=$(CONFIG_FILE)" \
-		--build-arg "BUILD_FLAGS=$(BUILD_FLAGS)" \
 		--file init/docker/Dockerfile .
 
 ####################

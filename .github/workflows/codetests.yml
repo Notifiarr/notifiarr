@@ -1,0 +1,60 @@
+name: test-and-lint
+on:
+  push:
+    branches:
+      - unstable
+  pull_request:
+    types: [opened, reopened, edited]
+permissions:
+  contents: read
+jobs:
+  # Runs `go test` against 3 operating systems.
+  gotest:
+    strategy:
+      matrix:
+        os: [macos, windows, ubuntu]
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: go-test
+        run: |
+          go test ./pkg/...
+  # Runs golangci-lint on macos against freebsd and macos.
+  golangci-darwin:
+    strategy:
+      matrix:
+        os: [darwin, freebsd]
+    name: golangci-lint
+    runs-on: macos-latest
+    env:
+      GOOS: ${{ matrix.os }}
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48
+  # Runs golangci-lint on linux against linux and windows.
+  golangci-linux:
+    strategy:
+      matrix:
+        os: [windows, linux]
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    env:
+      GOOS: ${{ matrix.os }}
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48

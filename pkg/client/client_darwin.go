@@ -22,7 +22,7 @@ func (c *Client) handleAptHook(_ context.Context) error {
 
 func (c *Client) printUpdateMessage() {}
 
-func (c *Client) upgradeWindows(_ interface{}) {}
+func (c *Client) upgradeWindows(_, _ interface{}) {}
 
 func (c *Client) AutoWatchUpdate(_ interface{}) {}
 

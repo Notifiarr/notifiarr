@@ -47,24 +47,14 @@ func (c *cmd) create() {
 	c.setupRadarr(ci)
 	c.setupSonarr(ci)
 
-	var (
-		radarrTicker *time.Ticker
-		sonarrTicker *time.Ticker
-	)
-
 	// Check each instance and enable only if needed.
-	//nolint:gosec
 	if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
 		if len(ci.Actions.Sync.RadarrInstances) > 0 {
-			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-			radarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
 			c.Printf("==> Radarr TRaSH Sync: interval: %s, %s ",
 				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.RadarrSync, ", "))
 		}
 
 		if len(ci.Actions.Sync.SonarrInstances) > 0 {
-			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-			sonarrTicker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
 			c.Printf("==> Sonarr TRaSH Sync: interval: %s, %s ",
 				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
 		}
@@ -74,12 +64,10 @@ func (c *cmd) create() {
 		Name: TrigCFSyncRadarr,
 		Fn:   c.syncRadarr,
 		C:    make(chan *common.ActionInput, 1),
-		T:    radarrTicker,
 	}, &common.Action{
 		Name: TrigRPSyncSonarr,
 		Fn:   c.syncSonarr,
 		C:    make(chan *common.ActionInput, 1),
-		T:    sonarrTicker,
 	})
 }
 
