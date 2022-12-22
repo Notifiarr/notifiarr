@@ -105,7 +105,7 @@ dmg: clean $(MACAPP).app
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
-signdmg: generate $(MACAPP).app
+signdmg: $(MACAPP).app
 	bash scripts/makedmg.sh
 
 # Delete all build assets.
