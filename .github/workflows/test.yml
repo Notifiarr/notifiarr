@@ -21,12 +21,7 @@ jobs:
           go test ./pkg/...
 
   gotest-macos:
-    strategy:
-      matrix:
-        goos: [darwin, freebsd]
     runs-on: macos-latest
-    env:
-      GOOS: ${{ matrix.goos }}
     steps:
       - uses: actions/checkout@v3.1.0
       - uses: actions/setup-go@v3
@@ -37,7 +32,7 @@ jobs:
           go test ./pkg/...
 
   gotest-linux:
-    runs-on: macos-linux
+    runs-on: linux-latest
     steps:
       - uses: actions/checkout@v3.1.0
       - uses: actions/setup-go@v3
@@ -48,7 +43,7 @@ jobs:
           go test ./pkg/...
 
   golangci-macos:
-    runs-on: macos-linux
+    runs-on: macos-latest
     steps:
       - uses: actions/setup-go@v3
         with:
@@ -63,7 +58,7 @@ jobs:
     strategy:
       matrix:
         go: [1.19]
-        os: [windows,  linux, freebsd]
+        os: [windows, linux, freebsd]
     name: golangci-lint
     runs-on: ubuntu-latest
     env:
