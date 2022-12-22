@@ -4,7 +4,7 @@
 ##########
 
 VENDOR="Go Lift <code@golift.io>"
-DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+DATE="$(date -u +%Y-%m-%dT%H:%M:00Z)"
 # Defines docker manifest/build types.
 BUILDS="linux:armhf:arm linux:arm64:arm64 linux:amd64:amd64 linux:i386:386"
 

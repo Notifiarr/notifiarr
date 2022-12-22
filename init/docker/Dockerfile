@@ -8,29 +8,15 @@ FROM golang:1-bullseye as builder
 # Build speed magic! 
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
-
-ARG TARGETARCH
-ARG TARGETOS
-ARG BINARY
-ARG BUILD_DATE
-ARG BRANCH
-ARG VERSION
-ARG ITERATION
-ARG COMMIT
+COPY main.go settings.sh go.mod go.sum ./
+RUN go mod download
+COPY init init
+COPY pkg pkg
 
 RUN apt update
 RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
 
-# Build the app.
-RUN --mount=target=. \
-    --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
-        -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
-        -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
-        -X \"golift.io/version.BuildUser=docker\" \
-        -X \"golift.io/version.Revision=${ITERATION}\"\
-        -X \"golift.io/version.Version=${VERSION}\""
+ARG TARGETARCH
 
 RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C /
@@ -47,7 +33,44 @@ RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux
     ln -s /usr/lib /tmp/lib_link/lib64 && \
     ln -s /usr/lib /tmp/lib_link/lib
 
+ARG TARGETOS
+ARG BUILD_DATE
+ARG BRANCH
+ARG VERSION
+ARG ITERATION
+ARG COMMIT
+
+# Build the app.
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
+        -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
+        -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
+        -X \"golift.io/version.BuildUser=docker\" \
+        -X \"golift.io/version.Revision=${ITERATION}\" \
+        -X \"golift.io/version.Version=${VERSION}\""
+
 FROM scratch
+
+# Make sure we have an ssl cert chain and timezone data.
+COPY --from=builder /etc/ssl /etc/ssl
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+
+COPY --from=builder /tmp/image /image
+
+# For megacli.
+COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
+COPY --from=builder /tmp/lib /usr/lib
+COPY --from=builder /tmp/lib_link/ /
+
+ENV TZ=UTC
+
+# Notifiarr specific.
+ENV PATH=/
+ENV USER=root
+ENV NOTIFIARR_IN_DOCKER=true
+
+EXPOSE 5454
+ENTRYPOINT [ "/image" ]
+
 ARG TARGETOS
 ARG TARGETARCH
 ARG BUILD_DATE
@@ -74,24 +97,3 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.architecture="${TARGETOS} ${TARGETARCH}" \
       org.opencontainers.image.licenses="${LICENSE}" \
       org.opencontainers.image.version="${VERSION}-${ITERATION}"
-
-# Make sure we have an ssl cert chain and timezone data.
-COPY --from=builder /etc/ssl /etc/ssl
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-
-COPY --from=builder /tmp/image /image
-
-# For megacli.
-COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
-COPY --from=builder /tmp/lib /usr/lib
-COPY --from=builder /tmp/lib_link/ /
-
-ENV TZ=UTC
-
-# Notifiarr specific.
-ENV PATH=/
-ENV USER=root
-ENV NOTIFIARR_IN_DOCKER=true
-
-EXPOSE 5454
-ENTRYPOINT [ "/image" ]
