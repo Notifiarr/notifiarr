@@ -116,7 +116,7 @@ clean:
 	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go pack.temp.dmg
 	rm -f before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh 
 	rm -rf aur package_build_* release $(MACAPP).*.app $(MACAPP).app
-	# rm -f pkg/docs/swagger.* docs.go
+	rm -f pkg/bindata/docs/api_docs.go
 
 ####################
 ##### Sidecars #####
@@ -489,8 +489,10 @@ $(shell go env GOPATH)/bin/go-bindata:
 	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
 #generate: mockgen bindata pkg/bindata/bindata.go
-generate: swag bindata pkg/bindata/bindata.go
-pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
+generate:  pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
+pkg/bindata/docs/api_docs.go: $(shell go env GOPATH)/bin/swag
+	go generate ./pkg/bindata/docs
+pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/* $(shell go env GOPATH)/bin/go-bindata
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/
 

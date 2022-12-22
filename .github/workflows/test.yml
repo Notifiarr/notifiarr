@@ -1,20 +1,28 @@
-name: Test
-
+name: test-and-lint
 on:
   push:
+    branches:
+      - unstable
   pull_request:
     types: [opened, reopened, edited]
-
+  contents: read
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  golangci:
+    strategy:
+      matrix:
+        go: [1.19]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    name: lint
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3.1.0
-
       - uses: actions/setup-go@v3
-
-      - name: Make test
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48
+      - name: go-test
         run: |
-          make test
-        env:
-          PATH: /bin:/usr/bin:/home/runner/go/bin
+          go test ./...

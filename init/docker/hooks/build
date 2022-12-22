@@ -5,12 +5,13 @@
 pushd ../..
 source settings.sh
 
+
 if ! (docker buildx inspect | grep -q running); then 
   echo "Creating docker builder instance"
   docker buildx create --use
 fi
 
-docker pull docker.io/library/golang:1-bullseye
+set -e
 
 read -r -d '' BUILD_ARGS << EOF
 --build-arg "BUILD_DATE=${DATE}" \
