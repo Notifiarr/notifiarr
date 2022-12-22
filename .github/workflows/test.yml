@@ -9,8 +9,11 @@ permissions:
   contents: read
 jobs:
 
-  gotest-windows:
-    runs-on: windows-latest
+  gotest:
+    strategy:
+      matrix:
+        os: [macos, windows, ubuntu]
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3.1.0
       - uses: actions/setup-go@v3
@@ -20,29 +23,7 @@ jobs:
         run: |
           go test ./pkg/...
 
-  gotest-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3.1.0
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
-      - name: go-test
-        run: |
-          go test ./pkg/...
-
-  gotest-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3.1.0
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
-      - name: go-test
-        run: |
-          go test ./pkg/...
-
-  golangci-macos:
+  golangci-darwin:
     strategy:
       matrix:
         os: [darwin, freebsd]
