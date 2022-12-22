@@ -8,13 +8,30 @@ on:
 permissions:
   contents: read
 jobs:
+  gotest:
+    strategy:
+      matrix:
+        go: [1.19]
+        os: [windows, darwin, linux, freebsd]
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/checkout@v3
+      - name: go-test
+        run: |
+          GOOS=${{ matrix.os }} go test ./...
   golangci:
     strategy:
       matrix:
         go: [1.19]
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [windows, darwin, linux, freebsd]
     name: lint
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    env:
+      GOOS: ${{ matrix.os }}
     steps:
       - uses: actions/setup-go@v3
         with:
@@ -24,6 +41,3 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.48
-      - name: go-test
-        run: |
-          go test ./...
