@@ -7,25 +7,34 @@ FROM golang:1-bullseye as builder
 
 # Build speed magic! 
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
-RUN apt update
-RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
 WORKDIR /src
-COPY go.mod go.sum ./
-RUN go mod download
-COPY init ./init
-COPY settings.sh Makefile *.go ./
-COPY pkg ./pkg
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/bin \
-    --mount=type=cache,target=/go/pkg make generate
+
+ARG TARGETARCH
 ARG TARGETOS
 ARG BINARY
-ARG TARGETARCH
+
+RUN apt update
+RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
+
+# This will fail the build if anything needs to be generated.
+RUN --mount=target=. \
+    --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    --mount=type=cache,target=/go/bin \
+    CGO_ENABLED=1 OUTPUTDIR=/tmp make generate
+
+# Build the app.
+RUN --mount=target=. \
+    --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    --mount=type=cache,target=/go/bin \
+    CGO_ENABLED=1 OUTPUTDIR=/tmp make ${BINARY}.${TARGETARCH}.${TARGETOS}
+
+RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
+    tar -zxf /notifiarr.tgz -C /
 
 # For megacli. All the *'s are to deal with multiarch. :(
-RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
-    tar -zxf /notifiarr.tgz -C / && \
-    mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
+RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
     /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
     /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
     /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
@@ -35,11 +44,6 @@ RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-d
     ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
     ln -s /usr/lib /tmp/lib_link/lib64 && \
     ln -s /usr/lib /tmp/lib_link/lib
-
-# Build the app.
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=1 make ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 FROM scratch
 ARG TARGETOS
@@ -68,16 +72,16 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.licenses="${LICENSE}" \
       org.opencontainers.image.version="${VERSION}"
 
-COPY --from=builder /src/${BINARY}.${TARGETARCH}.${TARGETOS} /image
+# Make sure we have an ssl cert chain and timezone data.
+COPY --from=builder /etc/ssl /etc/ssl
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+
+COPY --from=builder /tmp/${BINARY}.${TARGETARCH}.${TARGETOS} /image
 
 # For megacli.
 COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
 COPY --from=builder /tmp/lib /usr/lib
 COPY --from=builder /tmp/lib_link/ /
-
-# Make sure we have an ssl cert chain and timezone data.
-COPY --from=builder /etc/ssl /etc/ssl
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
 ENV TZ=UTC
 

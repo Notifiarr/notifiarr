@@ -16,3 +16,5 @@ jobs:
       - name: Make test
         run: |
           make test
+        env:
+          PATH: /bin:/usr/bin:/home/runner/go/bin
