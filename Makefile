@@ -35,7 +35,7 @@ else
 	# Preserve the passed-in version & iteration (homebrew).
 	_VERSION:=$(VERSION)
 	_ITERATION:=$(ITERATION)
-	include .metadata.make
+	include /tmp/.metadata.make
 	VERSION:=$(_VERSION)
 	ITERATION:=$(_ITERATION)
 endif
