@@ -8,17 +8,22 @@ FROM golang:1-bullseye as builder
 # Build speed magic! 
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
-COPY go.mod go.sum .
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
+RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
 COPY . .
+RUN make generate
 
 ARG TARGETOS
 ARG BINARY
 ARG TARGETARCH
 
+# Build the app.
+RUN CGO_ENABLED=1 make ${BINARY}.${TARGETARCH}.${TARGETOS}
+
 # For megacli. All the *'s are to deal with multiarch. :(
-RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates && \
-    curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
+RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C / && \
     mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
     /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
@@ -30,9 +35,6 @@ RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-c
     ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
     ln -s /usr/lib /tmp/lib_link/lib64 && \
     ln -s /usr/lib /tmp/lib_link/lib
-
-# Build the app.
-RUN CGO_ENABLED=1 make clean ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 FROM scratch
 ARG TARGETOS
