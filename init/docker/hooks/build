@@ -16,7 +16,7 @@ read -r -d '' BUILD_ARGS << EOF
 --build-arg "BUILD_DATE=${DATE}" \
 --build-arg "BUILD_FLAGS=${BUILD_FLAGS}" \
 --build-arg "COMMIT=${COMMIT}" \
---build-arg "BRANCH=$(BRANCH)" \
+--build-arg "BRANCH=${BRANCH}" \
 --build-arg "VERSION=${VERSION}" \
 --build-arg "ITERATION=${ITERATION}" \
 --build-arg "LICENSE=${LICENSE}" \
