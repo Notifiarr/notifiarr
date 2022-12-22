@@ -16,18 +16,10 @@ ARG BINARY
 RUN apt update
 RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
 
-# This will fail the build if anything needs to be generated.
-RUN --mount=target=. \
-    --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg \
-    --mount=type=cache,target=/go/bin \
-    CGO_ENABLED=1 OUTPUTDIR=/tmp make generate
-
 # Build the app.
 RUN --mount=target=. \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    --mount=type=cache,target=/go/bin \
     CGO_ENABLED=1 OUTPUTDIR=/tmp make ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \

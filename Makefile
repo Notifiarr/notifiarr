@@ -158,13 +158,13 @@ $(BINARY): generate main.go
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux: $(BINARY).amd64.linux
-$(BINARY).amd64.linux: generate main.go
+$(BINARY).amd64.linux:  main.go
 	# Building linux 64-bit x86 binary.
 	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux386: $(BINARY).386.linux
-$(BINARY).386.linux: generate main.go
+$(BINARY).386.linux:  main.go
 	# Building linux 32-bit x86 binary.
 	GOOS=linux GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
@@ -172,14 +172,14 @@ $(BINARY).386.linux: generate main.go
 arm: arm64 armhf
 
 arm64: $(BINARY).arm64.linux
-$(BINARY).arm64.linux: generate main.go
+$(BINARY).arm64.linux:  main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	# https://github.com/upx/upx/issues/351#issuecomment-599116973
 	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 armhf: $(BINARY).arm.linux
-$(BINARY).arm.linux: generate main.go
+$(BINARY).arm.linux:  main.go
 	# Building linux 32-bit ARM binary.
 	GOOS=linux GOARCH=arm GOARM=6 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
@@ -188,7 +188,7 @@ macos: $(BINARY).universal.macos
 $(BINARY).universal.macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
 	# Building darwin 64-bit universal binary.
 	lipo -create -output $@ $(BINARY).amd64.macos $(BINARY).arm64.macos
-$(BINARY).amd64.macos: generate main.go
+$(BINARY).amd64.macos:  main.go
 	# Building darwin 64-bit x86 binary.
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 $(BINARY).arm64.macos: generate main.go
@@ -489,7 +489,7 @@ $(shell go env GOPATH)/bin/go-bindata:
 	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
 
 #generate: mockgen bindata pkg/bindata/bindata.go
-generate:  pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
+generate: pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
 pkg/bindata/docs/api_docs.go: $(shell go env GOPATH)/bin/swag
 	go generate ./pkg/bindata/docs
 pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/* $(shell go env GOPATH)/bin/go-bindata
