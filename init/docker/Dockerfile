@@ -12,6 +12,11 @@ WORKDIR /src
 ARG TARGETARCH
 ARG TARGETOS
 ARG BINARY
+ARG BUILD_DATE
+ARG BRANCH
+ARG VERSION
+ARG ITERATION
+ARG COMMIT
 
 RUN apt update
 RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
@@ -20,7 +25,12 @@ RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
 RUN --mount=target=. \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-    CGO_ENABLED=1 OUTPUTDIR=/tmp make ${BINARY}.${TARGETARCH}.${TARGETOS}
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
+        -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
+        -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
+        -X \"golift.io/version.BuildUser=docker\" \
+        -X \"golift.io/version.Revision=${ITERATION}\"\
+        -X \"golift.io/version.Version=${VERSION}\""
 
 RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
     tar -zxf /notifiarr.tgz -C /
@@ -43,6 +53,7 @@ ARG TARGETARCH
 ARG BUILD_DATE
 ARG COMMIT
 ARG VERSION
+ARG ITERATION
 ARG LICENSE=MIT
 ARG BINARY
 ARG SOURCE_URL=http://github.com/golift/application-builder
@@ -62,13 +73,13 @@ LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.authors="${AUTHOR}" \
       org.opencontainers.image.architecture="${TARGETOS} ${TARGETARCH}" \
       org.opencontainers.image.licenses="${LICENSE}" \
-      org.opencontainers.image.version="${VERSION}"
+      org.opencontainers.image.version="${VERSION}-${ITERATION}"
 
 # Make sure we have an ssl cert chain and timezone data.
 COPY --from=builder /etc/ssl /etc/ssl
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
-COPY --from=builder /tmp/${BINARY}.${TARGETARCH}.${TARGETOS} /image
+COPY --from=builder /tmp/image /image
 
 # For megacli.
 COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
