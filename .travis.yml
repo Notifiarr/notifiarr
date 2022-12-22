@@ -52,7 +52,7 @@ before_script:
   - rm -f gpg.signing.key .secret_files.tar
   - source settings.sh
 script:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make generate $MAKEBUILD; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make $MAKEBUILD; fi
   # Build mac binary or image.
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make signdmg; fi
   # Test homebrew (with make install).

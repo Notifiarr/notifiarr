@@ -87,7 +87,7 @@ all: clean build
 ####################
 
 # Prepare a release. Called in Travis CI.
-release: clean linux_packages freebsd_packages windows
+release: clean generate linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
 	mv $(BINARY).*.linux $(BINARY).*.freebsd $@/
