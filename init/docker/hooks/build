@@ -7,7 +7,7 @@ source settings.sh
 
 docker buildx inspect
 
-if ! (docker buildx inspect | grep -q running); then 
+if ! (docker buildx inspect | grep -Eq 'docker-container'); then
   echo "Creating docker builder instance"
   docker buildx create --use
 fi
