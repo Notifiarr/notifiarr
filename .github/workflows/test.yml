@@ -22,11 +22,13 @@ jobs:
 
   gotest-macos:
     runs-on: macos-latest
-    steps: *gotest-test
+    steps: 
+      <<: *gotest-test
 
   gotest-linux:
     runs-on: ubuntu-latest
-    steps: *gotest-test
+    steps: 
+      <<: *gotest-test
 
 
   golangci-macos:
@@ -55,4 +57,5 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GOOS: ${{ matrix.os }}
-    steps: *golangci-lint-test
+    steps: 
+      <<: *golangci-lint-test
