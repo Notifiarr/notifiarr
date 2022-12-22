@@ -5,7 +5,7 @@ on:
       - unstable
   pull_request:
     types: [opened, reopened, edited]
-prmissions:
+permissions:
   contents: read
 jobs:
   golangci:
