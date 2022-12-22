@@ -155,6 +155,7 @@ require (
 	github.com/kevinburke/go-bindata v3.24.0+incompatible
 )
 
+// xtractr stuff...
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect

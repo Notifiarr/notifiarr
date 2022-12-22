@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 jobs:
-
+  # Runs `go test` against 3 operating systems.
   gotest:
     strategy:
       matrix:
@@ -22,13 +22,13 @@ jobs:
       - name: go-test
         run: |
           go test ./pkg/...
-
+  # Runs golangci-lint on freebsd against freebsd and macos.
   golangci-darwin:
     strategy:
       matrix:
         os: [darwin, freebsd]
     name: golangci-lint
-    runs-on: macos-latest
+    runs-on: freebsd-latest
     env:
       GOOS: ${{ matrix.os }}
     steps:
@@ -40,7 +40,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.48
-
+  # Runs golangci-lint on linux against linux and windows.
   golangci-linux:
     strategy:
       matrix:
