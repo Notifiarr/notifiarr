@@ -13,7 +13,7 @@ jobs:
       matrix:
         go: [1.19]
         os: [windows, darwin, linux, freebsd]
-    name: lint
+    name: go-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v3
@@ -22,13 +22,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: go-test
         run: |
-          GOOS=${{ matrix.os }} go test ./...
+          GOOS=${{ matrix.os }} go test ./pkg/...
   golangci:
     strategy:
       matrix:
         go: [1.19]
         os: [windows, darwin, linux, freebsd]
-    name: lint
+    name: golangci-lint
     runs-on: ubuntu-latest
     env:
       GOOS: ${{ matrix.os }}
