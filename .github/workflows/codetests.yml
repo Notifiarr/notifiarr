@@ -22,13 +22,13 @@ jobs:
       - name: go-test
         run: |
           go test ./pkg/...
-  # Runs golangci-lint on freebsd against freebsd and macos.
+  # Runs golangci-lint on macos against freebsd and macos.
   golangci-darwin:
     strategy:
       matrix:
         os: [darwin, freebsd]
     name: golangci-lint
-    runs-on: freebsd-latest
+    runs-on: macos-latest
     env:
       GOOS: ${{ matrix.os }}
     steps:
