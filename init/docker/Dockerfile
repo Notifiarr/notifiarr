@@ -7,20 +7,20 @@ FROM golang:1-bullseye as builder
 
 # Build speed magic! 
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
+RUN apt update
+RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
 WORKDIR /src
-COPY go.mod ./
-COPY go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
-RUN apt update && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
-COPY . .
-RUN make generate
-
+COPY init ./init
+COPY settings.sh Makefile *.go ./
+COPY pkg ./pkg
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/bin \
+    --mount=type=cache,target=/go/pkg make generate
 ARG TARGETOS
 ARG BINARY
 ARG TARGETARCH
-
-# Build the app.
-RUN CGO_ENABLED=1 make ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 # For megacli. All the *'s are to deal with multiarch. :(
 RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
@@ -35,6 +35,11 @@ RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-d
     ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
     ln -s /usr/lib /tmp/lib_link/lib64 && \
     ln -s /usr/lib /tmp/lib_link/lib
+
+# Build the app.
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg \
+    CGO_ENABLED=1 make ${BINARY}.${TARGETARCH}.${TARGETOS}
 
 FROM scratch
 ARG TARGETOS
