@@ -8,26 +8,59 @@ on:
 permissions:
   contents: read
 jobs:
-  gotest:
-    strategy:
-      matrix:
-        go: [1.19]
-        os: [windows, darwin, linux, freebsd]
-    name: go-test
-    runs-on: ubuntu-latest
+
+  gotest-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: go-test-windows
+        run: |
+          GOOS=windows go test ./pkg/...
+
+
+  gotest-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: go-test-macos
+        run: |
+          GOOS=darwin go test ./pkg/...
+          GOOS=freebsd go test ./pkg/...
+
+  gotest-linux:
+    runs-on: macos-linux
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: go-test-linux
+        run: |
+          GOOS=linux go test ./pkg/...
+
+  golangci-macos:
+    runs-on: macos-linux
     steps:
       - uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.go }}
+          go-version: 1.19
       - uses: actions/checkout@v3
-      - name: go-test
-        run: |
-          GOOS=${{ matrix.os }} go test ./pkg/...
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48
+
   golangci:
     strategy:
       matrix:
         go: [1.19]
-        os: [windows, darwin, linux, freebsd]
+        os: [windows,  linux, freebsd]
     name: golangci-lint
     runs-on: ubuntu-latest
     env:

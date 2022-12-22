@@ -52,13 +52,6 @@ before_script:
   - rm -f gpg.signing.key .secret_files.tar
   - source settings.sh
 script:
-  # Test Go.
-  - if [ "$TRAVIS_OS_NAME" != "osx" ]; then make test; fi
-  # Test Docker. Docker rate limits and breaks my builds.
-  - #if [ "$TRAVIS_OS_NAME" == "linux" ]; then make docker; fi
-  # Test built docker image.
-  - #if [ "$TRAVIS_OS_NAME" == "linux" ]; then docker run $BINARY -v 2>&1 | grep -Eq "^$BINARY,? v.*$VERSION"; fi
-  # Build everything
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make generate $MAKEBUILD; fi
   # Build mac binary or image.
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make signdmg; fi
