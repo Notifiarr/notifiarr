@@ -18,11 +18,15 @@ jobs:
           go-version: 1.19
       - name: go-test-windows
         run: |
-          GOOS=windows go test ./pkg/...
-
+          go test ./pkg/...
 
   gotest-macos:
+    strategy:
+      matrix:
+        goos: [darwin, freebsd]
     runs-on: macos-latest
+    env:
+      GOOS: ${{ matrix.goos }}
     steps:
       - uses: actions/checkout@v3.1.0
       - uses: actions/setup-go@v3
@@ -30,8 +34,7 @@ jobs:
           go-version: 1.19
       - name: go-test-macos
         run: |
-          GOOS=darwin go test ./pkg/...
-          GOOS=freebsd go test ./pkg/...
+          go test ./pkg/...
 
   gotest-linux:
     runs-on: macos-linux
@@ -42,7 +45,7 @@ jobs:
           go-version: 1.19
       - name: go-test-linux
         run: |
-          GOOS=linux go test ./pkg/...
+          go test ./pkg/...
 
   golangci-macos:
     runs-on: macos-linux
