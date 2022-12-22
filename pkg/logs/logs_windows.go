@@ -7,8 +7,8 @@ import (
 	"syscall"
 )
 
-// nolint:gochecknoglobals // These can be reused if needed.
-var (
+// nolint:gochecknoglobals,nolintlint
+var ( // These can be reused if needed.
 	kernel    = syscall.MustLoadDLL("kernel32.dll")
 	setHandle = kernel.MustFindProc("SetStdHandle")
 	stderr    = syscall.STD_ERROR_HANDLE

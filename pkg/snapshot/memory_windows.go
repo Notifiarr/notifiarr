@@ -6,7 +6,6 @@ import (
 	"unsafe"
 )
 
-//nolint:structcheck
 type memoryStatusEx struct {
 	cbSize                  uint32
 	dwMemoryLoad            uint32

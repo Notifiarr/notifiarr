@@ -12,7 +12,7 @@ echo "Uploading unstable files."
 for file in release/*.{zip,dmg,gz,txz}; do
   if [ -f "$file" ]; then
     echo "Uploading: $file"
-    echo curl -H "X-API-KEY: ${UNSTABLE_UPLOAD_KEY}" "$URL" -F "file=@$file"
+    curl -H "X-API-KEY: ${UNSTABLE_UPLOAD_KEY}" "$URL" -F "file=@$file"
     echo
   fi
 done

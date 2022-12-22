@@ -58,7 +58,7 @@ func (c *Client) checkForUpdate(ctx context.Context) {
 		c.Errorf("Update Check: %v", err)
 		_, _ = ui.Error(mnd.Title+" ERROR", "Checking version on GitHub: "+err.Error())
 	case update.Outdate && runtime.GOOS == mnd.Windows:
-		c.upgradeWindows(update)
+		c.upgradeWindows(ctx, update)
 	case update.Outdate:
 		c.downloadOther(update)
 	default:

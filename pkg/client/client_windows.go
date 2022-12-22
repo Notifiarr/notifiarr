@@ -18,14 +18,14 @@ import (
 )
 
 // This is the pop-up a user sees when they click update in the menu.
-func (c *Client) upgradeWindows(update *update.Update) {
+func (c *Client) upgradeWindows(ctx context.Context, update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
 		"Your Version: "+update.Version+"\n"+
 		"New Version: "+update.Current+"\n"+
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
 		durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
 	if yes {
-		if err := c.updateNow(update, "user requested"); err != nil {
+		if err := c.updateNow(ctx, update, "user requested"); err != nil {
 			c.Errorf("Update Failed: %v", err)
 			_, _ = ui.Error(mnd.Title+" ERROR", "Updating Notifiarr:\n"+err.Error()+"\n")
 		}
@@ -95,14 +95,14 @@ func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 		return fmt.Errorf("checking GitHub for update: %w", err)
 	} else if !u.Outdate {
 		return nil
-	} else if err = c.updateNow(u, how); err != nil {
+	} else if err = c.updateNow(ctx, u, how); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (c *Client) updateNow(u *update.Update, msg string) error {
+func (c *Client) updateNow(ctx context.Context, u *update.Update, msg string) error {
 	c.Printf("[UPDATE] Downloading and installing update! %s => %s: %s", u.Version, u.Current, u.CurrURL)
 
 	cmd := &update.Command{
@@ -120,7 +120,7 @@ func (c *Client) updateNow(u *update.Update, msg string) error {
 	// Moves the running file to a backup name in the same folder.
 	// Moves the new file to the same location that the running file was at.
 	// Triggers another invocation of the app that sleeps 5 seconds then restarts.
-	backupFile, err := update.Now(cmd)
+	backupFile, err := update.Now(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("installing update: %w", err)
 	}
