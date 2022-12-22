@@ -11,7 +11,7 @@ jobs:
 
   gotest-windows:
     runs-on: windows-latest
-    steps: &gotest-test
+    steps:
       - uses: actions/checkout@v3.1.0
       - uses: actions/setup-go@v3
         with:
@@ -22,14 +22,25 @@ jobs:
 
   gotest-macos:
     runs-on: macos-latest
-    steps: 
-      <<: *gotest-test
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: go-test
+        run: |
+          go test ./pkg/...
 
   gotest-linux:
     runs-on: ubuntu-latest
-    steps: 
-      <<: *gotest-test
-
+    steps:
+      - uses: actions/checkout@v3.1.0
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: go-test
+        run: |
+          go test ./pkg/...
 
   golangci-macos:
     strategy:
@@ -39,7 +50,7 @@ jobs:
     runs-on: macos-latest
     env:
       GOOS: ${{ matrix.os }}
-    steps: &golangci-lint-test
+    steps:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.19
@@ -57,5 +68,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GOOS: ${{ matrix.os }}
-    steps: 
-      <<: *golangci-lint-test
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48
