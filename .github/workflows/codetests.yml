@@ -159,11 +159,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test-release
-      - uses: TykTechnologies/packagecloud-action@v1
-        env:
-          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+      - uses: golift/packagecloud-upload@v1
         with:
-          repo: 'golift/unstable'
-          dir: '.'
-          rpmvers: 'el/6'
-          debvers: 'ubuntu/focal'
+          repo: golift/unstable
+          token: ${{ secrets.PACKAGECLOUD_TOKEN }}
+          packages: .
+          rpmdistrib: el/6
+          debdistrib: ubuntu/focal ubuntu/xenial
