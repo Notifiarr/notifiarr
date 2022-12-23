@@ -70,3 +70,14 @@ jobs:
         run: |
           TMP=$(mktemp -d)
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
+  release-test:
+    name: test-make-release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - uses: actions/checkout@v3
+      - name: make-release
+        run: |
+          make release
