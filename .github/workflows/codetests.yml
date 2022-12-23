@@ -126,10 +126,9 @@ jobs:
           go install github.com/akavel/rsrc@latest
           go install github.com/davidnewhall/md2roff@v0.0.1
           make release
-          echo "$(ls release/*{deb,rpm} | jq -R '.'  | jq -sc)"
-          echo "allfiles=$(ls release/* | jq -R '.'  | jq -sc)" >> $GITHUB_OUTPUT
-          echo "packages=$(ls release/*.{deb,rpm} | jq -R '.'  | jq -sc)" >> $GITHUB_OUTPUT
-          echo "zips=$(ls release/*.{gz,zip} | jq -R '.'  | jq -sc)" >> $GITHUB_OUTPUT
+          echo "allfiles=$(ls release/* | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
+          echo "packages=$(ls release/*.{deb,rpm} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
+          echo "zips=$(ls release/*.{gz,zip} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
           source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
       - name: upload artifacts
         uses: actions/upload-artifact@v3
@@ -166,5 +165,5 @@ jobs:
         with:
           repo: 'golift/unstable'
           dir: '.'
-          rpmvers: 'el6'
-          debvers: 'focal'
+          rpmvers: 'el/6'
+          debvers: 'ubuntu/focal'
