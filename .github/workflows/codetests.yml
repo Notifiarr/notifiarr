@@ -156,7 +156,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test-release
-      - uses: TykTechnologies/packagecloud-action
+      - uses: TykTechnologies/packagecloud-action@v1
         env:
           PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
         with:
