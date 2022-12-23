@@ -1,40 +1,40 @@
 #!/bin/sh
 #
-# FreeBSD rc.d startup script for {{BINARY}}.
+# FreeBSD rc.d startup script for notifiarr.
 #
-# PROVIDE: {{BINARY}}
+# PROVIDE: notifiarr
 # REQUIRE: networking syslog
 # KEYWORD:
 
 . /etc/rc.subr
 
-name="{{BINARYU}}"
-real_name="{{BINARY}}"
-rcvar="{{BINARYU}}_enable"
-{{BINARYU}}_command="/usr/local/bin/${real_name}"
-{{BINARYU}}_user="{{BINARY}}"
-{{BINARYU}}_config="/usr/local/etc/${real_name}/{{CONFIG_FILE}}"
+name="notifiarr"
+real_name="notifiarr"
+rcvar="notifiarr_enable"
+notifiarr_command="/usr/local/bin/${real_name}"
+notifiarr_user="notifiarr"
+notifiarr_config="/usr/local/etc/${real_name}/notifiarr.conf"
 pidfile="/var/run/${real_name}/pid"
 
-# This runs `daemon` as the `{{BINARYU}}_user` user.
+# This runs `daemon` as the `notifiarr_user` user.
 command="/usr/sbin/daemon"
-command_args="-P ${pidfile} -r -t ${real_name} -T ${real_name} -l daemon ${{{BINARYU}}_command} -c ${{{BINARYU}}_config}"
+command_args="-P ${pidfile} -r -t ${real_name} -T ${real_name} -l daemon ${notifiarr_command} -c ${notifiarr_config}"
 
 load_rc_config ${name}
-: ${{{BINARYU}}_enable:=no}
+: ${notifiarr_enable:=no}
 
 # Make a place for the pid file.
 mkdir -p $(dirname ${pidfile})
-chown -R ${{BINARYU}}_user $(dirname ${pidfile})
+chown -R $notifiarr_user $(dirname ${pidfile})
 
 # Suck in optional exported override variables.
 # ie. add something like the following to this file: export DN_DEBUG=true
 [ -f "/usr/local/etc/defaults/${real_name}" ] && . "/usr/local/etc/defaults/${real_name}"
 
-export DN_LOG_FILE=/usr/local/var/log/{{BINARY}}/app.log
-export DN_HTTP_LOG=/usr/local/var/log/{{BINARY}}/http.log
-export DN_DEBUG_LOG=/usr/local/var/log/{{BINARY}}/debug.log
-export DN_SERVICES_LOG_FILE=/usr/local/var/log/{{BINARY}}/services.log
+export DN_LOG_FILE=/usr/local/var/log/notifiarr/app.log
+export DN_HTTP_LOG=/usr/local/var/log/notifiarr/http.log
+export DN_DEBUG_LOG=/usr/local/var/log/notifiarr/debug.log
+export DN_SERVICES_LOG_FILE=/usr/local/var/log/notifiarr/services.log
 export DN_QUIET=true
 
 # Go!

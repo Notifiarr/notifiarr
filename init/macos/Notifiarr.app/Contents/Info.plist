@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>{{MACAPP}}</string>
+	<string>Notifiarr</string>
 	<key>CFBundleIdentifier</key>
-	<string>io.golift.{{BINARY}}</string>
+	<string>io.golift.notifiarr</string>
 	<key>CFBundleExecutable</key>
-	<string>{{MACAPP}}</string>
+	<string>Notifiarr</string>
 	<key>CFBundleIconFile</key>
-	<string>{{MACAPP}}.icns</string>
+	<string>Notifiarr.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleVersion</key>
@@ -17,7 +17,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>{{VERSION}}</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2022 Go Lift (https://golift.io)</string>
+	<string>© 2023 Go Lift (https://golift.io)</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>LSApplicationCategoryType</key>

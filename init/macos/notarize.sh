@@ -3,6 +3,7 @@
 ## This doesn't work in CI/CD because of the AppleScript. 
 # Must be run on a real Mac with a real apple ID and password.
 # AC_PASSWORD and AC_USERNAME variables are required to be set.
+# The only part that doesn't work in CI/CD currently is the applescript.
 
 # Download latest release.
 echo "==> Getting latest release."
@@ -19,7 +20,7 @@ rm -f pack.temp.dmg
 hdiutil create -srcfolder "/Volumes/NotifiarrRelease/Notifiarr.app" -volname "Notifiarr" -fs HFS+ \
       -fsargs "-c c=64,a=16,e=16" -format UDRW -size 200000k pack.temp.dmg
 
-echo "==> Unmounting /Volumes/NotifiarrRelease and /Volumes/NotifiarrRelease (may not be mounted)."
+echo "==> Unmounting /Volumes/NotifiarrRelease and /Volumes/NotifiarrIntermediate (may not be mounted)."
 hdiutil detach "/Volumes/NotifiarrIntermediate"
 hdiutil detach "/Volumes/NotifiarrRelease"
 sleep 1

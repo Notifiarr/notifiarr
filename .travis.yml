@@ -106,7 +106,7 @@ deploy:
   - provider: script
     skip_cleanup: true
     cleanup: false
-    script: bash scripts/unstable-deploy.sh
+    script: bash init/unstable-deploy.sh
     on:
       branch: unstable
   # Stable packages (releases).
@@ -149,13 +149,13 @@ deploy:
       tags: true
   # Upload homebrew formula file to a special repo.
   - provider: script
-    script: bash scripts/formula-deploy.sh
+    script: bash init/homebrew/formula-deploy.sh
     on:
       tags: true
       condition: "$TRAVIS_OS_NAME = osx"
   # Upload aur PKGBUILD file to a special repo.
   - provider: script
-    script: bash scripts/aur-deploy.sh
+    script: bash init/archlinux/aur-deploy.sh
     on:
       tags: true
       condition: "$TRAVIS_OS_NAME = linux"

@@ -1,8 +1,3 @@
-# Application Builder Configuration File. Customized for: hello-world
-# Each line must have an export clause.
-# This file is parsed and sourced by the Makefile, Docker and Homebrew builds.
-# Powered by Application Builder: https://github.com/golift/application-builder
-
 # Must match the repo name to make things easy. Otherwise, fix some other paths.
 BINARY="notifiarr"
 # github username / repo name
@@ -38,8 +33,6 @@ export VENDOR DATE VERSION ITERATION COMMIT BRANCH
 # Import this signing key only if it's in the keyring.
 gpg --list-keys 2>/dev/null | grep -q B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
 [ "$?" != "0" ] || export SIGNING_KEY=B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
-
-export MACAPP="Notifiarr"
 
 # Make sure Docker builds work locally.
 # These do not affect automated builds, just allow the docker build scripts to run from a local clone.

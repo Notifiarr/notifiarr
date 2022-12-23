@@ -45,7 +45,9 @@ ARG ITERATION
 ARG COMMIT
 
 # Build the app.
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
+
+RUN GOFLAGS=-trimpath -mod=readonly -modcacherw \
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
         -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
         -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
         -X \"golift.io/version.BuildUser=docker\" \

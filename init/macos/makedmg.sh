@@ -3,10 +3,6 @@
 # This only works on macOS.
 ###########################################
 
-source settings.sh
-
-[ -n "$MACAPP" ] || exit 1
-
 # If we are running in Travis, make a new keychain and import the certificate.
 if [ -n "$TRAVIS_OS_NAME" ]; then
   KEYCHAIN="ios-build.keychain"
@@ -34,7 +30,7 @@ gon init/macos/sign.json
 
 # Creating non-notarized DMG.
 mkdir -p release
-hdiutil create release/${MACAPP}.dmg -srcfolder ${MACAPP}.app -ov
+hdiutil create release/Notifiarr.dmg -srcfolder Notifiarr.app -ov
 
 echo "Notarizing DMG."
 gon init/macos/notarize.json

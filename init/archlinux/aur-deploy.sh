@@ -48,7 +48,7 @@ rm -rf aur_release_repo
 git clone git@github.com-aurepo:golift/aur.git aur_release_repo
 
 mkdir -p "aur_release_repo/notifiarr"
-cp aur/{*,.??*} "aur_release_repo/notifiarr/"
+mv aur/{*,.??*} "aur_release_repo/notifiarr/"
 pushd aur_release_repo
 git add notifiarr
 git commit -m "Update notifiarr on Release: v${VERSION}-${ITERATION}"

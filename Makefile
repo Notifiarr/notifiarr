@@ -30,12 +30,10 @@ endif
 
 # rpm is weird and changes - to _ in versions.
 RPMVERSION:=$(shell echo $(VERSION) | tr -- - _)
-# used for freebsd packages.
-BINARYU:=$(shell echo notifiarr | tr -- - _)
 
-PACKAGE_SCRIPTS=--before-install scripts/before-install.sh \
---after-install scripts/after-install.sh \
---before-remove scripts/before-remove.sh
+PACKAGE_SCRIPTS=--before-install init/systemd/before-install.sh \
+--after-install init/systemd/after-install.sh \
+--before-remove init/systemd/before-remove.sh
 
 define PACKAGE_ARGS
 $(PACKAGE_SCRIPTS) \
@@ -80,24 +78,17 @@ release: clean generate linux_packages freebsd_packages windows
 	# Generating File Hashes
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
-# DMG only makes a DMG file if MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
-dmg: clean $(MACAPP).app
-	mkdir -p release
-	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP)-unsigned.dmg -srcfolder $(MACAPP).app -ov
-	[ "$(MACAPP)" != "" ] || mv notifiarr.*.macos release/
-	[ "$(MACAPP)" != "" ] || gzip -9r release/
-	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
-
-signdmg: $(MACAPP).app
-	bash scripts/makedmg.sh
+# requires a mac.
+signdmg: Notifiarr.app
+	bash init/macos/makedmg.sh
 
 # Delete all build assets.
 clean:
 	rm -f notifiarr notifiarr.*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} notifiarr.1{,.gz} notifiarr.rb
 	rm -f notifiarr{_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
-	rm -f cmd/notifiarr/README{,.html} README{,.html} ./notifiarr_manual.html rsrc.syso $(MACAPP).*.app.zip
+	rm -f cmd/notifiarr/README{,.html} README{,.html} ./notifiarr_manual.html rsrc.syso Notifiarr.*.app.zip
 	rm -f notifiarr.service pkg/bindata/bindata.go pack.temp.dmg
-	rm -rf package_build_* release $(MACAPP).*.app $(MACAPP).app
+	rm -rf package_build_* release Notifiarr.*.app Notifiarr.app
 	rm -f pkg/bindata/docs/api_docs.go
 
 ####################
@@ -192,16 +183,12 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
-macapp: $(MACAPP).app
-$(MACAPP).app: notifiarr.universal.macos
-	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
-	[ -z "$(MACAPP)" ] || mkdir -p $(MACAPP).app/Contents/MacOS
-	[ -z "$(MACAPP)" ] || cp notifiarr.universal.macos $(MACAPP).app/Contents/MacOS/$(MACAPP)
-	[ -z "$(MACAPP)" ] || sed -i '' \
-		-e "s/{{VERSION}}/$(VERSION)/g" \
-		-e "s%{{BINARY}}%notifiarr%g" \
-		-e "s%{{MACAPP}}%$(MACAPP)%g" \
-		$(MACAPP).app/Contents/Info.plist
+macapp: Notifiarr.app
+Notifiarr.app: notifiarr.universal.macos
+	cp -rp init/macos/Notifiarr.app Notifiarr.app
+	mkdir -p Notifiarr.app/Contents/MacOS
+	cp notifiarr.universal.macos Notifiarr.app/Contents/MacOS/Notifiarr
+	sed -i '' -e "s/{{VERSION}}/$(VERSION)/g" Notifiarr.app/Contents/Info.plist
 
 rpm: notifiarr-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 notifiarr-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux_rpm check_fpm
@@ -267,7 +254,7 @@ notifiarr-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
 	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p notifiarr-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
 
 # Build an environment that can be packaged for linux.
-package_build_linux_rpm: readme man notifiarr.service linux
+package_build_linux_rpm: readme man linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
@@ -277,11 +264,11 @@ package_build_linux_rpm: readme man notifiarr.service linux
 	cp examples/notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
 	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
-	cp notifiarr.service $@/lib/systemd/system/
+	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
 
 # Build an environment that can be packaged for linux.
-package_build_linux_deb: readme man notifiarr.service linux
+package_build_linux_deb: readme man linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
@@ -291,12 +278,8 @@ package_build_linux_deb: readme man notifiarr.service linux
 	cp examples/notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
 	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
-	cp notifiarr.service $@/lib/systemd/system/
+	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/deb" ] || cp -r init/linux/deb/* $@
-
-notifiarr.service:
-	sed -e "s/{{BINARY}}/notifiarr/g" -e "s/{{DESC}}/$(DESC)/g" \
-		init/systemd/template.unit.service > notifiarr.service
 
 package_build_linux_386_deb: package_build_linux_deb linux386
 	mkdir -p $@
@@ -336,11 +319,9 @@ package_build_freebsd: readme man freebsd
 	cp examples/notifiarr.conf.example $@/usr/local/etc/notifiarr/
 	cp examples/notifiarr.conf.example $@/usr/local/etc/notifiarr/notifiarr.conf
 	cp LICENSE *.html examples/*?.?* $@/usr/local/share/doc/notifiarr/
-	[ "$(FORMULA)" != "service" ] || mkdir -p $@/usr/local/etc/rc.d
-	[ "$(FORMULA)" != "service" ] || \
-			sed -e "s/{{BINARY}}/notifiarr/g" -e "s/{{BINARYU}}/$(BINARYU)/g" -e "s/{{CONFIG_FILE}}/notifiarr.conf/g" \
-			init/bsd/freebsd.rc.d > $@/usr/local/etc/rc.d/notifiarr
-	[ "$(FORMULA)" != "service" ] || chmod +x $@/usr/local/etc/rc.d/notifiarr
+	mkdir -p $@/usr/local/etc/rc.d
+	cp init/bsd/freebsd.rc.d $@/usr/local/etc/rc.d/notifiarr
+	chmod +x $@/usr/local/etc/rc.d/notifiarr
 
 package_build_freebsd_386: package_build_freebsd freebsd386
 	mkdir -p $@
@@ -378,7 +359,7 @@ pkg/bindata/bindata.go:
 ##################
 
 docker:
-	scripts/makedocker.sh
+	init/docker/makedocker.sh
 
 # Used for Homebrew only. Other distros can create packages.
 install: man readme notifiarr

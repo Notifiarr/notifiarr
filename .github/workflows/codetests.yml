@@ -102,6 +102,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3.1.0
         with:
+          # we need the whole thing so we can count commits.
           fetch-depth: ''
       - uses: actions/setup-go@v3
         with:
@@ -110,7 +111,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          # make release will generate so do not do it here.
+          # make release will clean and generate so do not do it here.
       - name: make-release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg

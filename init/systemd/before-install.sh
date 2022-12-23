@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This file is used by aur, deb, rpm and BSD packages.
+# This file is used by deb, rpm and BSD packages.
 # FPM adds this as the before-install script.
 
 OS="$(uname -s)"
