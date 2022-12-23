@@ -1,6 +1,4 @@
 # Powered by Application Builder: https://github.com/golift/application-builder
-env:
-  - MAKEBUILD=deb
 jobs:
   include:
   - if: tag IS present OR branch = unstable
@@ -8,19 +6,12 @@ jobs:
     osx_image: xcode13.2
     language: go
     go: 1.19.x
-  - if: tag IS NOT present AND branch != unstable
-    os: linux
-    dist: bionic
-    services: docker
-    language: go
-    go: 1.19.x
   - if: tag IS present OR branch = unstable
     os: linux
     dist: bionic
     services: docker
     language: go
     go: 1.19.x
-    env: MAKEBUILD=release
 git:
   depth: false
 addons:
@@ -51,7 +42,7 @@ before_script:
   - rm -f gpg.signing.key .secret_files.tar
   - source settings.sh
 script:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make $MAKEBUILD; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then rvm 2.6.0 do make release; fi
   # Build mac binary or image.
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make signdmg; fi
   # Test homebrew (with make install).
