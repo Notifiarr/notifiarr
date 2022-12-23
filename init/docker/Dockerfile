@@ -12,7 +12,6 @@ COPY main.go settings.sh go.mod go.sum ./
 RUN go mod download
 RUN go install github.com/swaggo/swag/cmd/swag@v1.8.7
 RUN go install github.com/kevinburke/go-bindata/...@latest
-COPY init init
 COPY pkg pkg
 RUN go generate ./...
 
@@ -21,21 +20,21 @@ RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
 
 ARG TARGETARCH
 
-RUN curl -sSo /notifiarr.tgz https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz && \
-    tar -zxf /notifiarr.tgz -C /
+RUN curl -sSo /notifiarr.tgz \
+ https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
+ && tar -zxf /notifiarr.tgz -C /
 
 # For megacli. All the *'s are to deal with multiarch. :(
 RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
-    /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
-    /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
-    /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
-    /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 \
-    /lib/*-linux-gnu*/libtinfo.so.5 /tmp$(ls -d /lib/*-linux-gnu*) && \
-    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
-    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
-    ln -s /usr/lib /tmp/lib_link/lib64 && \
-    ln -s /usr/lib /tmp/lib_link/lib
-
+ /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
+ /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
+ /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
+ /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 \
+ /lib/*-linux-gnu*/libtinfo.so.5 /tmp$(ls -d /lib/*-linux-gnu*) && \
+ ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
+ ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
+ ln -s /usr/lib /tmp/lib_link/lib64 && \
+ ln -s /usr/lib /tmp/lib_link/lib
 
 ARG TARGETOS
 ARG BUILD_DATE
@@ -45,14 +44,13 @@ ARG ITERATION
 ARG COMMIT
 
 # Build the app.
-
-RUN GOFLAGS=-trimpath -mod=readonly -modcacherw \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
-        -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
-        -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
-        -X \"golift.io/version.BuildUser=docker\" \
-        -X \"golift.io/version.Revision=${ITERATION}\" \
-        -X \"golift.io/version.Version=${VERSION}\""
+RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
+ GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
+ -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
+ -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
+ -X \"golift.io/version.BuildUser=docker\" \
+ -X \"golift.io/version.Revision=${ITERATION}\" \
+ -X \"golift.io/version.Version=${VERSION}\""
 
 FROM scratch
 

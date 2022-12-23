@@ -61,7 +61,7 @@ VERSION_LDFLAGS:= -X \"golift.io/version.Branch=$(BRANCH) ($(COMMIT))\" \
 
 # Makefile targets follow.
 
-all: clean build
+all: notifiarr
 
 ####################
 ##### Releases #####
@@ -84,7 +84,7 @@ signdmg: Notifiarr.app
 
 # Delete all build assets.
 clean:
-	rm -f notifiarr notifiarr.*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} notifiarr.1{,.gz} notifiarr.rb
+	rm -f notifiarr notifiarr.*.{macos,freebsd,linux,exe}{,.gz,.zip} notifiarr.1{,.gz} notifiarr.rb
 	rm -f notifiarr{_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/notifiarr/README{,.html} README{,.html} ./notifiarr_manual.html rsrc.syso Notifiarr.*.app.zip
 	rm -f notifiarr.service pkg/bindata/bindata.go pack.temp.dmg
@@ -101,24 +101,23 @@ clean:
 man: notifiarr.1.gz
 notifiarr.1.gz:
 	# Building man page. Build dependency first: md2roff
-	$(shell go env GOPATH)/bin/md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" examples/MANUAL.md
+	md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" examples/MANUAL.md
 	gzip -9nc examples/MANUAL > $@
 	mv examples/MANUAL.html notifiarr_manual.html
 
 readme: README.html
 README.html: 
 	# This turns README.md into README.html
-	$(shell go env GOPATH)/bin/md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" README.md
+	md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" README.md
 
 rsrc: rsrc.syso
 rsrc.syso: init/windows/application.ico init/windows/manifest.xml
-	$(shell go env GOPATH)/bin/rsrc -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
+	rsrc -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
 
 ####################
 ##### Binaries #####
 ####################
 
-build: notifiarr
 notifiarr: generate main.go
 	go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
@@ -138,7 +137,6 @@ arm64: notifiarr.arm64.linux
 notifiarr.arm64.linux:  main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	# https://github.com/upx/upx/issues/351#issuecomment-599116973
 
 armhf: notifiarr.arm.linux
 notifiarr.arm.linux:  main.go
@@ -340,12 +338,13 @@ check_fpm:
 test: generate lint
 	# Testing.
 	go test -race -covermode=atomic ./...
+
 lint: generate
 	# Checking lint.
-	$(shell go env GOPATH)/bin/golangci-lint version
-	GOOS=linux $(shell go env GOPATH)/bin/golangci-lint run
-	GOOS=freebsd $(shell go env GOPATH)/bin/golangci-lint run
-	GOOS=windows $(shell go env GOPATH)/bin/golangci-lint run
+	golangci-lint version
+	GOOS=linux golangci-lint run
+	GOOS=freebsd golangci-lint run
+	GOOS=windows golangci-lint run
 
 generate: pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
 pkg/bindata/docs/api_docs.go: 
