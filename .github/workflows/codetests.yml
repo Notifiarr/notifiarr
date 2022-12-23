@@ -69,6 +69,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
+          go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -89,7 +90,6 @@ jobs:
       - name: make-install
         run: |
           TMP=$(mktemp -d)
-          PATH=${PATH}:$(go env GOPATH)/bin
           go install github.com/davidnewhall/md2roff@v0.0.1
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
   release-test:
@@ -108,9 +108,9 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
+          go generate ./...
       - name: make-release
         run: |
-          PATH=${PATH}:$(go env GOPATH)/bin 
           sudo apt install -y rpm fakeroot zip debsigs gnupg
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
