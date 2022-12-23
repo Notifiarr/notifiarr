@@ -11,33 +11,19 @@ MD2ROFF_BIN=github.com/davidnewhall/md2roff@v0.0.1
 # rsrc adds an ico file to a Windows exe file.
 RSRC_BIN=github.com/akavel/rsrc
 
-# If upx is available, use it to compress the binaries.
-UPXPATH=$(shell which upx)
-
-# Skip upx in Mac environments: https://github.com/upx/upx/issues/446
-ifeq ($(shell uname -s),Darwin)
-  UPXPATH=
-endif
-
-# Skip upx on arch linux too.
-ifeq ($(shell grep -o 'Arch Linux' /etc/issue 2>/dev/null),Arch Linux)
-  UPXPATH=
-endif
-
 ifeq ($(OUTPUTDIR),)
      OUTPUTDIR=.
 endif
 
+# Preserve the passed-in version & iteration (homebrew).
+_VERSION:=$(VERSION)
+_ITERATION:=$(ITERATION)
+include /tmp/.metadata.make
+
 # Travis CI passes the version in. Local builds get it from the current git tag.
-ifeq ($(VERSION),)
-	include /tmp/.metadata.make
-else
-	# Preserve the passed-in version & iteration (homebrew).
-	_VERSION:=$(VERSION)
-	_ITERATION:=$(ITERATION)
-	include /tmp/.metadata.make
-	VERSION:=$(_VERSION)
-	ITERATION:=$(_ITERATION)
+ifneq ($(_VERSION),)
+VERSION:=$(_VERSION)
+ITERATION:=$(_ITERATION)
 endif
 
 # rpm is weird and changes - to _ in versions.
@@ -155,19 +141,16 @@ $(shell go env GOPATH)/bin/rsrc:
 build: $(BINARY)
 $(BINARY): generate main.go
 	go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux: $(BINARY).amd64.linux
 $(BINARY).amd64.linux:  main.go
 	# Building linux 64-bit x86 binary.
 	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 linux386: $(BINARY).386.linux
 $(BINARY).386.linux:  main.go
 	# Building linux 32-bit x86 binary.
 	GOOS=linux GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 arm: arm64 armhf
 
@@ -176,13 +159,11 @@ $(BINARY).arm64.linux:  main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	# https://github.com/upx/upx/issues/351#issuecomment-599116973
-	# [ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 armhf: $(BINARY).arm.linux
 $(BINARY).arm.linux:  main.go
 	# Building linux 32-bit ARM binary.
 	GOOS=linux GOARCH=arm GOARM=6 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 macos: $(BINARY).universal.macos
 $(BINARY).universal.macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
@@ -203,7 +184,6 @@ $(BINARY).amd64.freebsd: generate main.go
 freebsd386: $(BINARY).i386.freebsd
 $(BINARY).i386.freebsd: generate main.go
 	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@ || true
 
 freebsdarm: $(BINARY).armhf.freebsd
 $(BINARY).armhf.freebsd: generate main.go
@@ -214,7 +194,6 @@ windows: $(BINARY).amd64.exe
 $(BINARY).amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
 	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
-	[ -z "$(UPXPATH)" ] || $(UPXPATH) -q9 $@
 
 ####################
 ##### Packages #####
