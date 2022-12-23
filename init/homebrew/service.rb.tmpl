@@ -1,13 +1,9 @@
-# Homebrew Formula Template. Built by Makefile: `make fomula`
-# This is part of Application Builder.
-# https://github.com/golift/application-builder
-# This file is used when FORMULA is set to 'service'.
-class {{Class}} < Formula
+class Notifiarr < Formula
   desc "{{Desc}}"
-  homepage "{{URL}}"
+  homepage "https://notifiarr.com"
   url "{{SOURCE_PATH}}"
   sha256 "{{SHA256}}"
-  head "{{URL}}"
+  head "https://github.com/Notifiarr/notifiarr"
 
   depends_on "go" => :build
   depends_on "terminal-notifier"
@@ -17,6 +13,9 @@ class {{Class}} < Formula
     # Copy all files from their current location to buildpath/#{name}
     bin_path.install Dir["*",".??*"]
     cd bin_path do
+      system "go" "install" "github.com/swaggo/swag/cmd/swag@v1.8.7"
+      system "go" "install" "github.com/kevinburke/go-bindata/...@latest"
+      system "go" "install" "github.com/davidnewhall/md2roff@v0.0.1"
       system "make", "install", "VERSION=#{version}", "ITERATION={{Iter}}", "PREFIX=#{prefix}", "ETC=#{etc}"
       # If this fails, the user gets a nice big warning about write permissions on their
       # #{var}/log folder. The alternative could be letting the app silently fail
@@ -27,7 +26,7 @@ class {{Class}} < Formula
 
   def caveats
     <<-EOS
-  Edit the config file at #{etc}/#{name}/{{CONFIG_FILE}} then start #{name} with
+  Edit the config file at #{etc}/#{name}/notifiarr.conf then start #{name} with
   brew services start #{name} ~ log file: #{var}/log/#{name}.log
   The manual explains the config file options: man #{name}
     EOS
@@ -47,7 +46,7 @@ class {{Class}} < Formula
          <array>
              <string>#{bin}/#{name}</string>
              <string>--config</string>
-             <string>#{etc}/#{name}/{{CONFIG_FILE}}</string>
+             <string>#{etc}/#{name}/notifiarr.conf</string>
          </array>
          <key>RunAtLoad</key>
          <true/>

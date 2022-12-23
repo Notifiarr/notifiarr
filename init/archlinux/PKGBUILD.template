@@ -1,4 +1,4 @@
-pkgname={{BINARY}}
+pkgname=notifiarr
 pkgver={{VERSION}}
 pkgrel={{Iter}}
 pkgdesc='{{Desc}}'
@@ -8,7 +8,7 @@ license=('MIT')
 makedepends=('go' 'make')
 source=("notifiarr-${pkgver}.tar.gz::{{SOURCE_PATH}}")
 sha256sums=('{{SHA256}}')
-configfile='{{CONFIG_FILE}}'
+configfile='notifiarr.conf'
 backup=("etc/${pkgname}/${configfile}")
 install="${pkgname}.aur.install"
 

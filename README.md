@@ -41,7 +41,7 @@ Here: <https://github.com/golift/aur>
 Example of the above in shell form:
 
 ```shell
-wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install.sh | sudo bash
+wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install.sh | sudo bash
 
 vi /usr/local/etc/notifiarr/notifiarr.conf
 service notifiarr start
