@@ -97,6 +97,9 @@ jobs:
   release-test:
     outputs:
       packages: ${{ steps.release.outputs.packages }}
+      allfiles: ${{ steps.release.outputs.allfiles }}
+      zips: ${{ steps.release.outputs.zips }}
+      version: ${{ steps.release.outputs.version }}
     name: test-make-release
     runs-on: ubuntu-latest
     env:
@@ -123,27 +126,41 @@ jobs:
           go install github.com/akavel/rsrc@latest
           go install github.com/davidnewhall/md2roff@v0.0.1
           make release
-          echo "$(ls release/*{deb,rpm} | jq -R '.'  | jq -s"
+          echo "$(ls release/*{deb,rpm} | jq -R '.'  | jq -sc)"
+          echo "allfiles=$(ls release/* | jq -R '.'  | jq -sc)" >> $GITHUB_OUTPUT
           echo "packages=$(ls release/*.{deb,rpm} | jq -R '.'  | jq -sc)" >> $GITHUB_OUTPUT
+          echo "zips=$(ls release/*.{gz,zip} | jq -R '.'  | jq -sc)" >> $GITHUB_OUTPUT
+          source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: test-release
           path: release
+  # deploy-unstable-unstable:
+  #   needs: release-test
+  #   name: deploy-unstable-unstable
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download release files
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: test-release
+  #     - name: upload files to unstable.notifiarr.app
+  #       run: 
   deploy-unstable-packagecloud:
     needs: release-test
-    strategy:
-      matrix:
-        files: ${{needs.release-test.outputs.packages}}
-    name: deploy-unstable
+    name: deploy-unstable-packagecloud
     runs-on: ubuntu-latest
-    env:
-      UPLOADFILE: ${{ matrix.files }}
     steps:
       - name: Download release files
         uses: actions/download-artifact@v2
         with:
           name: test-release
-      - name: show me downloaded files
-        run: |
-          echo "${UPLOADFILE}"
+      - uses: TykTechnologies/packagecloud-action
+        env:
+          PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+        with:
+          repo: 'golift/unstable'
+          dir: '.'
+          rpmvers: 'el6'
+          debvers: 'focal'
