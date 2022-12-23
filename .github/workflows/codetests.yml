@@ -95,8 +95,8 @@ jobs:
           go install github.com/davidnewhall/md2roff@v0.0.1
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
   release-test:
-    # outputs:
-    #   matrix: ${{ steps.release.outputs.matrix }}
+    outputs:
+      packages: ${{ steps.release.outputs.packages }}
     name: test-make-release
     runs-on: ubuntu-latest
     env:
@@ -123,21 +123,22 @@ jobs:
           go install github.com/akavel/rsrc@latest
           go install github.com/davidnewhall/md2roff@v0.0.1
           make release
+          echo "$(ls release/*{deb,rpm} | jq -R '.'  | jq -s"
+          echo "packages=$(ls release/*.{deb,rpm} | jq -R '.'  | jq -sc)" >> $GITHUB_OUTPUT
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: test-release
           path: release
-      - name: Show me the files
-        run: |
-          echo "matrix=${{ hashFiles('release/*') }}"
-  deploy-unstable:
+  deploy-unstable-packagecloud:
     needs: release-test
-    # strategy:
-    #   matrix:
-    #     files: ${{needs.release-test.outputs.matrix}}
+    strategy:
+      matrix:
+        files: ${{needs.release-test.outputs.packages}}
     name: deploy-unstable
     runs-on: ubuntu-latest
+    env:
+      UPLOADFILE: ${{ matrix.files }}
     steps:
       - name: Download release files
         uses: actions/download-artifact@v2
@@ -145,6 +146,4 @@ jobs:
           name: test-release
       - name: show me downloaded files
         run: |
-          ls
-          pwd
-          echo "matrix=${{ hashFiles('release/*') }}"
+          echo "${UPLOADFILE}"

@@ -17,7 +17,7 @@ VENDOR="Go Lift <code@golift.io>"
 DATE="$(date -u +%Y-%m-%dT%H:%M:00Z)"
 
 VERSION=$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1) | tr -d v)
-[ "$VERSON" != "" ] || VERSION=development
+[ "$VERSION" != "" ] || VERSION=development
 # This produces a 0 in some environments (like Homebrew), but it's only used for packages.
 ITERATION=$(git rev-list --count --all || echo 0)
 COMMIT="$(git rev-parse --short HEAD || echo 0)"
