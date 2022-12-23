@@ -369,7 +369,7 @@ lint: generate
 generate: pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
 pkg/bindata/docs/api_docs.go: 
 	go generate ./pkg/bindata/docs
-pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
+pkg/bindata/bindata.go:
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/
 
