@@ -159,7 +159,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test-release
-      - uses: golift/upload-packagecloud@v1
+      - uses: golift/upload-packagecloud@v1-beta
         with:
           repo: golift/unstable
           token: ${{ secrets.PACKAGECLOUD_TOKEN }}
