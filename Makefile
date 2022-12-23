@@ -70,7 +70,7 @@ all: clean build
 ####################
 
 # Prepare a release. Called in Travis CI.
-release: clean generate linux_packages freebsd_packages windows
+release: linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
 	mv notifiarr.*.linux notifiarr.*.freebsd $@/

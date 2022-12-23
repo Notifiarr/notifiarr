@@ -18,11 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3.1.0
       - uses: actions/setup-go@v3
+         with:
+          go-version: 'stable'
       - name: go-generate
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          PATH=${PATH}:$(go env GOPATH)/bin go generate ./...
+          go generate ./...
       - name: go-test
         run: |
           go test ./pkg/...
@@ -36,13 +38,15 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/setup-go@v3
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+         with:
+          go-version: 'stable'
       - name: go-generate
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          PATH=${PATH}:$(go env GOPATH)/bin go generate ./...
+          go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -57,13 +61,14 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/setup-go@v3
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+         with:
+          go-version: 'stable'
       - name: go-generate
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          PATH=${PATH}:$(go env GOPATH)/bin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -72,16 +77,19 @@ jobs:
     name: test-homebrew-install
     runs-on: macos-latest
     steps:
-      - uses: actions/setup-go@v3
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+         with:
+          go-version: 'stable'
       - name: go-generate
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          PATH=${PATH}:$(go env GOPATH)/bin go generate ./...
+          go generate ./...
       - name: make-install
         run: |
           TMP=$(mktemp -d)
+          PATH=${PATH}:$(go env GOPATH)/bin
           go install github.com/davidnewhall/md2roff@v0.0.1
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
   release-test:
@@ -90,17 +98,19 @@ jobs:
     env:
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
     steps:
-      - uses: actions/setup-go@v3
       - uses: actions/checkout@v3
         with:
           fetch-depth: ''
+      - uses: actions/setup-go@v3
+         with:
+          go-version: 'stable'
       - name: go-generate
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          PATH=${PATH}:$(go env GOPATH)/bin go generate ./...
       - name: make-release
         run: |
+          PATH=${PATH}:$(go env GOPATH)/bin 
           sudo apt install -y rpm fakeroot zip debsigs gnupg
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
