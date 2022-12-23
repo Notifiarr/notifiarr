@@ -34,7 +34,6 @@ eval "docker buildx build --load --tag current:arm64 --platform linux/arm64/v8 $
 eval "docker buildx build --load --tag current:arm --platform linux/arm $BUILD_ARGS"
 echo "Done Building."
 
-
 TAGS="$SOURCE_BRANCH"
 if [ "v$VERSION" = "$SOURCE_BRANCH" ]; then
   TAGS="$VERSION"
