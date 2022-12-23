@@ -24,9 +24,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          echo "::set-env name=GOPATH::$(go env GOPATH)"
-          echo "::add-path::$(go env GOPATH)/bin"
-          go generate ./...
+          PATH=${PATH}:$(go env GOPATH)/bin go generate ./...
       - name: go-test
         run: |
           go test ./pkg/...
@@ -48,8 +46,8 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          echo "::set-env name=GOPATH::$(go env GOPATH)"
-          echo "::add-path::$(go env GOPATH)/bin"
+          echo $PATH
+          ls $(go env GOPATH)/bin
           go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -73,8 +71,8 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          echo "::set-env name=GOPATH::$(go env GOPATH)"
-          echo "::add-path::$(go env GOPATH)/bin"
+          echo $PATH
+          ls $(go env GOPATH)/bin
           go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -92,8 +90,8 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          echo "::set-env name=GOPATH::$(go env GOPATH)"
-          echo "::add-path::$(go env GOPATH)/bin"
+          echo $PATH
+          ls $(go env GOPATH)/bin
           go generate ./...
       - name: make-install
         run: |
