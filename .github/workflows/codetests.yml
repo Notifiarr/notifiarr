@@ -44,11 +44,9 @@ jobs:
           go-version: 'stable'
       - name: go-generate
         run: |
-          go install github.com/swaggo/swag/cmd/swag@v1.8.7
-          go install github.com/kevinburke/go-bindata/...@latest
-          echo $PATH
-          ls $(go env GOPATH)/bin
-          go generate ./...
+          GOOS=darwin go install github.com/swaggo/swag/cmd/swag@v1.8.7
+          GOOS=darwin go install github.com/kevinburke/go-bindata/...@latest
+          GOOS=darwin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -69,11 +67,9 @@ jobs:
           go-version: 'stable'
       - name: go-generate
         run: |
-          go install github.com/swaggo/swag/cmd/swag@v1.8.7
-          go install github.com/kevinburke/go-bindata/...@latest
-          echo $PATH
-          ls $(go env GOPATH)/bin
-          go generate ./...
+          GOOS=linux go install github.com/swaggo/swag/cmd/swag@v1.8.7
+          GOOS=linux go install github.com/kevinburke/go-bindata/...@latest
+          GOOS=linux go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
