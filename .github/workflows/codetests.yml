@@ -136,17 +136,21 @@ jobs:
         with:
           name: test-release
           path: release
-  # deploy-unstable-unstable:
-  #   needs: release-test
-  #   name: deploy-unstable-unstable
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Download release files
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: test-release
-  #     - name: upload files to unstable.notifiarr.app
-  #       run: 
+  deploy-unstable-unstable:
+    needs: release-test
+    name: deploy-unstable-unstable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v2
+        with:
+          name: test-release
+      - name: upload files to unstable.notifiarr.app
+        run: |
+          echo "Version:"
+          echo ${{needs.release-test.outputs.version}}
+          ls
+          pwd
   deploy-unstable-packagecloud:
     needs: release-test
     name: deploy-unstable-packagecloud
