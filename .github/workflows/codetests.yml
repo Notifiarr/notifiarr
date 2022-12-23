@@ -4,7 +4,8 @@ on:
     branches:
       - unstable
   pull_request:
-    types: [opened, reopened, edited]
+    branches:
+    - master
 permissions:
   contents: read
 jobs:
