@@ -95,6 +95,8 @@ jobs:
           go install github.com/davidnewhall/md2roff@v0.0.1
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
   release-test:
+    # outputs:
+    #   matrix: ${{ steps.release.outputs.matrix }}
     name: test-make-release
     runs-on: ubuntu-latest
     env:
@@ -113,6 +115,7 @@ jobs:
           go install github.com/kevinburke/go-bindata/...@latest
           # make release will clean and generate so do not do it here.
       - name: make-release
+        id: release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg
           sudo gem install --no-document fpm
@@ -125,14 +128,23 @@ jobs:
         with:
           name: test-release
           path: release
+      - name: Show me the files
+        run: |
+          echo "matrix=${{ hashFiles('release/*') }}"
   deploy-unstable:
     needs: release-test
+    # strategy:
+    #   matrix:
+    #     files: ${{needs.release-test.outputs.matrix}}
     name: deploy-unstable
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
         uses: actions/download-artifact@v2
         with:
-          name: test-release          
-      - name: Show me the files
-        run: echo "${{ hashFiles('release/*') }}"
+          name: test-release
+      - name: show me downloaded files
+        run: |
+          ls
+          pwd
+          echo "matrix=${{ hashFiles('release/*') }}"
