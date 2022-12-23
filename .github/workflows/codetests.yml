@@ -81,11 +81,14 @@ jobs:
         with:
           go-version: 1.19
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
       - name: make-release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg
           sudo gem install --no-document fpm -v 1.11.0
-          echo "${GPG_SIGNING_KEY}" > gpg.signing.key
-          ls -l gpg.signing.key
-          gpg --import gpg.signing.key
+          echo "${GPG_SIGNING_KEY}" | gpg --import -
+          git status
+          pwd
+          ls -la
           make release
