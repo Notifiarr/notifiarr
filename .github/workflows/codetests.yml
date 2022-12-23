@@ -161,8 +161,8 @@ jobs:
           name: test-release
       - uses: golift/upload-packagecloud@v1-beta
         with:
-          repo: golift/unstable
-          token: ${{ secrets.PACKAGECLOUD_TOKEN }}
+          userrepo: golift/unstable
+          apitoken: ${{ secrets.PACKAGECLOUD_TOKEN }}
           packages: .
-          rpmdistrib: el/6
-          debdistrib: ubuntu/focal ubuntu/xenial
+          rpmdists: el/6
+          debdists: ubuntu/focal ubuntu/xenial
