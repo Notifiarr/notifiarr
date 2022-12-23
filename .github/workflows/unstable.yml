@@ -1,11 +1,11 @@
 name: build-and-push-unstable
-needs: release-test
 on:
   push:
     branches:
       - unstable
 jobs:
   deploy-unstable:
+    needs: release-test
     name: deploy-unstable
     runs-on: ubuntu-latest
     steps:
