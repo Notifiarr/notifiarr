@@ -88,4 +88,8 @@ jobs:
           sudo apt install -y rpm fakeroot zip debsigs gnupg
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
+          go install github.com/swaggo/swag/cmd/swag@v1.8.7
+          go install github.com/kevinburke/go-bindata/...@latest
+          go install github.com/davidnewhall/md2roff@v0.0.1
+          go install github.com/akavel/rsrc@latest
           make release

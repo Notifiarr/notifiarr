@@ -10,8 +10,11 @@ FROM golang:1-bullseye as builder
 WORKDIR /src
 COPY main.go settings.sh go.mod go.sum ./
 RUN go mod download
+RUN go install github.com/swaggo/swag/cmd/swag@v1.8.7
+RUN go install github.com/kevinburke/go-bindata/...@latest
 COPY init init
 COPY pkg pkg
+RUN go generate ./...
 
 RUN apt update
 RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
@@ -32,6 +35,7 @@ RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux
     ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
     ln -s /usr/lib /tmp/lib_link/lib64 && \
     ln -s /usr/lib /tmp/lib_link/lib
+
 
 ARG TARGETOS
 ARG BUILD_DATE

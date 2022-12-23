@@ -1,9 +1,9 @@
-pkgbase = {{BINARY}}
+pkgbase = notifiarr
 	pkgdesc = {{Desc}}
 	pkgver = {{VERSION}}
 	pkgrel = {{Iter}}
 	url = {{SOURCE_URL}}
-	install = {{BINARY}}.aur.install
+	install = notifiarr.aur.install
 	arch = x86_64
 	arch = arm
 	arch = armv6h
@@ -14,8 +14,8 @@ pkgbase = {{BINARY}}
 	license = MIT
 	makedepends = go
 	makedepends = make
-	backup = etc/{{BINARY}}/{{CONFIG_FILE}}
-	source = {{BINARY}}-{{VERSION}}.tar.gz::{{SOURCE_PATH}}
+	backup = etc/notifiarr/notifiarr.conf
+	source = notifiarr-{{VERSION}}.tar.gz::{{SOURCE_PATH}}
 	sha256sums = {{SHA256}}
 
-pkgname = {{BINARY}}
+pkgname = notifiarr

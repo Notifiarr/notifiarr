@@ -1,7 +1,5 @@
 .git
 /examples
-/init
-!/init/buildinfo.sh
 /scripts
 
 # Change this line.

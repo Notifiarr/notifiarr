@@ -7,18 +7,52 @@
 
 source settings.sh
 
-make aur
+mkdir aur
 
-git config --global user.email "${BINARY}@auto.releaser"
-git config --global user.name "${BINARY}-auto-releaser"
+SHA256=${curl -sL https://github.com/Notifiarr/notifiarr/archive/v$(VERSION).tar.gz | openssl dgst -r -sha256}
+
+sed -e "s/{{VERSION}}/${VERSION}/g" \
+    -e "s/{{Iter}}/${ITERATION}/g" \
+    -e "s/{{SHA256}}/${SHA256}/g" \
+    -e "s/{{Desc}}/${DESC}/g" \
+    -e "s%{{BINARY}}%notifiarr%g" \
+    -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
+    -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
+    -e "s%{{CONFIG_FILE}}%${CONFIG_FILE}%g" \
+    init/archlinux/PKGBUILD.template > aur/PKGBUILD
+
+sed -e "s/{{VERSION}}/${VERSION}/g" \
+    -e "s/{{Iter}}/${ITERATION}/g" \
+    -e "s/{{SHA256}}/${SHA256}/g" \
+    -e "s/{{Desc}}/${DESC}/g" \
+    -e "s%{{BINARY}}%notifiarr%g" \
+    -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
+    -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
+    -e "s%{{CONFIG_FILE}}%${CONFIG_FILE}%g" \
+    init/archlinux/SRCINFO.template > aur/.SRCINFO
+
+cat > aur/notifiarr.aur.install << EOF
+post_upgrade() {
+  /bin/systemctl restart notifiarr
+}
+pre_remove() {
+  /bin/systemctl stop notifiarr
+  /bin/systemctl disable notifiarr
+}
+EOF
+
+git config --global user.email "notifiarr@auto.releaser"
+git config --global user.name "notifiarr-auto-releaser"
 
 rm -rf aur_release_repo
 git clone git@github.com-aurepo:golift/aur.git aur_release_repo
 
-mkdir -p "aur_release_repo/${BINARY}"
-cp aur/{*,.??*} "aur_release_repo/${BINARY}/"
+mkdir -p "aur_release_repo/notifiarr"
+cp aur/{*,.??*} "aur_release_repo/notifiarr/"
 pushd aur_release_repo
-git add ${BINARY}
-git commit -m "Update ${BINARY} on Release: v${VERSION}-${ITERATION}"
+git add notifiarr
+git commit -m "Update notifiarr on Release: v${VERSION}-${ITERATION}"
 git push
 popd
+
+rm -rf aur aur_release_repo

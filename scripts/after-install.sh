@@ -2,28 +2,26 @@
 
 # This file is used by aur, deb, rpm and BSD packages.
 # FPM adds this as the after-install script.
-# Edit this file as needed for your application.
-# This file is only installed if FORMULA is set to service.
 
-if [ -d /usr/local/etc/{{BINARY}} ]; then
-  chown -R {{BINARY}}: /usr/local/etc/{{BINARY}}
+if [ -d /usr/local/etc/notifiarr ]; then
+  chown -R notifiarr: /usr/local/etc/notifiarr
 fi
 
-if [ -d /etc/{{BINARY}} ]; then
-  chown -R {{BINARY}}: /etc/{{BINARY}}
+if [ -d /etc/notifiarr ]; then
+  chown -R notifiarr: /etc/notifiarr
 fi
 
-if [ -d /var/log/{{BINARY}} ]; then
-  chown -R {{BINARY}}: /var/log/{{BINARY}}
+if [ -d /var/log/notifiarr ]; then
+  chown -R notifiarr: /var/log/notifiarr
 fi
 
-if [ -d /usr/local/var/log/{{BINARY}} ]; then
-  chown -R {{BINARY}}: /usr/local/var/log/{{BINARY}}
+if [ -d /usr/local/var/log/notifiarr ]; then
+  chown -R notifiarr: /usr/local/var/log/notifiarr
 fi
 
 if [ -x "/bin/systemctl" ]; then
   # Reload and restart - this starts the application as user nobody.
   /bin/systemctl daemon-reload
-  /bin/systemctl enable {{BINARY}}
-  /bin/systemctl restart {{BINARY}}
+  /bin/systemctl enable notifiarr
+  /bin/systemctl restart notifiarr
 fi

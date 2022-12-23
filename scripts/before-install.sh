@@ -1,22 +1,20 @@
 #!/bin/sh
 
 # This file is used by aur, deb, rpm and BSD packages.
-# FPM adds this as the after-install script.
-# Edit this file as needed for your application.
-# This file is only installed if FORMULA is set to service.
+# FPM adds this as the before-install script.
 
 OS="$(uname -s)"
 
 if [ "${OS}" = "Linux" ]; then
   # Make a user and group for this app, but only if it does not already exist.
-  id {{BINARY}} >/dev/null 2>&1  || \
-    useradd --system --user-group --no-create-home --home-dir /tmp --shell /bin/false {{BINARY}}
+  id notifiarr >/dev/null 2>&1  || \
+    useradd --system --user-group --no-create-home --home-dir /tmp --shell /bin/false notifiarr
 elif [ "${OS}" = "OpenBSD" ]; then
-  id {{BINARY}} >/dev/null 2>&1  || \
-    useradd  -g =uid -d /tmp -s /bin/false {{BINARY}}
+  id notifiarr >/dev/null 2>&1  || \
+    useradd  -g =uid -d /tmp -s /bin/false notifiarr
 elif [ "${OS}" = "FreeBSD" ]; then
-  id {{BINARY}} >/dev/null 2>&1  || \
-    pw useradd {{BINARY}} -d /tmp -w no -s /bin/false
+  id notifiarr >/dev/null 2>&1  || \
+    pw useradd notifiarr -d /tmp -w no -s /bin/false
 else
-  echo "Unknown OS: ${OS}, please add system user {{BINARY}} manually."
+  echo "Unknown OS: ${OS}, please add system user notifiarr manually."
 fi

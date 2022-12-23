@@ -5,11 +5,13 @@
 # Suck in our application information.
 IGNORED:=$(shell bash -c "source settings.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > /tmp/.metadata.make")
 
-# md2roff turns markdown into man files and html files.
-MD2ROFF_BIN=github.com/davidnewhall/md2roff@v0.0.1
-
-# rsrc adds an ico file to a Windows exe file.
-RSRC_BIN=github.com/akavel/rsrc
+EXTRA_FPM_FLAGS=--conflicts=discordnotifier-client>0.0.1 --provides=notifiarr --provides=discordnotifier-client
+BUILD_FLAGS=-tags osusergo,netgo
+GOFLAGS=-trimpath -mod=readonly -modcacherw
+CGO_CPPFLAGS=$(CPPFLAGS)
+CGO_CFLAGS=$(CFLAGS)
+CGO_CXXFLAGS=$(CXXFLAGS)
+CGO_LDFLAGS=$(LDFLAGS)
 
 ifeq ($(OUTPUTDIR),)
      OUTPUTDIR=.
@@ -29,38 +31,35 @@ endif
 # rpm is weird and changes - to _ in versions.
 RPMVERSION:=$(shell echo $(VERSION) | tr -- - _)
 # used for freebsd packages.
-BINARYU:=$(shell echo $(BINARY) | tr -- - _)
+BINARYU:=$(shell echo notifiarr | tr -- - _)
 
-PACKAGE_SCRIPTS=
-ifeq ($(FORMULA),service)
-	PACKAGE_SCRIPTS=--before-install before-install-rendered.sh \
-	--after-install after-install-rendered.sh \
-	--before-remove before-remove-rendered.sh
-endif
+PACKAGE_SCRIPTS=--before-install scripts/before-install.sh \
+--after-install scripts/after-install.sh \
+--before-remove scripts/before-remove.sh
 
 define PACKAGE_ARGS
 $(PACKAGE_SCRIPTS) \
---name $(BINARY) \
+--name notifiarr \
 --deb-no-default-config-files \
 --rpm-os linux \
---deb-user $(BINARY) \
---rpm-user $(BINARY) \
---pacman-user $(BINARY) \
+--deb-user notifiarr \
+--rpm-user notifiarr \
+--pacman-user notifiarr \
 --iteration $(ITERATION) \
 --license $(LICENSE) \
 --url $(SOURCE_URL) \
 --maintainer "$(MAINT)" \
 --vendor "$(VENDOR)" \
 --description "$(DESC)" \
---config-files "/etc/$(BINARY)/$(CONFIG_FILE)" \
+--config-files "/etc/notifiarr/notifiarr.conf" \
 --freebsd-origin "$(SOURCE_URL)"
 endef
 
-VERSION_LDFLAGS:= -X \"$(VERSION_PATH).Branch=$(BRANCH) ($(COMMIT))\" \
-	-X \"$(VERSION_PATH).BuildDate=$(DATE)\" \
-	-X \"$(VERSION_PATH).BuildUser=$(shell whoami)\" \
-	-X \"$(VERSION_PATH).Revision=$(ITERATION)\" \
-	-X \"$(VERSION_PATH).Version=$(VERSION)\"
+VERSION_LDFLAGS:= -X \"golift.io/version.Branch=$(BRANCH) ($(COMMIT))\" \
+	-X \"golift.io/version.BuildDate=$(DATE)\" \
+	-X \"golift.io/version.BuildUser=$(shell whoami || echo "unknown")\" \
+	-X \"golift.io/version.Revision=$(ITERATION)\" \
+	-X \"golift.io/version.Version=$(VERSION)\"
 
 # Makefile targets follow.
 
@@ -74,9 +73,9 @@ all: clean build
 release: clean generate linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
-	mv $(BINARY).*.linux $(BINARY).*.freebsd $@/
+	mv notifiarr.*.linux notifiarr.*.freebsd $@/
 	gzip -9r $@/
-	for i in $(BINARY)*.exe ; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
+	for i in notifiarr*.exe ; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
 	mv *.rpm *.deb *.txz $@/
 	# Generating File Hashes
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
@@ -85,7 +84,7 @@ release: clean generate linux_packages freebsd_packages windows
 dmg: clean $(MACAPP).app
 	mkdir -p release
 	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP)-unsigned.dmg -srcfolder $(MACAPP).app -ov
-	[ "$(MACAPP)" != "" ] || mv $(BINARY).*.macos release/
+	[ "$(MACAPP)" != "" ] || mv notifiarr.*.macos release/
 	[ "$(MACAPP)" != "" ] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
@@ -94,12 +93,11 @@ signdmg: $(MACAPP).app
 
 # Delete all build assets.
 clean:
-	rm -f $(BINARY) $(BINARY).*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} $(BINARY).1{,.gz} $(BINARY).rb
-	rm -f $(BINARY){_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
-	rm -f cmd/$(BINARY)/README{,.html} README{,.html} ./$(BINARY)_manual.html rsrc.syso $(MACAPP).*.app.zip
-	rm -f $(BINARY).aur.install PKGBUILD $(BINARY).service pkg/bindata/bindata.go pack.temp.dmg
-	rm -f before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh 
-	rm -rf aur package_build_* release $(MACAPP).*.app $(MACAPP).app
+	rm -f notifiarr notifiarr.*.{macos,freebsd,linux,exe,upx}{,.gz,.zip} notifiarr.1{,.gz} notifiarr.rb
+	rm -f notifiarr{_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
+	rm -f cmd/notifiarr/README{,.html} README{,.html} ./notifiarr_manual.html rsrc.syso $(MACAPP).*.app.zip
+	rm -f notifiarr.service pkg/bindata/bindata.go pack.temp.dmg
+	rm -rf package_build_* release $(MACAPP).*.app $(MACAPP).app
 	rm -f pkg/bindata/docs/api_docs.go
 
 ####################
@@ -109,87 +107,80 @@ clean:
 # Build a man page from a markdown file using md2roff.
 # This also turns the repo readme into an html file.
 # md2roff is needed to build the man file and html pages from the READMEs.
-man: $(BINARY).1.gz
-$(BINARY).1.gz: md2roff
+man: notifiarr.1.gz
+notifiarr.1.gz:
 	# Building man page. Build dependency first: md2roff
-	$(shell go env GOPATH)/bin/md2roff --manual $(BINARY) --version $(VERSION) --date "$(DATE)" examples/MANUAL.md
+	$(shell go env GOPATH)/bin/md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" examples/MANUAL.md
 	gzip -9nc examples/MANUAL > $@
-	mv examples/MANUAL.html $(BINARY)_manual.html
+	mv examples/MANUAL.html notifiarr_manual.html
 
-md2roff: $(shell go env GOPATH)/bin/md2roff
-$(shell go env GOPATH)/bin/md2roff:
-	cd /tmp ; go install $(MD2ROFF_BIN)
-
-# TODO: provide a template that adds the date to the built html file.
 readme: README.html
-README.html: md2roff
+README.html: 
 	# This turns README.md into README.html
-	$(shell go env GOPATH)/bin/md2roff --manual $(BINARY) --version $(VERSION) --date "$(DATE)" README.md
+	$(shell go env GOPATH)/bin/md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" README.md
 
 rsrc: rsrc.syso
-rsrc.syso: init/windows/application.ico init/windows/manifest.xml $(shell go env GOPATH)/bin/rsrc
+rsrc.syso: init/windows/application.ico init/windows/manifest.xml
 	$(shell go env GOPATH)/bin/rsrc -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
-$(shell go env GOPATH)/bin/rsrc:
-	cd /tmp ; go install $(RSRC_BIN)@latest
 
 ####################
 ##### Binaries #####
 ####################
 
-build: $(BINARY)
-$(BINARY): generate main.go
-	go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$(BINARY) -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+build: notifiarr
+notifiarr: generate main.go
+	go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-linux: $(BINARY).amd64.linux
-$(BINARY).amd64.linux:  main.go
+linux: notifiarr.amd64.linux
+notifiarr.amd64.linux:  main.go
 	# Building linux 64-bit x86 binary.
 	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-linux386: $(BINARY).386.linux
-$(BINARY).386.linux:  main.go
+linux386: notifiarr.386.linux
+notifiarr.386.linux:  main.go
 	# Building linux 32-bit x86 binary.
 	GOOS=linux GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 arm: arm64 armhf
 
-arm64: $(BINARY).arm64.linux
-$(BINARY).arm64.linux:  main.go
+arm64: notifiarr.arm64.linux
+notifiarr.arm64.linux:  main.go
 	# Building linux 64-bit ARM binary.
 	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 	# https://github.com/upx/upx/issues/351#issuecomment-599116973
 
-armhf: $(BINARY).arm.linux
-$(BINARY).arm.linux:  main.go
+armhf: notifiarr.arm.linux
+notifiarr.arm.linux:  main.go
 	# Building linux 32-bit ARM binary.
 	GOOS=linux GOARCH=arm GOARM=6 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-macos: $(BINARY).universal.macos
-$(BINARY).universal.macos: $(BINARY).amd64.macos $(BINARY).arm64.macos
+macos: notifiarr.universal.macos
+notifiarr.universal.macos: notifiarr.amd64.macos notifiarr.arm64.macos
 	# Building darwin 64-bit universal binary.
-	lipo -create -output $@ $(BINARY).amd64.macos $(BINARY).arm64.macos
-$(BINARY).amd64.macos:  main.go
+	lipo -create -output $@ notifiarr.amd64.macos notifiarr.arm64.macos
+notifiarr.amd64.macos:  main.go
 	# Building darwin 64-bit x86 binary.
 	GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-$(BINARY).arm64.macos: generate main.go
+notifiarr.arm64.macos: generate main.go
 	# Building darwin 64-bit arm binary.
 	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 
-freebsd: $(BINARY).amd64.freebsd
-$(BINARY).amd64.freebsd: generate main.go
+freebsd: notifiarr.amd64.freebsd
+notifiarr.amd64.freebsd: generate main.go
 	GOOS=freebsd GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-freebsd386: $(BINARY).i386.freebsd
-$(BINARY).i386.freebsd: generate main.go
+freebsd386: notifiarr.i386.freebsd
+notifiarr.i386.freebsd: generate main.go
 	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-freebsdarm: $(BINARY).armhf.freebsd
-$(BINARY).armhf.freebsd: generate main.go
+freebsdarm: notifiarr.armhf.freebsd
+notifiarr.armhf.freebsd: generate main.go
 	GOOS=freebsd GOARCH=arm go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
-exe: $(BINARY).amd64.exe
-windows: $(BINARY).amd64.exe
-$(BINARY).amd64.exe: generate rsrc.syso main.go
+exe: notifiarr.amd64.exe
+windows: notifiarr.amd64.exe
+notifiarr.amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
 	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 
@@ -202,213 +193,164 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
 macapp: $(MACAPP).app
-$(MACAPP).app: $(BINARY).universal.macos
+$(MACAPP).app: notifiarr.universal.macos
 	[ -z "$(MACAPP)" ] || cp -rp init/macos/$(MACAPP).app $(MACAPP).app
 	[ -z "$(MACAPP)" ] || mkdir -p $(MACAPP).app/Contents/MacOS
-	[ -z "$(MACAPP)" ] || cp $(BINARY).universal.macos $(MACAPP).app/Contents/MacOS/$(MACAPP)
+	[ -z "$(MACAPP)" ] || cp notifiarr.universal.macos $(MACAPP).app/Contents/MacOS/$(MACAPP)
 	[ -z "$(MACAPP)" ] || sed -i '' \
 		-e "s/{{VERSION}}/$(VERSION)/g" \
-		-e "s%{{BINARY}}%$(BINARY)%g" \
+		-e "s%{{BINARY}}%notifiarr%g" \
 		-e "s%{{MACAPP}}%$(MACAPP)%g" \
 		$(MACAPP).app/Contents/Info.plist
 
-aur: PKGBUILD SRCINFO $(BINARY).aur.install
-	mkdir -p $@
-	mv PKGBUILD $(BINARY).aur.install $@/
-	mv SRCINFO $@/.SRCINFO
-
-PKGBUILD: v$(VERSION).tar.gz.sha256
-	@echo "Creating 'aur' PKGBUILD file for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
-	sed -e "s/{{VERSION}}/$(VERSION)/g" \
-		-e "s/{{Iter}}/$(ITERATION)/g" \
-		-e "s/{{SHA256}}/$(shell head -c64 $<)/g" \
-		-e "s/{{Desc}}/$(DESC)/g" \
-		-e "s%{{BINARY}}%$(BINARY)%g" \
-		-e "s%{{SOURCE_URL}}%$(SOURCE_URL)%g" \
-		-e "s%{{SOURCE_PATH}}%$(SOURCE_PATH)%g" \
-		-e "s%{{CONFIG_FILE}}%$(CONFIG_FILE)%g" \
-		init/archlinux/PKGBUILD.template | tee PKGBUILD
-
-SRCINFO: v$(VERSION).tar.gz.sha256
-	sed -e "s/{{VERSION}}/$(VERSION)/g" \
-		-e "s/{{Iter}}/$(ITERATION)/g" \
-		-e "s/{{SHA256}}/$(shell head -c64 $<)/g" \
-		-e "s/{{Desc}}/$(DESC)/g" \
-		-e "s%{{BINARY}}%$(BINARY)%g" \
-		-e "s%{{SOURCE_URL}}%$(SOURCE_URL)%g" \
-		-e "s%{{SOURCE_PATH}}%$(SOURCE_PATH)%g" \
-		-e "s%{{CONFIG_FILE}}%$(CONFIG_FILE)%g" \
-		init/archlinux/SRCINFO.template | tee SRCINFO
-
-rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
-$(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux_rpm check_fpm
-	@echo "Building 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
+rpm: notifiarr-$(RPMVERSION)-$(ITERATION).x86_64.rpm
+notifiarr-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux_rpm check_fpm
+	@echo "Building 'rpm' package for notifiarr version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a x86_64 -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
+	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign notifiarr-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 
-deb: $(BINARY)_$(VERSION)-$(ITERATION)_amd64.deb
-$(BINARY)_$(VERSION)-$(ITERATION)_amd64.deb: package_build_linux_deb check_fpm
-	@echo "Building 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
+deb: notifiarr_$(VERSION)-$(ITERATION)_amd64.deb
+notifiarr_$(VERSION)-$(ITERATION)_amd64.deb: package_build_linux_deb check_fpm
+	@echo "Building 'deb' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a amd64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_amd64.deb
+	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin notifiarr_$(VERSION)-$(ITERATION)_amd64.deb
 
-rpm386: $(BINARY)-$(RPMVERSION)-$(ITERATION).i386.rpm
-$(BINARY)-$(RPMVERSION)-$(ITERATION).i386.rpm: package_build_linux_386_rpm check_fpm
-	@echo "Building 32-bit 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
+rpm386: notifiarr-$(RPMVERSION)-$(ITERATION).i386.rpm
+notifiarr-$(RPMVERSION)-$(ITERATION).i386.rpm: package_build_linux_386_rpm check_fpm
+	@echo "Building 32-bit 'rpm' package for notifiarr version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a i386 -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).i386.rpm
+	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign notifiarr-$(RPMVERSION)-$(ITERATION).i386.rpm
 
-deb386: $(BINARY)_$(VERSION)-$(ITERATION)_i386.deb
-$(BINARY)_$(VERSION)-$(ITERATION)_i386.deb: package_build_linux_386_deb check_fpm
-	@echo "Building 32-bit 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
+deb386: notifiarr_$(VERSION)-$(ITERATION)_i386.deb
+notifiarr_$(VERSION)-$(ITERATION)_i386.deb: package_build_linux_386_deb check_fpm
+	@echo "Building 32-bit 'deb' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a i386 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_i386.deb
+	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin notifiarr_$(VERSION)-$(ITERATION)_i386.deb
 
-rpmarm: $(BINARY)-$(RPMVERSION)-$(ITERATION).aarch64.rpm
-$(BINARY)-$(RPMVERSION)-$(ITERATION).aarch64.rpm: package_build_linux_arm64_rpm check_fpm
-	@echo "Building 64-bit ARM8 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
+rpmarm: notifiarr-$(RPMVERSION)-$(ITERATION).aarch64.rpm
+notifiarr-$(RPMVERSION)-$(ITERATION).aarch64.rpm: package_build_linux_arm64_rpm check_fpm
+	@echo "Building 64-bit ARM8 'rpm' package for notifiarr version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a aarch64 -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).aarch64.rpm
+	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign notifiarr-$(RPMVERSION)-$(ITERATION).aarch64.rpm
 
-debarm: $(BINARY)_$(VERSION)-$(ITERATION)_arm64.deb
-$(BINARY)_$(VERSION)-$(ITERATION)_arm64.deb: package_build_linux_arm64_deb check_fpm
-	@echo "Building 64-bit ARM8 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
+debarm: notifiarr_$(VERSION)-$(ITERATION)_arm64.deb
+notifiarr_$(VERSION)-$(ITERATION)_arm64.deb: package_build_linux_arm64_deb check_fpm
+	@echo "Building 64-bit ARM8 'deb' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a arm64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_arm64.deb
+	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin notifiarr_$(VERSION)-$(ITERATION)_arm64.deb
 
-rpmarmhf: $(BINARY)-$(RPMVERSION)-$(ITERATION).armhf.rpm
-$(BINARY)-$(RPMVERSION)-$(ITERATION).armhf.rpm: package_build_linux_armhf_rpm check_fpm
-	@echo "Building 32-bit ARM6/7 HF 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
+rpmarmhf: notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm
+notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm: package_build_linux_armhf_rpm check_fpm
+	@echo "Building 32-bit ARM6/7 HF 'rpm' package for notifiarr version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a armhf -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).armhf.rpm
+	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm
 
-debarmhf: $(BINARY)_$(VERSION)-$(ITERATION)_armhf.deb
-$(BINARY)_$(VERSION)-$(ITERATION)_armhf.deb: package_build_linux_armhf_deb check_fpm
-	@echo "Building 32-bit ARM6/7 HF 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
+debarmhf: notifiarr_$(VERSION)-$(ITERATION)_armhf.deb
+notifiarr_$(VERSION)-$(ITERATION)_armhf.deb: package_build_linux_armhf_deb check_fpm
+	@echo "Building 32-bit ARM6/7 HF 'deb' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_armhf.deb
+	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin notifiarr_$(VERSION)-$(ITERATION)_armhf.deb
 
-freebsd_pkg: $(BINARY)-$(VERSION)_$(ITERATION).amd64.txz
-$(BINARY)-$(VERSION)_$(ITERATION).amd64.txz: package_build_freebsd check_fpm
-	@echo "Building 'freebsd pkg' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
-	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a amd64 -v $(VERSION) -p $(BINARY)-$(VERSION)_$(ITERATION).amd64.txz -C $< $(EXTRA_FPM_FLAGS)
+freebsd_pkg: notifiarr-$(VERSION)_$(ITERATION).amd64.txz
+notifiarr-$(VERSION)_$(ITERATION).amd64.txz: package_build_freebsd check_fpm
+	@echo "Building 'freebsd pkg' package for notifiarr version '$(VERSION)-$(ITERATION)'."
+	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a amd64 -v $(VERSION) -p notifiarr-$(VERSION)_$(ITERATION).amd64.txz -C $< $(EXTRA_FPM_FLAGS)
 
-freebsd386_pkg: $(BINARY)-$(VERSION)_$(ITERATION).i386.txz
-$(BINARY)-$(VERSION)_$(ITERATION).i386.txz: package_build_freebsd_386 check_fpm
-	@echo "Building 32-bit 'freebsd pkg' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
-	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a 386 -v $(VERSION) -p $(BINARY)-$(VERSION)_$(ITERATION).i386.txz -C $< $(EXTRA_FPM_FLAGS)
+freebsd386_pkg: notifiarr-$(VERSION)_$(ITERATION).i386.txz
+notifiarr-$(VERSION)_$(ITERATION).i386.txz: package_build_freebsd_386 check_fpm
+	@echo "Building 32-bit 'freebsd pkg' package for notifiarr version '$(VERSION)-$(ITERATION)'."
+	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a 386 -v $(VERSION) -p notifiarr-$(VERSION)_$(ITERATION).i386.txz -C $< $(EXTRA_FPM_FLAGS)
 
-freebsdarm_pkg: $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz
-$(BINARY)-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
-	@echo "Building 32-bit ARM6/7 HF 'freebsd pkg' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
-	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
+freebsdarm_pkg: notifiarr-$(VERSION)_$(ITERATION).armhf.txz
+notifiarr-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
+	@echo "Building 32-bit ARM6/7 HF 'freebsd pkg' package for notifiarr version '$(VERSION)-$(ITERATION)'."
+	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p notifiarr-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
 
 # Build an environment that can be packaged for linux.
-package_build_linux_rpm: readme man before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
+package_build_linux_rpm: readme man notifiarr.service linux
 	# Building package environment for linux.
-	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY) $@/var/log/$(BINARY)
+	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
-	cp $(BINARY).amd64.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
 	cp *.1.gz $@/usr/share/man/man1
-	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/
-	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/$(CONFIG_FILE)
-	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/$(BINARY)/
-	[ "$(FORMULA)" != "service" ] || mkdir -p $@/lib/systemd/system
-	[ "$(FORMULA)" != "service" ] || cp $(BINARY).service $@/lib/systemd/system/
+	cp examples/notifiarr.conf.example $@/etc/notifiarr/
+	cp examples/notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
+	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
+	mkdir -p $@/lib/systemd/system
+	cp notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
 
 # Build an environment that can be packaged for linux.
-package_build_linux_deb: readme man before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
+package_build_linux_deb: readme man before-install-rendered.sh notifiarr.service linux
 	# Building package environment for linux.
-	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY) $@/var/log/$(BINARY)
+	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
-	cp $(BINARY).amd64.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
 	cp *.1.gz $@/usr/share/man/man1
-	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/
-	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/$(CONFIG_FILE)
-	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/$(BINARY)/
-	[ "$(FORMULA)" != "service" ] || mkdir -p $@/lib/systemd/system
-	[ "$(FORMULA)" != "service" ] || cp $(BINARY).service $@/lib/systemd/system/
+	cp examples/notifiarr.conf.example $@/etc/notifiarr/
+	cp examples/notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
+	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
+	mkdir -p $@/lib/systemd/system
+	cp notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/deb" ] || cp -r init/linux/deb/* $@
 
-$(BINARY).service:
-	[ "$(FORMULA)" != "service" ] || \
-		sed -e "s/{{BINARY}}/$(BINARY)/g" -e "s/{{DESC}}/$(DESC)/g" \
-		init/systemd/template.unit.service > $(BINARY).service
-
-after-install-rendered.sh:
-	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/after-install.sh > after-install-rendered.sh
-
-before-install-rendered.sh:
-	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/before-install.sh > before-install-rendered.sh
-
-before-remove-rendered.sh:
-	sed -e "s/{{BINARY}}/$(BINARY)/g" scripts/before-remove.sh > before-remove-rendered.sh
-
-# This is used for arch linux
-$(BINARY).aur.install:
-	echo "post_upgrade() {" >> $@
-	echo "  /bin/systemctl restart $(BINARY)" >> $@
-	echo "}" >> $@
-	echo "" >> $@
-	echo "pre_remove() {" >> $@
-	echo "  /bin/systemctl stop $(BINARY)" >> $@
-	echo "  /bin/systemctl disable $(BINARY)" >> $@
-	echo "}" >> $@
+notifiarr.service:
+	sed -e "s/{{BINARY}}/notifiarr/g" -e "s/{{DESC}}/$(DESC)/g" \
+		init/systemd/template.unit.service > notifiarr.service
 
 package_build_linux_386_deb: package_build_linux_deb linux386
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).386.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.386.linux $@/usr/bin/notifiarr
 
 package_build_linux_arm64_deb: package_build_linux_deb arm64
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).arm64.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.arm64.linux $@/usr/bin/notifiarr
 
 package_build_linux_armhf_deb: package_build_linux_deb armhf
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).arm.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.arm.linux $@/usr/bin/notifiarr
 
 package_build_linux_386_rpm: package_build_linux_rpm linux386
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).386.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.386.linux $@/usr/bin/notifiarr
 
 package_build_linux_arm64_rpm: package_build_linux_rpm arm64
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).arm64.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.arm64.linux $@/usr/bin/notifiarr
 
 package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).arm.linux $@/usr/bin/$(BINARY)
+	cp notifiarr.arm.linux $@/usr/bin/notifiarr
 
 # Build an environment that can be packaged for freebsd.
-package_build_freebsd: readme man before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh freebsd
-	mkdir -p $@/usr/local/bin $@/usr/local/etc/$(BINARY) $@/usr/local/share/man/man1 $@/usr/local/share/doc/$(BINARY) $@/usr/local/var/log/$(BINARY)
-	cp $(BINARY).amd64.freebsd $@/usr/local/bin/$(BINARY)
+package_build_freebsd: readme man freebsd
+	mkdir -p $@/usr/local/bin $@/usr/local/etc/notifiarr $@/usr/local/share/man/man1 $@/usr/local/share/doc/notifiarr $@/usr/local/var/log/notifiarr
+	cp notifiarr.amd64.freebsd $@/usr/local/bin/notifiarr
 	cp *.1.gz $@/usr/local/share/man/man1
-	cp examples/$(CONFIG_FILE).example $@/usr/local/etc/$(BINARY)/
-	cp examples/$(CONFIG_FILE).example $@/usr/local/etc/$(BINARY)/$(CONFIG_FILE)
-	cp LICENSE *.html examples/*?.?* $@/usr/local/share/doc/$(BINARY)/
+	cp examples/notifiarr.conf.example $@/usr/local/etc/notifiarr/
+	cp examples/notifiarr.conf.example $@/usr/local/etc/notifiarr/notifiarr.conf
+	cp LICENSE *.html examples/*?.?* $@/usr/local/share/doc/notifiarr/
 	[ "$(FORMULA)" != "service" ] || mkdir -p $@/usr/local/etc/rc.d
 	[ "$(FORMULA)" != "service" ] || \
-			sed -e "s/{{BINARY}}/$(BINARY)/g" -e "s/{{BINARYU}}/$(BINARYU)/g" -e "s/{{CONFIG_FILE}}/$(CONFIG_FILE)/g" \
-			init/bsd/freebsd.rc.d > $@/usr/local/etc/rc.d/$(BINARY)
-	[ "$(FORMULA)" != "service" ] || chmod +x $@/usr/local/etc/rc.d/$(BINARY)
+			sed -e "s/{{BINARY}}/notifiarr/g" -e "s/{{BINARYU}}/$(BINARYU)/g" -e "s/{{CONFIG_FILE}}/notifiarr.conf/g" \
+			init/bsd/freebsd.rc.d > $@/usr/local/etc/rc.d/notifiarr
+	[ "$(FORMULA)" != "service" ] || chmod +x $@/usr/local/etc/rc.d/notifiarr
 
 package_build_freebsd_386: package_build_freebsd freebsd386
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).i386.freebsd $@/usr/local/bin/$(BINARY)
+	cp notifiarr.i386.freebsd $@/usr/local/bin/notifiarr
 
 package_build_freebsd_arm: package_build_freebsd freebsdarm
 	mkdir -p $@
 	cp -r $</* $@/
-	cp $(BINARY).armhf.freebsd $@/usr/local/bin/$(BINARY)
+	cp notifiarr.armhf.freebsd $@/usr/local/bin/notifiarr
 
 check_fpm:
 	@fpm --version > /dev/null || (echo "FPM missing. Install FPM: https://fpm.readthedocs.io/en/latest/installing.html" && false)
@@ -424,76 +366,22 @@ lint: generate
 	GOOS=freebsd $(shell go env GOPATH)/bin/golangci-lint run
 	GOOS=windows $(shell go env GOPATH)/bin/golangci-lint run
 
-# Mockgen and bindata are examples.
-# Your `go generate` may require other tools; add them!
-
-mockgen: $(shell go env GOPATH)/bin/mockgen
-$(shell go env GOPATH)/bin/mockgen:
-	cd /tmp ; go install github.com/golang/mock/mockgen@latest
-
-swag: $(shell go env GOPATH)/bin/swag
-$(shell go env GOPATH)/bin/swag:
-	cd /tmp ; go install github.com/swaggo/swag/cmd/swag@v1.8.7
-
-bindata: $(shell go env GOPATH)/bin/go-bindata
-$(shell go env GOPATH)/bin/go-bindata:
-	cd /tmp ; go install github.com/kevinburke/go-bindata/...@latest
-
-#generate: mockgen bindata pkg/bindata/bindata.go
 generate: pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
-pkg/bindata/docs/api_docs.go: $(shell go env GOPATH)/bin/swag
+pkg/bindata/docs/api_docs.go: 
 	go generate ./pkg/bindata/docs
-pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/* $(shell go env GOPATH)/bin/go-bindata
+pkg/bindata/bindata.go: pkg/bindata/templates/* pkg/bindata/files/* pkg/bindata/files/*/* pkg/bindata/files/*/*/* pkg/bindata/files/*/*/*/*
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/
-
 
 ##################
 ##### Docker #####
 ##################
 
 docker:
-	docker buildx build --load --pull --tag $(BINARY) \
-		--platform linux/amd64 \
-		--build-arg "BUILD_DATE=$(DATE)" \
-		--build-arg "COMMIT=$(COMMIT)" \
-		--build-arg "BRANCH=$(BRANCH)" \
-		--build-arg "VERSION=$(VERSION)" \
-		--build-arg "ITERATION=$(ITERATION)" \
-		--build-arg "LICENSE=$(LICENSE)" \
-		--build-arg "DESC=$(DESC)" \
-		--build-arg "VENDOR=$(VENDOR)" \
-		--build-arg "AUTHOR=$(MAINT)" \
-		--build-arg "BINARY=$(BINARY)" \
-		--build-arg "SOURCE_URL=$(SOURCE_URL)" \
-		--file init/docker/Dockerfile .
-
-####################
-##### Homebrew #####
-####################
-
-# This builds a Homebrew formula file that can be used to install this app from source.
-# The source used comes from the released version on GitHub. This will not work with local source.
-# This target is used by Travis CI to update the released Formula when a new tag is created.
-formula: $(BINARY).rb
-v$(VERSION).tar.gz.sha256:
-	# Calculate the SHA from the Github source file.
-	curl -sL $(SOURCE_URL)/archive/v$(VERSION).tar.gz | openssl dgst -r -sha256 | tee $@
-$(BINARY).rb: v$(VERSION).tar.gz.sha256 init/homebrew/$(FORMULA).rb.tmpl
-	# Creating formula from template using sed.
-	sed -e "s/{{Version}}/$(VERSION)/g" \
-		-e "s/{{Iter}}/$(ITERATION)/g" \
-		-e "s/{{SHA256}}/$(shell head -c64 $<)/g" \
-		-e "s/{{Desc}}/$(DESC)/g" \
-		-e "s%{{SOURCE_URL}}%$(SOURCE_URL)%g" \
-		-e "s%{{SOURCE_PATH}}%$(SOURCE_PATH)%g" \
-		-e "s%{{CONFIG_FILE}}%$(CONFIG_FILE)%g" \
-		-e "s%{{Class}}%$(shell echo $(BINARY) | perl -pe 's/(?:\b|-)(\p{Ll})/\u$$1/g')%g" \
-		init/homebrew/$(FORMULA).rb.tmpl | tee $(BINARY).rb
-		# That perl line turns hello-world into HelloWorld, etc.
+	scripts/makedocker.sh
 
 # Used for Homebrew only. Other distros can create packages.
-install: man readme $(BINARY)
+install: man readme notifiarr
 	@echo -  Done Building  -
 	@echo -  Local installation with the Makefile is only supported on macOS.
 	@echo -  Otherwise, build and install a package: make rpm -or- make deb
@@ -501,9 +389,9 @@ install: man readme $(BINARY)
 	@[ "$(PREFIX)" != "" ] || (echo "Unable to continue, PREFIX not set. Use: make install PREFIX=/usr/local ETC=/usr/local/etc" && false)
 	@[ "$(ETC)" != "" ] || (echo "Unable to continue, ETC not set. Use: make install PREFIX=/usr/local ETC=/usr/local/etc" && false)
 	# Copying the binary, config file, unit file, and man page into the env.
-	/usr/bin/install -m 0755 -d $(PREFIX)/bin $(PREFIX)/share/man/man1 $(ETC)/$(BINARY) $(PREFIX)/share/doc/$(BINARY) $(PREFIX)/lib/$(BINARY)
-	/usr/bin/install -m 0755 -cp $(BINARY) $(PREFIX)/bin/$(BINARY)
-	/usr/bin/install -m 0644 -cp $(BINARY).1.gz $(PREFIX)/share/man/man1
-	/usr/bin/install -m 0644 -cp examples/$(CONFIG_FILE).example $(ETC)/$(BINARY)/
-	[ -f $(ETC)/$(BINARY)/$(CONFIG_FILE) ] || /usr/bin/install -m 0644 -cp  examples/$(CONFIG_FILE).example $(ETC)/$(BINARY)/$(CONFIG_FILE)
-	/usr/bin/install -m 0644 -cp LICENSE *.html examples/* $(PREFIX)/share/doc/$(BINARY)/
+	/usr/bin/install -m 0755 -d $(PREFIX)/bin $(PREFIX)/share/man/man1 $(ETC)/notifiarr $(PREFIX)/share/doc/notifiarr $(PREFIX)/lib/notifiarr
+	/usr/bin/install -m 0755 -cp notifiarr $(PREFIX)/bin/notifiarr
+	/usr/bin/install -m 0644 -cp notifiarr.1.gz $(PREFIX)/share/man/man1
+	/usr/bin/install -m 0644 -cp examples/notifiarr.conf.example $(ETC)/notifiarr/
+	[ -f $(ETC)/notifiarr/notifiarr.conf ] || /usr/bin/install -m 0644 -cp  examples/notifiarr.conf.example $(ETC)/notifiarr/notifiarr.conf
+	/usr/bin/install -m 0644 -cp LICENSE *.html examples/* $(PREFIX)/share/doc/notifiarr/
