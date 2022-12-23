@@ -22,7 +22,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          go generate ./...
+          PATH=$PATH:$(go env GOPATH)/bin go generate ./...
       - name: go-test
         run: |
           go test ./pkg/...
@@ -42,7 +42,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          go generate ./...
+          PATH=$PATH:$(go env GOPATH)/bin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -63,7 +63,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          go generate ./...
+          PATH=$PATH:$(go env GOPATH)/bin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -78,7 +78,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          go generate ./...
+          PATH=$PATH:$(go env GOPATH)/bin go generate ./...
       - name: make-install
         run: |
           TMP=$(mktemp -d)
@@ -98,7 +98,7 @@ jobs:
         run: |
           go install github.com/swaggo/swag/cmd/swag@v1.8.7
           go install github.com/kevinburke/go-bindata/...@latest
-          go generate ./...
+          PATH=$PATH:$(go env GOPATH)/bin go generate ./...
       - name: make-release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg
