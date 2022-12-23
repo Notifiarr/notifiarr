@@ -73,7 +73,7 @@ jobs:
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
   release-test:
     name: test-make-release
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v3
         with:
