@@ -70,7 +70,7 @@ all: clean build
 ####################
 
 # Prepare a release. Called in Travis CI.
-release: linux_packages freebsd_packages windows
+release: clean generate linux_packages freebsd_packages windows
 	# Prepareing a release!
 	mkdir -p $@
 	mv notifiarr.*.linux notifiarr.*.freebsd $@/
@@ -281,7 +281,7 @@ package_build_linux_rpm: readme man notifiarr.service linux
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
 
 # Build an environment that can be packaged for linux.
-package_build_linux_deb: readme man before-install-rendered.sh notifiarr.service linux
+package_build_linux_deb: readme man notifiarr.service linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
