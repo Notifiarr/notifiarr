@@ -125,3 +125,14 @@ jobs:
         with:
           name: test-release
           path: release
+  deploy-unstable:
+    needs: release-test
+    name: deploy-unstable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v2
+        with:
+          name: test-release          
+      - name: Show me the files
+        run: echo "${{ hashFiles('release/*') }}"
