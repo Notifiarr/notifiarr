@@ -16,7 +16,7 @@ jobs:
         os: [ubuntu, macos, windows]
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -38,7 +38,7 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -61,7 +61,7 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -78,7 +78,7 @@ jobs:
     name: test-homebrew-install
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -105,7 +105,7 @@ jobs:
     env:
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
         with:
           # we need the whole thing so we can count commits.
           fetch-depth: '0'
@@ -159,7 +159,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test-release
-      - uses: golift/packagecloud-upload@v1
+      - uses: golift/upload-packagecloud@v1
         with:
           repo: golift/unstable
           token: ${{ secrets.PACKAGECLOUD_TOKEN }}
