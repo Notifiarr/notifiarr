@@ -4,7 +4,8 @@ on:
     branches:
       - unstable
   pull_request:
-    types: [opened, reopened, edited]
+    branches:
+    - main
 permissions:
   contents: read
 jobs:
@@ -58,3 +59,33 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.48
+  homebrew-test:
+    name: test-homebrew-install
+    runs-on: macos-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - uses: actions/checkout@v3
+      - name: make-install
+        run: |
+          TMP=$(mktemp -d)
+          make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
+  release-test:
+    name: test-make-release
+    runs-on: ubuntu-latest
+    env:
+      GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: make-release
+        run: |
+          sudo apt install -y rpm fakeroot zip debsigs gnupg
+          sudo gem install --no-document fpm
+          echo "${GPG_SIGNING_KEY}" | gpg --import -
+          make release
