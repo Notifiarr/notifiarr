@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Used by CI/CD pipelines to upload unstable files to the unstable website.
+
 source settings.sh
 
 URL="https://unstable.notifiarr.app/upload.php"

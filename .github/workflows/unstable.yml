@@ -1,0 +1,17 @@
+name: build-and-push-unstable
+needs: release-test
+on:
+  push:
+    branches:
+      - unstable
+jobs:
+  deploy-unstable:
+    name: deploy-unstable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v2
+        with:
+          name: test-release          
+      - name: Show me the files
+        run: echo "${{ hashFiles('release/*') }}"

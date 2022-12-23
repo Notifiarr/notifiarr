@@ -120,5 +120,8 @@ jobs:
           go install github.com/akavel/rsrc@latest
           go install github.com/davidnewhall/md2roff@v0.0.1
           make release
-          echo "junk file:"
-          cat /tmp/.metadata.make
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-release
+          path: release
