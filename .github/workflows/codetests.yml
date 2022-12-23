@@ -8,14 +8,12 @@ on:
     - main
 permissions:
   contents: read
-env:
-  GOBIN: bin
 jobs:
   # Runs `go test` against 3 operating systems.
   gotest:
     strategy:
       matrix:
-        os: [macos, windows, ubuntu]
+        os: [ubuntu, macos, windows]
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3.1.0
@@ -34,7 +32,7 @@ jobs:
   golangci-darwin:
     strategy:
       matrix:
-        os: [darwin, freebsd]
+        os: [freebsd, darwin]
     name: golangci-lint
     runs-on: macos-latest
     env:
@@ -59,7 +57,7 @@ jobs:
   golangci-linux:
     strategy:
       matrix:
-        os: [windows, linux]
+        os: [linux, windows]
     name: golangci-lint
     runs-on: ubuntu-latest
     env:
