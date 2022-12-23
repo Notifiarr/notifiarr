@@ -56,8 +56,6 @@ $(PACKAGE_SCRIPTS) \
 --freebsd-origin "$(SOURCE_URL)"
 endef
 
-PLUGINS:=$(patsubst plugins/%/main.go,%,$(wildcard plugins/*/main.go))
-
 VERSION_LDFLAGS:= -X \"$(VERSION_PATH).Branch=$(BRANCH) ($(COMMIT))\" \
 	-X \"$(VERSION_PATH).BuildDate=$(DATE)\" \
 	-X \"$(VERSION_PATH).BuildUser=$(shell whoami)\" \
@@ -86,9 +84,9 @@ release: clean generate linux_packages freebsd_packages windows
 # DMG only makes a DMG file if MACAPP is set. Otherwise, it makes a gzipped binary for macOS.
 dmg: clean $(MACAPP).app
 	mkdir -p release
-	[ "$(MACAPP)" = "" ] || hdiutil create release/$(MACAPP)-unsigned.dmg -srcfolder $(MACAPP).app -ov
-	[ "$(MACAPP)" != "" ] || mv $(BINARY).*.macos release/
-	[ "$(MACAPP)" != "" ] || gzip -9r release/
+	[[ "$(MACAPP)" == "" ]] || hdiutil create release/$(MACAPP)-unsigned.dmg -srcfolder $(MACAPP).app -ov
+	[[ "$(MACAPP)" != "" ]] || mv $(BINARY).*.macos release/
+	[[ "$(MACAPP)" != "" ]] || gzip -9r release/
 	openssl dgst -r -sha256 release/* | sed 's#release/##' | tee release/macos_checksum.sha256.txt
 
 signdmg: $(MACAPP).app
@@ -246,49 +244,49 @@ rpm: $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm: package_build_linux_rpm check_fpm
 	@echo "Building 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a x86_64 -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
+	[[ "$(SIGNING_KEY)" == "" ]] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).x86_64.rpm
 
 deb: $(BINARY)_$(VERSION)-$(ITERATION)_amd64.deb
 $(BINARY)_$(VERSION)-$(ITERATION)_amd64.deb: package_build_linux_deb check_fpm
 	@echo "Building 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a amd64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_amd64.deb
+	[[ "$(SIGNING_KEY)" == "" ]] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_amd64.deb
 
 rpm386: $(BINARY)-$(RPMVERSION)-$(ITERATION).i386.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).i386.rpm: package_build_linux_386_rpm check_fpm
 	@echo "Building 32-bit 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a i386 -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).i386.rpm
+	[[ "$(SIGNING_KEY)" == "" ]] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).i386.rpm
 
 deb386: $(BINARY)_$(VERSION)-$(ITERATION)_i386.deb
 $(BINARY)_$(VERSION)-$(ITERATION)_i386.deb: package_build_linux_386_deb check_fpm
 	@echo "Building 32-bit 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a i386 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_i386.deb
+	[[ "$(SIGNING_KEY)" == "" ]] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_i386.deb
 
 rpmarm: $(BINARY)-$(RPMVERSION)-$(ITERATION).arm64.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).arm64.rpm: package_build_linux_arm64_rpm check_fpm
 	@echo "Building 64-bit ARM8 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a arm64 -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).arm64.rpm
+	[[ "$(SIGNING_KEY)" == "" ]] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).arm64.rpm
 
 debarm: $(BINARY)_$(VERSION)-$(ITERATION)_arm64.deb
 $(BINARY)_$(VERSION)-$(ITERATION)_arm64.deb: package_build_linux_arm64_deb check_fpm
 	@echo "Building 64-bit ARM8 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a arm64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_arm64.deb
+	[[ "$(SIGNING_KEY)" == "" ]] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_arm64.deb
 
 rpmarmhf: $(BINARY)-$(RPMVERSION)-$(ITERATION).armhf.rpm
 $(BINARY)-$(RPMVERSION)-$(ITERATION).armhf.rpm: package_build_linux_armhf_rpm check_fpm
 	@echo "Building 32-bit ARM6/7 HF 'rpm' package for $(BINARY) version '$(RPMVERSION)-$(ITERATION)'."
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a armhf -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).armhf.rpm
+	[[ "$(SIGNING_KEY)" == "" ]] || rpmsign --key-id=$(SIGNING_KEY) --resign $(BINARY)-$(RPMVERSION)-$(ITERATION).armhf.rpm
 
 debarmhf: $(BINARY)_$(VERSION)-$(ITERATION)_armhf.deb
 $(BINARY)_$(VERSION)-$(ITERATION)_armhf.deb: package_build_linux_armhf_deb check_fpm
 	@echo "Building 32-bit ARM6/7 HF 'deb' package for $(BINARY) version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" == "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_armhf.deb
+	[[ "$(SIGNING_KEY)" == "" ]] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin $(BINARY)_$(VERSION)-$(ITERATION)_armhf.deb
 
 freebsd_pkg: $(BINARY)-$(VERSION)_$(ITERATION).amd64.txz
 $(BINARY)-$(VERSION)_$(ITERATION).amd64.txz: package_build_freebsd check_fpm
@@ -306,39 +304,35 @@ $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
 	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p $(BINARY)-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
 
 # Build an environment that can be packaged for linux.
-package_build_linux_rpm: readme man plugins_linux_amd64 before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
+package_build_linux_rpm: readme man before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY) $@/var/log/$(BINARY)
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp $(BINARY).amd64.linux $@/usr/bin/$(BINARY)
 	cp *.1.gz $@/usr/share/man/man1
-	rm -f $@/usr/lib/$(BINARY)/*.so
-	[ ! -f *amd64.so ] || cp *amd64.so $@/usr/lib/$(BINARY)/
 	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/
 	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/$(CONFIG_FILE)
 	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/$(BINARY)/
-	[ "$(FORMULA)" != "service" ] || mkdir -p $@/lib/systemd/system
-	[ "$(FORMULA)" != "service" ] || cp $(BINARY).service $@/lib/systemd/system/
+	[[ "$(FORMULA)" != "service" ]] || mkdir -p $@/lib/systemd/system
+	[[ "$(FORMULA)" != "service" ]] || cp $(BINARY).service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
 
 # Build an environment that can be packaged for linux.
-package_build_linux_deb: readme man plugins_linux_amd64 before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
+package_build_linux_deb: readme man before-install-rendered.sh after-install-rendered.sh before-remove-rendered.sh $(BINARY).service linux
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/$(BINARY) $@/usr/share/man/man1 $@/usr/share/doc/$(BINARY) $@/usr/lib/$(BINARY) $@/var/log/$(BINARY)
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp $(BINARY).amd64.linux $@/usr/bin/$(BINARY)
 	cp *.1.gz $@/usr/share/man/man1
-	rm -f $@/usr/lib/$(BINARY)/*.so
-	[ ! -f *amd64.so ] || cp *amd64.so $@/usr/lib/$(BINARY)/
 	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/
 	cp examples/$(CONFIG_FILE).example $@/etc/$(BINARY)/$(CONFIG_FILE)
 	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/$(BINARY)/
-	[ "$(FORMULA)" != "service" ] || mkdir -p $@/lib/systemd/system
-	[ "$(FORMULA)" != "service" ] || cp $(BINARY).service $@/lib/systemd/system/
+	[[ "$(FORMULA)" != "service" ]] || mkdir -p $@/lib/systemd/system
+	[[ "$(FORMULA)" != "service" ]] || cp $(BINARY).service $@/lib/systemd/system/
 	[ ! -d "init/linux/deb" ] || cp -r init/linux/deb/* $@
 
 $(BINARY).service:
-	[ "$(FORMULA)" != "service" ] || \
+	[[ "$(FORMULA)" != "service" ]] || \
 		sed -e "s/{{BINARY}}/$(BINARY)/g" -e "s/{{DESC}}/$(DESC)/g" \
 		init/systemd/template.unit.service > $(BINARY).service
 
@@ -365,36 +359,31 @@ $(BINARY).aur.install:
 package_build_linux_386_deb: package_build_linux_deb linux386
 	mkdir -p $@
 	cp -r $</* $@/
-	[ ! -f *386.so ] || cp *386.so $@/usr/lib/$(BINARY)/
 	cp $(BINARY).386.linux $@/usr/bin/$(BINARY)
 
 package_build_linux_arm64_deb: package_build_linux_deb arm64
 	mkdir -p $@
 	cp -r $</* $@/
-	[ ! -f *arm64.so ] || cp *arm64.so $@/usr/lib/$(BINARY)/
 	cp $(BINARY).arm64.linux $@/usr/bin/$(BINARY)
 
 package_build_linux_armhf_deb: package_build_linux_deb armhf
 	mkdir -p $@
 	cp -r $</* $@/
-	[ ! -f *armhf.so ] || cp *armhf.so $@/usr/lib/$(BINARY)/
 	cp $(BINARY).arm.linux $@/usr/bin/$(BINARY)
+
 package_build_linux_386_rpm: package_build_linux_rpm linux386
 	mkdir -p $@
 	cp -r $</* $@/
-	[ ! -f *386.so ] || cp *386.so $@/usr/lib/$(BINARY)/
 	cp $(BINARY).386.linux $@/usr/bin/$(BINARY)
 
 package_build_linux_arm64_rpm: package_build_linux_rpm arm64
 	mkdir -p $@
 	cp -r $</* $@/
-	[ ! -f *arm64.so ] || cp *arm64.so $@/usr/lib/$(BINARY)/
 	cp $(BINARY).arm64.linux $@/usr/bin/$(BINARY)
 
 package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 	mkdir -p $@
 	cp -r $</* $@/
-	[ ! -f *armhf.so ] || cp *armhf.so $@/usr/lib/$(BINARY)/
 	cp $(BINARY).arm.linux $@/usr/bin/$(BINARY)
 
 # Build an environment that can be packaged for freebsd.
@@ -405,11 +394,11 @@ package_build_freebsd: readme man before-install-rendered.sh after-install-rende
 	cp examples/$(CONFIG_FILE).example $@/usr/local/etc/$(BINARY)/
 	cp examples/$(CONFIG_FILE).example $@/usr/local/etc/$(BINARY)/$(CONFIG_FILE)
 	cp LICENSE *.html examples/*?.?* $@/usr/local/share/doc/$(BINARY)/
-	[ "$(FORMULA)" != "service" ] || mkdir -p $@/usr/local/etc/rc.d
-	[ "$(FORMULA)" != "service" ] || \
+	[[ "$(FORMULA)" != "service" ]] || mkdir -p $@/usr/local/etc/rc.d
+	[[ "$(FORMULA)" != "service" ]] || \
 			sed -e "s/{{BINARY}}/$(BINARY)/g" -e "s/{{BINARYU}}/$(BINARYU)/g" -e "s/{{CONFIG_FILE}}/$(CONFIG_FILE)/g" \
 			init/bsd/freebsd.rc.d > $@/usr/local/etc/rc.d/$(BINARY)
-	[ "$(FORMULA)" != "service" ] || chmod +x $@/usr/local/etc/rc.d/$(BINARY)
+	[[ "$(FORMULA)" != "service" ]] || chmod +x $@/usr/local/etc/rc.d/$(BINARY)
 
 package_build_freebsd_386: package_build_freebsd freebsd386
 	mkdir -p $@
@@ -423,23 +412,6 @@ package_build_freebsd_arm: package_build_freebsd freebsdarm
 
 check_fpm:
 	@fpm --version > /dev/null || (echo "FPM missing. Install FPM: https://fpm.readthedocs.io/en/latest/installing.html" && false)
-
-##################
-##### Extras #####
-##################
-
-plugins: $(patsubst %,%.so,$(PLUGINS))
-$(patsubst %,%.so,$(PLUGINS)):
-	go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.so,%,$@)
-
-linux_plugins: plugins_linux_amd64 plugins_linux_i386 plugins_linux_arm64 plugins_linux_armhf
-plugins_linux_amd64: $(patsubst %,%.linux_amd64.so,$(PLUGINS))
-$(patsubst %,%.linux_amd64.so,$(PLUGINS)):
-	GOOS=linux GOARCH=amd64 go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.linux_amd64.so,%,$@)
-
-plugins_darwin: $(patsubst %,%.darwin.so,$(PLUGINS))
-$(patsubst %,%.darwin.so,$(PLUGINS)):
-	GOOS=darwin go build -o $@ -ldflags "$(VERSION_LDFLAGS)" -buildmode=plugin ./plugins/$(patsubst %.darwin.so,%,$@)
 
 # Run code tests and lint.
 test: generate lint
@@ -521,7 +493,7 @@ $(BINARY).rb: v$(VERSION).tar.gz.sha256 init/homebrew/$(FORMULA).rb.tmpl
 		# That perl line turns hello-world into HelloWorld, etc.
 
 # Used for Homebrew only. Other distros can create packages.
-install: man readme $(BINARY) plugins_darwin
+install: man readme $(BINARY)
 	@echo -  Done Building  -
 	@echo -  Local installation with the Makefile is only supported on macOS.
 	@echo -  Otherwise, build and install a package: make rpm -or- make deb
