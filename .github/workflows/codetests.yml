@@ -83,10 +83,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: make-release
         run: |
-          sudo apt update
           sudo apt install -y rpm fakeroot zip debsigs gnupg
           sudo gem install --no-document fpm -v 1.11.0
-          echo $GPG_SIGNING_KEY > gpg.signing.key
+          echo "${GPG_SIGNING_KEY}" > gpg.signing.key
           ls -l gpg.signing.key
           gpg --import gpg.signing.key
           make release
