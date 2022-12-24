@@ -154,12 +154,12 @@ jobs:
           name: test-release
       - name: Upload files to unstable.notifiarr.app
         run: >-
-        for file in *.{zip,dmg,gz}; do
-          echo "Uploading: ${file}"
-          curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.notifiarr.app/upload.php" -F "file=@${file}"
-          versionfile="${{needs.release-test.outputs.version}};filename=${file}.txt;type=text/plain"
-          curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.notifiarr.app/upload.php" -F "file=${versionfile}"
-        done
+          for file in *.{zip,dmg,gz}; do
+            echo "Uploading: ${file}"
+            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.notifiarr.app/upload.php" -F "file=@${file}"
+            versionfile="${{needs.release-test.outputs.version}};filename=${file}.txt;type=text/plain"
+            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.notifiarr.app/upload.php" -F "file=${versionfile}"
+          done
 
   deploy-unstable-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
