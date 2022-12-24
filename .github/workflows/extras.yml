@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: hah
-      - run: echo "it works"
+        run: echo "it works"
 
   archlinux-aur:
     if: startsWith(github.ref, 'refs/tags/v') && ${{ github.event.workflow_run.conclusion == 'success' }}
