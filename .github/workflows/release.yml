@@ -174,7 +174,6 @@ jobs:
 
   archlinux-aur:
     # description: creates and uploads and aur file to the golift/aur repo for arch linux.
-    needs: deploy-github-release
     name: deploy-archilinux-aur
     runs-on: ubuntu-latest
     steps:
@@ -184,11 +183,10 @@ jobs:
       - name: deploy-aur
         run: bash init/archlinux/aur-deploy.sh
         env:
-          AUR_DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
+          DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
 
   homebrew-formula:
     # description: creates and uploads a homebrew formula file to the golift.homebrew-mugs repo.
-    needs: deploy-github-release
     name: deploy-homebrew-formula
     runs-on: ubuntu-latest
     steps:
@@ -198,4 +196,4 @@ jobs:
       - name: make-homebrew
         run: bash init/homebrew/formula-deploy.sh
         env:
-          HOMEBREW_DEPLOY_KEY: ${{ secrets.HOMEBREW_DEPLOY_KEY }}
+          DEPLOY_KEY: ${{ secrets.HOMEBREW_DEPLOY_KEY }}
