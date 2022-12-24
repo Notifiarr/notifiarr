@@ -10,12 +10,12 @@ echo "==> Using URL: $URL"
 SHA256=$(curl -sL $URL | openssl dgst -r -sha256 | awk '{print $1}')
 
 push_it() {
-  pushd aur_release_repo
-  git add notifiarr
+  pushd release_repo
+  git add .
   git commit -m "Update notifiarr on Release: v${VERSION}-${ITERATION}"
   git push
   popd
-  rm -rf aur_release_repo
+  rm -rf release_repo
 }
 
 # Make an id_rsa file with our secret.
@@ -35,9 +35,9 @@ printf "%s\n" \
 git config --global user.email "notifiarr@auto.releaser"
 git config --global user.name "notifiarr-auto-releaser"
 
-rm -rf aur_release_repo
-git clone git@${GITHUB_HOST}:golift/aur.git aur_release_repo
-mkdir -p aur_release_repo/notifiarr
+rm -rf release_repo
+git clone git@${GITHUB_HOST}:golift/aur.git release_repo
+mkdir -p release_repo/notifiarr
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
@@ -45,7 +45,7 @@ sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
     -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    init/archlinux/PKGBUILD.template | tee aur_release_repo/notifiarr/PKGBUILD
+    init/archlinux/PKGBUILD.template | tee release_repo/notifiarr/PKGBUILD
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
@@ -53,9 +53,9 @@ sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
     -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    init/archlinux/SRCINFO.template | tee aur_release_repo/notifiarr/.SRCINFO
+    init/archlinux/SRCINFO.template | tee release_repo/notifiarr/.SRCINFO
 
-tee aur_release_repo/notifiarr/notifiarr.aur.install << EOF
+tee release_repo/notifiarr/notifiarr.aur.install << EOF
 post_upgrade() {
   /bin/systemctl restart notifiarr
 }

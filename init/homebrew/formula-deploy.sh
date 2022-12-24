@@ -10,12 +10,12 @@ echo "==> Using URL: $URL"
 SHA256=$(curl -sL $URL | openssl dgst -r -sha256 | awk '{print $1}')
 
 push_it() {
-  pushd homebrew_release_repo
-  git add Formula/notifiarr.rb
+  pushd release_repo
+  git add .
   git commit -m "Update notifiarr on Release: v${VERSION}-${ITERATION}"
   git push
   popd
-  rm -rf homebrew_release_repo
+  rm -rf release_repo
 }
 
 # Make an id_rsa file with our secret.
@@ -35,9 +35,9 @@ printf "%s\n" \
 git config --global user.email "notifiarr@auto.releaser"
 git config --global user.name "notifiarr-auto-releaser"
 
-rm -rf homebrew_release_repo
-git clone git@${GITHUB_HOST}:golift/homebrew-mugs.git homebrew_release_repo
-mkdir -p homebrew_release_repo/Formula
+rm -rf release_repo
+git clone git@${GITHUB_HOST}:golift/homebrew-mugs.git release_repo
+mkdir -p release_repo/Formula
 
 # Creating formula from template using sed.
 sed -e "s/{{Version}}/${VERSION}/g" \
@@ -46,6 +46,6 @@ sed -e "s/{{Version}}/${VERSION}/g" \
   -e "s/{{Desc}}/${DESC}/g" \
   -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
   -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-  init/homebrew/service.rb.tmpl | tee homebrew_release_repo/Formula/notifiarr.rb
+  init/homebrew/service.rb.tmpl | tee release_repo/Formula/notifiarr.rb
 
 push_it
