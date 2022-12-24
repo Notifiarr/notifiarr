@@ -9,6 +9,8 @@ on:
   pull_request:
     branches:
     - main
+    - unstable
+    - development
 permissions:
   contents: read
 jobs:
@@ -104,6 +106,7 @@ jobs:
 
   macapp-test:
     # description: "Builds and signs a macOS app then packages it in a notarized DMG."
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable'
     outputs:
       packages: ${{ steps.release.outputs.packages }}
     name: test-make-signdmg
@@ -139,10 +142,8 @@ jobs:
 
   release-test:
     # description: "Builds all the Notifiarr client binaries and packages for a release."
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable' || github.ref == 'refs/heads/main'
     outputs:
-      packages: ${{ steps.release.outputs.packages }}
-      allfiles: ${{ steps.release.outputs.allfiles }}
-      zips: ${{ steps.release.outputs.zips }}
       version: ${{ steps.release.outputs.version }}
     name: test-make-release
     runs-on: ubuntu-latest
@@ -170,9 +171,6 @@ jobs:
           go install github.com/akavel/rsrc@latest
           go install github.com/davidnewhall/md2roff@v0.0.1
           make release
-          echo "allfiles=$(ls release/* | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
-          echo "packages=$(ls release/*.{deb,rpm} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
-          echo "zips=$(ls release/*.{gz,zip} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
           source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
       - name: upload artifacts
         uses: actions/upload-artifact@v3
