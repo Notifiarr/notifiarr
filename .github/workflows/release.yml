@@ -94,7 +94,7 @@ jobs:
     needs:
       - release-test
       - macapp-test
-    name: deploy-unstable
+    name: Deploy Unstable.app
     runs-on: ubuntu-latest
     steps:
       - name: "Download files: ${{ matrix.files }}"
@@ -115,7 +115,7 @@ jobs:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     if: github.ref == 'refs/heads/unstable'
     needs: release-test
-    name: deploy-unstable-packagecloud
+    name: Deploy Unstable PackageCloud
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
@@ -134,7 +134,7 @@ jobs:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     if: startsWith(github.ref, 'refs/tags/v')
     needs: release-test
-    name: deploy-release-packagecloud
+    name: Deploy Release PackageCloud
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
@@ -150,6 +150,7 @@ jobs:
           debdists: ubuntu/focal
 
   deploy-github-release:
+    # description: uploads all the built release assets to the GitHub Release.
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
@@ -157,10 +158,10 @@ jobs:
     strategy:
       matrix:
         files: [release, dmg-release]
-    name: deploy-github-release
+    name: Deploy GitHub Release
     runs-on: ubuntu-latest
     steps:
-      - name: Download ${{ matrix.files }} files
+      - name: Download ${{ matrix.files }} Files
         uses: actions/download-artifact@v2
         with:
           name: ${{ matrix.files }}
@@ -172,7 +173,7 @@ jobs:
   archlinux-aur:
     # description: creates and uploads and aur file to the golift/aur repo for arch linux.
     needs: deploy-github-release
-    name: deploy-archilinux-aur
+    name: Deploy ArchLinux AUR
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -184,9 +185,9 @@ jobs:
           DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
 
   homebrew-formula:
-    # description: creates and uploads a homebrew formula file to the golift.homebrew-mugs repo.
+    # description: creates and uploads a homebrew formula file to the golift/homebrew-mugs repo.
     needs: deploy-github-release
-    name: deploy-homebrew-formula
+    name: Deploy Homebrew Formula
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
