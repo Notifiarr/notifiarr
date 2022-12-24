@@ -1,7 +1,5 @@
 name: build-and-release
 on:
-  workflow_run:
-    workflows: ["test-and-lint"]
   push:
     branches:
       - unstable
@@ -137,7 +135,7 @@ jobs:
 
   deploy-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
-   if: startsWith(github.ref, 'refs/tags/v')
+    ßif: startsWith(github.ref, 'refs/tags/v')
     needs: release-test
     name: deploy-unstable-packagecloud
     runs-on: ubuntu-latest
