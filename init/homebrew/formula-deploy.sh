@@ -16,8 +16,6 @@ sed -e "s/{{Version}}/${VERSION}/g" \
   -e "s/{{Desc}}/${DESC}/g" \
   -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
   -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-  -e "s%{{CONFIG_FILE}}%${CONFIG_FILE}%g" \
-  -e "s%{{Class}}%Notifiarr%g" \
   init/homebrew/service.rb.tmpl | tee notifiarr.rb
 
 HB_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"

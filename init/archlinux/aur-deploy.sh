@@ -15,20 +15,16 @@ sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
     -e "s/{{SHA256}}/${SHA256}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
-    -e "s%{{BINARY}}%notifiarr%g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
     -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    -e "s%{{CONFIG_FILE}}%${CONFIG_FILE}%g" \
     init/archlinux/PKGBUILD.template > aur/PKGBUILD
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
     -e "s/{{SHA256}}/${SHA256}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
-    -e "s%{{BINARY}}%notifiarr%g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
     -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    -e "s%{{CONFIG_FILE}}%${CONFIG_FILE}%g" \
     init/archlinux/SRCINFO.template > aur/.SRCINFO
 
 cat > aur/notifiarr.aur.install << EOF
