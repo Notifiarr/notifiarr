@@ -3,9 +3,12 @@ on:
   push:
     branches:
       - unstable
+      - main
   pull_request:
     branches:
     - main
+  tags:
+    - v*
 permissions:
   contents: read
 jobs:
