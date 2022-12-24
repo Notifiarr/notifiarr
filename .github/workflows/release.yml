@@ -130,7 +130,7 @@ jobs:
           userrepo: golift/unstable
           apitoken: ${{ secrets.PACKAGECLOUD_TOKEN }}
           packages: .
-          rpmdists: el/7
+          rpmdists: el/6
           debdists: ubuntu/focal
 
   deploy-packagecloud:
@@ -149,11 +149,13 @@ jobs:
           userrepo: golift/pkgs
           apitoken: ${{ secrets.PACKAGECLOUD_TOKEN }}
           packages: .
-          rpmdists: el/7
+          rpmdists: el/6
           debdists: ubuntu/focal
 
   deploy-github-release:
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     needs: [release-test, macapp-test]
     strategy:
       matrix:
@@ -166,9 +168,9 @@ jobs:
         with:
           name: ${{ matrix.files }}
       - name: Publish ${{ matrix.files }} artifacts to github
-        run: |
-          echo "publish stuff to github here."
-          ls
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "*.{rpm,deb,txz,zip,dmg,gz,txt}"
 
   archlinux-aur:
     # description: creates and uploads and aur file to the golift/aur repo for arch linux.
