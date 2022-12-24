@@ -158,7 +158,7 @@ jobs:
     strategy:
       matrix:
         files: [release, dmg-release]
-    name: deploy-release-packagecloud
+    name: deploy-github-release
     runs-on: ubuntu-latest
     steps:
       - name: Download ${{ matrix.files }} files
@@ -171,7 +171,7 @@ jobs:
           ls
 
   archlinux-aur:
-    needs: deploy-github-release
+    # description: creates and uploads and aur file to the golift/aur repo for arch linux.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -183,7 +183,7 @@ jobs:
           AUR_DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
 
   homebrew-formula:
-    needs: deploy-github-release
+    # description: creates and uploads a homebrew formula file to the golift.homebrew-mugs repo.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
