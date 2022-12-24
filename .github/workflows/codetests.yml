@@ -9,14 +9,14 @@ on:
 permissions:
   contents: read
 jobs:
-  # Runs `go test` against 3 operating systems.
   gotest:
+    # description: "Runs `go test` against 3 operating systems."
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -28,8 +28,9 @@ jobs:
       - name: go-test
         run: |
           go test ./pkg/...
-  # Runs golangci-lint on macos against freebsd and macos.
+
   golangci-darwin:
+    # description: "Runs golangci-lint on macos against freebsd and macos."
     strategy:
       matrix:
         os: [freebsd, darwin]
@@ -38,7 +39,7 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -51,8 +52,9 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.48
-  # Runs golangci-lint on linux against linux and windows.
+
   golangci-linux:
+    # description: "Runs golangci-lint on linux against linux and windows."
     strategy:
       matrix:
         os: [linux, windows]
@@ -61,7 +63,7 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -74,11 +76,13 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.48
+
   homebrew-test:
+    # description: "Installs dependencis on macOS and runs `make install` to mimic a homebrew install."
     name: test-homebrew-install
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
@@ -94,13 +98,55 @@ jobs:
           TMP=$(mktemp -d)
           go install github.com/davidnewhall/md2roff@v0.0.1
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
+
+  macapp-test:
+    # description: "Builds and signs a macOS app then packages it in a notarized DMG."
+    outputs:
+      packages: ${{ steps.release.outputs.packages }}
+    name: test-make-signdmg
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # we need the whole thing so we can count commits.
+          fetch-depth: '0'
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 'stable'
+      - name: go-generate
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@v1.8.7
+          go install github.com/kevinburke/go-bindata/...@latest
+          go generate ./...
+      - name: make-signdmg
+        env:
+          APPLE_SIGNING_KEY: ${{ secrets.APPLE_SIGNING_KEY }}
+          AC_USERNAME: ${{ secrets.AC_USERNAME }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+        id: release
+        run: |
+          brew install mitchellh/gon/gon jq
+          make signdmg
+          echo "packages=$(ls release/*.dmg | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-macos-release
+          path: release
+
   release-test:
+    # description: "Builds all the Notifiarr client binaries and packages for a release."
+    outputs:
+      packages: ${{ steps.release.outputs.packages }}
+      allfiles: ${{ steps.release.outputs.allfiles }}
+      zips: ${{ steps.release.outputs.zips }}
+      version: ${{ steps.release.outputs.version }}
     name: test-make-release
     runs-on: ubuntu-latest
     env:
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
         with:
           # we need the whole thing so we can count commits.
           fetch-depth: '0'
@@ -113,15 +159,63 @@ jobs:
           go install github.com/kevinburke/go-bindata/...@latest
           # make release will clean and generate so do not do it here.
       - name: make-release
+        id: release
         run: |
-          sudo apt install -y rpm fakeroot zip debsigs gnupg
+          sudo apt install -y rpm fakeroot zip debsigs gnupg jq 
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           go install github.com/akavel/rsrc@latest
           go install github.com/davidnewhall/md2roff@v0.0.1
           make release
+          echo "allfiles=$(ls release/* | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
+          echo "packages=$(ls release/*.{deb,rpm} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
+          echo "zips=$(ls release/*.{gz,zip} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
+          source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: test-release
           path: release
+
+  deploy-unstable-unstable:
+    # description: "Uploads pre-built binaries to unstable.notifiarr.app."
+    strategy:
+      matrix:
+        files: [test-release, test-macos-release]
+    needs:
+      - release-test
+      - macapp-test
+    name: deploy-unstable-unstable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.files }}
+      - name: Upload files to unstable.notifiarr.app
+        run: >-
+          for file in *.{zip,dmg,gz}; do
+            [ -f "$file" ] || continue;
+            echo "Uploading: ${file}";
+            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.notifiarr.app/upload.php" -F "file=@${file}";
+            versionfile="${{needs.release-test.outputs.version}};filename=${file}.txt;type=text/plain";
+            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.notifiarr.app/upload.php" -F "file=${versionfile}";
+          done
+
+  deploy-unstable-packagecloud:
+    # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
+    needs: release-test
+    name: deploy-unstable-packagecloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@v2
+        with:
+          name: test-release
+      - uses: golift/upload-packagecloud@v1
+        with:
+          userrepo: golift/unstable
+          apitoken: ${{ secrets.PACKAGECLOUD_TOKEN }}
+          packages: .
+          rpmdists: el/7
+          debdists: ubuntu/focal
