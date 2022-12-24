@@ -127,9 +127,7 @@ jobs:
         run: |
           brew install mitchellh/gon/gon jq
           make signdmg
-          echo "packages:."
           echo "packages=$(ls release/*.dmg | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
-          echo "end:."
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
