@@ -3,6 +3,8 @@
 # This only works on macOS.
 ###########################################
 
+set -e -o pipefail
+
 # If we are running in Travis, make a new keychain and import the certificate.
 if [ -n "$TRAVIS_OS_NAME" ] || [ -n "$APPLE_SIGNING_KEY" ]; then
   KEYCHAIN="ios-build.keychain"
