@@ -14,7 +14,7 @@ if [ -n "$TRAVIS_OS_NAME" ] || [ -n "$APPLE_SIGNING_KEY" ]; then
   if [ -f "apple.signing.key" ]; then
     security import apple.signing.key -P '' -f pkcs12 -k $KEYCHAIN -T /usr/bin/codesign
   else
-    echo "${APPLE_SIGNING_KEY}" | base64 -d | security import /dev/stdin -P '' -f pkcs12 -k $KEYCHAIN -T /usr/bin/codesign
+    echo "${APPLE_SIGNING_KEY}" | base64 -d | security import /dev/stdin -P '${AC_PASSWORD}' -f pkcs12 -k $KEYCHAIN -T /usr/bin/codesign
   fi
 
   echo "==> Unlocking keychain ${KEYCHAIN}"
@@ -40,4 +40,3 @@ echo "==> Notarizing DMG."
 gon init/macos/notarize.json
 
 echo "==> Finished."
-exit 0
