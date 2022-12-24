@@ -9,8 +9,8 @@ on:
 permissions:
   contents: read
 jobs:
-  # Runs `go test` against 3 operating systems.
   gotest:
+    description: "Runs `go test` against 3 operating systems."
     strategy:
       matrix:
         os: [ubuntu, macos, windows]
@@ -28,8 +28,9 @@ jobs:
       - name: go-test
         run: |
           go test ./pkg/...
-  # Runs golangci-lint on macos against freebsd and macos.
+
   golangci-darwin:
+    description: "Runs golangci-lint on macos against freebsd and macos."
     strategy:
       matrix:
         os: [freebsd, darwin]
@@ -51,8 +52,9 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.48
-  # Runs golangci-lint on linux against linux and windows.
+
   golangci-linux:
+    description: "Runs golangci-lint on linux against linux and windows."
     strategy:
       matrix:
         os: [linux, windows]
@@ -74,7 +76,9 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.48
+
   homebrew-test:
+    description: "Installs dependencis on macOS and runs `make install` to mimic a homebrew install."
     name: test-homebrew-install
     runs-on: macos-latest
     steps:
@@ -94,7 +98,9 @@ jobs:
           TMP=$(mktemp -d)
           go install github.com/davidnewhall/md2roff@v0.0.1
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
+
   release-test:
+    description: "Builds all the Notifiarr client binaries and packages for a release."
     outputs:
       packages: ${{ steps.release.outputs.packages }}
       allfiles: ${{ steps.release.outputs.allfiles }}
@@ -135,7 +141,9 @@ jobs:
         with:
           name: test-release
           path: release
+
   deploy-unstable-unstable:
+    description: "Uploads pre-built binaries to unstable.notifiarr.app."
     needs: release-test
     name: deploy-unstable-unstable
     runs-on: ubuntu-latest
@@ -150,7 +158,9 @@ jobs:
           echo ${{needs.release-test.outputs.version}}
           ls
           pwd
+
   deploy-unstable-packagecloud:
+    description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     needs: release-test
     name: deploy-unstable-packagecloud
     runs-on: ubuntu-latest
@@ -159,7 +169,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test-release
-      - uses: golift/upload-packagecloud@v1-beta
+      - uses: golift/upload-packagecloud@v1
         with:
           userrepo: golift/unstable
           apitoken: ${{ secrets.PACKAGECLOUD_TOKEN }}
