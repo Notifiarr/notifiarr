@@ -172,6 +172,7 @@ jobs:
 
   archlinux-aur:
     # description: creates and uploads and aur file to the golift/aur repo for arch linux.
+    needs: deploy-github-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -184,6 +185,7 @@ jobs:
 
   homebrew-formula:
     # description: creates and uploads a homebrew formula file to the golift.homebrew-mugs repo.
+    needs: deploy-github-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
