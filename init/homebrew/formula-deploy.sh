@@ -7,7 +7,7 @@
 
 source settings.sh
 
-SHA256=$(curl -sL https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz | openssl dgst -r -sha256)
+SHA256=$(curl -sL https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz | openssl dgst -r -sha256 | awk '{print $1}')
 
 # Creating formula from template using sed.
 sed -e "s/{{Version}}/${VERSION}/g" \
