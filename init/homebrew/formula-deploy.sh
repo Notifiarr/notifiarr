@@ -27,7 +27,7 @@ printf "%s\n" \
   "  HostName github.com" \
   "  IdentityFile ${HB_FILE}" \
   "  StrictHostKeyChecking no" \
-  "  LogLevel ERROR" >> $HOME/.ssh/config
+  "  LogLevel ERROR" | tee -a $HOME/.ssh/config
 
 git config --global user.email "notifiarr@auto.releaser"
 git config --global user.name "notifiarr-auto-releaser"
@@ -41,3 +41,5 @@ git add Formula/notifiarr.rb
 git commit -m "Update notifiarr on Release: v${VERSION}-${ITERATION}"
 git push
 popd
+
+rm -rf homebrew_release_repo

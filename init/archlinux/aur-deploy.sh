@@ -17,7 +17,7 @@ sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
     -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    init/archlinux/PKGBUILD.template > aur/PKGBUILD
+    init/archlinux/PKGBUILD.template | tee aur/PKGBUILD
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
@@ -25,9 +25,9 @@ sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
     -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    init/archlinux/SRCINFO.template > aur/.SRCINFO
+    init/archlinux/SRCINFO.template | tee aur/.SRCINFO
 
-cat > aur/notifiarr.aur.install << EOF
+tee aur/notifiarr.aur.install << EOF
 post_upgrade() {
   /bin/systemctl restart notifiarr
 }
@@ -46,7 +46,7 @@ printf "%s\n" \
   "  HostName github.com" \
   "  IdentityFile ${AU_FILE}" \
   "  StrictHostKeyChecking no" \
-  "  LogLevel ERROR" >> $HOME/.ssh/config
+  "  LogLevel ERROR" | tee -a $HOME/.ssh/config
 
 git config --global user.email "notifiarr@auto.releaser"
 git config --global user.name "notifiarr-auto-releaser"
