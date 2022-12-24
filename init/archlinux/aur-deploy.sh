@@ -9,7 +9,7 @@ source settings.sh
 
 mkdir aur
 
-SHA256=$(curl -sL https://github.com/Notifiarr/notifiarr/archive/v$(VERSION).tar.gz | openssl dgst -r -sha256)
+SHA256=$(curl -sL https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz | openssl dgst -r -sha256)
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
