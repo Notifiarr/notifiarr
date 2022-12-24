@@ -41,6 +41,16 @@ pre_remove() {
 }
 EOF
 
+AU_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
+echo "${AUR_DEPLOY_KEY}" > "${AU_FILE}"
+chmod 600 "${AU_FILE}"
+printf "%s\n" \
+  "Host github.com-aurepo" \
+  "  HostName github.com" \
+  "  IdentityFile ${AU_FILE}" \
+  "  StrictHostKeyChecking no" \
+  "  LogLevel ERROR" >> $HOME/.ssh/config
+
 git config --global user.email "notifiarr@auto.releaser"
 git config --global user.name "notifiarr-auto-releaser"
 
