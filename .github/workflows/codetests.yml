@@ -1,5 +1,5 @@
 name: test-and-lint
-on: [push]
+on: push
 permissions:
   contents: read
 jobs:
