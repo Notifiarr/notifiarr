@@ -127,7 +127,8 @@ jobs:
         id: release
         run: |
           brew install mitchellh/gon/gon
-          make signdmg
+          make Notifiarr.app
+          bash init/macos/makedmg.sh
           source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
           echo "packages=$(ls release/*.{dmg} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
       - name: upload artifacts

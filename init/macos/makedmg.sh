@@ -38,3 +38,4 @@ hdiutil create release/Notifiarr.dmg -srcfolder Notifiarr.app -ov
 
 echo "Notarizing DMG."
 gon init/macos/notarize.json || echo "Ignored an error from notarization."
+exit 0
