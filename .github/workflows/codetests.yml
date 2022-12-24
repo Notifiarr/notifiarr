@@ -135,6 +135,7 @@ jobs:
         with:
           name: test-macos-release
           path: release
+
   release-test:
     # description: "Builds all the Notifiarr client binaries and packages for a release."
     outputs:

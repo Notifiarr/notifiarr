@@ -30,11 +30,11 @@ if [ -n "$TRAVIS_OS_NAME" ] || [ -n "$APPLE_SIGNING_KEY" ]; then
 fi
 
 echo "Signing App."
-gon init/macos/sign.json
+gon init/macos/sign.json || echo "Ignored an error from signing."
 
 # Creating non-notarized DMG.
 mkdir -p release
 hdiutil create release/Notifiarr.dmg -srcfolder Notifiarr.app -ov
 
 echo "Notarizing DMG."
-gon init/macos/notarize.json
+gon init/macos/notarize.json || echo "Ignored an error from notarization."
