@@ -124,7 +124,7 @@ jobs:
       - name: Download release files
         uses: actions/download-artifact@v2
         with:
-          name: test-release
+          name: release
       - uses: golift/upload-packagecloud@v1
         with:
           userrepo: golift/unstable
@@ -143,7 +143,7 @@ jobs:
       - name: Download release files
         uses: actions/download-artifact@v2
         with:
-          name: test-release
+          name: release
       - uses: golift/upload-packagecloud@v1
         with:
           userrepo: golift/pkgs
