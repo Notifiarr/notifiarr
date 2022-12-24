@@ -4,11 +4,11 @@ on:
     branches:
       - unstable
       - main
+  tags:
+    - v*
   pull_request:
     branches:
     - main
-  tags:
-    - v*
 permissions:
   contents: read
 jobs:
@@ -182,7 +182,7 @@ jobs:
 
   deploy-unstable-unstable:
     # description: "Uploads pre-built binaries to unstable.notifiarr.app."
-    if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/unstable'
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable'
     strategy:
       matrix:
         files: [test-release, test-macos-release]
@@ -208,7 +208,7 @@ jobs:
 
   deploy-unstable-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
-    if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/unstable'
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable'
     needs: release-test
     name: deploy-unstable-packagecloud
     runs-on: ubuntu-latest
