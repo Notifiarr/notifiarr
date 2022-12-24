@@ -23,7 +23,6 @@ read -r -d '' BUILD_ARGS << EOF
 --build-arg "DESC=${DESC}" \
 --build-arg "VENDOR=${VENDOR}" \
 --build-arg "AUTHOR=${MAINT}" \
---build-arg "BINARY=${BINARY}" \
 --build-arg "SOURCE_URL=${SOURCE_URL}" \
 --file ${DOCKERFILE_PATH} .
 EOF

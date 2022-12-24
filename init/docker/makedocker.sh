@@ -15,6 +15,5 @@ docker buildx build --load --pull --tag notifiarr \
     --build-arg "DESC=${DESC}" \
     --build-arg "VENDOR=${VENDOR}" \
     --build-arg "AUTHOR=${MAINT}" \
-    --build-arg "BINARY=${BINARY}" \
     --build-arg "SOURCE_URL=${SOURCE_URL}" \
     --file init/docker/Dockerfile .

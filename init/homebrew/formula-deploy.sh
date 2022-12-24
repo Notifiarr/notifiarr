@@ -45,7 +45,7 @@ sed -e "s/{{Version}}/${VERSION}/g" \
   -e "s/{{SHA256}}/${SHA256}/g" \
   -e "s/{{Desc}}/${DESC}/g" \
   -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
-  -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
+  -e "s%{{SOURCE_PATH}}%${URL}%g" \
   init/homebrew/service.rb.tmpl | tee release_repo/Formula/notifiarr.rb
 
 push_it

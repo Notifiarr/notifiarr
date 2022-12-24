@@ -82,7 +82,6 @@ ARG COMMIT
 ARG VERSION
 ARG ITERATION
 ARG LICENSE=MIT
-ARG BINARY
 ARG SOURCE_URL=http://github.com/golift/application-builder
 ARG DESC=application-builder
 ARG VENDOR=golift
@@ -90,7 +89,7 @@ ARG AUTHOR=golift
 
 # Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.title="${BINARY}" \
+      org.opencontainers.image.title="Notifiarr" \
       org.opencontainers.image.documentation="${SOURCE_URL}/wiki/Docker" \
       org.opencontainers.image.description="${DESC}" \
       org.opencontainers.image.url="${SOURCE_URL}" \

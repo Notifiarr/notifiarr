@@ -181,7 +181,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
-      - name: deploy-aur
+      - name: Deploy Aurch AUR
         run: bash init/archlinux/aur-deploy.sh
         env:
           DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
@@ -195,7 +195,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: '0'
-      - name: make-homebrew
+      - name: Deploy Homebrew Formula
         run: bash init/homebrew/formula-deploy.sh
         env:
           DEPLOY_KEY: ${{ secrets.HOMEBREW_DEPLOY_KEY }}

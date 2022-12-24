@@ -44,7 +44,7 @@ sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{SHA256}}/${SHA256}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
-    -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
+    -e "s%{{SOURCE_PATH}}%${URL}%g" \
     init/archlinux/PKGBUILD.template | tee release_repo/notifiarr/PKGBUILD
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
@@ -52,7 +52,7 @@ sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{SHA256}}/${SHA256}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
     -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
-    -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
+    -e "s%{{SOURCE_PATH}}%${URL}%g" \
     init/archlinux/SRCINFO.template | tee release_repo/notifiarr/.SRCINFO
 
 tee release_repo/notifiarr/notifiarr.aur.install << EOF
