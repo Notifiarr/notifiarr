@@ -126,11 +126,13 @@ jobs:
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         id: release
         run: |
-          brew install mitchellh/gon/gon
-          make Notifiarr.app
-          bash init/macos/makedmg.sh
+          brew install mitchellh/gon/gon jq
+          make signdmg
+          echo "Version:."
           source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
+          echo "packages:."
           echo "packages=$(ls release/*.{dmg} | jq -R '.' | jq -sc)" >> $GITHUB_OUTPUT
+          echo "end:."
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
