@@ -1,0 +1,30 @@
+name: release-aur-and-homebrew
+on:
+  workflow_run:
+    workflows: ["build-and-release"]
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  archlinux-aur:
+    if: startsWith(github.ref, 'refs/tags/v') && ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # we need the whole thing so we can count commits.
+          fetch-depth: '0'
+      - name: deploy-aur
+        env:
+          AUR_DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
+        run: bash init/archlinux/aur-deploy.sh
+  homebrew-formula:
+    if: startsWith(github.ref, 'refs/tags/v') && ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # we need the whole thing so we can count commits.
+          fetch-depth: '0'
+      - name: make-homebrew
+        env:
+          HOMEBREW_DEPLOY_KEY: ${{ secrets.HOMEBREW_DEPLOY_KEY }}
+        run: bash init/homebrew/formula-deploy.sh

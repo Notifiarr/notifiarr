@@ -20,11 +20,21 @@ sed -e "s/{{Version}}/${VERSION}/g" \
   -e "s%{{Class}}%Notifiarr%g" \
   init/homebrew/service.rb.tmpl | tee notifiarr.rb
 
+HB_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
+echo "${HOMEBREW_DEPLOY_KEY}" > "${HB_FILE}"
+chmod 600 "${HB_FILE}"
+printf "%s\n" \
+  "Host github.com-aurepo" \
+  "  HostName github.com-hb" \
+  "  IdentityFile ${HB_FILE}" \
+  "  StrictHostKeyChecking no" \
+  "  LogLevel ERROR" >> $HOME/.ssh/config
+
 git config --global user.email "notifiarr@auto.releaser"
 git config --global user.name "notifiarr-auto-releaser"
 
 rm -rf homebrew_release_repo
-git clone git@github.com:Notifiarr/homebrew-mugs.git homebrew_release_repo
+git clone git@github.com-hb:golift/homebrew-mugs.git homebrew_release_repo
 
 mv notifiarr.rb homebrew_release_repo/Formula
 pushd homebrew_release_repo
