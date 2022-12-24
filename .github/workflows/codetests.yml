@@ -4,8 +4,8 @@ on:
     branches:
       - unstable
       - main
-  tags:
-    - v*
+    tags:
+      - v*
   pull_request:
     branches:
     - main
