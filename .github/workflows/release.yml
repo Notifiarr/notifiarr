@@ -135,7 +135,7 @@ jobs:
 
   deploy-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
-    ßif: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: release-test
     name: deploy-unstable-packagecloud
     runs-on: ubuntu-latest
