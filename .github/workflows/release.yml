@@ -168,7 +168,14 @@ jobs:
       - name: Publish ${{ matrix.files }} artifacts to github
         uses: softprops/action-gh-release@v1
         with:
-          files: "*.{rpm,deb,txz,zip,dmg,gz,txt}"
+          files: |
+            "*.rpm"
+            "*.deb"
+            "*.txz"
+            "*.zip"
+            "*.dmg"
+            "*.gz"
+            "*.txt"
 
   archlinux-aur:
     # description: creates and uploads and aur file to the golift/aur repo for arch linux.
