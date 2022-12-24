@@ -47,7 +47,7 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: test-macos-release
+          name: dmg-release
           path: release
 
   release-test:
@@ -85,7 +85,7 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: test-release
+          name: release
           path: release
 
   deploy-unstable-unstable:
@@ -93,11 +93,11 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable'
     strategy:
       matrix:
-        files: [test-release, test-macos-release]
+        files: [release, dmg-release]
     needs:
       - release-test
       - macapp-test
-    name: deploy-unstable-unstable
+    name: deploy-unstable
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
@@ -137,7 +137,7 @@ jobs:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     if: startsWith(github.ref, 'refs/tags/v')
     needs: release-test
-    name: deploy-unstable-packagecloud
+    name: deploy-release-packagecloud
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
