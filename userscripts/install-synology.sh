@@ -151,8 +151,11 @@ echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
 echo 'notifiarr ALL=(root) NOPASSWD:/bin/smartctl *' >> /etc/sudoers
 
-echo "${P} Updating init file: /usr/share/init/notifiarr.conf"
-cat <<EOT > /usr/share/init/notifiarr.conf
+SYSTEMCTL=$(which systemctl)
+
+if [ -z "$SYSTEMCTL" ]; then
+  echo "${P} Updating init file: /usr/share/init/notifiarr.conf"
+  cat <<EOT > /usr/share/init/notifiarr.conf
 description "start notifiarr"
 
 start on syno.network.ready
@@ -164,22 +167,54 @@ respawn limit 5 10
 setuid notifiarr
 exec /usr/bin/notifiarr -c ${CONFIGFILE}
 EOT
+else
+  echo "${P} Updating unit file: /etc/systemd/system/notifiarr.service"
+  cat <<EOT > /etc/systemd/system/notifiarr.service
+[Unit]
+Description=notifiarr - Official Client for Notifiarr.com
+After=network.target
+Requires=network.target
+
+[Service]
+ExecStart=/usr/bin/notifiarr -c ${CONFIGFILE}
+Restart=always
+RestartSec=10
+SyslogIdentifier=notifiarr
+Type=simple
+WorkingDirectory=/tmp
+
+[Install]
+WantedBy=multi-user.target
+EOT
+fi
 
 chown -R notifiarr: /etc/notifiarr
 
 echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
-status notifiarr
+SYSTEMCTL=$(which systemctl)
+[ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
 if [ "$?" = "0" ]; then
-  stop notifiarr
-  start notifiarr
+  if [ -z "$SYSTEMCTL" ]; then
+    stop notifiarr
+    start notifiarr
+  else
+    systemctl stop notifiarr
+    systemctl start notifiarr
+  fi
 fi
 
 if [ "${INSTALLED}" = "" ]; then
   echo "${P} Installed. Edit your config file: ${CONFIGFILE}"
   echo "${P} Log files are written to: /var/log/notifiarr"
-  echo "${P} start the service with:  start notifiarr"
-  echo "${P} stop the service with:   stop notifiarr"
-  echo "${P} to check service status: status notifiarr"
+  if [ -z "$SYSTEMCTL" ]; then
+    echo "${P} start the service with:  start notifiarr"
+    echo "${P} stop the service with:   stop notifiarr"
+    echo "${P} to check service status: status notifiarr"
+  else
+    echo "${P} start the service with:  systemctl notifiarr start"
+    echo "${P} stop the service with:   systemtcl notifiarr stop"
+    echo "${P} to check service status: systemctl notifiarr status"
+  fi
 else
   echo "${P} Upgraded and restarted."
 fi
