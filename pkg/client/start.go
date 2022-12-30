@@ -48,6 +48,7 @@ type Client struct {
 	cookies    *securecookie.SecureCookie
 	template   *template.Template
 	webauth    bool
+	noauth     bool
 	reloading  bool
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" and "reloading" as of its creation.
