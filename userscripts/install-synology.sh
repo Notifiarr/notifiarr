@@ -63,7 +63,6 @@ if [ "$WGET" = "" ]; then
 fi
 
 INSTALLED=$(/usr/bin/notifiarr -v | cut -d' ' -f 2 | cut -d- -f1)
-INSTALLED=""
 
 # Grab latest release file from github.
 PAYLOAD=$($WGET ${LATEST})
@@ -130,9 +129,9 @@ fi
 echo "${P} Downloaded. Installing the binary to /usr/bin/notifiarr"
 
 mkdir -p /etc/notifiarr /var/log/notifiarr
-[ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
+[ -z "$SYSTEMCTL" ] && status notifiarr 2>/dev/null >/dev/null || systemctl status notifiarr 2>/dev/null >/dev/null
 RUNNING=$?
-stop notifiarr || systemctl stop notifiarr
+stop notifiarr 2>/dev/null || systemctl stop notifiarr 2>/dev/null >/dev/null
 gunzip -c /tmp/${FILE} > /usr/bin/notifiarr
 rm /tmp/${FILE}
 chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
