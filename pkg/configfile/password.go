@@ -17,6 +17,7 @@ type CryptPass string
 const (
 	cryptedPassPfx = "!!cryptd!!"
 	webauth        = "webauth"
+	noauth         = "noauth"
 )
 
 func (c *Config) setupPassword() error {
@@ -25,7 +26,7 @@ func (c *Config) setupPassword() error {
 		return nil
 	}
 
-	if pass == webauth {
+	if pass == webauth || pass == noauth {
 		return nil
 	}
 
@@ -47,8 +48,8 @@ func (p *CryptPass) Set(pass string) error {
 		return nil
 	}
 
-	if pass == webauth {
-		*p = webauth
+	if pass == webauth || pass == noauth {
+		*p = CryptPass(pass)
 		return nil
 	}
 
@@ -67,7 +68,11 @@ func (p *CryptPass) Set(pass string) error {
 }
 
 func (p CryptPass) Webauth() bool {
-	return p == webauth
+	return p == webauth || p == noauth
+}
+
+func (p CryptPass) Noauth() bool {
+	return p == noauth
 }
 
 // Valid checks if a password is valid.

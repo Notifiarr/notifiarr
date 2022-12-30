@@ -6,15 +6,15 @@ go 1.19
 require (
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
-	golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5
+	golift.io/cnfgfile v0.0.0-20221228223038-bba56925665c
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1-0.20220724230358-943104994ccb
-	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
-	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
-	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
-	golift.io/starr v0.14.1-0.20221212084058-3f88524766d7
+	golift.io/nzbget v0.1.4
+	golift.io/qbit v0.0.0-20221229002737-e0ea34432325
+	golift.io/rotatorr v0.0.0-20221229081120-f7a18c5c5533
+	golift.io/starr v0.14.1-0.20221230094403-a3c1a181c54a
 	golift.io/version v0.0.2
-	golift.io/xtractr v0.2.0
+	golift.io/xtractr v0.2.1
 )
 
 // menu-ui
@@ -33,10 +33,8 @@ require (
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gonutz/w32 v1.0.0
-	github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2 // indirect
 )
 
 // snapshot and other stuff.
@@ -45,8 +43,6 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/go-stack/stack v1.8.1 // indirect
-	github.com/google/cabbie v1.0.5 // indirect
-	github.com/google/glazier v0.0.0-20221216153259-2c148e97421c // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
@@ -61,7 +57,6 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
-	github.com/scjalliance/comshim v0.0.0-20190308082608-cf06d2532c4e // indirect
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
@@ -84,7 +79,7 @@ require (
 require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20220927061507-ef77025ab5aa // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
@@ -97,7 +92,7 @@ require (
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.20.0
+	modernc.org/sqlite v1.20.1
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.1.0 // indirect
 )
@@ -138,7 +133,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/swaggo/swag v1.8.7
+	github.com/swaggo/swag v1.8.9
 	github.com/urfave/cli/v2 v2.23.7 // indirect
 )
 
@@ -151,7 +146,7 @@ require (
 
 // tools.
 require (
-	github.com/golang/mock v1.4.4
+	github.com/golang/mock v1.6.0
 	github.com/kevinburke/go-bindata v3.24.0+incompatible
 )
 
@@ -159,7 +154,7 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect
-	github.com/bodgit/sevenzip v1.3.0 // indirect
+	github.com/bodgit/sevenzip v1.4.0 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/connesc/cipherio v0.2.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
@@ -169,3 +164,5 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	go4.org v0.0.0-20201209231011-d4a079459e60 // indirect
 )
+
+require github.com/kdomanski/iso9660 v0.3.3 // indirect

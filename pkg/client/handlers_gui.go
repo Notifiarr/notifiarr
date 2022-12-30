@@ -78,11 +78,16 @@ func (c *Client) getUserName(request *http.Request) (string, bool) {
 		return username, found
 	}
 
-	if userName := request.Header.Get("x-webauth-user"); userName != "" {
+	ip := strings.Trim(request.RemoteAddr[:strings.LastIndex(request.RemoteAddr, ":")], "[]")
+	if c.Config.Allow.Contains(ip) {
 		// If the upstream is allowed and gave us a username header, use it.
-		ip := strings.Trim(request.RemoteAddr[:strings.LastIndex(request.RemoteAddr, ":")], "[]")
-		if c.Config.Allow.Contains(ip) {
+		if userName := request.Header.Get("x-webauth-user"); userName != "" && c.webauth {
 			return userName, true
+		}
+
+		// If the upstream IP is allowed and no auth is enabled, set a username.
+		if c.noauth {
+			return configfile.DefaultUsername, true
 		}
 	}
 
