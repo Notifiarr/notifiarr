@@ -109,7 +109,7 @@ vercomp "$INSTALLED" "$TAG"
 case $? in
   0) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is current: ${TAG}" ; exit 0 ;;
   1) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is newer than the current release (${TAG})" ; exit 0 ;;
-  2) echo "${P} Upgrading ${PACKAGE} to ${TAG} from ${INSTALLED}." ;;
+  2) echo "${P} Upgrading ${PACKAGE} to ${TAG} from ${INSTALLED}." ; RESTART=true ;;
   3) echo "${P} Installing ${PACKAGE} version ${TAG}." ;;
 esac
 
@@ -192,17 +192,19 @@ fi
 
 chown -R notifiarr: /etc/notifiarr
 
-# echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
-# [ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
-# if [ "$?" = "0" ]; then
-#   if [ -z "$SYSTEMCTL" ]; then
-#     stop notifiarr
-#     start notifiarr
-#   else
-#     systemctl stop notifiarr
-#     systemctl start notifiarr
-#   fi
-# fi
+if [ "$RESTART" = "true" ]; then
+  echo "${P} Restarting Notifiarr client service if it's running."
+  [ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
+  if [ "$?" = "0" ]; then
+    if [ -z "$SYSTEMCTL" ]; then
+      stop notifiarr
+      start notifiarr
+    else
+      systemctl stop notifiarr
+      systemctl start notifiarr
+    fi
+  fi
+fi
 
 if [ "${INSTALLED}" = "" ]; then
   echo "${P} Installed. Edit your config file: ${CONFIGFILE}"
@@ -212,9 +214,9 @@ if [ "${INSTALLED}" = "" ]; then
     echo "${P} stop the service with:   stop notifiarr"
     echo "${P} to check service status: status notifiarr"
   else
-    echo "${P} start the service with:  systemctl notifiarr start"
-    echo "${P} stop the service with:   systemtcl notifiarr stop"
-    echo "${P} to check service status: systemctl notifiarr status"
+    echo "${P} start the service with:  systemctl start notifiarr"
+    echo "${P} stop the service with:   systemtcl stop notifiarr"
+    echo "${P} to check service status: systemctl status notifiarr"
   fi
 else
   echo "${P} Upgraded and restarted."
