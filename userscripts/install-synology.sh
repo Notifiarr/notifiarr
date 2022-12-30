@@ -144,8 +144,11 @@ else
 fi
 
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
-echo "${P} Ensuring config file: ${CONFIGFILE} and log dir: /var/log/notifiarr"
-[ -f "${CONFIGFILE}" ] || $WGET https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
+if [ ! -f "${CONFIGFILE}" ]; then
+  echo "${P} Downloading config file ${CONFIGFILE}"
+  $WGET https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
+fi
+chown -R notifiarr /etc/notifiarr
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
@@ -190,7 +193,6 @@ EOT
   systemctl daemon-reload
 fi
 
-chown -R notifiarr: /etc/notifiarr
 
 if [ "$RESTART" = "true" ]; then
   echo "${P} Restarting Notifiarr client service if it's running."
