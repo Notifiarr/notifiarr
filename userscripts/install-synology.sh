@@ -62,7 +62,7 @@ if [ "$WGET" = "" ]; then
   exit 1
 fi
 
-INSTALLED=$(/usr/bin/notifiarr -v 2>/dev/null | head -n1 | cut -d' ' -f3)
+INSTALLED=$(/usr/bin/notifiarr -v | cut -d' ' -f 2 | cut -d- -f1)
 
 # Grab latest release file from github.
 PAYLOAD=$($WGET ${LATEST})
