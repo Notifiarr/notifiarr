@@ -27,6 +27,8 @@ P=" ==>"
 
 echo "<-------------------------------------------------->"
 
+PACKAGE=notifiarr
+
 # $ARCH is passed into egrep to find the right file.
 if [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "amd64" ]; then
   ARCH="x86_64|amd64"
