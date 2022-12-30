@@ -4,12 +4,12 @@
 #
 # Use it like this, pick curl or wget:  (sudo is not optional for Synology)
 # ----
-#   curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh | sudo bash
-#   wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh | sudo bash
+#   curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh | sudo bash
+#   wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh | sudo bash
 # ----
 #
 # This file can be added to crontab. First, save it locally:
-#   sudo curl -sSLo /usr/bin/update-notifiarr.sh https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh
+#   sudo curl -sSLo /usr/bin/update-notifiarr.sh https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh
 # Then install this crontab:
 #   echo "10 3 * * * root /bin/bash /usr/bin/update-notifiarr.sh 2>&1 > /volume1/data/notifiarr-updates.log" | sudo tee /etc/cron.d/update-notifiarr
 #
@@ -26,6 +26,8 @@ OS=$(uname -s)
 P=" ==>"
 
 echo "<-------------------------------------------------->"
+
+PACKAGE=notifiarr
 
 # $ARCH is passed into egrep to find the right file.
 if [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "amd64" ]; then
@@ -62,7 +64,7 @@ if [ "$WGET" = "" ]; then
   exit 1
 fi
 
-INSTALLED=$(/usr/bin/notifiarr -v 2>/dev/null | head -n1 | cut -d' ' -f3)
+INSTALLED=$(/usr/bin/notifiarr -v | cut -d' ' -f 2 | cut -d- -f1)
 
 # Grab latest release file from github.
 PAYLOAD=$($WGET ${LATEST})
@@ -109,7 +111,7 @@ vercomp "$INSTALLED" "$TAG"
 case $? in
   0) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is current: ${TAG}" ; exit 0 ;;
   1) echo "${P} The installed version of ${PACKAGE} (${INSTALLED}) is newer than the current release (${TAG})" ; exit 0 ;;
-  2) echo "${P} Upgrading ${PACKAGE} to ${TAG} from ${INSTALLED}." ;;
+  2) echo "${P} Upgrading ${PACKAGE} to ${TAG} from ${INSTALLED}." ; RESTART=true ;;
   3) echo "${P} Installing ${PACKAGE} version ${TAG}." ;;
 esac
 
@@ -129,6 +131,9 @@ fi
 echo "${P} Downloaded. Installing the binary to /usr/bin/notifiarr"
 
 mkdir -p /etc/notifiarr /var/log/notifiarr
+[ -z "$SYSTEMCTL" ] && status notifiarr 2>/dev/null >/dev/null || systemctl status notifiarr 2>/dev/null >/dev/null
+RUNNING=$?
+stop notifiarr 2>/dev/null || systemctl stop notifiarr 2>/dev/null >/dev/null
 gunzip -c /tmp/${FILE} > /usr/bin/notifiarr
 rm /tmp/${FILE}
 chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
@@ -144,15 +149,21 @@ else
 fi
 
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
-echo "${P} Ensuring config file: ${CONFIGFILE} and log dir: /var/log/notifiarr"
-[ -f "${CONFIGFILE}" ] || $WGET https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
+if [ ! -f "${CONFIGFILE}" ]; then
+  echo "${P} Downloading config file ${CONFIGFILE}"
+  $WGET https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
+fi
+chown -R notifiarr /etc/notifiarr
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
 echo 'notifiarr ALL=(root) NOPASSWD:/bin/smartctl *' >> /etc/sudoers
 
-echo "${P} Updating init file: /usr/share/init/notifiarr.conf"
-cat <<EOT > /usr/share/init/notifiarr.conf
+SYSTEMCTL=$(which systemctl)
+
+if [ -z "$SYSTEMCTL" ]; then
+  echo "${P} Updating init file: /usr/share/init/notifiarr.conf"
+  cat <<EOT > /usr/share/init/notifiarr.conf
 description "start notifiarr"
 
 start on syno.network.ready
@@ -164,22 +175,53 @@ respawn limit 5 10
 setuid notifiarr
 exec /usr/bin/notifiarr -c ${CONFIGFILE}
 EOT
+else
+  echo "${P} Updating unit file: /etc/systemd/system/notifiarr.service"
+  cat <<EOT > /etc/systemd/system/notifiarr.service
+[Unit]
+Description=notifiarr - Official Client for Notifiarr.com
+After=network.target
+Requires=network.target
 
-chown -R notifiarr: /etc/notifiarr
+[Service]
+ExecStart=/usr/bin/notifiarr -c ${CONFIGFILE}
+Restart=always
+RestartSec=10
+SyslogIdentifier=notifiarr
+Type=simple
+WorkingDirectory=/tmp
 
-echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
-status notifiarr
-if [ "$?" = "0" ]; then
-  stop notifiarr
-  start notifiarr
+[Install]
+WantedBy=multi-user.target
+EOT
+
+  systemctl daemon-reload
+fi
+
+
+if [ "$RESTART" = "true" ]; then
+  echo "${P} Restarting Notifiarr client service if it was running."
+  if [ "$RUNNING" = "0" ]; then
+    if [ -z "$SYSTEMCTL" ]; then
+      start notifiarr
+    else
+      systemctl start notifiarr
+    fi
+  fi
 fi
 
 if [ "${INSTALLED}" = "" ]; then
   echo "${P} Installed. Edit your config file: ${CONFIGFILE}"
   echo "${P} Log files are written to: /var/log/notifiarr"
-  echo "${P} start the service with:  start notifiarr"
-  echo "${P} stop the service with:   stop notifiarr"
-  echo "${P} to check service status: status notifiarr"
+  if [ -z "$SYSTEMCTL" ]; then
+    echo "${P} start the service with:  start notifiarr"
+    echo "${P} stop the service with:   stop notifiarr"
+    echo "${P} to check service status: status notifiarr"
+  else
+    echo "${P} start the service with:  systemctl start notifiarr"
+    echo "${P} stop the service with:   systemtcl stop notifiarr"
+    echo "${P} to check service status: systemctl status notifiarr"
+  fi
 else
   echo "${P} Upgraded and restarted."
 fi
