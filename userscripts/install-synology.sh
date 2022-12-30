@@ -4,12 +4,12 @@
 #
 # Use it like this, pick curl or wget:  (sudo is not optional for Synology)
 # ----
-#   curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh | sudo bash
-#   wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh | sudo bash
+#   curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh | sudo bash
+#   wget -qO- https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh | sudo bash
 # ----
 #
 # This file can be added to crontab. First, save it locally:
-#   sudo curl -sSLo /usr/bin/update-notifiarr.sh https://raw.githubusercontent.com/Notifiarr/notifiarr/main/scripts/install-synology.sh
+#   sudo curl -sSLo /usr/bin/update-notifiarr.sh https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh
 # Then install this crontab:
 #   echo "10 3 * * * root /bin/bash /usr/bin/update-notifiarr.sh 2>&1 > /volume1/data/notifiarr-updates.log" | sudo tee /etc/cron.d/update-notifiarr
 #
@@ -186,22 +186,23 @@ WorkingDirectory=/tmp
 [Install]
 WantedBy=multi-user.target
 EOT
+
+  systemctl daemon-reload
 fi
 
 chown -R notifiarr: /etc/notifiarr
 
-echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
-SYSTEMCTL=$(which systemctl)
-[ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
-if [ "$?" = "0" ]; then
-  if [ -z "$SYSTEMCTL" ]; then
-    stop notifiarr
-    start notifiarr
-  else
-    systemctl stop notifiarr
-    systemctl start notifiarr
-  fi
-fi
+# echo "${P} Restarting service (if running): status notifiarr ; stop notifiarr ; start notifiarr"
+# [ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
+# if [ "$?" = "0" ]; then
+#   if [ -z "$SYSTEMCTL" ]; then
+#     stop notifiarr
+#     start notifiarr
+#   else
+#     systemctl stop notifiarr
+#     systemctl start notifiarr
+#   fi
+# fi
 
 if [ "${INSTALLED}" = "" ]; then
   echo "${P} Installed. Edit your config file: ${CONFIGFILE}"
