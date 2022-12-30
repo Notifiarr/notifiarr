@@ -130,14 +130,11 @@ fi
 # Install it.
 echo "${P} Downloaded. Installing the binary to /usr/bin/notifiarr"
 
-mkdir -p /etc/notifiarr /var/log/notifiarr
 [ -z "$SYSTEMCTL" ] && status notifiarr 2>/dev/null >/dev/null || systemctl status notifiarr 2>/dev/null >/dev/null
 RUNNING=$?
 stop notifiarr 2>/dev/null || systemctl stop notifiarr 2>/dev/null >/dev/null
 gunzip -c /tmp/${FILE} > /usr/bin/notifiarr
 rm /tmp/${FILE}
-chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
-chown notifiarr: /var/log/notifiarr
 
 ID=$(id notifiarr 2>&1)
 if [ "$?" != "0" ]; then
@@ -148,12 +145,15 @@ else
   echo "${P} User notifiarr already exists: ${ID}"
 fi
 
+mkdir -p /etc/notifiarr /var/log/notifiarr
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
 if [ ! -f "${CONFIGFILE}" ]; then
   echo "${P} Downloading config file ${CONFIGFILE}"
   $WGET https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
 fi
-chown -R notifiarr /etc/notifiarr
+echo "${P} Setting permissions/ownership on: /usr/bin/notifiarr /var/log/notifiarr"
+chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
+chown -R notifiarr: /var/log/notifiarr /etc/notifiarr
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
