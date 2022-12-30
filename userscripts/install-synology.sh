@@ -63,6 +63,7 @@ if [ "$WGET" = "" ]; then
 fi
 
 INSTALLED=$(/usr/bin/notifiarr -v | cut -d' ' -f 2 | cut -d- -f1)
+INSTALLED=""
 
 # Grab latest release file from github.
 PAYLOAD=$($WGET ${LATEST})
@@ -129,6 +130,9 @@ fi
 echo "${P} Downloaded. Installing the binary to /usr/bin/notifiarr"
 
 mkdir -p /etc/notifiarr /var/log/notifiarr
+[ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
+RUNNING=$?
+stop notifiarr || systemctl stop notifiarr
 gunzip -c /tmp/${FILE} > /usr/bin/notifiarr
 rm /tmp/${FILE}
 chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
@@ -195,14 +199,11 @@ fi
 
 
 if [ "$RESTART" = "true" ]; then
-  echo "${P} Restarting Notifiarr client service if it's running."
-  [ -z "$SYSTEMCTL" ] && status notifiarr || systemctl status notifiarr
-  if [ "$?" = "0" ]; then
+  echo "${P} Restarting Notifiarr client service if it was running."
+  if [ "$RUNNING" = "0" ]; then
     if [ -z "$SYSTEMCTL" ]; then
-      stop notifiarr
       start notifiarr
     else
-      systemctl stop notifiarr
       systemctl start notifiarr
     fi
   fi
