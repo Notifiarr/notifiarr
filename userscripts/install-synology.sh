@@ -219,7 +219,7 @@ if [ "${INSTALLED}" = "" ]; then
     echo "${P} to check service status: status notifiarr"
   else
     echo "${P} start the service with:  systemctl start notifiarr"
-    echo "${P} stop the service with:   systemtcl stop notifiarr"
+    echo "${P} stop the service with:   systemctl stop notifiarr"
     echo "${P} to check service status: systemctl status notifiarr"
   fi
 else
