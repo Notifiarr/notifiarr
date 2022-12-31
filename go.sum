@@ -462,8 +462,8 @@ golift.io/cnfgfile v0.0.0-20221228223038-bba56925665c h1:KIi4+C8rp/hPODuFClkuw20
 golift.io/cnfgfile v0.0.0-20221228223038-bba56925665c/go.mod h1:otNbRuDiho8qpywLHwv8qzac7FWqunXyFGoKdI5I9u8=
 golift.io/datacounter v1.0.4 h1:b2gLQCs8WYRtKjOMG0qM82rF1o0+oKUXB9QH7kjmxZ4=
 golift.io/datacounter v1.0.4/go.mod h1:79Yf1ucynYvZzVS/hpfrAFt6y/w82FMlOJgh+MBaZvs=
-golift.io/deluge v0.10.1-0.20220724230358-943104994ccb h1:cd9eokZYvpH3glO3e/Cpr2LYutWY70JKcQ43h9X3LHE=
-golift.io/deluge v0.10.1-0.20220724230358-943104994ccb/go.mod h1:4AEg/gqM2FiqLGAGT8ZYrYmeSVS8vTqTtG+nItc8CAk=
+golift.io/deluge v0.10.1-0.20221231022948-81f784064173 h1:4X1LCME8gsN/OPyTxbaqerENWQfolF1ye4GvKDpismI=
+golift.io/deluge v0.10.1-0.20221231022948-81f784064173/go.mod h1:i6h0V+nRzG4XymHQ5kC4d4Z6JZw2M83gMqcZhWgiD1k=
 golift.io/nzbget v0.1.4 h1:4v4uw/XJGBaMStpc039xIfRzNxfgtcft4bz7TT8onTk=
 golift.io/nzbget v0.1.4/go.mod h1:YYGQsadsgvadzM6qlVBS21gz8DBhfbxexGMndsGelj8=
 golift.io/qbit v0.0.0-20221229002737-e0ea34432325 h1:r1ZKpjpS2RRGTZmx2gFVwPZogfNxFq9o6DXxxqX1I8I=
