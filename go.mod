@@ -8,7 +8,7 @@ require (
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20220509075834-08755d9ef3f5
 	golift.io/datacounter v1.0.4
-	golift.io/deluge v0.10.1-0.20220724230358-943104994ccb
+	golift.io/deluge v0.10.1-0.20221231065315-d7854474ae71
 	golift.io/nzbget v0.1.4-0.20220719081244-8d4d909649d3
 	golift.io/qbit v0.0.0-20220724223744-38c3efd14e2c
 	golift.io/rotatorr v0.0.0-20220126065426-d6b5acaac41c
@@ -33,10 +33,8 @@ require (
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gonutz/w32 v1.0.0
-	github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2 // indirect
 )
 
 // snapshot and other stuff.
@@ -45,8 +43,6 @@ require (
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/go-stack/stack v1.8.1 // indirect
-	github.com/google/cabbie v1.0.5 // indirect
-	github.com/google/glazier v0.0.0-20221216153259-2c148e97421c // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
@@ -61,7 +57,6 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
-	github.com/scjalliance/comshim v0.0.0-20190308082608-cf06d2532c4e // indirect
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/spf13/pflag v1.0.6-0.20201009195203-85dd5c8bc61c
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
