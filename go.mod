@@ -2,6 +2,8 @@ module github.com/Notifiarr/notifiarr
 
 go 1.19
 
+// pflag and tail are pinned to master. 12/31/2022
+
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/fsnotify/fsnotify v1.6.0
@@ -24,9 +26,9 @@ require (
 	github.com/lestrrat-go/apache-logformat v2.0.4+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mrobinsn/go-rtorrent v1.8.0
-	github.com/nxadm/tail v1.4.8
+	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
 	github.com/shirou/gopsutil/v3 v3.22.10
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	github.com/stretchr/testify v1.8.1
 	github.com/swaggo/swag v1.8.9
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
