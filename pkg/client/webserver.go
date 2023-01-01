@@ -13,7 +13,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
-	apachelog "github.com/lestrrat-go/apache-logformat"
+	apachelog "github.com/lestrrat-go/apache-logformat/v2"
 )
 
 // StartWebServer starts the web server.
