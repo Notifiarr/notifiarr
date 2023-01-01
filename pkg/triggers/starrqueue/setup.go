@@ -25,7 +25,7 @@ const (
 	// How often to check starr apps for queue list when finished items is enabled.
 	finishedDuration = time.Minute
 	// This is the max number of queued items to inspect/send.
-	queueItemsMax = 100
+	queueItemsMax = 1000
 )
 
 const (
