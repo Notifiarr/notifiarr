@@ -430,6 +430,8 @@ golift.io/deluge v0.10.1-0.20221231075837-76f6391fe347 h1:XlJx3HXLQs/nJpWo/bgteb
 golift.io/deluge v0.10.1-0.20221231075837-76f6391fe347/go.mod h1:i6h0V+nRzG4XymHQ5kC4d4Z6JZw2M83gMqcZhWgiD1k=
 golift.io/deluge v0.10.1-0.20230102191027-532ddcffa38a h1:M/8bnVC/eyjZQw6al4aFv5hCL0mzYY2h8LkWtXcGrDc=
 golift.io/deluge v0.10.1-0.20230102191027-532ddcffa38a/go.mod h1:i6h0V+nRzG4XymHQ5kC4d4Z6JZw2M83gMqcZhWgiD1k=
+golift.io/deluge v0.10.1-0.20230102191215-5ad3092ca04d h1:siqaggf4cpWTfCgmcjpn8s8hBwLVW2FBvChxnMj4Grg=
+golift.io/deluge v0.10.1-0.20230102191215-5ad3092ca04d/go.mod h1:i6h0V+nRzG4XymHQ5kC4d4Z6JZw2M83gMqcZhWgiD1k=
 golift.io/nzbget v0.1.4 h1:4v4uw/XJGBaMStpc039xIfRzNxfgtcft4bz7TT8onTk=
 golift.io/nzbget v0.1.4/go.mod h1:YYGQsadsgvadzM6qlVBS21gz8DBhfbxexGMndsGelj8=
 golift.io/qbit v0.0.0-20221229002737-e0ea34432325 h1:r1ZKpjpS2RRGTZmx2gFVwPZogfNxFq9o6DXxxqX1I8I=
