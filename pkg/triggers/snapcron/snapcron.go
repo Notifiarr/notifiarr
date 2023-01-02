@@ -100,7 +100,7 @@ func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
 		}
 	}
 
-	// These debug messages are mostly just errors that we we expect to have.
+	// These debug messages are mostly just errors that we expect to have.
 	for _, err := range debug {
 		if err != nil {
 			c.Debugf("Snapshot: %v", err)
