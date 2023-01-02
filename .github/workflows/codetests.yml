@@ -35,7 +35,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: go-generate
-        run: go generate ./...
+        run: GOOS=darwin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -56,7 +56,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: go-generate
-        run: go generate ./...
+        run: GOOS=linux go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
