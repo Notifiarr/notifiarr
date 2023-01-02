@@ -101,18 +101,18 @@ clean:
 man: notifiarr.1.gz
 notifiarr.1.gz:
 	# Building man page. Build dependency first: md2roff
-	md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" examples/MANUAL.md
+	go run github.com/davidnewhall/md2roff@v0.0.1 --manual notifiarr --version $(VERSION) --date "$(DATE)" examples/MANUAL.md
 	gzip -9nc examples/MANUAL > $@
 	mv examples/MANUAL.html notifiarr_manual.html
 
 readme: README.html
 README.html: 
 	# This turns README.md into README.html
-	md2roff --manual notifiarr --version $(VERSION) --date "$(DATE)" README.md
+	go run github.com/davidnewhall/md2roff@v0.0.1 --manual notifiarr --version $(VERSION) --date "$(DATE)" README.md
 
 rsrc: rsrc.syso
 rsrc.syso: init/windows/application.ico init/windows/manifest.xml
-	rsrc -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
+	go run github.com/akavel/rsrc@latest -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
 
 ####################
 ##### Binaries #####
@@ -153,7 +153,6 @@ notifiarr.amd64.macos:  main.go
 notifiarr.arm64.macos: generate main.go
 	# Building darwin 64-bit arm binary.
 	GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 CGO_LDFLAGS=-mmacosx-version-min=10.8 CGO_CFLAGS=-mmacosx-version-min=10.8 go build -o $@ -ldflags "-v -w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-
 
 freebsd: notifiarr.amd64.freebsd
 notifiarr.amd64.freebsd: generate main.go

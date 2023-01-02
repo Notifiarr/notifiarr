@@ -28,6 +28,7 @@ func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
 			MaxBody: maxBody,
 			Debugf:  logger.Debugf,
 			Caller:  metricMakerCallback(starr.Plex.String()),
+			Redact:  []string{c.Token},
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
@@ -58,6 +59,7 @@ func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
 			MaxBody: maxBody,
 			Debugf:  logger.Debugf,
 			Caller:  metricMakerCallback("Tautulli"),
+			Redact:  []string{c.APIKey},
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
@@ -101,6 +103,7 @@ func (c *DelugeConfig) setup(maxBody int, logger mnd.Logger) error {
 			MaxBody: maxBody,
 			Debugf:  logger.Debugf,
 			Caller:  metricMakerCallback("Deluge"),
+			Redact:  []string{c.Password, c.HTTPPass},
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
@@ -150,6 +153,7 @@ func (c *SabNZBConfig) Setup(maxBody int, logger mnd.Logger) {
 			MaxBody: maxBody,
 			Debugf:  logger.Debugf,
 			Caller:  metricMakerCallback("SABnzbd"),
+			Redact:  []string{c.APIKey},
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
@@ -193,6 +197,7 @@ func (c *QbitConfig) Setup(maxBody int, logger mnd.Logger) error {
 			MaxBody: maxBody,
 			Debugf:  logger.Debugf,
 			Caller:  metricMakerCallback("qBittorrent"),
+			Redact:  []string{c.Pass, c.HTTPPass},
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
@@ -256,6 +261,7 @@ func (c *RtorrentConfig) Setup(maxBody int, logger mnd.Logger) {
 			MaxBody: maxBody,
 			Debugf:  logger.Debugf,
 			Caller:  metricMakerCallback("rTorrent"),
+			Redact:  []string{c.Pass},
 		})
 	}
 
@@ -286,6 +292,7 @@ func (a *Apps) setupNZBGet() error {
 				MaxBody: a.MaxBody,
 				Debugf:  a.Debugf,
 				Caller:  metricMakerCallback("NZBGet"),
+				Redact:  []string{app.Pass},
 			})
 		} else {
 			app.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
