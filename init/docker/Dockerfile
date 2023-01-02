@@ -10,8 +10,6 @@ FROM golang:1-bullseye as builder
 WORKDIR /src
 COPY main.go settings.sh go.mod go.sum ./
 RUN go mod download
-RUN go install github.com/swaggo/swag/cmd/swag@master
-RUN go install github.com/kevinburke/go-bindata/...@latest
 COPY pkg pkg
 RUN go generate ./...
 
@@ -70,7 +68,6 @@ ENV TZ=UTC
 # Notifiarr specific.
 ENV PATH=/
 ENV USER=root
-ENV NOTIFIARR_IN_DOCKER=true
 
 EXPOSE 5454
 ENTRYPOINT [ "/image" ]

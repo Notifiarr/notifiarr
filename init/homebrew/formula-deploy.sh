@@ -5,9 +5,9 @@
 
 source settings.sh
 
-URL=https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz
-echo "==> Using URL: $URL"
-SHA256=$(curl -sL $URL | openssl dgst -r -sha256 | awk '{print $1}')
+SOURCE_PATH=https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz
+echo "==> Using URL: $SOURCE_PATH"
+SHA256=$(curl -sL $SOURCE_PATH | openssl dgst -r -sha256 | awk '{print $1}')
 
 push_it() {
   pushd release_repo
@@ -44,8 +44,7 @@ sed -e "s/{{Version}}/${VERSION}/g" \
   -e "s/{{Iter}}/${ITERATION}/g" \
   -e "s/{{SHA256}}/${SHA256}/g" \
   -e "s/{{Desc}}/${DESC}/g" \
-  -e "s%{{SOURCE_URL}}%${SOURCE_URL}%g" \
-  -e "s%{{SOURCE_PATH}}%${URL}%g" \
+  -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
   init/homebrew/service.rb.tmpl | tee release_repo/Formula/notifiarr.rb
 
 push_it
