@@ -13,7 +13,6 @@ require (
 	github.com/getlantern/systray v1.2.1
 	github.com/go-ping/ping v1.1.0
 	github.com/go-sql-driver/mysql v1.7.0
-	github.com/golang/mock v1.6.0
 	github.com/gonutz/w32 v1.0.0
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -40,7 +39,7 @@ require (
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20221228223038-bba56925665c
 	golift.io/datacounter v1.0.4
-	golift.io/deluge v0.10.1-0.20230102191215-5ad3092ca04d
+	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
 	golift.io/qbit v0.0.0-20221229002737-e0ea34432325
 	golift.io/rotatorr v0.0.0-20221229081120-f7a18c5c5533
