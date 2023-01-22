@@ -74,6 +74,7 @@ func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
 				continue
 			}
 
+			//nolint:dupword
 			// 	Filesystem                    mount space   quota     limit           grace  files   quota   limit   grace
 			// /dev/mapper/ubuntu--vg-ubuntu--lv /  95216K  10485760K 11534336K       0      1k      0k      0k       0
 			space := getQuotaSize(fields[2])

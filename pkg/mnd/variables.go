@@ -11,7 +11,7 @@ var (
 	// IsSynology tells us if this we're running on a Synology.
 	IsSynology bool
 	// IsDocker tells us if this is our Docker container.
-	IsDocker = os.Getenv(DockerV) == "true"
+	IsDocker = os.Getpid() == 1
 )
 
 //nolint:gochecknoinits

@@ -28,10 +28,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: go-generate
-        run: |
-          go install github.com/swaggo/swag/cmd/swag@master
-          go install github.com/kevinburke/go-bindata/...@latest
-          go generate ./...
+        run: go generate ./...
       - name: make-signdmg
         env:
           APPLE_SIGNING_KEY: ${{ secrets.APPLE_SIGNING_KEY }}
@@ -64,19 +61,12 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: 'stable'
-      - name: go-generate
-        run: |
-          go install github.com/swaggo/swag/cmd/swag@master
-          go install github.com/kevinburke/go-bindata/...@latest
-          # make release will clean and generate so do not do it here.
       - name: make-release
         id: release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg jq 
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
-          go install github.com/akavel/rsrc@latest
-          go install github.com/davidnewhall/md2roff@v0.0.1
           make release
           source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
       - name: upload artifacts

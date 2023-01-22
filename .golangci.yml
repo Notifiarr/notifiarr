@@ -10,19 +10,28 @@ issues:
 linters:
   enable-all: true
   disable:
+  # deprecated
     - maligned
     - scopelint
     - interfacer
     - golint
+    - exhaustivestruct
+    - nosnakecase
+    - structcheck
+    - deadcode
+    - varcheck
+    - ifshort
+    # unused
     - exhaustruct
     - exhaustive
-    - exhaustivestruct
     - dupl
     - nlreturn
     - nonamedreturns
     - varnamelen
-    - ifshort
-    - nosnakecase # broken on syscall.
     - godot
+    # unneeded (broken because of generics)
+    - rowserrcheck
+    - wastedassign
+    - sqlclosecheck
 run:
   timeout: 5m

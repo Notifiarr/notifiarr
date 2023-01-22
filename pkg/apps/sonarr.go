@@ -90,6 +90,7 @@ func (a *Apps) setupSonarr() error {
 				MaxBody: a.MaxBody,
 				Debugf:  a.Debugf,
 				Caller:  metricMakerCallback(string(starr.Sonarr)),
+				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)

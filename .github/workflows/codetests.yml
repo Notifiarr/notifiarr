@@ -15,10 +15,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: go-generate
-        run: |
-          go install github.com/swaggo/swag/cmd/swag@master
-          go install github.com/kevinburke/go-bindata/...@latest
-          go generate ./...
+        run: go generate ./...
       - name: go-test
         run: |
           go test ./pkg/...
@@ -38,10 +35,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: go-generate
-        run: |
-          GOOS=darwin go install github.com/swaggo/swag/cmd/swag@master
-          GOOS=darwin go install github.com/kevinburke/go-bindata/...@latest
-          GOOS=darwin go generate ./...
+        run: GOOS=darwin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -62,10 +56,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: go-generate
-        run: |
-          GOOS=linux go install github.com/swaggo/swag/cmd/swag@master
-          GOOS=linux go install github.com/kevinburke/go-bindata/...@latest
-          GOOS=linux go generate ./...
+        run: GOOS=linux go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
@@ -81,12 +72,7 @@ jobs:
         with:
           go-version: 'stable'
       - name: go-generate
-        run: |
-          go install github.com/swaggo/swag/cmd/swag@master
-          go install github.com/kevinburke/go-bindata/...@latest
-          echo $PATH
-          ls $(go env GOPATH)/bin
-          go generate ./...
+        run: go generate ./...
       - name: make-install
         run: |
           TMP=$(mktemp -d)
