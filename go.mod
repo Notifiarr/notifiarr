@@ -33,8 +33,8 @@ require (
 	github.com/swaggo/swag v1.8.9
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
-	golang.org/x/sys v0.3.0
-	golang.org/x/text v0.5.0
+	golang.org/x/sys v0.4.0
+	golang.org/x/text v0.6.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20221228223038-bba56925665c
@@ -43,7 +43,7 @@ require (
 	golift.io/nzbget v0.1.4
 	golift.io/qbit v0.0.0-20221229002737-e0ea34432325
 	golift.io/rotatorr v0.0.0-20221229081120-f7a18c5c5533
-	golift.io/starr v0.14.1-0.20230102070200-aef6117bc707
+	golift.io/starr v0.14.1-0.20230114084726-e2805c5237b5
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.1
 	modernc.org/sqlite v1.20.2
@@ -104,7 +104,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go4.org v0.0.0-20201209231011-d4a079459e60 // indirect
-	golang.org/x/net v0.4.0 // indirect
+	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
