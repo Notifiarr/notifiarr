@@ -42,7 +42,7 @@ require (
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
 	golift.io/qbit v0.0.0-20221229002737-e0ea34432325
-	golift.io/rotatorr v0.0.0-20221229081120-f7a18c5c5533
+	golift.io/rotatorr v0.0.0-20230110212846-590e84fecf74
 	golift.io/starr v0.14.1-0.20230114084726-e2805c5237b5
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.1
