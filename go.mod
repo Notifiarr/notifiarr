@@ -32,7 +32,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/swaggo/swag v1.8.9
 	golang.org/x/crypto v0.5.0
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
+	golang.org/x/mod v0.7.0
 	golang.org/x/sys v0.4.0
 	golang.org/x/text v0.6.0
 	golift.io/cache v0.0.2
