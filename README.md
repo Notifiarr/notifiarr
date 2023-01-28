@@ -131,7 +131,7 @@ docker logs <container id from docker run>
 
 ### WebUI
 
-To enable the webui, add this parameter to your config file, toward the top next to quiet, and restart the client:
+To enable the webui, add this parameter to your config file, toward the top next to `quiet`, and restart the client:
 
 ```yaml
 ui_password = "username:9CharacterPassword"
@@ -502,7 +502,7 @@ Make sure the Nginx `location` path matches the `urlbase` Notifiarr setting.
 That's all there is to it.
 
 Using an auth proxy? Be sure to set `ui_password` to the string `"webauth"`.
-The Nginx config looks more like this:
+Also see the [WebUI](#WebUI) section above. The Nginx config looks more like this:
 
 ```nginx
 location /notifiarr/api {
