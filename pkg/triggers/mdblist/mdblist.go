@@ -93,38 +93,30 @@ func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput)
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Mdblist.Radarr.Has(instance) {
+			c.Debugf("Skipping MDBList for Radarr %d:%s, not enabled.", instance, app.URL)
 			continue
 		}
 
-		movies, err := app.GetMovieContext(ctx, 0)
+		library := &mdbListPayload{Instance: instance, Name: app.Name}
+		output = append(output, library)
+
+		items, err := app.GetMovieContext(ctx, 0)
 		if err != nil {
+			library.Error = err.Error()
 			c.Errorf("[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting movies: %v",
-				input.Type, instance, app.URL, err)
-
-			output = append(output, &mdbListPayload{
-				Instance: instance,
-				Name:     app.Name,
-				Error:    err.Error(),
-			})
+				input.Type, instance, app.URL, library.Error)
 
 			continue
 		}
 
-		library := &mdbListPayload{
-			Instance: instance,
-			Name:     app.Name,
-			Library:  make([]*libraryData, len(movies)),
-		}
-
-		for idx, item := range movies {
+		library.Library = make([]*libraryData, len(items))
+		for idx, item := range items {
 			library.Library[idx] = &libraryData{
 				Imdb:   item.ImdbID,
 				Tmdb:   item.TmdbID,
 				Exists: item.SizeOnDisk > 0,
 			}
 		}
-
-		output = append(output, library)
 	}
 
 	return output
@@ -137,38 +129,30 @@ func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput)
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Mdblist.Sonarr.Has(instance) {
+			c.Debugf("Skipping MDBList for Sonarr %d:%s, not enabled.", instance, app.URL)
 			continue
 		}
 
-		movies, err := app.GetSeriesContext(ctx, 0)
+		library := &mdbListPayload{Instance: instance, Name: app.Name}
+		output = append(output, library)
+
+		items, err := app.GetSeriesContext(ctx, 0)
 		if err != nil {
+			library.Error = err.Error()
 			c.Errorf("[%s requested] Sonarr Library (MDBList) (%d:%s) failed: getting series: %v",
-				input.Type, instance, app.URL, err)
-
-			output = append(output, &mdbListPayload{
-				Instance: instance,
-				Name:     app.Name,
-				Error:    err.Error(),
-			})
+				input.Type, instance, app.URL, library.Error)
 
 			continue
 		}
 
-		library := &mdbListPayload{
-			Instance: instance,
-			Name:     app.Name,
-			Library:  make([]*libraryData, len(movies)),
-		}
-
-		for idx, item := range movies {
+		library.Library = make([]*libraryData, len(items))
+		for idx, item := range items {
 			library.Library[idx] = &libraryData{
 				Imdb:   item.ImdbID,
 				Tvdb:   item.TvdbID,
 				Exists: item.Statistics.SizeOnDisk > 0,
 			}
 		}
-
-		output = append(output, library)
 	}
 
 	return output
