@@ -78,7 +78,7 @@ func (c *cmd) sendMDBList(ctx context.Context, input *common.ActionInput) {
 		Route:      website.GapsRoute,
 		Event:      input.Type,
 		LogPayload: true,
-		LogMsg:     "MDb List Libraries",
+		LogMsg:     "MDBList Libraries Update",
 		Payload: map[string][]*mdbListPayload{
 			"radarr": c.getRadarrLibraries(ctx, input),
 			"sonarr": c.getSonarrLibraries(ctx, input),

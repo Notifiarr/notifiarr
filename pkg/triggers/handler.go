@@ -369,8 +369,8 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 	return http.StatusOK, "Emptying Plex Trash for library " + content
 }
 
-// @Description  Sends Radarr and Sonarr Libraries for MDb List Syncing.
-// @Summary      Send Libraries for MDb List
+// @Description  Sends Radarr and Sonarr Libraries for MDBList Syncing.
+// @Summary      Send Libraries for MDBList
 // @Tags         Triggers
 // @Produce      json
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
@@ -379,5 +379,5 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 // @Security     ApiKeyAuth
 func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 	a.MDbList.Send(input.Type)
-	return http.StatusOK, "MDbList library update started."
+	return http.StatusOK, "MDBList library update started."
 }
