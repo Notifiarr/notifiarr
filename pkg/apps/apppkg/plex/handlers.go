@@ -73,6 +73,13 @@ func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
 		return http.StatusInternalServerError, fmt.Errorf("directory request failed (%d): %w", plexID, err)
 	}
 
+	for idx, library := range directory.Directory {
+		directory.Directory[idx].TrashSize, err = s.GetDirectoryTrashSizeWithContext(r.Context(), library.Key)
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Errorf("directory trash request failed (%d): %w", plexID, err)
+		}
+	}
+
 	return http.StatusOK, directory
 }
 
