@@ -75,7 +75,7 @@ type libraryData struct {
 
 func (c *cmd) sendMDBList(ctx context.Context, input *common.ActionInput) {
 	c.SendData(&website.Request{
-		Route:      website.GapsRoute,
+		Route:      website.MdbListRoute,
 		Event:      input.Type,
 		LogPayload: true,
 		LogMsg:     "MDBList Libraries Update",
