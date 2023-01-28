@@ -21,12 +21,8 @@ const (
 )
 
 func (c *Config) setupPassword() error {
-	pass := string(c.UIPassword)
-	if pass == "" {
-		return nil
-	}
-
-	if pass == webauth || pass == noauth {
+	pass := c.UIPassword.Val()
+	if pass == "" || c.UIPassword.Webauth() {
 		return nil
 	}
 
@@ -41,20 +37,11 @@ func (c *Config) setupPassword() error {
 	return nil
 }
 
-// Set sets a encrypted password.
+// Set sets an encrypted password.
 func (p *CryptPass) Set(pass string) error {
-	if strings.HasPrefix(pass, cryptedPassPfx) {
+	if strings.HasPrefix(pass, cryptedPassPfx) || p.Webauth() || pass == "" {
 		*p = CryptPass(pass)
 		return nil
-	}
-
-	if pass == webauth || pass == noauth {
-		*p = CryptPass(pass)
-		return nil
-	}
-
-	if pass == "" {
-		*p = ""
 	}
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
@@ -67,27 +54,40 @@ func (p *CryptPass) Set(pass string) error {
 	return nil
 }
 
+// Webauth returns true if the password indicates an auth proxy (or no auth) is in use.
 func (p CryptPass) Webauth() bool {
-	return p == webauth || p == noauth
+	return p == webauth || strings.HasPrefix(p.Val(), webauth+":") || p.Noauth()
 }
 
+// Header returns the auth proxy header that is configured.
+func (p CryptPass) Header() string {
+	if split := strings.Split(p.Val(), ":"); len(split) == 2 && split[0] == webauth {
+		return split[1]
+	}
+
+	return DefaultHeader
+}
+
+// Noauth returns true if the password indicates skipping authentication.
 func (p CryptPass) Noauth() bool {
-	return p == noauth
+	return p == noauth || strings.HasPrefix(p.Val(), noauth+":")
+}
+
+// Val returns the string representation of the current password.
+// It may or may not be encrypted.
+func (p CryptPass) Val() string {
+	return string(p)
 }
 
 // Valid checks if a password is valid.
 func (p CryptPass) Valid(pass string) bool {
-	if !p.Webauth() {
-		hash := []byte(strings.TrimPrefix(string(p), cryptedPassPfx))
-		return bcrypt.CompareHashAndPassword(hash, []byte(pass)) == nil
-	}
-
-	return false
+	hash := []byte(strings.TrimPrefix(p.Val(), cryptedPassPfx))
+	return !p.Webauth() && bcrypt.CompareHashAndPassword(hash, []byte(pass)) == nil
 }
 
 // IsCrypted checks if a password string is already encrypted.
 func (p CryptPass) IsCrypted() bool {
-	return strings.HasPrefix(string(p), cryptedPassPfx)
+	return strings.HasPrefix(p.Val(), cryptedPassPfx)
 }
 
 // generatePassword uses a word list to create a randmo password of two words and a number.
@@ -114,4 +114,10 @@ func generatePassword() string {
 	rand.Shuffle(len(pieces), func(i, j int) { pieces[i], pieces[j] = pieces[j], pieces[i] })
 
 	return strings.Join(pieces, "")
+}
+
+// UnmarshalENV satisfies the cnfg interface to unmarshal an env variable.
+func (p *CryptPass) UnmarshalENV(tag, envval string) error {
+	*p = CryptPass(envval)
+	return nil
 }

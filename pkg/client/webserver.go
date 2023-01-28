@@ -30,6 +30,7 @@ func (c *Client) StartWebServer() {
 	c.Config.Router.Use(c.addUsernameHeader)
 	c.webauth = c.Config.UIPassword.Webauth() // this needs to be locked since password can be changed without reloading.
 	c.noauth = c.Config.UIPassword.Noauth()
+	c.authHeader = c.Config.UIPassword.Header()
 
 	// Make a multiplexer because websockets can't use apache log.
 	smx := http.NewServeMux()
