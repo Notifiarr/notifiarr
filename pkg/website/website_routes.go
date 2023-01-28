@@ -110,6 +110,7 @@ const (
 	ClientRoute   Route = userRoute2 + "/client"
 	CFSyncRoute   Route = userRoute1 + "/trash"
 	GapsRoute     Route = userRoute1 + "/gaps"
+	MdbListRoute  Route = userRoute1 + "/mdblist"
 	notifiRoute   Route = "/api/v1/notification"
 	DashRoute     Route = notifiRoute + "/dashboard"
 	StuckRoute    Route = notifiRoute + "/stuck"
