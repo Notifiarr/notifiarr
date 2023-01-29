@@ -38,7 +38,7 @@ require (
 	golang.org/x/text v0.6.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
-	golift.io/cnfgfile v0.0.0-20221228223038-bba56925665c
+	golift.io/cnfgfile v0.0.0-20230128062626-d879199d7b9b
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
