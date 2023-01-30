@@ -322,18 +322,18 @@ func megabyte(size interface{}) string {
 	}
 
 	switch {
-	case val > mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte*1000:
-		return fmt.Sprintf("%.2f Eb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Megabyte))
-	case val > mnd.Megabyte*mnd.Megabyte*1000:
-		return fmt.Sprintf("%.2f Pb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte))
-	case val > mnd.Megabyte*mnd.Kilobyte*1000:
-		return fmt.Sprintf("%.2f Tb", float64(val)/float64(mnd.Megabyte*mnd.Megabyte))
-	case val > mnd.Megabyte*1000:
-		return fmt.Sprintf("%.2f Gb", float64(val)/float64(mnd.Megabyte*mnd.Kilobyte))
-	case val > mnd.Kilobyte*1000:
-		return fmt.Sprintf("%.1f Mb", float64(val)/float64(mnd.Megabyte))
-	default:
-		return fmt.Sprintf("%.1f Kb", float64(val)/float64(mnd.Kilobyte))
+	case val > mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte*1000: // 2^60
+		return fmt.Sprintf("%.2f EiB", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Megabyte))
+	case val > mnd.Megabyte*mnd.Megabyte*1000: // 2^50
+		return fmt.Sprintf("%.2f PiB", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte))
+	case val > mnd.Megabyte*mnd.Kilobyte*1000: // 2^40
+		return fmt.Sprintf("%.2f TiB", float64(val)/float64(mnd.Megabyte*mnd.Megabyte))
+	case val > mnd.Megabyte*1000: // 2^30
+		return fmt.Sprintf("%.2f GiB", float64(val)/float64(mnd.Megabyte*mnd.Kilobyte))
+	case val > mnd.Kilobyte*1000: // 2^20
+		return fmt.Sprintf("%.1f MiB", float64(val)/float64(mnd.Megabyte))
+	default: // 2^10
+		return fmt.Sprintf("%.1f KiB", float64(val)/float64(mnd.Kilobyte))
 	}
 }
 
