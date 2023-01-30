@@ -42,6 +42,7 @@ const (
 		"and will not be printed again. Log in, and change it."
 	MsgConfigFound  = "Using Config File: "
 	DefaultUsername = "admin"
+	DefaultHeader   = "x-webauth-user"
 )
 
 // Config represents the data in our config file.

@@ -1,15 +1,17 @@
 ###############################################
 # Notifiarr Client Example Configuration File #
-# Created by Notifiarr v0.2.7   @ 220103T0842 #
+# Created by Notifiarr v0.4.4   @ 232801T0734 #
 ###############################################
 
 ## This API key must be copied from your notifiarr.com account.
 api_key = "api-key-from-notifiarr.com"
 
-## Setting a UI password enables the human accessible web GUI. Must be at least 16 characters.
+## Setting a UI password enables the human accessible web GUI. Must be at least 9 characters.
 ## The default username is admin; change it by setting ui_password to "username:password"
 ## Set to "webauth" to disable the login form and use only proxy authentication. See upstreams, below.
-## Your proxy auth must pass x-webauth-user header if you set this to "webauth".
+## Your auth proxy must pass the x-webauth-user header if you set this to "webauth".
+## You may also set a custom auth header by setting to "webauth:<header>" e.g. "webauth:remote-user"
+## Disable auth by setting this to "noauth". Not recommended. Requires "upstreams" being set.
 ui_password = ""
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
@@ -71,9 +73,15 @@ log_files = 0
 ## Missing, blank or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
 file_mode = "0600"
 
-## Web server and application timeouts.
+## Web server and website timeout.
 ##
 timeout = "1m"
+
+## This application can integrate with apt on Debian-based OSes.
+## Set apt to true to enable this integration. A true setting causes
+## notifiarr to relay apt package install/update hooks to notifiarr.com.
+##
+apt = false
 
 ## Setting serial to true makes the app use fewer threads when polling apps.
 ## This spreads CPU usage out and uses a bit less memory.
@@ -82,8 +90,7 @@ serial = false
 ## Retries controls how many times to retry requests to notifiarr.com.
 ## Sometimes cloudflare returns a 521, and this mitigates those problems.
 ## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
-retries = 0
-
+retries = 4
 
 ##################
 # Starr Settings #
@@ -95,18 +102,17 @@ retries = 0
 ## See the Service Checks section below for information about setting the names.
 ##
 ## Examples follow. UNCOMMENT (REMOVE #), AT MINIMUM: [[header]], url, api_key
-##
-## NOTE: The url should match what you see in your address bar locally
+## Setting any application timeout to "-1s" will disable that application.
 
 #[[lidarr]]
 #name     = "" # Set a name to enable checks of your service.
-#url      = "http://lidarr:8989"
+#url      = "http://lidarr:8989/"
 #api_key  = ""
 
 
 #[[prowlarr]]
 #name     = "" # Set a name to enable checks of your service.
-#url      = "http://prowlarr:9696"
+#url      = "http://prowlarr:9696/"
 #api_key  = ""
 
 
@@ -124,7 +130,7 @@ retries = 0
 
 #[[sonarr]]
 #name      = ""  # Set a name to enable checks of your service.
-#url       = "http://sonarr:8989"
+#url       = "http://sonarr:8989/"
 #api_key   = ""
 
 
@@ -132,20 +138,34 @@ retries = 0
 
 #[[deluge]]
 #name     = ""  # Set a name to enable checks of your service.
-#url      = "http://deluge:8112"
+#url      = "http://deluge:8112/"
 #password = ""
 
 
 #[[qbit]]
 #name     = ""  # Set a name to enable checks of your service.
-#url      = "http://qbit:8080"
+#url      = "http://qbit:8080/"
+#user     = ""
+#pass     = ""
+
+
+#[[rtorrent]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://rtorrent:5000/"
+#user     = ""
+#pass     = ""
+
+
+#[[nzbget]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://nzbget:6789/"
 #user     = ""
 #pass     = ""
 
 
 #[[sabnzbd]]
 #name     = ""  # Set a name to enable checks of this application.
-#url      = "http://sabnzbd:8080"
+#url      = "http://sabnzbd:8080/"
 #api_key  = ""
 
 
@@ -186,6 +206,19 @@ retries = 0
 #user = "notifiarr"
 #pass = "password"
 
+###################
+# Nvidia Snapshot #
+###################
+
+# The app will automatically collect Nvidia data if nvidia-smi is present.
+# Use the settings below to disable Nvidia GPU collection, or restrict collection to only specific Bus IDs.
+# SMI Path is found automatically if left blank. Set it to path to nvidia-smi (nvidia-smi.exe on Windows).
+
+[snapshot.nvidia]
+disabled = false
+smi_path = ''''''
+bus_ids  = []
+
 ##################
 # Service Checks #
 ##################
@@ -193,6 +226,7 @@ retries = 0
 ## This application performs service checks on configured services at the specified interval.
 ## The service states are sent to Notifiarr.com. Failed services generate a notification.
 ## Setting names on Starr apps (above) enables service checks for that app.
+## Setting the Interval to "-1s" (Disabled in UI) will disable service checks on that named instance.
 ## Use the [[service]] directive to add more service checks. Example below.
 
 [services]
@@ -222,3 +256,43 @@ retries = 0
 #  check   = 'http://10.1.1.2:6767/series/'
 #  expect  = "200"
 #  timeout = "10s"
+
+
+######################
+# File & Log Watcher #
+######################
+
+## Tail a log file, regex match lines, and send notifications.
+## Example:
+
+#[[watch_file]]
+#  path  = '/var/log/system.log'
+#  skip  = '''error'''
+#  regex = '''[Ee]rror'''
+#  poll  = false
+#  pipe  = false
+#  must_exist = false
+#  log_match  = true
+
+
+
+###################
+# Custom Commands #
+###################
+
+## Run and trigger custom commands.
+## Commands may have required arguments thet can be passed in when the command is run.
+## These use the format ({regex}) - a regular expression wrapped by curly braces and parens.
+## The example below allows a user to run any combination of ls -la on /usr, /home, or /tmp:
+## command = "/bin/ls ({-la|-al|-l|-a}) ({/usr|/home|/tmp})"
+##
+## Full Example (remove the leading # hashes to use it):
+
+#[[command]]
+#  name    = 'some-name-for-logs'
+#  command = '/var/log/system.log'
+#  shell   = false
+#  log     = true
+#  notify  = true
+#  timeout = "10s"
+
