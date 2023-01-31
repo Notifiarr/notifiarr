@@ -49,6 +49,7 @@ type Client struct {
 	template   *template.Template
 	webauth    bool
 	noauth     bool
+	authHeader string
 	reloading  bool
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" and "reloading" as of its creation.

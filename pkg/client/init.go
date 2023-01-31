@@ -51,7 +51,12 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 	c.printTautulli()
 	c.printMySQL()
 	c.Printf(" => Timeout: %s, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
-	c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
+
+	if c.Config.UIPassword.Webauth() {
+		c.Printf(" => Trusted Upstream Networks: %v, Auth Proxy Header: %s", c.Config.Allow, c.Config.UIPassword.Header())
+	} else {
+		c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
+	}
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		c.Print(" => Web HTTPS Listen:", "https://"+c.Config.BindAddr+path.Join("/", c.Config.URLBase))

@@ -46,7 +46,9 @@ extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
 ## Setting a UI password enables the human accessible web GUI. Must be at least 9 characters.
 ## The default username is admin; change it by setting ui_password to "username:password"
 ## Set to "webauth" to disable the login form and use only proxy authentication. See upstreams, below.
-## Your proxy auth must pass x-webauth-user header if you set this to "webauth".
+## Your auth proxy must pass the x-webauth-user header if you set this to "webauth".
+## You may also set a custom auth header by setting to "webauth:<header>" e.g. "webauth:remote-user"
+## Disable auth by setting this to "noauth". Not recommended. Requires "upstreams" being set.
 ui_password = "{{.UIPassword}}"
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
@@ -75,11 +77,12 @@ quiet = {{.Quiet}}
 debug = {{.Debug}}
 max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
 
+{{- if not force}}
+
 ## HostID is used to uniquely identify this client's system.
 ## Do not set or change this unless you have a good reason.
 ## Do not copy this value to another server, every client must be unique.
-##
-host_id = "{{.HostID}}"
+host_id = "{{.HostID}}"{{end}}
 
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
 ## Change it to /somethingelse/api by setting urlbase to "/somethingelse"

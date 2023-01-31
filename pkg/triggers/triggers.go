@@ -19,6 +19,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/emptytrash"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/mdblist"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/snapcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/starrqueue"
@@ -54,6 +55,7 @@ type Actions struct {
 	StarrQueue *starrqueue.Action
 	Commands   *commands.Action
 	EmptyTrash *emptytrash.Action
+	MDbList    *mdblist.Action
 }
 
 // New turns a populated Config into a pile of Actions.
@@ -80,6 +82,7 @@ func New(config *Config) *Actions {
 		StarrQueue: starrqueue.New(common),
 		Commands:   commands.New(common, config.Commands),
 		EmptyTrash: emptytrash.New(common),
+		MDbList:    mdblist.New(common),
 		Timers:     common,
 	}
 }

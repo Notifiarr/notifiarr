@@ -76,6 +76,8 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 		return a.notification(content)
 	case "emptyplextrash":
 		return a.emptyplextrash(input, content)
+	case "mdblist":
+		return a.mdblist(input)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
@@ -365,4 +367,17 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 	a.EmptyTrash.Plex(input.Type, strings.Split(content, ","))
 
 	return http.StatusOK, "Emptying Plex Trash for library " + content
+}
+
+// @Description  Sends Radarr and Sonarr Libraries for MDBList Syncing.
+// @Summary      Send Libraries for MDBList
+// @Tags         Triggers
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trigger/mdblist [get]
+// @Security     ApiKeyAuth
+func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
+	a.MDbList.Send(input.Type)
+	return http.StatusOK, "MDBList library update started."
 }

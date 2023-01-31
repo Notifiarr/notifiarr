@@ -28,6 +28,7 @@ type ClientInfo struct {
 		Apps      AllAppConfigs    `json:"apps"`      // Site Config for Starr.
 		Dashboard DashConfig       `json:"dashboard"` // Site Config for Dashboard.
 		Sync      SyncConfig       `json:"sync"`      // Site Config for TRaSH Sync.
+		Mdblist   MdbListConfig    `json:"mdblist"`   // Site Config for MDB List.
 		Gaps      GapsConfig       `json:"gaps"`      // Site Config for Radarr Gaps.
 		Custom    []*CronConfig    `json:"custom"`    // Site config for Custom Crons.
 		Snapshot  *snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
@@ -45,18 +46,23 @@ type CronConfig struct {
 
 // SyncConfig is the configuration returned from the notifiarr website for CF/RP TraSH sync.
 type SyncConfig struct {
-	Interval        cnfg.Duration `json:"interval"`        // how often to fire in minutes.
-	Radarr          int64         `json:"radarr"`          // deprecated: items in sync
+	Interval        cnfg.Duration `json:"interval"`        // how often to fire.
 	RadarrInstances IntList       `json:"radarrInstances"` // which instance IDs we sync
-	Sonarr          int64         `json:"sonarr"`          // deprecated: items in sync
 	SonarrInstances IntList       `json:"sonarrInstances"` // which instance IDs we sync
 	SonarrSync      []string      `json:"sonarrSync"`      // items in sync.
 	RadarrSync      []string      `json:"radarrSync"`      // items in sync.
 }
 
+// MdbList contains the instances we send libraries for, and the interval we do it in.
+type MdbListConfig struct {
+	Interval cnfg.Duration `json:"interval"` // how often to fire.
+	Radarr   IntList       `json:"radarr"`   // which instance IDs we sync
+	Sonarr   IntList       `json:"sonarr"`   // which instance IDs we sync
+}
+
 // DashConfig is the configuration returned from the notifiarr website for the dashboard configuration.
 type DashConfig struct {
-	Interval cnfg.Duration `json:"interval"` // how often to fire in minutes.
+	Interval cnfg.Duration `json:"interval"` // how often to fire.
 }
 
 // AppConfig is the data that comes from the website for each Starr app.
