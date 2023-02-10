@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 'stable'
+          go-version: '1.19'
       - name: go-generate
         run: go generate ./...
       - name: go-test
@@ -33,13 +33,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 'stable'
+          go-version: '1.19'
       - name: go-generate
         run: GOOS=darwin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.48
+          version: v1.50
 
   golangci-linux:
     # description: "Runs golangci-lint on linux against linux and windows."
@@ -54,13 +54,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 'stable'
+          go-version: '1.19'
       - name: go-generate
         run: GOOS=linux go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.48
+          version: v1.50
 
   homebrew-test:
     # description: "Installs dependencis on macOS and runs `make install` to mimic a homebrew install."
@@ -70,11 +70,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: 'stable'
+          go-version: '1.19'
       - name: go-generate
         run: go generate ./...
       - name: make-install
         run: |
           TMP=$(mktemp -d)
-          go install github.com/davidnewhall/md2roff@v0.0.1
           make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc
