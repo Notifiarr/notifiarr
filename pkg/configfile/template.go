@@ -43,12 +43,13 @@ const tmpl = `###############################################
 {{if .APIKey}}api_key = "{{.APIKey}}"{{else}}api_key = "api-key-from-notifiarr.com"{{end}}{{if .ExKeys}}
 extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
 
-## Setting a UI password enables the human accessible web GUI. Must be at least 9 characters.
+## Setting a UI password properly secures the Web UI. Must be at least 9 characters.
 ## The default username is admin; change it by setting ui_password to "username:password"
 ## Set to "webauth" to disable the login form and use only proxy authentication. See upstreams, below.
 ## Your auth proxy must pass the x-webauth-user header if you set this to "webauth".
 ## You may also set a custom auth header by setting to "webauth:<header>" e.g. "webauth:remote-user"
-## Disable auth by setting this to "noauth". Not recommended. Requires "upstreams" being set.
+## Disable auth by setting this to "noauth". Not recommended and requires "upstreams" being set.
+## If you leave this unset the password will be set to the API key defined at the top of this file.
 ui_password = "{{.UIPassword}}"
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!

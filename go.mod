@@ -35,14 +35,14 @@ require (
 	golang.org/x/crypto v0.5.0
 	golang.org/x/mod v0.7.0
 	golang.org/x/sys v0.5.0
-	golang.org/x/text v0.6.0
+	golang.org/x/text v0.7.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
-	golift.io/cnfgfile v0.0.0-20230128062626-d879199d7b9b
+	golift.io/cnfgfile v0.0.0-20230210073958-ec0a0d77ab9a
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
-	golift.io/qbit v0.0.0-20230130063812-f8043926be13
+	golift.io/qbit v0.0.0-20230210082614-25a38fade923
 	golift.io/rotatorr v0.0.0-20230110212846-590e84fecf74
 	golift.io/starr v0.14.1-0.20230114084726-e2805c5237b5
 	golift.io/version v0.0.2
@@ -61,6 +61,7 @@ require (
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/connesc/cipherio v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/getlantern/context v0.0.0-20190109183933-c447772a6520 // indirect
 	github.com/getlantern/errors v0.0.0-20190325191628-abdb3e3e36f7 // indirect
@@ -105,7 +106,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go4.org v0.0.0-20201209231011-d4a079459e60 // indirect
-	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/net v0.6.0 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
