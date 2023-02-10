@@ -16,8 +16,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dsnet/compress/bzip2"
-
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
@@ -30,6 +28,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"github.com/dsnet/compress/bzip2"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
 	"golift.io/cnfg"
@@ -242,13 +241,13 @@ func (c *Config) FindAndReturn(ctx context.Context, configFile string, write boo
 	}
 
 	if defaultConfigFile != "" && write {
-		return c.writenewConfigFile(ctx, defaultConfigFile, confFile)
+		return c.writeDefaultConfigFile(ctx, defaultConfigFile, confFile)
 	}
 
 	return configFile, "", MsgNoConfigFile
 }
 
-func (c *Config) writenewConfigFile(ctx context.Context, defaultConfigFile, configFile string) (string, string, string) {
+func (c *Config) writeDefaultConfigFile(ctx context.Context, defaultFile, configFile string) (string, string, string) {
 	// If we are writing a config file, set a password.
 	newPassword := c.APIKey
 	if len(newPassword) != website.APIKeyLength {
@@ -257,7 +256,7 @@ func (c *Config) writenewConfigFile(ctx context.Context, defaultConfigFile, conf
 
 	_ = c.UIPassword.Set(DefaultUsername + ":" + newPassword)
 
-	findFile, err := c.Write(ctx, defaultConfigFile)
+	findFile, err := c.Write(ctx, defaultFile)
 	if err != nil {
 		return configFile, newPassword, MsgConfigFailed + err.Error()
 	} else if findFile == "" {
