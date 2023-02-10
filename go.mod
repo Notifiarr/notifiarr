@@ -38,7 +38,7 @@ require (
 	golang.org/x/text v0.6.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
-	golift.io/cnfgfile v0.0.0-20230128062626-d879199d7b9b
+	golift.io/cnfgfile v0.0.0-20230210073958-ec0a0d77ab9a
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
@@ -61,6 +61,7 @@ require (
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/connesc/cipherio v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/getlantern/context v0.0.0-20190109183933-c447772a6520 // indirect
 	github.com/getlantern/errors v0.0.0-20190325191628-abdb3e3e36f7 // indirect

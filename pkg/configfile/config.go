@@ -16,6 +16,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dsnet/compress/bzip2"
+
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
@@ -38,7 +40,7 @@ import (
 const (
 	MsgNoConfigFile = "Using env variables only. Config file not found."
 	MsgConfigFailed = "Using env variables only. Could not create config file: "
-	MsgConfigCreate = "Created new config file '%s'. Your Web UI '%s' password is '%s' " +
+	MsgConfigCreate = "Created new config file '%s'. Your Web UI '%s' user password is '%s' " +
 		"and will not be printed again. Log in, and change it."
 	MsgConfigFound  = "Using Config File: "
 	DefaultUsername = "admin"
@@ -176,6 +178,10 @@ func (c *Config) fixConfig() {
 		c.Retries = website.DefaultRetries
 	}
 
+	if c.UIPassword.Val() == "" && len(c.APIKey) == website.APIKeyLength {
+		c.UIPassword.Set(DefaultUsername + ":" + c.APIKey)
+	}
+
 	c.Services.Apps = c.Apps
 	c.Services.Plugins = c.Snapshot.Plugins
 }
@@ -239,8 +245,12 @@ func (c *Config) FindAndReturn(ctx context.Context, configFile string, write boo
 		return configFile, "", MsgNoConfigFile
 	}
 
-	// If we are writing a
-	newPassword := generatePassword()
+	// If we are writing a config file, set a password.
+	newPassword := c.APIKey
+	if len(newPassword) != website.APIKeyLength {
+		newPassword = generatePassword()
+	}
+
 	_ = c.UIPassword.Set(DefaultUsername + ":" + newPassword)
 
 	findFile, err := c.Write(ctx, defaultConfigFile)
@@ -293,7 +303,13 @@ func (c *Config) Write(ctx context.Context, file string) (string, error) {
 		c.HostID, _ = host.HostIDWithContext(ctx)
 	}
 
-	if err := Template.Execute(newFile, c); err != nil {
+	bzWr, err := bzip2.NewWriter(newFile, &bzip2.WriterConfig{Level: 1})
+	if err != nil {
+		return "", fmt.Errorf("encoding config file: %w", err)
+	}
+	defer bzWr.Close()
+
+	if err := Template.Execute(bzWr, c); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)
 	}
 
