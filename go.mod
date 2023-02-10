@@ -32,10 +32,10 @@ require (
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	github.com/stretchr/testify v1.8.1
 	github.com/swaggo/swag v1.8.10
-	golang.org/x/crypto v0.5.0
+	golang.org/x/crypto v0.6.0
 	golang.org/x/mod v0.7.0
 	golang.org/x/sys v0.5.0
-	golang.org/x/text v0.6.0
+	golang.org/x/text v0.7.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20230128062626-d879199d7b9b
@@ -105,7 +105,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go4.org v0.0.0-20201209231011-d4a079459e60 // indirect
-	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/net v0.6.0 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
