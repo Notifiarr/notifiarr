@@ -7,6 +7,7 @@ go 1.19
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/akavel/rsrc v0.10.2
+	github.com/dsnet/compress v0.0.1
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/gen2brain/beeep v0.0.0-20220909211152-5a9ec94374f6
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
@@ -47,7 +48,7 @@ require (
 	golift.io/starr v0.14.1-0.20230114084726-e2805c5237b5
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.1
-	modernc.org/sqlite v1.20.3
+	modernc.org/sqlite v1.20.4
 )
 
 require (
@@ -61,7 +62,6 @@ require (
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/connesc/cipherio v0.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/getlantern/context v0.0.0-20190109183933-c447772a6520 // indirect
 	github.com/getlantern/errors v0.0.0-20190325191628-abdb3e3e36f7 // indirect
