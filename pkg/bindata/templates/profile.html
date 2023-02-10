@@ -56,7 +56,7 @@
                                                                     <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UI_PASSWORD" .Flags.EnvPrefix}}</span>
                                                                 </div>
                                                             {{- end}}
-                                                            <input placeholder="16 character minimum" type="password" autocomplete="new-password" id="NewPassword" name="NewPassword" class="profile-parameter form-control input-sm" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
+                                                            <input placeholder="9 character minimum" type="password" autocomplete="new-password" id="NewPassword" name="NewPassword" class="profile-parameter form-control input-sm" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
                                                             <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('NewPassword', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                         </div>
                                                     </div>
