@@ -179,7 +179,7 @@ func (c *Config) fixConfig() {
 	}
 
 	if c.UIPassword.Val() == "" && len(c.APIKey) == website.APIKeyLength {
-		c.UIPassword.Set(DefaultUsername + ":" + c.APIKey)
+		_ = c.UIPassword.Set(DefaultUsername + ":" + c.APIKey)
 	}
 
 	c.Services.Apps = c.Apps
@@ -241,10 +241,14 @@ func (c *Config) FindAndReturn(ctx context.Context, configFile string, write boo
 		return configFile, "", MsgConfigFound + configFile
 	}
 
-	if defaultConfigFile == "" || !write {
-		return configFile, "", MsgNoConfigFile
+	if defaultConfigFile != "" && write {
+		return c.writenewConfigFile(ctx, defaultConfigFile, confFile)
 	}
 
+	return configFile, "", MsgNoConfigFile
+}
+
+func (c *Config) writenewConfigFile(ctx context.Context, defaultConfigFile, configFile string) (string, string, string) {
 	// If we are writing a config file, set a password.
 	newPassword := c.APIKey
 	if len(newPassword) != website.APIKeyLength {
