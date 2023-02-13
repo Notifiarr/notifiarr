@@ -7,11 +7,14 @@
                                 {{- end}}
                                 <p>
                                     <li><i class="fas fa-star text-dgrey"></i> This page controls how you log into this Notifiarr client application.</li>
-                                    <li><i class="fas fa-star text-dgrey"></i> Auth Header is only used if Auth Type is <i>not</i> set to Password.
                                     <li><i class="fas fa-star text-dgrey"></i> Username and Password are only used if Auth Type is set to Password.</li>
+                                    <li><i class="fas fa-star text-dgrey"></i> Auth Header is only used if Auth Type is <i>not</i> set to Password.</li>
                                     <li><i class="fas fa-star text-dgrey"></i> See <a href="https://notifiarr.wiki/en/Client/ReverseProxy">the wiki</a> for instructions setting up an authentication proxy.</li>
+                                    <li><i class="fas fa-star text-dgrey"></i> If Auth Type changes, reload <a href="#profile" onClick="reloadConfig();"><i class="fas fa-recycle text-success"></i></a> 
+                                        and log out <a href="logout#profile"><i class="fas fa-sign-out-alt text-danger"></i></a> to complete the process.</li>
                                     {{- if not .ProxyAllow}}
-                                    <li><i class="fas fa-star text-danger"></i> Proxy authentication is disabled because your upstream ({{.UpstreamIP}}) is not in the <a href="#config" onClick="swapNavigationTemplate('config')">allowed upstreams list</a>.</li>
+                                    <li><i class="fas fa-star text-danger"></i> Proxy authentication is disabled because your upstream (<b>{{.UpstreamIP}}</b>) 
+                                        is not in the <a href="#config" onClick="swapNavigationTemplate('config')">allowed upstreams list</a>.</li>
                                     {{- end}}
                                 </p>
                                 <table class="table bk-dark table-bordered">
@@ -24,19 +27,54 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>Auth Type</td>
+                                            <td>
+                                                <span class="dialogTitle">Auth Type</span>
+                                                <div style="display:none;" class="dialogText">
+                                                    Three auth types are currently support.
+                                                    Auth Proxy and No Password are only available if the current request comes from a valid, known
+                                                    upstream IP address. Configure known upstreams on the main
+                                                    <a href="#config" onClick="swapNavigationTemplate('config')">Configuration</a> page.
+                                                    <h4>Password: Local Username</h4>
+                                                    This is the default auth type.
+                                                    Select the Password option to log into this application with a configured username and password.
+                                                    Only 1 username and password is supported.
+                                                    When selecting this option, you must fill in the username and new password fields.
+                                                    If this is the current auth type you must also fill in the current password field.
+                                                    <h4>Auth Proxy: Header</h4>
+                                                    Select this option to log into this application using an HTTP header that container a username.
+                                                    This is commonly known as proxy authentication. We have
+                                                    <a href="https://notifiarr.wiki/en/Client/ReverseProxy">a wiki page</a>
+                                                    that provides instructions to configure Nginx for this feature.
+                                                    When selecting this option, you must also select a header for the auth proxy.
+                                                    If no headers are displayed, then no valid headers were provided by the upstream proxy.
+                                                    <h4>No Password</h4>
+                                                    This configuration is not recommended.
+                                                    The No Password auth type allows any request from a known <code>upstream</code> IP.
+                                                    It also works with an auth proxy to set the username. If no username is in the provided header,
+                                                    then it defaults to admin.
+                                                </div>
+                                                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                            </td>
                                             <td>{{.Config.UIPassword.Type.String}}</td>
                                             <td>
                                                 <select id="AuthType" name="AuthType" class="profile-parameter form-control input-sm" type="select">
-                                                    <option value="password"{{if eq .Config.UIPassword.Type 0}} selected{{end}}>Passowrd (Local Username)</option>
-                                                    <option value="header"{{if eq .Config.UIPassword.Type 1}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>Auth Proxy (header)</option>
+                                                    <option value="password"{{if eq .Config.UIPassword.Type 0}} selected{{end}}>Passowrd: Local Username</option>
+                                                    <option value="header"{{if eq .Config.UIPassword.Type 1}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>Auth Proxy: Header</option>
                                                     <option value="nopass"{{if eq .Config.UIPassword.Type 2}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>No Password (danger)</option>
                                                 </select>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Auth Header</td>
-                                            <td>{{.Config.UIPassword.Header}}</td>
+                                            <td>
+                                                <span class="dialogTitle">Auth Header</span>
+                                                <div style="display:none;" class="dialogText">
+                                                    This displays headers that are provided by the client or upstream that may be used for
+                                                    proxy authentication. This selection is only used if auth type is set to header.
+                                                    Choose the header that displays your proper username.
+                                                </div>
+                                                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                            </td>
+                                            <td>{{if .Config.UIPassword.Webauth}}{{.Config.UIPassword.Header}}{{else}}none{{end}}</td>
                                             <td>
                                                 <select id="AuthHeader" name="AuthHeader" class="profile-parameter form-control input-sm" type="select">
                                                     {{- range $header, $val := .Headers }}

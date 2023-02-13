@@ -40,12 +40,12 @@
                         {{- if .Username }}
                             <div class="dropdown"><!-- this is lame -->
                                 <button class="btn btn-default dropdown-toggle" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
+                                    <i class="nav-icon fas fa-user-astronaut"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
                                 </button>
                                 <ul style="width:92%;" class="dropdown-menu bk-brown" aria-labelledby="user menu">
-                                    <li><a class="nav-link" href="#profile" onclick="swapNavigationTemplate('profile')">Profile</a></li>
+                                    <li><a class="nav-link" href="#profile" onclick="swapNavigationTemplate('profile')"><i class="nav-icon fas fa-lock"></i> Profile</a></li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="logout">Logout</a></li>
+                                    <li><a href="logout"><i class="nav-icon fas fa-sign-out-alt"></i>Logout</a></li>
                                 </ul>
                             </div>
                             <div class="desktop-hide">

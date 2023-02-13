@@ -11,6 +11,8 @@ import (
 	"golang.org/x/text/language"
 )
 
+var ErrEmptyHeader = fmt.Errorf("auth header may not be empty")
+
 // CryptPass allows us to validate an input password easily.
 type CryptPass string
 
@@ -73,11 +75,15 @@ func (p *CryptPass) Set(pass string) error {
 	return nil
 }
 
-func (p *CryptPass) SetNoAuth(reason string) error {
-	return p.Set(authNone + ":" + reason)
+func (p *CryptPass) SetNoAuth(header string) error {
+	return p.Set(authNone + ":" + header)
 }
 
 func (p *CryptPass) SetHeader(header string) error {
+	if header == "" {
+		return ErrEmptyHeader
+	}
+
 	return p.Set(authHeader + ":" + header)
 }
 

@@ -513,12 +513,12 @@ func (c *Client) setUserPass(ctx context.Context, authType, username, password s
 	case "header":
 		err = c.Config.UIPassword.SetHeader(username)
 	case "nopass":
-		err = c.Config.UIPassword.SetNoAuth("")
+		err = c.Config.UIPassword.SetNoAuth(username)
 	}
 
 	if err != nil {
 		c.Config.UIPassword = current
-		return fmt.Errorf("saving username and password: %w", err)
+		return fmt.Errorf("saving new auth settings: %w", err)
 	}
 
 	if err := c.saveNewConfig(ctx, c.Config); err != nil {

@@ -382,7 +382,7 @@ function saveProfileChanges()
         data: fields,
         success: function (data){
             $('#current-username').html($('#NewUsername').val()); // update the html username.
-            toast('Profile Saved', data, 'success');
+            toast('Auth Settings Saved', data, 'success');
         },
         error: function (response, status, error) {
             if (response.responseText === undefined) {

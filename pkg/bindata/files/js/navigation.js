@@ -125,3 +125,11 @@ function showhttps(val, elem) {
         $(elem).hide();
     }
 }
+
+// Make 'enter' on a profile form element submit the form correctly.
+$('.profile-parameter').keydown(function(e) {
+    if(e.keyCode == 13) {
+        e.preventDefault();
+        saveProfileChanges();
+    }
+});
