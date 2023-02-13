@@ -38,11 +38,6 @@
                     <nav class="ts-sidebar" style="margin-bottom: 25px;">
                         <ul class="ts-sidebar-menu">
                         {{- if .Username }}
-                            {{- if .Dynamic }}
-                            <div class="btn btn-default" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px">
-                                <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<i style="font-size:9px" class="fas fa-lock"></i>
-                            </div>
-                            {{- else }}
                             <div class="dropdown"><!-- this is lame -->
                                 <button class="btn btn-default dropdown-toggle" style="margin-top:4px;padding-left:0px;width:100%; text-align: left; font-size:15px" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <i class="nav-icon fas fa-user"></i> &nbsp;&nbsp;&nbsp;&nbsp; {{.Username}} &nbsp;<span class="caret"></span>
@@ -53,7 +48,6 @@
                                     <li><a href="logout">Logout</a></li>
                                 </ul>
                             </div>
-                            {{- end }}
                             <div class="desktop-hide">
                                 <br>
                                 <div class="pending-change-container" style="display: none;">

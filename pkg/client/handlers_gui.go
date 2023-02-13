@@ -78,8 +78,7 @@ func (c *Client) getUserName(request *http.Request) (string, bool) {
 		return username, found
 	}
 
-	ip := strings.Trim(request.RemoteAddr[:strings.LastIndex(request.RemoteAddr, ":")], "[]")
-	if c.Config.Allow.Contains(ip) && c.webauth {
+	if c.Config.Allow.Contains(request.RemoteAddr) && c.webauth {
 		// If the upstream is allowed and gave us a username header, use it.
 		if userName := request.Header.Get(c.authHeader); userName != "" {
 			return userName, true
@@ -348,18 +347,43 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	currUser, dynamic := c.getUserName(request)
-	if dynamic {
-		http.Error(response, "Dynamic accounts cannot make profile changes.", http.StatusBadRequest)
+	var (
+		currPass          = request.PostFormValue("Password")
+		authType          = request.PostFormValue("AuthType")
+		authHeader        = request.PostFormValue("AuthHeader")
+		currUser, dynamic = c.getUserName(request)
+	)
+
+	if !dynamic {
+		// If the auth is currently using a password, check the password.
+		if !c.checkUserPass(currUser, currPass) {
+			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if authType == "password" {
+		c.handleProfilePostPassword(response, request)
 		return
 	}
 
+	switch err := c.setUserPass(request.Context(), authType, authHeader, ""); {
+	case err != nil:
+		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
+		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
+	case authType == "nopass":
+		c.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
+		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
+	default:
+		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, authHeader)
+		c.setSession(request.Header.Get(authHeader), response)
+		http.Error(response, "Enabled WebUI proxy authentication, header: "+authHeader, http.StatusOK)
+	}
+}
+
+func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request *http.Request) {
 	currPass := request.PostFormValue("Password")
-
-	if !c.checkUserPass(currUser, currPass) {
-		http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
-		return
-	}
+	currUser, _ := c.getUserName(request)
 
 	username := request.PostFormValue("NewUsername")
 	if username == "" {
@@ -382,7 +406,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		return
 	}
 
-	if err := c.setUserPass(request.Context(), username, newPassw); err != nil {
+	if err := c.setUserPass(request.Context(), "password", username, ""); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 

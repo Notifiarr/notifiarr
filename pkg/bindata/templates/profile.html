@@ -1,14 +1,19 @@
                                 {{- if .ClientInfo.IsSub}}
-                                <h1><font color="green"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-tie{{end}}"></i></font> User Profile</h1>
+                                <h1><font color="green"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-tie{{end}}"></i></font> Auth Profile</h1>
                                 {{- else if .ClientInfo.IsPatron}}
-                                <h1><font color="purple"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-ninja{{end}}"></i></font> User Profile</h1>
+                                <h1><font color="purple"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-ninja{{end}}"></i></font> Auth Profile</h1>
                                 {{- else}}
-                                <h1><i class="fas fa-user-alt" style="float:left;font-size:40px"></i> User Profile</h1>
+                                <h1><i class="fas fa-user-alt" style="float:left;font-size:40px"></i> Auth Profile</h1>
                                 {{- end}}
-                            {{- if .Dynamic }}
-                                <p>Profile editing is disabled for dynamic users.</p>
-                            {{- else }}
-                                <p>You must enter your current password to save changes.</p>
+                                <p>
+                                    <li><i class="fas fa-star text-dgrey"></i> This page controls how you log into this Notifiarr client application.</li>
+                                    <li><i class="fas fa-star text-dgrey"></i> Auth Header is only used if Auth Type is <i>not</i> set to Password.
+                                    <li><i class="fas fa-star text-dgrey"></i> Username and Password are only used if Auth Type is set to Password.</li>
+                                    <li><i class="fas fa-star text-dgrey"></i> See <a href="https://notifiarr.wiki/en/Client/ReverseProxy">the wiki</a> for instructions setting up an authentication proxy.</li>
+                                    {{- if not .ProxyAllow}}
+                                    <li><i class="fas fa-star text-danger"></i> Proxy authentication is disabled because your upstream ({{.UpstreamIP}}) is not in the <a href="#config" onClick="swapNavigationTemplate('config')">allowed upstreams list</a>.</li>
+                                    {{- end}}
+                                </p>
                                 <table class="table bk-dark table-bordered">
                                     <thead>
                                         <tr>
@@ -18,6 +23,36 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr>
+                                            <td>Auth Type</td>
+                                            <td>{{.Config.UIPassword.Type.String}}</td>
+                                            <td>
+                                                <select id="AuthType" name="AuthType" class="profile-parameter form-control input-sm" type="select">
+                                                    <option value="password"{{if eq .Config.UIPassword.Type 0}} selected{{end}}>Passowrd (Local Username)</option>
+                                                    <option value="header"{{if eq .Config.UIPassword.Type 1}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>Auth Proxy (header)</option>
+                                                    <option value="nopass"{{if eq .Config.UIPassword.Type 2}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>No Password (danger)</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Auth Header</td>
+                                            <td>{{.Config.UIPassword.Header}}</td>
+                                            <td>
+                                                <select id="AuthHeader" name="AuthHeader" class="profile-parameter form-control input-sm" type="select">
+                                                    {{- range $header, $val := .Headers }}
+                                                        {{- /* Hide some headers, but not the one that's currently selected. */ -}}
+                                                        {{ if or (eq (lower $header) (lower $.Config.UIPassword.Header)) (and 
+                                                            (ne (lower $header) "cookie") (ne (lower $header) "accept") (ne (lower $header) "upgrade-insecure-requests")
+                                                            (ne (lower $header) "accept-encoding") (ne (lower $header) "accept-language") (ne (lower $header) "connection")  
+                                                            (ne (lower $header) "x-forwarded-for") (ne (lower $header) "x-redacted-uri")  (ne (lower $header) "user-agent")
+                                                            (ne (lower $header) "referer") (ne (lower $header) "x-noticlient-username") (ne (lower $header) "cache-control")
+                                                        )}}
+                                                    <option value="{{$header}}"{{if eq (lower $header) (lower $.Config.UIPassword.Header)}} selected{{end}}>{{$header}}: {{index $val 0}}</option>
+                                                        {{- end }}
+                                                    {{- end }}
+                                                </select>
+                                            </td>
+                                        </tr>
                                         <tr>
                                             <td>Username</td>
                                             <td id="current-username">{{.Username}}</td>
@@ -42,7 +77,13 @@
                                         </tr>
                                         <tr>
                                             <td>Password</td>
-                                            <td><input placeholder="enter current password" type="password" id="Password" name="Password" class="profile-parameter form-control input-sm" style="width: 100%;"></td>
+                                            <td>
+                                                {{- if .Webauth}}
+                                                none
+                                                {{- else}}
+                                                <input placeholder="enter current password" type="password" id="Password" name="Password" class="profile-parameter form-control input-sm" style="width: 100%;">
+                                                {{- end}}
+                                            </td>
                                             <td>
                                                 <form class="form-inline">
                                                     <div class="form-group" style="width:100%">
@@ -65,7 +106,12 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <button onclick="saveProfileChanges()" class="btn btn-primary">Save Changes</button>
-                                <hr><div class="col-md-10 col-md-offset-1"><pre class="bk-dark text-white">{{fortune}}</pre></div>
-                            {{- end}}
+                                <p>
+                                    <button onclick="saveProfileChanges()" class="btn btn-primary">Save Changes</button>
+                                    {{- if not .Webauth}}
+                                    &nbsp;You must enter your current password to save changes.{{end}}
+                                </p>
+                                <hr>
+                                <h2><i class="fas fa-stroopwafel"></i> Fortune</h2>
+                                <div class="col-md-10 col-md-offset-1"><pre class="bk-dark text-white">{{fortune}}</pre></div>
 {{- /* end of profile (leave this comment) */ -}}

@@ -14,10 +14,18 @@ import (
 // CryptPass allows us to validate an input password easily.
 type CryptPass string
 
+type AuthType int
+
 const (
-	cryptedPassPfx = "!!cryptd!!"
-	webauth        = "webauth"
-	noauth         = "noauth"
+	AuthPassword AuthType = iota
+	AuthHeader
+	AuthNone
+)
+
+const (
+	authPassword = "!!cryptd!!"
+	authHeader   = "webauth"
+	authNone     = "noauth"
 )
 
 func (c *Config) setupPassword() error {
@@ -37,9 +45,20 @@ func (c *Config) setupPassword() error {
 	return nil
 }
 
+func (t AuthType) String() string {
+	return map[AuthType]string{
+		AuthPassword: "Password",
+		AuthHeader:   "Header",
+		AuthNone:     "No Password",
+	}[t]
+}
+
 // Set sets an encrypted password.
 func (p *CryptPass) Set(pass string) error {
-	if strings.HasPrefix(pass, cryptedPassPfx) || p.Webauth() || pass == "" {
+	if strings.HasPrefix(pass, authPassword) ||
+		strings.HasPrefix(pass, authHeader+":") ||
+		strings.HasPrefix(pass, authNone+":") ||
+		pass == "" {
 		*p = CryptPass(pass)
 		return nil
 	}
@@ -49,19 +68,39 @@ func (p *CryptPass) Set(pass string) error {
 		return fmt.Errorf("encrypting password: %w", err)
 	}
 
-	*p = CryptPass(cryptedPassPfx + string(bytes))
+	*p = CryptPass(authPassword + string(bytes))
 
 	return nil
 }
 
+func (p *CryptPass) SetNoAuth(reason string) error {
+	return p.Set(authNone + ":" + reason)
+}
+
+func (p *CryptPass) SetHeader(header string) error {
+	return p.Set(authHeader + ":" + header)
+}
+
+// Type returns the authentication type configured.
+func (p CryptPass) Type() AuthType {
+	switch {
+	case p.Noauth():
+		return AuthNone
+	case p.Webauth():
+		return AuthHeader
+	default:
+		return AuthPassword
+	}
+}
+
 // Webauth returns true if the password indicates an auth proxy (or no auth) is in use.
 func (p CryptPass) Webauth() bool {
-	return p == webauth || strings.HasPrefix(p.Val(), webauth+":") || p.Noauth()
+	return p == authHeader || strings.HasPrefix(p.Val(), authHeader+":") || p.Noauth()
 }
 
 // Header returns the auth proxy header that is configured.
 func (p CryptPass) Header() string {
-	if split := strings.Split(p.Val(), ":"); len(split) == 2 && split[0] == webauth {
+	if split := strings.Split(p.Val(), ":"); len(split) == 2 && split[0] == authHeader {
 		return split[1]
 	}
 
@@ -70,7 +109,7 @@ func (p CryptPass) Header() string {
 
 // Noauth returns true if the password indicates skipping authentication.
 func (p CryptPass) Noauth() bool {
-	return p == noauth || strings.HasPrefix(p.Val(), noauth+":")
+	return p == authNone || strings.HasPrefix(p.Val(), authNone+":")
 }
 
 // Val returns the string representation of the current password.
@@ -81,13 +120,13 @@ func (p CryptPass) Val() string {
 
 // Valid checks if a password is valid.
 func (p CryptPass) Valid(pass string) bool {
-	hash := []byte(strings.TrimPrefix(p.Val(), cryptedPassPfx))
+	hash := []byte(strings.TrimPrefix(p.Val(), authPassword))
 	return !p.Webauth() && bcrypt.CompareHashAndPassword(hash, []byte(pass)) == nil
 }
 
 // IsCrypted checks if a password string is already encrypted.
 func (p CryptPass) IsCrypted() bool {
-	return strings.HasPrefix(p.Val(), cryptedPassPfx)
+	return strings.HasPrefix(p.Val(), authPassword)
 }
 
 // generatePassword uses a word list to create a randmo password of two words and a number.

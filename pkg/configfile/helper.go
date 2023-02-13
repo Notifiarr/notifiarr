@@ -40,6 +40,8 @@ func (n AllowedIPs) String() (s string) {
 
 // Contains returns true if an IP is allowed.
 func (n AllowedIPs) Contains(ip string) bool {
+	ip = strings.Trim(ip[:strings.LastIndex(ip, ":")], "[]")
+
 	for i := range n {
 		if n[i].Contains(net.ParseIP(ip)) {
 			return true
