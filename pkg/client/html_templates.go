@@ -426,7 +426,7 @@ type templateData struct {
 	Expvar      mnd.AllData                    `json:"expvar"`
 	HostInfo    *host.InfoStat                 `json:"hostInfo"`
 	Disks       map[string]*snapshot.Partition `json:"disks"`
-	Headers     map[string][]string            `json:"headers"`
+	Headers     http.Header                    `json:"headers"`
 	ProxyAllow  bool                           `json:"proxyAllow"`
 	UpstreamIP  string                         `json:"upstreamIp"`
 }
@@ -521,7 +521,12 @@ func (c *Client) setUserPass(ctx context.Context, authType, username, password s
 		return fmt.Errorf("saving new auth settings: %w", err)
 	}
 
-	if err := c.saveNewConfig(ctx, c.Config); err != nil {
+	config, err := c.Config.CopyConfig()
+	if err != nil {
+		return fmt.Errorf("copying config: %w", err)
+	}
+
+	if err := c.saveNewConfig(ctx, config); err != nil {
 		c.Config.UIPassword = current
 		return err
 	}

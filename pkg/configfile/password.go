@@ -135,10 +135,10 @@ func (p CryptPass) IsCrypted() bool {
 	return strings.HasPrefix(p.Val(), authPassword)
 }
 
-// generatePassword uses a word list to create a randmo password of two words and a number.
+// GeneratePassword uses a word list to create a randmo password of two words and a number.
 //
 //nolint:gosec,gomnd
-func generatePassword() string {
+func GeneratePassword() string {
 	title := cases.Title(language.AmericanEnglish)
 	pieces := make([]string, 4)
 

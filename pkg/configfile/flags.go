@@ -22,7 +22,8 @@ type Flags struct {
 	Updated       bool     `json:"updated"`
 	PSlist        bool     `json:"pslist"`
 	Fortune       bool     `json:"fortune"`
-	Write         string   `json:"wrte"`
+	Write         string   `json:"write"`
+	Reset         bool     `json:"reset"`
 	Curl          string   `json:"curl"`
 	ConfigFile    string   `json:"configFile"`
 	ExtraConf     []string `json:"extraConf"`
@@ -46,6 +47,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringVar(&f.Curl, "curl", "", "GET a URL and display headers and payload.")
 	f.StringSliceVar(&f.Headers, "header", nil, "Use with --curl to add a request header.")
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
+	f.BoolVar(&f.Reset, "reset", false, "Reset the admin password and write it to the config file.")
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
 	f.StringVarP(&f.Assets, "assets", "a", "", "Provide path to custom web assets: static files and templates")
 	f.BoolVar(&f.AptHook, "apthook", false, "Process a payload from a dpkg Pre-Install-Pkgs hook.")

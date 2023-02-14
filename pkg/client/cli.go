@@ -27,7 +27,7 @@ var (
 	ErrInvalidHeader = fmt.Errorf("invalid header provided; must contain a colon")
 )
 
-// forceWriteWithExit is called only when a user passes --write on the command line.
+// forceWriteWithExit is called only when a user passes --write or --reset on the command line.
 func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error {
 	if fileName == "example" || fileName == "---" {
 		// Bubilding a default template.
@@ -40,7 +40,7 @@ func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error 
 		configfile.ForceAllTmpl = true
 	}
 
-	f, err := c.Config.Write(ctx, fileName)
+	f, err := c.Config.Write(ctx, fileName, false)
 	if err != nil {
 		return fmt.Errorf("writing config: %w", err)
 	}
@@ -48,6 +48,20 @@ func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error 
 	c.Print("Wrote Config File:", f)
 
 	return nil
+}
+
+func (c *Client) resetAdminPassword(ctx context.Context, fileName string) error {
+	password := configfile.GeneratePassword()
+
+	err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + password)
+	if err != nil {
+		return fmt.Errorf("setting password failed: %w", err)
+	}
+
+	c.Printf("New '%s' user password: %s", configfile.DefaultUsername, password)
+	c.Printf("Writing Config File: %s", c.Flags.ConfigFile)
+
+	return c.saveNewConfig(ctx, c.Config)
 }
 
 // printProcessList is triggered by the --ps command line arg.

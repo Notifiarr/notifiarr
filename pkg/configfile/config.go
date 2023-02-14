@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -251,12 +252,12 @@ func (c *Config) writeDefaultConfigFile(ctx context.Context, defaultFile, config
 	// If we are writing a config file, set a password.
 	newPassword := c.APIKey
 	if len(newPassword) != website.APIKeyLength {
-		newPassword = generatePassword()
+		newPassword = GeneratePassword()
 	}
 
 	_ = c.UIPassword.Set(DefaultUsername + ":" + newPassword)
 
-	findFile, err := c.Write(ctx, defaultFile)
+	findFile, err := c.Write(ctx, defaultFile, false)
 	if err != nil {
 		return configFile, newPassword, MsgConfigFailed + err.Error()
 	} else if findFile == "" {
@@ -273,7 +274,7 @@ func (c *Config) writeDefaultConfigFile(ctx context.Context, defaultFile, config
 }
 
 // Write config to a file.
-func (c *Config) Write(ctx context.Context, file string) (string, error) {
+func (c *Config) Write(ctx context.Context, file string, encode bool) (string, error) { //nolint:cyclop
 	if file == "" {
 		return "", nil
 	}
@@ -306,13 +307,19 @@ func (c *Config) Write(ctx context.Context, file string) (string, error) {
 		c.HostID, _ = host.HostIDWithContext(ctx)
 	}
 
-	bzWr, err := bzip2.NewWriter(newFile, &bzip2.WriterConfig{Level: 1})
-	if err != nil {
-		return "", fmt.Errorf("encoding config file: %w", err)
-	}
-	defer bzWr.Close()
+	var writer io.Writer = newFile
 
-	if err := Template.Execute(bzWr, c); err != nil {
+	if encode {
+		bzWr, err := bzip2.NewWriter(newFile, &bzip2.WriterConfig{Level: 1})
+		if err != nil {
+			return "", fmt.Errorf("encoding config file: %w", err)
+		}
+
+		defer bzWr.Close()
+		writer = bzWr
+	}
+
+	if err := Template.Execute(writer, c); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)
 	}
 
