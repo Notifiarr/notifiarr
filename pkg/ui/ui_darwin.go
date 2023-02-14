@@ -33,7 +33,7 @@ func Notify(msg string, vars ...interface{}) error {
 		return nil
 	}
 
-	// This finds terminal-notifier inside Toniq.app or in your PATH.
+	// This finds terminal-notifier inside this app or in your PATH.
 	app, err := osext.ExecutableFolder()
 	if err != nil {
 		return fmt.Errorf("cannot find application running directory: %w", err)
@@ -44,7 +44,7 @@ func Notify(msg string, vars ...interface{}) error {
 		return fmt.Errorf("cannot locate terminal-notifier: %w, app folder: %s, ../: %s", err, app, list)
 	}
 
-	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "tv.twitch.toniq")
+	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "io.golift.notifiarr")
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}
