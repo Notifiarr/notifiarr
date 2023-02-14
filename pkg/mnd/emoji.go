@@ -13,7 +13,7 @@ const (
 
 func today(when time.Time) int {
 	switch today := when.YearDay(); {
-	case !leapYear(when.Year()), today < leapDay:
+	case !isLeapYear(when.Year()), today < leapDay:
 		return today
 	case today == leapDay:
 		return altLeapDay
@@ -22,7 +22,7 @@ func today(when time.Time) int {
 	}
 }
 
-func leapYear(year int) bool {
+func isLeapYear(year int) bool {
 	return year%400 == 0 || (year%4 == 0 && year%100 != 0)
 }
 

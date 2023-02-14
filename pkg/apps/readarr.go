@@ -628,7 +628,7 @@ func readarrGetNotifications(req *http.Request) (int, interface{}) {
 	return http.StatusOK, output
 }
 
-// @Description  Updates a Notifcation in Readarr.
+// @Description  Updates a Notification in Readarr.
 // @Summary      Update Readarr Notification
 // @Tags         Readarr
 // @Produce      json

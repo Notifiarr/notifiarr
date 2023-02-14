@@ -1056,7 +1056,7 @@ func radarrGetNotifications(req *http.Request) (int, interface{}) {
 	return http.StatusOK, output
 }
 
-// @Description  Updates a Notifcation in Radarr.
+// @Description  Updates a Notification in Radarr.
 // @Summary      Update Radarr Notification
 // @Tags         Radarr
 // @Produce      json

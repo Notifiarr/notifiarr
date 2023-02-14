@@ -20,6 +20,16 @@ jobs:
         run: |
           go test ./pkg/...
 
+  codespell:
+    steps:
+      - uses: actions/checkout@v3
+      - uses: codespell-project/actions-codespell@v1
+        with:
+          check_hidden: true
+          ignore_words_list: vender
+          skip: .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js
+
+
   golangci-darwin:
     # description: "Runs golangci-lint on macos against freebsd and macos."
     strategy:
@@ -63,7 +73,7 @@ jobs:
           version: v1.50
 
   homebrew-test:
-    # description: "Installs dependencis on macOS and runs `make install` to mimic a homebrew install."
+    # description: "Installs dependencies on macOS and runs `make install` to mimic a homebrew install."
     name: test-homebrew-install
     runs-on: macos-latest
     steps:
