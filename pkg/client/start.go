@@ -133,7 +133,7 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 		ctx, cancel := context.WithTimeout(ctx, time.Minute)
 		defer cancel()
 
-		return c.resetAdminPassword(ctx, c.Flags.ConfigFile)
+		return c.resetAdminPassword(ctx)
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
 		c.Printf("==> %s", msg)
 

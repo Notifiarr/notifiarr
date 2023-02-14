@@ -50,7 +50,7 @@ func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error 
 	return nil
 }
 
-func (c *Client) resetAdminPassword(ctx context.Context, fileName string) error {
+func (c *Client) resetAdminPassword(ctx context.Context) error {
 	password := configfile.GeneratePassword()
 
 	err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + password)
