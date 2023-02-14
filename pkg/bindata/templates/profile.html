@@ -49,7 +49,7 @@
                                             <td>{{.Config.UIPassword.Type.String}}</td>
                                             <td>
                                                 <select id="AuthType" name="AuthType" class="profile-parameter form-control input-sm" type="select">
-                                                    <option value="password"{{if eq .Config.UIPassword.Type 0}} selected{{end}}>Passowrd: Local Username</option>
+                                                    <option value="password"{{if eq .Config.UIPassword.Type 0}} selected{{end}}>Password: Local Username</option>
                                                     <option value="header"{{if eq .Config.UIPassword.Type 1}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>Auth Proxy: Header</option>
                                                     <option value="nopass"{{if eq .Config.UIPassword.Type 2}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>No Password (danger)</option>
                                                 </select>
