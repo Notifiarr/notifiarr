@@ -181,7 +181,7 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
 notifiarr.conf.example: examples/notifiarr.conf.example generate
-	go run . -c $< -w ---
+	go run -ldflags "$(VERSION_LDFLAGS)" . -c $< -w ---
 	mv $<.new $@
 
 macapp: Notifiarr.app
