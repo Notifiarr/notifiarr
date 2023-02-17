@@ -422,7 +422,7 @@ func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request
 
 	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, username)
 	c.setSession(username, response)
-	http.Error(response, "Trust profile saved.", http.StatusOK)
+	http.Error(response, "Trust Profile saved.", http.StatusOK)
 	c.reloadAppNow()
 }
 

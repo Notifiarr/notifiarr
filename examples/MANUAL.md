@@ -62,8 +62,8 @@ OPTIONS
         Will not work on any OS except Linux; only designed for Debian OSes.
 
     --reset
-        This commands reads in the config file provided with --config,
-        changes the ui_password to a new random value and saves the file.
+        This flag reads in the config file provided with --config, changes
+        the ui_password to a new random value, prints it, and saves the file.
         Use this when you get locked out of the Web UI interface.
         Must reload or restart after this updates the config file.
 

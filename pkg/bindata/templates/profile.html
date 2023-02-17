@@ -24,16 +24,16 @@
                                                 <span class="dialogTitle">Auth Type</span>
                                                 <div style="display:none;" class="dialogText">
                                                     Three auth types are currently supported.
-                                                    Auth Proxy and No Password are only available if the current request comes from a valid, known
+                                                    Auth Proxy and No Password are only available if the current request comes from a valid, configured
                                                     upstream IP address.
                                                     <h4>Password: Local Username</h4>
                                                     This is the default auth type.
                                                     Select the Password option to log into this application with a configured username and password.
                                                     Only 1 username and password is supported.
                                                     When selecting this option, you must fill in the username and new password fields.
-                                                    If this is the current auth type you must also fill in the current password field.
+                                                    If this is the current auth type you must also fill in the current password field to make changes.
                                                     <h4>Auth Proxy: Header</h4>
-                                                    Select this option to log into this application using an HTTP header that container a username.
+                                                    Select this option to log into this application using an HTTP header that contains a username.
                                                     This is commonly known as proxy authentication. We have
                                                     <a href="https://notifiarr.wiki/en/Client/ReverseProxy">a wiki page</a>
                                                     that provides instructions to configure Nginx for this feature.
@@ -41,7 +41,7 @@
                                                     If no headers are displayed, then no valid headers were provided by the upstream proxy.
                                                     <h4>No Password</h4>
                                                     This configuration is not recommended.
-                                                    The No Password auth type allows any request from a known <code>upstream</code> IP.
+                                                    The No Password auth type allows any request from any configured <code>upstream</code> IP.
                                                     It also works with an auth proxy to set the username. If no username is in the provided header,
                                                     then it defaults to admin.
                                                 </div>
@@ -76,14 +76,14 @@
                                             </td>
                                             <td class="form-inline">
                                                 <div class="form-group" style="width:100%">
-                                                    {{- if (locked (printf "%s_UPTREAMS_0" .Flags.EnvPrefix))}}
+                                                    {{- if (locked (printf "%s_UPSTREAMS_0" .Flags.EnvPrefix))}}
                                                     <div class="input-group" style="width:100%">
                                                         <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                             <div style="display:none;" class="dialogText">
                                                                 An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                             </div>
                                                             <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
-                                                            <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UPTREAMS_0" .Flags.EnvPrefix}}</span>
+                                                            <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UPSTREAMS_0" .Flags.EnvPrefix}}</span>
                                                         </div>
                                                         <input type="text" id="Upstreams" name="Upstreams" placeholder="127.0.0.1 ::1" class="profile-parameter form-control input-sm" data-group="config" data-label="Upstreams" style="width: 100%;" data-original="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}" value="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}">
                                                     </div>
