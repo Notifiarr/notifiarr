@@ -414,15 +414,15 @@ func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request
 	}
 
 	if err := c.setUserPass(request.Context(), "password", username, newPassw); err != nil {
-		c.Errorf("[gui '%s' requested] Saving Auth Profile: %v", currUser, err)
-		http.Error(response, "Saving Auth Profile: "+err.Error(), http.StatusInternalServerError)
+		c.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
+		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
-	c.Printf("[gui '%s' requested] Updated user, pass and other auth settings, new username: %s", currUser, username)
+	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, username)
 	c.setSession(username, response)
-	http.Error(response, "Auth profile saved.", http.StatusOK)
+	http.Error(response, "Trust profile saved.", http.StatusOK)
 	c.reloadAppNow()
 }
 

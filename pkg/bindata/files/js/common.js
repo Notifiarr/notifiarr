@@ -382,7 +382,7 @@ function saveProfileChanges()
         data: fields,
         success: function (data){
             $('#current-username').html($('#NewUsername').val()); // update the html username.
-            toast('Auth Settings Saved', 'Page will refresh after reload finishes. '+data, 'success', 60000);
+            toast('Trust Profile Saved', 'Page will refresh after reload finishes. '+data, 'success', 60000);
             setTimeout(reloadTimeout, 500);
         },
         error: function (response, status, error) {
