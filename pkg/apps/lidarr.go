@@ -660,7 +660,7 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 	return http.StatusOK, output
 }
 
-// @Description  Updates a Notifcation in Lidarr.
+// @Description  Updates a Notification in Lidarr.
 // @Summary      Update Lidarr Notification
 // @Tags         Lidarr
 // @Produce      json

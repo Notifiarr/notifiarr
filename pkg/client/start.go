@@ -125,6 +125,15 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 	switch {
 	case c.Flags.AptHook:
 		return c.handleAptHook(ctx) // err?
+	case c.Flags.Reset:
+		if err != nil {
+			return fmt.Errorf("cannot reset admin password, got error reading configuration file: %w", err)
+		}
+
+		ctx, cancel := context.WithTimeout(ctx, time.Minute)
+		defer cancel()
+
+		return c.resetAdminPassword(ctx)
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
 		c.Printf("==> %s", msg)
 
@@ -174,7 +183,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	ctx, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 
-	_, _ = c.Config.Write(ctx, c.Flags.ConfigFile)
+	_, _ = c.Config.Write(ctx, c.Flags.ConfigFile, false)
 	_ = ui.OpenFile(c.Flags.ConfigFile)
 	_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
 		c.Flags.ConfigFile+" - it should open in a text editor. "+

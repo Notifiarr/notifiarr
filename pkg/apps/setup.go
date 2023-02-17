@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
-	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/cnfg"
@@ -112,7 +111,7 @@ func (a *Apps) Setup() error { //nolint:cyclop
 	}
 
 	if a.Tautulli == nil {
-		a.Tautulli = &TautulliConfig{Config: &tautulli.Config{}}
+		a.Tautulli = &TautulliConfig{}
 	}
 
 	if a.Plex == nil {

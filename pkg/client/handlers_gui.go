@@ -78,8 +78,7 @@ func (c *Client) getUserName(request *http.Request) (string, bool) {
 		return username, found
 	}
 
-	ip := strings.Trim(request.RemoteAddr[:strings.LastIndex(request.RemoteAddr, ":")], "[]")
-	if c.Config.Allow.Contains(ip) && c.webauth {
+	if c.Config.Allow.Contains(request.RemoteAddr) && c.webauth {
 		// If the upstream is allowed and gave us a username header, use it.
 		if userName := request.Header.Get(c.authHeader); userName != "" {
 			return userName, true
@@ -258,12 +257,16 @@ func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
 }
 
 func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
+	c.reloadAppNow()
+	http.Error(response, "OK", http.StatusOK)
+}
+
+func (c *Client) reloadAppNow() {
 	c.Lock()
 	c.reloading = true
 	c.Unlock()
 
 	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
-	http.Error(response, "OK", http.StatusOK)
 }
 
 func (c *Client) handlePing(response http.ResponseWriter, _ *http.Request) {
@@ -348,18 +351,51 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	currUser, dynamic := c.getUserName(request)
-	if dynamic {
-		http.Error(response, "Dynamic accounts cannot make profile changes.", http.StatusBadRequest)
+	var (
+		currPass          = request.PostFormValue("Password")
+		authType          = request.PostFormValue("AuthType")
+		authHeader        = request.PostFormValue("AuthHeader")
+		currUser, dynamic = c.getUserName(request)
+	)
+
+	if !dynamic {
+		// If the auth is currently using a password, check the password.
+		if !c.checkUserPass(currUser, currPass) {
+			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
+			return
+		}
+	}
+
+	// Upstreams is only read on reload, but this is still not thread safe
+	// because two people could click save at the same time.
+	c.Lock()
+	c.Config.Upstreams = strings.Fields(request.PostFormValue("Upstreams"))
+	c.Unlock()
+
+	if authType == "password" {
+		c.handleProfilePostPassword(response, request)
 		return
 	}
 
+	switch err := c.setUserPass(request.Context(), authType, authHeader, ""); {
+	case err != nil:
+		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
+		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
+	case authType == "nopass":
+		c.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
+		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
+		c.reloadAppNow()
+	default:
+		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, authHeader)
+		c.setSession(request.Header.Get(authHeader), response)
+		http.Error(response, "Enabled WebUI proxy authentication. Header: "+authHeader, http.StatusOK)
+		c.reloadAppNow()
+	}
+}
+
+func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request *http.Request) {
 	currPass := request.PostFormValue("Password")
-
-	if !c.checkUserPass(currUser, currPass) {
-		http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
-		return
-	}
+	currUser, _ := c.getUserName(request)
 
 	username := request.PostFormValue("NewUsername")
 	if username == "" {
@@ -377,21 +413,17 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		return
 	}
 
-	if newPassw == currPass && username == currUser {
-		http.Error(response, "Values unchanged. Nothing to save.", http.StatusOK)
-		return
-	}
-
-	if err := c.setUserPass(request.Context(), username, newPassw); err != nil {
-		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
-		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
+	if err := c.setUserPass(request.Context(), "password", username, newPassw); err != nil {
+		c.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
+		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
-	c.Printf("[gui '%s' requested] Updated primary username and password, new username: %s", currUser, username)
+	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, username)
 	c.setSession(username, response)
-	http.Error(response, "New username and/or password saved.", http.StatusOK)
+	http.Error(response, "Trust Profile saved.", http.StatusOK)
+	c.reloadAppNow()
 }
 
 func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http.Request) {
@@ -624,7 +656,7 @@ func (c *Client) saveNewConfig(ctx context.Context, config *configfile.Config) e
 
 	// write new config file to temporary path.
 	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig."+date)
-	if _, err := config.Write(ctx, destFile); err != nil { // write our config file template.
+	if _, err := config.Write(ctx, destFile, true); err != nil { // write our config file template.
 		return fmt.Errorf("writing new config file: %w", err)
 	}
 

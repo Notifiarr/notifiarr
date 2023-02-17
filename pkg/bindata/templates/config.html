@@ -193,39 +193,6 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you should add that proxy IP here. You can also specify full networks.
-                                                            This controls which IP is written to the web server log file (requestor or <span class="text-warning">x-forwarded-for</span> header).
-                                                            It also allows the <span class="text-warning">x-webauth-user</span> header for proxy authentication. Separate with spaces or new lines.<br>
-                                                            <b>Current Values</b>:<br>
-                                                            {{- range $i, $s := .Config.Upstreams}}<i>{{instance $i}}</i>: <b>{{$s}}</b><br>{{end}}
-                                                            {{- if not .Config.Upstreams}}<i>нет значения, ноль</i>{{end}}{{/* "no value, null" */}}
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Upstreams</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{range $i, $s := .Config.Upstreams}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}{{if not .Config.Upstreams}}<i>no value, null</i>{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_UPTREAMS_0" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UPTREAMS_0" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <textarea id="Upstreams" name="Upstreams" class="client-parameter form-control input-sm" data-group="config" data-label="Upstreams" data-original="{{range $s := .Config.Upstreams}}{{$s}} {{end}}">{{range $s := .Config.Upstreams}}{{$s}} {{end}}</textarea>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
                                                             The Host ID parameter is used to uniquely identify this client installation. 
                                                             Changing this value is discouraged; it should be found automatically.
                                                             Do not copy this value to another Notifiarr client installation.

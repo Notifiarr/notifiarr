@@ -1183,7 +1183,7 @@ func sonarrGetNotifications(req *http.Request) (int, interface{}) {
 	return http.StatusOK, output
 }
 
-// @Description  Updates a Notifcation in Sonarr.
+// @Description  Updates a Notification in Sonarr.
 // @Summary      Update Sonarr Notification
 // @Tags         Sonarr
 // @Produce      json

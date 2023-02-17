@@ -150,7 +150,7 @@ func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput)
 			library.Library[idx] = &libraryData{
 				Imdb:   item.ImdbID,
 				Tvdb:   item.TvdbID,
-				Exists: item.Statistics.SizeOnDisk > 0,
+				Exists: item.Statistics != nil && item.Statistics.SizeOnDisk > 0,
 			}
 		}
 	}

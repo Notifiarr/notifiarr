@@ -33,7 +33,7 @@ func Notify(msg string, vars ...interface{}) error {
 		return nil
 	}
 
-	// This finds terminal-notifier inside Notifiarr.app, or in the PATH (homebrew).
+	// This finds terminal-notifier inside this app or in your PATH.
 	app, err := osext.ExecutableFolder()
 	if err != nil {
 		return fmt.Errorf("cannot find application running directory: %w", err)

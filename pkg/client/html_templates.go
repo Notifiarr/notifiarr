@@ -111,6 +111,7 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
+		"lower": strings.ToLower,
 		"cutindex": func(str, delim, def string, idx int) string {
 			split := strings.Split(str, delim)
 			if idx >= len(split) {
@@ -425,6 +426,9 @@ type templateData struct {
 	Expvar      mnd.AllData                    `json:"expvar"`
 	HostInfo    *host.InfoStat                 `json:"hostInfo"`
 	Disks       map[string]*snapshot.Partition `json:"disks"`
+	Headers     http.Header                    `json:"headers"`
+	ProxyAllow  bool                           `json:"proxyAllow"`
+	UpstreamIP  string                         `json:"upstreamIp"`
 }
 
 func (c *Client) renderTemplate(
@@ -445,6 +449,8 @@ func (c *Client) renderTemplate(
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 
 	err := c.template.ExecuteTemplate(response, templateName, &templateData{
+		ProxyAllow:  c.Config.Allow.Contains(req.RemoteAddr),
+		UpstreamIP:  strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]"),
 		Config:      c.Config,
 		Flags:       c.Flags,
 		Username:    userName,
@@ -455,6 +461,7 @@ func (c *Client) renderTemplate(
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(ctx),
+		Headers:     req.Header,
 		Version: map[string]interface{}{
 			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),
@@ -492,19 +499,34 @@ func environ() map[string]string {
 	return out
 }
 
-func (c *Client) setUserPass(ctx context.Context, username, password string) error {
+func (c *Client) setUserPass(ctx context.Context, authType, username, password string) error {
 	c.Lock()
 	defer c.Unlock()
 
 	current := c.Config.UIPassword
 
-	err := c.Config.UIPassword.Set(username + ":" + password)
-	if err != nil {
-		c.Config.UIPassword = current
-		return fmt.Errorf("saving username and password: %w", err)
+	var err error
+
+	switch authType {
+	default:
+		err = c.Config.UIPassword.Set(username + ":" + password)
+	case "header":
+		err = c.Config.UIPassword.SetHeader(username)
+	case "nopass":
+		err = c.Config.UIPassword.SetNoAuth(username)
 	}
 
-	if err := c.saveNewConfig(ctx, c.Config); err != nil {
+	if err != nil {
+		c.Config.UIPassword = current
+		return fmt.Errorf("saving new auth settings: %w", err)
+	}
+
+	config, err := c.Config.CopyConfig()
+	if err != nil {
+		return fmt.Errorf("copying config: %w", err)
+	}
+
+	if err := c.saveNewConfig(ctx, config); err != nil {
 		c.Config.UIPassword = current
 		return err
 	}

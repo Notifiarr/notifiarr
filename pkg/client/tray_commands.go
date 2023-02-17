@@ -79,11 +79,11 @@ func (c *Client) downloadOther(update *update.Update) {
 	}
 }
 
-// This is always outdated. :( The format on screen sucs anyway. This should probably be removed.
+// This is always outdated. :( The format on screen sucks anyway. This should probably be removed.
 func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 	s = "Config File: " + c.Flags.ConfigFile
 	s += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
-	s += fmt.Sprintf("\nUpstreams: %v", c.Config.Allow)
+	s += fmt.Sprintf("\nUpstreams: %v", c.Config.Allow.Input)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		s += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, c.Config.URLBase)
@@ -154,7 +154,7 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 
 	c.Print("[user requested] Writing Config File:", val)
 
-	if _, err := c.Config.Write(ctx, val); err != nil {
+	if _, err := c.Config.Write(ctx, val, false); err != nil {
 		c.Errorf("Writing Config File: %v", err)
 		_, _ = ui.Error(mnd.Title+" Error", "Writing Config File: "+err.Error())
 

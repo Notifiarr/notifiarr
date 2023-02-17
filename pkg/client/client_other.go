@@ -89,17 +89,7 @@ func (c *Client) startTray(_, _, _ interface{}) {}
 func (c *Client) AutoWatchUpdate(_ interface{}) {}
 
 func (c *Client) checkReloadSignal(ctx context.Context, sigc os.Signal) error {
-	if sigc == syscall.SIGUSR1 && c.Flags.ConfigFile != "" {
-		c.Printf("Writing Config File! Caught Signal: %v", sigc)
-
-		if _, err := c.Config.Write(ctx, c.Flags.ConfigFile); err != nil {
-			c.Errorf("Writing Config File: %v", err)
-		}
-	} else {
-		return c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
-	}
-
-	return nil
+	return c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
 }
 
 func (c *Client) setSignals() {

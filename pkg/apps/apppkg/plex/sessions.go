@@ -120,13 +120,13 @@ func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
 }
 
 // GetMediaTranscode returns the transcode info in a format for an html template to consume.
-func GetMediaTranscode(medias []*Media) []string {
-	if len(medias) == 0 || len(medias[0].Part) == 0 {
+func GetMediaTranscode(mediaList []*Media) []string {
+	if len(mediaList) == 0 || len(mediaList[0].Part) == 0 {
 		return []string{"", ""}
 	}
 
 	var (
-		media    = medias[0]
+		media    = mediaList[0]
 		videoMsg string
 		audioMsg string
 	)

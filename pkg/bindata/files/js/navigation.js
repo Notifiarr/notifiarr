@@ -83,6 +83,22 @@ function shutDownApp()
      }
 }
 
+function reloadTimeout() {
+    const ping = setInterval(function () {
+        $.ajax({
+            url: URLBase+'ping',
+            complete: function(xhr){
+                if (xhr.status === 200) {
+                    clearInterval(ping);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                }
+            }
+        });
+    }, 400);
+}
+
 function reloadConfig()
 {
     $.ajax({
@@ -90,21 +106,7 @@ function reloadConfig()
         success: function (data){
             $('.pending-change-container').remove();          // remove save button.
             toast('Reloading', 'Page will refresh after reload finishes.', 'success', 60000);
-            setTimeout(function() {
-                const ping = setInterval(function () {
-                    $.ajax({
-                        url: URLBase+'ping',
-                        complete: function(xhr){
-                            if (xhr.status === 200) {
-                                clearInterval(ping);
-                                setTimeout(function() {
-                                    location.reload();
-                                }, 500);
-                            }
-                        }
-                    });
-                }, 400);
-            }, 500);
+            setTimeout(reloadTimeout, 500);
         },
          error: function (request, status, error) {
              if (response.status == 0) {
@@ -125,3 +127,11 @@ function showhttps(val, elem) {
         $(elem).hide();
     }
 }
+
+// Make 'enter' on a profile form element submit the form correctly.
+$('.profile-parameter').keydown(function(e) {
+    if(e.keyCode == 13) {
+        e.preventDefault();
+        saveProfileChanges();
+    }
+});

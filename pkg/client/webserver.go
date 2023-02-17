@@ -22,7 +22,7 @@ func (c *Client) StartWebServer() {
 	defer c.Unlock()
 
 	//nolint:lll // Create an apache-style logger.
-	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %{X-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %{X-NotiClient-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	// Create a request router.
 	c.Config.Router = mux.NewRouter()
 	c.Config.Router.Use(c.fixForwardedFor)
