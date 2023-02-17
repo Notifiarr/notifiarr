@@ -46,7 +46,7 @@ func (c *PlexConfig) Enabled() bool {
 
 type TautulliConfig struct {
 	extraConfig
-	*tautulli.Config
+	tautulli.Config
 }
 
 func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
@@ -71,7 +71,7 @@ func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
 
 // Enabled returns true if the instance is enabled and usable.
 func (c *TautulliConfig) Enabled() bool {
-	return c != nil && c.Config != nil && c.URL != "" && c.APIKey != "" && c.Timeout.Duration >= 0
+	return c != nil && c.URL != "" && c.APIKey != "" && c.Timeout.Duration >= 0
 }
 
 type DelugeConfig struct {
