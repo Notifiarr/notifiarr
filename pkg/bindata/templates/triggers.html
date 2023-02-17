@@ -1,5 +1,5 @@
                                 <h1><i class="fas fa-fire-extinguisher"></i> Triggers</h1>
-                                <p>Triggers are usually for troubleshooting. Use these to make the client do things that are normally on a cron timer.</p>
+                                <p>Triggers are usually for troubleshooting. Use these links to make the client do things that are normally on a timer or triggered by the website.</p>
                                 <div class="table-responsive">
                                     <table class="table table-striped">
                                         <tr><td>Runs</td><td>Action &nbsp;<a href="#triggers" class="fas fa-sync" onClick="refreshPage('triggers');"> Refresh</a></td><td>Description</td></tr>
@@ -37,6 +37,12 @@
                                             <td>{{index .Expvar.TimerCounts "Sending cached stuck items to website."}}</td>
                                             <td>
                                                 <a href="#triggers" onClick="triggerAction('stuckitems')">Send Stuck Queue Items</a></td><td>Sends cached stuck queue items to website.
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{index .Expvar.TimerCounts "Sending cached stuck items to website."}}</td>
+                                            <td>
+                                                <a href="#triggers" onClick="triggerAction('mdblist')">Send MDB List</a></td><td>Sends Sonarr and/or Radarr queues to <a href="https://mdblist.com">MDB List</a> for processing.
                                             </td>
                                         </tr>
                                         <tr>
