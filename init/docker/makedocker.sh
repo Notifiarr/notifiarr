@@ -5,6 +5,7 @@
 source settings.sh
 
 docker buildx build --load --pull --tag notifiarr \
+    --progress=plain \
     --platform linux/amd64 \
     --build-arg "BUILD_DATE=${DATE}" \
     --build-arg "COMMIT=${COMMIT}" \

@@ -8,13 +8,13 @@ FROM golang:1-bullseye as builder
 # Build speed magic! 
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
-COPY main.go settings.sh go.mod go.sum ./
+COPY main.go go.mod go.sum ./
 RUN go mod download
 COPY pkg pkg
 RUN go generate ./...
 
-RUN apt update
-RUN apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates
+RUN apt update \
+    && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates ipmitool
 
 ARG TARGETARCH
 
@@ -22,13 +22,15 @@ RUN curl -sSo /notifiarr.tgz \
  https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
  && tar -zxf /notifiarr.tgz -C /
 
-# For megacli. All the *'s are to deal with multiarch. :(
+# For megacli and ipmitool. All the *'s are to deal with multiarch. :(
 RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
  /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
  /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
  /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
- /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 \
- /lib/*-linux-gnu*/libtinfo.so.5 /tmp$(ls -d /lib/*-linux-gnu*) && \
+ /usr/lib/*-linux-gnu*/libgcrypt.so* /lib/*-linux-gnu*/libgpg-error.so.0 /lib/*-linux-gnu*/libtinfo.so* \
+ /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 /lib/*-linux-gnu*/libreadline.so* \
+ /lib/*-linux-gnu*/libtinfo.so.5 /usr/lib/*-linux-gnu*/libcrypto.so* /tmp$(ls -d /lib/*-linux-gnu*) && \
+ cp /usr/lib/libfreeipmi.so* /tmp/lib/ && \
  ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
  ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
  ln -s /usr/lib /tmp/lib_link/lib64 && \
@@ -62,6 +64,8 @@ COPY --from=builder /tmp/image /image
 COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
 COPY --from=builder /tmp/lib /usr/lib
 COPY --from=builder /tmp/lib_link/ /
+# Other tools.
+COPY --from=builder /usr/bin/ipmitool /ipmitool
 
 ENV TZ=UTC
 

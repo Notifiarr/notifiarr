@@ -53,7 +53,7 @@ type SyncConfig struct {
 	RadarrSync      []string      `json:"radarrSync"`      // items in sync.
 }
 
-// MdbList contains the instances we send libraries for, and the interval we do it in.
+// MdbListConfig contains the instances we send libraries for, and the interval we do it in.
 type MdbListConfig struct {
 	Interval cnfg.Duration `json:"interval"` // how often to fire.
 	Radarr   IntList       `json:"radarr"`   // which instance IDs we sync
