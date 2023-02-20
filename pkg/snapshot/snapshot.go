@@ -50,6 +50,8 @@ type Config struct {
 	IOTop     int           `toml:"iotop" xml:"iotop" json:"ioTop"`                           // number of processes to include from ioTop
 	PSTop     int           `toml:"pstop" xml:"pstop" json:"psTop"`                           // number of processes to include from top (cpu usage)
 	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                           // number of processes to include from mysql servers.
+	IPMI      bool          `toml:"ipmi" xml:"ipmi" json:"ipmi"`                              // get ipmi sensor info.
+	IPMISudo  bool          `toml:"ipmiSudo" xml:"ipmiSudo" json:"ipmiSudo"`                  // use sudo to get ipmi sensor info.
 	*Plugins
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
 }
@@ -95,6 +97,7 @@ type Snapshot struct {
 	Processes  Processes                      `json:"processes,omitempty"`
 	MySQL      map[string]*MySQLServerData    `json:"mysql,omitempty"`
 	Nvidia     []*NvidiaOutput                `json:"nvidia,omitempty"`
+	Sensors    []*IPMISensor                  `json:"ipmiSensors"`
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -128,6 +131,7 @@ func (c *Config) Validate() {
 
 	if mnd.IsDocker || mnd.IsWindows {
 		c.UseSudo = false
+		c.IPMISudo = false
 	}
 
 	if mnd.IsDocker || !mnd.IsLinux {
@@ -185,6 +189,7 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 	errs = append(errs, snap.getIoStat(ctx, c.DiskUsage && mnd.IsLinux))
 	errs = append(errs, snap.getIoStat2(ctx, c.DiskUsage))
 	errs = append(errs, snap.GetNvidia(ctx, c.Nvidia))
+	errs = append(errs, snap.GetIPMI(ctx, c.IPMI, c.IPMISudo))
 
 	return errs, debug
 }

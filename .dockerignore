@@ -1,0 +1,11 @@
+.??*
+.gitignore
+.golangci.yml
+.markdownlint.jsonc
+init
+examples
+.github
+userscripts
+README.md
+Makefile
+settings.sh
