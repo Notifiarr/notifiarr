@@ -76,7 +76,7 @@
                                             </td>
                                             <td class="form-inline">
                                                 <div class="form-group" style="width:100%">
-                                                    {{- if (locked (printf "%s_UPSTREAMS_0" .Flags.EnvPrefix))}}
+                                                {{- if (locked (printf "%s_UPSTREAMS_0" .Flags.EnvPrefix))}}
                                                     <div class="input-group" style="width:100%">
                                                         <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                                             <div style="display:none;" class="dialogText">
@@ -87,9 +87,9 @@
                                                         </div>
                                                         <input type="text" id="Upstreams" name="Upstreams" placeholder="127.0.0.1 ::1" class="profile-parameter form-control input-sm" data-group="config" data-label="Upstreams" style="width: 100%;" data-original="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}" value="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}">
                                                     </div>
-                                                    {{- else}}
+                                                {{- else}}
                                                     <input type="text" id="Upstreams" name="Upstreams" placeholder="127.0.0.1 ::1" class="profile-parameter form-control input-sm" data-group="config" data-label="Upstreams" style="width: 100%;" data-original="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}" value="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}">
-                                                    {{- end}}
+                                                {{- end}}
                                                     </div>
                                                 </div>
                                             </td>
@@ -114,6 +114,8 @@
                                                             (ne (lower $header) "accept-encoding") (ne (lower $header) "accept-language") (ne (lower $header) "connection")  
                                                             (ne (lower $header) "x-forwarded-for") (ne (lower $header) "x-redacted-uri")  (ne (lower $header) "user-agent")
                                                             (ne (lower $header) "referer") (ne (lower $header) "x-noticlient-username") (ne (lower $header) "cache-control")
+                                                            (ne (lower $header) "cdn-loop") (ne (lower $header) "cf-connecting-ip") (ne (lower $header) "cf-ip-country")
+                                                            (ne (lower $header) "cf-ray") (ne (lower $header) "cf-visitor") (ne (lower $header) "priority")
                                                         )}}
                                                     <option value="{{$header}}"{{if eq (lower $header) (lower $.Config.UIPassword.Header)}} selected{{end}}>{{$header}}: {{index $val 0}}</option>
                                                         {{- end }}
