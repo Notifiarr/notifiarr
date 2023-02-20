@@ -42,3 +42,4 @@ aur_deploy_key*
 .metadata.make
 /*-rendered.sh
 /gpg.signing.key
+/notifiarr.conf.example
