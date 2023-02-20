@@ -1,3 +1,4 @@
+//nolint:gomnd
 package snapshot
 
 import (
@@ -38,7 +39,12 @@ func (s *Snapshot) GetIPMI(ctx context.Context, run, useSudo bool) error {
 	}
 
 	if err != nil {
-		args = []string{"--sensor-types", "temperature,voltage,fan,current,Other_Units_Based_Sensor", "--sdr-cache-recreate", "--quiet-cache"}
+		args = []string{
+			"--sensor-types",
+			"temperature,voltage,fan,current,Other_Units_Based_Sensor",
+			"--sdr-cache-recreate",
+			"--quiet-cache",
+		}
 		scanFn = s.scanIPMISensorsOutput
 
 		if tool, err = exec.LookPath("ipmi-sensors"); err != nil {
