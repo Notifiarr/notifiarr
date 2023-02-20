@@ -153,7 +153,10 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{
 		return nil, err
 	}
 
-	return unmarshalResponse(s.Config.BaseURL+uri, code, body)
+	resp, err := unmarshalResponse(s.Config.BaseURL+uri, code, body)
+	resp.sent = len(post)
+
+	return resp, err
 }
 
 // SendData puts a send-data request to notifiarr.com into a channel queue.
