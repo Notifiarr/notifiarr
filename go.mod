@@ -44,7 +44,7 @@ require (
 	golift.io/nzbget v0.1.4
 	golift.io/qbit v0.0.0-20230210082614-25a38fade923
 	golift.io/rotatorr v0.0.0-20230110212846-590e84fecf74
-	golift.io/starr v0.14.1-0.20230114084726-e2805c5237b5
+	golift.io/starr v0.14.1-0.20230220073930-7dea55fd0994
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.1
 	modernc.org/sqlite v1.20.4
@@ -105,7 +105,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go4.org v0.0.0-20201209231011-d4a079459e60 // indirect
-	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect

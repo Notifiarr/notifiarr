@@ -333,6 +333,8 @@ golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4/go.mod h1:p54w0d4576C0XHj96b
 golang.org/x/net v0.0.0-20210421230115-4e50805a0758/go.mod h1:72T/g9IO56b78aLF+1Kcs5dz7/ng1VjMUvfKvpfy+jM=
 golang.org/x/net v0.6.0 h1:L4ZwwTvKW9gr0ZMS1yrHD9GZhIuVjOBBnaKH+SPQK0Q=
 golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
+golang.org/x/net v0.7.0 h1:rJrUqqhjsgNp7KqAIc25s9pZnjU7TUcSY7HcVZjdn1g=
+golang.org/x/net v0.7.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421/go.mod h1:gOpvHmFTYa4IltrdGE7lF6nIHvwfUNPOp7c8zoXwtLw=
 golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45/go.mod h1:gOpvHmFTYa4IltrdGE7lF6nIHvwfUNPOp7c8zoXwtLw=
@@ -438,6 +440,8 @@ golift.io/rotatorr v0.0.0-20230110212846-590e84fecf74 h1:R4BYe/Qr3I4rufv3g5TbAr2
 golift.io/rotatorr v0.0.0-20230110212846-590e84fecf74/go.mod h1:oJfUO23XVXu+8s0b409P/Av+JBtphEpb/C7eaQBm/cI=
 golift.io/starr v0.14.1-0.20230114084726-e2805c5237b5 h1:aS67JFc9T1qIFDnD5/f6KgcJB8Ekssk91nH/vieVS2o=
 golift.io/starr v0.14.1-0.20230114084726-e2805c5237b5/go.mod h1:TT/1TsgaUsbx8d1BEaKDWExIHl9j0xMK/3tVMAEVKz0=
+golift.io/starr v0.14.1-0.20230220073930-7dea55fd0994 h1:p+ztvN1mZpCf21kPcuX3Joir9LX4CIiivvSl7WSB4As=
+golift.io/starr v0.14.1-0.20230220073930-7dea55fd0994/go.mod h1:XAUO59KYCa26KImSunMKVG/hy/Uva0E48fBU2wYXu8w=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 golift.io/xtractr v0.2.1 h1:4jOSPUneJnbCZqCNPwySulhVFV+UvixNoGUAVzSfG6Q=
