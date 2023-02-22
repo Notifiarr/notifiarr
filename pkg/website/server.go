@@ -154,7 +154,9 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{
 	}
 
 	resp, err := unmarshalResponse(s.Config.BaseURL+uri, code, body)
-	resp.sent = len(post)
+	if resp != nil {
+		resp.sent = len(post)
+	}
 
 	return resp, err
 }
