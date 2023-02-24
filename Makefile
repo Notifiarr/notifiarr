@@ -87,7 +87,7 @@ clean:
 	rm -f notifiarr notifiarr.*.{macos,freebsd,linux,exe}{,.gz,.zip} notifiarr.1{,.gz} notifiarr.rb
 	rm -f notifiarr{_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/notifiarr/README{,.html} README{,.html} ./notifiarr_manual.html rsrc.syso Notifiarr.*.app.zip
-	rm -f notifiarr.service pkg/bindata/bindata.go pack.temp.dmg
+	rm -f notifiarr.service pkg/bindata/bindata.go pack.temp.dmg notifiarr.conf.example
 	rm -rf package_build_* release Notifiarr.*.app Notifiarr.app
 	rm -f pkg/bindata/docs/api_docs.go
 
@@ -180,6 +180,10 @@ linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
 
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
+notifiarr.conf.example: examples/notifiarr.conf.example generate
+	go run -ldflags "$(VERSION_LDFLAGS)" . -c $< -w ---
+	mv $<.new $@
+
 macapp: Notifiarr.app
 Notifiarr.app: notifiarr.universal.macos
 	cp -rp init/macos/Notifiarr.app Notifiarr.app
@@ -251,28 +255,28 @@ notifiarr-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
 	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p notifiarr-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
 
 # Build an environment that can be packaged for linux.
-package_build_linux_rpm: readme man linux
+package_build_linux_rpm: readme man linux notifiarr.conf.example
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
 	cp *.1.gz $@/usr/share/man/man1
-	cp examples/notifiarr.conf.example $@/etc/notifiarr/
-	cp examples/notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
+	cp notifiarr.conf.example $@/etc/notifiarr/
+	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
 	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
 
 # Build an environment that can be packaged for linux.
-package_build_linux_deb: readme man linux
+package_build_linux_deb: readme man linux notifiarr.conf.example
 	# Building package environment for linux.
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
 	cp *.1.gz $@/usr/share/man/man1
-	cp examples/notifiarr.conf.example $@/etc/notifiarr/
-	cp examples/notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
+	cp notifiarr.conf.example $@/etc/notifiarr/
+	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
 	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
@@ -309,12 +313,12 @@ package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 	cp notifiarr.arm.linux $@/usr/bin/notifiarr
 
 # Build an environment that can be packaged for freebsd.
-package_build_freebsd: readme man freebsd
+package_build_freebsd: readme man freebsd notifiarr.conf.example
 	mkdir -p $@/usr/local/bin $@/usr/local/etc/notifiarr $@/usr/local/share/man/man1 $@/usr/local/share/doc/notifiarr $@/usr/local/var/log/notifiarr
 	cp notifiarr.amd64.freebsd $@/usr/local/bin/notifiarr
 	cp *.1.gz $@/usr/local/share/man/man1
-	cp examples/notifiarr.conf.example $@/usr/local/etc/notifiarr/
-	cp examples/notifiarr.conf.example $@/usr/local/etc/notifiarr/notifiarr.conf
+	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/
+	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/notifiarr.conf
 	cp LICENSE *.html examples/*?.?* $@/usr/local/share/doc/notifiarr/
 	mkdir -p $@/usr/local/etc/rc.d
 	cp init/bsd/freebsd.rc.d $@/usr/local/etc/rc.d/notifiarr
@@ -368,10 +372,11 @@ install: man readme notifiarr
 	@[ "$(shell uname)" = "Darwin" ] || (echo "Unable to continue, not a Mac." && false)
 	@[ "$(PREFIX)" != "" ] || (echo "Unable to continue, PREFIX not set. Use: make install PREFIX=/usr/local ETC=/usr/local/etc" && false)
 	@[ "$(ETC)" != "" ] || (echo "Unable to continue, ETC not set. Use: make install PREFIX=/usr/local ETC=/usr/local/etc" && false)
+	./notifiarr -c examples/notifiarr.conf.example -w --- && mv examples/notifiarr.conf.example.new examples/notifiarr.conf.example
 	# Copying the binary, config file, unit file, and man page into the env.
 	/usr/bin/install -m 0755 -d $(PREFIX)/bin $(PREFIX)/share/man/man1 $(ETC)/notifiarr $(PREFIX)/share/doc/notifiarr $(PREFIX)/lib/notifiarr
 	/usr/bin/install -m 0755 -cp notifiarr $(PREFIX)/bin/notifiarr
 	/usr/bin/install -m 0644 -cp notifiarr.1.gz $(PREFIX)/share/man/man1
 	/usr/bin/install -m 0644 -cp examples/notifiarr.conf.example $(ETC)/notifiarr/
-	[ -f $(ETC)/notifiarr/notifiarr.conf ] || /usr/bin/install -m 0644 -cp  examples/notifiarr.conf.example $(ETC)/notifiarr/notifiarr.conf
+	[ -f $(ETC)/notifiarr/notifiarr.conf ] || /usr/bin/install -m 0644 -cp examples/notifiarr.conf.example $(ETC)/notifiarr/notifiarr.conf
 	/usr/bin/install -m 0644 -cp LICENSE *.html examples/* $(PREFIX)/share/doc/notifiarr/
