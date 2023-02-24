@@ -245,6 +245,8 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 		c.Config.Snapshot.IOTop = clientInfo.Actions.Snapshot.IOTop
 		c.Config.Snapshot.PSTop = clientInfo.Actions.Snapshot.PSTop
 		c.Config.Snapshot.MyTop = clientInfo.Actions.Snapshot.MyTop
+		c.Config.Snapshot.IPMI = clientInfo.Actions.Snapshot.IPMI
+		c.Config.Snapshot.IPMISudo = clientInfo.Actions.Snapshot.IPMISudo
 	}
 
 	return clientInfo

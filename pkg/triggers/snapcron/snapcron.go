@@ -62,15 +62,17 @@ func (c *cmd) printLog() {
 
 	for key, val := range map[string]bool{
 		"cpu, load, memory, uptime, users, temps": true,
-		"raid":   c.Snapshot.Raid,
-		"disks":  c.Snapshot.DiskUsage,
-		"quota":  c.Snapshot.Quotas,
-		"drives": c.Snapshot.DriveData,
-		"iotop":  c.Snapshot.IOTop > 0,
-		"pstop":  c.Snapshot.PSTop > 0,
-		"mysql":  c.Snapshot.Plugins != nil && len(c.Snapshot.MySQL) > 0,
-		"zfs":    len(c.Snapshot.ZFSPools) > 0,
-		"sudo":   c.Snapshot.UseSudo && c.Snapshot.DriveData,
+		"raid":     c.Snapshot.Raid,
+		"disks":    c.Snapshot.DiskUsage,
+		"quota":    c.Snapshot.Quotas,
+		"drives":   c.Snapshot.DriveData,
+		"ipmi":     c.Snapshot.IPMI && !c.Snapshot.IPMISudo,
+		"ipmiSudo": c.Snapshot.IPMI && c.Snapshot.IPMISudo,
+		"iotop":    c.Snapshot.IOTop > 0,
+		"pstop":    c.Snapshot.PSTop > 0,
+		"mysql":    c.Snapshot.Plugins != nil && len(c.Snapshot.MySQL) > 0,
+		"zfs":      len(c.Snapshot.ZFSPools) > 0,
+		"sudo":     c.Snapshot.UseSudo && c.Snapshot.DriveData,
 	} {
 		if !val {
 			continue
