@@ -1,3 +1,4 @@
+//nolint:gomnd
 package mnd
 
 import "fmt"
@@ -31,9 +32,9 @@ func FormatBytes(size interface{}) string { //nolint:cyclop
 		return fmt.Sprintf("%.2f GiB", val/float64(Megabyte*Kilobyte))
 	case val > Kilobyte*1000: // 2^20
 		return fmt.Sprintf("%.1f MiB", val/float64(Megabyte))
-	case val > Kilobyte: // 2^10
+	case val > 1000: // 2^10
 		return fmt.Sprintf("%.1f KiB", val/float64(Kilobyte))
 	default: // 2^1
-		return fmt.Sprintf("%.1f B", val)
+		return fmt.Sprintf("%f B", val)
 	}
 }
