@@ -35,6 +35,6 @@ func FormatBytes(size interface{}) string { //nolint:cyclop
 	case val > 1000: // 2^10
 		return fmt.Sprintf("%.1f KiB", val/float64(Kilobyte))
 	default: // 2^1
-		return fmt.Sprintf("%f B", val)
+		return fmt.Sprintf("%.0f B", val)
 	}
 }
