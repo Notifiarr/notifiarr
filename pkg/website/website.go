@@ -40,7 +40,9 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 
 	defer func() {
 		body.Close()
-		mnd.Website.Add("POST Bytes Received", int64(counter.Count()))
+
+		resp.size = int64(counter.Count())
+		mnd.Website.Add("POST Bytes Received", resp.size)
 	}()
 
 	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
@@ -170,37 +172,39 @@ func (s *Server) debughttplog(resp *http.Response, url string, start time.Time, 
 	}
 
 	if data == "" {
-		s.Config.Debugf("Sent GET Request to %s in %s, Response (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), status,
-			headers, readBodyForLog(body, int64(s.Config.Apps.MaxBody)))
+		truncatedBody, bodySize := readBodyForLog(body, int64(s.Config.Apps.MaxBody))
+		s.Config.Debugf("Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
+			url, time.Since(start).Round(time.Microsecond), mnd.FormatBytes(bodySize), status, headers, truncatedBody)
 	} else {
-		s.Config.Debugf("Sent JSON Payload to %s in %s:\n%s\nResponse (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), data, status,
-			headers, readBodyForLog(body, int64(s.Config.Apps.MaxBody)))
+		truncatedBody, bodySize := readBodyForLog(body, int64(s.Config.Apps.MaxBody))
+		s.Config.Debugf("Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
+			mnd.FormatBytes(len(data)), url, time.Since(start).Round(time.Microsecond),
+			data, mnd.FormatBytes(bodySize), status, headers, truncatedBody)
 	}
 }
 
 // readBodyForLog truncates the response body, or not, for the debug log. errors are ignored.
-func readBodyForLog(body io.Reader, max int64) string {
+func readBodyForLog(body io.Reader, max int64) (string, int64) {
 	if body == nil {
-		return ""
+		return "", 0
 	}
 
 	if max > 0 {
 		limitReader := io.LimitReader(body, max)
 		bodyBytes, _ := io.ReadAll(limitReader)
 		remaining, _ := io.Copy(io.Discard, body) // finish reading to the end.
+		total := remaining + int64(len(bodyBytes))
 
 		if remaining > 0 {
-			return fmt.Sprintf("%s <body truncated, max: %d>", string(bodyBytes), max)
+			return fmt.Sprintf("%s <body truncated, max: %d>", string(bodyBytes), max), total
 		}
 
-		return string(bodyBytes)
+		return string(bodyBytes), total
 	}
 
 	bodyBytes, _ := io.ReadAll(body)
 
-	return string(bodyBytes)
+	return string(bodyBytes), int64(len(bodyBytes))
 }
 
 func (s *Server) watchSendDataChan(ctx context.Context) {
@@ -220,8 +224,8 @@ func (s *Server) watchSendDataChan(ctx context.Context) {
 			s.Config.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
 				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 		case !data.ErrorsOnly:
-			s.Config.Printf("[%s requested] Sent (%v, buf=%d/%d): %s%s",
-				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
+			s.Config.Printf("[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
+				data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
 		default:
 		}
 	}

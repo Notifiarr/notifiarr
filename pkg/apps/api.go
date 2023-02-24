@@ -92,16 +92,19 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, aID)))
 		}
 
-		if len(post) > 0 {
-			s, _ := json.MarshalIndent(msg, "", " ")
-			a.Debugf("Incoming API: %s %s: %s\nStatus: %d, Reply: %s", r.Method, r.URL, string(post), code, s)
+		wrote := a.Respond(w, code, msg)
+
+		if str, _ := json.MarshalIndent(msg, "", " "); len(post) > 0 {
+			a.Debugf("Incoming API: %s %s (%s): %s\nStatus: %d, Reply (%s): %s",
+				r.Method, r.URL, mnd.FormatBytes(len(post)), string(post), code, mnd.FormatBytes(wrote), str)
+		} else {
+			a.Debugf("Incoming API: %s %s, Status: %d, Reply (%s): %s", r.Method, r.URL, code, mnd.FormatBytes(wrote), str)
 		}
 
 		if appName == "" {
 			appName = "Non-App"
 		}
 
-		wrote := a.Respond(w, code, msg)
 		mnd.APIHits.Add(appName+" Bytes Sent", wrote)
 		mnd.APIHits.Add(appName+" Bytes Received", int64(len(post)))
 		mnd.APIHits.Add(appName+" Requests", 1)

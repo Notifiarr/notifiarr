@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"golift.io/cnfg"
 )
@@ -192,6 +193,8 @@ func (r Route) Path(event EventType, params ...string) string {
 */
 // nitsua: all responses should be that way.. but response might not always be an object.
 type Response struct {
+	size    int64
+	sent    int
 	Result  string `json:"result"`
 	Details struct {
 		Response json.RawMessage `json:"response"` // can be anything. type it out later.
@@ -208,6 +211,6 @@ func (r *Response) String() string {
 		return ""
 	}
 
-	return fmt.Sprintf(" => Website took %s and replied with: %s, %s %s",
-		r.Details.Elapsed, r.Result, r.Details.Response, r.Details.Help)
+	return fmt.Sprintf(" => Website took %s and replied with (%s): %s, %s %s",
+		r.Details.Elapsed, mnd.FormatBytes(r.size), r.Result, r.Details.Response, r.Details.Help)
 }

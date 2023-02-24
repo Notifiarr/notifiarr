@@ -1,6 +1,7 @@
 package mnd
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"time"
@@ -13,6 +14,9 @@ var (
 	// IsDocker tells us if this is our Docker container.
 	IsDocker = os.Getpid() == 1
 )
+
+// ErrDisabledInstance is returned when a request for a disabled instance is performed.
+var ErrDisabledInstance = fmt.Errorf("instance is administratively disabled")
 
 //nolint:gochecknoinits
 func init() {

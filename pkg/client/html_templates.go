@@ -139,7 +139,7 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 		// returns the current time.
 		"now": time.Now,
 		// returns an integer divided by a million.
-		"megabyte": megabyte,
+		"megabyte": mnd.FormatBytes,
 		// returns the URL base.
 		"base": func() string { return path.Join(c.Config.URLBase, "ui") + "/" },
 		// returns the files url base.
@@ -308,34 +308,6 @@ func durShort(dur time.Duration) string {
 	}
 
 	return output
-}
-
-func megabyte(size interface{}) string {
-	val := int64(0)
-
-	switch valtype := size.(type) {
-	case int64:
-		val = valtype
-	case uint64:
-		val = int64(valtype)
-	case int:
-		val = int64(valtype)
-	}
-
-	switch {
-	case val > mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte*1000: // 2^60
-		return fmt.Sprintf("%.2f EiB", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Megabyte))
-	case val > mnd.Megabyte*mnd.Megabyte*1000: // 2^50
-		return fmt.Sprintf("%.2f PiB", float64(val)/float64(mnd.Megabyte*mnd.Megabyte*mnd.Kilobyte))
-	case val > mnd.Megabyte*mnd.Kilobyte*1000: // 2^40
-		return fmt.Sprintf("%.2f TiB", float64(val)/float64(mnd.Megabyte*mnd.Megabyte))
-	case val > mnd.Megabyte*1000: // 2^30
-		return fmt.Sprintf("%.2f GiB", float64(val)/float64(mnd.Megabyte*mnd.Kilobyte))
-	case val > mnd.Kilobyte*1000: // 2^20
-		return fmt.Sprintf("%.1f MiB", float64(val)/float64(mnd.Megabyte))
-	default: // 2^10
-		return fmt.Sprintf("%.1f KiB", float64(val)/float64(mnd.Kilobyte))
-	}
 }
 
 func since(t time.Time) string {
