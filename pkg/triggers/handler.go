@@ -28,7 +28,7 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 
 // handleTrigger is an abstraction to deal with API or GUI triggers (they have different handlers).
 func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int, string) {
-	input := &common.ActionInput{Type: website.EventAPI}
+	input := &common.ActionInput{Type: event}
 	trigger := mux.Vars(req)["trigger"]
 	content := mux.Vars(req)["content"]
 
@@ -46,6 +46,8 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 
 func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string) (int, string) { //nolint:cyclop
 	switch trigger {
+	case "custom":
+		return a.customTimer(input, content)
 	case "clientlogs":
 		return a.clientLogs(content)
 	case "command":
@@ -81,6 +83,29 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
+}
+
+// @Description  Trigger a custom website timer. This sends a GET request to trigger an action on the website.
+// @Summary      Trigger custom timer
+// @Tags         Triggers
+// @Produce      json
+// @Param        idx  path   int  true  "ID of the custom website timer to trigger"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success: name of timer"
+// @Failure      400  {object} string "invalid timer ID"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trigger/custom/{idx} [get]
+// @Security     ApiKeyAuth
+func (a *Actions) customTimer(input *common.ActionInput, content string) (int, string) {
+	timerList := a.CronTimer.List()
+
+	customTimerID, err := strconv.Atoi(content)
+	if err != nil || customTimerID < 0 || customTimerID >= len(timerList) {
+		return http.StatusBadRequest, "invalid timer ID"
+	}
+
+	defer timerList[customTimerID].Run(input)
+
+	return http.StatusOK, "Custom Website Timer Triggered: " + timerList[customTimerID].Name
 }
 
 // @Description  Toggle client error log sharing.

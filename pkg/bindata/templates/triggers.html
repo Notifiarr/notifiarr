@@ -106,5 +106,22 @@
                                             </td>
                                         </tr>
                                     </table>
+                                    {{- if .Actions.CronTimer.List }}
+                                    <h2><i class="fas fa-clock"></i> Website Timers</h2>
+                                    <p>These timers are dynamic and created by the website. Use the links to trigger an action manually.</p>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <tr><td>Runs</td><td>Name</td><td>Interval</td><td>Description</td></tr>
+                                            {{- range $idx, $action := .Actions.CronTimer.List }}
+                                            <tr>
+                                                <td>{{index $.Expvar.TimerCounts (print "Running Custom Cron Timer '" $action.Name "'")}}</td>
+                                                <td><a href="#triggers" onClick="triggerAction('custom/{{$idx}}')">{{$action.Name}}</a></td>
+                                                <td>{{$action.Interval}}</td>
+                                                <td>{{$action.Desc}}</td>
+                                            </tr>
+                                            {{- end }}
+                                        </table>
+                                    </div>
+                                    {{- end}}
                                 </div>
 {{- /* end of monitoring (leave this comment) */ -}}
