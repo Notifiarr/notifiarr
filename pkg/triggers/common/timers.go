@@ -72,9 +72,9 @@ func (c *Config) printStartupLog() {
 
 	for name := range triggers {
 		if _, ok := timers[name]; ok {
-			c.Debugf("==> Action: %s Trigger and Timer.", name)
+			c.Debugf("==> Enabled Action: %s Trigger and Timer.", name)
 		} else {
-			c.Debugf("==> Action: %s Trigger only.", name)
+			c.Debugf("==> Enabled Action: %s Trigger only.", name)
 		}
 	}
 
