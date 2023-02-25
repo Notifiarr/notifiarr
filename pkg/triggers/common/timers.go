@@ -49,7 +49,7 @@ func (c *Config) Run(ctx context.Context) {
 	c.printStartupLog()
 }
 
-func (c *Config) printStartupLog() {
+func (c *Config) GatherTriggerInfo() (map[string]cnfg.Duration, map[string]cnfg.Duration) {
 	var (
 		triggers = make(map[string]cnfg.Duration)
 		timers   = make(map[string]cnfg.Duration)
@@ -69,6 +69,11 @@ func (c *Config) printStartupLog() {
 		}
 	}
 
+	return triggers, timers
+}
+
+func (c *Config) printStartupLog() {
+	triggers, timers := c.GatherTriggerInfo()
 	c.Printf("==> Actions Started: %d Timers and %d Triggers", len(timers), len(triggers))
 
 	for name, dur := range triggers {

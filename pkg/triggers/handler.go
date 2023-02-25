@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"golift.io/cnfg"
 	"golift.io/starr"
 )
 
@@ -24,6 +25,63 @@ func (a *Actions) APIHandler(req *http.Request) (int, interface{}) {
 func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 	code, data := a.handleTrigger(req, website.EventGUI)
 	http.Error(response, data, code)
+}
+
+type trigger struct {
+	Name     string        `json:"name"`
+	Interval cnfg.Duration `json:"interval"`
+}
+type timer struct {
+	Name     string        `json:"name"`
+	Interval cnfg.Duration `json:"interval"`
+	// Use this ID to trigger this timer with the trigger/custom endpoint.
+	Idx int `json:"id"`
+}
+
+type triggerOutput struct {
+	Triggers map[string]trigger `json:"triggers"`
+	Timers   map[string]timer   `json:"timers"`
+}
+
+// @Description  Returns a list of triggers and website timers with their intervals, if configured.
+// @Summary      Get trigger list
+// @Tags         Triggers
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=triggers.triggerOutput} "lists of triggers and timers"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/triggers [get]
+// @Security     ApiKeyAuth
+func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
+	reply := &triggerOutput{
+		Triggers: make(map[string]trigger),
+		Timers:   make(map[string]timer),
+	}
+
+	triggers, timers := a.Timers.GatherTriggerInfo()
+
+	for name, dur := range triggers {
+		reply.Triggers[name] = trigger{
+			Name:     name,
+			Interval: dur,
+		}
+	}
+
+	for name, dur := range timers {
+		reply.Triggers[name] = trigger{
+			Name:     name,
+			Interval: dur,
+		}
+	}
+
+	for idx, action := range a.CronTimer.List() {
+		reply.Timers[action.Name] = timer{
+			Name:     action.Name,
+			Interval: action.Interval,
+			Idx:      idx,
+		}
+	}
+
+	return http.StatusOK, reply
 }
 
 // handleTrigger is an abstraction to deal with API or GUI triggers (they have different handlers).
