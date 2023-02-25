@@ -23,9 +23,8 @@ func (c *Config) Run(ctx context.Context) {
 	c.stop = &Action{Name: TrigStop, C: make(chan *ActionInput)}
 
 	var (
-		cases          = []reflect.SelectCase{}
-		combine        = []*Action{}
-		timer, trigger int
+		cases   = []reflect.SelectCase{}
+		combine = []*Action{}
 	)
 
 	for _, action := range append(c.list, c.stop) {
@@ -37,18 +36,53 @@ func (c *Config) Run(ctx context.Context) {
 		if action.C != nil {
 			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.C)})
 			combine = append(combine, action)
-			trigger++
 		}
 
 		if action.T != nil {
 			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.T.C)})
 			combine = append(combine, action)
-			timer++
 		}
 	}
 
 	go c.runTimerLoop(ctx, combine, cases)
-	c.Printf("==> Started %d Notifiarr Timers with %d Triggers", timer, trigger)
+	c.printStartupLog()
+}
+
+func (c *Config) printStartupLog() {
+	var (
+		triggers = make(map[string]struct{})
+		timers   = make(map[string]struct{})
+	)
+
+	for _, action := range append(c.list, c.stop) {
+		if action == nil {
+			continue
+		}
+
+		if action.C != nil {
+			triggers[string(action.Name)] = struct{}{}
+		}
+
+		if action.T != nil {
+			timers[string(action.Name)] = struct{}{}
+		}
+	}
+
+	c.Printf("==> Actions Started: %d Timers and %d Triggers", len(timers), len(triggers))
+
+	for name := range triggers {
+		if _, ok := timers[name]; ok {
+			c.Debugf("==> Action: %s Trigger and Timer.", name)
+		} else {
+			c.Debugf("==> Action: %s Trigger only.", name)
+		}
+	}
+
+	for name := range timers {
+		if _, ok := triggers[name]; !ok {
+			c.Debugf("==> Enabled Action: %s Timer only.", name)
+		}
+	}
 }
 
 // runTimerLoop does all of the timer/cron routines for starr apps and plex.

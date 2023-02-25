@@ -10,7 +10,7 @@ import (
 
 /* Gaps allows filling gaps in Radarr collections. */
 
-const TrigPlexEmptyTrash common.TriggerName = "Emptying Plex Trash"
+const TrigPlexEmptyTrash common.TriggerName = "Emptying Plex Trash."
 
 // Action contains the exported methods for this package.
 type Action struct {
