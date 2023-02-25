@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cnfg"
 	"golift.io/starr"
 )
 
@@ -58,7 +59,7 @@ func (c *cmd) makeBackupTriggersLidarr(ci *clientinfo.ClientInfo) {
 		if app.Enabled() && ci.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			action.T = time.NewTicker(checkInterval + randomTime)
+			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 
 			break
 		}
@@ -82,7 +83,7 @@ func (c *cmd) makeBackupTriggersRadarr(ci *clientinfo.ClientInfo) {
 		if app.Enabled() && ci.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			action.T = time.NewTicker(checkInterval + randomTime)
+			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 
 			break
 		}
@@ -106,7 +107,7 @@ func (c *cmd) makeBackupTriggersReadarr(ci *clientinfo.ClientInfo) {
 		if app.Enabled() && ci.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			action.T = time.NewTicker(checkInterval + randomTime)
+			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 
 			break
 		}
@@ -130,7 +131,7 @@ func (c *cmd) makeBackupTriggersSonarr(ci *clientinfo.ClientInfo) {
 		if app.Enabled() && ci.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			action.T = time.NewTicker(checkInterval + randomTime)
+			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 
 			break
 		}
@@ -154,7 +155,7 @@ func (c *cmd) makeBackupTriggersProwlarr(ci *clientinfo.ClientInfo) {
 		if app.Enabled() && ci.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
 				time.Duration(rand.Intn(randomMinutes))*time.Minute
-			action.T = time.NewTicker(checkInterval + randomTime)
+			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 
 			break
 		}

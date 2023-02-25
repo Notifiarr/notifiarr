@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golift.io/cnfg"
 )
 
 // TrigStop is used to signal a stop/reload.
@@ -38,8 +39,8 @@ func (c *Config) Run(ctx context.Context) {
 			combine = append(combine, action)
 		}
 
-		if action.T != nil {
-			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.T.C)})
+		if action.t != nil {
+			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.t.C)})
 			combine = append(combine, action)
 		}
 	}
@@ -50,8 +51,8 @@ func (c *Config) Run(ctx context.Context) {
 
 func (c *Config) printStartupLog() {
 	var (
-		triggers = make(map[string]struct{})
-		timers   = make(map[string]struct{})
+		triggers = make(map[string]cnfg.Duration)
+		timers   = make(map[string]cnfg.Duration)
 	)
 
 	for _, action := range append(c.list, c.stop) {
@@ -60,27 +61,27 @@ func (c *Config) printStartupLog() {
 		}
 
 		if action.C != nil {
-			triggers[string(action.Name)] = struct{}{}
+			triggers[string(action.Name)] = action.D
 		}
 
-		if action.T != nil {
-			timers[string(action.Name)] = struct{}{}
+		if action.t != nil {
+			timers[string(action.Name)] = action.D
 		}
 	}
 
 	c.Printf("==> Actions Started: %d Timers and %d Triggers", len(timers), len(triggers))
 
-	for name := range triggers {
+	for name, dur := range triggers {
 		if _, ok := timers[name]; ok {
-			c.Debugf("==> Enabled Action: %s Trigger and Timer.", name)
+			c.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, dur)
 		} else {
 			c.Debugf("==> Enabled Action: %s Trigger only.", name)
 		}
 	}
 
-	for name := range timers {
+	for name, dur := range timers {
 		if _, ok := triggers[name]; !ok {
-			c.Debugf("==> Enabled Action: %s Timer only.", name)
+			c.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, dur)
 		}
 	}
 }
@@ -146,9 +147,9 @@ func (c *Config) stopTimerLoop(actions []*Action) {
 	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
 	for _, action := range actions {
-		if action.T != nil {
-			action.T.Stop()
-			action.T = nil
+		if action.t != nil {
+			action.t.Stop()
+			action.t = nil
 		}
 
 		if action.C != nil && action.C != c.stop.C { // do not close stop channel here.

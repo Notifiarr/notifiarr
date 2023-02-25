@@ -9,6 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cnfg"
 	"golift.io/starr/radarr"
 )
 
@@ -38,13 +39,13 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
-	var ticker *time.Ticker
+	var dur time.Duration
 
 	ci := clientinfo.Get()
 	//nolint:gosec
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-		ticker = time.NewTicker(ci.Actions.Gaps.Interval.Duration + randomTime)
+		dur = ci.Actions.Gaps.Interval.Duration + randomTime
 		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
 	}
 
@@ -52,7 +53,7 @@ func (c *cmd) create() {
 		Name: TrigCollectionGaps,
 		Fn:   c.sendGaps,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
+		D:    cnfg.Duration{Duration: dur},
 	})
 }
 

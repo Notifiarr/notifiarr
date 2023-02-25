@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cnfg"
 )
 
 /* CF Sync means Custom Format Sync. This is a premium feature that allows syncing
@@ -60,6 +61,7 @@ func (c *cmd) create() {
 		}
 	}
 
+	// These aggregate  triggers have no timers. Used to sync "all the things" at once.
 	c.Add(&common.Action{
 		Name: TrigCFSyncRadarr,
 		Fn:   c.syncRadarr,
@@ -88,19 +90,19 @@ func (c *cmd) setupRadarr(ci *clientinfo.ClientInfo) {
 			continue
 		}
 
-		var ticker *time.Ticker
+		var dur cnfg.Duration
 		//nolint:gosec
 		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
 			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-			ticker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
+			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
 		}
 
 		c.Add(&common.Action{
 			Hide: true,
+			D:    dur,
 			Name: TrigCFSyncRadarrInt.WithInstance(instance),
 			Fn:   (&radarrApp{app: app, cmd: c, idx: idx}).syncRadarr,
 			C:    make(chan *common.ActionInput, 1),
-			T:    ticker,
 		})
 	}
 }
@@ -122,19 +124,20 @@ func (c *cmd) setupSonarr(ci *clientinfo.ClientInfo) {
 			continue
 		}
 
-		var ticker *time.Ticker
+		var dur cnfg.Duration
+
 		//nolint:gosec
 		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
 			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-			ticker = time.NewTicker(ci.Actions.Sync.Interval.Duration + randomTime)
+			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
 		}
 
 		c.Add(&common.Action{
 			Hide: true,
+			D:    dur,
 			Name: TrigRPSyncSonarrInt.WithInstance(instance),
 			Fn:   (&sonarrApp{app: app, cmd: c, idx: idx}).syncSonarr,
 			C:    make(chan *common.ActionInput, 1),
-			T:    ticker,
 		})
 	}
 }
