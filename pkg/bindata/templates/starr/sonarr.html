@@ -77,7 +77,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <form class="form-inline">
+                                                    <div class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_SONARR_%d_NAME" $.Flags.EnvPrefix $index)) }}
@@ -92,10 +92,10 @@
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Name" name="Apps.Sonarr.{{$index}}.Name" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <form class="form-inline">
+                                                    <div class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_SONARR_%d_URL" $.Flags.EnvPrefix $index)) }}
@@ -113,10 +113,10 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <form class="form-inline">
+                                                    <div class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index)) }}
@@ -128,14 +128,14 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.APIKey" name="Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                                                                <input type="password" autocomplete="new-password" id="Apps.Sonarr.{{$index}}.APIKey" name="Apps.Sonarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <form class="form-inline">
+                                                    <div class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_SONARR_%d_USERNAME" $.Flags.EnvPrefix $index)) }}
@@ -150,10 +150,10 @@
                                                                 <input type="text" id="Apps.Sonarr.{{$index}}.Username" name="Apps.Sonarr.{{$index}}.Username" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <form class="form-inline">
+                                                    <div class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index))}}
@@ -165,14 +165,14 @@
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SONARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
-                                                                <input type="password" autocomplete="off" id="Apps.Sonarr.{{$index}}.Password" name="Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                                                <input type="password" autocomplete="new-password" id="Apps.Sonarr.{{$index}}.Password" name="Apps.Sonarr.{{$index}}.Password" data-index="{{$index}}" data-app="Sonarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Sonarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
                                                                 <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Sonarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <form class="form-inline">
+                                                    <div class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_SONARR_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
@@ -189,10 +189,10 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <form class="form-inline">
+                                                    <div class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
                                                                 {{- if (locked (printf "%s_SONARR_%d_TIMEOUT" $.Flags.EnvPrefix $index)) }}
@@ -217,7 +217,7 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             {{- end}}
