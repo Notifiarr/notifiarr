@@ -3,6 +3,7 @@ package triggers
 import (
 	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 
@@ -89,7 +90,7 @@ func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
 			Name: action.Name,
 			Dur:  action.Interval.String(),
 			Idx:  idx,
-			Path: fmt.Sprint("api/trigger/custom/", idx),
+			Path: path.Join(a.Timers.Apps.URLBase, fmt.Sprint("api/trigger/custom/", idx)),
 		}
 	}
 
