@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/mux"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"golift.io/cnfg"
 	"golift.io/starr"
 )
 
@@ -31,16 +30,16 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 type trigger struct {
 	Name string `json:"name"`
 	Dur  string `json:"interval,omitempty"`
-	Path string `json:"api_path,omitempty"`
+	Path string `json:"apiPath,omitempty"`
 }
 type timer struct {
-	Name string        `json:"name"`
-	Dur  cnfg.Duration `json:"interval"`
+	Name string `json:"name"`
+	Dur  string `json:"interval"`
 	// Use this ID to trigger this timer with the trigger/custom endpoint.
-	Idx  int    `json:"id"`
-	Path string `json:"api_path"`
+	Idx int `json:"id"`
+	// The client API path to trigger this custom timer.
+	Path string `json:"apiPath"`
 }
-
 type triggerOutput struct {
 	Triggers []*trigger `json:"triggers"`
 	Timers   []*timer   `json:"timers"`
@@ -79,6 +78,7 @@ func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
 	}
 
 	idx := 0
+
 	for _, t := range temp {
 		reply.Triggers[idx] = t
 		idx++
@@ -87,7 +87,7 @@ func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
 	for idx, action := range cronTimers {
 		reply.Timers[idx] = &timer{
 			Name: action.Name,
-			Dur:  action.Interval,
+			Dur:  action.Interval.String(),
 			Idx:  idx,
 			Path: fmt.Sprint("api/trigger/custom/", idx),
 		}
