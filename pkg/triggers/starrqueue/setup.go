@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"golift.io/cnfg"
 )
 
 /* This file contains the procedures to send stuck download queue items to notifiarr. */
@@ -67,7 +68,7 @@ func (a *Action) Create() {
 			Name: TrigStuckItems,
 			Fn:   a.cmd.sendStuckQueues,
 			C:    make(chan *common.ActionInput, 1),
-			T:    time.NewTicker(stuckDuration),
+			D:    cnfg.Duration{Duration: stuckDuration},
 		})
 
 		a.cmd.Add(&common.Action{
@@ -75,7 +76,7 @@ func (a *Action) Create() {
 			Name: TrigDownloadingItems,
 			Fn:   a.cmd.sendDownloadingQueues,
 			C:    make(chan *common.ActionInput, 1),
-			T:    time.NewTicker(finishedDuration),
+			D:    cnfg.Duration{Duration: finishedDuration},
 		})
 	}
 }

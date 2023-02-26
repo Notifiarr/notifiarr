@@ -9,12 +9,18 @@ FROM golang:1-bullseye as builder
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
 COPY main.go go.mod go.sum ./
-RUN go mod download
-COPY pkg pkg
-RUN go generate ./...
 
+# Cache all the needed tools.
+RUN go mod download \
+    && go run github.com/kevinburke/go-bindata/go-bindata@latest -v \
+    && go run github.com/swaggo/swag/cmd/swag@master -v
+
+# Cache apt installs.
 RUN apt update \
     && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates ipmitool
+
+COPY pkg pkg
+RUN go generate ./...
 
 ARG TARGETARCH
 

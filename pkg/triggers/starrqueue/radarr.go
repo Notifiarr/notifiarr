@@ -9,6 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cnfg"
 )
 
 const TrigRadarrQueue common.TriggerName = "Storing Radarr instance %d queue."
@@ -55,16 +56,16 @@ func (c *cmd) setupRadarr() bool {
 			continue
 		}
 
-		var ticker *time.Ticker
+		var dur time.Duration
 
 		instance := idx + 1
 		if ci.Actions.Apps.Radarr.Finished(instance) {
-			ticker = time.NewTicker(finishedDuration)
+			dur = finishedDuration
 		} else if ci.Actions.Apps.Radarr.Stuck(instance) {
-			ticker = time.NewTicker(stuckDuration)
+			dur = stuckDuration
 		}
 
-		if ticker != nil {
+		if dur != 0 {
 			enabled = true
 
 			c.Add(&common.Action{
@@ -72,7 +73,7 @@ func (c *cmd) setupRadarr() bool {
 				Name: TrigRadarrQueue.WithInstance(instance),
 				Fn:   (&radarrApp{app: app, cmd: c, idx: idx}).storeQueue,
 				C:    make(chan *common.ActionInput, 1),
-				T:    ticker,
+				D:    cnfg.Duration{Duration: dur},
 			})
 		}
 	}

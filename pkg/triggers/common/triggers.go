@@ -12,6 +12,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cnfg"
 )
 
 // ErrInvalidApp is returned by triggers when a non-existent app is requested.
@@ -62,9 +63,10 @@ type TriggerName string
 // Action defines a trigger/timer that can be executed.
 type Action struct {
 	Name TriggerName
+	D    cnfg.Duration                       // how often the timer fires, sets ticker.
 	Fn   func(context.Context, *ActionInput) // most actions use this for triggers.
-	C    chan *ActionInput                   // if provided, T is optional.
-	T    *time.Ticker                        // if provided, C is optional.
+	C    chan *ActionInput                   // if provided, D is optional.
+	t    *time.Ticker                        // if provided, C is optional.
 	Hide bool                                // prevent logging.
 }
 
@@ -100,6 +102,12 @@ func (c *Config) Get(name TriggerName) *Action {
 // Add adds a new action to our list of "Actions to run."
 // actions are timers or triggers, or both.
 func (c *Config) Add(action ...*Action) {
+	for _, a := range action {
+		if a.D.Duration != 0 {
+			a.t = time.NewTicker(a.D.Duration)
+		}
+	}
+
 	c.list = append(c.list, action...)
 }
 

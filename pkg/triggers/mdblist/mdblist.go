@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cnfg"
 )
 
 const TrigMDBListSync common.TriggerName = "Sending Library contents for MDBList."
@@ -34,14 +35,14 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
-	var ticker *time.Ticker
+	var dur time.Duration
 
 	ci := clientinfo.Get()
 	//nolint:gosec
 	if ci != nil && ci.Actions.Mdblist.Interval.Duration > 0 &&
 		(len(ci.Actions.Mdblist.Radarr) > 0 || len(ci.Actions.Mdblist.Sonarr) > 0) {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-		ticker = time.NewTicker(ci.Actions.Mdblist.Interval.Duration + randomTime)
+		dur = ci.Actions.Mdblist.Interval.Duration + randomTime
 		c.Printf("==> MDB List Timer Enabled, interval:%s, Radarr/Sonarr: %d/%d instances",
 			ci.Actions.Mdblist.Interval, len(ci.Actions.Mdblist.Radarr), len(ci.Actions.Mdblist.Sonarr))
 	}
@@ -50,7 +51,7 @@ func (c *cmd) create() {
 		Name: TrigMDBListSync,
 		Fn:   c.sendMDBList,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
+		D:    cnfg.Duration{Duration: dur},
 	})
 }
 

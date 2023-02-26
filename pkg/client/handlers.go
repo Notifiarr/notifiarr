@@ -91,6 +91,7 @@ func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.clientinfo.VersionHandlerInstance, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
+	c.Config.HandleAPIpath("", "triggers", c.triggers.HandleGetTriggers, "GET")
 
 	// Aggregate handlers. Non-app specific.
 	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")

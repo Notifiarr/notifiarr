@@ -9,6 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golift.io/cnfg"
 )
 
 const TrigSnapshot common.TriggerName = "Gathering and sending System Snapshot."
@@ -40,12 +41,12 @@ func (a *Action) Send(event website.EventType) {
 }
 
 func (c *cmd) create() {
-	var ticker *time.Ticker
+	var dur time.Duration
 
 	//nolint:gosec
 	if c.Snapshot.Interval.Duration > 0 {
 		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-		ticker = time.NewTicker(c.Snapshot.Interval.Duration + randomTime)
+		dur = c.Snapshot.Interval.Duration + randomTime
 	}
 
 	c.printLog()
@@ -53,7 +54,7 @@ func (c *cmd) create() {
 		Name: TrigSnapshot,
 		Fn:   c.sendSnapshot,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
+		D:    cnfg.Duration{Duration: dur},
 	})
 }
 

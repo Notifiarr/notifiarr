@@ -7,6 +7,7 @@
                                     <li><i class="fas fa-star text-dgrey"></i> Use local URLs! Timeouts happen all the time when using a proxied URL.</li>
                                 </p>
                                 <div class="table-responsive">
+                                    <form>
                                     <table class="table table-bordered bk-dark" style="width:100%">
 {{ template "starr/lidarr.html" . }}
 {{ template "starr/prowlarr.html" . }}
@@ -14,5 +15,6 @@
 {{ template "starr/readarr.html" . }}
 {{ template "starr/sonarr.html" . }}
                                     </table>
+                                    </form>
                                 </div><!-- table-responsive -->
 {{- /* end of starr (leave this comment) */ -}}

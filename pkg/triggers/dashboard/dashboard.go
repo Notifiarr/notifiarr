@@ -122,12 +122,11 @@ func (a *Action) Create() {
 }
 
 func (c *Cmd) create() {
-	var ticker *time.Ticker
+	var dur time.Duration
 
 	//nolint:gosec
 	if ci := clientinfo.Get(); ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
-		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
-		ticker = time.NewTicker(ci.Actions.Dashboard.Interval.Duration + randomTime)
+		dur = (time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond) + ci.Actions.Dashboard.Interval.Duration
 		c.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
 	}
 
@@ -135,7 +134,7 @@ func (c *Cmd) create() {
 		Name: TrigDashboard,
 		Fn:   c.sendDashboardState,
 		C:    make(chan *common.ActionInput, 1),
-		T:    ticker,
+		D:    cnfg.Duration{Duration: dur},
 	})
 }
 

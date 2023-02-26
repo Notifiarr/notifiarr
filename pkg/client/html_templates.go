@@ -21,6 +21,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/fsnotify/fsnotify"
@@ -387,6 +388,7 @@ func (c *Client) parseCustomTemplates() error {
 type templateData struct {
 	Config      *configfile.Config             `json:"config"`
 	Flags       *configfile.Flags              `json:"flags"`
+	Actions     *triggers.Actions              `json:"actions"`
 	Username    string                         `json:"username"`
 	Dynamic     bool                           `json:"dynamic"`
 	Webauth     bool                           `json:"webauth"`
@@ -423,6 +425,7 @@ func (c *Client) renderTemplate(
 	err := c.template.ExecuteTemplate(response, templateName, &templateData{
 		ProxyAllow:  c.Config.Allow.Contains(req.RemoteAddr),
 		UpstreamIP:  strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]"),
+		Actions:     c.triggers,
 		Config:      c.Config,
 		Flags:       c.Flags,
 		Username:    userName,

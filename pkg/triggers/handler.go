@@ -1,7 +1,9 @@
 package triggers
 
 import (
+	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 
@@ -26,9 +28,78 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 	http.Error(response, data, code)
 }
 
+type trigger struct {
+	Name string `json:"name"`
+	Dur  string `json:"interval,omitempty"`
+	Path string `json:"apiPath,omitempty"`
+}
+type timer struct {
+	Name string `json:"name"`
+	Dur  string `json:"interval"`
+	// Use this ID to trigger this timer with the trigger/custom endpoint.
+	Idx int `json:"id"`
+	// The client API path to trigger this custom timer.
+	Path string `json:"apiPath"`
+}
+type triggerOutput struct {
+	Triggers []*trigger `json:"triggers"`
+	Timers   []*timer   `json:"timers"`
+}
+
+// @Description  Returns a list of triggers and website timers with their intervals, if configured.
+// @Summary      Get trigger list
+// @Tags         Triggers
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=triggers.triggerOutput} "lists of triggers and timers"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/triggers [get]
+// @Security     ApiKeyAuth
+func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
+	triggers, timers := a.Timers.GatherTriggerInfo()
+	temp := make(map[string]*trigger) // used to dedup.
+
+	for name, dur := range triggers {
+		if dur.Duration == 0 {
+			temp[name] = &trigger{Name: name}
+		} else {
+			temp[name] = &trigger{Name: name, Dur: dur.String()}
+		}
+	}
+
+	for name, dur := range timers {
+		if _, ok := temp[name]; !ok {
+			temp[name] = &trigger{Name: name, Dur: dur.String()}
+		}
+	}
+
+	cronTimers := a.CronTimer.List()
+	reply := &triggerOutput{
+		Triggers: make([]*trigger, len(temp)),
+		Timers:   make([]*timer, len(cronTimers)),
+	}
+
+	idx := 0
+
+	for _, t := range temp {
+		reply.Triggers[idx] = t
+		idx++
+	}
+
+	for idx, action := range cronTimers {
+		reply.Timers[idx] = &timer{
+			Name: action.Name,
+			Dur:  action.Interval.String(),
+			Idx:  idx,
+			Path: path.Join(a.Timers.Apps.URLBase, fmt.Sprint("api/trigger/custom/", idx)),
+		}
+	}
+
+	return http.StatusOK, reply
+}
+
 // handleTrigger is an abstraction to deal with API or GUI triggers (they have different handlers).
 func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int, string) {
-	input := &common.ActionInput{Type: website.EventAPI}
+	input := &common.ActionInput{Type: event}
 	trigger := mux.Vars(req)["trigger"]
 	content := mux.Vars(req)["content"]
 
@@ -46,6 +117,8 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 
 func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string) (int, string) { //nolint:cyclop
 	switch trigger {
+	case "custom":
+		return a.customTimer(input, content)
 	case "clientlogs":
 		return a.clientLogs(content)
 	case "command":
@@ -81,6 +154,29 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
+}
+
+// @Description  Trigger a custom website timer. This sends a GET request to trigger an action on the website.
+// @Summary      Trigger custom timer
+// @Tags         Triggers
+// @Produce      json
+// @Param        idx  path   int  true  "ID of the custom website timer to trigger"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success: name of timer"
+// @Failure      400  {object} string "invalid timer ID"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trigger/custom/{idx} [get]
+// @Security     ApiKeyAuth
+func (a *Actions) customTimer(input *common.ActionInput, content string) (int, string) {
+	timerList := a.CronTimer.List()
+
+	customTimerID, err := strconv.Atoi(content)
+	if err != nil || customTimerID < 0 || customTimerID >= len(timerList) {
+		return http.StatusBadRequest, "invalid timer ID"
+	}
+
+	defer timerList[customTimerID].Run(input)
+
+	return http.StatusOK, "Custom Website Timer Triggered: " + timerList[customTimerID].Name
 }
 
 // @Description  Toggle client error log sharing.

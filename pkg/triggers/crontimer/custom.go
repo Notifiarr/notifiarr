@@ -88,7 +88,7 @@ func (c *cmd) create() {
 		c.Add(&common.Action{
 			Name: TrigPollSite,
 			Fn:   c.PollForReload,
-			T:    time.NewTicker(pollDur + time.Duration(rand.Intn(randomSeconds))*time.Second), //nolint:gosec
+			D:    cnfg.Duration{Duration: pollDur + time.Duration(rand.Intn(randomSeconds))*time.Second}, //nolint:gosec
 		})
 	}
 
@@ -104,14 +104,13 @@ func (c *cmd) create() {
 		}
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 
-		var ticker *time.Ticker
+		var randomTime time.Duration
 
 		if custom.Interval.Duration < time.Minute {
 			c.Errorf("Website provided custom cron interval under 1 minute. Ignored! Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
 		} else {
-			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
-			ticker = time.NewTicker(custom.Interval.Duration + randomTime)
+			randomTime = time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
 		}
 
 		c.list = append(c.list, timer)
@@ -120,7 +119,7 @@ func (c *cmd) create() {
 			Name: common.TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s'", custom.Name)),
 			Fn:   timer.run,
 			C:    timer.ch,
-			T:    ticker,
+			D:    cnfg.Duration{Duration: custom.Interval.Duration + randomTime},
 		})
 	}
 

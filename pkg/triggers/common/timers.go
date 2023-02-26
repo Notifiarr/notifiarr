@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golift.io/cnfg"
 )
 
 // TrigStop is used to signal a stop/reload.
@@ -23,9 +24,8 @@ func (c *Config) Run(ctx context.Context) {
 	c.stop = &Action{Name: TrigStop, C: make(chan *ActionInput)}
 
 	var (
-		cases          = []reflect.SelectCase{}
-		combine        = []*Action{}
-		timer, trigger int
+		cases   = []reflect.SelectCase{}
+		combine = []*Action{}
 	)
 
 	for _, action := range append(c.list, c.stop) {
@@ -37,18 +37,58 @@ func (c *Config) Run(ctx context.Context) {
 		if action.C != nil {
 			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.C)})
 			combine = append(combine, action)
-			trigger++
 		}
 
-		if action.T != nil {
-			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.T.C)})
+		if action.t != nil {
+			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(action.t.C)})
 			combine = append(combine, action)
-			timer++
 		}
 	}
 
 	go c.runTimerLoop(ctx, combine, cases)
-	c.Printf("==> Started %d Notifiarr Timers with %d Triggers", timer, trigger)
+	c.printStartupLog()
+}
+
+func (c *Config) GatherTriggerInfo() (map[string]cnfg.Duration, map[string]cnfg.Duration) {
+	var (
+		triggers = make(map[string]cnfg.Duration)
+		timers   = make(map[string]cnfg.Duration)
+	)
+
+	for _, action := range append(c.list, c.stop) {
+		if action == nil {
+			continue
+		}
+
+		if action.C != nil {
+			triggers[string(action.Name)] = action.D
+		}
+
+		if action.t != nil {
+			timers[string(action.Name)] = action.D
+		}
+	}
+
+	return triggers, timers
+}
+
+func (c *Config) printStartupLog() {
+	triggers, timers := c.GatherTriggerInfo()
+	c.Printf("==> Actions Started: %d Timers and %d Triggers", len(timers), len(triggers))
+
+	for name, dur := range triggers {
+		if _, ok := timers[name]; ok {
+			c.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, dur)
+		} else {
+			c.Debugf("==> Enabled Action: %s Trigger only.", name)
+		}
+	}
+
+	for name, dur := range timers {
+		if _, ok := triggers[name]; !ok {
+			c.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, dur)
+		}
+	}
 }
 
 // runTimerLoop does all of the timer/cron routines for starr apps and plex.
@@ -112,9 +152,9 @@ func (c *Config) stopTimerLoop(actions []*Action) {
 	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
 	for _, action := range actions {
-		if action.T != nil {
-			action.T.Stop()
-			action.T = nil
+		if action.t != nil {
+			action.t.Stop()
+			action.t = nil
 		}
 
 		if action.C != nil && action.C != c.stop.C { // do not close stop channel here.

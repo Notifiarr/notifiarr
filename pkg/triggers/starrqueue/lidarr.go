@@ -9,6 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cnfg"
 )
 
 const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
@@ -53,16 +54,16 @@ func (c *cmd) setupLidarr() bool {
 			continue
 		}
 
-		var ticker *time.Ticker
+		var dur time.Duration
 
 		instance := idx + 1
 		if ci.Actions.Apps.Lidarr.Finished(instance) {
-			ticker = time.NewTicker(finishedDuration)
+			dur = finishedDuration
 		} else if ci.Actions.Apps.Lidarr.Stuck(instance) {
-			ticker = time.NewTicker(stuckDuration)
+			dur = stuckDuration
 		}
 
-		if ticker != nil {
+		if dur != 0 {
 			enabled = true
 
 			c.Add(&common.Action{
@@ -70,7 +71,7 @@ func (c *cmd) setupLidarr() bool {
 				Name: TrigLidarrQueue.WithInstance(instance),
 				Fn:   (&lidarrApp{app: app, cmd: c, idx: idx}).storeQueue,
 				C:    make(chan *common.ActionInput, 1),
-				T:    ticker,
+				D:    cnfg.Duration{Duration: dur},
 			})
 		}
 	}
