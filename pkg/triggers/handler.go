@@ -28,19 +28,19 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 }
 
 type trigger struct {
-	Name     string        `json:"name"`
-	Interval cnfg.Duration `json:"interval"`
+	Name string `json:"name"`
+	Dur  string `json:"interval,omitempty"`
 }
 type timer struct {
-	Name     string        `json:"name"`
-	Interval cnfg.Duration `json:"interval"`
+	Name string        `json:"name"`
+	Dur  cnfg.Duration `json:"interval"`
 	// Use this ID to trigger this timer with the trigger/custom endpoint.
 	Idx int `json:"id"`
 }
 
 type triggerOutput struct {
-	Triggers map[string]trigger `json:"triggers"`
-	Timers   map[string]timer   `json:"timers"`
+	Triggers []trigger `json:"triggers"`
+	Timers   []timer   `json:"timers"`
 }
 
 // @Description  Returns a list of triggers and website timers with their intervals, if configured.
@@ -52,33 +52,40 @@ type triggerOutput struct {
 // @Router       /api/triggers [get]
 // @Security     ApiKeyAuth
 func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
+	temp := make(map[string]trigger)
 	reply := &triggerOutput{
-		Triggers: make(map[string]trigger),
-		Timers:   make(map[string]timer),
+		Triggers: []trigger{},
+		Timers:   []timer{},
 	}
 
 	triggers, timers := a.Timers.GatherTriggerInfo()
 
 	for name, dur := range triggers {
-		reply.Triggers[name] = trigger{
-			Name:     name,
-			Interval: dur,
+		if dur.Duration == 0 {
+			temp[name] = trigger{Name: name}
+		} else {
+			temp[name] = trigger{Name: name, Dur: dur.String()}
 		}
 	}
 
 	for name, dur := range timers {
-		reply.Triggers[name] = trigger{
-			Name:     name,
-			Interval: dur,
+		if dur.Duration == 0 {
+			temp[name] = trigger{Name: name}
+		} else {
+			temp[name] = trigger{Name: name, Dur: dur.String()}
 		}
 	}
 
+	for _, t := range temp {
+		reply.Triggers = append(reply.Triggers, t)
+	}
+
 	for idx, action := range a.CronTimer.List() {
-		reply.Timers[action.Name] = timer{
-			Name:     action.Name,
-			Interval: action.Interval,
-			Idx:      idx,
-		}
+		reply.Timers = append(reply.Timers, timer{
+			Name: action.Name,
+			Dur:  action.Interval,
+			Idx:  idx,
+		})
 	}
 
 	return http.StatusOK, reply
