@@ -1,6 +1,7 @@
 package triggers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,17 +31,19 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 type trigger struct {
 	Name string `json:"name"`
 	Dur  string `json:"interval,omitempty"`
+	Path string `json:"api_path,omitempty"`
 }
 type timer struct {
 	Name string        `json:"name"`
 	Dur  cnfg.Duration `json:"interval"`
 	// Use this ID to trigger this timer with the trigger/custom endpoint.
-	Idx int `json:"id"`
+	Idx  int    `json:"id"`
+	Path string `json:"api_path"`
 }
 
 type triggerOutput struct {
-	Triggers []trigger `json:"triggers"`
-	Timers   []timer   `json:"timers"`
+	Triggers []*trigger `json:"triggers"`
+	Timers   []*timer   `json:"timers"`
 }
 
 // @Description  Returns a list of triggers and website timers with their intervals, if configured.
@@ -52,40 +55,42 @@ type triggerOutput struct {
 // @Router       /api/triggers [get]
 // @Security     ApiKeyAuth
 func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
-	temp := make(map[string]trigger)
-	reply := &triggerOutput{
-		Triggers: []trigger{},
-		Timers:   []timer{},
-	}
-
 	triggers, timers := a.Timers.GatherTriggerInfo()
+	temp := make(map[string]*trigger) // used to dedup.
 
 	for name, dur := range triggers {
 		if dur.Duration == 0 {
-			temp[name] = trigger{Name: name}
+			temp[name] = &trigger{Name: name}
 		} else {
-			temp[name] = trigger{Name: name, Dur: dur.String()}
+			temp[name] = &trigger{Name: name, Dur: dur.String()}
 		}
 	}
 
 	for name, dur := range timers {
-		if dur.Duration == 0 {
-			temp[name] = trigger{Name: name}
-		} else {
-			temp[name] = trigger{Name: name, Dur: dur.String()}
+		if _, ok := temp[name]; !ok {
+			temp[name] = &trigger{Name: name, Dur: dur.String()}
 		}
 	}
 
-	for _, t := range temp {
-		reply.Triggers = append(reply.Triggers, t)
+	cronTimers := a.CronTimer.List()
+	reply := &triggerOutput{
+		Triggers: make([]*trigger, len(temp)),
+		Timers:   make([]*timer, len(cronTimers)),
 	}
 
-	for idx, action := range a.CronTimer.List() {
-		reply.Timers = append(reply.Timers, timer{
+	idx := 0
+	for _, t := range temp {
+		reply.Triggers[idx] = t
+		idx++
+	}
+
+	for idx, action := range cronTimers {
+		reply.Timers[idx] = &timer{
 			Name: action.Name,
 			Dur:  action.Interval,
 			Idx:  idx,
-		})
+			Path: fmt.Sprint("api/trigger/custom/", idx),
+		}
 	}
 
 	return http.StatusOK, reply
