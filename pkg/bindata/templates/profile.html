@@ -114,8 +114,11 @@
                                                             (ne (lower $header) "accept-encoding") (ne (lower $header) "accept-language") (ne (lower $header) "connection")  
                                                             (ne (lower $header) "x-forwarded-for") (ne (lower $header) "x-redacted-uri")  (ne (lower $header) "user-agent")
                                                             (ne (lower $header) "referer") (ne (lower $header) "x-noticlient-username") (ne (lower $header) "cache-control")
-                                                            (ne (lower $header) "cdn-loop") (ne (lower $header) "cf-connecting-ip") (ne (lower $header) "cf-ip-country")
+                                                            (ne (lower $header) "cdn-loop") (ne (lower $header) "cf-connecting-ip") (ne (lower $header) "cf-ipcountry")
                                                             (ne (lower $header) "cf-ray") (ne (lower $header) "cf-visitor") (ne (lower $header) "priority")
+                                                            (ne (lower $header) "dnt") (ne (lower $header) "pragma") (ne (lower $header) "x-forwarded-proto")
+                                                            (ne (lower $header) "sec-ch-ua") (ne (lower $header) "sec-ch-ua-mobile") (ne (lower $header) "sec-ch-ua-platform") 
+                                                            (ne (lower $header) "sec-fetch-dest") (ne (lower $header) "sec-fetch-mode") (ne (lower $header) "sec-fetch-site")
                                                         )}}
                                                     <option value="{{$header}}"{{if eq (lower $header) (lower $.Config.UIPassword.Header)}} selected{{end}}>{{$header}}: {{index $val 0}}</option>
                                                         {{- end }}
