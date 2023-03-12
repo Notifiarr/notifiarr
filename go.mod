@@ -35,7 +35,7 @@ require (
 	golang.org/x/crypto v0.6.0
 	golang.org/x/mod v0.8.0
 	golang.org/x/sys v0.6.0
-	golang.org/x/text v0.7.0
+	golang.org/x/text v0.8.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.1
 	golift.io/cnfgfile v0.0.0-20230210073958-ec0a0d77ab9a
