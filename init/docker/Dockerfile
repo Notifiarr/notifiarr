@@ -25,22 +25,22 @@ RUN go generate ./...
 ARG TARGETARCH
 
 RUN curl -sSo /notifiarr.tgz \
- https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
- && tar -zxf /notifiarr.tgz -C /
+    https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
+    && tar -zxf /notifiarr.tgz -C /
 
 # For megacli and ipmitool. All the *'s are to deal with multiarch. :(
 RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
- /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
- /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
- /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
- /usr/lib/*-linux-gnu*/libgcrypt.so* /lib/*-linux-gnu*/libgpg-error.so.0 /lib/*-linux-gnu*/libtinfo.so* \
- /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 /lib/*-linux-gnu*/libreadline.so* \
- /lib/*-linux-gnu*/libtinfo.so.5 /usr/lib/*-linux-gnu*/libcrypto.so* /tmp$(ls -d /lib/*-linux-gnu*) && \
- cp /usr/lib/libfreeipmi.so* /tmp/lib/ && \
- ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
- ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
- ln -s /usr/lib /tmp/lib_link/lib64 && \
- ln -s /usr/lib /tmp/lib_link/lib
+    /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
+    /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
+    /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
+    /usr/lib/*-linux-gnu*/libgcrypt.so* /lib/*-linux-gnu*/libgpg-error.so.0 /lib/*-linux-gnu*/libtinfo.so* \
+    /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 /lib/*-linux-gnu*/libreadline.so* \
+    /usr/lib/*-linux-gnu*/libcrypto.so* /tmp$(ls -d /lib/*-linux-gnu*) && \
+    cp /usr/lib/libfreeipmi.so* /tmp/lib/ && \
+    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
+    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
+    ln -s /usr/lib /tmp/lib_link/lib64 && \
+    ln -s /usr/lib /tmp/lib_link/lib
 
 ARG TARGETOS
 ARG BUILD_DATE
@@ -51,12 +51,12 @@ ARG COMMIT
 
 # Build the app.
 RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
- GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
- -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
- -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
- -X \"golift.io/version.BuildUser=docker\" \
- -X \"golift.io/version.Revision=${ITERATION}\" \
- -X \"golift.io/version.Version=${VERSION}\""
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
+    -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
+    -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
+    -X \"golift.io/version.BuildUser=docker\" \
+    -X \"golift.io/version.Revision=${ITERATION}\" \
+    -X \"golift.io/version.Version=${VERSION}\""
 
 FROM scratch
 
@@ -96,14 +96,14 @@ ARG AUTHOR=golift
 
 # Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.title="Notifiarr" \
-      org.opencontainers.image.documentation="${SOURCE_URL}/wiki/Docker" \
-      org.opencontainers.image.description="${DESC}" \
-      org.opencontainers.image.url="${SOURCE_URL}" \
-      org.opencontainers.image.revision="${COMMIT}" \
-      org.opencontainers.image.source="${SOURCE_URL}" \
-      org.opencontainers.image.vendor="${VENDOR}" \
-      org.opencontainers.image.authors="${AUTHOR}" \
-      org.opencontainers.image.architecture="${TARGETOS} ${TARGETARCH}" \
-      org.opencontainers.image.licenses="${LICENSE}" \
-      org.opencontainers.image.version="${VERSION}-${ITERATION}"
+    org.opencontainers.image.title="Notifiarr" \
+    org.opencontainers.image.documentation="${SOURCE_URL}/wiki/Docker" \
+    org.opencontainers.image.description="${DESC}" \
+    org.opencontainers.image.url="${SOURCE_URL}" \
+    org.opencontainers.image.revision="${COMMIT}" \
+    org.opencontainers.image.source="${SOURCE_URL}" \
+    org.opencontainers.image.vendor="${VENDOR}" \
+    org.opencontainers.image.authors="${AUTHOR}" \
+    org.opencontainers.image.architecture="${TARGETOS} ${TARGETARCH}" \
+    org.opencontainers.image.licenses="${LICENSE}" \
+    org.opencontainers.image.version="${VERSION}-${ITERATION}"
