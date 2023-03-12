@@ -101,11 +101,12 @@ A sample docker compose file is [found in Examples](https://github.com/Notifiarr
 - Map the `/var/run/utmp` volume if you want to count users.
 - Mount any volumes you want to report storage space for. Where does not matter, "where" is the "name".
 - You MUST set a static hostname. Each client is identified by hostname.
+- You should mount `/config` - notifiarr will create the config file on first run.
 
 ```shell
 docker pull golift/notifiarr
 docker run --hostname=$(hostname) -d \
--v /your/config/notifiarr.conf:/config/notifiarr.conf \
+-v /your/appdata/notifiarr/:/config \
 -v /var/run/utmp:/var/run/utmp \
 golift/notifiarr
 docker logs <container id from docker run>
