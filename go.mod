@@ -42,7 +42,7 @@ require (
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
-	golift.io/qbit v0.0.0-20230210082614-25a38fade923
+	golift.io/qbit v0.0.0-20230317104018-501c06d9f5c4
 	golift.io/rotatorr v0.0.0-20230110212846-590e84fecf74
 	golift.io/starr v0.14.1-0.20230220073930-7dea55fd0994
 	golift.io/version v0.0.2
