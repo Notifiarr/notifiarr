@@ -46,7 +46,7 @@ require (
 	golift.io/rotatorr v0.0.0-20230110212846-590e84fecf74
 	golift.io/starr v0.14.1-0.20230220073930-7dea55fd0994
 	golift.io/version v0.0.2
-	golift.io/xtractr v0.2.1
+	golift.io/xtractr v0.2.2
 	modernc.org/sqlite v1.21.0
 )
 
@@ -86,7 +86,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kdomanski/iso9660 v0.3.3 // indirect
-	github.com/klauspost/compress v1.15.15 // indirect
+	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
 	github.com/lufia/plan9stats v0.0.0-20230110061619-bbe2e5e100de // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
