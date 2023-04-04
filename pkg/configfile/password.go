@@ -156,9 +156,3 @@ func GeneratePassword() string {
 
 	return strings.Join(pieces, "")
 }
-
-// UnmarshalENV satisfies the cnfg interface to unmarshal an env variable.
-func (p *CryptPass) UnmarshalENV(_, envval string) error {
-	*p = CryptPass(envval)
-	return nil
-}
