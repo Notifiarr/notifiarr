@@ -4,6 +4,6 @@ import (
 	"os"
 )
 
-func getFileOwner(fileInfo os.FileInfo) string {
+func getFileOwner(_ os.FileInfo) string {
 	return ""
 }

@@ -37,14 +37,14 @@ require (
 	golang.org/x/sys v0.6.0
 	golang.org/x/text v0.8.0
 	golift.io/cache v0.0.2
-	golift.io/cnfg v0.2.2-0.20230404042758-ed60b6ae8322
+	golift.io/cnfg v0.2.2-0.20230404052606-6b77ce5bfe26
 	golift.io/cnfgfile v0.0.0-20230324082957-6be76a6e033e
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
 	golift.io/qbit v0.0.0-20230317104018-501c06d9f5c4
 	golift.io/rotatorr v0.0.0-20230317103044-d974d22ee164
-	golift.io/starr v0.14.1-0.20230220073930-7dea55fd0994
+	golift.io/starr v0.14.1-0.20230403085822-18e31a14dad6
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
 	modernc.org/sqlite v1.21.1
