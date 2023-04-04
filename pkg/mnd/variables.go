@@ -2,9 +2,7 @@ package mnd
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
-	"time"
 )
 
 //nolint:gochecknoglobals
@@ -20,9 +18,6 @@ var ErrDisabledInstance = fmt.Errorf("instance is administratively disabled")
 
 //nolint:gochecknoinits
 func init() {
-	// initialize global pseudo random generator that gets used in a few places.
-	rand.Seed(time.Now().UnixNano())
-
 	_, err := os.Stat(Synology)
 	IsSynology = err == nil
 }

@@ -3,7 +3,6 @@ package gaps
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -42,9 +41,8 @@ func (c *cmd) create() {
 	var dur time.Duration
 
 	ci := clientinfo.Get()
-	//nolint:gosec
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
-		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
+		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = ci.Actions.Gaps.Interval.Duration + randomTime
 		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
 	}

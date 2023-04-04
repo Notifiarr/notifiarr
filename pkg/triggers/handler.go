@@ -33,6 +33,7 @@ type trigger struct {
 	Dur  string `json:"interval,omitempty"`
 	Path string `json:"apiPath,omitempty"`
 }
+
 type timer struct {
 	Name string `json:"name"`
 	Dur  string `json:"interval"`
@@ -41,6 +42,7 @@ type timer struct {
 	// The client API path to trigger this custom timer.
 	Path string `json:"apiPath"`
 }
+
 type triggerOutput struct {
 	Triggers []*trigger `json:"triggers"`
 	Timers   []*timer   `json:"timers"`
@@ -54,7 +56,7 @@ type triggerOutput struct {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/triggers [get]
 // @Security     ApiKeyAuth
-func (a *Actions) HandleGetTriggers(req *http.Request) (int, interface{}) {
+func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
 	triggers, timers := a.Timers.GatherTriggerInfo()
 	temp := make(map[string]*trigger) // used to dedup.
 

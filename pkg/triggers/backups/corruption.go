@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -61,13 +60,12 @@ func (c *cmd) makeCorruptionTriggersLidarr(ci *clientinfo.ClientInfo) {
 		return
 	}
 
-	//nolint:gosec
 	for idx, app := range c.Apps.Lidarr {
 		if app.Enabled() {
 			c.lidarr[idx] = ci.Actions.Apps.Lidarr.Corrupt(idx + 1) // mandatory
 			if c.lidarr[idx] != mnd.Disabled {
-				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
+					time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 				action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 			}
 		}
@@ -86,13 +84,12 @@ func (c *cmd) makeCorruptionTriggersProwlarr(ci *clientinfo.ClientInfo) {
 		return
 	}
 
-	//nolint:gosec
 	for idx, app := range c.Apps.Prowlarr {
 		if app.Enabled() {
 			c.prowlarr[idx] = ci.Actions.Apps.Prowlarr.Corrupt(idx + 1) // mandatory
 			if c.prowlarr[idx] != mnd.Disabled {
-				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
+					time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 				action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 			}
 		}
@@ -111,13 +108,12 @@ func (c *cmd) makeCorruptionTriggersRadarr(ci *clientinfo.ClientInfo) {
 		return
 	}
 
-	//nolint:gosec
 	for idx, app := range c.Apps.Radarr {
 		if app.Enabled() {
 			c.radarr[idx] = ci.Actions.Apps.Radarr.Corrupt(idx + 1) // mandatory
 			if c.radarr[idx] != mnd.Disabled {
-				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
+					time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 				action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 			}
 		}
@@ -136,13 +132,12 @@ func (c *cmd) makeCorruptionTriggersReadarr(ci *clientinfo.ClientInfo) {
 		return
 	}
 
-	//nolint:gosec
 	for idx, app := range c.Apps.Readarr {
 		if app.Enabled() {
 			c.readarr[idx] = ci.Actions.Apps.Readarr.Corrupt(idx + 1) // mandatory
 			if c.readarr[idx] != mnd.Disabled {
-				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
+					time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 				action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 			}
 		}
@@ -161,13 +156,12 @@ func (c *cmd) makeCorruptionTriggersSonarr(ci *clientinfo.ClientInfo) {
 		return
 	}
 
-	//nolint:gosec
 	for idx, app := range c.Apps.Sonarr {
 		if app.Enabled() {
 			c.sonarr[idx] = ci.Actions.Apps.Sonarr.Corrupt(idx + 1)
 			if c.sonarr[idx] != mnd.Disabled {
-				randomTime := time.Duration(rand.Intn(randomMinutes))*time.Second +
-					time.Duration(rand.Intn(randomMinutes))*time.Minute
+				randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
+					time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 				action.D = cnfg.Duration{Duration: checkInterval + randomTime}
 			}
 		}

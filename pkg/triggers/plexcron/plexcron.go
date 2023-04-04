@@ -2,7 +2,6 @@ package plexcron
 
 import (
 	"context"
-	"math/rand"
 	"sync"
 	"time"
 
@@ -75,7 +74,7 @@ func (c *cmd) run() {
 
 	cfg := ci.Actions.Plex
 	if cfg.Interval.Duration > 0 {
-		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
+		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = cfg.Interval.Duration + randomTime
 		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
 			c.Plex.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
@@ -91,12 +90,13 @@ func (c *cmd) run() {
 	if cfg.MoviesPC != 0 || cfg.SeriesPC != 0 || cfg.TrackSess {
 		c.Printf("==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
 			c.Plex.URL, c.Plex.Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
-		//nolint:gosec
+
 		c.Add(&common.Action{
 			Name: "Checking Plex for completed sessions.",
 			Hide: true, // do not log this one.
 			Fn:   c.checkForFinishedItems,
-			D:    cnfg.Duration{Duration: time.Minute + time.Duration(rand.Intn(randomMilliseconds2))*time.Millisecond},
+			D: cnfg.Duration{Duration: time.Minute +
+				time.Duration(c.Config.Rand().Intn(randomMilliseconds2))*time.Millisecond},
 		})
 	}
 }

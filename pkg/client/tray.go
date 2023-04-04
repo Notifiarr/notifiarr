@@ -196,7 +196,7 @@ func (c *Client) makeMoreChannels() {
 }
 
 // Listen to the top-menu-item channels so they don't back up with junk.
-func (c *Client) watchTopChannels(ctx context.Context) {
+func (c *Client) watchTopChannels(_ context.Context) {
 	for {
 		select {
 		case <-menu["conf"].ClickedCh: // unused, top menu.
@@ -274,7 +274,7 @@ func (c *Client) buildDynamicTimerMenus() {
 	}
 }
 
-func (c *Client) watchKillerChannels(ctx context.Context) {
+func (c *Client) watchKillerChannels(_ context.Context) {
 	defer systray.Quit() // this kills the app
 
 	for {
@@ -381,7 +381,7 @@ func (c *Client) watchLogsChannels(ctx context.Context) {
 }
 
 //nolint:errcheck,cyclop
-func (c *Client) watchNotifiarrMenu(ctx context.Context) {
+func (c *Client) watchNotifiarrMenu(_ context.Context) {
 	for {
 		select {
 		case <-menu["gaps"].ClickedCh:

@@ -40,11 +40,7 @@ func (c *Config) setupPassword() error {
 		pass = DefaultUsername + ":" + pass
 	}
 
-	if err := c.UIPassword.Set(pass); err != nil {
-		return err
-	}
-
-	return nil
+	return c.UIPassword.Set(pass)
 }
 
 func (t AuthType) String() string {
@@ -159,10 +155,4 @@ func GeneratePassword() string {
 	rand.Shuffle(len(pieces), func(i, j int) { pieces[i], pieces[j] = pieces[j], pieces[i] })
 
 	return strings.Join(pieces, "")
-}
-
-// UnmarshalENV satisfies the cnfg interface to unmarshal an env variable.
-func (p *CryptPass) UnmarshalENV(tag, envval string) error {
-	*p = CryptPass(envval)
-	return nil
 }

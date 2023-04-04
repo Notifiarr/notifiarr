@@ -328,11 +328,7 @@ func (w *WatchFile) Stop() error {
 
 	w.retries = maxRetries // so it will not get "restarted" after manually being stopped.
 
-	if err := w.stop(); err != nil {
-		return err
-	}
-
-	return nil
+	return w.stop()
 }
 
 func (c *cmd) stop() {

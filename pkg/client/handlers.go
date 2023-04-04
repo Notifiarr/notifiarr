@@ -102,7 +102,7 @@ func (c *Client) httpAPIHandlers() {
 		c.Config.HandleAPIpath(starr.Plex, "emptytrash/{key}", c.Config.Plex.HandleEmptyTrash, "GET")
 		c.Config.HandleAPIpath(starr.Plex, "markwatched/{key}", c.Config.Plex.HandleMarkWatched, "GET")
 		c.Config.HandleAPIpath(starr.Plex, "kill", c.Config.Plex.HandleKillSession, "GET").
-			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:.*")
+			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:.*}")
 
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
 		c.Config.Router.HandleFunc("/plex", c.PlexHandler).Methods("POST").Queries("token", tokens)
