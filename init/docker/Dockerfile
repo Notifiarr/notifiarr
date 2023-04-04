@@ -12,7 +12,7 @@ COPY main.go go.mod go.sum ./
 
 # Cache all the needed tools.
 RUN go mod download \
-    && go run github.com/kevinburke/go-bindata/go-bindata@latest -v \
+    && go run github.com/kevinburke/go-bindata/v4/go-bindata@latest -v \
     && go run github.com/swaggo/swag/cmd/swag@master -v
 
 # Cache apt installs.
