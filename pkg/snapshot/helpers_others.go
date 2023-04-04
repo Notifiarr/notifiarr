@@ -6,4 +6,4 @@ import (
 	"os/exec"
 )
 
-func sysCallSettings(cmd *exec.Cmd) {}
+func sysCallSettings(_ *exec.Cmd) {}

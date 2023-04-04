@@ -1,7 +1,6 @@
 package cfsync
 
 import (
-	"math/rand"
 	"strings"
 	"time"
 
@@ -91,9 +90,9 @@ func (c *cmd) setupRadarr(ci *clientinfo.ClientInfo) {
 		}
 
 		var dur cnfg.Duration
-		//nolint:gosec
+
 		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
-			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
+			randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
 		}
 
@@ -126,9 +125,8 @@ func (c *cmd) setupSonarr(ci *clientinfo.ClientInfo) {
 
 		var dur cnfg.Duration
 
-		//nolint:gosec
 		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
-			randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
+			randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
 		}
 

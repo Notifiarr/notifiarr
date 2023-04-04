@@ -3,7 +3,6 @@ package dashboard
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -124,9 +123,10 @@ func (a *Action) Create() {
 func (c *Cmd) create() {
 	var dur time.Duration
 
-	//nolint:gosec
 	if ci := clientinfo.Get(); ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
-		dur = (time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond) + ci.Actions.Dashboard.Interval.Duration
+		dur = (time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond) +
+			ci.Actions.Dashboard.Interval.Duration
+
 		c.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
 	}
 

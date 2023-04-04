@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -59,7 +58,7 @@ func (t *Timer) Run(input *common.ActionInput) {
 }
 
 // run responds to the channel that the timer fired into.
-func (t *Timer) run(ctx context.Context, input *common.ActionInput) {
+func (t *Timer) run(_ context.Context, input *common.ActionInput) {
 	t.website.SendData(&website.Request{
 		Route:      website.Route(t.URI),
 		Event:      input.Type,
@@ -88,7 +87,7 @@ func (c *cmd) create() {
 		c.Add(&common.Action{
 			Name: TrigPollSite,
 			Fn:   c.PollForReload,
-			D:    cnfg.Duration{Duration: pollDur + time.Duration(rand.Intn(randomSeconds))*time.Second}, //nolint:gosec
+			D:    cnfg.Duration{Duration: pollDur + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},
 		})
 	}
 
@@ -110,7 +109,7 @@ func (c *cmd) create() {
 			c.Errorf("Website provided custom cron interval under 1 minute. Ignored! Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
 		} else {
-			randomTime = time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond //nolint:gosec
+			randomTime = time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		}
 
 		c.list = append(c.list, timer)

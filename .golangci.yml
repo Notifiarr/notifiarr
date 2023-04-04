@@ -33,5 +33,7 @@ linters:
     - rowserrcheck
     - wastedassign
     - sqlclosecheck
+    #- revive # TODO: fix this one.
+    - musttag # broken in 1.52.
 run:
   timeout: 5m

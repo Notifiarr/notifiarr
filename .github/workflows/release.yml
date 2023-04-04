@@ -24,7 +24,7 @@ jobs:
         with:
           # we need the whole thing so we can count commits.
           fetch-depth: '0'
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: 'stable'
       - name: go-generate
@@ -58,7 +58,7 @@ jobs:
         with:
           # we need the whole thing so we can count commits.
           fetch-depth: '0'
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
           go-version: 'stable'
       - name: make-release

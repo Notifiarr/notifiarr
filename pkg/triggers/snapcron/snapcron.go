@@ -3,7 +3,6 @@ package snapcron
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -43,9 +42,8 @@ func (a *Action) Send(event website.EventType) {
 func (c *cmd) create() {
 	var dur time.Duration
 
-	//nolint:gosec
 	if c.Snapshot.Interval.Duration > 0 {
-		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
+		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = c.Snapshot.Interval.Duration + randomTime
 	}
 

@@ -49,7 +49,7 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 	if code < http.StatusOK || code > http.StatusIMUsed {
 		if err != nil {
 			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v), body: %s",
-				ErrNon200, url, code, http.StatusText(code), err, buf.String())
+				ErrNon200, url, code, http.StatusText(code), err, buf.String()) //nolint:errorlint
 		}
 
 		return &resp, fmt.Errorf("%w: %s: %d %s",

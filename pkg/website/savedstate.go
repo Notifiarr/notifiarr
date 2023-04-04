@@ -14,7 +14,7 @@ func (s *Server) SetState(ctx context.Context, key string, value []byte) error {
 }
 
 // SetStates sets values stored in the website database.
-func (s *Server) SetStates(ctx context.Context, values map[string][]byte) error {
+func (s *Server) SetStates(_ context.Context, values map[string][]byte) error {
 	for key, val := range values {
 		if val != nil { // ignore nil byte slices.
 			values[key] = []byte(base64.StdEncoding.EncodeToString(val))
@@ -35,7 +35,7 @@ func (s *Server) SetStates(ctx context.Context, values map[string][]byte) error 
 }
 
 // DelState deletes a value stored in the website database.
-func (s *Server) DelState(ctx context.Context, keys ...string) error {
+func (s *Server) DelState(_ context.Context, keys ...string) error {
 	values := make(map[string]interface{})
 	for _, key := range keys {
 		values[key] = nil
@@ -55,7 +55,7 @@ func (s *Server) DelState(ctx context.Context, keys ...string) error {
 }
 
 // GetState gets a value stored in the website database.
-func (s *Server) GetState(ctx context.Context, keys ...string) (map[string][]byte, error) {
+func (s *Server) GetState(_ context.Context, keys ...string) (map[string][]byte, error) {
 	resp, err := s.GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventGet,

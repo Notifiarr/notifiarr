@@ -11,9 +11,9 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: '1.19'
+          go-version: '1.20'
       - name: go-generate
         run: go generate ./...
       - name: go-test
@@ -42,15 +42,15 @@ jobs:
       GOOS: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: '1.19'
+          go-version: '1.20'
       - name: go-generate
         run: GOOS=darwin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.50
+          version: 'v1.52'
 
   golangci-linux:
     # description: "Runs golangci-lint on linux against linux and windows."
@@ -63,15 +63,15 @@ jobs:
       GOOS: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: '1.19'
+          go-version: '1.20'
       - name: go-generate
         run: GOOS=linux go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.50
+          version: 'v1.52'
 
   homebrew-test:
     # description: "Installs dependencies on macOS and runs `make install` to mimic a homebrew install."
@@ -79,9 +79,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v4
         with:
-          go-version: '1.19'
+          go-version: '1.20'
       - name: go-generate
         run: go generate ./...
       - name: make-install

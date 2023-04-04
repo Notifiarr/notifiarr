@@ -2,7 +2,6 @@ package mdblist
 
 import (
 	"context"
-	"math/rand"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -38,10 +37,9 @@ func (c *cmd) create() {
 	var dur time.Duration
 
 	ci := clientinfo.Get()
-	//nolint:gosec
 	if ci != nil && ci.Actions.Mdblist.Interval.Duration > 0 &&
 		(len(ci.Actions.Mdblist.Radarr) > 0 || len(ci.Actions.Mdblist.Sonarr) > 0) {
-		randomTime := time.Duration(rand.Intn(randomMilliseconds)) * time.Millisecond
+		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = ci.Actions.Mdblist.Interval.Duration + randomTime
 		c.Printf("==> MDB List Timer Enabled, interval:%s, Radarr/Sonarr: %d/%d instances",
 			ci.Actions.Mdblist.Interval, len(ci.Actions.Mdblist.Radarr), len(ci.Actions.Mdblist.Sonarr))
