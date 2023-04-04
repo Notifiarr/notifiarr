@@ -41,20 +41,20 @@ var ErrUnsupported = fmt.Errorf("unsupported OS")
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {
-	return fmt.Errorf("%w: %s", ErrUnsupported, runtime.GOOS)
+	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, cmd)
 }
 
 // OpenURL opens URL Links.
 func OpenURL(url string) error {
-	return fmt.Errorf("%w: %s", ErrUnsupported, runtime.GOOS)
+	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, url)
 }
 
 // OpenLog opens Log Files.
 func OpenLog(logFile string) error {
-	return fmt.Errorf("%w: %s", ErrUnsupported, runtime.GOOS)
+	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, logFile)
 }
 
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
-	return fmt.Errorf("%w: %s", ErrUnsupported, runtime.GOOS)
+	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, filePath)
 }
