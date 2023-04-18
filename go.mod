@@ -34,15 +34,15 @@ require (
 	github.com/swaggo/swag v1.8.12
 	golang.org/x/crypto v0.7.0
 	golang.org/x/mod v0.10.0
-	golang.org/x/sys v0.6.0
-	golang.org/x/text v0.8.0
+	golang.org/x/sys v0.7.0
+	golang.org/x/text v0.9.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.2-0.20230404052606-6b77ce5bfe26
 	golift.io/cnfgfile v0.0.0-20230324082957-6be76a6e033e
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
-	golift.io/qbit v0.0.0-20230317104018-501c06d9f5c4
+	golift.io/qbit v0.0.0-20230418150548-f83acdea71cb
 	golift.io/rotatorr v0.0.0-20230317103044-d974d22ee164
 	golift.io/starr v0.14.1-0.20230403085822-18e31a14dad6
 	golift.io/version v0.0.2
@@ -111,7 +111,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
