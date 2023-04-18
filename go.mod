@@ -31,7 +31,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.23.3
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	github.com/stretchr/testify v1.8.2
-	github.com/swaggo/swag v1.8.12
+	github.com/swaggo/swag v1.16.1
 	golang.org/x/crypto v0.7.0
 	golang.org/x/mod v0.10.0
 	golang.org/x/sys v0.6.0
