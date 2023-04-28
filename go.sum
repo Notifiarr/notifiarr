@@ -486,6 +486,8 @@ golift.io/rotatorr v0.0.0-20230317103044-d974d22ee164 h1:3buKpmb715F3AHZKVhL9+Zh
 golift.io/rotatorr v0.0.0-20230317103044-d974d22ee164/go.mod h1:010QO3LP1dFibSi7K5Uqi7v/C6j6XAEhCkgYuSpFlHc=
 golift.io/starr v0.14.1-0.20230403085822-18e31a14dad6 h1:MoGBaqeFbassbP6mHvNsh6jPa8Vlzr0K9TFu9DV/saM=
 golift.io/starr v0.14.1-0.20230403085822-18e31a14dad6/go.mod h1:Ku4I4OXDQDPOS4j/Ol414+FGg6vCJOc8oS8sg/liFNU=
+golift.io/starr v0.14.1-0.20230424062136-a6ae1b22ee8d h1:f0wH1sNy3ygZiJ7L0HoyNbDhZ0DI/Wiz5xR1NnPwNo8=
+golift.io/starr v0.14.1-0.20230424062136-a6ae1b22ee8d/go.mod h1:9Vhqug8dCF8Y45ImzBlQxs+M4W83ZhLiF4+gnz+dRCU=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 golift.io/xtractr v0.2.2 h1:MvujxeuX629d1rQs2VJbbcvYMvMmN5SzIkEflU5ryOc=
