@@ -28,7 +28,7 @@ jobs:
         with:
           check_hidden: true
           ignore_words_list: vender
-          skip: .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js
+          skip: .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum
 
 
   golangci-darwin:
