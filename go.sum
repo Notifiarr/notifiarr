@@ -478,6 +478,8 @@ golift.io/cnfg v0.2.2-0.20230404051435-d6106562962b h1:nQOG4TjKAykkw8MlQq/Hzxbs+
 golift.io/cnfg v0.2.2-0.20230404051435-d6106562962b/go.mod h1:XXOjkKsn3GJonpWRKKkU3k98AWgvkM28W90IdV4rRkc=
 golift.io/cnfg v0.2.2-0.20230404052606-6b77ce5bfe26 h1:K3lBNrSIvxhUsdK93pmSDOUVrp0REtpEHTJT2orkOb8=
 golift.io/cnfg v0.2.2-0.20230404052606-6b77ce5bfe26/go.mod h1:XXOjkKsn3GJonpWRKKkU3k98AWgvkM28W90IdV4rRkc=
+golift.io/cnfg v0.2.2 h1:m60kGVZQLuzAx939fLX8wSEKk2fpZdX6+HOjdYuUfCw=
+golift.io/cnfg v0.2.2/go.mod h1:XXOjkKsn3GJonpWRKKkU3k98AWgvkM28W90IdV4rRkc=
 golift.io/cnfgfile v0.0.0-20230324082957-6be76a6e033e h1:QATb4OzNFaru2rukoNRo+TIApM8G+wE0+VHB3tyR3EY=
 golift.io/cnfgfile v0.0.0-20230324082957-6be76a6e033e/go.mod h1:K+Dg62wTc+z8b3iE8brS7rrDSRevWBQzSPNu8HnE+JI=
 golift.io/datacounter v1.0.4 h1:b2gLQCs8WYRtKjOMG0qM82rF1o0+oKUXB9QH7kjmxZ4=
