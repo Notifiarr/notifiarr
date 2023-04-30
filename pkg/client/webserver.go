@@ -34,7 +34,7 @@ func (c *Client) StartWebServer() {
 
 	// Make a multiplexer because websockets can't use apache log.
 	smx := http.NewServeMux()
-	smx.Handle(path.Join(c.Config.URLBase, "/ws"), c.Config.Router)
+	smx.Handle(path.Join(c.Config.URLBase, "ui", "ws"), c.Config.Router) // websockets cannot go through the apache logger.
 	smx.Handle("/", c.stripSecrets(apache.Wrap(c.Config.Router, c.Logger.HTTPLog.Writer())))
 
 	// Create a server.
@@ -126,6 +126,8 @@ func (r *responseWrapper) Write(b []byte) (int, error) {
 func (r *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	hijack, ok := r.ResponseWriter.(http.Hijacker)
 	if !ok {
+		// This fires if you move the /ui/ws endpoint to another name.
+		// It needs to be updated in two places.
 		panic("cannot hijack connection!")
 	}
 
