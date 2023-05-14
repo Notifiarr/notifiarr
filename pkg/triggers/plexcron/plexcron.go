@@ -103,27 +103,29 @@ func (c *cmd) run() {
 
 // SendWebhook is called in a go routine after a plex media.play webhook is received.
 func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
-	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-		defer cancel()
-
-		a.cmd.sendWebhook(ctx, hook)
-	}()
+	go a.cmd.sendWebhook(hook)
 }
 
-func (c *cmd) sendWebhook(ctx context.Context, hook *plex.IncomingWebhook) {
+func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	sessions := &plex.Sessions{Name: c.Plex.Server.Name()}
 	ci := clientinfo.Get()
+	ctx := context.Background()
 
 	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.
 	if ci != nil && !ci.Actions.Plex.NoActivity {
 		time.Sleep(ci.Actions.Plex.Delay.Duration)
+		ctx, cancel := context.WithTimeout(ctx, c.Plex.Timeout.Duration)
 
 		var err error
 		if sessions, err = c.getSessions(ctx, time.Second); err != nil {
 			c.Errorf("Getting Plex sessions: %v", err)
 		}
+
+		cancel()
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second) //nolint:gomnd // wait max 5 seconds for system info.
+	defer cancel()
 
 	c.SendData(&website.Request{
 		Route:      website.PlexRoute,
