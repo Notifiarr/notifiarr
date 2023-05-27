@@ -30,7 +30,7 @@ require (
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
 	github.com/shirou/gopsutil/v3 v3.23.4
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	github.com/swaggo/swag v1.16.1
 	golang.org/x/crypto v0.9.0
 	golang.org/x/mod v0.10.0
@@ -43,7 +43,7 @@ require (
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
 	golift.io/qbit v0.0.0-20230418150548-f83acdea71cb
-	golift.io/rotatorr v0.0.0-20230317103044-d974d22ee164
+	golift.io/rotatorr v0.0.0-20230520191821-3b26224a1624
 	golift.io/starr v0.14.1-0.20230403085822-18e31a14dad6
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
