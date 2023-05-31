@@ -5,7 +5,7 @@ go 1.20
 // pflag and tail are pinned to master. 12/31/2022
 
 require (
-	github.com/BurntSushi/toml v1.2.1
+	github.com/BurntSushi/toml v1.3.0
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
 	github.com/fsnotify/fsnotify v1.6.0
@@ -30,7 +30,7 @@ require (
 	github.com/nxadm/tail v1.4.9-0.20211216163028-4472660a31a6
 	github.com/shirou/gopsutil/v3 v3.23.4
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.1
 	golang.org/x/crypto v0.9.0
 	golang.org/x/mod v0.10.0
@@ -38,7 +38,7 @@ require (
 	golang.org/x/text v0.9.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.2
-	golift.io/cnfgfile v0.0.0-20230519070633-a07e5db66d2d
+	golift.io/cnfgfile v0.0.0-20230531075023-f880041cc0a0
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
