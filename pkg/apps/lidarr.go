@@ -399,7 +399,7 @@ func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	}
 
 	// Get the profiles from radarr.
-	err = getLidarr(req).UpdateQualityProfileContext(req.Context(), &profile)
+	_, err = getLidarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
 	}
