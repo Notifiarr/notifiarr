@@ -4,7 +4,7 @@ package commands
 import (
 	"bytes"
 	"context"
-	"crypto/md5" //nolint:gosec
+	"crypto/sha256"
 	"fmt"
 	"regexp"
 	"strings"
@@ -17,6 +17,8 @@ import (
 )
 
 var ErrDisabled = fmt.Errorf("the command is disabled due to an error")
+
+const hashLen = 64
 
 const (
 	argPfx = "({"
@@ -31,8 +33,12 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 		}
 	}
 
-	hash := md5.Sum([]byte(fmt.Sprint(c.Name, c.Command, c.Shell, c.Log, c.Notify, c.Timeout))) //nolint:gosec
-	c.Hash = fmt.Sprintf("%x", hash)
+	if len(c.Hash) != hashLen {
+		hash := sha256.New()
+		hash.Write([]byte(fmt.Sprint(c.Name, c.Command, c.Shell, c.Log, c.Notify, c.Timeout)))
+		c.Hash = fmt.Sprintf("%x", hash.Sum(nil))
+	}
+
 	c.log = logger
 	c.website = website
 	c.Args = len(c.args)
