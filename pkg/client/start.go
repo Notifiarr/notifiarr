@@ -124,9 +124,9 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 
 	switch {
 	case c.Flags.AptHook:
-		return c.handleAptHook(ctx) // err?
+		return c.handleAptHook(ctx) // ignore config errors. *cringe*
 	case c.Flags.Reset:
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), "ip:port") {
 			return fmt.Errorf("cannot reset admin password, got error reading configuration file: %w", err)
 		}
 

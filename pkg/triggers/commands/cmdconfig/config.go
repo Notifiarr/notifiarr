@@ -11,6 +11,6 @@ type Config struct {
 	Log     bool          `json:"log" toml:"log" xml:"log" yaml:"log"`
 	Notify  bool          `json:"notify" toml:"notify" xml:"notify" yaml:"notify"`
 	Timeout cnfg.Duration `json:"-" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Hash    string        `json:"hash" toml:"-" xml:"-" yaml:"-"`
+	Hash    string        `json:"hash" toml:"hash" xml:"hash" yaml:"hash"`
 	Args    int           `json:"args" toml:"-" xml:"-" yaml:"-"`
 }
