@@ -255,7 +255,8 @@ func (c *Config) writeDefaultConfigFile(ctx context.Context, defaultFile, config
 		newPassword = GeneratePassword()
 	}
 
-	_ = c.UIPassword.Set(DefaultUsername + ":" + newPassword)
+	// Save the original password as plain text.
+	c.UIPassword = CryptPass(DefaultUsername + ":" + newPassword)
 
 	findFile, err := c.Write(ctx, defaultFile, false)
 	if err != nil {

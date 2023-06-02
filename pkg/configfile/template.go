@@ -50,6 +50,7 @@ extra_keys = [{{range $s := .ExKeys}}"{{$s}}",{{end}}]{{end}}
 ## You may also set a custom auth header by setting to "webauth:<header>" e.g. "webauth:remote-user"
 ## Disable auth by setting this to "noauth". Not recommended and requires "upstreams" being set.
 ## If you leave this unset the password will be set to the API key defined at the top of this file.
+## Changing the password in the Web UI encrypts it, and that is recommended.
 ui_password = "{{.UIPassword}}"
 
 ## The ip:port to listen on for incoming HTTP requests. 0.0.0.0 means all/any IP and is recommended!
