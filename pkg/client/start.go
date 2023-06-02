@@ -29,6 +29,7 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/hako/durafmt"
 	flag "github.com/spf13/pflag"
+	"golift.io/mulery/client"
 	"golift.io/version"
 )
 
@@ -47,6 +48,7 @@ type Client struct {
 	triggers   *triggers.Actions
 	cookies    *securecookie.SecureCookie
 	template   *template.Template
+	tunnel     *client.Client
 	webauth    bool
 	noauth     bool
 	authHeader string
@@ -296,7 +298,7 @@ func (c *Client) Exit(ctx context.Context, cancel context.CancelFunc) error {
 		c.Print(" ❌ Good bye! Uptime:", durafmt.Parse(time.Since(version.Started).Round(time.Second)).LimitFirstN(3))
 	}()
 
-	c.StartWebServer()
+	c.StartWebServer(ctx)
 	c.setSignals()
 
 	// For non-GUI systems, this is where the main go routine stops (and waits).
@@ -340,7 +342,7 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 		return fmt.Errorf("closing logger(s): %w", errs[0])
 	}
 
-	defer c.StartWebServer()
+	defer c.StartWebServer(ctx)
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	clientInfo := c.configureServices(ctx)

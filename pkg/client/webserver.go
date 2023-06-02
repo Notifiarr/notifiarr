@@ -12,17 +12,20 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	apachelog "github.com/lestrrat-go/apache-logformat/v2"
+	"golift.io/mulery/client"
 )
 
 // StartWebServer starts the web server.
-func (c *Client) StartWebServer() {
+func (c *Client) StartWebServer(ctx context.Context) {
 	c.Lock()
 	defer c.Unlock()
 
 	//nolint:lll // Create an apache-style logger.
-	apache, _ := apachelog.New(`%{X-Forwarded-For}i %l %{X-NotiClient-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	apache, _ := apachelog.New(`%{X-Forwarded-For}i - %{X-NotiClient-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+
 	// Create a request router.
 	c.Config.Router = mux.NewRouter()
 	c.Config.Router.Use(c.fixForwardedFor)
@@ -34,8 +37,8 @@ func (c *Client) StartWebServer() {
 
 	// Make a multiplexer because websockets can't use apache log.
 	smx := http.NewServeMux()
-	smx.Handle(path.Join(c.Config.URLBase, "ui", "ws"), c.Config.Router) // websockets cannot go through the apache logger.
 	smx.Handle("/", c.stripSecrets(apache.Wrap(c.Config.Router, c.Logger.HTTPLog.Writer())))
+	smx.Handle(path.Join(c.Config.URLBase, "ui", "ws"), c.Config.Router) // websockets cannot go through the apache logger.
 
 	// Create a server.
 	c.server = &http.Server{ //nolint: exhaustivestruct
@@ -48,11 +51,48 @@ func (c *Client) StartWebServer() {
 		ErrorLog:          c.Logger.ErrorLog,
 	}
 
+	// Start the Notifiarr.com origin websocket tunnel.
+	c.startTunnel(ctx)
 	// Initialize all the application API paths.
 	c.Config.Apps.InitHandlers()
 	c.httpHandlers()
 	// Run the server.
 	go c.runWebServer()
+}
+
+func (c *Client) startTunnel(ctx context.Context) {
+	const maxPoolSize = 20 // maximum websocket connections to the origin (mulery server).
+
+	poolmax := 2 + len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
+		len(c.Config.Apps.Readarr) + len(c.Config.Apps.Prowlarr) + len(c.Config.Apps.Deluge) +
+		len(c.Config.Apps.Qbit) + len(c.Config.Apps.Rtorrent) + len(c.Config.Apps.SabNZB) +
+		len(c.Config.Apps.NZBGet)
+
+	if c.Config.Apps.Plex.Enabled() {
+		poolmax++
+	}
+
+	if c.Config.Apps.Tautulli.Enabled() {
+		poolmax++
+	}
+
+	if poolmax > maxPoolSize {
+		poolmax = maxPoolSize
+	}
+
+	// This apache logger is only used for client->server websocket-tunneled requests.
+	remWs, _ := apachelog.New(
+		`%{X-Forwarded-For}i %{X-User-ID}i - %t "%r" %>s %b "%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	c.tunnel = client.NewClient(&client.Config{
+		ID:           c.Config.HostID,
+		Targets:      []string{"wss://" + website.OriginHost + ":5454/register"},
+		PoolIdleSize: 1,
+		PoolMaxSize:  poolmax,
+		SecretKey:    c.Config.APIKey,
+		Handler:      remWs.Wrap(c.Config.Router, c.Logger.HTTPLog.Writer()).ServeHTTP,
+		Logger:       &tunnelLogger{Logger: c.Logger},
+	})
+	c.tunnel.Start(ctx)
 }
 
 // runWebServer starts the http or https listener.
@@ -89,6 +129,8 @@ func (c *Client) StopWebServer(ctx context.Context) error {
 		menu["stat"].Uncheck()
 		menu["stat"].SetTooltip("web server paused, click to start")
 	}
+
+	c.tunnel.Shutdown()
 
 	if err := c.server.Shutdown(ctx); err != nil {
 		return fmt.Errorf("shutting down web server: %w", err)
@@ -142,4 +184,24 @@ func (r *responseWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 func (n *netConnWrapper) Write(b []byte) (int, error) {
 	mnd.HTTPRequests.Add("Response Bytes", int64(len(b)))
 	return n.Conn.Write(b) //nolint:wrapcheck
+}
+
+// tunnelLogger lets us tune the logs from the mulery tunnel.
+type tunnelLogger struct {
+	mnd.Logger
+}
+
+// Debugf prints a message with DEBUG prefixed.
+func (l *tunnelLogger) Debugf(format string, v ...interface{}) {
+	l.Logger.Debugf(format, v...)
+}
+
+// Errorf prints a message with ERROR prefixed.
+func (l *tunnelLogger) Errorf(format string, v ...interface{}) {
+	l.Logger.ErrorfNoShare(format, v...) // this is why we dont just pass the interface in as-is.
+}
+
+// Printf prints a message with INFO prefixed.
+func (l *tunnelLogger) Printf(format string, v ...interface{}) {
+	l.Logger.Printf(format, v...)
 }

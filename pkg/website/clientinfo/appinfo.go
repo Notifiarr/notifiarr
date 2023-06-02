@@ -71,6 +71,8 @@ type AppInfoClient struct {
 	HasGUI bool `json:"hasGui"`
 	// Listen is the IP and port the client has configured.
 	Listen string `json:"listen"`
+	// Application supports tunnelling.
+	Tunnel bool `json:"tunnel"`
 }
 
 // AppInfoConfig contains exported running configuration information for this app.
@@ -142,6 +144,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 			Docker:    mnd.IsDocker,
 			HasGUI:    ui.HasGUI(),
 			Listen:    GetOutboundIP() + ":" + port,
+			Tunnel:    true, // no toggle for this.
 		},
 		Num: map[string]int{
 			"nzbget":   len(c.Apps.NZBGet),

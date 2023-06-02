@@ -209,8 +209,13 @@ func (c *Client) countRequest(next http.Handler) http.Handler {
 func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		if x := r.Header.Get("X-Forwarded-For"); x == "" || !c.Config.Allow.Contains(r.RemoteAddr) {
-			r.Header.Set("X-Forwarded-For",
-				strings.Trim(r.RemoteAddr[:strings.LastIndex(r.RemoteAddr, ":")], "[]"))
+			if end := strings.LastIndex(r.RemoteAddr, ":"); end != -1 {
+				r.Header.Set("X-Forwarded-For", strings.Trim(r.RemoteAddr[:end], "[]"))
+			} else if ra := strings.Trim(r.RemoteAddr, "[]"); ra != "" {
+				r.Header.Set("X-Forwarded-For", ra)
+			} else {
+				r.Header.Set("X-Forwarded-For", "unknown")
+			}
 		} else if l := strings.LastIndexAny(x, ", "); l != -1 {
 			r.Header.Set("X-Forwarded-For", strings.Trim(x[l:len(x)-1], ", "))
 		}
