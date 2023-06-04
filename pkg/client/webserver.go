@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"time"
@@ -61,6 +62,11 @@ func (c *Client) StartWebServer(ctx context.Context) {
 }
 
 func (c *Client) startTunnel(ctx context.Context) {
+	// If clientinfo is nil, then we probably have a bad API key.
+	if c.clientinfo == nil && c.tunnel == nil {
+		return
+	}
+
 	const maxPoolSize = 20 // maximum websocket connections to the origin (mulery server).
 
 	poolmax := 2 + len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
@@ -89,10 +95,34 @@ func (c *Client) startTunnel(ctx context.Context) {
 		PoolIdleSize: 1,
 		PoolMaxSize:  poolmax,
 		SecretKey:    c.Config.APIKey,
-		Handler:      remWs.Wrap(c.Config.Router, c.Logger.HTTPLog.Writer()).ServeHTTP,
+		Handler:      remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
 		Logger:       &tunnelLogger{Logger: c.Logger},
 	})
 	c.tunnel.Start(ctx)
+}
+
+// prefixURLbase adds a prefix to an http request.
+// We need this to fix websocket-tunneled requests
+// from the website when url base is not the default.
+func (c *Client) prefixURLbase(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if c.Config.URLBase == "" || c.Config.URLBase == "/" {
+			h.ServeHTTP(w, r)
+			return
+		}
+
+		r2 := new(http.Request)
+		*r2 = *r
+		r2.URL = new(url.URL)
+		*r2.URL = *r.URL
+		r2.URL.Path = path.Join(c.Config.URLBase, r.URL.Path)
+
+		if r.URL.RawPath != "" {
+			r2.URL.RawPath = path.Join(c.Config.URLBase, r.URL.RawPath)
+		}
+
+		h.ServeHTTP(w, r2)
+	})
 }
 
 // runWebServer starts the http or https listener.
@@ -130,7 +160,9 @@ func (c *Client) StopWebServer(ctx context.Context) error {
 		menu["stat"].SetTooltip("web server paused, click to start")
 	}
 
-	c.tunnel.Shutdown()
+	if c.tunnel != nil {
+		c.tunnel.Shutdown()
+	}
 
 	if err := c.server.Shutdown(ctx); err != nil {
 		return fmt.Errorf("shutting down web server: %w", err)
