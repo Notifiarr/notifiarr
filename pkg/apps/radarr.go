@@ -910,7 +910,7 @@ func radarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 // @Tags         Radarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.ImportList}  "import list list"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.ImportListOutput}  "import list list"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/importlist [get]
@@ -931,22 +931,22 @@ func radarrGetImportLists(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        listID  path   int64  true  "Import List ID"
-// @Param        PUT body radarr.ImportList  true  "Updated Import Listcontent"
-// @Success      200  {object} apps.Respond.apiResponse{message=radarr.ImportList}  "import list returns"
+// @Param        PUT body radarr.ImportListInput  true  "Updated Import Listcontent"
+// @Success      200  {object} apps.Respond.apiResponse{message=radarr.ImportListOutput}  "import list returns"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/importlist/{listID} [put]
 // @Security     ApiKeyAuth
 func radarrUpdateImportList(req *http.Request) (int, interface{}) {
-	var ilist radarr.ImportList
+	var ilist radarr.ImportListInput
 	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
 	ilist.ID, _ = strconv.ParseInt(mux.Vars(req)["ilid"], mnd.Base10, mnd.Bits64)
 
-	output, err := getRadarr(req).UpdateImportListContext(req.Context(), &ilist)
+	output, err := getRadarr(req).UpdateImportListContext(req.Context(), &ilist, false)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating import list: %w", err)
 	}
@@ -960,15 +960,15 @@ func radarrUpdateImportList(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        POST body radarr.ImportList  true  "New Import List"
-// @Success      200  {object} apps.Respond.apiResponse{message=radarr.ImportList}  "import list returns"
+// @Param        POST body radarr.ImportListInput  true  "New Import List"
+// @Success      200  {object} apps.Respond.apiResponse{message=radarr.ImportListOutput}  "import list returns"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/importlist [post]
 // @Security     ApiKeyAuth
 func radarrAddImportList(req *http.Request) (int, interface{}) {
-	var ilist radarr.ImportList
+	var ilist radarr.ImportListInput
 	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
