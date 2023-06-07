@@ -35,7 +35,7 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 
 	if len(c.Hash) != hashLen {
 		hash := sha256.New()
-		hash.Write([]byte(fmt.Sprint(c.Name, c.Command, c.Shell, c.Log, c.Notify, c.Timeout)))
+		hash.Write([]byte(fmt.Sprint(time.Now(), c.Name, c.Command, c.Timeout)))
 		c.Hash = fmt.Sprintf("%x", hash.Sum(nil))
 	}
 
