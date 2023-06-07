@@ -67,9 +67,12 @@ func (c *Client) startTunnel(ctx context.Context) {
 		return
 	}
 
-	const maxPoolSize = 20 // maximum websocket connections to the origin (mulery server).
+	const (
+		maxPoolSize = 20 // maximum websocket connections to the origin (mulery server).
+		maxPoolMin  = 2  // maximum is calculated, and this is the minimum it may be.
+	)
 
-	poolmax := 2 + len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
+	poolmax := 1 + len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
 		len(c.Config.Apps.Readarr) + len(c.Config.Apps.Prowlarr) + len(c.Config.Apps.Deluge) +
 		len(c.Config.Apps.Qbit) + len(c.Config.Apps.Rtorrent) + len(c.Config.Apps.SabNZB) +
 		len(c.Config.Apps.NZBGet)
@@ -84,19 +87,24 @@ func (c *Client) startTunnel(ctx context.Context) {
 
 	if poolmax > maxPoolSize {
 		poolmax = maxPoolSize
+	} else if poolmax < maxPoolMin {
+		poolmax = maxPoolMin
 	}
 
 	// This apache logger is only used for client->server websocket-tunneled requests.
 	remWs, _ := apachelog.New(
 		`%{X-Forwarded-For}i %{X-User-ID}i - %t "%r" %>s %b "%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	//nolint:gomnd // just attempting a tiny bit of splay.
 	c.tunnel = client.NewClient(&client.Config{
-		ID:           c.Config.HostID,
-		Targets:      []string{"wss://" + website.OriginHost + ":5454/register"},
-		PoolIdleSize: 1,
-		PoolMaxSize:  poolmax,
-		SecretKey:    c.Config.APIKey,
-		Handler:      remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
-		Logger:       &tunnelLogger{Logger: c.Logger},
+		ID:            c.Config.HostID,
+		Targets:       []string{"wss://" + website.TunnelHost + ":5454/register"},
+		PoolIdleSize:  1,
+		PoolMaxSize:   poolmax,
+		CleanInterval: time.Second + time.Duration(c.triggers.Timers.Rand().Intn(1000))*time.Millisecond,
+		Backoff:       600*time.Millisecond + time.Duration(c.triggers.Timers.Rand().Intn(600))*time.Millisecond,
+		SecretKey:     c.Config.APIKey,
+		Handler:       remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
+		Logger:        &tunnelLogger{Logger: c.Logger},
 	})
 	c.tunnel.Start(ctx)
 }

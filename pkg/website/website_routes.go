@@ -105,7 +105,7 @@ api/v1/user/trash?app=...
   sonarr
 */
 const (
-	OriginHost          = "origin-proxy.notifiarr.com"
+	TunnelHost          = "origin.tunnel.notifiarr.com"
 	BaseURL             = "https://notifiarr.com"
 	userRoute1    Route = "/api/v1/user"
 	userRoute2    Route = "/api/v2/user"
