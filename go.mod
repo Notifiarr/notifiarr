@@ -5,7 +5,7 @@ go 1.20
 // pflag and tail are pinned to master. 12/31/2022
 
 require (
-	github.com/BurntSushi/toml v1.3.0
+	github.com/BurntSushi/toml v1.3.1
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
 	github.com/fsnotify/fsnotify v1.6.0
