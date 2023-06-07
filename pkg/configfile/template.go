@@ -547,6 +547,7 @@ bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
 
 [[command]]
   name    = '{{$item.Name}}'
+  hash    = '{{$item.Hash}}'
   command = '''{{toml $item.Command}}'''
   shell   = {{$item.Shell}}
   log     = {{$item.Log}}
