@@ -169,7 +169,7 @@ func (c *Client) StopWebServer(ctx context.Context) error {
 	}
 
 	if c.tunnel != nil {
-		c.tunnel.Shutdown()
+		defer c.tunnel.Shutdown()
 	}
 
 	if err := c.server.Shutdown(ctx); err != nil {
