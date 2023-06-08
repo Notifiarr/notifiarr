@@ -41,7 +41,7 @@ func (a *Apps) readarrHandlers() {
 
 // ReadarrConfig represents the input data for a Readarr server.
 type ReadarrConfig struct {
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	*readarr.Readarr `toml:"-" xml:"-" json:"-"`
 	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`

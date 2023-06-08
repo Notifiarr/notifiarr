@@ -47,7 +47,7 @@ func (a *Apps) lidarrHandlers() {
 
 // LidarrConfig represents the input data for a Lidarr server.
 type LidarrConfig struct {
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	*lidarr.Lidarr `toml:"-" xml:"-" json:"-"`
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`

@@ -19,7 +19,7 @@ import (
 type PlexConfig struct {
 	*plex.Config
 	*plex.Server
-	extraConfig
+	ExtraConfig
 }
 
 func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
@@ -45,7 +45,7 @@ func (c *PlexConfig) Enabled() bool {
 }
 
 type TautulliConfig struct {
-	extraConfig
+	ExtraConfig
 	tautulli.Config
 }
 
@@ -75,7 +75,7 @@ func (c *TautulliConfig) Enabled() bool {
 }
 
 type DelugeConfig struct {
-	extraConfig
+	ExtraConfig
 	*deluge.Config
 	*deluge.Deluge `toml:"-" xml:"-" json:"-"`
 }
@@ -125,7 +125,7 @@ func (c *DelugeConfig) Enabled() bool {
 }
 
 type SabNZBConfig struct {
-	extraConfig
+	ExtraConfig
 	*sabnzbd.Config
 }
 
@@ -169,7 +169,7 @@ func (c *SabNZBConfig) Enabled() bool {
 }
 
 type QbitConfig struct {
-	extraConfig
+	ExtraConfig
 	*qbit.Config
 	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
 }
@@ -218,7 +218,7 @@ func (c *QbitConfig) Enabled() bool {
 }
 
 type RtorrentConfig struct {
-	extraConfig
+	ExtraConfig
 	*xmlrpc.Client
 	URL  string `toml:"url" xml:"url" json:"url"`
 	User string `toml:"user" xml:"user" json:"user"`
@@ -274,7 +274,7 @@ func (c *RtorrentConfig) Enabled() bool {
 }
 
 type NZBGetConfig struct {
-	extraConfig
+	ExtraConfig
 	*nzbget.Config
 	*nzbget.NZBGet `toml:"-" xml:"-" json:"-"`
 }

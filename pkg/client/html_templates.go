@@ -108,7 +108,7 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 	}
 }
 
-func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
+func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen,cyclop
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
@@ -148,12 +148,10 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 		// adds 1 an integer, to deal with instance IDs for humans.
 		"instance": func(idx int) int { return idx + 1 },
 		// returns true if the environment variable has a value.
-		"locked":   func(env string) bool { return os.Getenv(env) != "" },
+		"locked":   func(env string) bool { return c.Flags.ConfigFile == "" || os.Getenv(env) != "" },
 		"contains": strings.Contains,
 		"since":    since,
-		"percent": func(i, j float64) int64 {
-			return int64(i / j * 100) //nolint:gomnd
-		},
+		"percent":  func(i, j float64) int64 { return int64(i / j * 100) }, //nolint:gomnd
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
 				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {

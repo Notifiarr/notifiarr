@@ -15,7 +15,7 @@ func (a *Apps) prowlarrHandlers() {
 
 // ProwlarrConfig represents the input data for a Prowlarr server.
 type ProwlarrConfig struct {
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	*prowlarr.Prowlarr `toml:"-" xml:"-" json:"-"`
 	errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`

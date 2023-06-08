@@ -57,7 +57,7 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	*radarr.Radarr `toml:"-" xml:"-" json:"-"`
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`

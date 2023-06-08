@@ -62,7 +62,7 @@ func (a *Apps) sonarrHandlers() {
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
 	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
