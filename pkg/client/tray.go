@@ -11,13 +11,13 @@ import (
 	"strings"
 	"time"
 
+	"fyne.io/systray"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
-	"github.com/getlantern/systray"
 	"golift.io/starr"
 	"golift.io/version"
 )
