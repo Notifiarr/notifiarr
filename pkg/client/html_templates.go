@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -26,6 +27,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
+	"github.com/jackpal/gateway"
 	"github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
 	"golang.org/x/text/cases"
@@ -419,6 +421,8 @@ func (c *Client) renderTemplate(
 	userName, dynamic := c.getUserName(req)
 	hostInfo, _ := c.website.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
+	outboundIP := getOutboundIP()
+	ifName, netmask := getIfNameAndNetmask(outboundIP)
 
 	err := c.template.ExecuteTemplate(response, templateName, &templateData{
 		ProxyAllow:  c.Config.Allow.Contains(req.RemoteAddr),
@@ -451,6 +455,10 @@ func (c *Client) renderTemplate(
 			"docker":    mnd.IsDocker,
 			"uid":       os.Getuid(),
 			"gid":       os.Getgid(),
+			"ip":        outboundIP,
+			"gateway":   getGateway(),
+			"ifName":    ifName,
+			"netmask":   netmask,
 		},
 		Expvar:   mnd.GetAllData(),
 		HostInfo: hostInfo,
@@ -700,4 +708,58 @@ func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 	}
 
 	return output
+}
+
+func getGateway() string {
+	gateway, err := gateway.DiscoverGateway()
+	if err != nil {
+		return ""
+	}
+
+	return gateway.String()
+}
+
+func getOutboundIP() string {
+	conn, err := net.Dial("udp", "1.1.1.1:437")
+	if err != nil {
+		return ""
+	}
+	defer conn.Close()
+
+	localAddr, ok := conn.LocalAddr().(*net.UDPAddr)
+	if !ok {
+		return conn.LocalAddr().String()
+	}
+
+	return localAddr.IP.String()
+}
+
+// Returns interface name and netmask.
+func getIfNameAndNetmask(ipAddr string) (string, string) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", ""
+	}
+
+	for _, i := range ifaces {
+		addrs, err := i.Addrs()
+		if err != nil {
+			continue
+		}
+
+		for _, a := range addrs {
+			switch v := a.(type) {
+			case *net.IPNet:
+				if v.IP.String() == ipAddr {
+					return i.Name, a.String()
+				}
+			case *net.IPAddr:
+				if v.IP.String() == ipAddr {
+					return i.Name, a.String()
+				}
+			}
+		}
+	}
+
+	return "", ""
 }

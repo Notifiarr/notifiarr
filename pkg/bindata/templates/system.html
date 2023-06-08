@@ -194,7 +194,35 @@
                                                 <td>{{.Version.uid}}, {{.Version.gid}}</td>
                                                 <td style="display:none;"></td>
                                             </tr>
-                                             <tr class="text-center">
+                                            <tr class="text-center">
+                                                <td style="display:none;"></td>
+                                                <td style="display:none;"></td>
+                                                <td colspan="2">
+                                                    <i class="fas fa-wifi" style="float:left;font-size:40px"></i>
+                                                    <h4>Network</h4>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>IP Address</td>
+                                                <td>{{.Version.ip}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Gateway</td>
+                                                <td>{{.Version.gateway}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Netmask</td>
+                                                <td>{{.Version.netmask}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Interface</td>
+                                                <td>{{.Version.ifName}}</td>
+                                                <td style="display:none;"></td>
+                                            </tr>
+                                            <tr class="text-center">
                                                 <td style="display:none;"></td>
                                                 <td style="display:none;"></td>
                                                 <td colspan="2">
