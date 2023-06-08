@@ -21,7 +21,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
-	github.com/jaypipes/ghw v0.10.0
+	github.com/jaypipes/ghw v0.11.0
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/kevinburke/go-bindata v3.24.0+incompatible
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
