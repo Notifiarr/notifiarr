@@ -74,7 +74,7 @@ func (a *Apps) setupReadarr() error {
 			})
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), nil)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), app.Config.Client.Transport)
 		}
 
 		app.errorf = a.Errorf

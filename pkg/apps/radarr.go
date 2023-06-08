@@ -90,7 +90,7 @@ func (a *Apps) setupRadarr() error {
 			})
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Radarr.String(), nil)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Radarr.String(), app.Config.Client.Transport)
 		}
 
 		app.errorf = a.Errorf

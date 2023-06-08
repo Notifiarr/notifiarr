@@ -32,7 +32,7 @@ func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper(starr.Plex.String(), nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper(starr.Plex.String(), c.Config.Client.Transport)
 	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
@@ -63,7 +63,7 @@ func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("Tautulli", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("Tautulli", c.Config.Client.Transport)
 	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
@@ -107,7 +107,7 @@ func (c *DelugeConfig) setup(maxBody int, logger mnd.Logger) error {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("Deluge", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("Deluge", c.Config.Client.Transport)
 	}
 
 	var err error
@@ -157,7 +157,7 @@ func (c *SabNZBConfig) Setup(maxBody int, logger mnd.Logger) {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("SABnzbd", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("SABnzbd", c.Config.Client.Transport)
 	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
@@ -201,7 +201,7 @@ func (c *QbitConfig) Setup(maxBody int, logger mnd.Logger) error {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("qBittorrent", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("qBittorrent", c.Config.Client.Transport)
 	}
 
 	var err error
@@ -254,7 +254,7 @@ func (c *RtorrentConfig) Setup(maxBody int, logger mnd.Logger) {
 	}
 
 	client := starr.Client(c.Timeout.Duration, c.ValidSSL)
-	client.Transport = NewMetricsRoundTripper("rTorrent", nil)
+	client.Transport = NewMetricsRoundTripper("rTorrent", client.Transport)
 
 	if logger != nil && logger.DebugEnabled() {
 		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
@@ -296,7 +296,7 @@ func (a *Apps) setupNZBGet() error {
 			})
 		} else {
 			app.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Client.Transport = NewMetricsRoundTripper("NZBGet", nil)
+			app.Client.Transport = NewMetricsRoundTripper("NZBGet", app.Client.Transport)
 		}
 
 		a.NZBGet[idx].NZBGet = nzbget.New(a.NZBGet[idx].Config)
