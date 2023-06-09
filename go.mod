@@ -6,7 +6,7 @@ go 1.20
 
 require (
 	fyne.io/systray v1.10.0
-	github.com/BurntSushi/toml v1.3.1
+	github.com/BurntSushi/toml v1.3.2
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
 	github.com/fsnotify/fsnotify v1.6.0
@@ -22,7 +22,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
 	github.com/jackpal/gateway v1.0.10
-	github.com/jaypipes/ghw v0.10.0
+	github.com/jaypipes/ghw v0.11.0
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/kevinburke/go-bindata v3.24.0+incompatible
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
@@ -43,7 +43,7 @@ require (
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/nzbget v0.1.4
-	golift.io/qbit v0.0.0-20230608081843-3a99d21758be
+	golift.io/qbit v0.0.0-20230608082406-436061e567bb
 	golift.io/rotatorr v0.0.0-20230520191821-3b26224a1624
 	golift.io/starr v0.14.1-0.20230608042659-071c4ff7e149
 	golift.io/version v0.0.2
@@ -93,7 +93,7 @@ require (
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
-	github.com/tklauser/numcpus v0.6.0 // indirect
+	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
@@ -105,11 +105,11 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.0 // indirect
 	lukechampine.com/uint128 v1.3.0 // indirect
-	modernc.org/cc/v3 v3.40.0 // indirect
+	modernc.org/cc/v3 v3.41.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect
-	modernc.org/libc v1.22.6 // indirect
+	modernc.org/libc v1.24.1 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
-	modernc.org/memory v1.5.0 // indirect
+	modernc.org/memory v1.6.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.1.0 // indirect
