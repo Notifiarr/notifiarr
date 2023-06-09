@@ -107,7 +107,7 @@ type AppInfoTautulli struct {
 }
 
 // Info is used for JSON input for our outgoing app info.
-func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
+func (c *Config) Info(ctx context.Context, startup bool) *AppInfo { //nolint:funlen
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
 	if c.Apps.Plex.Enabled() {
 		numPlex = 1

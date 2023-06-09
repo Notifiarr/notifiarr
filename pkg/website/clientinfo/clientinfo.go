@@ -24,7 +24,6 @@ type ClientInfo struct {
 		Tunnels    []string `json:"tunnels"`
 	} `json:"user"`
 	Actions struct {
-		Poll      bool             `json:"poll"`
 		Plex      PlexConfig       `json:"plex"`      // Site Config for Plex.
 		Apps      AllAppConfigs    `json:"apps"`      // Site Config for Starr.
 		Dashboard DashConfig       `json:"dashboard"` // Site Config for Dashboard.

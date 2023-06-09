@@ -68,14 +68,14 @@ func (c *Client) startTunnel(ctx context.Context) {
 	}
 
 	const (
-		maxPoolSize = 20 // maximum websocket connections to the origin (mulery server).
-		maxPoolMin  = 2  // maximum is calculated, and this is the minimum it may be.
+		maxPoolSize = 25 // maximum websocket connections to the origin (mulery server).
+		maxPoolMin  = 4  // maximum is calculated, and this is the minimum it may be.
 	)
 
-	poolmax := 1 + len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
+	poolmax := len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
 		len(c.Config.Apps.Readarr) + len(c.Config.Apps.Prowlarr) + len(c.Config.Apps.Deluge) +
 		len(c.Config.Apps.Qbit) + len(c.Config.Apps.Rtorrent) + len(c.Config.Apps.SabNZB) +
-		len(c.Config.Apps.NZBGet)
+		len(c.Config.Apps.NZBGet) + 1
 
 	if c.Config.Apps.Plex.Enabled() {
 		poolmax++
@@ -91,11 +91,17 @@ func (c *Client) startTunnel(ctx context.Context) {
 		poolmax = maxPoolMin
 	}
 
+	hostname, _ := os.Hostname()
+	if hostInfo, err := c.clientinfo.GetHostInfo(ctx); err != nil {
+		hostname = hostInfo.Hostname
+	}
+
 	// This apache logger is only used for client->server websocket-tunneled requests.
 	remWs, _ := apachelog.New(
 		`%{X-Forwarded-For}i %{X-User-ID}i - %t "%r" %>s %b "%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	//nolint:gomnd // just attempting a tiny bit of splay.
 	c.tunnel = client.NewClient(&client.Config{
+		Name:          hostname,
 		ID:            c.Config.HostID,
 		Targets:       []string{"wss://" + website.TunnelHost + ":5454/register"},
 		PoolIdleSize:  1,

@@ -425,7 +425,7 @@ func (a *Actions) backup(input *common.ActionInput, content string) (int, string
 func (a *Actions) handleConfigReload() (int, string) {
 	go func() {
 		// Until we have a way to reliably finish the tunnel requests, this is the best I got.
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond) //nolint:gomnd
 		a.Timers.ReloadApp("HTTP Triggered Reload")
 	}()
 
