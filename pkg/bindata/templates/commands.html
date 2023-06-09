@@ -87,6 +87,7 @@
                                         </thead>
                                         <tbody id="commands-Commands-container">
                                         {{- range $index, $app := .Config.Commands}}
+                                            <input  style="display: none;" id="Commands.{{$index}}.Hash" name="Commands.{{$index}}.Hash" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Hash" data-original="{{$app.Hash}}" value="{{$app.Hash}}">
                                             <input disabled style="display: none;" class="client-parameter commands-Commands{{$index}}-deleted" data-group="commands" data-label="Command {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="commands-Commands" id="commands-Commands-{{$index}}">
                                                 <td style="white-space:nowrap;">
@@ -126,7 +127,6 @@
                                                     </form>
                                                 </td>
                                                 <td>
-                                                    <input type="hidden" id="Commands.{{$index}}.Hash" name="Commands.{{$index}}.Hash" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Hash" data-original="{{$app.Hash}}" value="{{$app.Hash}}">
                                                     <form class="form-inline">
                                                         <div class="form-group" style="width:100%">
                                                             <div class="input-group" style="width:100%">
