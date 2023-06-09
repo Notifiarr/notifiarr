@@ -3,7 +3,9 @@ package clientinfo
 import (
 	"context"
 	"fmt"
+	"net"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -49,6 +51,8 @@ type AppInfoClient struct {
 	Arch string `json:"arch"`
 	// Application Build Date.
 	BuildDate string `json:"buildDate"`
+	// Branch application built from.
+	Branch string `json:"branch"`
 	// Go Version app built with.
 	GoVersion string `json:"goVersion"`
 	// OS app is running on.
@@ -65,6 +69,8 @@ type AppInfoClient struct {
 	Docker bool `json:"docker"`
 	// Application has a GUI? (windows/mac only)
 	HasGUI bool `json:"hasGui"`
+	// Listen is the IP and port the client has configured.
+	Listen string `json:"listen"`
 }
 
 // AppInfoConfig contains exported running configuration information for this app.
@@ -115,10 +121,18 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 		err = fmt.Errorf("") //nolint:goerr113
 	}
 
+	split := strings.Split(c.Config.BindAddr, ":")
+
+	port := split[0]
+	if len(split) > 1 {
+		port = split[1]
+	}
+
 	return &AppInfo{
 		Client: &AppInfoClient{
 			Arch:      runtime.GOARCH,
 			BuildDate: version.BuildDate,
+			Branch:    version.Branch,
 			GoVersion: version.GoVersion,
 			OS:        runtime.GOOS,
 			Revision:  version.Revision,
@@ -127,6 +141,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 			Started:   version.Started,
 			Docker:    mnd.IsDocker,
 			HasGUI:    ui.HasGUI(),
+			Listen:    GetOutboundIP() + ":" + port,
 		},
 		Num: map[string]int{
 			"nzbget":   len(c.Apps.NZBGet),
@@ -210,4 +225,19 @@ func (c *Config) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
 	data.Save(tautulliUsersKey, users)
 
 	return users, nil
+}
+
+func GetOutboundIP() string {
+	conn, err := net.Dial("udp", "1.1.1.1:437")
+	if err != nil {
+		return ""
+	}
+	defer conn.Close()
+
+	localAddr, ok := conn.LocalAddr().(*net.UDPAddr)
+	if !ok {
+		return conn.LocalAddr().String()
+	}
+
+	return localAddr.IP.String()
 }

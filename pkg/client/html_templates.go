@@ -421,7 +421,7 @@ func (c *Client) renderTemplate(
 	userName, dynamic := c.getUserName(req)
 	hostInfo, _ := c.website.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
-	outboundIP := getOutboundIP()
+	outboundIP := clientinfo.GetOutboundIP()
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
 
 	err := c.template.ExecuteTemplate(response, templateName, &templateData{
@@ -717,21 +717,6 @@ func getGateway() string {
 	}
 
 	return gateway.String()
-}
-
-func getOutboundIP() string {
-	conn, err := net.Dial("udp", "1.1.1.1:437")
-	if err != nil {
-		return ""
-	}
-	defer conn.Close()
-
-	localAddr, ok := conn.LocalAddr().(*net.UDPAddr)
-	if !ok {
-		return conn.LocalAddr().String()
-	}
-
-	return localAddr.IP.String()
 }
 
 // Returns interface name and netmask.
