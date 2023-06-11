@@ -19,7 +19,7 @@ import (
 type PlexConfig struct {
 	*plex.Config
 	*plex.Server
-	extraConfig
+	ExtraConfig
 }
 
 func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
@@ -32,7 +32,7 @@ func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper(starr.Plex.String(), nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper(starr.Plex.String(), c.Config.Client.Transport)
 	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
@@ -45,7 +45,7 @@ func (c *PlexConfig) Enabled() bool {
 }
 
 type TautulliConfig struct {
-	extraConfig
+	ExtraConfig
 	tautulli.Config
 }
 
@@ -63,7 +63,7 @@ func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("Tautulli", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("Tautulli", c.Config.Client.Transport)
 	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
@@ -75,7 +75,7 @@ func (c *TautulliConfig) Enabled() bool {
 }
 
 type DelugeConfig struct {
-	extraConfig
+	ExtraConfig
 	*deluge.Config
 	*deluge.Deluge `toml:"-" xml:"-" json:"-"`
 }
@@ -107,7 +107,7 @@ func (c *DelugeConfig) setup(maxBody int, logger mnd.Logger) error {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("Deluge", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("Deluge", c.Config.Client.Transport)
 	}
 
 	var err error
@@ -125,7 +125,7 @@ func (c *DelugeConfig) Enabled() bool {
 }
 
 type SabNZBConfig struct {
-	extraConfig
+	ExtraConfig
 	*sabnzbd.Config
 }
 
@@ -157,7 +157,7 @@ func (c *SabNZBConfig) Setup(maxBody int, logger mnd.Logger) {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("SABnzbd", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("SABnzbd", c.Config.Client.Transport)
 	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
@@ -169,7 +169,7 @@ func (c *SabNZBConfig) Enabled() bool {
 }
 
 type QbitConfig struct {
-	extraConfig
+	ExtraConfig
 	*qbit.Config
 	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
 }
@@ -201,7 +201,7 @@ func (c *QbitConfig) Setup(maxBody int, logger mnd.Logger) error {
 		})
 	} else {
 		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("qBittorrent", nil)
+		c.Config.Client.Transport = NewMetricsRoundTripper("qBittorrent", c.Config.Client.Transport)
 	}
 
 	var err error
@@ -218,7 +218,7 @@ func (c *QbitConfig) Enabled() bool {
 }
 
 type RtorrentConfig struct {
-	extraConfig
+	ExtraConfig
 	*xmlrpc.Client
 	URL  string `toml:"url" xml:"url" json:"url"`
 	User string `toml:"user" xml:"user" json:"user"`
@@ -254,7 +254,7 @@ func (c *RtorrentConfig) Setup(maxBody int, logger mnd.Logger) {
 	}
 
 	client := starr.Client(c.Timeout.Duration, c.ValidSSL)
-	client.Transport = NewMetricsRoundTripper("rTorrent", nil)
+	client.Transport = NewMetricsRoundTripper("rTorrent", client.Transport)
 
 	if logger != nil && logger.DebugEnabled() {
 		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
@@ -274,7 +274,7 @@ func (c *RtorrentConfig) Enabled() bool {
 }
 
 type NZBGetConfig struct {
-	extraConfig
+	ExtraConfig
 	*nzbget.Config
 	*nzbget.NZBGet `toml:"-" xml:"-" json:"-"`
 }
@@ -296,7 +296,7 @@ func (a *Apps) setupNZBGet() error {
 			})
 		} else {
 			app.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Client.Transport = NewMetricsRoundTripper("NZBGet", nil)
+			app.Client.Transport = NewMetricsRoundTripper("NZBGet", app.Client.Transport)
 		}
 
 		a.NZBGet[idx].NZBGet = nzbget.New(a.NZBGet[idx].Config)

@@ -57,7 +57,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_NVIDIA_DISABLED" $.Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
@@ -78,7 +78,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_NVIDIA_SMI_PATH" $.Flags.EnvPrefix}}</span>
                                                                 </div>
                                                                 {{- end}}
@@ -98,7 +98,7 @@
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
                                                                     <div class="form-group">
-                                                                        <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                        <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_NVIDIA_BUS_ID_0" $.Flags.EnvPrefix}}</span>
                                                                     </div>
                                                                 </div>

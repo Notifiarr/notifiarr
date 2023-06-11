@@ -39,6 +39,7 @@ type Config struct {
 	BaseURL    string
 	Timeout    cnfg.Duration
 	HostID     string
+	BindAddr   string
 	mnd.Logger // log file writer
 }
 

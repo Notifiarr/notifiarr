@@ -15,7 +15,7 @@ func (a *Apps) prowlarrHandlers() {
 
 // ProwlarrConfig represents the input data for a Prowlarr server.
 type ProwlarrConfig struct {
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	*prowlarr.Prowlarr `toml:"-" xml:"-" json:"-"`
 	errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
@@ -49,7 +49,7 @@ func (a *Apps) setupProwlarr() error {
 			})
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Prowlarr.String(), nil)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Prowlarr.String(), app.Config.Client.Transport)
 		}
 
 		app.errorf = a.Errorf

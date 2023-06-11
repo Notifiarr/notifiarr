@@ -62,7 +62,7 @@ func (a *Apps) sonarrHandlers() {
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
 	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
@@ -94,7 +94,7 @@ func (a *Apps) setupSonarr() error {
 			})
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Sonarr.String(), nil)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Sonarr.String(), app.Config.Client.Transport)
 		}
 
 		app.errorf = a.Errorf

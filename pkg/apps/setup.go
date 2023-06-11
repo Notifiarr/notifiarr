@@ -40,7 +40,7 @@ type Apps struct {
 	keys       map[string]struct{} `toml:"-"` // for fast key lookup.
 }
 
-type extraConfig struct {
+type ExtraConfig struct {
 	Name     string        `toml:"name" xml:"name" json:"name"`
 	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
 	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`

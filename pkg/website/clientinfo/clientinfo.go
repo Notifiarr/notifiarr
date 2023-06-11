@@ -15,12 +15,13 @@ import (
 // ClientInfo is the client's startup data received from the website.
 type ClientInfo struct {
 	User struct {
-		WelcomeMSG string  `json:"welcome"`
-		Subscriber bool    `json:"subscriber"`
-		Patron     bool    `json:"patron"`
-		DevAllowed bool    `json:"devAllowed"`
-		DateFormat PHPDate `json:"dateFormat"`
-		StopLogs   bool    `json:"stopLogs"`
+		WelcomeMSG string   `json:"welcome"`
+		Subscriber bool     `json:"subscriber"`
+		Patron     bool     `json:"patron"`
+		DevAllowed bool     `json:"devAllowed"`
+		DateFormat PHPDate  `json:"dateFormat"`
+		StopLogs   bool     `json:"stopLogs"`
+		Tunnels    []string `json:"tunnels"`
 	} `json:"user"`
 	Actions struct {
 		Poll      bool             `json:"poll"`

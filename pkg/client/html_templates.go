@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"path"
@@ -26,6 +27,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
+	"github.com/jackpal/gateway"
 	"github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v3/host"
 	"golang.org/x/text/cases"
@@ -108,7 +110,7 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 	}
 }
 
-func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
+func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen,cyclop
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
@@ -148,12 +150,10 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen
 		// adds 1 an integer, to deal with instance IDs for humans.
 		"instance": func(idx int) int { return idx + 1 },
 		// returns true if the environment variable has a value.
-		"locked":   func(env string) bool { return os.Getenv(env) != "" },
+		"locked":   func(env string) bool { return c.Flags.ConfigFile == "" || os.Getenv(env) != "" },
 		"contains": strings.Contains,
 		"since":    since,
-		"percent": func(i, j float64) int64 {
-			return int64(i / j * 100) //nolint:gomnd
-		},
+		"percent":  func(i, j float64) int64 { return int64(i / j * 100) }, //nolint:gomnd
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
 				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {
@@ -421,6 +421,8 @@ func (c *Client) renderTemplate(
 	userName, dynamic := c.getUserName(req)
 	hostInfo, _ := c.website.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
+	outboundIP := clientinfo.GetOutboundIP()
+	ifName, netmask := getIfNameAndNetmask(outboundIP)
 
 	err := c.template.ExecuteTemplate(response, templateName, &templateData{
 		ProxyAllow:  c.Config.Allow.Contains(req.RemoteAddr),
@@ -453,6 +455,10 @@ func (c *Client) renderTemplate(
 			"docker":    mnd.IsDocker,
 			"uid":       os.Getuid(),
 			"gid":       os.Getgid(),
+			"ip":        outboundIP,
+			"gateway":   getGateway(),
+			"ifName":    ifName,
+			"netmask":   netmask,
 		},
 		Expvar:   mnd.GetAllData(),
 		HostInfo: hostInfo,
@@ -702,4 +708,43 @@ func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 	}
 
 	return output
+}
+
+func getGateway() string {
+	gateway, err := gateway.DiscoverGateway()
+	if err != nil {
+		return ""
+	}
+
+	return gateway.String()
+}
+
+// Returns interface name and netmask.
+func getIfNameAndNetmask(ipAddr string) (string, string) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", ""
+	}
+
+	for _, i := range ifaces {
+		addrs, err := i.Addrs()
+		if err != nil {
+			continue
+		}
+
+		for _, a := range addrs {
+			switch v := a.(type) {
+			case *net.IPNet:
+				if v.IP.String() == ipAddr {
+					return i.Name, a.String()
+				}
+			case *net.IPAddr:
+				if v.IP.String() == ipAddr {
+					return i.Name, a.String()
+				}
+			}
+		}
+	}
+
+	return "", ""
 }

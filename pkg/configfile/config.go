@@ -54,8 +54,8 @@ type Config struct {
 	BindAddr   string                 `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
 	SSLCrtFile string                 `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
 	SSLKeyFile string                 `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
-	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
 	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
+	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
 	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Retries    int                    `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
 	Snapshot   *snapshot.Config       `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
@@ -160,12 +160,13 @@ func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *trigge
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Website = website.New(&website.Config{
-		Apps:    c.Apps,
-		Logger:  c.Apps.Logger,
-		BaseURL: website.BaseURL,
-		Timeout: c.Timeout,
-		Retries: c.Retries,
-		HostID:  c.HostID,
+		Apps:     c.Apps,
+		Logger:   c.Apps.Logger,
+		BaseURL:  website.BaseURL,
+		Timeout:  c.Timeout,
+		Retries:  c.Retries,
+		HostID:   c.HostID,
+		BindAddr: c.BindAddr,
 	})
 
 	return c.Services.Website, c.setup(), err

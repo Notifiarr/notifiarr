@@ -57,7 +57,7 @@ func (a *Apps) radarrHandlers() {
 
 // RadarrConfig represents the input data for a Radarr server.
 type RadarrConfig struct {
-	extraConfig
+	ExtraConfig
 	*starr.Config
 	*radarr.Radarr `toml:"-" xml:"-" json:"-"`
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
@@ -90,7 +90,7 @@ func (a *Apps) setupRadarr() error {
 			})
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Radarr.String(), nil)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Radarr.String(), app.Config.Client.Transport)
 		}
 
 		app.errorf = a.Errorf

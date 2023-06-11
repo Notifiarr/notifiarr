@@ -87,6 +87,7 @@
                                         </thead>
                                         <tbody id="commands-Commands-container">
                                         {{- range $index, $app := .Config.Commands}}
+                                            <input  style="display: none;" id="Commands.{{$index}}.Hash" name="Commands.{{$index}}.Hash" data-index="{{$index}}" data-app="Commands" class="client-parameter form-control input-sm" data-group="commands" data-label="Commands {{instance $index}} Hash" data-original="{{$app.Hash}}" value="{{$app.Hash}}">
                                             <input disabled style="display: none;" class="client-parameter commands-Commands{{$index}}-deleted" data-group="commands" data-label="Command {{instance $index}} Deleted" data-original="false" value="false">
                                             <tr class="commands-Commands" id="commands-Commands-{{$index}}">
                                                 <td style="white-space:nowrap;">
@@ -115,7 +116,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')"><i class="text-danger help-icon fas fa-outdent"></i></a>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_NAME" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
@@ -134,7 +135,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_COMMAND" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
@@ -153,7 +154,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_SHELL" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
@@ -174,7 +175,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_LOG" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
@@ -195,7 +196,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'left')" class="help-icon fas fa-outdent"></a>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_NOTIFY" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
@@ -216,7 +217,7 @@
                                                                     <div style="display:none;" class="dialogText">
                                                                         An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                                                     </div>
-                                                                    <a onClick="dialog($(this), 'right')" class="help-icon fas fa-outdent"></a>
+                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
                                                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_COMMAND_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                                                 </div>
                                                                 {{- end}}
