@@ -29,7 +29,7 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/hako/durafmt"
 	flag "github.com/spf13/pflag"
-	"golift.io/mulery/client"
+	mulery "golift.io/mulery/client"
 	"golift.io/version"
 )
 
@@ -48,7 +48,7 @@ type Client struct {
 	triggers   *triggers.Actions
 	cookies    *securecookie.SecureCookie
 	template   *template.Template
-	tunnel     *client.Client
+	tunnel     *mulery.Client
 	webauth    bool
 	noauth     bool
 	authHeader string

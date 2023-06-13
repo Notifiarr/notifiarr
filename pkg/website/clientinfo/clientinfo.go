@@ -15,6 +15,7 @@ import (
 // ClientInfo is the client's startup data received from the website.
 type ClientInfo struct {
 	User struct {
+		ID         any      `json:"id"` // user id from notifiarr db.
 		WelcomeMSG string   `json:"welcome"`
 		Subscriber bool     `json:"subscriber"`
 		Patron     bool     `json:"patron"`

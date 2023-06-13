@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
 	apachelog "github.com/lestrrat-go/apache-logformat/v2"
-	"golift.io/mulery/client"
+	mulery "golift.io/mulery/client"
 )
 
 // StartWebServer starts the web server.
@@ -63,7 +63,8 @@ func (c *Client) StartWebServer(ctx context.Context) {
 
 func (c *Client) startTunnel(ctx context.Context) {
 	// If clientinfo is nil, then we probably have a bad API key.
-	if c.clientinfo == nil && c.tunnel == nil {
+	ci := clientinfo.Get()
+	if ci == nil {
 		return
 	}
 
@@ -97,13 +98,14 @@ func (c *Client) startTunnel(ctx context.Context) {
 	}
 
 	// This apache logger is only used for client->server websocket-tunneled requests.
-	remWs, _ := apachelog.New(
-		`%{X-Forwarded-For}i %{X-User-ID}i - %t "%r" %>s %b "%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	remWs, _ := apachelog.New(`%{X-Forwarded-For}i %{X-User-ID}i env:%{X-User-Environment}i %t "%r" %>s %b ` +
+		`"%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 	//nolint:gomnd // just attempting a tiny bit of splay.
-	c.tunnel = client.NewClient(&client.Config{
+	c.tunnel = mulery.NewClient(&mulery.Config{
 		Name:          hostname,
 		ID:            c.Config.HostID,
-		Targets:       []string{"wss://" + website.TunnelHost + ":5454/register"},
+		ClientIDs:     []any{ci.User.ID},
+		Targets:       ci.User.Tunnels,
 		PoolIdleSize:  1,
 		PoolMaxSize:   poolmax,
 		CleanInterval: time.Second + time.Duration(c.triggers.Timers.Rand().Intn(1000))*time.Millisecond,
