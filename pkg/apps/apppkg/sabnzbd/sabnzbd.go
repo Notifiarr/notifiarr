@@ -289,18 +289,18 @@ func (s *SabNZBSize) UnmarshalJSON(b []byte) (err error) {
 		return nil
 	}
 
-	switch split[1] {
-	case "B", "":
+	switch strings.ToLower(split[1]) {
+	case "", "b":
 		s.Bytes = int64(bytes)
-	case "K":
+	case "k", "kb":
 		s.Bytes = int64(bytes * mnd.Kilobyte)
-	case "M":
+	case "m", "mb":
 		s.Bytes = int64(bytes * mnd.Megabyte)
-	case "G":
+	case "g", "gb":
 		s.Bytes = int64(bytes * mnd.Megabyte * mnd.Kilobyte)
-	case "T":
+	case "t", "tb":
 		s.Bytes = int64(bytes * mnd.Megabyte * mnd.Megabyte)
-	case "P":
+	case "p", "pb":
 		s.Bytes = int64(bytes * mnd.Megabyte * mnd.Megabyte * mnd.Kilobyte)
 	default:
 		return fmt.Errorf("%w: %s", ErrUnknownByteType, split[1])
