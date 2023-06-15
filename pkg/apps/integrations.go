@@ -2,12 +2,14 @@ package apps
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/hekmon/transmissionrpc/v2"
 	"github.com/mrobinsn/go-rtorrent/xmlrpc"
 	"golift.io/deluge"
 	"golift.io/nzbget"
@@ -308,4 +310,51 @@ func (a *Apps) setupNZBGet() error {
 // Enabled returns true if the instance is enabled and usable.
 func (c *NZBGetConfig) Enabled() bool {
 	return c != nil && c.Config != nil && c.URL != "" && c.Timeout.Duration >= 0
+}
+
+// XmissionConfig is the Transmission input configuration.
+type XmissionConfig struct {
+	URL  string `toml:"url" xml:"url" json:"url"`
+	User string `toml:"user" xml:"user" json:"user"`
+	Pass string `toml:"pass" xml:"pass" json:"pass"`
+	ExtraConfig
+	*transmissionrpc.Client `toml:"-" xml:"-" json:"-"`
+}
+
+// Enabled returns true if the instance is enabled and usable.
+func (c *XmissionConfig) Enabled() bool {
+	return c != nil && c.URL != "" && c.Timeout.Duration >= 0
+}
+
+func (a *Apps) setupTransmission() error {
+	for idx, app := range a.Transmission {
+		if app == nil || app.URL == "" {
+			return fmt.Errorf("%w: missing url: Transmission config %d", ErrInvalidApp, idx+1)
+		} else if !strings.HasPrefix(app.URL, "http://") && !strings.HasPrefix(app.URL, "https://") {
+			return fmt.Errorf("%w: URL must begin with http:// or https://: Transmission config %d", ErrInvalidApp, idx+1)
+		}
+
+		var client *http.Client
+		if a.Logger != nil && a.Logger.DebugEnabled() {
+			client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+				MaxBody: a.MaxBody,
+				Debugf:  a.Debugf,
+				Caller:  metricMakerCallback("Transmission"),
+				Redact:  []string{app.Pass},
+			})
+		} else {
+			client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			client.Transport = NewMetricsRoundTripper("Transmission", client.Transport)
+		}
+
+		a.Transmission[idx].Client = transmissionrpc.NewClient(transmissionrpc.Config{
+			URL:       app.URL,
+			Username:  app.User,
+			Password:  app.Pass,
+			UserAgent: mnd.Title,
+			Client:    client,
+		})
+	}
+
+	return nil
 }

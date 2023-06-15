@@ -325,6 +325,25 @@ retries = {{.Retries}}
 #pass     = ""
 
 
+{{end}}{{if .Transmission}}{{range .Transmission}}[[transmission]]
+  name     = "{{.Name}}"
+  url      = "{{.URL}}"
+  user     = "{{.User}}"
+  pass     = "{{.Pass}}"
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
+
+{{end}}
+{{else}}#[[transmission]]
+#name     = ""  # Set a name to enable checks of your service.
+#url      = "http://transmission:9091/transmission/rpc"
+#user     = ""
+#pass     = ""
+
+
 {{end}}{{if .NZBGet}}{{range .NZBGet}}[[nzbget]]
   name     = "{{.Name}}"
   url      = "{{.URL}}"
