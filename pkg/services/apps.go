@@ -300,12 +300,17 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 			interval.Duration = DefaultCheckInterval
 		}
 
+		expect := "401"
+		if app.User == "" {
+			expect = "409"
+		}
+
 		if app.Name != "" {
 			svcs = append(svcs, &Service{
 				Name:     app.Name,
 				Type:     CheckHTTP,
 				Value:    app.URL,
-				Expect:   "200,401",
+				Expect:   expect, // no 200 from RPC endpoint.
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
 				validSSL: app.ValidSSL,
