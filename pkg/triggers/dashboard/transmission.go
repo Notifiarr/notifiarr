@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/hekmon/transmissionrpc/v2"
+	xmission "github.com/hekmon/transmissionrpc/v2"
 	"golift.io/cnfg"
 )
 
@@ -33,7 +33,7 @@ func (c *Cmd) getTransmissionStates(ctx context.Context) []*State {
 	return states
 }
 
-//nolint:cyclop
+//nolint:cyclop,funlen
 func (c *Cmd) getTransmissionState(ctx context.Context, instance int, app *apps.XmissionConfig) (*State, error) {
 	start := time.Now()
 	xfers, err := app.TorrentGetAll(ctx)
@@ -65,7 +65,7 @@ func (c *Cmd) getTransmissionState(ctx context.Context, instance int, app *apps.
 
 		state.Size += int64(xfer.TotalSize.Byte())
 		state.Uploaded += *xfer.UploadedEver
-		state.Downloaded += int64(*xfer.DownloadedEver)
+		state.Downloaded += *xfer.DownloadedEver
 		state.Downloads++
 
 		if *xfer.PercentDone < 1 {
@@ -81,12 +81,13 @@ func (c *Cmd) getTransmissionState(ctx context.Context, instance int, app *apps.
 		}
 
 		switch *xfer.Status {
-		case transmissionrpc.TorrentStatusSeed:
+		case xmission.TorrentStatusSeed:
 			state.Seeding++
-		case transmissionrpc.TorrentStatusDownload:
+		case xmission.TorrentStatusDownload:
 			state.Downloading++
-		case transmissionrpc.TorrentStatusStopped, transmissionrpc.TorrentStatusCheckWait, transmissionrpc.TorrentStatusIsolated,
-			transmissionrpc.TorrentStatusDownloadWait, transmissionrpc.TorrentStatusCheck, transmissionrpc.TorrentStatusSeedWait:
+		case xmission.TorrentStatusStopped, xmission.TorrentStatusCheckWait,
+			xmission.TorrentStatusIsolated, xmission.TorrentStatusDownloadWait,
+			xmission.TorrentStatusCheck, xmission.TorrentStatusSeedWait:
 			state.Paused++
 		}
 	}
