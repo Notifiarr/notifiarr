@@ -102,6 +102,7 @@ type States struct {
 	Qbit     []*State `json:"qbit"`
 	Deluge   []*State `json:"deluge"`
 	SabNZB   []*State `json:"sabnzbd"`
+	Xmission []*State `json:"transmission"`
 	Plex     any      `json:"plexSessions"`
 }
 
@@ -174,6 +175,7 @@ func (c *Cmd) getStates(ctx context.Context) *States {
 		Readarr:  c.getReadarrStates(ctx),
 		Sonarr:   c.getSonarrStates(ctx),
 		SabNZB:   c.getSabNZBStates(ctx),
+		Xmission: c.getTransmissionStates(ctx),
 		Plex:     sessions,
 	}
 }
