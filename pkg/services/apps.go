@@ -289,6 +289,30 @@ func (c *Config) collectDownloadApps(svcs []*Service) []*Service {
 		}
 	}
 
+	// Transmission instances.
+	for _, app := range c.Apps.Transmission {
+		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+			continue
+		}
+
+		interval := app.Interval
+		if interval.Duration == 0 {
+			interval.Duration = DefaultCheckInterval
+		}
+
+		if app.Name != "" {
+			svcs = append(svcs, &Service{
+				Name:     app.Name,
+				Type:     CheckHTTP,
+				Value:    app.URL,
+				Expect:   "200,401",
+				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+				Interval: interval,
+				validSSL: app.ValidSSL,
+			})
+		}
+	}
+
 	return svcs
 }
 

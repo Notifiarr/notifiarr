@@ -10,12 +10,14 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
+	"github.com/hekmon/transmissionrpc/v2"
 	"golift.io/deluge"
 	"golift.io/nzbget"
 	"golift.io/qbit"
@@ -68,6 +70,10 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	case "Rtorrent":
 		if len(config.Apps.Rtorrent) > index {
 			reply, code = testRtorrent(config.Apps.Rtorrent[index])
+		}
+	case "Transmission":
+		if len(config.Apps.Transmission) > index {
+			reply, code = testTransmission(request.Context(), config.Apps.Transmission[index])
 		}
 	case "SabNZB":
 		if len(config.Apps.SabNZB) > index {
@@ -188,6 +194,22 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 	}
 
 	return "Getting Server Name: result was not a string?", http.StatusBadGateway
+}
+
+func testTransmission(ctx context.Context, config *apps.XmissionConfig) (string, int) {
+	client := transmissionrpc.NewClient(transmissionrpc.Config{
+		URL:       config.URL,
+		Username:  config.User,
+		Password:  config.Pass,
+		UserAgent: mnd.Title,
+	})
+
+	args, err := client.SessionArgumentsGetAll(ctx)
+	if err != nil {
+		return "Getting Server Version: " + err.Error(), http.StatusBadGateway
+	}
+
+	return fmt.Sprintln("Transmission Server version:", *args.Version), http.StatusOK
 }
 
 func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {

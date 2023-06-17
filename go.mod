@@ -2,6 +2,8 @@ module github.com/Notifiarr/notifiarr
 
 go 1.20
 
+replace github.com/hekmon/transmissionrpc/v2 => github.com/twitchcaptain/transmissionrpc/v2 v2.0.0-20230615075430-65420002ecea
+
 // pflag and tail are pinned to master. 12/31/2022
 
 require (
@@ -20,6 +22,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
+	github.com/hekmon/transmissionrpc/v2 v2.0.1
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
 	github.com/jackpal/gateway v1.0.10
 	github.com/jaypipes/ghw v0.11.0
@@ -73,7 +76,9 @@ require (
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/rpc v1.2.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/hekmon/cunits/v2 v2.1.0 // indirect
 	github.com/jaypipes/pcidb v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect

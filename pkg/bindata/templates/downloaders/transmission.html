@@ -1,0 +1,192 @@
+                                        <thead>
+                                            <tr>
+                                                <td colspan="7" class="mobile-hide text-center">
+                                                    <div style="float: left;"><img src="{{files}}/images/logo/transmission.png" style="height:50px;"></div>
+                                                    <h2 class="mb-3" style="margin-bottom:-45px">Transmission</h2>
+                                                    <div style="float: right;">
+                                                        <button id="download-Transmission-addbutton" onclick="addInstance('download', 'Transmission')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","URL","User","Pass","Interval","Timeout"]' type="button" title="Add another instance of Transmission." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td colspan="7" class="tablet-hide desktop-hide">
+                                                    <button onclick="addInstance('download', 'Transmission')" data-prefix="Apps" type="button" title="Add another instance of Transmission." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                    <h2 class="mb-3" style="margin-left:5px;display:inline;">Transmission</h2>
+                                                    <div style="float:right;"><img src="{{files}}/images/logo/transmission.png" style="height:50px;"></div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center" style="width:90px;min-width:90px;">
+                                                    <div style="display:none;" class="dialogText">
+                                                        The <span class="text-danger">red</span> button deletes the instance.<br>
+                                                        The <span class="text-success">green</span> button tests the instance.<br>
+                                                        The <span class="text-primary">blue</span> button adds a new instance.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Actions</span>
+                                                </td>
+                                                <td style="min-width:130px;">
+                                                    <div style="display:none;" class="dialogText">Name is optional, but required to be unique if you wish to enable service checks on the instance. Otherwise, it's used to identify the instance easier.</div>
+                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Name</span>
+                                                </td>
+                                                <td style="min-width:190px;">
+                                                    <div style="display:none;" class="dialogText">
+                                                        http:// or https:// URL for the application instance. Providing an https:// URL reveals a checkbox. 
+                                                        Checking this box enables SSL certificate validation; invalid certificates generate an error.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">URL</span>
+                                                </td>
+                                                <td style="min-width:80px;">Username</td>
+                                                <td style="min-width:170px;">Password</td>
+                                                <td style="min-width:90px;width:90px">
+                                                    <div style="display:none;" class="dialogText">This controls how often to check this service. Disable service checks for this instance by setting this to Disabled</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Interval</span>
+                                                </td>
+                                                <td style="min-width:120px;width:120px">
+                                                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Timeout</span>
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="download-Transmission-container">
+                                        {{- range $index, $app := .Config.Apps.Transmission}}
+                                            <input disabled style="display: none;" class="client-parameter download-Transmission{{$index}}-deleted" data-group="download" data-label="Transmission {{instance $index}} Deleted" data-original="false" value="false">
+                                            <tr class="download-Transmission {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="download-Transmission-{{$index}}">
+                                                <td style="white-space:nowrap;">
+                                                    <div class="btn-group" role="group" style="display:flex;">
+                                                        <button onclick="removeInstance('download-Transmission', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
+                                                        <button id="TransmissionIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                                                        <button onClick="testInstance($(this), 'Transmission', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_TRANSMISSION_%d_NAME" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TRANSMISSION_%d_NAME" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Transmission.{{$index}}.Name" name="Apps.Transmission.{{$index}}.Name" data-index="{{$index}}" data-app="Transmission" class="client-parameter form-control input-sm" data-group="download" data-label="Transmission {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_TRANSMISSION_%d_URL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TRANSMISSION_%d_URL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Transmission.{{$index}}.URL" onChange="showhttps($(this).val(), '#Transmission{{$index}}SSL');" name="Apps.Transmission.{{$index}}.URL" data-index="{{$index}}" data-app="Transmission" class="client-parameter form-control input-sm" data-group="download" data-label="Transmission {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}" placeholder="http://127.0.0.1:9091/transmission/rpc">
+                                                                <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Transmission{{$index}}SSL" class="input-group-addon input-sm">
+                                                                    <input type="checkbox" id="Apps.Transmission.{{$index}}.ValidSSL" name="Apps.Transmission.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Transmission" class="client-parameter" data-group="download" data-label="Transmission {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_TRANSMISSION_%d_USER" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TRANSMISSION_%d_USER" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="text" id="Apps.Transmission.{{$index}}.User" name="Apps.Transmission.{{$index}}.User" data-index="{{$index}}" data-app="Transmission" class="client-parameter form-control input-sm" data-group="download" data-label="Transmission {{instance $index}} User" data-original="{{$app.User}}" value="{{$app.User}}">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_TRANSMISSION_%d_PASS" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TRANSMISSION_%d_PASS" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <input type="password" autocomplete="off" id="Apps.Transmission.{{$index}}.Pass" name="Apps.Transmission.{{$index}}.Pass" data-index="{{$index}}" data-app="Transmission" class="client-parameter form-control input-sm" data-group="download" data-label="Transmission {{instance $index}} Pass" data-original="{{$app.Pass}}" value="{{$app.Pass}}">
+                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Transmission.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_TRANSMISSION_%d_INTERVAL" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TRANSMISSION_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select type="select" id="Apps.Transmission.{{$index}}.Interval" name="Apps.Transmission.{{$index}}.Interval" data-index="{{$index}}" data-app="Transmission" class="client-parameter form-control input-sm" data-group="download" data-label="Transmission {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+{{template "includes/intervaloptions.html" $app.Interval}}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_TRANSMISSION_%d_TIMEOUT" $.Flags.EnvPrefix $index))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_TRANSMISSION_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select type="select" id="Apps.Transmission.{{$index}}.Timeout" name="Apps.Transmission.{{$index}}.Timeout" data-index="{{$index}}" data-app="Transmission" class="client-parameter form-control input-sm" data-group="download" data-label="Transmission {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                                                    <option value="-1s" {{if eq $app.Timeout.Seconds (add 0 -1)}}selected {{end}}>Disabled</option>
+                                                                    <option value="0s" {{if eq $app.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
+                                                                    {{- end}}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 0 60)}}selected {{end}}value="1m">1 minute</option>
+                                                                    {{- range $i := one259 }}
+                                                                    <option {{if eq $app.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
+                                                                    {{- end}}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {{- end}}
+                                            <tr id="download-Transmission-none" {{if .Config.Apps.Transmission}} style="display: none;"{{end}}><td colspan="7">No Transmission instances configured.</td></tr>
+                                        </tbody>
+{{- /* end of downloaders Transmission (leave this comment) */ -}}
