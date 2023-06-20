@@ -64,7 +64,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		fallthrough
 	case strings.EqualFold(v.Event, "library.new"):
 		fallthrough
-	case strings.EqualFold(v.Event, "scrobble"):
+	case strings.EqualFold(v.Event, "media.scrobble"):
 		fallthrough
 	case strings.EqualFold(v.Event, "admin.database.corrupt"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
