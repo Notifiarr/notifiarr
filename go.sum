@@ -23,6 +23,8 @@ github.com/BurntSushi/toml v1.3.2/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbi
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
+github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
+github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
 github.com/StackExchange/wmi v1.2.1 h1:VIkavFPXSjcnS+O8yTq7NI32k0R5Aj+v39y29VYDOSA=
 github.com/StackExchange/wmi v1.2.1/go.mod h1:rcmrprowKIVzvc+NUiLncP2uuArMWLCbu9SBzvHz7e8=
 github.com/akavel/rsrc v0.10.2 h1:Zxm8V5eI1hW4gGaYsJQUhxpjkENuG91ki8B4zCrvEsw=
@@ -438,6 +440,8 @@ golift.io/deluge v0.10.1 h1:wu1GzXsDYzWGnRl4mNEd2IeY0O7+jhYJ4IKBPfDEanM=
 golift.io/deluge v0.10.1/go.mod h1:i6h0V+nRzG4XymHQ5kC4d4Z6JZw2M83gMqcZhWgiD1k=
 golift.io/mulery v0.0.2-0.20230613205229-bc027c25da70 h1:BMdc3omfwTaQRi+A+/qc46RtZgs+5pDSheLFngYKXQU=
 golift.io/mulery v0.0.2-0.20230613205229-bc027c25da70/go.mod h1:82Bpf+pS4o4N+zUOnBy5gBHpCZHAmZVfrjUd02g2CGE=
+golift.io/mulery v0.0.2-0.20230727054035-405b50ea2664 h1:j+Et2xbL4RZyDgT2Sp2stStFWw17AnCaIF+NQGxZJ58=
+golift.io/mulery v0.0.2-0.20230727054035-405b50ea2664/go.mod h1:yHyQ8xOFrsJmGje1jdf73Gr6ESsJgq6N27/0t+p4RHI=
 golift.io/nzbget v0.1.4 h1:4v4uw/XJGBaMStpc039xIfRzNxfgtcft4bz7TT8onTk=
 golift.io/nzbget v0.1.4/go.mod h1:YYGQsadsgvadzM6qlVBS21gz8DBhfbxexGMndsGelj8=
 golift.io/qbit v0.0.0-20230609023034-22291372c767 h1:ybBvFIZtlJ1PECUXHOjfT3VJ1d6kGTJHEQRnhaqwPes=
