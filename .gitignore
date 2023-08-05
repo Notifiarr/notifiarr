@@ -43,3 +43,4 @@ aur_deploy_key*
 /*-rendered.sh
 /gpg.signing.key
 /notifiarr.conf.example
+notifiarr.conf

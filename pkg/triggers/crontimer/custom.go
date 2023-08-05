@@ -81,7 +81,7 @@ func (a *Action) Create() {
 func (c *cmd) create() {
 	ci := clientinfo.Get()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
-	if ci == nil || ci.Actions.Poll {
+	if ci == nil {
 		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s",
 			ci != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)})
 		c.Add(&common.Action{
@@ -89,9 +89,7 @@ func (c *cmd) create() {
 			Fn:   c.PollForReload,
 			D:    cnfg.Duration{Duration: pollDur + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},
 		})
-	}
 
-	if ci == nil {
 		return
 	}
 
@@ -125,7 +123,8 @@ func (c *cmd) create() {
 	c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Actions.Custom))
 }
 
-// PollForReload checks if the website wants the client to reload (new settings).
+// PollForReload is only started if the initial connection to the website failed.
+// This will keep checking until it works, then reload to grab settings and start properly.
 func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 	body, err := c.GetData(&website.Request{
 		Route:      website.ClientRoute,
@@ -149,11 +148,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 		return
 	}
 
-	if v.Reload {
-		c.Printf("[%s requested] Website indicated new configurations; reloading to pick them up!"+
-			" Last Sync: %v, Last Change: %v, Diff: %v", input.Type, v.LastSync, v.LastChange, v.LastSync.Sub(v.LastChange))
-		defer c.ReloadApp("poll triggered reload")
-	} else if ci := clientinfo.Get(); ci == nil {
+	if ci := clientinfo.Get(); ci == nil {
 		c.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", input.Type)
 		defer c.ReloadApp("client info reload")
 	}

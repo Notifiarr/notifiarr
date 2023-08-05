@@ -15,6 +15,7 @@ import (
 // ClientInfo is the client's startup data received from the website.
 type ClientInfo struct {
 	User struct {
+		ID         any      `json:"id"` // user id from notifiarr db.
 		WelcomeMSG string   `json:"welcome"`
 		Subscriber bool     `json:"subscriber"`
 		Patron     bool     `json:"patron"`
@@ -24,7 +25,6 @@ type ClientInfo struct {
 		Tunnels    []string `json:"tunnels"`
 	} `json:"user"`
 	Actions struct {
-		Poll      bool             `json:"poll"`
 		Plex      PlexConfig       `json:"plex"`      // Site Config for Plex.
 		Apps      AllAppConfigs    `json:"apps"`      // Site Config for Starr.
 		Dashboard DashConfig       `json:"dashboard"` // Site Config for Dashboard.
