@@ -6,6 +6,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -422,7 +423,12 @@ func (a *Actions) backup(input *common.ActionInput, content string) (int, string
 //
 //nolint:lll
 func (a *Actions) handleConfigReload() (int, string) {
-	defer a.Timers.ReloadApp("HTTP Triggered Reload")
+	go func() {
+		// Until we have a way to reliably finish the tunnel requests, this is the best I got.
+		time.Sleep(200 * time.Millisecond) //nolint:gomnd
+		a.Timers.ReloadApp("HTTP Triggered Reload")
+	}()
+
 	return http.StatusOK, "Application reload initiated."
 }
 

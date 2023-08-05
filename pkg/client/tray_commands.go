@@ -25,7 +25,7 @@ func (c *Client) toggleServer(ctx context.Context) {
 		ui.Notify("Started web server") //nolint:errcheck
 		c.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
 			c.Config.URLBase, c.Config.BindAddr)
-		c.StartWebServer()
+		c.StartWebServer(ctx)
 
 		return
 	}
@@ -206,7 +206,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 
 	c.Print("[user requested] Updating Web UI password.")
 
-	defer c.StartWebServer()
+	defer c.StartWebServer(ctx)
 
 	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
 		c.Errorf("Updating Web UI Password: %v", err)

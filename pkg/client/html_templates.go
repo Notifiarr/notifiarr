@@ -105,7 +105,7 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 				c.Errorf("fsnotify/parsing templates: %v", err)
 			}
 
-			c.StartWebServer()
+			c.StartWebServer(ctx)
 		}
 	}
 }

@@ -71,6 +71,8 @@ type AppInfoClient struct {
 	HasGUI bool `json:"hasGui"`
 	// Listen is the IP and port the client has configured.
 	Listen string `json:"listen"`
+	// Application supports tunnelling.
+	Tunnel bool `json:"tunnel"`
 }
 
 // AppInfoConfig contains exported running configuration information for this app.
@@ -105,7 +107,7 @@ type AppInfoTautulli struct {
 }
 
 // Info is used for JSON input for our outgoing app info.
-func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
+func (c *Config) Info(ctx context.Context, startup bool) *AppInfo { //nolint:funlen
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
 	if c.Apps.Plex.Enabled() {
 		numPlex = 1
@@ -142,6 +144,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 			Docker:    mnd.IsDocker,
 			HasGUI:    ui.HasGUI(),
 			Listen:    GetOutboundIP() + ":" + port,
+			Tunnel:    true, // no toggle for this.
 		},
 		Num: map[string]int{
 			"nzbget":       len(c.Apps.NZBGet),
