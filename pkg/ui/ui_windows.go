@@ -12,7 +12,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gen2brain/beeep"
-	"github.com/gonutz/w32"
+	"github.com/gonutz/w32/v2"
 	"github.com/kardianos/osext"
 )
 
