@@ -710,6 +710,11 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	config.Service = nil
 	config.Snapshot.Plugins.MySQL = nil
 
+	// for k, v := range request.PostForm {
+	// 	c.Debugf("Config Post: %s = %+v", k, v)
+	// }
+
+	// Decode the POST'd data directly into the mostly-empty config struct.
 	if err := configPostDecoder.Decode(config, request.PostForm); err != nil {
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
 	}
