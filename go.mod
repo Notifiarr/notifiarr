@@ -5,10 +5,10 @@ go 1.20
 // pflag and tail are pinned to master. 12/31/2022
 
 require (
-	fyne.io/systray v1.10.0
 	github.com/BurntSushi/toml v1.3.2
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
+	github.com/energye/systray v1.0.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/gen2brain/beeep v0.0.0-20230602101333-f384c29b62dd
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d

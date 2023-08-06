@@ -364,7 +364,6 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 func (c *Client) stop(ctx context.Context, event website.EventType) error {
 	defer func() {
 		defer c.CapturePanic()
-		c.closeDynamicTimerMenus()
 		c.triggers.Stop(event)
 		c.Config.Services.Stop()
 		c.website.Stop()

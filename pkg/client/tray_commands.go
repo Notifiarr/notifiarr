@@ -21,7 +21,7 @@ import (
 /* This file contains methods that are triggered from the GUI menu. */
 
 func (c *Client) toggleServer(ctx context.Context) {
-	if c.server == nil {
+	if !menu["stat"].Checked() {
 		ui.Notify("Started web server") //nolint:errcheck
 		c.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
 			c.Config.URLBase, c.Config.BindAddr)
