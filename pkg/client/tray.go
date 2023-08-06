@@ -1,5 +1,6 @@
-//go:build darwin || windows
+//go:build darwin || windows || linux
 
+//nolint:errcheck
 package client
 
 import (
@@ -38,7 +39,12 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 		b, _ := bindata.Asset(ui.SystrayIcon)
 		systray.SetTemplateIcon(b, b)
 		systray.SetTooltip(version.Print(c.Flags.Name()))
-		systray.SetOnRClick(func(menu systray.IMenu) { menu.ShowMenu() })
+		systray.SetOnRClick(func(menu systray.IMenu) {
+			err := menu.ShowMenu()
+			if err != nil {
+				c.Errorf("Menu Failed: %v", err)
+			}
+		})
 		systray.SetOnDClick(c.openGUI)
 		c.makeMenus(ctx)         // make the menu before starting the web server.
 		c.setupMenus(clientInfo) // code that runs on reload, too.
@@ -95,7 +101,6 @@ func (c *Client) setupMenus(clientInfo *clientinfo.ClientInfo) {
 		return
 	}
 
-	c.closeDynamicTimerMenus()
 	go c.buildDynamicTimerMenus()
 
 	if clientInfo.IsSub() {
@@ -116,7 +121,7 @@ func (c *Client) makeMenus(ctx context.Context) {
 
 	c.configMenu(ctx)
 	c.linksMenu()
-	c.logsMenu(ctx)
+	c.logsMenu()
 	c.notifiarrMenu()
 	c.debugMenu()
 
@@ -133,7 +138,6 @@ func (c *Client) makeMenus(ctx context.Context) {
 	})
 }
 
-//nolint:errcheck
 func (c *Client) configMenu(ctx context.Context) {
 	conf := systray.AddMenuItem("Config", "show configuration")
 	menu["conf"] = conf
@@ -178,7 +182,6 @@ func (c *Client) configMenu(ctx context.Context) {
 	})
 }
 
-//nolint:errcheck
 func (c *Client) linksMenu() {
 	link := systray.AddMenuItem("Links", "external resources")
 	menu["link"] = link
@@ -202,8 +205,7 @@ func (c *Client) linksMenu() {
 	menu["gh"].Click(func() { go ui.OpenURL("https://github.com/Notifiarr/notifiarr/") })
 }
 
-//nolint:errcheck
-func (c *Client) logsMenu(ctx context.Context) {
+func (c *Client) logsMenu() {
 	logs := systray.AddMenuItem("Logs", "log file info")
 	menu["logs"] = logs
 
@@ -346,6 +348,8 @@ func (c *Client) debugMenu() {
 func (c *Client) buildDynamicTimerMenus() {
 	defer c.CapturePanic()
 
+	c.closeDynamicTimerMenus()
+
 	timers := c.triggers.CronTimer.List()
 	if len(timers) == 0 {
 		return
@@ -359,6 +363,8 @@ func (c *Client) buildDynamicTimerMenus() {
 	menu["timerinfo"].Disable()
 
 	for idx, timer := range timers {
+		idx := idx
+
 		desc := fmt.Sprintf("%s; config: interval: %s, path: %s", timer.Desc, timer.Interval, timer.URI)
 		if timer.Desc == "" {
 			desc = fmt.Sprintf("dynamic custom timer; config: interval: %s, path: %s", timer.Interval, timer.URI)

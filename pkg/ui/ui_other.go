@@ -5,6 +5,7 @@ package ui
 import (
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"runtime"
 )
@@ -12,9 +13,12 @@ import (
 // SystrayIcon is the icon in the system tray or task bar.
 const SystrayIcon = "files/images/favicon.png"
 
-// HasGUI returns false on Linux, true on Windows and optional on macOS.
+//nolint:gochecknoglobals
+var hasGUI = os.Getenv("USEGUI") == "true" && runtime.GOOS == "Linux"
+
+// HasGUI tries to determine if the app was invoked as a GUI app.
 func HasGUI() bool {
-	return false
+	return hasGUI
 }
 
 func Notify(_ string, _ ...interface{}) error {
