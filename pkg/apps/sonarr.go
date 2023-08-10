@@ -976,8 +976,8 @@ func sonarrSeasonPass(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        POST body sonarr.CustomFormat  true  "New Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.CustomFormat}  "custom format"
+// @Param        POST body sonarr.CustomFormatInput  true  "New Custom Format content"
+// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.CustomFormatOutput}  "custom format"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
@@ -1004,7 +1004,7 @@ func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.CustomFormat}  "custom formats"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.CustomFormatOutput}  "custom formats"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/customformats [get]
@@ -1025,8 +1025,8 @@ func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        formatID  path   int64  true  "Custom Format ID"
-// @Param        PUT body sonarr.CustomFormat  true  "Updated Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.CustomFormat}  "custom format"
+// @Param        PUT body sonarr.CustomFormatInput  true  "Updated Custom Format content"
+// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.CustomFormatOutput}  "custom format"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
