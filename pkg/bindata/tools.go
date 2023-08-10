@@ -7,7 +7,7 @@ import (
 	// Used to build windows exe metadata.
 	_ "github.com/akavel/rsrc"
 	// Used to convert static files to internal binary data.
-	_ "github.com/kevinburke/go-bindata"
+	_ "github.com/kevinburke/go-bindata/v4"
 	// Used to create API docs.
 	_ "github.com/swaggo/swag"
 )
