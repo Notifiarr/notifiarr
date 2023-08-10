@@ -984,7 +984,7 @@ func sonarrSeasonPass(req *http.Request) (int, interface{}) {
 // @Router       /api/sonarr/{instance}/customformats [post]
 // @Security     ApiKeyAuth
 func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
-	var cusform sonarr.CustomFormat
+	var cusform sonarr.CustomFormatInput
 
 	err := json.NewDecoder(req.Body).Decode(&cusform)
 	if err != nil {
@@ -1033,14 +1033,12 @@ func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Router       /api/sonarr/{instance}/customformats/{formatID} [put]
 // @Security     ApiKeyAuth
 func sonarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
-	var cusform sonarr.CustomFormat
+	var cusform sonarr.CustomFormatInput
 	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
-
-	output, err := getSonarr(req).UpdateCustomFormatContext(req.Context(), &cusform, cfID)
+	output, err := getSonarr(req).UpdateCustomFormatContext(req.Context(), &cusform)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
 	}
@@ -1060,7 +1058,7 @@ func sonarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 // @Router       /api/sonarr/{instance}/customformats/{formatID} [delete]
 // @Security     ApiKeyAuth
 func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
-	cfID, _ := strconv.Atoi(mux.Vars(req)["cfid"])
+	cfID, _ := strconv.ParseInt(mux.Vars(req)["cfid"], mnd.Base10, mnd.Bits64)
 
 	err := getSonarr(req).DeleteCustomFormatContext(req.Context(), cfID)
 	if err != nil {
