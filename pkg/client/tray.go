@@ -39,13 +39,9 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 		b, _ := bindata.Asset(ui.SystrayIcon)
 		systray.SetTemplateIcon(b, b)
 		systray.SetTooltip(version.Print(c.Flags.Name()))
-		systray.SetOnRClick(func(menu systray.IMenu) {
-			err := menu.ShowMenu()
-			if err != nil {
-				c.Errorf("Menu Failed: %v", err)
-			}
-		})
-		systray.SetOnDClick(c.openGUI)
+		systray.SetOnClick(c.showMenu)
+		systray.SetOnRClick(c.showMenu)
+		systray.SetOnDClick(func(menu systray.IMenu) { c.openGUI() })
 		c.makeMenus(ctx)         // make the menu before starting the web server.
 		c.setupMenus(clientInfo) // code that runs on reload, too.
 
@@ -63,6 +59,12 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 		// because systray wants to control the exit code? no..
 		os.Exit(0)
 	})
+}
+
+func (c *Client) showMenu(menu systray.IMenu) {
+	if err := menu.ShowMenu(); err != nil {
+		c.Errorf("Menu Failed: %v", err)
+	}
 }
 
 // setupMenus is the only code that re-runs on reload.
