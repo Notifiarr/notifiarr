@@ -10,7 +10,7 @@ require (
 	github.com/dsnet/compress v0.0.1
 	github.com/energye/systray v1.0.1
 	github.com/fsnotify/fsnotify v1.6.0
-	github.com/gen2brain/beeep v0.0.0-20230602101333-f384c29b62dd
+	github.com/gen2brain/beeep v0.0.0-20230812223410-3e1549ef0811
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
 	github.com/go-ping/ping v1.1.0
 	github.com/go-sql-driver/mysql v1.7.1
