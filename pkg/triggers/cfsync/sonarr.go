@@ -22,14 +22,14 @@ const (
 // SonarrTrashPayload is the payload sent and received
 // to/from notifarr.com when updating custom formats for Sonarr.
 type SonarrTrashPayload struct {
-	Instance           int                         `json:"instance"`
-	Name               string                      `json:"name"`
-	ReleaseProfiles    []*sonarr.ReleaseProfile    `json:"releaseProfiles,omitempty"`
-	QualityProfiles    []*sonarr.QualityProfile    `json:"qualityProfiles,omitempty"`
-	CustomFormats      []*sonarr.CustomFormat      `json:"customFormats,omitempty"`
-	QualityDefinitions []*sonarr.QualityDefinition `json:"qualityDefinitions,omitempty"`
-	Naming             *sonarr.Naming              `json:"naming"`
-	Error              string                      `json:"error"`
+	Instance           int                          `json:"instance"`
+	Name               string                       `json:"name"`
+	ReleaseProfiles    []*sonarr.ReleaseProfile     `json:"releaseProfiles,omitempty"`
+	QualityProfiles    []*sonarr.QualityProfile     `json:"qualityProfiles,omitempty"`
+	CustomFormats      []*sonarr.CustomFormatOutput `json:"customFormats,omitempty"`
+	QualityDefinitions []*sonarr.QualityDefinition  `json:"qualityDefinitions,omitempty"`
+	Naming             *sonarr.Naming               `json:"naming"`
+	Error              string                       `json:"error"`
 }
 
 // SyncSonarrRP initializes a release profile sync with sonarr.

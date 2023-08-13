@@ -338,7 +338,7 @@ check_fpm:
 	@fpm --version > /dev/null || (echo "FPM missing. Install FPM: https://fpm.readthedocs.io/en/latest/installing.html" && false)
 
 # Run code tests and lint.
-test: generate lint
+test: clean generate lint
 	# Testing.
 	go test -race -covermode=atomic ./...
 

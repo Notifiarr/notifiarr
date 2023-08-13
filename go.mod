@@ -7,12 +7,12 @@ replace github.com/hekmon/transmissionrpc/v2 => github.com/twitchcaptain/transmi
 // pflag and tail are pinned to master. 12/31/2022
 
 require (
-	fyne.io/systray v1.10.0
 	github.com/BurntSushi/toml v1.3.2
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
+	github.com/energye/systray v1.0.1
 	github.com/fsnotify/fsnotify v1.6.0
-	github.com/gen2brain/beeep v0.0.0-20230602101333-f384c29b62dd
+	github.com/gen2brain/beeep v0.0.0-20230812223410-3e1549ef0811
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
 	github.com/go-ping/ping v1.1.0
 	github.com/go-sql-driver/mysql v1.7.1
@@ -27,7 +27,7 @@ require (
 	github.com/jackpal/gateway v1.0.10
 	github.com/jaypipes/ghw v0.12.0
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
-	github.com/kevinburke/go-bindata v3.24.0+incompatible
+	github.com/kevinburke/go-bindata/v4 v4.0.2
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mrobinsn/go-rtorrent v1.8.0
@@ -46,10 +46,10 @@ require (
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/mulery v0.0.2
-	golift.io/nzbget v0.1.4
+	golift.io/nzbget v0.1.5
 	golift.io/qbit v0.0.0-20230609023034-22291372c767
 	golift.io/rotatorr v0.0.0-20230520191821-3b26224a1624
-	golift.io/starr v0.14.1-0.20230805164356-6363aff7d2c1
+	golift.io/starr v0.14.1-0.20230807054235-28f03e1840ba
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
 	modernc.org/sqlite v1.25.0
