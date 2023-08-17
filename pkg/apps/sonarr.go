@@ -57,6 +57,7 @@ func (a *Apps) sonarrHandlers() {
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrAddNotification, "POST")
+	a.HandleAPIpath(starr.Sonarr, "/delete/{episodeFileID:[0-9]+}", sonarrDeleteEpisode, "DELETE")
 }
 
 // SonarrConfig represents the input data for a Sonarr server.
@@ -781,7 +782,7 @@ func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
 //
 //nolint:lll
 func sonarrSearchSeries(req *http.Request) (int, interface{}) {
-	// Get all movies
+	// Get all series
 	series, err := getSonarr(req).GetAllSeriesContext(req.Context())
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting series: %w", err)
@@ -1237,4 +1238,27 @@ func sonarrAddNotification(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, id
+}
+
+// @Description  Delete episode files from Sonarr.
+// @Summary      Remove Sonarr episode files
+// @Tags         Sonarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        episodeFileID  path   int64  true  "episode file ID to delete, not episode ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/delete/{episodeFileID} [post]
+// @Security     ApiKeyAuth
+func sonarrDeleteEpisode(req *http.Request) (int, interface{}) {
+	idString := mux.Vars(req)["episodeFileID"]
+	episodeFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+
+	err := getSonarr(req).DeleteEpisodeFileContext(req.Context(), episodeFileID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting episode file: %w", err)
+	}
+
+	return http.StatusOK, "deleted: " + idString
 }

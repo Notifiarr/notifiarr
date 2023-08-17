@@ -456,6 +456,8 @@ golift.io/starr v0.14.1-0.20230805164356-6363aff7d2c1 h1:il+bNjw8kp2EITXW/epRs4k
 golift.io/starr v0.14.1-0.20230805164356-6363aff7d2c1/go.mod h1:xnUwp4vK62bDvozW9QHUYc08m6kjwaZnGw3Db65fQHw=
 golift.io/starr v0.14.1-0.20230807054235-28f03e1840ba h1:XSOZduQSrTsvWPNNdop83vCZI7T7gORufJI1nDyEosA=
 golift.io/starr v0.14.1-0.20230807054235-28f03e1840ba/go.mod h1:xnUwp4vK62bDvozW9QHUYc08m6kjwaZnGw3Db65fQHw=
+golift.io/starr v0.14.1-0.20230817191647-4f4635dd3322 h1:irTnA3RqN6jH0DxwP/8viD9AE6itNh241hNMUvQaqIc=
+golift.io/starr v0.14.1-0.20230817191647-4f4635dd3322/go.mod h1:xnUwp4vK62bDvozW9QHUYc08m6kjwaZnGw3Db65fQHw=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 golift.io/xtractr v0.2.2 h1:MvujxeuX629d1rQs2VJbbcvYMvMmN5SzIkEflU5ryOc=
