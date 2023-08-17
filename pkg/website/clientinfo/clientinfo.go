@@ -25,14 +25,14 @@ type ClientInfo struct {
 		Tunnels    []string `json:"tunnels"`
 	} `json:"user"`
 	Actions struct {
-		Plex      PlexConfig       `json:"plex"`      // Site Config for Plex.
-		Apps      AllAppConfigs    `json:"apps"`      // Site Config for Starr.
-		Dashboard DashConfig       `json:"dashboard"` // Site Config for Dashboard.
-		Sync      SyncConfig       `json:"sync"`      // Site Config for TRaSH Sync.
-		Mdblist   MdbListConfig    `json:"mdblist"`   // Site Config for MDB List.
-		Gaps      GapsConfig       `json:"gaps"`      // Site Config for Radarr Gaps.
-		Custom    []*CronConfig    `json:"custom"`    // Site config for Custom Crons.
-		Snapshot  *snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
+		Plex      PlexConfig      `json:"plex"`      // Site Config for Plex.
+		Apps      AllAppConfigs   `json:"apps"`      // Site Config for Starr.
+		Dashboard DashConfig      `json:"dashboard"` // Site Config for Dashboard.
+		Sync      SyncConfig      `json:"sync"`      // Site Config for TRaSH Sync.
+		Mdblist   MdbListConfig   `json:"mdblist"`   // Site Config for MDB List.
+		Gaps      GapsConfig      `json:"gaps"`      // Site Config for Radarr Gaps.
+		Custom    []*CronConfig   `json:"custom"`    // Site config for Custom Crons.
+		Snapshot  snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
 	} `json:"actions"`
 }
 

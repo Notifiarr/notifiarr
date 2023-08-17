@@ -192,12 +192,12 @@ type LogFileInfo struct {
 	User string
 }
 
-// GetAllLogFilePaths searches the disk for log file names.
-func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
+// GetActiveLogFilePaths returns the configured log file paths.
+func (l *LogConfig) GetActiveLogFilePaths() []string {
 	logFiles := []string{
-		l.LogConfig.LogFile,
-		l.LogConfig.HTTPLog,
-		l.LogConfig.DebugLog,
+		l.LogFile,
+		l.HTTPLog,
+		l.DebugLog,
 	}
 
 	for cust := range customLog {
@@ -206,7 +206,12 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 		}
 	}
 
-	return GetFilePaths(logFiles...)
+	return logFiles
+}
+
+// GetAllLogFilePaths searches the disk for log file names.
+func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
+	return GetFilePaths(l.LogConfig.GetActiveLogFilePaths()...)
 }
 
 // GetFilePaths is a helper function that returns data about similar files in
