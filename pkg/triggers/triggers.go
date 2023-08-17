@@ -33,6 +33,7 @@ type Config struct {
 	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
+	LogFiles   []string
 	Commands   []*commands.Command
 	CIC        *clientinfo.Config
 	common.Services
@@ -76,7 +77,7 @@ func New(config *Config) *Actions {
 		CFSync:     cfsync.New(common),
 		CronTimer:  crontimer.New(common),
 		Dashboard:  dashboard.New(common, plex),
-		FileWatch:  filewatch.New(common, config.WatchFiles),
+		FileWatch:  filewatch.New(common, config.WatchFiles, config.LogFiles),
 		Gaps:       gaps.New(common),
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),

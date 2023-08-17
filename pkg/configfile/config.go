@@ -208,13 +208,14 @@ func (c *Config) setup() *triggers.Actions {
 	}
 	triggers := triggers.New(&triggers.Config{
 		Apps:       c.Apps,
-		Logger:     c.Apps.Logger,
 		Website:    c.Services.Website,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
+		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
 		Commands:   c.Commands,
-		Services:   c.Services,
 		CIC:        cic,
+		Services:   c.Services,
+		Logger:     c.Apps.Logger,
 	})
 	cic.CmdList = triggers.Commands.List()
 
