@@ -53,8 +53,8 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Radarr, "/delete/{movieID:[0-9]+}", radarrDeleteContent, "POST")
-	a.HandleAPIpath(starr.Radarr, "/delete/{movieFileID:[0-9]+}", radarrDeleteMovie, "DELETE")
+	a.HandleAPIpath(starr.Radarr, "/delete/{movieID:[0-9]+}", radarrDeleteMovie, "POST")
+	a.HandleAPIpath(starr.Radarr, "/delete/{movieFileID:[0-9]+}", radarrDeleteContent, "DELETE")
 }
 
 // RadarrConfig represents the input data for a Radarr server.
@@ -1125,13 +1125,15 @@ func radarrAddNotification(req *http.Request) (int, interface{}) {
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/radarr/{instance}/delete/{movieID} [delete]
+// @Router       /api/radarr/{instance}/delete/{movieID} [post]
 // @Security     ApiKeyAuth
 func radarrDeleteMovie(req *http.Request) (int, interface{}) {
-	idString := mux.Vars(req)["movieid"]
+	idString := mux.Vars(req)["movieID"]
 	movieID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+	deleteFiles := req.PostFormValue("deleteFiles")
+	addExclusion := req.PostFormValue("addImportExclusion")
 
-	err := getRadarr(req).DeleteMovieContext(req.Context(), movieID, true, false)
+	err := getRadarr(req).DeleteMovieContext(req.Context(), movieID, deleteFiles == "true", addExclusion == "true")
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("deleting movie: %w", err)
 	}
@@ -1148,7 +1150,7 @@ func radarrDeleteMovie(req *http.Request) (int, interface{}) {
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
-// @Router       /api/radarr/{instance}/delete/{movieFileID} [post]
+// @Router       /api/radarr/{instance}/delete/{movieFileID} [delete]
 // @Security     ApiKeyAuth
 func radarrDeleteContent(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["movieFileID"]
