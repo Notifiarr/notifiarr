@@ -3,6 +3,7 @@ package filewatch
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
@@ -16,7 +17,10 @@ import (
 	"github.com/nxadm/tail/ratelimiter"
 )
 
-var ErrInvalidRegexp = fmt.Errorf("invalid regexp")
+var (
+	ErrInvalidRegexp = fmt.Errorf("invalid regexp")
+	ErrIgnoredLog    = fmt.Errorf("the requested path is internally ignored")
+)
 
 const (
 	maxRetries    = 6                                  // how many times to retry watching a file.
@@ -33,6 +37,7 @@ type cmd struct {
 	awMutex     sync.RWMutex
 	files       []*WatchFile
 	limiter     *ratelimiter.LeakyBucket
+	ignored     []string
 }
 
 // Action contains the exported methods for this package.
@@ -64,14 +69,51 @@ type Match struct {
 }
 
 // New configures the library.
-func New(config *common.Config, files []*WatchFile) *Action {
+func New(config *common.Config, files []*WatchFile, ignored []string) *Action {
 	return &Action{
 		cmd: &cmd{
 			Config:  config,
 			files:   files,
 			limiter: ratelimiter.NewLeakyBucket(burstRate, requestPer),
+			ignored: checkIgnored(ignored),
 		},
 	}
+}
+
+// We ignore our own log files.
+func (i ignored) isIgnored(filePath string) bool {
+	if abs, err := filepath.Abs(filePath); err == nil {
+		filePath = abs
+	}
+
+	for _, name := range i {
+		if filePath == name {
+			return true
+		}
+	}
+
+	return false
+}
+
+type ignored []string
+
+// We ignore our own log files.
+func checkIgnored(ignored []string) ignored {
+	output := []string{}
+
+	for _, item := range ignored {
+		if item == "" {
+			continue
+		}
+
+		if abs, err := filepath.Abs(item); err == nil {
+			item = abs // err is swallowed
+		}
+
+		output = append(output, item)
+	}
+
+	return output
 }
 
 // Run compiles any regexp's and opens a tail -f on provided watch files.
@@ -94,8 +136,8 @@ func (c *cmd) run() {
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
 	for _, item := range c.files {
-		if err := item.setup(&logger{Logger: c.Config.Logger}); err != nil {
-			c.Errorf("Unable to watch file %v", err)
+		if err := item.setup(&logger{Logger: c.Config.Logger}, c.ignored); err != nil {
+			c.Errorf("Unable to watch file: %v", err)
 			continue
 		}
 
@@ -108,7 +150,7 @@ func (c *cmd) run() {
 	}
 }
 
-func (w *WatchFile) setup(logger *logger) error {
+func (w *WatchFile) setup(logger *logger, ignored ignored) error {
 	var err error
 
 	w.retries = maxRetries // so it will not get "restarted" unless it passes validation.
@@ -119,6 +161,8 @@ func (w *WatchFile) setup(logger *logger) error {
 		return fmt.Errorf("%w: regexp match compile failed, ignored: %s", ErrInvalidRegexp, w.Path)
 	} else if w.skip, err = regexp.Compile(w.Skip); err != nil {
 		return fmt.Errorf("%w: regexp skip compile failed, ignored: %s", ErrInvalidRegexp, w.Path)
+	} else if ignored.isIgnored(w.Path) {
+		return fmt.Errorf("%w: %s", ErrIgnoredLog, w.Path)
 	}
 
 	w.tail, err = tail.TailFile(w.Path, tail.Config{
@@ -309,7 +353,8 @@ func (c *cmd) addFileWatcher(file *WatchFile) error {
 		return common.ErrNoChannel
 	}
 
-	if err := file.setup(&logger{Logger: c.Config.Logger}); err != nil {
+	err := file.setup(&logger{Logger: c.Config.Logger}, c.ignored)
+	if err != nil {
 		return err
 	}
 

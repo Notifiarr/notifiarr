@@ -300,10 +300,10 @@ func (c *cmd) checkBackupFileCorruption(
 	input *genericInstance,
 	remotePath string,
 ) (*Info, error) {
-	// XXX: Set TMPDIR to configure this.
 	folder, err := os.MkdirTemp("", "notifiarr_tmp_dir")
 	if err != nil {
-		return nil, fmt.Errorf("creating temporary folder: %w", err)
+		const moreInfo = "click here for help with this: https://notifiarr.wiki/en/Client/Configuration#tmp-not-found"
+		return nil, fmt.Errorf("creating temporary folder: %w - %s", err, moreInfo)
 	}
 
 	defer os.RemoveAll(folder) // clean up when we're done.

@@ -39,7 +39,7 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 		b, _ := bindata.Asset(ui.SystrayIcon)
 		systray.SetTemplateIcon(b, b)
 		systray.SetTooltip(version.Print(c.Flags.Name()))
-		systray.SetOnClick(c.showMenu)
+		// systray.SetOnClick(c.showMenu) // buggy
 		systray.SetOnRClick(c.showMenu)
 		systray.SetOnDClick(func(menu systray.IMenu) { c.openGUI() })
 		c.makeMenus(ctx)         // make the menu before starting the web server.
