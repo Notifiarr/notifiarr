@@ -118,7 +118,7 @@ func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 	w := multipart.NewWriter(&buf)
 
 	// Create a new form field
-	fw, err := w.CreateFormFile("file", file.FileName+".zip")
+	fw, err := w.CreateFormFile("file", file.FileName+".gz")
 	if err != nil {
 		return nil, fmt.Errorf("creating form buffer: %w", err)
 	}
