@@ -154,6 +154,8 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 		return a.emptyplextrash(input, content)
 	case "mdblist":
 		return a.mdblist(input)
+	case "uploadlog":
+		return a.uploadlog(input, content)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
@@ -484,4 +486,23 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 	a.MDbList.Send(input.Type)
 	return http.StatusOK, "MDBList library update started."
+}
+
+// @Description  Uploads a log file to Notifiarr.com.
+// @Summary      Upload log file to Notifiarr.com
+// @Tags         Triggers
+// @Produce      json
+// @Param        file  path   string  true  "File to upload. Must be one of app, http, debug"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad or missing file"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trigger/uploadlog/{file} [get]
+// @Security     ApiKeyAuth
+func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string) {
+	err := a.FileUpload.Log(input.Type, file)
+	if err != nil {
+		return http.StatusBadRequest, fmt.Sprintf("Uploading %s log file: %v", file, err)
+	}
+
+	return http.StatusOK, fmt.Sprintf("Uploading %s log file.", file)
 }

@@ -126,8 +126,21 @@ function triggerFileAction(caller, action, source, fileID)
             },
         });
         setTooltips();
-    } else if (action == "notifiarr") {
-        toast('Invalid', 'Sending to Notifiarr.com does not work yet.', 'warning')
+    } else if (action == "upload") {
+        $.ajax({
+            url: URLBase+'uploadFile/'+ source +'/'+ fileID,
+
+            success: function (data){
+                toast('Uploading File', filename, 'success', 8000)
+            },
+            error: function (request, status, error){
+                if (response.status == 0) {
+                    toast('Web Server Error', 'Notifiarr client appears to be down! Hard refresh recommended.', 'error', 10000);
+                } else {
+                    toast(error!=''?error:'Bad Request', request.responseText, 'error', 10000);
+                }
+            },
+        });
     }
 
 }

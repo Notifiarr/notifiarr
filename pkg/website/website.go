@@ -2,11 +2,13 @@ package website
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -85,6 +87,16 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return resp.StatusCode, resp.Body, nil
 	}
 
+	return resp.StatusCode, s.debugLogResponseBody(start, resp, url, data, log), nil
+}
+
+func (s *Server) debugLogResponseBody(
+	start time.Time,
+	resp *http.Response,
+	url string,
+	data []byte,
+	log bool,
+) io.ReadCloser {
 	var buf bytes.Buffer
 	tee := io.TeeReader(resp.Body, &buf)
 
@@ -96,7 +108,67 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 		defer s.debughttplog(resp, url, start, fmt.Sprintf("<data not logged, length:%d>", len(data)), tee)
 	}
 
-	return resp.StatusCode, io.NopCloser(&buf), nil
+	return io.NopCloser(&buf)
+}
+
+func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*Response, error) {
+	defer file.Close()
+	// Create a new multipart writer with the buffer
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+
+	// Create a new form field
+	fw, err := w.CreateFormFile("file", file.FileName+".zip")
+	if err != nil {
+		return nil, fmt.Errorf("creating form buffer: %w", err)
+	}
+
+	compress := gzip.NewWriter(fw)
+	compress.Header.Name = file.FileName
+
+	// Copy the contents of the file to the form field with compression.
+	if _, err := io.Copy(compress, file); err != nil {
+		return nil, fmt.Errorf("filling form buffer: %w", err)
+	}
+
+	// Close the compressor and multipart writer to finalize the request.
+	compress.Close()
+	w.Close()
+
+	sent := buf.Len()
+	url := s.Config.BaseURL + uri
+
+	// Send the request
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, &buf)
+	if err != nil {
+		return nil, fmt.Errorf("creating http request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Header.Set("X-API-Key", s.Config.Apps.APIKey)
+
+	start := time.Now()
+	msg := fmt.Sprintf("Upload %s, %d bytes", file.FileName, sent)
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		s.debughttplog(nil, url, start, msg, nil)
+		return nil, fmt.Errorf("making http request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	reader := resp.Body
+
+	if s.Config.DebugEnabled() {
+		reader = s.debugLogResponseBody(start, resp, url, []byte(msg), true)
+	}
+
+	response, err := unmarshalResponse(url, resp.StatusCode, reader)
+	if response != nil {
+		response.sent = sent
+	}
+
+	return response, err
 }
 
 // Do performs an http Request with retries and logging!
@@ -254,8 +326,18 @@ func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, tim
 		uri = data.Route.Path(data.Event)
 	}
 
-	start := time.Now()
-	resp, err := s.sendPayload(ctx, uri, data.Payload, data.LogPayload)
+	var (
+		resp  *Response
+		err   error
+		start = time.Now()
+	)
+
+	if data.UploadFile != nil {
+		resp, err = s.sendFile(ctx, uri, data.UploadFile)
+	} else {
+		resp, err = s.sendPayload(ctx, uri, data.Payload, data.LogPayload)
+	}
+
 	elapsed := time.Since(start).Round(time.Millisecond)
 
 	if data.respChan != nil {

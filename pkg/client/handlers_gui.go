@@ -45,9 +45,8 @@ import (
 // @BasePath /
 
 const (
-	minPasswordLen   = 9
-	fileSourceLogs   = "logs"
-	fileSourceConfig = "config"
+	minPasswordLen = 9
+	fileSourceLogs = "logs"
 )
 
 // userNameValue is used a context value key.
@@ -161,20 +160,12 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 
 // getFileDeleteHandler deletes log and config files.
 func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Request) {
-	var fileInfos *logs.LogFileInfos
-
-	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
-
-	switch mux.Vars(req)["source"] {
-	case fileSourceLogs:
-		fileInfos = c.Logger.GetAllLogFilePaths()
-	case fileSourceConfig:
-		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile, backupPath)
-	default:
+	if mux.Vars(req)["source"] != fileSourceLogs {
 		http.Error(response, "invalid source", http.StatusBadRequest)
 		return
 	}
 
+	fileInfos := c.Logger.GetAllLogFilePaths()
 	id := mux.Vars(req)["id"]
 
 	for _, fileInfo := range fileInfos.List {
@@ -199,22 +190,35 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 	}
 }
 
-// getFileDownloadHandler downloads config and log files.
-func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.Request) {
-	var fileInfos *logs.LogFileInfos
-
-	switch mux.Vars(req)["source"] {
-	case fileSourceLogs:
-		fileInfos = c.Logger.GetAllLogFilePaths()
-	case fileSourceConfig:
-		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
-	default:
+// uploadFileHandler uploads a log file to notifiarr.com.
+func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Request) {
+	if mux.Vars(req)["source"] != fileSourceLogs {
 		http.Error(response, "invalid source", http.StatusBadRequest)
 		return
 	}
 
 	id := mux.Vars(req)["id"]
-	for _, fileInfo := range fileInfos.List {
+	for _, fileInfo := range c.Logger.GetAllLogFilePaths().List {
+		if fileInfo.ID != id {
+			continue
+		}
+
+		err := c.triggers.FileUpload.Upload(website.EventGUI, fileInfo.Path)
+		if err != nil {
+			http.Error(response, err.Error(), http.StatusInternalServerError)
+		}
+
+		user, _ := c.getUserName(req)
+		c.Printf("[gui '%s' requested] Uploaded file: %s", user, fileInfo.Path)
+
+		return
+	}
+}
+
+// getFileDownloadHandler downloads log files to the browser.
+func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.Request) {
+	id := mux.Vars(req)["id"]
+	for _, fileInfo := range c.Logger.GetAllLogFilePaths().List {
 		if fileInfo.ID != id {
 			continue
 		}
@@ -316,8 +320,6 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 	switch mux.Vars(req)["source"] {
 	case fileSourceLogs:
 		fileInfos = c.Logger.GetAllLogFilePaths()
-	case fileSourceConfig:
-		fileInfos = logs.GetFilePaths(c.Flags.ConfigFile)
 	default:
 		http.Error(response, "invalid source", http.StatusBadRequest)
 		return
