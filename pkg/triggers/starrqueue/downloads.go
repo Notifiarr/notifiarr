@@ -15,6 +15,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const maxQueuePayloadSize = 50
+
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
 func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
 	lidarr := c.getDownloadingItemsLidarr(ctx)
@@ -88,6 +90,8 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:c
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
 		items[instance] = appList
 	}
 
@@ -131,6 +135,8 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:c
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
 		items[instance] = appList
 	}
 
@@ -174,6 +180,8 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
 		items[instance] = appList
 	}
 
@@ -217,8 +225,18 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
 		items[instance] = appList
 	}
 
 	return items
+}
+
+func truncateQueue(queue []any, length int) []any {
+	if len(queue) <= length {
+		return queue
+	}
+
+	return queue[:length]
 }
