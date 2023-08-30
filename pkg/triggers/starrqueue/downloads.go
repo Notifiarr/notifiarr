@@ -91,7 +91,7 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:c
 		}
 
 		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
@@ -136,7 +136,7 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:c
 		}
 
 		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
@@ -181,7 +181,7 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:
 		}
 
 		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
@@ -226,17 +226,17 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 		}
 
 		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue, maxQueuePayloadSize)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
 	return items
 }
 
-func truncateQueue(queue []any, length int) []any {
-	if len(queue) <= length {
+func truncateQueue(queue []any) []any {
+	if len(queue) <= maxQueuePayloadSize {
 		return queue
 	}
 
-	return queue[:length]
+	return queue[:maxQueuePayloadSize]
 }
