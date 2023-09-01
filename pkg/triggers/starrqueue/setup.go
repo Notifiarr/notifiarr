@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 )
 
@@ -71,13 +72,16 @@ func (a *Action) Create() {
 			D:    cnfg.Duration{Duration: stuckDuration},
 		})
 
-		a.cmd.Add(&common.Action{
-			Hide: true,
-			Name: TrigDownloadingItems,
-			Fn:   a.cmd.sendDownloadingQueues,
-			C:    make(chan *common.ActionInput, 1),
-			D:    cnfg.Duration{Duration: finishedDuration},
-		})
+		// Only enable this timer if the user is a patron.
+		if ci := clientinfo.Get(); ci != nil && ci.IsPatron() {
+			a.cmd.Add(&common.Action{
+				Hide: true,
+				Name: TrigDownloadingItems,
+				Fn:   a.cmd.sendDownloadingQueues,
+				C:    make(chan *common.ActionInput, 1),
+				D:    cnfg.Duration{Duration: finishedDuration},
+			})
+		}
 	}
 }
 
@@ -85,6 +89,7 @@ func (a *Action) Create() {
 type listItem struct {
 	Name  string        `json:"name"`
 	Queue []interface{} `json:"queue"`
+	Total int           `json:"total"`
 }
 
 // itemList stores an instance->queue map.
