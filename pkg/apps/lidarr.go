@@ -625,7 +625,7 @@ func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	_, err = getLidarr(req).UpdateArtistContext(req.Context(), &artist)
+	_, err = getLidarr(req).UpdateArtistContext(req.Context(), &artist, true)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating artist: %w", err)
 	}
