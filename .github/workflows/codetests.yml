@@ -27,7 +27,7 @@ jobs:
       - uses: codespell-project/actions-codespell@v2
         with:
           check_hidden: true
-          ignore_words_list: vender
+          ignore_words_list: vender, te
           skip: .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum
 
 
