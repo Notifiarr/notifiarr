@@ -136,7 +136,6 @@
                                                                 {{- end}}
                                                                 <select type="select" id="Apps.Tautulli.extraConfig.Timeout" name="Apps.Tautulli.extraConfig.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli Timeout" data-original="{{.Config.Apps.Tautulli.Timeout}}">
                                                                     <option value="-1s" {{if eq $.Config.Tautulli.Timeout.Seconds (add -1 0)}}selected {{end}}>Disabled</option>
-                                                                    <option value="0s" {{if eq $.Config.Tautulli.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
                                                                     {{- range $i := one259 }}
                                                                     <option {{if eq $.Config.Apps.Tautulli.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>
                                                                     {{- end}}

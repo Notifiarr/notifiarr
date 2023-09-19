@@ -3,6 +3,7 @@ package apps
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd"
@@ -23,6 +24,10 @@ type PlexConfig struct {
 }
 
 func (c *PlexConfig) Setup(maxBody int, logger mnd.Logger) {
+	if c.Timeout.Duration == 0 {
+		c.Timeout.Duration = time.Minute
+	}
+
 	if logger != nil && logger.DebugEnabled() {
 		c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
@@ -52,6 +57,10 @@ type TautulliConfig struct {
 func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
 	if !c.Enabled() {
 		return
+	}
+
+	if c.Timeout.Duration == 0 {
+		c.Timeout.Duration = time.Minute
 	}
 
 	if logger != nil && logger.DebugEnabled() {
