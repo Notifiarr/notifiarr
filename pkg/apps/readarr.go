@@ -10,6 +10,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"golang.org/x/time/rate"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
 	"golift.io/starr/readarr"
@@ -47,9 +48,8 @@ type ReadarrConfig struct {
 	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func getReadarr(r *http.Request) *readarr.Readarr {
-	app, _ := r.Context().Value(starr.Readarr).(*ReadarrConfig)
-	return app.Readarr
+func getReadarr(r *http.Request) *ReadarrConfig {
+	return r.Context().Value(starr.Readarr).(*ReadarrConfig) //nolint:forcetypeassert
 }
 
 // Enabled returns true if the Readarr instance is enabled and usable.
@@ -80,6 +80,10 @@ func (a *Apps) setupReadarr() error {
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Readarr = readarr.New(app.Config)
+
+		if app.Deletes > 0 {
+			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes-1)
+		}
 	}
 
 	return nil

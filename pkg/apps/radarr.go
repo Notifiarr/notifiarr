@@ -10,6 +10,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"golang.org/x/time/rate"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
 	"golift.io/starr/radarr"
@@ -65,9 +66,8 @@ type RadarrConfig struct {
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func getRadarr(r *http.Request) *radarr.Radarr {
-	app, _ := r.Context().Value(starr.Radarr).(*RadarrConfig)
-	return app.Radarr
+func getRadarr(r *http.Request) *RadarrConfig {
+	return r.Context().Value(starr.Radarr).(*RadarrConfig) //nolint:forcetypeassert
 }
 
 // Enabled returns true if the Radarr instance is enabled and usable.
@@ -98,6 +98,10 @@ func (a *Apps) setupRadarr() error {
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Radarr = radarr.New(app.Config)
+
+		if app.Deletes > 0 {
+			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes-1)
+		}
 	}
 
 	return nil
@@ -1125,6 +1129,7 @@ func radarrAddNotification(req *http.Request) (int, interface{}) {
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
+// @Failure      423  {object} string "rate limit reached"
 // @Router       /api/radarr/{instance}/delete/{movieID} [post]
 // @Security     ApiKeyAuth
 func radarrDeleteMovie(req *http.Request) (int, interface{}) {
@@ -1132,6 +1137,10 @@ func radarrDeleteMovie(req *http.Request) (int, interface{}) {
 	movieID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 	deleteFiles := req.PostFormValue("deleteFiles")
 	addExclusion := req.PostFormValue("addImportExclusion")
+
+	if !getRadarr(req).DelOK() {
+		return http.StatusLocked, ErrRateLimit
+	}
 
 	err := getRadarr(req).DeleteMovieContext(req.Context(), movieID, deleteFiles == "true", addExclusion == "true")
 	if err != nil {
@@ -1150,11 +1159,16 @@ func radarrDeleteMovie(req *http.Request) (int, interface{}) {
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
+// @Failure      423  {object} string "rate limit reached"
 // @Router       /api/radarr/{instance}/delete/{movieFileID} [delete]
 // @Security     ApiKeyAuth
 func radarrDeleteContent(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["movieFileID"]
 	movieFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+
+	if !getRadarr(req).DelOK() {
+		return http.StatusLocked, ErrRateLimit
+	}
 
 	err := getRadarr(req).DeleteMovieFilesContext(req.Context(), movieFileID)
 	if err != nil {

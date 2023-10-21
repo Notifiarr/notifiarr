@@ -11,6 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"golang.org/x/time/rate"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
 	"golift.io/starr/sonarr"
@@ -68,9 +69,8 @@ type SonarrConfig struct {
 	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func getSonarr(r *http.Request) *sonarr.Sonarr {
-	app, _ := r.Context().Value(starr.Sonarr).(*SonarrConfig)
-	return app.Sonarr
+func getSonarr(r *http.Request) *SonarrConfig {
+	return r.Context().Value(starr.Sonarr).(*SonarrConfig) //nolint:forcetypeassert
 }
 
 // Enabled returns true if the Sonarr instance is enabled and usable.
@@ -101,6 +101,10 @@ func (a *Apps) setupSonarr() error {
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Sonarr = sonarr.New(app.Config)
+
+		if app.Deletes > 0 {
+			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes-1)
+		}
 	}
 
 	return nil
@@ -1249,11 +1253,16 @@ func sonarrAddNotification(req *http.Request) (int, interface{}) {
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
+// @Failure      423  {object} string "rate limit reached"
 // @Router       /api/sonarr/{instance}/delete/{episodeFileID} [post]
 // @Security     ApiKeyAuth
 func sonarrDeleteEpisode(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["episodeFileID"]
 	episodeFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+
+	if !getRadarr(req).DelOK() {
+		return http.StatusLocked, ErrRateLimit
+	}
 
 	err := getSonarr(req).DeleteEpisodeFileContext(req.Context(), episodeFileID)
 	if err != nil {

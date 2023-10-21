@@ -11,6 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"golang.org/x/time/rate"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
 	"golift.io/starr/lidarr"
@@ -53,9 +54,8 @@ type LidarrConfig struct {
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func getLidarr(r *http.Request) *lidarr.Lidarr {
-	app, _ := r.Context().Value(starr.Lidarr).(*LidarrConfig)
-	return app.Lidarr
+func getLidarr(r *http.Request) *LidarrConfig {
+	return r.Context().Value(starr.Lidarr).(*LidarrConfig) //nolint:forcetypeassert
 }
 
 // Enabled returns true if the Lidarr instance is enabled and usable.
@@ -86,6 +86,10 @@ func (a *Apps) setupLidarr() error {
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Lidarr = lidarr.New(app.Config)
+
+		if app.Deletes > 0 {
+			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes-1)
+		}
 	}
 
 	return nil
