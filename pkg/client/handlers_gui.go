@@ -704,6 +704,8 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		config.Apps.Tautulli = nil
 	}
 
+	config.SSLCrtFile = ""
+	config.SSLKeyFile = ""
 	config.Plex = nil
 	config.WatchFiles = nil
 	config.Commands = nil
@@ -711,7 +713,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	config.Snapshot.Plugins.MySQL = nil
 
 	// for k, v := range request.PostForm {
-	// 	c.Debugf("Config Post: %s = %+v", k, v)
+	// 	c.Errorf("Config Post: %s = %+v", k, v)
 	// }
 
 	// Decode the POST'd data directly into the mostly-empty config struct.

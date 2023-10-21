@@ -41,7 +41,7 @@ type Config struct {
 	LogFile     string            `toml:"log_file" xml:"log_file" json:"logFile"`
 	Apps        *apps.Apps        `toml:"-" json:"-"`
 	Website     *website.Server   `toml:"-" json:"-"`
-	Plugins     *snapshot.Plugins `toml:"-" json:"-"`
+	Plugins     *snapshot.Plugins `toml:"-" json:"-"` // pass this in so we can service-check mysql
 	mnd.Logger  `json:"-"`        // log file writer
 	services    map[string]*Service
 	checks      chan *Service

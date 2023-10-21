@@ -51,10 +51,11 @@ func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error 
 }
 
 func (c *Client) resetAdminPassword(ctx context.Context) error {
-	password := configfile.GeneratePassword()
+	c.Config.SSLCrtFile = ""
+	c.Config.SSLKeyFile = ""
 
-	err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + password)
-	if err != nil {
+	password := configfile.DefaultUsername + ":" + configfile.GeneratePassword()
+	if err := c.Config.UIPassword.Set(password); err != nil {
 		return fmt.Errorf("setting password failed: %w", err)
 	}
 
