@@ -127,6 +127,10 @@ log_files = {{.LogFiles}}
 ## Missing, blank or 0 uses default of 0600. Permissive is 0644. Ignored by Windows.
 file_mode = "{{.FileMode.String}}"
 
+## Disallow the website from triggering (log file) uploads. Sometimes an admin needs to see client
+## logs while diagnosing problems. You can disable this ability by setting no_uploads to true.
+no_uploads = {{.NoUploads}}
+
 ## Web server and website timeout.
 ##
 timeout = "{{.Timeout}}"

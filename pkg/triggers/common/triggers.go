@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -29,7 +29,7 @@ type Config struct {
 	*website.Server // send trigger responses to website.
 	Snapshot        *snapshot.Config
 	Apps            *apps.Apps
-	mnd.Logger
+	*logs.Logger
 	stop     *Action        // Triggered by calling Stop()
 	list     []*Action      // List of action triggers
 	Services                // for running service checks.

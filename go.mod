@@ -1,6 +1,6 @@
 module github.com/Notifiarr/notifiarr
 
-go 1.20
+go 1.21
 
 // pflag and tail are pinned to master. 12/31/2022
 
