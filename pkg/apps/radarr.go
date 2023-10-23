@@ -10,6 +10,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"golang.org/x/time/rate"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
 	"golift.io/starr/radarr"
@@ -53,6 +54,8 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrAddNotification, "POST")
+	a.HandleAPIpath(starr.Radarr, "/delete/{movieID:[0-9]+}", radarrDeleteMovie, "POST")
+	a.HandleAPIpath(starr.Radarr, "/delete/{movieFileID:[0-9]+}", radarrDeleteContent, "DELETE")
 }
 
 // RadarrConfig represents the input data for a Radarr server.
@@ -63,9 +66,8 @@ type RadarrConfig struct {
 	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
 }
 
-func getRadarr(r *http.Request) *radarr.Radarr {
-	app, _ := r.Context().Value(starr.Radarr).(*RadarrConfig)
-	return app.Radarr
+func getRadarr(r *http.Request) *RadarrConfig {
+	return r.Context().Value(starr.Radarr).(*RadarrConfig) //nolint:forcetypeassert
 }
 
 // Enabled returns true if the Radarr instance is enabled and usable.
@@ -96,6 +98,10 @@ func (a *Apps) setupRadarr() error {
 		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
 		app.Radarr = radarr.New(app.Config)
+
+		if app.Deletes > 0 {
+			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes-1)
+		}
 	}
 
 	return nil
@@ -128,7 +134,7 @@ func radarrAddMovie(req *http.Request) (int, interface{}) {
 	}
 
 	// Check for existing movie.
-	m, err := getRadarr(req).GetMovieContext(req.Context(), payload.TmdbID)
+	m, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{TMDBID: payload.TmdbID})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
@@ -177,7 +183,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 func radarrCheckMovie(req *http.Request) (int, interface{}) {
 	tmdbID, _ := strconv.ParseInt(mux.Vars(req)["tmdbid"], mnd.Base10, mnd.Bits64)
 	// Check for existing movie.
-	m, err := getRadarr(req).GetMovieContext(req.Context(), tmdbID)
+	m, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{TMDBID: tmdbID})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
@@ -245,7 +251,7 @@ func radarrTriggerSearchMovie(req *http.Request) (int, interface{}) {
 // @Router       /api/radarr/{instance}/get [get]
 // @Security     ApiKeyAuth
 func radarrGetAllMovies(req *http.Request) (int, interface{}) {
-	movies, err := getRadarr(req).GetMovieContext(req.Context(), 0)
+	movies, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{ExcludeLocalCovers: true})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	}
@@ -531,7 +537,7 @@ func radarrUpdateNaming(req *http.Request) (int, interface{}) {
 //nolint:lll
 func radarrSearchMovie(req *http.Request) (int, interface{}) {
 	// Get all movies
-	movies, err := getRadarr(req).GetMovieContext(req.Context(), 0)
+	movies, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{ExcludeLocalCovers: true})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting movies: %w", err)
 	}
@@ -1112,4 +1118,62 @@ func radarrAddNotification(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, id
+}
+
+// @Description  Delete Movies from Radarr.
+// @Summary      Remove Radarr Movies
+// @Tags         Radarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        movieID  path   int64  true  "movie ID to delete"
+// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Failure      423  {object} string "rate limit reached"
+// @Router       /api/radarr/{instance}/delete/{movieID} [post]
+// @Security     ApiKeyAuth
+func radarrDeleteMovie(req *http.Request) (int, interface{}) {
+	idString := mux.Vars(req)["movieID"]
+	movieID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+	deleteFiles := req.PostFormValue("deleteFiles")
+	addExclusion := req.PostFormValue("addImportExclusion")
+
+	if !getRadarr(req).DelOK() {
+		return http.StatusLocked, ErrRateLimit
+	}
+
+	err := getRadarr(req).DeleteMovieContext(req.Context(), movieID, deleteFiles == "true", addExclusion == "true")
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting movie: %w", err)
+	}
+
+	return http.StatusOK, "deleted: " + idString
+}
+
+// @Description  Delete Movie files from Radarr without deleting the movie.
+// @Summary      Remove Radarr movie files
+// @Tags         Radarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        movieFileID  path   int64  true  "movie file ID to delete"
+// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Failure      423  {object} string "rate limit reached"
+// @Router       /api/radarr/{instance}/delete/{movieFileID} [delete]
+// @Security     ApiKeyAuth
+func radarrDeleteContent(req *http.Request) (int, interface{}) {
+	idString := mux.Vars(req)["movieFileID"]
+	movieFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+
+	if !getRadarr(req).DelOK() {
+		return http.StatusLocked, ErrRateLimit
+	}
+
+	err := getRadarr(req).DeleteMovieFilesContext(req.Context(), movieFileID)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("deleting movie file: %w", err)
+	}
+
+	return http.StatusOK, "deleted: " + idString
 }

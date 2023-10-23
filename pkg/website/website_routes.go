@@ -3,6 +3,7 @@ package website
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
 	"time"
 
@@ -45,10 +46,17 @@ type Request struct {
 	Event      EventType
 	Params     []string    // optional.
 	Payload    interface{} // data to send.
+	UploadFile *UploadFile // file to send (instead of payload).
 	LogMsg     string      // if empty, nothing is logged.
-	LogPayload bool        // debug log the sent payload
+	LogPayload bool        // debug log the sent payload.
 	ErrorsOnly bool        // only log errors.
 	respChan   chan *chResponse
+}
+
+// UploadFile is the file upload identifier in a request.
+type UploadFile struct {
+	FileName string
+	io.ReadCloser
 }
 
 // chResponse is used to send a website response through a channel.
@@ -125,6 +133,9 @@ const (
 	PkgRoute      Route = notifiRoute + "/packageManager"
 	LogLineRoute  Route = notifiRoute + "/logWatcher"
 	CommandRoute  Route = notifiRoute + "/command"
+
+	systemRoute Route = "/api/v1/system"
+	UploadRoute Route = systemRoute + "/upload"
 )
 
 // Path adds parameters to a route path and turns it into a string.

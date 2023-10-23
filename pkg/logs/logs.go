@@ -73,6 +73,7 @@ type LogConfig struct {
 	FileMode  FileMode `json:"fileMode" toml:"file_mode" xml:"file_mode" yaml:"fileMode"`
 	Debug     bool     `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
 	Quiet     bool     `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
+	NoUploads bool     `json:"noUploads" toml:"no_uploads" xml:"no_uploads" yaml:"noUploads"`
 }
 
 // New returns a new Logger with debug off and sends everything to stdout.

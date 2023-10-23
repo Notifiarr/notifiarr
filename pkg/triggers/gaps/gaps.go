@@ -80,7 +80,7 @@ func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 			Movies   []*radarr.Movie `json:"movies"`
 		}
 
-		movies, err := app.GetMovieContext(ctx, 0)
+		movies, err := app.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
 		if err != nil {
 			c.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v",
 				input.Type, instance, app.URL, err)

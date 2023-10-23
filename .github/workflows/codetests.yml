@@ -10,10 +10,10 @@ jobs:
         os: [ubuntu, macos, windows]
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.21'
       - name: go-generate
         run: go generate ./...
       - name: go-test
@@ -23,11 +23,11 @@ jobs:
   codespell:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: codespell-project/actions-codespell@v2
         with:
           check_hidden: true
-          ignore_words_list: vender
+          ignore_words_list: vender, te
           skip: .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum
 
 
@@ -41,16 +41,16 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.21'
       - name: go-generate
         run: GOOS=darwin go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: 'v1.53'
+          version: 'v1.54'
 
   golangci-linux:
     # description: "Runs golangci-lint on linux against linux and windows."
@@ -62,26 +62,26 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.21'
       - name: go-generate
         run: GOOS=linux go generate ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: 'v1.53'
+          version: 'v1.54'
 
   homebrew-test:
     # description: "Installs dependencies on macOS and runs `make install` to mimic a homebrew install."
     name: test-homebrew-install
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '1.21'
       - name: go-generate
         run: go generate ./...
       - name: make-install
