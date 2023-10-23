@@ -495,10 +495,15 @@ func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 // @Param        file  path   string  true  "File to upload. Must be one of app, http, debug"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad or missing file"
+// @Failure      424  {object} apps.Respond.apiResponse{message=string} "log uploads disabled"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/uploadlog/{file} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string) {
+	if a.Timers.LogConfig.NoUploads {
+		return http.StatusFailedDependency, "Uploads Administratively Disabled"
+	}
+
 	err := a.FileUpload.Log(input.Type, file)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Sprintf("Uploading %s log file: %v", file, err)
