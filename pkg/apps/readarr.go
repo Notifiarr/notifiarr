@@ -593,7 +593,7 @@ func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	err = getReadarr(req).UpdateAuthorContext(req.Context(), author.ID, &author)
+	_, err = getReadarr(req).UpdateAuthorContext(req.Context(), &author, true)
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("updating author: %w", err)
 	}

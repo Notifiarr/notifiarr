@@ -36,7 +36,7 @@ func (c *Cmd) getRadarrState(ctx context.Context, instance int, r *apps.RadarrCo
 	state := &State{Instance: instance, Next: []*Sortable{}, Latest: []*Sortable{}, Name: r.Name}
 	start := time.Now()
 
-	movies, err := r.GetMovieContext(ctx, 0)
+	movies, err := r.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
 	state.Elapsed.Duration = time.Since(start)
 
 	if err != nil {

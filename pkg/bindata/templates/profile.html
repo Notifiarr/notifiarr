@@ -110,15 +110,26 @@
                                                     {{- range $header, $val := .Headers }}
                                                         {{- /* Hide some headers, but not the one that's currently selected. */ -}}
                                                         {{ if or (eq (lower $header) (lower $.Config.UIPassword.Header)) (and 
-                                                            (ne (lower $header) "cookie") (ne (lower $header) "accept") (ne (lower $header) "upgrade-insecure-requests")
-                                                            (ne (lower $header) "accept-encoding") (ne (lower $header) "accept-language") (ne (lower $header) "connection")  
-                                                            (ne (lower $header) "x-forwarded-for") (ne (lower $header) "x-redacted-uri")  (ne (lower $header) "user-agent")
-                                                            (ne (lower $header) "referer") (ne (lower $header) "x-noticlient-username") (ne (lower $header) "cache-control")
-                                                            (ne (lower $header) "cdn-loop") (ne (lower $header) "cf-connecting-ip") (ne (lower $header) "cf-ipcountry")
-                                                            (ne (lower $header) "cf-ray") (ne (lower $header) "cf-visitor") (ne (lower $header) "priority")
-                                                            (ne (lower $header) "dnt") (ne (lower $header) "pragma") (ne (lower $header) "x-forwarded-proto")
-                                                            (ne (lower $header) "sec-ch-ua") (ne (lower $header) "sec-ch-ua-mobile") (ne (lower $header) "sec-ch-ua-platform") 
-                                                            (ne (lower $header) "sec-fetch-dest") (ne (lower $header) "sec-fetch-mode") (ne (lower $header) "sec-fetch-site")
+                                                            (ne (lower $header) "accept") (ne (lower $header) "accept-encoding") 
+                                                            (ne (lower $header) "accept-language") (ne (lower $header) "cache-control") 
+                                                            (ne (lower $header) "cdn-loop") (ne (lower $header) "cf-connecting-ip") 
+                                                            (ne (lower $header) "cf-ipcountry") (ne (lower $header) "cf-ray") 
+                                                            (ne (lower $header) "cf-visitor") (ne (lower $header) "connection") 
+                                                            (ne (lower $header) "cookie") (ne (lower $header) "dnt") 
+                                                            (ne (lower $header) "expect") (ne (lower $header) "pragma") 
+                                                            (ne (lower $header) "priority") (ne (lower $header) "referer") 
+                                                            (ne (lower $header) "sec-ch-ua") (ne (lower $header) "sec-ch-ua-mobile") 
+                                                            (ne (lower $header) "sec-ch-ua-platform") (ne (lower $header) "sec-fetch-dest") 
+                                                            (ne (lower $header) "sec-fetch-mode") (ne (lower $header) "sec-fetch-site") 
+                                                            (ne (lower $header) "strict-transport-security") (ne (lower $header) "te") 
+                                                            (ne (lower $header) "upgrade-insecure-requests") (ne (lower $header) "user-agent") 
+                                                            (ne (lower $header) "x-content-type-options") (ne (lower $header) "x-forwarded-for") 
+                                                            (ne (lower $header) "x-forwarded-host") (ne (lower $header) "x-forwarded-method") 
+                                                            (ne (lower $header) "x-forwarded-proto") (ne (lower $header) "x-forwarded-ssl") 
+                                                            (ne (lower $header) "x-forwarded-uri") (ne (lower $header) "x-noticlient-username") 
+                                                            (ne (lower $header) "x-original-uri") (ne (lower $header) "x-real-ip") 
+                                                            (ne (lower $header) "x-redacted-uri") (ne (lower $header) "x-request-id")
+
                                                         )}}
                                                     <option value="{{$header}}"{{if eq (lower $header) (lower $.Config.UIPassword.Header)}} selected{{end}}>{{$header}}: {{index $val 0}}</option>
                                                         {{- end }}
