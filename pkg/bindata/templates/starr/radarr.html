@@ -1,13 +1,13 @@
                                         <thead>
                                             <tr>
-                                                <td colspan="8" class="text-center mobile-hide">
+                                                <td colspan="9" class="text-center mobile-hide">
                                                     <div style="float: left;"><img src="{{files}}/images/logo/radarr.png" style="height:50px;"></div>
                                                     <h2 style="margin-bottom:-45px">Radarr</h2>
                                                     <div style="float: right;">
-                                                        <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                                                        <button id="starr-Radarr-addbutton" onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout","Deletes"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     </div>
                                                 </td>
-                                                <td colspan="8" class="tablet-hide desktop-hide">
+                                                <td colspan="9" class="tablet-hide desktop-hide">
                                                     <button onclick="addInstance('starr', 'Radarr')" data-prefix="Apps" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
                                                     <h2 style="margin-left:5px;display:inline;">Radarr</h2>
                                                     <div style="float:right;"><img src="{{files}}/images/logo/radarr.png" style="height:50px;"></div>
@@ -31,7 +31,7 @@
                                                 <td>
                                                     <div style="display:none;" class="dialogText">
                                                         http:// or https:// URL for the application instance. Include the Base URL if that's configured in your application.
-                                                        Providing an https:// URL reveals a checkbox. 
+                                                        Providing an https:// URL reveals a checkbox.
                                                         Checking this box enables SSL certificate validation; invalid certificates generate an error.
                                                     </div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -61,6 +61,16 @@
                                                     <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse.</div>
                                                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                                                     <span class="dialogTitle">Timeout</span>
+                                                </td>
+                                                <td style="min-width:90px;width:100px">
+                                                    <div style="display:none;" class="dialogText">
+                                                        This controls how many delete requests are allowed per hour.
+                                                        A setting of 0 disables the ability to send delete requests.
+                                                        This refers to media deletes, but may include other actions.
+                                                        This is a throttle to prevent hackers from obliterating your content.
+                                                    </div>
+                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                                                    <span class="dialogTitle">Deletes</span>
                                                 </td>
                                             </tr>
                                         </thead>
@@ -220,8 +230,31 @@
                                                         </div>
                                                     </div>
                                                 </td>
+                                                <td>
+                                                    <div class="form-inline">
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_RADARR_%d_DELETES" $.Flags.EnvPrefix $index)) }}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_RADARR_%d_DELETES" $.Flags.EnvPrefix $index}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select type="select" id="Apps.Radarr.{{$index}}.Deletes" name="Apps.Radarr.{{$index}}.Deletes" data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Deletes" data-original="{{$app.Deletes}}" value="{{$app.Deletes}}">
+                                                                    <option {{if eq $app.Deletes 0}}selected {{end}}value="0">Disabled</option>
+                                                                    {{- range $i := oneto 100 }}
+                                                                    <option {{if eq $app.Deletes $i}}selected {{end}}value="{{$i}}">{{$i}}</option>
+                                                                    {{- end}}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                             {{- end}}
-                                            <tr id="starr-Radarr-none"{{if .Config.Apps.Radarr}} style="display: none;"{{end}}><td colspan="8">No Radarr instances configured.</td></tr>
+                                            <tr id="starr-Radarr-none"{{if .Config.Apps.Radarr}} style="display: none;"{{end}}><td colspan="9">No Radarr instances configured.</td></tr>
                                         </tbody>
 {{- /* end of radarr (leave this comment) */ -}}

@@ -175,6 +175,7 @@ retries = {{.Retries}}
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  deletes  = {{.Deletes}}
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}
@@ -217,6 +218,7 @@ retries = {{.Retries}}
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  deletes  = {{.Deletes}}
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}
@@ -238,6 +240,7 @@ retries = {{.Retries}}
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  deletes  = {{.Deletes}}
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}
@@ -259,6 +262,7 @@ retries = {{.Retries}}
   http_pass = "{{.HTTPPass}}"{{end}}
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
   timeout  = "{{.Timeout}}"
+  deletes  = {{.Deletes}}
   {{- if .ValidSSL}}
   valid_ssl = true
   {{- end}}

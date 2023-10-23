@@ -179,6 +179,12 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen,cyclop
 		"add": func(i, j float64) float64 {
 			return i + j
 		},
+		"oneto": func(to int) (num []int) {
+			for i := 1; i < to; i++ {
+				num = append(num, i)
+			}
+			return num
+		},
 		"intervaloptions": intervaloptions,
 	}
 }

@@ -191,6 +191,9 @@ function addInstance(section, app)
                 nameval = "changeme";
                 nameori = "";
              break;
+             case "Deletes":
+                itype = "<select type=\"select\""
+                extra = '<option value="0">Disabled</option><option selected value="1">1</option><option value="5">5</option><option value="15">15</option></select>';
         }
 
         row += '<td colspan="'+ colspan +'"><form class="form-inline"><div class="form-group" style="width:100%"><div class="input-group" style="width:100%">';
