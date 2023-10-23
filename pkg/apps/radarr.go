@@ -128,7 +128,7 @@ func radarrAddMovie(req *http.Request) (int, interface{}) {
 	}
 
 	// Check for existing movie.
-	m, err := getRadarr(req).GetMovieContext(req.Context(), payload.TmdbID)
+	m, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{TMDBID: payload.TmdbID})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
@@ -177,7 +177,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 func radarrCheckMovie(req *http.Request) (int, interface{}) {
 	tmdbID, _ := strconv.ParseInt(mux.Vars(req)["tmdbid"], mnd.Base10, mnd.Bits64)
 	// Check for existing movie.
-	m, err := getRadarr(req).GetMovieContext(req.Context(), tmdbID)
+	m, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{TMDBID: tmdbID})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	} else if len(m) > 0 {
@@ -245,7 +245,7 @@ func radarrTriggerSearchMovie(req *http.Request) (int, interface{}) {
 // @Router       /api/radarr/{instance}/get [get]
 // @Security     ApiKeyAuth
 func radarrGetAllMovies(req *http.Request) (int, interface{}) {
-	movies, err := getRadarr(req).GetMovieContext(req.Context(), 0)
+	movies, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{ExcludeLocalCovers: true})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("checking movie: %w", err)
 	}
@@ -531,7 +531,7 @@ func radarrUpdateNaming(req *http.Request) (int, interface{}) {
 //nolint:lll
 func radarrSearchMovie(req *http.Request) (int, interface{}) {
 	// Get all movies
-	movies, err := getRadarr(req).GetMovieContext(req.Context(), 0)
+	movies, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{ExcludeLocalCovers: true})
 	if err != nil {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting movies: %w", err)
 	}
