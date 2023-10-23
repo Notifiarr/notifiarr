@@ -70,7 +70,8 @@ func (a *Action) List() []*cmdconfig.Config {
 	output := []*cmdconfig.Config{}
 
 	for _, c := range a.cmd.cmdlist {
-		output = append(output, &c.Config)
+		config := c.Config
+		output = append(output, &config)
 	}
 
 	return output
