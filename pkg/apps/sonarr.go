@@ -1260,7 +1260,7 @@ func sonarrDeleteEpisode(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["episodeFileID"]
 	episodeFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 
-	if !getRadarr(req).DelOK() {
+	if !getSonarr(req).DelOK() {
 		return http.StatusLocked, ErrRateLimit
 	}
 
