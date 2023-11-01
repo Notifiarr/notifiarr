@@ -37,6 +37,7 @@ require (
 	golang.org/x/mod v0.13.0
 	golang.org/x/sys v0.13.0
 	golang.org/x/text v0.13.0
+	golang.org/x/time v0.3.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.2
 	golift.io/cnfgfile v0.0.0-20230531075023-f880041cc0a0
@@ -49,7 +50,7 @@ require (
 	golift.io/starr v1.0.1-0.20231015171231-06f957db4485
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
-	modernc.org/sqlite v1.26.0
+	modernc.org/sqlite v1.27.0
 )
 
 require (
@@ -101,7 +102,6 @@ require (
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
-  golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -110,7 +110,7 @@ require (
 	lukechampine.com/uint128 v1.3.0 // indirect
 	modernc.org/cc/v3 v3.41.0 // indirect
 	modernc.org/ccgo/v3 v3.16.15 // indirect
-	modernc.org/libc v1.24.1 // indirect
+	modernc.org/libc v1.29.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/opt v0.1.3 // indirect
