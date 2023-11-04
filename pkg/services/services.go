@@ -234,3 +234,8 @@ func (c *Config) Stop() {
 	c.done = nil
 	c.stopChan = nil
 }
+
+// SvcCount returns the count of services being monitored.
+func (c *Config) SvcCount() int {
+	return len(c.services)
+}
