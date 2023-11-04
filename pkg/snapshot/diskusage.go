@@ -16,16 +16,17 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 		return nil
 	}
 
-	getAllDisks := allDrives || mnd.IsDocker
+	var (
+		errs        []error
+		getAllDisks = allDrives || mnd.IsDocker
+	)
 
 	partitions, err := disk.PartitionsWithContext(ctx, getAllDisks)
 	if err != nil {
-		return []error{fmt.Errorf("unable to get partitions: %w", err)}
+		errs = append(errs, fmt.Errorf("unable to get partitions: %w", err))
 	}
 
 	s.DiskUsage = make(map[string]*Partition)
-
-	var errs []error
 
 	for idx := range partitions {
 		usage, err := disk.UsageWithContext(ctx, partitions[idx].Mountpoint)
