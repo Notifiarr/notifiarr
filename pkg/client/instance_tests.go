@@ -4,18 +4,21 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"strconv"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
+	"github.com/hekmon/transmissionrpc/v3"
 	"golift.io/deluge"
 	"golift.io/nzbget"
 	"golift.io/qbit"
@@ -25,6 +28,7 @@ import (
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
 	"golift.io/starr/sonarr"
+	"golift.io/version"
 )
 
 //nolint:funlen,cyclop,gocognit,gocyclo
@@ -68,6 +72,10 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 	case "Rtorrent":
 		if len(config.Apps.Rtorrent) > index {
 			reply, code = testRtorrent(config.Apps.Rtorrent[index])
+		}
+	case "Transmission":
+		if len(config.Apps.Transmission) > index {
+			reply, code = testTransmission(request.Context(), config.Apps.Transmission[index])
 		}
 	case "SabNZB":
 		if len(config.Apps.SabNZB) > index {
@@ -188,6 +196,26 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 	}
 
 	return "Getting Server Name: result was not a string?", http.StatusBadGateway
+}
+
+func testTransmission(ctx context.Context, config *apps.XmissionConfig) (string, int) {
+	endpoint, err := url.Parse(config.URL)
+	if err != nil {
+		return "parsing url: " + err.Error(), http.StatusBadGateway
+	} else if config.User != "" {
+		endpoint.User = url.UserPassword(config.User, config.Pass)
+	}
+
+	client, _ := transmissionrpc.New(endpoint, &transmissionrpc.Config{
+		UserAgent: fmt.Sprintf("%s v%s-%s %s", mnd.Title, version.Version, version.Revision, version.Branch),
+	})
+
+	args, err := client.SessionArgumentsGetAll(ctx)
+	if err != nil {
+		return "Getting Server Version: " + err.Error(), http.StatusBadGateway
+	}
+
+	return fmt.Sprintln("Transmission Server version:", *args.Version), http.StatusOK
 }
 
 func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
