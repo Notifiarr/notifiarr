@@ -42,8 +42,8 @@ type Sortable struct {
 	Name    string    `json:"name"`
 	Sub     string    `json:"subName,omitempty"`
 	Date    time.Time `json:"date"`
-	Season  int64     `json:"season,omitempty"`
-	Episode int64     `json:"episode,omitempty"`
+	Season  int       `json:"season,omitempty"`
+	Episode int       `json:"episode,omitempty"`
 }
 
 // SortableList allows sorting a list.
