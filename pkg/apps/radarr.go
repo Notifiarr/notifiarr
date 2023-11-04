@@ -100,7 +100,7 @@ func (a *Apps) setupRadarr() error {
 		app.Radarr = radarr.New(app.Config)
 
 		if app.Deletes > 0 {
-			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes-1)
+			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
 		}
 	}
 
