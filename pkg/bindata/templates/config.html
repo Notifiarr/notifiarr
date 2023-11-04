@@ -193,7 +193,7 @@
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
-                                                            The Host ID parameter is used to uniquely identify this client installation. 
+                                                            The Host ID parameter is used to uniquely identify this client installation.
                                                             Changing this value is discouraged; it should be found automatically.
                                                             Do not copy this value to another Notifiarr client installation.
                                                         </div>
@@ -878,6 +878,41 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <input type="number" min="0" max="999" name="LogFiles" id="LogFiles" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}">
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div style="display:none;" class="dialogText">
+                                                            This setting controls the Notifiarr.com website and Notifiarr administrators ability to trigger
+                                                            this client to upload log files to the website. Sometimes we need to see log entries while
+                                                            diagnosing problems and this trigger allows us to make the client upload the app and debug
+                                                            log files. You may remove our ability to request logs by disabling this setting.
+                                                            <br><b>Current Value</b>: <i>{{if .Config.NoUploads}}Disabled{{else}}Allowed{{end}}</i>
+                                                        </div>
+                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                                                        <span class="dialogTitle">Upload Trigger</span>
+                                                    </td>
+                                                    <td class="mobile-hide">
+                                                        {{if .Config.NoUploads}}Disabled{{else}}Allowed{{end}}
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group" style="width:100%">
+                                                            <div class="input-group" style="width:100%">
+                                                                {{- if (locked (printf "%s_NO_UPLOADS" .Flags.EnvPrefix))}}
+                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                                                    <div style="display:none;" class="dialogText">
+                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                                                    </div>
+                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_NO_UPLOADS" .Flags.EnvPrefix}}</span>
+                                                                </div>
+                                                                {{- end}}
+                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="NoUploads" id="NoUploads" name="NoUploads" data-original="{{.Config.NoUploads}}">
+                                                                    <option {{if .Config.NoUploads}}selected {{end}}value="true">Disabled</option>
+                                                                    <option {{if not .Config.NoUploads}}selected {{end}}value="false">Allowed</option>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </td>

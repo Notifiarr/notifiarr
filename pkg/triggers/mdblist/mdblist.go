@@ -8,6 +8,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
+	"golift.io/starr/radarr"
 )
 
 const TrigMDBListSync common.TriggerName = "Sending Library contents for MDBList."
@@ -99,7 +100,7 @@ func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput)
 		library := &mdbListPayload{Instance: instance, Name: app.Name}
 		output = append(output, library)
 
-		items, err := app.GetMovieContext(ctx, 0)
+		items, err := app.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
 		if err != nil {
 			library.Error = err.Error()
 			c.Errorf("[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting movies: %v",

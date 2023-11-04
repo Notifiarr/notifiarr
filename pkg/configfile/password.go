@@ -144,7 +144,7 @@ func GeneratePassword() string {
 	}
 
 	pieces[1] = strconv.Itoa(rand.Intn(89) + 10)
-	punctuation := strings.Split(`!@#$%^&*+=/<>\|~`, "")
+	punctuation := strings.Split(`!@#$%^&*+=/<>|~`, "")
 	pieces[2] = punctuation[rand.Intn(len(punctuation))]
 
 	pieces[3] = words[rand.Intn(len(words))]

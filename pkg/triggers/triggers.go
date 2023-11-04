@@ -8,7 +8,7 @@ import (
 	"reflect"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/cfsync"
@@ -17,6 +17,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/crontimer"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/emptytrash"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/fileupload"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/mdblist"
@@ -33,10 +34,11 @@ type Config struct {
 	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
+	LogFiles   []string
 	Commands   []*commands.Command
 	CIC        *clientinfo.Config
 	common.Services
-	mnd.Logger
+	*logs.Logger
 }
 
 // Actions defines all our triggers and timers.
@@ -56,6 +58,7 @@ type Actions struct {
 	Commands   *commands.Action
 	EmptyTrash *emptytrash.Action
 	MDbList    *mdblist.Action
+	FileUpload *fileupload.Action
 }
 
 // New turns a populated Config into a pile of Actions.
@@ -76,13 +79,14 @@ func New(config *Config) *Actions {
 		CFSync:     cfsync.New(common),
 		CronTimer:  crontimer.New(common),
 		Dashboard:  dashboard.New(common, plex),
-		FileWatch:  filewatch.New(common, config.WatchFiles),
+		FileWatch:  filewatch.New(common, config.WatchFiles, config.LogFiles),
 		Gaps:       gaps.New(common),
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
 		Commands:   commands.New(common, config.Commands),
 		EmptyTrash: emptytrash.New(common),
 		MDbList:    mdblist.New(common),
+		FileUpload: fileupload.New(common),
 		Timers:     common,
 	}
 }

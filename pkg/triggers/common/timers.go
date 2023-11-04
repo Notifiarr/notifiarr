@@ -135,7 +135,7 @@ func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action 
 	}
 
 	if action.Name != "" && !action.Hide {
-		c.Printf("[%s requested] %s", input.Type, action.Name)
+		c.Printf("[%s requested] Event Triggered: %s", input.Type, action.Name)
 	}
 
 	if action.Fn != nil {

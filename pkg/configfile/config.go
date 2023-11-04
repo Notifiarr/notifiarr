@@ -169,7 +169,7 @@ func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *trigge
 		BindAddr: c.BindAddr,
 	})
 
-	return c.Services.Website, c.setup(), err
+	return c.Services.Website, c.setup(logger), err
 }
 
 func (c *Config) fixConfig() {
@@ -187,7 +187,7 @@ func (c *Config) fixConfig() {
 	c.Services.Plugins = c.Snapshot.Plugins
 }
 
-func (c *Config) setup() *triggers.Actions {
+func (c *Config) setup(logger *logs.Logger) *triggers.Actions {
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
 
@@ -208,13 +208,14 @@ func (c *Config) setup() *triggers.Actions {
 	}
 	triggers := triggers.New(&triggers.Config{
 		Apps:       c.Apps,
-		Logger:     c.Apps.Logger,
 		Website:    c.Services.Website,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
+		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
 		Commands:   c.Commands,
-		Services:   c.Services,
 		CIC:        cic,
+		Services:   c.Services,
+		Logger:     logger,
 	})
 	cic.CmdList = triggers.Commands.List()
 

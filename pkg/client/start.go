@@ -234,22 +234,11 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 		return nil
 	}
 
-	if clientInfo.Actions.Snapshot != nil {
-		c.Config.Snapshot.Interval.Duration = clientInfo.Actions.Snapshot.Interval.Duration
-		c.Config.Snapshot.Timeout.Duration = clientInfo.Actions.Snapshot.Timeout.Duration
-		c.Config.Snapshot.ZFSPools = clientInfo.Actions.Snapshot.ZFSPools
-		c.Config.Snapshot.UseSudo = clientInfo.Actions.Snapshot.UseSudo
-		c.Config.Snapshot.Raid = clientInfo.Actions.Snapshot.Raid
-		c.Config.Snapshot.DriveData = clientInfo.Actions.Snapshot.DriveData
-		c.Config.Snapshot.DiskUsage = clientInfo.Actions.Snapshot.DiskUsage
-		c.Config.Snapshot.AllDrives = clientInfo.Actions.Snapshot.AllDrives
-		c.Config.Snapshot.Quotas = clientInfo.Actions.Snapshot.Quotas
-		c.Config.Snapshot.IOTop = clientInfo.Actions.Snapshot.IOTop
-		c.Config.Snapshot.PSTop = clientInfo.Actions.Snapshot.PSTop
-		c.Config.Snapshot.MyTop = clientInfo.Actions.Snapshot.MyTop
-		c.Config.Snapshot.IPMI = clientInfo.Actions.Snapshot.IPMI
-		c.Config.Snapshot.IPMISudo = clientInfo.Actions.Snapshot.IPMISudo
-	}
+	// Snapshot is a bit complicated because config-file data (plugins) merges with site-data (snapshot config).
+	clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins
+	c.Config.Snapshot = &clientInfo.Actions.Snapshot
+	c.triggers.Timers.Snapshot = c.Config.Snapshot
+	c.Config.Services.Plugins = c.Config.Snapshot.Plugins
 
 	return clientInfo
 }
@@ -364,7 +353,6 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 func (c *Client) stop(ctx context.Context, event website.EventType) error {
 	defer func() {
 		defer c.CapturePanic()
-		c.closeDynamicTimerMenus()
 		c.triggers.Stop(event)
 		c.Config.Services.Stop()
 		c.website.Stop()

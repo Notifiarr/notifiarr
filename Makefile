@@ -338,12 +338,12 @@ check_fpm:
 	@fpm --version > /dev/null || (echo "FPM missing. Install FPM: https://fpm.readthedocs.io/en/latest/installing.html" && false)
 
 # Run code tests and lint.
-test: generate lint
+test: clean generate lint
 	# Testing.
 	go test -race -covermode=atomic ./...
 
 lint: generate
-	codespell -H -L vender -S .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum .
+	codespell -H -L vender,te -S .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum .
 	# Checking lint.
 	golangci-lint version
 	GOOS=linux golangci-lint run

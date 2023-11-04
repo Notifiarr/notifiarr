@@ -42,7 +42,7 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
-func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop,funlen,gocognit
+func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop,funlen
 	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		var (
 			msg     interface{}

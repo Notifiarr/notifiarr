@@ -141,6 +141,11 @@ func (a *Action) GetSessions(ctx context.Context) (*plex.Sessions, error) {
 	return a.cmd.getSessions(ctx, time.Minute)
 }
 
+// GetMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.
+func (a *Action) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
+	return a.cmd.getMetaSnap(ctx)
+}
+
 // getMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.
 func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	var (

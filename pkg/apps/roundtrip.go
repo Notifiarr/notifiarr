@@ -6,6 +6,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/datacounter"
+	"golift.io/version"
 )
 
 /*
@@ -51,6 +52,8 @@ func NewMetricsRoundTripper(app string, next http.RoundTripper) *LoggingRoundTri
 // RoundTrip satisfies the http.RoundTripper interface.
 // This is where our logging takes place.
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Set("User-Agent", mnd.Title+"/"+version.Version+"-"+version.Revision)
+
 	if req.Body != nil {
 		sent := datacounter.NewReaderCounter(req.Body)
 		req.Body = io.NopCloser(sent)

@@ -12,6 +12,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"golang.org/x/time/rate"
 	"golift.io/cnfg"
 	"golift.io/starr"
 )
@@ -48,6 +49,8 @@ type ExtraConfig struct {
 	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
 	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
 	ValidSSL bool          `toml:"valid_ssl" xml:"valid_ssl" json:"validSsl"`
+	Deletes  int           `toml:"deletes" xml:"deletes" json:"deletes"`
+	delLimit *rate.Limiter
 }
 
 // Errors sent to client web requests.
@@ -66,6 +69,7 @@ var (
 	// ErrWrongCount is returned when an app returns the wrong item count.
 	ErrWrongCount = fmt.Errorf("wrong item count returned")
 	ErrInvalidApp = fmt.Errorf("invalid application configuration provided")
+	ErrRateLimit  = fmt.Errorf("rate limit reached")
 )
 
 // Setup creates request interfaces and sets the timeout for each server.
@@ -145,4 +149,9 @@ func (a *Apps) InitHandlers() {
 	a.radarrHandlers()
 	a.readarrHandlers()
 	a.sonarrHandlers()
+}
+
+// DelOK returns true if the delete limit isn't reached.
+func (e *ExtraConfig) DelOK() bool {
+	return e.Deletes > 0 && e.delLimit.Allow()
 }

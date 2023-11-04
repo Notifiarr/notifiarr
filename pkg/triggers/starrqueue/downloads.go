@@ -15,6 +15,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const maxQueuePayloadSize = 50
+
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
 func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
 	lidarr := c.getDownloadingItemsLidarr(ctx)
@@ -76,6 +78,11 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:c
 		repeatStomper := make(map[string]*lidarr.QueueRecord)
 
 		for _, item := range queue.Records {
+			// Delay items have no download ID, so group them by size.
+			if item.DownloadID == "" {
+				item.DownloadID = fmt.Sprint(item.Size)
+			}
+
 			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
 				appList.Queue = append(appList.Queue, item)
 				repeatStomper[item.DownloadID] = item
@@ -83,6 +90,8 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:c
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
@@ -114,6 +123,11 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:c
 		repeatStomper := make(map[string]*radarr.QueueRecord)
 
 		for _, item := range queue.Records {
+			// Delay items have no download ID, so group them by size.
+			if item.DownloadID == "" {
+				item.DownloadID = fmt.Sprint(item.Size)
+			}
+
 			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
 				appList.Queue = append(appList.Queue, item)
 				repeatStomper[item.DownloadID] = item
@@ -121,6 +135,8 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:c
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
@@ -152,6 +168,11 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:
 		repeatStomper := make(map[string]*readarr.QueueRecord)
 
 		for _, item := range queue.Records {
+			// Delay items have no download ID, so group them by size.
+			if item.DownloadID == "" {
+				item.DownloadID = fmt.Sprint(item.Size)
+			}
+
 			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
 				appList.Queue = append(appList.Queue, item)
 				repeatStomper[item.DownloadID] = item
@@ -159,6 +180,8 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
@@ -190,6 +213,11 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 		repeatStomper := make(map[string]*sonarr.QueueRecord)
 
 		for _, item := range queue.Records {
+			// Delay items have no download ID, so group them by size.
+			if item.DownloadID == "" {
+				item.DownloadID = fmt.Sprint(item.Size)
+			}
+
 			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
 				appList.Queue = append(appList.Queue, item)
 				repeatStomper[item.DownloadID] = item
@@ -197,8 +225,18 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 			}
 		}
 
+		appList.Total = len(appList.Queue)
+		appList.Queue = truncateQueue(appList.Queue)
 		items[instance] = appList
 	}
 
 	return items
+}
+
+func truncateQueue(queue []any) []any {
+	if len(queue) <= maxQueuePayloadSize {
+		return queue
+	}
+
+	return queue[:maxQueuePayloadSize]
 }
