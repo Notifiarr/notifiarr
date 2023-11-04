@@ -3,6 +3,7 @@ package apps
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -10,13 +11,14 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/hekmon/transmissionrpc/v2"
+	"github.com/hekmon/transmissionrpc/v3"
 	"github.com/mrobinsn/go-rtorrent/xmlrpc"
 	"golift.io/deluge"
 	"golift.io/nzbget"
 	"golift.io/qbit"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
+	"golift.io/version"
 )
 
 type PlexConfig struct {
@@ -343,6 +345,13 @@ func (a *Apps) setupTransmission() error {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Transmission config %d", ErrInvalidApp, idx+1)
 		}
 
+		endpoint, err := url.Parse(app.URL)
+		if err != nil {
+			return fmt.Errorf("%w: invalid URL: Transmission config %d", err, idx+1)
+		} else if app.User != "" {
+			endpoint.User = url.UserPassword(app.User, app.Pass)
+		}
+
 		var client *http.Client
 		if a.Logger != nil && a.Logger.DebugEnabled() {
 			client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
@@ -356,12 +365,9 @@ func (a *Apps) setupTransmission() error {
 			client.Transport = NewMetricsRoundTripper("Transmission", client.Transport)
 		}
 
-		a.Transmission[idx].Client = transmissionrpc.NewClient(transmissionrpc.Config{
-			URL:       app.URL,
-			Username:  app.User,
-			Password:  app.Pass,
-			UserAgent: mnd.Title,
-			Client:    client,
+		a.Transmission[idx].Client, _ = transmissionrpc.New(endpoint, &transmissionrpc.Config{
+			UserAgent:    fmt.Sprintf("%s v%s-%s %s", mnd.Title, version.Version, version.Revision, version.Branch),
+			CustomClient: client,
 		})
 	}
 

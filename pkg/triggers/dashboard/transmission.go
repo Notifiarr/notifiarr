@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	xmission "github.com/hekmon/transmissionrpc/v2"
+	xmission "github.com/hekmon/transmissionrpc/v3"
 	"golift.io/cnfg"
 )
 
@@ -51,10 +51,10 @@ func (c *Cmd) getTransmissionState(ctx context.Context, instance int, app *apps.
 	}
 
 	for _, xfer := range xfers {
-		if *xfer.Eta != 8640000 && *xfer.Eta != 0 && *xfer.LeftUntilDone > 0 {
+		if *xfer.ETA != 8640000 && *xfer.ETA != 0 && *xfer.LeftUntilDone > 0 {
 			state.Next = append(state.Next, &Sortable{
 				Name: *xfer.Name,
-				Date: time.Now().Add(time.Second * time.Duration(*xfer.Eta)),
+				Date: time.Now().Add(time.Second * time.Duration(*xfer.ETA)),
 			})
 		} else if *xfer.LeftUntilDone == 0 {
 			state.Latest = append(state.Latest, &Sortable{

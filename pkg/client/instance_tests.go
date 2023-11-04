@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"strconv"
@@ -17,7 +18,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
-	"github.com/hekmon/transmissionrpc/v2"
+	"github.com/hekmon/transmissionrpc/v3"
 	"golift.io/deluge"
 	"golift.io/nzbget"
 	"golift.io/qbit"
@@ -27,6 +28,7 @@ import (
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
 	"golift.io/starr/sonarr"
+	"golift.io/version"
 )
 
 //nolint:funlen,cyclop,gocognit,gocyclo
@@ -197,11 +199,15 @@ func testRtorrent(config *apps.RtorrentConfig) (string, int) {
 }
 
 func testTransmission(ctx context.Context, config *apps.XmissionConfig) (string, int) {
-	client := transmissionrpc.NewClient(transmissionrpc.Config{
-		URL:       config.URL,
-		Username:  config.User,
-		Password:  config.Pass,
-		UserAgent: mnd.Title,
+	endpoint, err := url.Parse(config.URL)
+	if err != nil {
+		return "parsing url: " + err.Error(), http.StatusBadGateway
+	} else if config.User != "" {
+		endpoint.User = url.UserPassword(config.User, config.Pass)
+	}
+
+	client, _ := transmissionrpc.New(endpoint, &transmissionrpc.Config{
+		UserAgent: fmt.Sprintf("%s v%s-%s %s", mnd.Title, version.Version, version.Revision, version.Branch),
 	})
 
 	args, err := client.SessionArgumentsGetAll(ctx)
