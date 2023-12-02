@@ -108,7 +108,7 @@
                                             <td>
                                                 <select id="AuthHeader" name="AuthHeader" class="profile-parameter form-control input-sm" type="select">
                                                     {{- range $header, $val := .Headers }}
-                                                        {{- /* Hide some headers, but not the one that's currently selected. */ -}}
+                                                        {{- /* Ignored Headers. Hide some headers, but not the one that's currently selected. */ -}}
                                                         {{ if or (eq (lower $header) (lower $.Config.UIPassword.Header)) (and 
                                                             (ne (lower $header) "accept") (ne (lower $header) "accept-encoding") 
                                                             (ne (lower $header) "accept-language") (ne (lower $header) "cache-control") 
@@ -129,6 +129,13 @@
                                                             (ne (lower $header) "x-forwarded-uri") (ne (lower $header) "x-noticlient-username") 
                                                             (ne (lower $header) "x-original-uri") (ne (lower $header) "x-real-ip") 
                                                             (ne (lower $header) "x-redacted-uri") (ne (lower $header) "x-request-id")
+                                                            (ne (lower $header) "cf-iplongitude") (ne (lower $header) "cf-iplatitude")
+                                                            (ne (lower $header) "cf-ipcontinent") (ne (lower $header) "cf-ipcity")
+                                                            (ne (lower $header) "cf-metro-code") (ne (lower $header) "cf-postal-code")
+                                                            (ne (lower $header) "cf-region") (ne (lower $header) "cf-region-code")
+                                                            (ne (lower $header) "cf-timezone") (ne (lower $header) "x-forwarded-port")
+                                                            (ne (lower $header) "x-original-url") (ne (lower $header) "x-original-method")
+                                                            (ne (lower $header) "x-forwarded-server")
 
                                                         )}}
                                                     <option value="{{$header}}"{{if eq (lower $header) (lower $.Config.UIPassword.Header)}} selected{{end}}>{{$header}}: {{index $val 0}}</option>
