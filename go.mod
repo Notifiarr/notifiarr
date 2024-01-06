@@ -16,7 +16,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gonutz/w32/v2 v2.10.0
 	github.com/gorilla/mux v1.8.0
-	github.com/gorilla/schema v1.2.0
+	github.com/gorilla/schema v1.2.1
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
