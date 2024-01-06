@@ -22,7 +22,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hekmon/transmissionrpc/v3 v3.0.0
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
-	github.com/jackpal/gateway v1.0.10
+	github.com/jackpal/gateway v1.0.13
 	github.com/jaypipes/ghw v0.12.0
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/kevinburke/go-bindata/v4 v4.0.2
@@ -96,6 +96,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
