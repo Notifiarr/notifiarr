@@ -195,7 +195,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	case "lidarr":
 		if instance <= len(c.Apps.Lidarr) && c.Apps.Lidarr[idx].Enabled() {
 			stat, err := c.Apps.Lidarr[idx].GetSystemStatusContext(ctx)
-			data.SaveWithID(app+"Status", idx, stat)
+			data.SaveWithID(app+mnd.Status, idx, stat)
 
 			return &AppStatuses{Lidarr: []*LidarrConTest{{c.getConTest(app, c.Apps.Lidarr[idx].Name, instance, err), stat}}}
 		}
@@ -206,7 +206,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	case "radarr":
 		if instance <= len(c.Apps.Radarr) && c.Apps.Radarr[idx].Enabled() {
 			stat, err := c.Apps.Radarr[idx].GetSystemStatusContext(ctx)
-			data.SaveWithID(app+"Status", idx, stat)
+			data.SaveWithID(app+mnd.Status, idx, stat)
 
 			return &AppStatuses{Radarr: []*RadarrConTest{{c.getConTest(app, c.Apps.Radarr[idx].Name, instance, err), stat}}}
 		}
@@ -217,7 +217,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	case "readarr":
 		if instance <= len(c.Apps.Readarr) && c.Apps.Readarr[idx].Enabled() {
 			stat, err := c.Apps.Readarr[idx].GetSystemStatusContext(ctx)
-			data.SaveWithID(app+"Status", idx, stat)
+			data.SaveWithID(app+mnd.Status, idx, stat)
 
 			return &AppStatuses{Readarr: []*ReadarrConTest{{c.getConTest(app, c.Apps.Readarr[idx].Name, instance, err), stat}}}
 		}
@@ -228,7 +228,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	case "sonarr":
 		if instance <= len(c.Apps.Sonarr) && c.Apps.Sonarr[idx].Enabled() {
 			stat, err := c.Apps.Sonarr[idx].GetSystemStatusContext(ctx)
-			data.SaveWithID(app+"Status", idx, stat)
+			data.SaveWithID(app+mnd.Status, idx, stat)
 
 			return &AppStatuses{Sonarr: []*SonarrConTest{{c.getConTest(app, c.Apps.Sonarr[idx].Name, instance, err), stat}}}
 		}
@@ -239,7 +239,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	case "prowlarr":
 		if instance <= len(c.Apps.Prowlarr) && c.Apps.Prowlarr[idx].Enabled() {
 			stat, err := c.Apps.Prowlarr[idx].GetSystemStatusContext(ctx)
-			data.SaveWithID(app+"Status", idx, stat)
+			data.SaveWithID(app+mnd.Status, idx, stat)
 
 			return &AppStatuses{Prowlarr: []*ProwlarrConTest{{c.getConTest(app, c.Apps.Prowlarr[idx].Name, instance, err), stat}}}
 		}
@@ -260,7 +260,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		}
 
 		stat, err := c.Apps.Tautulli.GetInfo(ctx)
-		data.SaveWithID(app+"Status", 1, stat)
+		data.SaveWithID(app+mnd.Status, 1, stat)
 
 		return &AppStatuses{Tautulli: []*TautulliConTest{{c.getConTest(app, c.Apps.Tautulli.Name, 1, err), stat}}}
 	}

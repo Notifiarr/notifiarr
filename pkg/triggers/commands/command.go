@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"regexp"
 	"strings"
@@ -36,7 +37,7 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 	if len(c.Hash) != hashLen {
 		hash := sha256.New()
 		hash.Write([]byte(fmt.Sprint(time.Now(), c.Name, c.Command, c.Timeout)))
-		c.Hash = fmt.Sprintf("%x", hash.Sum(nil))
+		c.Hash = hex.EncodeToString(hash.Sum(nil))
 	}
 
 	c.log = logger

@@ -7,6 +7,11 @@ import (
 	"golift.io/cnfg"
 )
 
+const (
+	starrV3StatusURI = "/api/v3/system/status?apikey="
+	starrV1StatusURI = "/api/v1/system/status?apikey="
+)
+
 // collectApps turns app configs into service checks if they have a name.
 func (c *Config) collectApps() []*Service {
 	svcs := []*Service{}
@@ -38,7 +43,7 @@ func (c *Config) collectLidarrApps(svcs []*Service) []*Service {
 			svcs = append(svcs, &Service{
 				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
+				Value:    app.URL + starrV1StatusURI + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
@@ -65,7 +70,7 @@ func (c *Config) collectProwlarrApps(svcs []*Service) []*Service {
 			svcs = append(svcs, &Service{
 				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
+				Value:    app.URL + starrV1StatusURI + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
@@ -92,7 +97,7 @@ func (c *Config) collectRadarrApps(svcs []*Service) []*Service {
 			svcs = append(svcs, &Service{
 				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    app.URL + "/api/v3/system/status?apikey=" + app.APIKey,
+				Value:    app.URL + starrV3StatusURI + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
@@ -119,7 +124,7 @@ func (c *Config) collectReadarrApps(svcs []*Service) []*Service {
 			svcs = append(svcs, &Service{
 				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    app.URL + "/api/v1/system/status?apikey=" + app.APIKey,
+				Value:    app.URL + starrV1StatusURI + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,
@@ -146,7 +151,7 @@ func (c *Config) collectSonarrApps(svcs []*Service) []*Service {
 			svcs = append(svcs, &Service{
 				Name:     app.Name,
 				Type:     CheckHTTP,
-				Value:    app.URL + "/api/v3/system/status?apikey=" + app.APIKey,
+				Value:    app.URL + starrV3StatusURI + app.APIKey,
 				Expect:   "200",
 				Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 				Interval: interval,

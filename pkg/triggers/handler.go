@@ -210,7 +210,7 @@ func (a *Actions) clientLogs(content string) (int, string) {
 // @Tags         Triggers
 // @Produce      json
 // @Param        hash  path   bool  true  "Unique hash for command being executed"
-// @Param        args formData []string true "provide args as multiple 'args' paramers in POST body" collectionFormat(multi) example(args=/tmp&args=/var)
+// @Param        args formData []string true "provide args as multiple 'args' parameters in POST body" collectionFormat(multi) example(args=/tmp&args=/var)
 // @Accept       application/x-www-form-urlencoded
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad or missing hash"

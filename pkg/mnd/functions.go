@@ -1,7 +1,12 @@
 //nolint:gomnd
 package mnd
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+
+	"github.com/hako/durafmt"
+)
 
 // FormatBytes converts a byte counter into a pretty UI string.
 // The input val must be int, int64, uint64 or float64.
@@ -37,4 +42,10 @@ func FormatBytes(size interface{}) string { //nolint:cyclop
 	default: // 2^1
 		return fmt.Sprintf("%.0f B", val)
 	}
+}
+
+// DurationAgo returns an elapsed-time formatted for humans.
+// Print this after a date to show how long ago it was.
+func DurationAgo(when time.Time) string {
+	return " (" + durafmt.Parse(time.Since(when).Round(time.Hour)).String() + " ago)"
 }
