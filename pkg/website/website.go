@@ -44,7 +44,7 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 		body.Close()
 
 		resp.size = int64(counter.Count())
-		mnd.Website.Add("POST Bytes Received", resp.size)
+		mnd.Website.Add("POST"+mnd.BytesReceived, resp.size)
 	}()
 
 	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
@@ -183,7 +183,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 	timeout := time.Until(deadline).Round(time.Millisecond)
 
 	for retry := 0; ; retry++ {
-		mnd.Website.Add(req.Method+" Requests", 1)
+		mnd.Website.Add(req.Method+mnd.Requests, 1)
 
 		resp, err := h.Client.Do(req)
 		if err == nil {
@@ -193,7 +193,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 
 			if resp.StatusCode < http.StatusInternalServerError &&
 				(resp.StatusCode != http.StatusBadRequest || resp.Header.Get("content-type") != "text/html") {
-				mnd.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
+				mnd.Website.Add(req.Method+mnd.BytesSent, resp.Request.ContentLength)
 				return resp, nil
 			}
 
@@ -202,8 +202,8 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 			size, _ := io.Copy(io.Discard, resp.Body) // must read the entire body when err == nil
 			resp.Body.Close()                         // do not defer, because we're in a loop.
 			mnd.Website.Add(req.Method+" Retries", 1)
-			mnd.Website.Add(req.Method+" Bytes Sent", resp.Request.ContentLength)
-			mnd.Website.Add(req.Method+" Bytes Received", size)
+			mnd.Website.Add(req.Method+mnd.BytesSent, resp.Request.ContentLength)
+			mnd.Website.Add(req.Method+mnd.BytesReceived, size)
 			// shoehorn a non-200 error into the empty http error.
 			err = fmt.Errorf("%w: %s: %d bytes, %s", ErrNon200, req.URL, size, resp.Status)
 		}

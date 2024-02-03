@@ -105,9 +105,9 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			appName = "Non-App"
 		}
 
-		mnd.APIHits.Add(appName+" Bytes Sent", wrote)
-		mnd.APIHits.Add(appName+" Bytes Received", int64(len(post)))
-		mnd.APIHits.Add(appName+" Requests", 1)
+		mnd.APIHits.Add(appName+mnd.BytesSent, wrote)
+		mnd.APIHits.Add(appName+mnd.BytesReceived, int64(len(post)))
+		mnd.APIHits.Add(appName+mnd.Requests, 1)
 		mnd.APIHits.Add("Total", 1)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 	}

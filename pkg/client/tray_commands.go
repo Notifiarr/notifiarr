@@ -19,6 +19,8 @@ import (
 
 /* This file contains methods that are triggered from the GUI menu. */
 
+const TitleError = mnd.Title + " Error"
+
 func (c *Client) toggleServer(ctx context.Context) {
 	if !menu["stat"].Checked() {
 		ui.Notify("Started web server") //nolint:errcheck
@@ -55,7 +57,7 @@ func (c *Client) checkForUpdate(ctx context.Context) {
 	switch update, err := update.Check(ctx, mnd.UserRepo, version.Version); {
 	case err != nil:
 		c.Errorf("Update Check: %v", err)
-		_, _ = ui.Error(mnd.Title+" ERROR", "Checking version on GitHub: "+err.Error())
+		_, _ = ui.Error(TitleError, "Checking version on GitHub: "+err.Error())
 	case update.Outdate && runtime.GOOS == mnd.Windows:
 		c.upgradeWindows(ctx, update)
 	case update.Outdate:
@@ -147,7 +149,7 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 	val, _, _ := ui.Entry(mnd.Title, "Enter path to write config file:", c.Flags.ConfigFile)
 
 	if val == "" {
-		_, _ = ui.Error(mnd.Title+" Error", "No Config File Provided")
+		_, _ = ui.Error(TitleError, "No Config File Provided")
 		return
 	}
 
@@ -155,7 +157,7 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 
 	if _, err := c.Config.Write(ctx, val, false); err != nil {
 		c.Errorf("Writing Config File: %v", err)
-		_, _ = ui.Error(mnd.Title+" Error", "Writing Config File: "+err.Error())
+		_, _ = ui.Error(TitleError, "Writing Config File: "+err.Error())
 
 		return
 	}
@@ -209,7 +211,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 
 	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
 		c.Errorf("Updating Web UI Password: %v", err)
-		_, _ = ui.Error(mnd.Title+" Error", "Updating Web UI Password: "+err.Error())
+		_, _ = ui.Error(TitleError, "Updating Web UI Password: "+err.Error())
 	}
 
 	if err = ui.Notify("Web UI password updated. Save config to persist this change."); err != nil {

@@ -7,7 +7,10 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // Config is the Tautulli configuration.
@@ -157,10 +160,10 @@ func (u *Users) MapIDName() map[string]string {
 
 	for _, user := range u.Response.Data {
 		if user.FriendlyName == "" {
-			nameMap[fmt.Sprint(user.UserID)] = user.Username
+			nameMap[strconv.FormatInt(user.UserID, mnd.Base10)] = user.Username
 			nameMap[user.Username] = user.Username
 		} else {
-			nameMap[fmt.Sprint(user.UserID)] = user.FriendlyName
+			nameMap[strconv.FormatInt(user.UserID, mnd.Base10)] = user.FriendlyName
 			nameMap[user.Username] = user.FriendlyName
 		}
 	}

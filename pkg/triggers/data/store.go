@@ -1,7 +1,7 @@
 package data
 
 import (
-	"fmt"
+	"strconv"
 
 	"golift.io/cache"
 )
@@ -22,10 +22,10 @@ func Get(key string) *cache.Item {
 
 // SaveWithID saves data to the cache, and appends the key to an id.
 func SaveWithID(key string, id int, data interface{}) {
-	store.Save(key+fmt.Sprint(id), data, cache.Options{})
+	store.Save(key+strconv.Itoa(id), data, cache.Options{})
 }
 
 // GetWithID returns data from the cache using a kay appended to an id.
 func GetWithID(key string, id int) *cache.Item {
-	return store.Get(key + fmt.Sprint(id))
+	return store.Get(key + strconv.Itoa(id))
 }

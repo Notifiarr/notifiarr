@@ -78,7 +78,7 @@ type Action struct {
 
 // Services is the input interface to do things with services via triggers.
 type Services interface {
-	RunChecks(website.EventType)
+	RunChecks(et website.EventType)
 }
 
 // Exec runs a trigger. This is abastraction method used in a bunch of places.

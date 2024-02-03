@@ -15,6 +15,13 @@ import (
 	"golift.io/version"
 )
 
+const (
+	server       = "server"
+	servers      = "servers"
+	starrLogLine = " =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v " +
+		"stuck/fin:%v/%v corrupt:%v backup:%v http/pass:%v/%v"
+)
+
 // PrintStartupInfo prints info about our startup config.
 // This runs once on startup, and again during reloads.
 func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.ClientInfo) {
@@ -142,16 +149,15 @@ func (c *Client) printPlex() {
 
 // printLidarr is called on startup to print info about each configured server.
 func (c *Client) printLidarr(app *clientinfo.InstanceConfig) {
-	s := "s"
+	s := servers
 	if len(c.Config.Lidarr) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), "server"+s)
+	c.Print(" => Lidarr Config:", len(c.Config.Lidarr), s)
 
 	for idx, f := range c.Config.Lidarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v "+
-			"http/pass:%v/%v",
+		c.Printf(starrLogLine,
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled,
 			f.HTTPPass != "" && f.HTTPUser != "", f.Password != "" && f.Username != "")
@@ -160,17 +166,16 @@ func (c *Client) printLidarr(app *clientinfo.InstanceConfig) {
 
 // printProwlarr is called on startup to print info about each configured server.
 func (c *Client) printProwlarr(app *clientinfo.InstanceConfig) {
-	s := "s"
+	s := servers
 	if len(c.Config.Prowlarr) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), "server"+s)
+	c.Print(" => Prowlarr Config:", len(c.Config.Prowlarr), s)
 
 	for idx, f := range c.Config.Prowlarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v corrupt:%v backup:%v "+
-			"http/pass:%v/%v",
-			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL,
+		c.Printf(starrLogLine,
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, "na", "na",
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled,
 			f.HTTPPass != "" && f.HTTPUser != "", f.Password != "" && f.Username != "")
 	}
@@ -178,16 +183,15 @@ func (c *Client) printProwlarr(app *clientinfo.InstanceConfig) {
 
 // printRadarr is called on startup to print info about each configured server.
 func (c *Client) printRadarr(app *clientinfo.InstanceConfig) {
-	s := "s"
+	s := servers
 	if len(c.Config.Radarr) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => Radarr Config:", len(c.Config.Radarr), "server"+s)
+	c.Print(" => Radarr Config:", len(c.Config.Radarr), s)
 
 	for idx, f := range c.Config.Radarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v "+
-			"http/pass:%v/%v",
+		c.Printf(starrLogLine,
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled,
 			f.HTTPPass != "" && f.HTTPUser != "", f.Password != "" && f.Username != "")
@@ -196,16 +200,15 @@ func (c *Client) printRadarr(app *clientinfo.InstanceConfig) {
 
 // printReadarr is called on startup to print info about each configured server.
 func (c *Client) printReadarr(app *clientinfo.InstanceConfig) {
-	s := "s"
+	s := servers
 	if len(c.Config.Readarr) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => Readarr Config:", len(c.Config.Readarr), "server"+s)
+	c.Print(" => Readarr Config:", len(c.Config.Readarr), s)
 
 	for idx, f := range c.Config.Readarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v "+
-			"http/pass:%v/%v",
+		c.Printf(starrLogLine,
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled,
 			f.HTTPPass != "" && f.HTTPUser != "", f.Password != "" && f.Username != "")
@@ -214,16 +217,15 @@ func (c *Client) printReadarr(app *clientinfo.InstanceConfig) {
 
 // printSonarr is called on startup to print info about each configured server.
 func (c *Client) printSonarr(app *clientinfo.InstanceConfig) {
-	s := "s"
+	s := servers
 	if len(c.Config.Sonarr) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), "server"+s)
+	c.Print(" => Sonarr Config:", len(c.Config.Sonarr), s)
 
 	for idx, f := range c.Config.Sonarr {
-		c.Printf(" =>    Server %d: %s apikey:%v timeout:%s valid_ssl:%v stuck/fin:%v/%v corrupt:%v backup:%v "+
-			"http/pass:%v/%v",
+		c.Printf(starrLogLine,
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled,
 			f.HTTPPass != "" && f.HTTPUser != "", f.Password != "" && f.Username != "")
@@ -232,12 +234,12 @@ func (c *Client) printSonarr(app *clientinfo.InstanceConfig) {
 
 // printDeluge is called on startup to print info about each configured server.
 func (c *Client) printDeluge() {
-	s := "s"
+	s := servers
 	if len(c.Config.Deluge) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => Deluge Config:", len(c.Config.Deluge), "server"+s)
+	c.Print(" => Deluge Config:", len(c.Config.Deluge), s)
 
 	for i, f := range c.Config.Deluge {
 		c.Printf(" =>    Server %d: %s password:%v timeout:%s valid_ssl:%v",
@@ -247,12 +249,12 @@ func (c *Client) printDeluge() {
 
 // printNZBGet is called on startup to print info about each configured server.
 func (c *Client) printNZBGet() {
-	s := "s"
+	s := servers
 	if len(c.Config.NZBGet) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => NZBGet Config:", len(c.Config.NZBGet), "server"+s)
+	c.Print(" => NZBGet Config:", len(c.Config.NZBGet), s)
 
 	for i, f := range c.Config.NZBGet {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
@@ -262,12 +264,12 @@ func (c *Client) printNZBGet() {
 
 // printQbit is called on startup to print info about each configured server.
 func (c *Client) printQbit() {
-	s := "s"
+	s := servers
 	if len(c.Config.Qbit) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => Qbit Config:", len(c.Config.Qbit), "server"+s)
+	c.Print(" => Qbit Config:", len(c.Config.Qbit), s)
 
 	for i, f := range c.Config.Qbit {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
@@ -277,12 +279,12 @@ func (c *Client) printQbit() {
 
 // printRtorrent is called on startup to print info about each configured server.
 func (c *Client) printRtorrent() {
-	s := "s"
+	s := servers
 	if len(c.Config.Rtorrent) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => rTorrent Config:", len(c.Config.Rtorrent), "server"+s)
+	c.Print(" => rTorrent Config:", len(c.Config.Rtorrent), s)
 
 	for i, f := range c.Config.Rtorrent {
 		c.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
@@ -292,12 +294,12 @@ func (c *Client) printRtorrent() {
 
 // printSABnzbd is called on startup to print info about each configured SAB downloader.
 func (c *Client) printSABnzbd() {
-	s := "s"
+	s := servers
 	if len(c.Config.SabNZB) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => SABnzbd Config:", len(c.Config.SabNZB), "server"+s)
+	c.Print(" => SABnzbd Config:", len(c.Config.SabNZB), s)
 
 	for i, f := range c.Config.SabNZB {
 		c.Printf(" =>    Server %d: %s, api_key:%v timeout:%s", i+1, f.URL, f.APIKey != "", f.Timeout)
@@ -323,12 +325,12 @@ func (c *Client) printMySQL() {
 		return
 	}
 
-	s := "s"
+	s := servers
 	if len(c.Config.Snapshot.MySQL) == 1 {
-		s = ""
+		s = server
 	}
 
-	c.Print(" => MySQL Config:", len(c.Config.Snapshot.MySQL), "server"+s)
+	c.Print(" => MySQL Config:", len(c.Config.Snapshot.MySQL), s)
 
 	for i, m := range c.Config.Snapshot.MySQL {
 		if m.Name != "" {

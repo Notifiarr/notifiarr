@@ -10,7 +10,7 @@ import (
 )
 
 /*
- * The code in this files powers the metrics collection for prety much every integrated app,
+ * The code in this files powers the metrics collection for pretty much every integrated app,
  * but only when debug is disabled.
  */
 
@@ -23,11 +23,11 @@ type fakeCloser struct {
 }
 
 func (f *fakeCloser) Close() error {
-	defer mnd.Apps.Add(f.App+"&&"+f.Method+" Bytes Received", int64(f.Rcvd()))
+	defer mnd.Apps.Add(f.App+"&&"+f.Method+mnd.BytesReceived, int64(f.Rcvd()))
 	return f.CloseFn()
 }
 
-// LoggingRoundTripper allows us to use a datacounter to log http request data.
+// LoggingRoundTripper allows us to use a data counter to log http request data.
 type LoggingRoundTripper struct {
 	next http.RoundTripper
 	app  string
@@ -59,7 +59,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		req.Body = io.NopCloser(sent)
 
 		defer func() {
-			mnd.Apps.Add(rt.app+"&&"+req.Method+" Bytes Sent", int64(sent.Count()))
+			mnd.Apps.Add(rt.app+"&&"+req.Method+mnd.BytesSent, int64(sent.Count()))
 		}()
 	}
 
@@ -88,7 +88,7 @@ func NewFakeCloser(app, method string, body io.ReadCloser) io.ReadCloser {
 }
 
 func checkResp(app, method string, resp *http.Response, err error) {
-	mnd.Apps.Add(app+"&&"+method+" Requests", 1)
+	mnd.Apps.Add(app+"&&"+method+mnd.Requests, 1)
 
 	if resp != nil {
 		mnd.Apps.Add(app+"&&"+method+" Response: "+resp.Status, 1)
@@ -104,11 +104,11 @@ func checkResp(app, method string, resp *http.Response, err error) {
 // This does not interact with or use any other methods in this file.
 func metricMakerCallback(app string) func(string, string, int, int, error) {
 	return func(status, method string, sent, rcvd int, err error) {
-		mnd.Apps.Add(app+"&&"+method+" Bytes Received", int64(rcvd))
-		mnd.Apps.Add(app+"&&"+method+" Requests", 1)
+		mnd.Apps.Add(app+"&&"+method+mnd.BytesReceived, int64(rcvd))
+		mnd.Apps.Add(app+"&&"+method+mnd.Requests, 1)
 
 		if method != "GET" || sent > 0 {
-			mnd.Apps.Add(app+"&&"+method+" Bytes Sent", int64(sent))
+			mnd.Apps.Add(app+"&&"+method+mnd.BytesSent, int64(sent))
 		}
 
 		if err != nil {
