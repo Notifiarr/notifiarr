@@ -7,13 +7,11 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
-	"github.com/hako/durafmt"
 	"golift.io/version"
 )
 
@@ -64,8 +62,7 @@ func (c *Client) checkForUpdate(ctx context.Context) {
 		c.downloadOther(update)
 	default:
 		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+update.Version+"\n"+
-			"Updated: "+update.RelDate.Format("Jan 2, 2006")+" ("+
-			durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)")
+			"Updated: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate))
 	}
 }
 
@@ -73,8 +70,7 @@ func (c *Client) downloadOther(update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Download?\n\n"+
 		"Your Version: "+update.Version+"\n"+
 		"New Version: "+update.Current+"\n"+
-		"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
-		durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
+		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate), false)
 	if yes {
 		_ = ui.OpenURL(update.CurrURL)
 	}
