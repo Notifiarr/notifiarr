@@ -131,22 +131,22 @@ func sonarrAddSeries(req *http.Request) (int, interface{}) {
 	// Extract payload and check for TVDB ID.
 	err := json.NewDecoder(req.Body).Decode(&payload)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	} else if payload.TvdbID == 0 {
-		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoTVDB)
+		return apiError(http.StatusUnprocessableEntity, "0", ErrNoTVDB)
 	}
 
 	// Check for existing series.
 	m, err := getSonarr(req).GetSeriesContext(req.Context(), payload.TvdbID)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking series", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, sonarrData(m[0])
 	}
 
 	series, err := getSonarr(req).AddSeriesContext(req.Context(), &payload)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding series: %w", err)
+		return apiError(http.StatusInternalServerError, "adding series", err)
 	}
 
 	return http.StatusCreated, series
@@ -183,7 +183,7 @@ func sonarrCheckSeries(req *http.Request) (int, interface{}) {
 	// Check for existing series.
 	m, err := getSonarr(req).GetSeriesContext(req.Context(), tvdbid)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking series", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, sonarrData(m[0])
 	}
@@ -207,7 +207,7 @@ func sonarrGetSeries(req *http.Request) (int, interface{}) {
 
 	series, err := getSonarr(req).GetSeriesByIDContext(req.Context(), seriesID)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking series", err)
 	}
 
 	return http.StatusOK, series
@@ -229,7 +229,7 @@ func sonarrGetEpisodes(req *http.Request) (int, interface{}) {
 
 	episodes, err := getSonarr(req).GetSeriesEpisodesContext(req.Context(), seriesID)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking series", err)
 	}
 
 	return http.StatusOK, episodes
@@ -251,7 +251,7 @@ func sonarrUnmonitorEpisode(req *http.Request) (int, interface{}) {
 
 	episodes, err := getSonarr(req).MonitorEpisodeContext(req.Context(), []int64{episodeID}, false)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking series: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking series", err)
 	} else if len(episodes) != 1 {
 		return http.StatusServiceUnavailable, fmt.Errorf("%w (%d): %v", ErrWrongCount, len(episodes), episodes)
 	}
@@ -278,7 +278,7 @@ func sonarrTriggerSearchSeries(req *http.Request) (int, interface{}) {
 		SeriesID: seriesID,
 	})
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("triggering series search: %w", err)
+		return apiError(http.StatusServiceUnavailable, "triggering series search", err)
 	}
 
 	return http.StatusOK, output.Status
@@ -302,7 +302,7 @@ func sonarrTriggerCommand(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&command)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding command payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding command payload", err)
 	}
 
 	output, err := getSonarr(req).SendCommandContext(req.Context(), &command)
@@ -351,7 +351,7 @@ func sonarrLangProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(req).GetLanguageProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting language profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting language profiles", err)
 	}
 
 	// Format profile ID=>Name into a nice map.
@@ -377,7 +377,7 @@ func sonarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	return http.StatusOK, profiles
@@ -397,7 +397,7 @@ func sonarrGetQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	// Format profile ID=>Name into a nice map.
@@ -428,13 +428,13 @@ func sonarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	// Get the profiles from sonarr.
 	id, err := getSonarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+		return apiError(http.StatusInternalServerError, "adding profile", err)
 	}
 
 	return http.StatusOK, id
@@ -461,7 +461,7 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	profile.ID, _ = strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
@@ -472,7 +472,7 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	_, err = getSonarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+		return apiError(http.StatusInternalServerError, "updating profile", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -499,7 +499,7 @@ func sonarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
 	// Delete the profile from sonarr.
 	err := getSonarr(req).DeleteQualityProfileContext(req.Context(), profileID)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("deleting profile: %w", err)
+		return apiError(http.StatusInternalServerError, "deleting profile", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -519,7 +519,7 @@ func sonarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get all the profiles from sonarr.
 	profiles, err := getSonarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	var (
@@ -558,7 +558,7 @@ func sonarrGetReleaseProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(req).GetReleaseProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	return http.StatusOK, profiles
@@ -583,13 +583,13 @@ func sonarrAddReleaseProfile(req *http.Request) (int, interface{}) {
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	// Get the profiles from sonarr.
 	id, err := getSonarr(req).AddReleaseProfileContext(req.Context(), &profile)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+		return apiError(http.StatusInternalServerError, "adding profile", err)
 	}
 
 	return http.StatusOK, id
@@ -616,7 +616,7 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	profile.ID, _ = strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
@@ -627,7 +627,7 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
 	_, err = getSonarr(req).UpdateReleaseProfileContext(req.Context(), &profile)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+		return apiError(http.StatusInternalServerError, "updating profile", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -654,7 +654,7 @@ func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
 	// Delete the profile from sonarr.
 	err := getSonarr(req).DeleteReleaseProfileContext(req.Context(), profileID)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("deleting profile: %w", err)
+		return apiError(http.StatusInternalServerError, "deleting profile", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -673,7 +673,7 @@ func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
 func sonarrDeleteAllReleaseProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getSonarr(req).GetReleaseProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	var (
@@ -713,7 +713,7 @@ func sonarrRootFolders(req *http.Request) (int, interface{}) {
 	// Get folder list from Sonarr.
 	folders, err := getSonarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
+		return apiError(http.StatusInternalServerError, "getting folders", err)
 	}
 
 	// Format folder list into a nice path=>freesSpace map.
@@ -738,7 +738,7 @@ func sonarrRootFolders(req *http.Request) (int, interface{}) {
 func sonarrGetNaming(req *http.Request) (int, interface{}) {
 	naming, err := getSonarr(req).GetNamingContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting naming: %w", err)
+		return apiError(http.StatusInternalServerError, "getting naming", err)
 	}
 
 	return http.StatusOK, naming
@@ -761,12 +761,12 @@ func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&naming)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	output, err := getSonarr(req).UpdateNamingContext(req.Context(), &naming)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating naming: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating naming", err)
 	}
 
 	return http.StatusOK, output.ID
@@ -789,7 +789,7 @@ func sonarrSearchSeries(req *http.Request) (int, interface{}) {
 	// Get all series
 	series, err := getSonarr(req).GetAllSeriesContext(req.Context())
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting series: %w", err)
+		return apiError(http.StatusServiceUnavailable, "getting series", err)
 	}
 
 	type seriesData struct {
@@ -867,7 +867,7 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 func sonarrGetTags(req *http.Request) (int, interface{}) {
 	tags, err := getSonarr(req).GetTagsContext(req.Context())
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
+		return apiError(http.StatusServiceUnavailable, "getting tags", err)
 	}
 
 	return http.StatusOK, tags
@@ -890,7 +890,7 @@ func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 
 	tag, err := getSonarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating tag", err)
 	}
 
 	return http.StatusOK, tag.ID
@@ -910,7 +910,7 @@ func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 func sonarrSetTag(req *http.Request) (int, interface{}) {
 	tag, err := getSonarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
+		return apiError(http.StatusServiceUnavailable, "setting tag", err)
 	}
 
 	return http.StatusOK, tag.ID
@@ -933,14 +933,14 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&series)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	moveFiles := mux.Vars(req)["moveFiles"] == strconv.FormatBool(true)
 
 	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series, moveFiles)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating series: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating series", err)
 	}
 
 	return http.StatusOK, "sonarr seems to have worked"
@@ -964,12 +964,12 @@ func sonarrSeasonPass(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&seasonPass)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	err = getSonarr(req).UpdateSeasonPassContext(req.Context(), &seasonPass)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating seasonPass: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating seasonPass", err)
 	}
 
 	return http.StatusOK, "ok"
@@ -993,12 +993,12 @@ func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&cusform)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	resp, err := getSonarr(req).AddCustomFormatContext(req.Context(), &cusform)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding custom format: %w", err)
+		return apiError(http.StatusInternalServerError, "adding custom format", err)
 	}
 
 	return http.StatusOK, resp
@@ -1017,7 +1017,7 @@ func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
 func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
 	cusform, err := getSonarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
+		return apiError(http.StatusInternalServerError, "getting custom formats", err)
 	}
 
 	return http.StatusOK, cusform
@@ -1040,12 +1040,12 @@ func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
 func sonarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 	var cusform sonarr.CustomFormatInput
 	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	output, err := getSonarr(req).UpdateCustomFormatContext(req.Context(), &cusform)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("updating custom format: %w", err)
+		return apiError(http.StatusInternalServerError, "updating custom format", err)
 	}
 
 	return http.StatusOK, output
@@ -1067,7 +1067,7 @@ func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 
 	err := getSonarr(req).DeleteCustomFormatContext(req.Context(), cfID)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("deleting custom format: %w", err)
+		return apiError(http.StatusInternalServerError, "deleting custom format", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -1086,7 +1086,7 @@ func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 func sonarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 	formats, err := getSonarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting custom formats: %w", err)
+		return apiError(http.StatusInternalServerError, "getting custom formats", err)
 	}
 
 	var (
@@ -1124,7 +1124,7 @@ func sonarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 	output, err := getSonarr(req).GetQualityDefinitionsContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting quality definitions: %w", err)
+		return apiError(http.StatusInternalServerError, "getting quality definitions", err)
 	}
 
 	return http.StatusOK, output
@@ -1148,12 +1148,12 @@ func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	var input []*sonarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	output, err := getSonarr(req).UpdateQualityDefinitionsContext(req.Context(), input)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("updating quality definition: %w", err)
+		return apiError(http.StatusInternalServerError, "updating quality definition", err)
 	}
 
 	return http.StatusOK, output
@@ -1172,7 +1172,7 @@ func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 func sonarrGetNotifications(req *http.Request) (int, interface{}) {
 	notifs, err := getSonarr(req).GetNotificationsContext(req.Context())
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting notifications: %w", err)
+		return apiError(http.StatusServiceUnavailable, "getting notifications", err)
 	}
 
 	output := []*sonarr.NotificationOutput{}
@@ -1204,12 +1204,12 @@ func sonarrUpdateNotification(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	_, err = getSonarr(req).UpdateNotificationContext(req.Context(), &notif)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating notification", err)
 	}
 
 	return http.StatusOK, mnd.Success
@@ -1233,12 +1233,12 @@ func sonarrAddNotification(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	id, err := getSonarr(req).AddNotificationContext(req.Context(), &notif)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("adding notification: %w", err)
+		return apiError(http.StatusServiceUnavailable, "adding notification", err)
 	}
 
 	return http.StatusOK, id
@@ -1266,7 +1266,7 @@ func sonarrDeleteEpisode(req *http.Request) (int, interface{}) {
 
 	err := getSonarr(req).DeleteEpisodeFileContext(req.Context(), episodeFileID)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("deleting episode file: %w", err)
+		return apiError(http.StatusInternalServerError, "deleting episode file", err)
 	}
 
 	return http.StatusOK, mnd.Deleted + idString

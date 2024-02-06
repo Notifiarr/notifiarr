@@ -6,6 +6,7 @@
 package apps
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -154,4 +155,15 @@ func (a *Apps) InitHandlers() {
 // DelOK returns true if the delete limit isn't reached.
 func (e *ExtraConfig) DelOK() bool {
 	return e.Deletes > 0 && e.delLimit.Allow()
+}
+
+// apiError attempts to parse the api error message to create a better return code.
+func apiError(backupCode int, msg string, err error) (int, error) {
+	var reqerr *starr.ReqError
+
+	if errors.As(err, &reqerr) {
+		return reqerr.Code, fmt.Errorf("%s: %w", msg, reqerr)
+	}
+
+	return backupCode, fmt.Errorf("%s: %w", msg, err)
 }
