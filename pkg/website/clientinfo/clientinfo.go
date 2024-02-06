@@ -15,14 +15,16 @@ import (
 // ClientInfo is the client's startup data received from the website.
 type ClientInfo struct {
 	User struct {
-		ID         any      `json:"id"` // user id from notifiarr db.
-		WelcomeMSG string   `json:"welcome"`
-		Subscriber bool     `json:"subscriber"`
-		Patron     bool     `json:"patron"`
-		DevAllowed bool     `json:"devAllowed"`
-		DateFormat PHPDate  `json:"dateFormat"`
-		StopLogs   bool     `json:"stopLogs"`
-		Tunnels    []string `json:"tunnels"`
+		ID         any             `json:"id"` // user id from notifiarr db.
+		WelcomeMSG string          `json:"welcome"`
+		Subscriber bool            `json:"subscriber"`
+		Patron     bool            `json:"patron"`
+		DevAllowed bool            `json:"devAllowed"`
+		DateFormat PHPDate         `json:"dateFormat"`
+		StopLogs   bool            `json:"stopLogs"`
+		TunnelURL  string          `json:"tunnelUrl"`
+		Tunnels    []string        `json:"tunnels"`
+		Mulery     []*MuleryServer `json:"mulery"`
 	} `json:"user"`
 	Actions struct {
 		Plex      PlexConfig      `json:"plex"`      // Site Config for Plex.
@@ -34,6 +36,12 @@ type ClientInfo struct {
 		Custom    []*CronConfig   `json:"custom"`    // Site config for Custom Crons.
 		Snapshot  snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
 	} `json:"actions"`
+}
+
+// MuleryServer is data from the website. It's a tunnel's https and wss urls.
+type MuleryServer struct {
+	Tunnel string `json:"tunnel"`
+	Socket string `json:"socket"`
 }
 
 // CronConfig defines a custom GET timer from the website.
