@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -65,6 +66,7 @@ func (c *Client) startTunnel(ctx context.Context) {
 	// If clientinfo is nil, then we probably have a bad API key.
 	ci := clientinfo.Get()
 	if ci == nil {
+		c.Errorf("Skipping tunnel creation because there is no client info.")
 		return
 	}
 
@@ -86,7 +88,7 @@ func (c *Client) startTunnel(ctx context.Context) {
 		poolmax++
 	}
 
-	if poolmax > maxPoolSize {
+	if poolmax > maxPoolSize || ci.IsSub() {
 		poolmax = maxPoolSize
 	} else if poolmax < maxPoolMin {
 		poolmax = maxPoolMin
@@ -112,8 +114,11 @@ func (c *Client) startTunnel(ctx context.Context) {
 		Backoff:       600*time.Millisecond + time.Duration(c.triggers.Timers.Rand().Intn(600))*time.Millisecond,
 		SecretKey:     c.Config.APIKey,
 		Handler:       remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
-		Logger:        &tunnelLogger{Logger: c.Logger},
+		Logger:        &tunnelLogger{Logger: c.Logger, sendSiteErrors: ci.User.DevAllowed},
 	})
+	c.Printf("Tunneling to %q with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
+		strings.Join(c.tunnel.Targets, ", "), c.tunnel.PoolMaxSize, c.tunnel.CleanInterval,
+		c.tunnel.Backoff, ci.User.TunnelURL, c.tunnel.GetID())
 	c.tunnel.Start(ctx)
 }
 
@@ -237,6 +242,8 @@ func (n *netConnWrapper) Write(b []byte) (int, error) {
 // tunnelLogger lets us tune the logs from the mulery tunnel.
 type tunnelLogger struct {
 	mnd.Logger
+	// sendSiteErrors true sends tunnel errors to website as notifications.
+	sendSiteErrors bool
 }
 
 // Debugf prints a message with DEBUG prefixed.
@@ -246,7 +253,12 @@ func (l *tunnelLogger) Debugf(format string, v ...interface{}) {
 
 // Errorf prints a message with ERROR prefixed.
 func (l *tunnelLogger) Errorf(format string, v ...interface{}) {
-	l.Logger.ErrorfNoShare(format, v...) // this is why we dont just pass the interface in as-is.
+	// this is why we dont just pass the interface in as-is.
+	if l.sendSiteErrors {
+		l.Logger.Errorf(format, v...)
+	} else {
+		l.Logger.ErrorfNoShare(format, v...)
+	}
 }
 
 // Printf prints a message with INFO prefixed.
