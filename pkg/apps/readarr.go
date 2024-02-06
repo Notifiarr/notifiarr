@@ -110,18 +110,18 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 	// Extract payload and check for GRID ID.
 	switch err := json.NewDecoder(req.Body).Decode(payload); {
 	case err != nil:
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	case len(payload.Editions) != 1:
 		return http.StatusUnprocessableEntity,
 			fmt.Errorf("invalid editions count; only 1 allowed: %d, %w", len(payload.Editions), ErrNoGRID)
 	case payload.Editions[0].ForeignEditionID == "":
-		return http.StatusUnprocessableEntity, fmt.Errorf("0: %w", ErrNoGRID)
+		return apiError(http.StatusUnprocessableEntity, "0", ErrNoGRID)
 	}
 
 	// Check for existing book.
 	m, err := getReadarr(req).GetBookContext(req.Context(), payload.Editions[0].ForeignEditionID)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking book", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, readarrData(m[0])
 	}
@@ -129,7 +129,7 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 	// Add book using payload.
 	book, err := getReadarr(req).AddBookContext(req.Context(), payload)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding book: %w", err)
+		return apiError(http.StatusInternalServerError, "adding book", err)
 	}
 
 	return http.StatusCreated, book
@@ -151,7 +151,7 @@ func readarrGetAuthor(req *http.Request) (int, interface{}) {
 
 	author, err := getReadarr(req).GetAuthorByIDContext(req.Context(), authorID)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting author: %w", err)
+		return apiError(http.StatusServiceUnavailable, "getting author", err)
 	}
 
 	return http.StatusOK, author
@@ -189,7 +189,7 @@ func readarrCheckBook(req *http.Request) (int, interface{}) {
 
 	m, err := getReadarr(req).GetBookContext(req.Context(), grid)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking book", err)
 	} else if len(m) > 0 {
 		return http.StatusConflict, readarrData(m[0])
 	}
@@ -213,7 +213,7 @@ func readarrGetBook(req *http.Request) (int, interface{}) {
 
 	book, err := getReadarr(req).GetBookByIDContext(req.Context(), bookID)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking book", err)
 	}
 
 	return http.StatusOK, book
@@ -227,7 +227,7 @@ func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 		BookIDs: []int64{bookID},
 	})
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("checking book: %w", err)
+		return apiError(http.StatusServiceUnavailable, "checking book", err)
 	}
 
 	return http.StatusOK, output.Status
@@ -247,7 +247,7 @@ func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetMetadataProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	// Format profile ID=>Name into a nice map.
@@ -273,7 +273,7 @@ func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	// Format profile ID=>Name into a nice map.
@@ -299,7 +299,7 @@ func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting profiles: %w", err)
+		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}
 
 	return http.StatusOK, profiles
@@ -324,13 +324,13 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	// Get the profiles from radarr.
 	id, err := getReadarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("adding profile: %w", err)
+		return apiError(http.StatusInternalServerError, "adding profile", err)
 	}
 
 	return http.StatusOK, id
@@ -357,7 +357,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&profile)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	profile.ID, _ = strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
@@ -368,7 +368,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from radarr.
 	_, err = getReadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("updating profile: %w", err)
+		return apiError(http.StatusInternalServerError, "updating profile", err)
 	}
 
 	return http.StatusOK, "OK"
@@ -388,7 +388,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 func readarrRootFolders(req *http.Request) (int, interface{}) {
 	folders, err := getReadarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("getting folders: %w", err)
+		return apiError(http.StatusInternalServerError, "getting folders", err)
 	}
 
 	// Format folder list into a nice path=>freesSpace map.
@@ -414,7 +414,7 @@ func readarrRootFolders(req *http.Request) (int, interface{}) {
 func readarrSearchBook(req *http.Request) (int, interface{}) {
 	books, err := getReadarr(req).GetBookContext(req.Context(), "")
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting books: %w", err)
+		return apiError(http.StatusServiceUnavailable, "getting books", err)
 	}
 
 	type bookData struct {
@@ -495,7 +495,7 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 func readarrGetTags(req *http.Request) (int, interface{}) {
 	tags, err := getReadarr(req).GetTagsContext(req.Context())
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting tags: %w", err)
+		return apiError(http.StatusServiceUnavailable, "getting tags", err)
 	}
 
 	return http.StatusOK, tags
@@ -518,7 +518,7 @@ func readarrUpdateTag(req *http.Request) (int, interface{}) {
 
 	tag, err := getReadarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating tag: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating tag", err)
 	}
 
 	return http.StatusOK, tag.ID
@@ -538,7 +538,7 @@ func readarrUpdateTag(req *http.Request) (int, interface{}) {
 func readarrSetTag(req *http.Request) (int, interface{}) {
 	tag, err := getReadarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("setting tag: %w", err)
+		return apiError(http.StatusServiceUnavailable, "setting tag", err)
 	}
 
 	return http.StatusOK, tag.ID
@@ -563,14 +563,14 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&book)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	moveFiles := mux.Vars(req)["moveFiles"] == strconv.FormatBool(true)
 
 	err = getReadarr(req).UpdateBookContext(req.Context(), book.ID, &book, moveFiles)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating book: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating book", err)
 	}
 
 	return http.StatusOK, "readarr seems to have worked"
@@ -594,12 +594,12 @@ func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&author)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	_, err = getReadarr(req).UpdateAuthorContext(req.Context(), &author, true)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating author: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating author", err)
 	}
 
 	return http.StatusOK, "readarr seems to have worked"
@@ -618,7 +618,7 @@ func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 func readarrGetNotifications(req *http.Request) (int, interface{}) {
 	notifs, err := getReadarr(req).GetNotificationsContext(req.Context())
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("getting notifications: %w", err)
+		return apiError(http.StatusServiceUnavailable, "getting notifications", err)
 	}
 
 	output := []*readarr.NotificationOutput{}
@@ -650,12 +650,12 @@ func readarrUpdateNotification(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	_, err = getReadarr(req).UpdateNotificationContext(req.Context(), &notif)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("updating notification: %w", err)
+		return apiError(http.StatusServiceUnavailable, "updating notification", err)
 	}
 
 	return http.StatusOK, mnd.Success
@@ -679,12 +679,12 @@ func readarrAddNotification(req *http.Request) (int, interface{}) {
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
+		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
 	id, err := getReadarr(req).AddNotificationContext(req.Context(), &notif)
 	if err != nil {
-		return http.StatusServiceUnavailable, fmt.Errorf("adding notification: %w", err)
+		return apiError(http.StatusServiceUnavailable, "adding notification", err)
 	}
 
 	return http.StatusOK, id
