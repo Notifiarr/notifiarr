@@ -1,4 +1,4 @@
-<img src="https://docs.notifiarr.com/img/repo-logo.png">
+<img src="https://gh.notifiarr.com/img/repo-logo.png">
 
 This is the unified client for [Notifiarr.com](https://notifiarr.com).
 The client enables content requests from Media Bot in your Discord Server and also provides reports for Plex usage and system health among many other features.
@@ -550,12 +550,12 @@ integrations are used for things like storage, building, compiling, distribution
 documentation support. This project succeeds because of them. Thank you!
 
 <p style="text-align: center;">
-<a title="PackageCloud" alt="PackageCloud" href="https://packagecloud.io"><img src="https://docs.golift.io/integrations/packagecloud.png"/></a>
-<a title="GitHub" alt="GitHub" href="https://GitHub.com"><img src="https://docs.golift.io/integrations/octocat.png"/></a>
-<a title="Docker Cloud" alt="Docker" href="https://cloud.docker.com"><img src="https://docs.golift.io/integrations/docker.png"/></a>
-<a title="Homebrew" alt="Homebrew" href="https://brew.sh"><img src="https://docs.golift.io/integrations/homebrew.png"/></a>
-<a title="Go Lift" alt="Go Lift" href="https://golift.io"><img src="https://docs.golift.io/integrations/golift.png"/></a>
-<a title="Better Uptime" alt="Go Lift" href="https://betteruptime.com"><img src="https://docs.golift.io/integrations/betteruptime.png"/></a>
+<a title="PackageCloud" alt="PackageCloud" href="https://packagecloud.io"><img src="https://golift.io/integrations/packagecloud.png"/></a>
+<a title="GitHub" alt="GitHub" href="https://GitHub.com"><img src="https://golift.io/integrations/octocat.png"/></a>
+<a title="Docker Cloud" alt="Docker" href="https://cloud.docker.com"><img src="https://golift.io/integrations/docker.png"/></a>
+<a title="Homebrew" alt="Homebrew" href="https://brew.sh"><img src="https://golift.io/integrations/homebrew.png"/></a>
+<a title="Go Lift" alt="Go Lift" href="https://golift.io"><img src="https://golift.io/integrations/golift.png"/></a>
+<a title="Better Uptime" alt="Go Lift" href="https://betteruptime.com"><img src="https://golift.io/integrations/betteruptime.png"/></a>
 </p>
 
 ## Contributing

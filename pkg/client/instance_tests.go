@@ -31,6 +31,12 @@ import (
 	"golift.io/version"
 )
 
+const (
+	success    = "Connection Successful! Version: "
+	connecting = "Connecting: "
+	validation = "Validation: "
+)
+
 //nolint:funlen,cyclop,gocognit,gocyclo
 func (c *Client) testInstance(response http.ResponseWriter, request *http.Request) {
 	config := configfile.Config{}
@@ -142,10 +148,10 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 func testDeluge(ctx context.Context, config *deluge.Config) (string, int) {
 	deluge, err := deluge.New(ctx, config)
 	if err != nil {
-		return "Connecting: " + err.Error(), http.StatusBadGateway
+		return connecting + err.Error(), http.StatusBadGateway
 	}
 
-	return fmt.Sprintf("Connection Successful! Version: %s", deluge.Version), http.StatusOK
+	return fmt.Sprintf("%s%s", success, deluge.Version), http.StatusOK
 }
 
 func testNZBGet(ctx context.Context, config *nzbget.Config) (string, int) {
@@ -154,7 +160,7 @@ func testNZBGet(ctx context.Context, config *nzbget.Config) (string, int) {
 		return "Getting Version: " + err.Error(), http.StatusBadGateway
 	}
 
-	return fmt.Sprintf("Connection Successful! Version: %s", ver), http.StatusOK
+	return fmt.Sprintf("%s%s", success, ver), http.StatusOK
 }
 
 func testCustomCommand(ctx context.Context, cmd *commands.Command) (string, int) {
@@ -170,13 +176,17 @@ func testCustomCommand(ctx context.Context, cmd *commands.Command) (string, int)
 }
 
 func testQbit(ctx context.Context, config *qbit.Config) (string, int) {
-	if qbit, err := qbit.New(ctx, config); err != nil {
-		return "Connecting: " + err.Error(), http.StatusBadGateway
-	} else if xfers, err := qbit.GetXfersContext(ctx); err != nil {
-		return "Getting Transfers: " + err.Error(), http.StatusBadGateway
-	} else {
-		return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
+	qbit, err := qbit.New(ctx, config)
+	if err != nil {
+		return connecting + err.Error(), http.StatusBadGateway
 	}
+
+	xfers, err := qbit.GetXfersContext(ctx)
+	if err != nil {
+		return "Getting Transfers: " + err.Error(), http.StatusBadGateway
+	}
+
+	return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
 }
 
 func testRtorrent(config *apps.RtorrentConfig) (string, int) {
@@ -226,52 +236,52 @@ func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
 		return "Getting Queue: " + err.Error(), http.StatusBadGateway
 	}
 
-	return "Connection Successful! Version: " + sab.Version, http.StatusOK
+	return success + sab.Version, http.StatusOK
 }
 
 func testLidarr(ctx context.Context, config *starr.Config) (string, int) {
 	status, err := lidarr.New(config).GetSystemStatusContext(ctx)
 	if err != nil {
-		return "Connecting: " + err.Error(), http.StatusBadGateway
+		return connecting + err.Error(), http.StatusBadGateway
 	}
 
-	return "Connection Successful! Version: " + status.Version, http.StatusOK
+	return success + status.Version, http.StatusOK
 }
 
 func testProwlarr(ctx context.Context, config *starr.Config) (string, int) {
 	status, err := prowlarr.New(config).GetSystemStatusContext(ctx)
 	if err != nil {
-		return "Connecting: " + err.Error(), http.StatusBadGateway
+		return connecting + err.Error(), http.StatusBadGateway
 	}
 
-	return "Connection Successful! Version: " + status.Version, http.StatusOK
+	return success + status.Version, http.StatusOK
 }
 
 func testRadarr(ctx context.Context, config *starr.Config) (string, int) {
 	status, err := radarr.New(config).GetSystemStatusContext(ctx)
 	if err != nil {
-		return "Connecting: " + err.Error(), http.StatusBadGateway
+		return connecting + err.Error(), http.StatusBadGateway
 	}
 
-	return "Connection Successful! Version: " + status.Version, http.StatusOK
+	return success + status.Version, http.StatusOK
 }
 
 func testReadarr(ctx context.Context, config *starr.Config) (string, int) {
 	status, err := readarr.New(config).GetSystemStatusContext(ctx)
 	if err != nil {
-		return "Connecting: " + err.Error(), http.StatusBadGateway
+		return connecting + err.Error(), http.StatusBadGateway
 	}
 
-	return "Connection Successful! Version: " + status.Version, http.StatusOK
+	return success + status.Version, http.StatusOK
 }
 
 func testSonarr(ctx context.Context, config *starr.Config) (string, int) {
 	status, err := sonarr.New(config).GetSystemStatusContext(ctx)
 	if err != nil {
-		return "Connecting: " + err.Error(), http.StatusBadGateway
+		return connecting + err.Error(), http.StatusBadGateway
 	}
 
-	return "Connection Successful! Version: " + status.Version, http.StatusOK
+	return success + status.Version, http.StatusOK
 }
 
 func testMySQL(ctx context.Context, config *snapshot.MySQLConfig) (string, int) {
@@ -326,7 +336,7 @@ func testNvidia(ctx context.Context, config *snapshot.NvidiaConfig) (string, int
 
 func testTCP(ctx context.Context, svc *services.Service) (string, int) {
 	if err := svc.Validate(); err != nil {
-		return "Validation: " + err.Error(), http.StatusBadRequest
+		return validation + err.Error(), http.StatusBadRequest
 	}
 
 	res := svc.CheckOnly(ctx)
@@ -339,7 +349,7 @@ func testTCP(ctx context.Context, svc *services.Service) (string, int) {
 
 func testHTTP(ctx context.Context, svc *services.Service) (string, int) {
 	if err := svc.Validate(); err != nil {
-		return "Validation: " + err.Error(), http.StatusBadRequest
+		return validation + err.Error(), http.StatusBadRequest
 	}
 
 	res := svc.CheckOnly(ctx)
@@ -353,7 +363,7 @@ func testHTTP(ctx context.Context, svc *services.Service) (string, int) {
 
 func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 	if err := svc.Validate(); err != nil {
-		return "Validation: " + err.Error(), http.StatusBadRequest
+		return validation + err.Error(), http.StatusBadRequest
 	}
 
 	res := svc.CheckOnly(ctx)
@@ -366,7 +376,7 @@ func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 
 func testPing(ctx context.Context, svc *services.Service) (string, int) {
 	if err := svc.Validate(); err != nil {
-		return "Validation: " + err.Error(), http.StatusBadRequest
+		return validation + err.Error(), http.StatusBadRequest
 	}
 
 	res := svc.CheckOnly(ctx)

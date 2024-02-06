@@ -22,8 +22,7 @@ func (c *Client) upgradeWindows(ctx context.Context, update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
 		"Your Version: "+update.Version+"\n"+
 		"New Version: "+update.Current+"\n"+
-		"Date: "+update.RelDate.Format("Jan 2, 2006")+" ("+
-		durafmt.Parse(time.Since(update.RelDate).Round(time.Hour)).String()+" ago)", false)
+		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate), false)
 	if yes {
 		if err := c.updateNow(ctx, update, "user requested"); err != nil {
 			c.Errorf("Update Failed: %v", err)

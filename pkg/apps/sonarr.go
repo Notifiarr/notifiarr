@@ -936,7 +936,7 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	moveFiles := mux.Vars(req)["moveFiles"] == fmt.Sprint(true)
+	moveFiles := mux.Vars(req)["moveFiles"] == strconv.FormatBool(true)
 
 	_, err = getSonarr(req).UpdateSeriesContext(req.Context(), &series, moveFiles)
 	if err != nil {
@@ -1269,5 +1269,5 @@ func sonarrDeleteEpisode(req *http.Request) (int, interface{}) {
 		return http.StatusInternalServerError, fmt.Errorf("deleting episode file: %w", err)
 	}
 
-	return http.StatusOK, "deleted: " + idString
+	return http.StatusOK, mnd.Deleted + idString
 }

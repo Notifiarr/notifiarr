@@ -23,6 +23,8 @@ var (
 )
 
 const (
+	Errors        = " Errors"
+	Matched       = " Matched"
 	maxRetries    = 6                                  // how many times to retry watching a file.
 	retryInterval = 10 * time.Second                   // how often channels are checked for being closed.
 	specialCase   = 2                                  // We have two special channels in our select cases.
@@ -176,7 +178,7 @@ func (w *WatchFile) setup(logger *logger, ignored ignored) error {
 		Logger:        logger,
 	})
 	if err != nil {
-		mnd.FileWatcher.Add(w.Path+" Errors", 1)
+		mnd.FileWatcher.Add(w.Path+Errors, 1)
 		return fmt.Errorf("watching file %s: %w", w.Path, err)
 	}
 
@@ -207,9 +209,9 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 		c.Printf("==> Watching: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
 			item.Path, item.Regexp, item.Skip, item.Poll, item.Pipe, item.MustExist, item.LogMatch)
 
-		if mnd.FileWatcher.Get(item.Path+" Matched") == nil {
+		if mnd.FileWatcher.Get(item.Path+Matched) == nil {
 			// so it shows up on the Metrics page if no lines have been read.
-			mnd.FileWatcher.Add(item.Path+" Matched", 0)
+			mnd.FileWatcher.Add(item.Path+Matched, 0)
 		}
 	}
 
@@ -243,7 +245,7 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 			died = c.fileWatcherTicker(died)
 		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
 			c.Errorf("Got non-addressable file watcher data from %s", item.Path)
-			mnd.FileWatcher.Add(item.Path+" Errors", 1)
+			mnd.FileWatcher.Add(item.Path+Errors, 1)
 		case idx == 0:
 			item, _ = data.Elem().Addr().Interface().(*WatchFile)
 			tails = append(tails, item)
@@ -264,7 +266,7 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 func (c *cmd) killWatcher(item *WatchFile) bool {
 	if err := item.deactivate(); err != nil {
 		c.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
-		mnd.FileWatcher.Add(item.Path+" Errors", 1)
+		mnd.FileWatcher.Add(item.Path+Errors, 1)
 
 		return true
 	}
@@ -295,7 +297,7 @@ func (c *cmd) fileWatcherTicker(died bool) bool {
 
 		if err := c.addFileWatcher(item); err != nil {
 			c.Errorf("Restarting File Watcher (retries: %d): %s: %v", item.retries, item.Path, err)
-			mnd.FileWatcher.Add(item.Path+" Errors", 1)
+			mnd.FileWatcher.Add(item.Path+Errors, 1)
 
 			stilldead = true
 		} else {
@@ -319,7 +321,7 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		return // skip matches
 	}
 
-	mnd.FileWatcher.Add(tail.Path+" Matched", 1)
+	mnd.FileWatcher.Add(tail.Path+Matched, 1)
 
 	match := &Match{
 		File:    tail.Path,

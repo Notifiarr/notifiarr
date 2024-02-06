@@ -687,7 +687,7 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 		return http.StatusBadRequest, fmt.Errorf("decoding payload: %w", err)
 	}
 
-	moveFiles := mux.Vars(req)["moveFiles"] == fmt.Sprint(true)
+	moveFiles := mux.Vars(req)["moveFiles"] == strconv.FormatBool(true)
 
 	// Check for existing movie.
 	_, err = getRadarr(req).UpdateMovieContext(req.Context(), movie.ID, &movie, moveFiles)
@@ -773,7 +773,7 @@ func radarrDelExclusions(req *http.Request) (int, interface{}) {
 		return http.StatusInternalServerError, fmt.Errorf("deleting exclusions: %w", err)
 	}
 
-	return http.StatusOK, "deleted: " + strings.Join(strings.Split(ids, ","), ", ")
+	return http.StatusOK, mnd.Deleted + strings.Join(strings.Split(ids, ","), ", ")
 }
 
 // @Description  Creates a new Custom Format in Radarr.
@@ -1147,7 +1147,7 @@ func radarrDeleteMovie(req *http.Request) (int, interface{}) {
 		return http.StatusInternalServerError, fmt.Errorf("deleting movie: %w", err)
 	}
 
-	return http.StatusOK, "deleted: " + idString
+	return http.StatusOK, mnd.Deleted + idString
 }
 
 // @Description  Delete Movie files from Radarr without deleting the movie.
@@ -1175,5 +1175,5 @@ func radarrDeleteContent(req *http.Request) (int, interface{}) {
 		return http.StatusInternalServerError, fmt.Errorf("deleting movie file: %w", err)
 	}
 
-	return http.StatusOK, "deleted: " + idString
+	return http.StatusOK, mnd.Deleted + idString
 }

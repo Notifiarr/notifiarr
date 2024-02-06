@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -163,7 +164,7 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, a
 			pid += ";"
 		}
 
-		pid += fmt.Sprintf("%v", activePid)
+		pid += strconv.Itoa(int(activePid))
 	}
 
 	return
