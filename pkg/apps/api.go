@@ -62,18 +62,21 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch aID--; {
 		// Make sure the id is within range of the available service.
-		case app == starr.Lidarr && (aID >= len(a.Lidarr) || aID < 0):
-			msg = fmt.Errorf("%v: %w", aID, ErrNoLidarr)
-		case app == starr.Prowlarr && (aID >= len(a.Prowlarr) || aID < 0):
-			msg = fmt.Errorf("%v: %w", aID, ErrNoProwlarr)
-		case app == starr.Radarr && (aID >= len(a.Radarr) || aID < 0):
-			msg = fmt.Errorf("%v: %w", aID, ErrNoRadarr)
-		case app == starr.Readarr && (aID >= len(a.Readarr) || aID < 0):
-			msg = fmt.Errorf("%v: %w", aID, ErrNoReadarr)
-		case app == starr.Sonarr && (aID >= len(a.Sonarr) || aID < 0):
-			msg = fmt.Errorf("%v: %w", aID, ErrNoSonarr)
-			// Store the application configuration (starr) in a context then pass that into the api() method.
-			// Retrieve the return code and output, and send a response via a.Respond().
+		case app == starr.Lidarr && (aID >= len(a.Lidarr) || aID < 0),
+			app == starr.Prowlarr && (aID >= len(a.Prowlarr) || aID < 0),
+			app == starr.Radarr && (aID >= len(a.Radarr) || aID < 0),
+			app == starr.Readarr && (aID >= len(a.Readarr) || aID < 0),
+			app == starr.Sonarr && (aID >= len(a.Sonarr) || aID < 0):
+			msg = fmt.Errorf("%s: %w: %v", app, ErrNoStarrApp, aID)
+		case app == Qbit && (aID >= len(a.Qbit) || aID < 0),
+			app == SabNZB && (aID >= len(a.Qbit) || aID < 0),
+			app == Rtorrent && (aID >= len(a.Qbit) || aID < 0),
+			app == NZBGet && (aID >= len(a.Qbit) || aID < 0),
+			app == Deluge && (aID >= len(a.Qbit) || aID < 0),
+			app == Transmission && (aID >= len(a.Qbit) || aID < 0):
+			msg = fmt.Errorf("%s: %w: %v", app, ErrNoDLClient, aID)
+		// Store the application configuration (starr) in a context then pass that into the api() method.
+		// Retrieve the return code and output, and send a response via a.Respond().
 		case app == starr.Lidarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Lidarr[aID])))
 		case app == starr.Prowlarr:
@@ -84,6 +87,18 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Readarr[aID])))
 		case app == starr.Sonarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[aID])))
+		case app == Qbit:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Qbit[aID])))
+		case app == SabNZB:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.SabNZB[aID])))
+		case app == Rtorrent:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Rtorrent[aID])))
+		case app == NZBGet:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.NZBGet[aID])))
+		case app == Deluge:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Deluge[aID])))
+		case app == Transmission:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Transmission[aID])))
 		case app == "":
 			// no app, just run the handler.
 			code, msg = api(r) // unknown app, just run the handler.

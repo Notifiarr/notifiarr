@@ -60,11 +60,8 @@ var (
 	ErrNoGRID     = fmt.Errorf("GRID ID must not be empty")
 	ErrNoTVDB     = fmt.Errorf("TVDB ID must not be empty")
 	ErrNoMBID     = fmt.Errorf("MBID ID must not be empty")
-	ErrNoRadarr   = fmt.Errorf("configured %s ID not found", starr.Radarr)
-	ErrNoSonarr   = fmt.Errorf("configured %s ID not found", starr.Sonarr)
-	ErrNoLidarr   = fmt.Errorf("configured %s ID not found", starr.Lidarr)
-	ErrNoReadarr  = fmt.Errorf("configured %s ID not found", starr.Readarr)
-	ErrNoProwlarr = fmt.Errorf("configured %s ID not found", starr.Prowlarr)
+	ErrNoDLClient = fmt.Errorf("configured download client ID not found")
+	ErrNoStarrApp = fmt.Errorf("configured starr app ID not found")
 	ErrNotFound   = fmt.Errorf("the request returned an empty payload")
 	ErrNonZeroID  = fmt.Errorf("provided ID must be non-zero")
 	// ErrWrongCount is returned when an app returns the wrong item count.
@@ -150,6 +147,7 @@ func (a *Apps) InitHandlers() {
 	a.radarrHandlers()
 	a.readarrHandlers()
 	a.sonarrHandlers()
+	a.qbitHandlers()
 }
 
 // DelOK returns true if the delete limit isn't reached.
