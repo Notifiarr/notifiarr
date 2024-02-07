@@ -100,7 +100,7 @@ func qbitSetCategory(req *http.Request) (int, interface{}) {
 // @Tags         Qbit
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]string]} "categories"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]string} "categories"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/qbit/{instance}/category/get [get]
