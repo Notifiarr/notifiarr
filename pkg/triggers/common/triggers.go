@@ -81,7 +81,7 @@ type Services interface {
 	RunChecks(et website.EventType)
 }
 
-// Exec runs a trigger. This is abastraction method used in a bunch of places.
+// Exec runs a trigger. This abstraction method is used in a bunch of places.
 func (c *Config) Exec(input *ActionInput, name TriggerName) bool {
 	trig := c.Get(name)
 	if c.stop == nil || trig == nil || trig.C == nil {
