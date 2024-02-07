@@ -77,6 +77,8 @@ func (c *DelugeConfig) Enabled() bool {
 // @Tags         Deluge
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
+// @Param        label  path   string  true  "label to set"
+// @Param        hash  path   string  true  "torrent hash"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"

@@ -20,8 +20,8 @@ type QbitConfig struct {
 
 // qbitHandlers is called once on startup to register the web API paths.
 func (a *Apps) qbitHandlers() {
-	a.HandleAPIpath(Qbit, "/category/set/{category}/{hash}", qbitSetCategory, "GET")
-	a.HandleAPIpath(Qbit, "/category/get", qbitGetCategory, "GET")
+	a.HandleAPIpath(Qbit, "category/set/{category}/{hash}", qbitSetCategory, "GET")
+	a.HandleAPIpath(Qbit, "category/get", qbitGetCategory, "GET")
 }
 
 func getQbit(r *http.Request) *QbitConfig {
@@ -76,6 +76,8 @@ func (c *QbitConfig) Enabled() bool {
 // @Tags         Qbit
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
+// @Param        category  path   string  true  "category to set"
+// @Param        hash  path   string  true  "torrent hash"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
@@ -98,7 +100,7 @@ func qbitSetCategory(req *http.Request) (int, interface{}) {
 // @Tags         Qbit
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=map[string]qbit.Category} "categories"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]string]} "categories"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/qbit/{instance}/category/get [get]
@@ -109,5 +111,10 @@ func qbitGetCategory(req *http.Request) (int, interface{}) {
 		return http.StatusServiceUnavailable, fmt.Errorf("getting categories: %w", err)
 	}
 
-	return http.StatusOK, categories
+	cats := []string{}
+	for cat := range categories {
+		cats = append(cats, cat)
+	}
+
+	return http.StatusOK, cats
 }

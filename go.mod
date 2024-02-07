@@ -4,8 +4,6 @@ go 1.21
 
 // pflag and tail are pinned to master. 12/31/2022
 
-replace golift.io/deluge => ../../../golift.io/deluge
-
 require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/akavel/rsrc v0.10.2
