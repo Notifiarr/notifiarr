@@ -12,16 +12,16 @@ import (
 	"golift.io/starr/debuglog"
 )
 
-// qbitHandlers is called once on startup to register the web API paths.
-func (a *Apps) qbitHandlers() {
-	a.HandleAPIpath(Qbit, "/category/set/{category}/{hash}", qbitSetCategory, "GET")
-	a.HandleAPIpath(Qbit, "/category/get", qbitGetCategory, "GET")
-}
-
 type QbitConfig struct {
 	ExtraConfig
 	*qbit.Config
 	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
+}
+
+// qbitHandlers is called once on startup to register the web API paths.
+func (a *Apps) qbitHandlers() {
+	a.HandleAPIpath(Qbit, "/category/set/{category}/{hash}", qbitSetCategory, "GET")
+	a.HandleAPIpath(Qbit, "/category/get", qbitGetCategory, "GET")
 }
 
 func getQbit(r *http.Request) *QbitConfig {

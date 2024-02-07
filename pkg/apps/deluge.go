@@ -2,9 +2,11 @@ package apps
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/gorilla/mux"
 	"golift.io/deluge"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
@@ -17,7 +19,14 @@ type DelugeConfig struct {
 }
 
 // delugeHandlers is called once on startup to register the web API paths.
-func (a *Apps) delugeHandlers() {}
+func (a *Apps) delugeHandlers() {
+	a.HandleAPIpath(Deluge, "label/set/{label}/{hash}", delugeSetLabel, "GET")
+	a.HandleAPIpath(Deluge, "label/get", delugeGetLabels, "GET")
+}
+
+func getDeluge(r *http.Request) *DelugeConfig {
+	return r.Context().Value(Deluge).(*DelugeConfig) //nolint:forcetypeassert
+}
 
 func (a *Apps) setupDeluge() error {
 	for idx, app := range a.Deluge {
@@ -61,4 +70,45 @@ func (c *DelugeConfig) setup(maxBody int, logger mnd.Logger) error {
 // Enabled returns true if the instance is enabled and usable.
 func (c *DelugeConfig) Enabled() bool {
 	return c != nil && c.Config != nil && c.URL != "" && c.Password != "" && c.Timeout.Duration >= 0
+}
+
+// @Description  Update the label for a torrent.
+// @Summary      Set torrent label
+// @Tags         Deluge
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/deluge/{instance}/label/set/{label}/{hash} [get]
+// @Security     ApiKeyAuth
+func delugeSetLabel(req *http.Request) (int, interface{}) {
+	label := mux.Vars(req)["label"]
+	hash := mux.Vars(req)["hash"]
+
+	err := getDeluge(req).SetLabelContext(req.Context(), hash, label)
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("setting label: %w", err)
+	}
+
+	return http.StatusOK, mnd.Success
+}
+
+// @Description  Return all configured labels.
+// @Summary      Get all labels
+// @Tags         Deluge
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]string} "labels"
+// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/deluge/{instance}/label/get [get]
+// @Security     ApiKeyAuth
+func delugeGetLabels(req *http.Request) (int, interface{}) {
+	labels, err := getDeluge(req).GetLabelsContext(req.Context())
+	if err != nil {
+		return http.StatusServiceUnavailable, fmt.Errorf("getting labels: %w", err)
+	}
+
+	return http.StatusOK, labels
 }
