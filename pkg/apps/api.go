@@ -42,22 +42,22 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
-func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop,funlen
-	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop,funlen,gocyclo
+	return func(resp http.ResponseWriter, req *http.Request) {
 		var (
 			msg     interface{}
-			ctx     = r.Context()
+			ctx     = req.Context()
 			code    = http.StatusUnprocessableEntity
-			aID, _  = strconv.Atoi(mux.Vars(r)["id"])
+			aID, _  = strconv.Atoi(mux.Vars(req)["id"])
 			start   = time.Now()
 			buf     bytes.Buffer
-			tee     = io.TeeReader(r.Body, &buf) // must read tee first.
+			tee     = io.TeeReader(req.Body, &buf) // must read tee first.
 			post, _ = io.ReadAll(tee)
 			appName = app.String()
 		)
 
-		r.Body.Close()              // we just read this into a buffer.
-		r.Body = io.NopCloser(&buf) // someone else gets to read it now.
+		req.Body.Close()              // we just read this into a buffer.
+		req.Body = io.NopCloser(&buf) // someone else gets to read it now.
 
 		// notifiarr.com uses 1-indexes; subtract 1 from the ID (turn 1 into 0 generally).
 		switch aID--; {
@@ -78,42 +78,42 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		// Store the application configuration (starr) in a context then pass that into the api() method.
 		// Retrieve the return code and output, and send a response via a.Respond().
 		case app == starr.Lidarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Lidarr[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Lidarr[aID])))
 		case app == starr.Prowlarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Prowlarr[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Prowlarr[aID])))
 		case app == starr.Radarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Radarr[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Radarr[aID])))
 		case app == starr.Readarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Readarr[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Readarr[aID])))
 		case app == starr.Sonarr:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Sonarr[aID])))
 		case app == Qbit:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Qbit[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Qbit[aID])))
 		case app == SabNZB:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.SabNZB[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.SabNZB[aID])))
 		case app == Rtorrent:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Rtorrent[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Rtorrent[aID])))
 		case app == NZBGet:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.NZBGet[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.NZBGet[aID])))
 		case app == Deluge:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Deluge[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Deluge[aID])))
 		case app == Transmission:
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Transmission[aID])))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, a.Transmission[aID])))
 		case app == "":
 			// no app, just run the handler.
-			code, msg = api(r) // unknown app, just run the handler.
+			code, msg = api(req) // unknown app, just run the handler.
 		default:
 			// unknown app, add the ID to the context and run the handler.
-			code, msg = api(r.WithContext(context.WithValue(ctx, app, aID)))
+			code, msg = api(req.WithContext(context.WithValue(ctx, app, aID)))
 		}
 
-		wrote := a.Respond(w, code, msg)
+		wrote := a.Respond(resp, code, msg)
 
 		if str, _ := json.MarshalIndent(msg, "", " "); len(post) > 0 {
 			a.Debugf("Incoming API: %s %s (%s): %s\nStatus: %d, Reply (%s): %s",
-				r.Method, r.URL, mnd.FormatBytes(len(post)), string(post), code, mnd.FormatBytes(wrote), str)
+				req.Method, req.URL, mnd.FormatBytes(len(post)), string(post), code, mnd.FormatBytes(wrote), str)
 		} else {
-			a.Debugf("Incoming API: %s %s, Status: %d, Reply (%s): %s", r.Method, r.URL, code, mnd.FormatBytes(wrote), str)
+			a.Debugf("Incoming API: %s %s, Status: %d, Reply (%s): %s", req.Method, req.URL, code, mnd.FormatBytes(wrote), str)
 		}
 
 		if appName == "" {
@@ -124,7 +124,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		mnd.APIHits.Add(appName+mnd.BytesReceived, int64(len(post)))
 		mnd.APIHits.Add(appName+mnd.Requests, 1)
 		mnd.APIHits.Add("Total", 1)
-		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
+		req.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 	}
 }
 

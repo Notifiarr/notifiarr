@@ -148,6 +148,11 @@ func (a *Apps) InitHandlers() {
 	a.readarrHandlers()
 	a.sonarrHandlers()
 	a.qbitHandlers()
+	a.delugeHandlers()
+	a.transmissionHandlers()
+	a.sabnzbHandlers()
+	a.nzbgetHandlers()
+	a.rtorrentHandlers()
 }
 
 // DelOK returns true if the delete limit isn't reached.
