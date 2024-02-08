@@ -18,7 +18,7 @@ import (
 )
 
 // sonarrHandlers is called once on startup to register the web API paths.
-func (a *Apps) sonarrHandlers() {
+func (a *Apps) sonarrHandlers() { //nolint:funlen
 	a.HandleAPIpath(starr.Sonarr, "/add", sonarrAddSeries, "POST")
 	a.HandleAPIpath(starr.Sonarr, "/check/{tvdbid:[0-9]+}", sonarrCheckSeries, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/get/{seriesid:[0-9]+}", sonarrGetSeries, "GET")
