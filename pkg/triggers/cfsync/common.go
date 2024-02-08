@@ -59,6 +59,7 @@ func (c *cmd) create() {
 			c.Printf("==> Sonarr TRaSH Sync: interval: %s, %s ",
 				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
 		}
+
 		if len(ci.Actions.Sync.LidarrInstances) > 0 {
 			c.Printf("==> Lidarr profile and format sync interval: %s, %s",
 				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
