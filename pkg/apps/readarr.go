@@ -38,6 +38,7 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrAddNotification, "POST")
+	a.HandleAPIpath(starr.Readarr, "/delete/queue/{queueID}", readarrDeleteQueue, "GET")
 }
 
 // ReadarrConfig represents the input data for a Readarr server.
@@ -327,7 +328,7 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from readarr.
 	id, err := getReadarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "adding profile", err)
@@ -365,7 +366,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, ErrNonZeroID
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from readarr.
 	_, err = getReadarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "updating profile", err)
@@ -688,4 +689,39 @@ func readarrAddNotification(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, id
+}
+
+// @Description  Delete items from the activity queue.
+// @Summary      Delete Queue Items
+// @Tags         Readarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        queueID  path   int64  true  "queue ID to delete"
+// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Failure      423  {object} string "rate limit reached"
+// @Router       /api/readarr/{instance}/delete/queue/{queueID} [get]
+// @Security     ApiKeyAuth
+func readarrDeleteQueue(req *http.Request) (int, interface{}) {
+	idString := mux.Vars(req)["queueID"]
+	queueID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+
+	if !getReadarr(req).DelOK() {
+		return http.StatusLocked, ErrRateLimit
+	}
+
+	opts := &starr.QueueDeleteOpts{
+		RemoveFromClient: starr.False(),
+		BlockList:        true,
+		SkipRedownload:   false,
+		ChangeCategory:   true,
+	}
+
+	err := getReadarr(req).DeleteQueueContext(req.Context(), queueID, opts)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "deleting queue", err)
+	}
+
+	return http.StatusOK, mnd.Deleted + idString
 }

@@ -44,6 +44,7 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrAddNotification, "POST")
+	a.HandleAPIpath(starr.Lidarr, "/delete/queue/{queueID}", lidarrDeleteQueue, "GET")
 }
 
 // LidarrConfig represents the input data for a Lidarr server.
@@ -364,7 +365,7 @@ func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from lidarr.
 	id, err := getLidarr(req).AddQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "adding profile", err)
@@ -402,7 +403,7 @@ func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 		return http.StatusUnprocessableEntity, ErrNonZeroID
 	}
 
-	// Get the profiles from radarr.
+	// Get the profiles from lidarr.
 	_, err = getLidarr(req).UpdateQualityProfileContext(req.Context(), &profile)
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "updating profile", err)
@@ -662,6 +663,41 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 	}
 
 	return http.StatusOK, output
+}
+
+// @Description  Delete items from the activity queue.
+// @Summary      Delete Queue Items
+// @Tags         Lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        queueID  path   int64  true  "queue ID to delete"
+// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Failure      423  {object} string "rate limit reached"
+// @Router       /api/lidarr/{instance}/delete/queue/{queueID} [get]
+// @Security     ApiKeyAuth
+func lidarrDeleteQueue(req *http.Request) (int, interface{}) {
+	idString := mux.Vars(req)["queueID"]
+	queueID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
+
+	if !getLidarr(req).DelOK() {
+		return http.StatusLocked, ErrRateLimit
+	}
+
+	opts := &starr.QueueDeleteOpts{
+		RemoveFromClient: starr.False(),
+		BlockList:        true,
+		SkipRedownload:   false,
+		ChangeCategory:   true,
+	}
+
+	err := getLidarr(req).DeleteQueueContext(req.Context(), queueID, opts)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "deleting queue", err)
+	}
+
+	return http.StatusOK, mnd.Deleted + idString
 }
 
 // @Description  Updates a Notification in Lidarr.
