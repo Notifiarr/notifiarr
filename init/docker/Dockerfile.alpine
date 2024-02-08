@@ -19,11 +19,6 @@ COPY pkg pkg
 RUN go generate ./...
 
 ARG TARGETARCH
-
-RUN curl -sSo /notifiarr.tgz \
-    https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
-    && tar -zxf /notifiarr.tgz -C /
-
 ARG TARGETOS
 ARG BUILD_DATE
 ARG BRANCH
@@ -33,7 +28,7 @@ ARG COMMIT
 
 # Build the app.
 RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/image -tags osusergo,netgo \
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/notifiarr -tags osusergo,netgo \
     -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
     -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
     -X \"golift.io/version.BuildUser=docker\" \
@@ -42,18 +37,11 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
 
 FROM alpine
 
-COPY --from=builder /tmp/image /notifiarr
-RUN ln -s /notifiarr /image
-
-# For megacli.
-COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
-# Other tools.
-RUN apk add ipmitool 
+COPY --from=builder /tmp/notifiarr /
+RUN apk add ipmitool smartmontools
 
 ENV TZ=UTC
-
-# Notifiarr specific.
-ENV PATH=/
+ENV PATH=/bin:/usr/bin:/sbin:/usr/sbin
 ENV USER=root
 
 EXPOSE 5454

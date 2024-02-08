@@ -11,6 +11,9 @@ jobs:
   docker-ghcr-build-push:
     name: Deploy GHCR Containers
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker: [ {name: 'scratch', sfx: ''}, {name: 'cuda', sfx: '-cuda'}, {name: 'alpine', sfx: '-alpine'} ]
     permissions:
       contents: read
       packages: write
@@ -34,48 +37,12 @@ jobs:
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry ghcr.io
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker base metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=semver,pattern=v{{version}}
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,enable=true,event=branch
-      - name: Extract Docker alpine metadata
-        id: alpine
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=semver,pattern=v{{version}}-alpine
-            type=semver,pattern={{version}}-alpine
-            type=semver,pattern={{major}}.{{minor}}-alpine
-            type=semver,pattern={{major}}-alpine
-            type=ref,enable=true,event=branch,suffix=-alpine
-      - name: Extract Docker cuda metadata
-        id: cuda
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=semver,pattern=v{{version}}-cuda
-            type=semver,pattern={{version}}-cuda
-            type=semver,pattern={{major}}.{{minor}}-cuda
-            type=semver,pattern={{major}}-cuda
-            type=ref,enable=true,event=branch,suffix=-cuda
       - name: Set docker build-args
         run: >-
           git fetch --force --tags;
@@ -85,66 +52,32 @@ jobs:
             eval echo "${item}=\$${item}" >> $GITHUB_ENV;
           done
 
-      # Build and push Docker image with Buildx (don't push on PR)
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker ${{ matrix.docker.name }} metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern=v{{version}}${{ matrix.docker.sfx }}
+            type=semver,pattern={{version}}${{ matrix.docker.sfx }}
+            type=semver,pattern={{major}}.{{minor}}${{ matrix.docker.sfx }}
+            type=semver,pattern={{major}}${{ matrix.docker.sfx }}
+            type=ref,enable=true,event=branch,suffix=${{ matrix.docker.sfx }}
+
+      # Build and push Docker image with Buildx
       # https://github.com/docker/build-push-action
-      - name: Build and push base Docker image
-        id: build-and-push-base
+      - name: Build and push ${{ matrix.docker.name }} Docker image
         uses: docker/build-push-action@v5
         with:
           platforms: |-
             linux/amd64
             linux/arm64
           context: .
-          file: init/docker/Dockerfile
+          file: init/docker/Dockerfile.${{ matrix.docker.name }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            BUILD_DATE=${{ env.DATE }}
-            COMMIT=${{ env.COMMIT }}
-            VERSION=${{ env.VERSION }}
-            ITERATION=${{ env.ITERATION }}
-            BRANCH=${{ env.BRANCH }}
-            LICENSE=${{ env.LICENSE }}
-            DESC=${{ env.DESC }}
-            VENDOR=${{ env.VENDOR }}
-            AUTHOR=${{ env.MAINT }}
-            SOURCE_URL=${{ env.SOURCE_URL }}
-      - name: Build and push CUDA Docker image
-        id: build-and-push-cuda
-        uses: docker/build-push-action@v5
-        with:
-          platforms: |-
-            linux/amd64
-          context: .
-          file: init/docker/Dockerfile.cuda
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.cuda.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            BUILD_DATE=${{ env.DATE }}
-            COMMIT=${{ env.COMMIT }}
-            VERSION=${{ env.VERSION }}
-            ITERATION=${{ env.ITERATION }}
-            BRANCH=${{ env.BRANCH }}
-            LICENSE=${{ env.LICENSE }}
-            DESC=${{ env.DESC }}
-            VENDOR=${{ env.VENDOR }}
-            AUTHOR=${{ env.MAINT }}
-            SOURCE_URL=${{ env.SOURCE_URL }}
-      - name: Build and push Alpine Docker image
-        id: build-and-push-alpine
-        uses: docker/build-push-action@v5
-        with:
-          platforms: |-
-            linux/amd64
-            linux/arm64
-          context: .
-          file: init/docker/Dockerfile.alpine
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.alpine.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
