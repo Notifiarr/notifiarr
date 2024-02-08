@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	TrigCFSyncRadarr    common.TriggerName = "Starting Radarr TRaSH Profiles sync."
-	TrigCFSyncRadarrInt common.TriggerName = "Starting Radarr %d TRaSH Profiles sync."
+	TrigCFSyncRadarr    common.TriggerName = "Starting Radarr profile and format sync."
+	TrigCFSyncRadarrInt common.TriggerName = "Starting Radarr %d profile and format sync."
 )
 
 // RadarrTrashPayload is the payload sent and received
@@ -49,17 +49,17 @@ func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) err
 func (c *cmd) syncRadarr(ctx context.Context, input *common.ActionInput) {
 	ci := clientinfo.Get()
 	if ci == nil || len(ci.Actions.Sync.RadarrInstances) < 1 {
-		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. Website provided 0 instances.", input.Type)
+		c.Debugf("[%s requested] Cannot sync Radarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Radarr) < 1 {
-		c.Debugf("[%s requested] Cannot sync Radarr Custom Formats. No Radarr instances configured.", input.Type)
+		c.Debugf("[%s requested] Cannot sync Radarr profiles and formats. No Radarr instances configured.", input.Type)
 		return
 	}
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Sync.RadarrInstances.Has(instance) {
-			c.Debugf("[%s requested] CF Sync Skipping Radarr instance %d. Not in sync list: %v",
+			c.Debugf("[%s requested] Profiles and formats sync skipping Radarr instance %d. Not in sync list: %v",
 				input.Type, instance, ci.Actions.Sync.RadarrInstances)
 			continue
 		}
@@ -78,10 +78,10 @@ func (c *radarrApp) syncRadarr(ctx context.Context, input *common.ActionInput) {
 		Event:      input.Type,
 		Params:     []string{"app=radarr"},
 		Payload:    payload,
-		LogMsg:     fmt.Sprintf("Radarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
+		LogMsg:     fmt.Sprintf("Radarr profiles and formats sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
 		LogPayload: true,
 	})
-	c.cmd.Printf("[%s requested] Synced Custom Formats for Radarr instance %d (%s/%s)",
+	c.cmd.Printf("[%s requested] Synced profiles and formats for Radarr instance %d (%s/%s)",
 		input.Type, c.idx+1, c.app.Name, c.app.URL)
 }
 
@@ -138,7 +138,7 @@ func (c *cmd) aggregateTrashRadarr(
 			if app.Enabled() {
 				output = append(output, &RadarrTrashPayload{Instance: instance, Name: app.Name})
 			} else {
-				c.Errorf("[%s requested] Aggegregate request for disabled Radarr instance %d (%s)", event, instance, app.Name)
+				c.Errorf("[%s requested] Profiles and formats aggregate for disabled Radarr instance %d (%s)", event, instance, app.Name)
 			}
 		}
 	}

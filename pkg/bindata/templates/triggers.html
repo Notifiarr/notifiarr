@@ -26,17 +26,17 @@
                                             <td>Description</td>
                                         </tr>
                                         <tr>
-                                            <td>{{index .Expvar.TimerCounts "Starting Radarr TRaSH Profiles sync."}}</td>
+                                            <td>{{index .Expvar.TimerCounts "Starting Radarr profile and format sync."}}</td>
                                             <td>{{.ClientInfo.Actions.Sync.Interval}}</td>
                                             <td>
-                                                <a href="#triggers" onClick="triggerAction('cfsync')">Radarr TRaSH Sync</a></td><td>Syncs customized TRaSH profiles to Radarr.
+                                                <a href="#triggers" onClick="triggerAction('cfsync')">Radarr TRaSH Sync</a></td><td>Sync custom profiles and formats to Radarr.
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>{{index .Expvar.TimerCounts "Starting Sonarr TRaSH Profiles sync."}}</td>
+                                            <td>{{index .Expvar.TimerCounts "Starting Sonarr profile and format sync."}}</td>
                                             <td>{{.ClientInfo.Actions.Sync.Interval}}</td>
                                             <td>
-                                                <a href="#triggers" onClick="triggerAction('rpsync')">Sonarr TRaSH Sync</a></td><td>Syncs customized TRaSH profiles to Sonarr.
+                                                <a href="#triggers" onClick="triggerAction('rpsync')">Sonarr TRaSH Sync</a></td><td>Sync custom profiles and formats to Sonarr.
                                             </td>
                                         </tr>
                                         <tr>

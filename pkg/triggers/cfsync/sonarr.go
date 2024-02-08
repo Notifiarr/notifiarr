@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	TrigRPSyncSonarr    common.TriggerName = "Starting Sonarr TRaSH Profiles sync."
-	TrigRPSyncSonarrInt common.TriggerName = "Starting Sonarr %d TRaSH Profiles sync."
+	TrigRPSyncSonarr    common.TriggerName = "Starting Sonarr profile and format sync."
+	TrigRPSyncSonarrInt common.TriggerName = "Starting Sonarr %d profile and format sync."
 )
 
 // SonarrTrashPayload is the payload sent and received
@@ -50,17 +50,17 @@ func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) err
 func (c *cmd) syncSonarr(ctx context.Context, input *common.ActionInput) {
 	ci := clientinfo.Get()
 	if ci == nil || len(ci.Actions.Sync.SonarrInstances) < 1 {
-		c.Debugf("[%s requested] Cannot sync Sonarr Release Profiles. Website provided 0 instances.", input.Type)
+		c.Debugf("[%s requested] Cannot sync Sonarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Sonarr) < 1 {
-		c.Debugf("[%s requested] Cannot sync Sonarr Release Profiles. No Sonarr instances configured.", input.Type)
+		c.Debugf("[%s requested] Cannot sync Sonarr profiles and formats. No Sonarr instances configured.", input.Type)
 		return
 	}
 
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Sync.SonarrInstances.Has(instance) {
-			c.Debugf("[%s requested] CF Sync Skipping Sonarr instance %d. Not in sync list: %v",
+			c.Debugf("[%s requested] Profiles and formats sync skipping Sonarr instance %d. Not in sync list: %v",
 				input.Type, instance, ci.Actions.Sync.SonarrInstances)
 			continue
 		}
@@ -78,10 +78,10 @@ func (c *sonarrApp) syncSonarr(ctx context.Context, input *common.ActionInput) {
 		Event:      input.Type,
 		Params:     []string{"app=sonarr"},
 		Payload:    payload,
-		LogMsg:     fmt.Sprintf("Sonarr TRaSH Sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
+		LogMsg:     fmt.Sprintf("Sonarr profiles and formats sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
 		LogPayload: true,
 	})
-	c.cmd.Printf("[%s requested] Synced Release Profiles for Sonarr instance %d (%s/%s)",
+	c.cmd.Printf("[%s requested] Synced profiles and formats for Sonarr instance %d (%s/%s)",
 		input.Type, c.idx+1, c.app.Name, c.app.URL)
 }
 
@@ -149,7 +149,7 @@ func (c *cmd) aggregateTrashSonarr(
 			if app.Enabled() {
 				output = append(output, &SonarrTrashPayload{Instance: instance, Name: app.Name})
 			} else {
-				c.Errorf("[%s requested] Aggegregate request for disabled Sonarr instance %d (%s)", event, instance, app.Name)
+				c.Errorf("[%s requested] Profiles and formats aggregate for disabled Sonarr instance %d (%s)", event, instance, app.Name)
 			}
 		}
 	}
