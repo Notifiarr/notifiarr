@@ -138,7 +138,8 @@ func (c *cmd) aggregateTrashRadarr(
 			if app.Enabled() {
 				output = append(output, &RadarrTrashPayload{Instance: instance, Name: app.Name})
 			} else {
-				c.Errorf("[%s requested] Profiles and formats aggregate for disabled Radarr instance %d (%s)", event, instance, app.Name)
+				c.Errorf("[%s requested] Profiles and formats aggregate for disabled Radarr instance %d (%s)",
+					event, instance, app.Name)
 			}
 		}
 	}

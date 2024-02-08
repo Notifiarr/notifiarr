@@ -149,7 +149,8 @@ func (c *cmd) aggregateTrashSonarr(
 			if app.Enabled() {
 				output = append(output, &SonarrTrashPayload{Instance: instance, Name: app.Name})
 			} else {
-				c.Errorf("[%s requested] Profiles and formats aggregate for disabled Sonarr instance %d (%s)", event, instance, app.Name)
+				c.Errorf("[%s requested] Profiles and formats aggregate for disabled Sonarr instance %d (%s)",
+					event, instance, app.Name)
 			}
 		}
 	}
