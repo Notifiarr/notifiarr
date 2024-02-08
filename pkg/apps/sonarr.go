@@ -1267,7 +1267,7 @@ func sonarrDeleteQueue(req *http.Request) (int, interface{}) {
 
 	opts := &starr.QueueDeleteOpts{
 		RemoveFromClient: starr.False(),
-		BlockList:        true,
+		BlockList:        false,
 		SkipRedownload:   false,
 		ChangeCategory:   true,
 	}
