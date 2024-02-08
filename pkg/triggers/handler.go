@@ -242,7 +242,7 @@ func (a *Actions) command(input *common.ActionInput, content string) (int, strin
 	return http.StatusOK, "Command triggered: " + cmd.Name
 }
 
-// @Description  Sync TRaSH Radarr data.
+// @Description  Sync custom profiles and formats to Radarr.
 // @Summary      Sync TRaSH Radarr data
 // @Tags         Triggers,TRaSH
 // @Produce      json
@@ -254,18 +254,18 @@ func (a *Actions) command(input *common.ActionInput, content string) (int, strin
 func (a *Actions) cfsync(input *common.ActionInput, content string) (int, string) {
 	if content == "" {
 		a.CFSync.SyncRadarrCF(input.Type)
-		return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated."
+		return http.StatusOK, "Radarr profile and format sync initiated."
 	}
 
 	instance, _ := strconv.Atoi(content)
 	if err := a.CFSync.SyncRadarrInstanceCF(input.Type, instance); err != nil {
-		return http.StatusBadRequest, "TRaSH Custom Formats Radarr Sync failed for instance " + content + ": " + err.Error()
+		return http.StatusBadRequest, "Radarr profile and format sync initiated for instance " + content + ": " + err.Error()
 	}
 
-	return http.StatusOK, "TRaSH Custom Formats Radarr Sync initiated for instance " + content
+	return http.StatusOK, "Radarr profile and format sync initiated for instance " + content
 }
 
-// @Description  Sync TRaSH Sonarr data.
+// @Description  Sync custom profiles and formats to Sonarr.
 // @Summary      Sync TRaSH Sonarr data
 // @Tags         Triggers,TRaSH
 // @Produce      json
@@ -277,15 +277,15 @@ func (a *Actions) cfsync(input *common.ActionInput, content string) (int, string
 func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string) {
 	if content == "" {
 		a.CFSync.SyncSonarrRP(input.Type)
-		return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated."
+		return http.StatusOK, "Sonarr profile and format sync initiated."
 	}
 
 	instance, _ := strconv.Atoi(content)
 	if err := a.CFSync.SyncSonarrInstanceRP(input.Type, instance); err != nil {
-		return http.StatusBadRequest, "TRaSH Release Profile Sonarr Sync failed for instance " + content + ": " + err.Error()
+		return http.StatusBadRequest, "Sonarr profile and format sync initiated for instance " + content + ": " + err.Error()
 	}
 
-	return http.StatusOK, "TRaSH Release Profile Sonarr Sync initiated for instance " + content
+	return http.StatusOK, "Sonarr profile and format sync initiated for instance " + content
 }
 
 // @Description  Reschedule all service checks to run immediately.
