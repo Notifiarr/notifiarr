@@ -38,6 +38,7 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
 FROM alpine
 
 COPY --from=builder /tmp/notifiarr /
+# Other tools.
 RUN apk add ipmitool smartmontools
 
 ENV TZ=UTC

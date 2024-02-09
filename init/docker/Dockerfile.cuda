@@ -43,13 +43,16 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
 
 FROM nvidia/cuda:12.3.1-base-ubuntu22.04
 
+COPY --from=builder /tmp/notifiarr /
+# Other tools.
 RUN apt update \
     && apt install -y smartmontools ipmitool \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
-
-COPY --from=builder /tmp/notifiarr /MegaCli* /libstorelibir-2.so.14.07-0 /
-COPY --link /usr/lib/x86_64-linux-gnu/libncurses.so.6 /usr/lib/x86_64-linux-gnu/libncurses.so.5
+# For megacli.
+COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /
+RUN mkdir -p /usr/lib/x86_64-linux-gnu && \
+    ln -s /usr/lib/x86_64-linux-gnu/libncurses.so.6 /usr/lib/x86_64-linux-gnu/libncurses.so.5
 
 ENV TZ=UTC
 ENV PATH=/bin:/usr/bin:/sbin:/usr/sbin
