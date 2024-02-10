@@ -30,14 +30,15 @@ type MySQLProcesses []*MySQLProcess
 
 // MySQLProcess represents the data returned from SHOW PROCESS LIST.
 type MySQLProcess struct {
-	ID    int64      `json:"id"`
-	User  string     `json:"user"`
-	Host  string     `json:"host"`
-	DB    NullString `json:"db"`
-	Cmd   string     `json:"command"`
-	Time  int64      `json:"time"`
-	State string     `json:"state"`
-	Info  NullString `json:"info"`
+	ID       int64      `json:"id"`
+	User     string     `json:"user"`
+	Host     string     `json:"host"`
+	DB       NullString `json:"db"`
+	Cmd      string     `json:"command"`
+	Time     int64      `json:"time"`
+	State    string     `json:"state"`
+	Info     NullString `json:"info"`
+	Progress float64    `json:"progress"` // mariadb
 }
 
 type NullString struct {
@@ -137,8 +138,14 @@ func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, e
 
 	for rows.Next() {
 		var pid MySQLProcess
-		// for each row, scan the result into our tag composite object
-		err := rows.Scan(&pid.ID, &pid.User, &pid.Host, &pid.DB, &pid.Cmd, &pid.Time, &pid.State, &pid.Info)
+		// for each row, scan the result into our tag composite object.
+		if cols, _ := rows.Columns(); len(cols) == 8 {
+			// mysql only has 8 columns
+			err = rows.Scan(&pid.ID, &pid.User, &pid.Host, &pid.DB, &pid.Cmd, &pid.Time, &pid.State, &pid.Info)
+		} else {
+			// mariadb returns 9 columns (adds progress).
+			err = rows.Scan(&pid.ID, &pid.User, &pid.Host, &pid.DB, &pid.Cmd, &pid.Time, &pid.State, &pid.Info, &pid.Progress)
+		}
 		if err != nil {
 			mnd.Apps.Add("MySQL&&Errors", 1)
 			return nil, fmt.Errorf("scanning process rows: %w", err)
