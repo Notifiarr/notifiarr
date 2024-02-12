@@ -46,6 +46,7 @@ func (c *cmd) create() {
 	ci := clientinfo.Get()
 	c.setupRadarr(ci)
 	c.setupSonarr(ci)
+	c.setupLidarr(ci)
 
 	// Check each instance and enable only if needed.
 	if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
@@ -58,9 +59,14 @@ func (c *cmd) create() {
 			c.Printf("==> Sonarr TRaSH Sync: interval: %s, %s ",
 				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
 		}
+
+		if len(ci.Actions.Sync.LidarrInstances) > 0 {
+			c.Printf("==> Lidarr profile and format sync interval: %s, %s",
+				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
+		}
 	}
 
-	// These aggregate  triggers have no timers. Used to sync "all the things" at once.
+	// These aggregate triggers have no timers. Used to sync "all the things" at once.
 	c.Add(&common.Action{
 		Name: TrigCFSyncRadarr,
 		Fn:   c.syncRadarr,
@@ -69,7 +75,45 @@ func (c *cmd) create() {
 		Name: TrigRPSyncSonarr,
 		Fn:   c.syncSonarr,
 		C:    make(chan *common.ActionInput, 1),
+	}, &common.Action{
+		Name: TrigCFSyncLidarr,
+		Fn:   c.syncLidarr,
+		C:    make(chan *common.ActionInput, 1),
 	})
+}
+
+type lidarrApp struct {
+	app *apps.LidarrConfig
+	cmd *cmd
+	idx int
+}
+
+func (c *cmd) setupLidarr(ci *clientinfo.ClientInfo) {
+	if ci == nil {
+		return
+	}
+
+	for idx, app := range c.Apps.Lidarr {
+		instance := idx + 1
+		if !app.Enabled() || !ci.Actions.Sync.LidarrInstances.Has(instance) {
+			continue
+		}
+
+		var dur cnfg.Duration
+
+		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
+			randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
+			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
+		}
+
+		c.Add(&common.Action{
+			Hide: true,
+			D:    dur,
+			Name: TrigCFSyncLidarrInt.WithInstance(instance),
+			Fn:   (&lidarrApp{app: app, cmd: c, idx: idx}).syncLidarr,
+			C:    make(chan *common.ActionInput, 1),
+		})
+	}
 }
 
 type radarrApp struct {
