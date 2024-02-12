@@ -19,8 +19,9 @@ export DATE VERSION ITERATION COMMIT BRANCH
 ### Optional ###
 
 # Import this signing key only if it's in the keyring.
-gpg --list-keys 2>/dev/null | grep -q B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
-[ "$?" != "0" ] || export SIGNING_KEY=B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
+if gpg --list-keys 2>/dev/null | grep -q B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C; then
+    export SIGNING_KEY=B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
+fi
 
 # Make sure Docker builds work locally.
 # These do not affect automated builds, just allow the docker build scripts to run from a local clone.
@@ -28,4 +29,4 @@ gpg --list-keys 2>/dev/null | grep -q B93DD66EF98E54E2EAE025BA0166AD34ABC5A57C
 [ -n "$DOCKER_TAG" ] || export DOCKER_TAG=$(echo $SOURCE_BRANCH | sed 's/^v*\([0-9].*\)/\1/')
 [ -n "$DOCKER_REPO" ] || export DOCKER_REPO="golift/notifiarr"
 [ -n "$IMAGE_NAME" ] || export IMAGE_NAME="${DOCKER_REPO}:${DOCKER_TAG}"
-[ -n "$DOCKERFILE_PATH" ] || export DOCKERFILE_PATH="init/docker/Dockerfile"
+[ -n "$DOCKERFILE_PATH" ] || export DOCKERFILE_PATH="init/docker/Dockerfile.scratch"
