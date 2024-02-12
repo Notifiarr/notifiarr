@@ -146,6 +146,7 @@ func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, e
 			// mariadb returns 9 columns (adds progress).
 			err = rows.Scan(&pid.ID, &pid.User, &pid.Host, &pid.DB, &pid.Cmd, &pid.Time, &pid.State, &pid.Info, &pid.Progress)
 		}
+
 		if err != nil {
 			mnd.Apps.Add("MySQL&&Errors", 1)
 			return nil, fmt.Errorf("scanning process rows: %w", err)
