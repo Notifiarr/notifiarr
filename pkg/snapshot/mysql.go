@@ -136,10 +136,12 @@ func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, e
 
 	var list MySQLProcesses
 
+	const mysqlColCount = 8
+
 	for rows.Next() {
 		var pid MySQLProcess
 		// for each row, scan the result into our tag composite object.
-		if cols, _ := rows.Columns(); len(cols) == 8 {
+		if cols, _ := rows.Columns(); len(cols) == mysqlColCount {
 			// mysql only has 8 columns
 			err = rows.Scan(&pid.ID, &pid.User, &pid.Host, &pid.DB, &pid.Cmd, &pid.Time, &pid.State, &pid.Info)
 		} else {
