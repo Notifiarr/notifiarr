@@ -39,7 +39,8 @@ FROM alpine
 
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
-RUN apk add ipmitool smartmontools
+RUN apk add ipmitool smartmontools zfs sysstat && \
+    rm -f /bin/iostat
 
 ENV TZ=UTC
 ENV PATH=/bin:/usr/bin:/sbin:/usr/sbin
