@@ -46,7 +46,7 @@ FROM nvidia/cuda:12.3.1-base-ubuntu22.04
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
 RUN apt update \
-    && apt install -y smartmontools ipmitool \
+    && apt install -y smartmontools ipmitool zfsutils-linux sysstat \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 # For megacli.
