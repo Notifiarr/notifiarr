@@ -28,7 +28,16 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/check/{mbid:[-a-z0-9]+}", lidarrCheckAlbum, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/get/{albumid:[0-9]+}", lidarrGetAlbum, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/metadataProfiles", lidarrMetadata, "GET")
-	a.HandleAPIpath(starr.Lidarr, "/qualityDefinitions", lidarrQualityDefs, "GET")
+	a.HandleAPIpath(starr.Lidarr, "/naming", lidarrGetNaming, "GET")
+	a.HandleAPIpath(starr.Lidarr, "/naming", lidarrUpdateNaming, "PUT")
+	a.HandleAPIpath(starr.Lidarr, "/customformats", lidarrGetCustomFormats, "GET")
+	a.HandleAPIpath(starr.Lidarr, "/customformats", lidarrAddCustomFormat, "POST")
+	a.HandleAPIpath(starr.Lidarr, "/customformats", lidarrUpdateCustomFormat, "PUT")
+	a.HandleAPIpath(starr.Lidarr, "/customformats/{cfid:[0-9]+}", lidarrUpdateCustomFormat, "PUT")
+	a.HandleAPIpath(starr.Lidarr, "/customformats/{cfid:[0-9]+}", lidarrDeleteCustomFormat, "DELETE")
+	a.HandleAPIpath(starr.Lidarr, "/customformats/all", lidarrDeleteAllCustomFormats, "DELETE")
+	a.HandleAPIpath(starr.Lidarr, "/qualitydefinition", lidarrUpdateQualityDefinition, "PUT")
+	a.HandleAPIpath(starr.Lidarr, "/qualityDefinitions", lidarrGetQualityDefinitions, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/qualityProfiles", lidarrQualityProfiles, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/qualityProfile", lidarrGetQualityProfile, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/qualityProfile", lidarrAddQualityProfile, "POST")
@@ -179,7 +188,7 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        mbid  path   int64  true  "movie brains ID"
+// @Param        mbid  path   int64  true  "music brains ID"
 // @Success      200  {object} apps.Respond.apiResponse{message=string} "not found"
 // @Failure      409  {object} apps.Respond.apiResponse{message=string} "already exists"
 // @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
@@ -271,6 +280,217 @@ func lidarrMetadata(req *http.Request) (int, interface{}) {
 	return http.StatusOK, p
 }
 
+// @Description  Returns Lidarr track naming conventions.
+// @Summary      Retrieve Lidarr Track Naming
+// @Tags         Lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.Naming} "naming conventions"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/naming [get]
+// @Security     ApiKeyAuth
+func lidarrGetNaming(req *http.Request) (int, interface{}) {
+	naming, err := getLidarr(req).GetNamingContext(req.Context())
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "getting naming", err)
+	}
+
+	return http.StatusOK, naming
+}
+
+// @Description  Updates the Lidarr track naming conventions.
+// @Summary      Update Lidarr Track Naming
+// @Tags         Lidarr
+// @Produce      json
+// @Accept       json
+// @Param        PUT body lidarr.Naming  true  "naming conventions"
+// @Success      200  {object} apps.Respond.apiResponse{message=int64} "naming ID"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/naming [put]
+// @Security     ApiKeyAuth
+func lidarrUpdateNaming(req *http.Request) (int, interface{}) {
+	var naming lidarr.Naming
+
+	err := json.NewDecoder(req.Body).Decode(&naming)
+	if err != nil {
+		return apiError(http.StatusBadRequest, "decoding payload", err)
+	}
+
+	output, err := getLidarr(req).UpdateNamingContext(req.Context(), &naming)
+	if err != nil {
+		return apiError(http.StatusServiceUnavailable, "updating naming", err)
+	}
+
+	return http.StatusOK, output.ID
+}
+
+// @Description  Creates a new Custom Format in Lidarr.
+// @Summary      Create Lidarr Custom Format
+// @Tags         Lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body lidarr.CustomFormatInput  true  "New Custom Format content"
+// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.CustomFormatOutput}  "custom format"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/customformats [post]
+// @Security     ApiKeyAuth
+func lidarrAddCustomFormat(req *http.Request) (int, interface{}) {
+	var cusform lidarr.CustomFormatInput
+
+	err := json.NewDecoder(req.Body).Decode(&cusform)
+	if err != nil {
+		return apiError(http.StatusBadRequest, "decoding payload", err)
+	}
+
+	resp, err := getLidarr(req).AddCustomFormatContext(req.Context(), &cusform)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "adding custom format", err)
+	}
+
+	return http.StatusOK, resp
+}
+
+// @Description  Returns all Custom Formats Data from Lidarr.
+// @Summary      Get Lidarr Custom Formats Data
+// @Tags         Lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.CustomFormatOutput}  "custom formats"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/customformats [get]
+// @Security     ApiKeyAuth
+func lidarrGetCustomFormats(req *http.Request) (int, interface{}) {
+	cusform, err := getLidarr(req).GetCustomFormatsContext(req.Context())
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "getting custom formats", err)
+	}
+
+	return http.StatusOK, cusform
+}
+
+// @Description  Updates a Custom Format in Lidarr.
+// @Summary      Update Lidarr Custom Format
+// @Tags         Lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        PUT body lidarr.CustomFormatInput  true  "Updated Custom Format content"
+// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.CustomFormatOutput}  "custom format"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/customformats/{formatID} [put]
+// @Security     ApiKeyAuth
+func lidarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
+	var cusform lidarr.CustomFormatInput
+	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
+		return apiError(http.StatusBadRequest, "decoding payload", err)
+	}
+
+	output, err := getLidarr(req).UpdateCustomFormatContext(req.Context(), &cusform)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "updating custom format", err)
+	}
+
+	return http.StatusOK, output
+}
+
+// @Description  Delete a Custom Format from Lidarr.
+// @Summary      Delete Lidarr Custom Format
+// @Tags         Lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        formatID  path   int64  true  "Custom Format ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/customformats/{formatID} [delete]
+// @Security     ApiKeyAuth
+func lidarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
+	cfID, _ := strconv.ParseInt(mux.Vars(req)["cfid"], mnd.Base10, mnd.Bits64)
+
+	err := getLidarr(req).DeleteCustomFormatContext(req.Context(), cfID)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "deleting custom format", err)
+	}
+
+	return http.StatusOK, "OK"
+}
+
+// @Description  Delete all Custom Formats from Lidarr.
+// @Summary      Delete all Lidarr Custom Formats
+// @Tags         Lidarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=apps.deleteResponse}  "item delete counters"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/customformats/all [delete]
+// @Security     ApiKeyAuth
+func lidarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
+	formats, err := getLidarr(req).GetCustomFormatsContext(req.Context())
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "getting custom formats", err)
+	}
+
+	var (
+		deleted int
+		errs    []string
+	)
+
+	for _, format := range formats {
+		err := getLidarr(req).DeleteCustomFormatContext(req.Context(), format.ID)
+		if err != nil {
+			errs = append(errs, err.Error())
+			continue
+		}
+
+		deleted++
+	}
+
+	return http.StatusOK, &deleteResponse{
+		Found:   len(formats),
+		Deleted: deleted,
+		Errors:  errs,
+	}
+}
+
+// @Description  Updates all Quality Definitions in Lidarr.
+// @Summary      Update Lidarr Quality Definitions
+// @Tags         Lidarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        PUT body []lidarr.QualityDefinition  true  "Updated quality definitions"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.QualityDefinition}  "quality definitions return"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/lidarr/{instance}/qualitydefinition [put]
+// @Security     ApiKeyAuth
+//
+//nolint:lll
+func lidarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
+	var input []*lidarr.QualityDefinition
+	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
+		return apiError(http.StatusBadRequest, "decoding payload", err)
+	}
+
+	output, err := getLidarr(req).UpdateQualityDefinitionsContext(req.Context(), input)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "updating quality definition", err)
+	}
+
+	return http.StatusOK, output
+}
+
 // @Description  Fetches all Quality Definitions from Lidarr.
 // @Summary      Get Lidarr Quality Definitions
 // @Tags         Lidarr
@@ -281,9 +501,9 @@ func lidarrMetadata(req *http.Request) (int, interface{}) {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualityDefinitions [get]
 // @Security     ApiKeyAuth
-func lidarrQualityDefs(req *http.Request) (int, interface{}) {
+func lidarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 	// Get the profiles from lidarr.
-	definitions, err := getLidarr(req).GetQualityDefinitionContext(req.Context())
+	definitions, err := getLidarr(req).GetQualityDefinitionsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting profiles", err)
 	}

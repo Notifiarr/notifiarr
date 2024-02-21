@@ -1013,7 +1013,7 @@ func radarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
-// @Param        PUT body []radarr.QualityDefinition  true  "Updated Import Listcontent"
+// @Param        PUT body []radarr.QualityDefinition  true  "Updated quality definitions"
 // @Success      200  {object} apps.Respond.apiResponse{message=[]radarr.QualityDefinition}  "quality definitions return"
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
