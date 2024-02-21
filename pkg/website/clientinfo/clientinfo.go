@@ -56,8 +56,10 @@ type CronConfig struct {
 // SyncConfig is the configuration returned from the notifiarr website for CF/RP TraSH sync.
 type SyncConfig struct {
 	Interval        cnfg.Duration `json:"interval"`        // how often to fire.
+	LidarrInstances IntList       `json:"lidarrInstances"` // which instance IDs we sync
 	RadarrInstances IntList       `json:"radarrInstances"` // which instance IDs we sync
 	SonarrInstances IntList       `json:"sonarrInstances"` // which instance IDs we sync
+	LidarrSync      []string      `json:"lidarrSync"`      // items in sync.
 	SonarrSync      []string      `json:"sonarrSync"`      // items in sync.
 	RadarrSync      []string      `json:"radarrSync"`      // items in sync.
 }

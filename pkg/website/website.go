@@ -112,39 +112,21 @@ func (s *Server) debugLogResponseBody(
 }
 
 func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*Response, error) {
-	defer file.Close()
-	// Create a new multipart writer with the buffer
-	var buf bytes.Buffer
-	w := multipart.NewWriter(&buf)
-
-	// Create a new form field
-	fw, err := w.CreateFormFile("file", file.FileName+".gz")
+	form, contentType, err := s.createFileUpload(file)
 	if err != nil {
-		return nil, fmt.Errorf("creating form buffer: %w", err)
+		return nil, err
 	}
 
-	compress := gzip.NewWriter(fw)
-	compress.Header.Name = file.FileName
-
-	// Copy the contents of the file to the form field with compression.
-	if _, err := io.Copy(compress, file); err != nil {
-		return nil, fmt.Errorf("filling form buffer: %w", err)
-	}
-
-	// Close the compressor and multipart writer to finalize the request.
-	compress.Close()
-	w.Close()
-
-	sent := buf.Len()
+	sent := form.Len()
 	url := s.Config.BaseURL + uri
 
 	// Send the request
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, &buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, form)
 	if err != nil {
 		return nil, fmt.Errorf("creating http request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("X-API-Key", s.Config.Apps.APIKey)
 
 	start := time.Now()
@@ -169,6 +151,44 @@ func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 	}
 
 	return response, err
+}
+
+func (s *Server) createFileUpload(file *UploadFile) (*bytes.Buffer, string, error) {
+	// Create a new multipart writer with the buffer
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+
+	if hi := s.hostInfoNoError(); hi != nil {
+		// Since we can't send the normal hostInfo json payload,
+		// we have to shove some things into the form fields.
+		if err := w.WriteField("hostname", hi.Hostname); err != nil {
+			return nil, "", fmt.Errorf("adding variable to form buffer: %w", err)
+		}
+
+		_ = w.WriteField("hostId", hi.HostID)
+		_ = w.WriteField("os", hi.OS)
+	}
+
+	// Create a new form field
+	fw, err := w.CreateFormFile("file", file.FileName+".gz")
+	if err != nil {
+		return nil, "", fmt.Errorf("creating form buffer: %w", err)
+	}
+
+	compress := gzip.NewWriter(fw)
+	compress.Header.Name = file.FileName
+
+	// Copy the contents of the file to the form field with compression.
+	if _, err := io.Copy(compress, file); err != nil {
+		return nil, "", fmt.Errorf("filling form buffer: %w", err)
+	}
+
+	// Close the compressor and multipart writer to finalize the request.
+	compress.Close()
+	w.Close()
+	file.Close() // Close the file too.
+
+	return &buf, w.FormDataContentType(), nil
 }
 
 // Do performs an http Request with retries and logging!

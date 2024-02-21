@@ -58,12 +58,12 @@ type TautulliConfig struct {
 }
 
 func (c *TautulliConfig) Setup(maxBody int, logger mnd.Logger) {
-	if !c.Enabled() {
-		return
-	}
-
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = time.Minute
+	}
+
+	if !c.Enabled() {
+		return
 	}
 
 	if logger != nil && logger.DebugEnabled() {

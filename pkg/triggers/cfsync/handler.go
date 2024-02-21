@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-/* The site relies on release and quality profiles data from Radarr and Sonarr.
+/*
  * If someone has several instances, it causes slow page loads times.
  * So we made this file to aggregate responses from each of the app types.
  */
@@ -26,6 +26,21 @@ import (
 // @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad input payload or missing app"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trash/radarr [post]
+// @Security     ApiKeyAuth
+//
+//nolint:lll
+func _() {}
+
+// @Description  Returns custom format and related data for multiple Lidarr instances at once. May be slow.
+// @Summary      Retrieve custom format data from multiple Lidarr instances.
+// @Tags         TRaSH,Lidarr
+// @Produce      json
+// @Accept       json
+// @Param        request body TrashAggInput true "list of instances"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]LidarrTrashPayload} "contains app info included appStatus"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad input payload or missing app"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trash/lidarr [post]
 // @Security     ApiKeyAuth
 //
 //nolint:lll
@@ -69,10 +84,10 @@ func (c *cmd) aggregateTrash(req *http.Request) (int, interface{}) {
 	case err != nil:
 		return http.StatusBadRequest, fmt.Errorf("decoding POST payload: (app: %s) %w", app, err)
 	case app == "sonarr":
-		//	return http.StatusOK, &TrashAggOutput{Sonarr: c.aggregateTrashSonarr(req.Context(), &wait, input.Instances)}
 		return http.StatusOK, c.aggregateTrashSonarr(req.Context(), &wait, input.Instances)
 	case app == "radarr":
-		// return http.StatusOK, &TrashAggOutput{Radarr: c.aggregateTrashRadarr(req.Context(), &wait, input.Instances)}
 		return http.StatusOK, c.aggregateTrashRadarr(req.Context(), &wait, input.Instances)
+	case app == "lidarr":
+		return http.StatusOK, c.aggregateTrashLidarr(req.Context(), &wait, input.Instances)
 	}
 }
