@@ -64,27 +64,25 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 
 		queue, _ := item.Data.(*lidarr.Queue)
 		instance := idx + 1
-		stuckapp := stuck[instance]
+		appqueue := []*lidarrRecord{}
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*lidarr.QueueRecord)
+		repeatStomper := make(map[string]struct{})
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
 				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
 				continue
-			} else if repeatStomper[item.DownloadID] != nil {
+			} else if _, exists := repeatStomper[item.DownloadID]; exists {
 				continue
 			}
 
-			repeatStomper[item.DownloadID] = item
-			stuckapp.Queue = append(stuckapp.Queue, item)
+			repeatStomper[item.DownloadID] = struct{}{}
+			appqueue = append(appqueue, &lidarrRecord{QueueRecord: item}) //nolint:wsl
 		}
 
-		stuckapp.Name = c.Apps.Lidarr[idx].Name // this should be safe.
-		stuck[instance] = stuckapp
-
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
 		c.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			instance, len(queue.Records), len(stuck[instance].Queue))
+			instance, len(queue.Records), len(appqueue))
 	}
 
 	return stuck
@@ -106,27 +104,25 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 
 		queue, _ := item.Data.(*radarr.Queue)
 		instance := idx + 1
-		stuckapp := stuck[instance]
+		appqueue := []*radarrRecord{}
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*radarr.QueueRecord)
+		repeatStomper := make(map[string]struct{})
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
 				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
 				continue
-			} else if repeatStomper[item.DownloadID] != nil {
+			} else if _, exists := repeatStomper[item.DownloadID]; exists {
 				continue
 			}
 
-			repeatStomper[item.DownloadID] = item
-			stuckapp.Queue = append(stuckapp.Queue, item)
+			repeatStomper[item.DownloadID] = struct{}{}
+			appqueue = append(appqueue, &radarrRecord{QueueRecord: item}) //nolint:wsl
 		}
 
-		stuckapp.Name = c.Apps.Radarr[idx].Name // this should be safe.
-		stuck[instance] = stuckapp
-
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
 		c.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			instance, len(queue.Records), len(stuck[instance].Queue))
+			instance, len(queue.Records), len(appqueue))
 	}
 
 	return stuck
@@ -148,27 +144,25 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 
 		queue, _ := item.Data.(*readarr.Queue)
 		instance := idx + 1
-		stuckapp := stuck[instance]
+		appqueue := []*readarrRecord{}
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*readarr.QueueRecord)
+		repeatStomper := make(map[string]struct{})
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
 				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
 				continue
-			} else if repeatStomper[item.DownloadID] != nil {
+			} else if _, exists := repeatStomper[item.DownloadID]; exists {
 				continue
 			}
 
-			repeatStomper[item.DownloadID] = item
-			stuckapp.Queue = append(stuckapp.Queue, item)
+			repeatStomper[item.DownloadID] = struct{}{}
+			appqueue = append(appqueue, &readarrRecord{QueueRecord: item}) //nolint:wsl
 		}
 
-		stuckapp.Name = c.Apps.Readarr[idx].Name // this should be safe.
-		stuck[instance] = stuckapp
-
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
 		c.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			instance, len(queue.Records), len(stuck[instance].Queue))
+			instance, len(queue.Records), len(appqueue))
 	}
 
 	return stuck
@@ -190,27 +184,25 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
 		instance := idx + 1
-		stuckapp := stuck[instance]
+		appqueue := []*sonarrRecord{}
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*sonarr.QueueRecord)
+		repeatStomper := make(map[string]struct{})
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
 				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
 				continue
-			} else if repeatStomper[item.DownloadID] != nil {
+			} else if _, exists := repeatStomper[item.DownloadID]; exists {
 				continue
 			}
 
-			repeatStomper[item.DownloadID] = item
-			stuckapp.Queue = append(stuckapp.Queue, item)
+			repeatStomper[item.DownloadID] = struct{}{}
+			appqueue = append(appqueue, &sonarrRecord{QueueRecord: item}) //nolint:wsl
 		}
 
-		stuckapp.Name = c.Apps.Sonarr[idx].Name // this should be safe.
-		stuck[instance] = stuckapp
-
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
 		c.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
-			instance, len(queue.Records), len(stuck[instance].Queue))
+			instance, len(queue.Records), len(appqueue))
 	}
 
 	return stuck

@@ -87,9 +87,9 @@ func (a *Action) Create() {
 
 // listItem is data formatted for sending a json payload to the website.
 type listItem struct {
-	Name  string        `json:"name"`
-	Queue []interface{} `json:"queue"`
-	Total int           `json:"total"`
+	Name  string      `json:"name"`
+	Queue interface{} `json:"queue"`
+	Total int         `json:"total"`
 }
 
 // itemList stores an instance->queue map.
@@ -99,7 +99,7 @@ func (i itemList) Len() int {
 	count := 0
 
 	for _, v := range i {
-		count += len(v.Queue)
+		count += v.Total
 	}
 
 	return count
