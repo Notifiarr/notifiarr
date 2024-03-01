@@ -189,7 +189,7 @@ func (w *WatchFile) setup(logger *logger, ignored ignored) error {
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
 func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
-	c.addWatcher = make(chan *WatchFile, 1)
+	c.addWatcher = make(chan *WatchFile, len(tails)+1)
 	c.stopWatcher = make(chan struct{})
 	ticker := time.NewTicker(retryInterval)
 	cases := make([]reflect.SelectCase, len(tails))
