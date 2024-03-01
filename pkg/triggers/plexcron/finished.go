@@ -93,7 +93,7 @@ func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string
 		},
 		LogMsg:     "Plex Completed Sessions",
 		LogPayload: true,
-		ErrorsOnly: true,
+		ErrorsOnly: !c.DebugEnabled(),
 	})
 
 	c.sent[session.Session.ID+session.SessionKey] = struct{}{}

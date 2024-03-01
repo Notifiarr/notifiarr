@@ -56,6 +56,7 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 			reply, code = fmt.Sprintf("Command Triggered: %s", c.Config.Commands[index].Name), http.StatusOK
 		} else if len(config.Commands) > index { // check POST input for "new" command.
 			config.Commands[index].Setup(c.Logger, c.website)
+
 			if err := config.Commands[index].SetupRegexpArgs(); err != nil {
 				reply, code = err.Error(), http.StatusInternalServerError
 			} else {

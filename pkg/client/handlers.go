@@ -2,15 +2,18 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"expvar"
 	"fmt"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
 
@@ -93,6 +96,9 @@ func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "triggers", c.triggers.HandleGetTriggers, "GET")
+	c.Config.HandleAPIpath("", "ping", c.handleInstancePing, "GET")
+	c.Config.HandleAPIpath("", "ping/{app:[a-z,]+}", c.handleInstancePing, "GET")
+	c.Config.HandleAPIpath("", "ping/{app:[a-z]+}/{instance:[0-9]+}", c.handleInstancePing, "GET")
 
 	// Aggregate handlers. Non-app specific.
 	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
@@ -182,6 +188,7 @@ func (c *Client) addUsernameHeader(next http.Handler) http.Handler {
 		if username, _ := c.getUserName(req); username != "" {
 			req.Header.Set("X-NotiClient-Username", username)
 		}
+
 		next.ServeHTTP(response, req)
 	})
 }
@@ -223,4 +230,102 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// @Description  Returns true or false for 1 requested instance. True is up, false is down.
+// @Summary      Ping 1 starr instance.
+// @Tags         Client
+// @Produce      json
+// @Param        app      path string  true  "Application" Enums(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Param        instance path int64   true  "Application instance (1-index)."
+// @Success      200  {object} apps.Respond.apiResponse{message=map[string]map[int]bool} "map for app->instance->up"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/ping/{app}/{instance} [get]
+// @Security     ApiKeyAuth
+func _() {}
+
+// @Description  Returns true or false for every instance for starr app requested. True is up, false is down.
+// @Description  Multiple apps may be provided by separating them with a comma. ie /api/ping/radarr,sonarr
+// @Summary      Ping all instances for 1 or more starr apps.
+// @Tags         Client
+// @Produce      json
+// @Param        apps  path   string  true  "Application, comma separated" Enums(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Success      200  {object} apps.Respond.apiResponse{message=map[string]map[int]bool} "map for app->instance->up"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/ping/{apps} [get]
+// @Security     ApiKeyAuth
+//
+//nolint:lll
+func _() {}
+
+// @Description  Returns true or false for each configured starr instance. True is up, false is down.
+// @Summary      Ping all starr instances.
+// @Tags         Client
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=map[string]map[int]bool} "map for app->instance->up"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/ping [get]
+// @Security     ApiKeyAuth
+func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) { //nolint:cyclop
+	apps := strings.Split(mux.Vars(req)["app"], ",")
+	instance, _ := strconv.Atoi(mux.Vars(req)["instance"])
+	output := make(map[string]map[int]bool)
+
+	if len(apps) == 0 || len(apps) == 1 && apps[0] == "" {
+		instance, apps = 0, []string{
+			starr.Lidarr.Lower(),
+			starr.Radarr.Lower(),
+			starr.Readarr.Lower(),
+			starr.Sonarr.Lower(),
+			starr.Prowlarr.Lower(),
+		}
+	}
+
+	for _, app := range apps {
+		switch app {
+		case starr.Lidarr.Lower():
+			for idx := range c.Config.Apps.Lidarr {
+				c.pingInstance(req.Context(), c.Config.Apps.Lidarr[idx], app, idx, instance, output)
+			}
+		case starr.Radarr.Lower():
+			for idx := range c.Config.Apps.Radarr {
+				c.pingInstance(req.Context(), c.Config.Apps.Radarr[idx], app, idx, instance, output)
+			}
+		case starr.Readarr.Lower():
+			for idx := range c.Config.Apps.Readarr {
+				c.pingInstance(req.Context(), c.Config.Apps.Readarr[idx], app, idx, instance, output)
+			}
+		case starr.Sonarr.Lower():
+			for idx := range c.Config.Apps.Sonarr {
+				c.pingInstance(req.Context(), c.Config.Apps.Sonarr[idx], app, idx, instance, output)
+			}
+		case starr.Prowlarr.Lower():
+			for idx := range c.Config.Apps.Prowlarr {
+				c.pingInstance(req.Context(), c.Config.Apps.Prowlarr[idx], app, idx, instance, output)
+			}
+		}
+	}
+
+	return http.StatusOK, output
+}
+
+type instancePinger interface {
+	PingContext(ctx context.Context) error
+	Enabled() bool
+}
+
+func (c *Client) pingInstance(
+	ctx context.Context,
+	pinger instancePinger,
+	app string,
+	idx, instance int,
+	output map[string]map[int]bool,
+) {
+	if pinger.Enabled() && (instance == 0 || instance == idx+1) {
+		if output[app] == nil {
+			output[app] = make(map[int]bool)
+		}
+
+		output[app][idx+1] = pinger.PingContext(ctx) == nil
+	}
 }

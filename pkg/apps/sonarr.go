@@ -228,7 +228,7 @@ func sonarrGetSeries(req *http.Request) (int, interface{}) {
 func sonarrGetEpisodes(req *http.Request) (int, interface{}) {
 	seriesID, _ := strconv.ParseInt(mux.Vars(req)["seriesid"], mnd.Base10, mnd.Bits64)
 
-	episodes, err := getSonarr(req).GetSeriesEpisodesContext(req.Context(), seriesID)
+	episodes, err := getSonarr(req).GetSeriesEpisodesContext(req.Context(), &sonarr.GetEpisode{SeriesID: seriesID})
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "checking series", err)
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/cache"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
@@ -70,7 +71,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 		Route:      website.DownloadRoute,
 		Event:      input.Type,
 		LogPayload: true,
-		ErrorsOnly: true,
+		ErrorsOnly: !c.DebugEnabled(),
 		LogMsg: fmt.Sprintf("Downloading Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
 		Payload: &QueuesPaylod{
@@ -134,24 +135,21 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 			continue
 		}
 
-		var (
-			err       error
-			album     = &lidarr.Album{}
-			cacheItem = data.GetWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx)
-		)
-
 		// We have to connect back to the starr app and pull meta data for the active downloading item.
 		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		cacheItem := data.GetWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx)
 		if cacheItem == nil || cacheItem.Data == nil {
-			album, err = app.GetAlbumByIDContext(ctx, item.AlbumID)
+			album, err := app.GetAlbumByIDContext(ctx, item.AlbumID)
 			if err != nil {
 				c.Errorf("Getting data for downloading item: %v", err)
-				album = &lidarr.Album{Artist: &lidarr.Artist{}} //nolint:wsl
+				cacheItem = &cache.Item{Data: &lidarr.Album{Artist: &lidarr.Artist{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx, album)
+				cacheItem = &cache.Item{Data: album}
 			}
 		}
 
+		album, _ := cacheItem.Data.(*lidarr.Album)
 		repeatStomper[item.DownloadID] = struct{}{}
 		lidarrQueue = append(lidarrQueue, &lidarrRecord{ //nolint:wsl
 			QueueRecord:     item,
@@ -217,24 +215,21 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 			continue
 		}
 
-		var (
-			err       error
-			movie     = &radarr.Movie{}
-			cacheItem = data.GetWithID(fmt.Sprint("radarrMovie", item.MovieID), idx)
-		)
-
 		// We have to connect back to the starr app and pull meta data for the active downloading item.
 		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		cacheItem := data.GetWithID(fmt.Sprint("radarrMovie", item.MovieID), idx)
 		if cacheItem == nil || cacheItem.Data == nil {
-			movie, err = app.GetMovieByIDContext(ctx, item.MovieID)
+			movie, err := app.GetMovieByIDContext(ctx, item.MovieID)
 			if err != nil {
 				c.Errorf("Getting data for downloading item: %v", err)
-				movie = &radarr.Movie{} //nolint:wsl
+				cacheItem = &cache.Item{Data: &radarr.Movie{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("radarrMovie", item.MovieID), idx, movie)
+				cacheItem = &cache.Item{Data: movie}
 			}
 		}
 
+		movie, _ := cacheItem.Data.(*radarr.Movie)
 		repeatStomper[item.DownloadID] = struct{}{}
 		radarrQueue = append(radarrQueue, &radarrRecord{ //nolint:wsl
 			QueueRecord:    item,
@@ -298,24 +293,21 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 			continue
 		}
 
-		var (
-			err       error
-			book      = &readarr.Book{}
-			cacheItem = data.GetWithID(fmt.Sprint("readarrBook", item.BookID), idx)
-		)
-
 		// We have to connect back to the starr app and pull meta data for the active downloading item.
 		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		cacheItem := data.GetWithID(fmt.Sprint("readarrBook", item.BookID), idx)
 		if cacheItem == nil || cacheItem.Data == nil {
-			book, err = app.GetBookByIDContext(ctx, item.BookID)
+			book, err := app.GetBookByIDContext(ctx, item.BookID)
 			if err != nil {
 				c.Errorf("Getting data for downloading item: %v", err)
-				book = &readarr.Book{Author: &readarr.Author{}} //nolint:wsl
+				cacheItem = &cache.Item{Data: &readarr.Book{Author: &readarr.Author{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("readarrBook", item.BookID), idx, book)
+				cacheItem = &cache.Item{Data: book}
 			}
 		}
 
+		book, _ := cacheItem.Data.(*readarr.Book)
 		repeatStomper[item.DownloadID] = struct{}{}
 		readarrQueue = append(readarrQueue, &readarrRecord{ //nolint:wsl
 			QueueRecord:     item,
@@ -381,24 +373,21 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 			continue
 		}
 
-		var (
-			err       error
-			series    = &sonarr.Series{}
-			cacheItem = data.GetWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx)
-		)
-
 		// We have to connect back to the starr app and pull meta data for the active downloading item.
 		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		cacheItem := data.GetWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx)
 		if cacheItem == nil || cacheItem.Data == nil {
-			series, err = app.GetSeriesByIDContext(ctx, item.SeriesID)
+			series, err := app.GetSeriesByIDContext(ctx, item.SeriesID)
 			if err != nil {
 				c.Errorf("Getting data for downloading item: %v", err)
-				series = &sonarr.Series{} //nolint:wsl
+				cacheItem = &cache.Item{Data: &sonarr.Series{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx, series)
+				cacheItem = &cache.Item{Data: series}
 			}
 		}
 
+		series, _ := cacheItem.Data.(*sonarr.Series)
 		repeatStomper[item.DownloadID] = struct{}{}
 		sonarrQueue = append(sonarrQueue, &sonarrRecord{ //nolint:wsl
 			QueueRecord:     item,
