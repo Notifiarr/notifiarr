@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -15,7 +16,35 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-const maxQueuePayloadSize = 50
+const maxQueuePayloadSize = 15
+
+type lidarrRecord struct {
+	*lidarr.QueueRecord
+	Name            string `json:"name"`
+	ArtistTitle     string `json:"artistTitle"`
+	ForeignAlbumID  string `json:"foreignAlbumId"`
+	ForeignArtistID string `json:"foreignArtistId"`
+}
+
+type radarrRecord struct {
+	*radarr.QueueRecord
+	Name           string `json:"name"`
+	ForeignMovieID int64  `json:"foreignMovieId"`
+}
+
+type sonarrRecord struct {
+	*sonarr.QueueRecord
+	Name            string `json:"name"`
+	ForeignSeriesID int64  `json:"foreignSeriesId"`
+}
+
+type readarrRecord struct {
+	*readarr.QueueRecord
+	Name            string `json:"name"`
+	AuthorTitle     string `json:"authorTitle"`
+	ForeignBookID   string `json:"foreignBookId"`
+	ForeignAuthorID string `json:"foreignAuthorId"`
+}
 
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
 func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
@@ -53,7 +82,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	})
 }
 
-func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) getDownloadingItemsLidarr(ctx context.Context) itemList {
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -73,32 +102,70 @@ func (c *cmd) getDownloadingItemsLidarr(_ context.Context) itemList { //nolint:c
 		}
 
 		queue, _ := cacheItem.Data.(*lidarr.Queue)
-		appList := listItem{}
-		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*lidarr.QueueRecord)
-
-		for _, item := range queue.Records {
-			// Delay items have no download ID, so group them by size.
-			if item.DownloadID == "" {
-				item.DownloadID = fmt.Sprint(item.Size)
-			}
-
-			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
-				appList.Queue = append(appList.Queue, item)
-				repeatStomper[item.DownloadID] = item
-				appList.Name = app.Name
-			}
-		}
-
-		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue)
-		items[instance] = appList
+		lidarrQueue := c.rangeDownloadingItemsLidarr(ctx, idx, app, queue.Records)
+		items[instance] = listItem{Name: app.Name, Queue: lidarrQueue, Total: queue.TotalRecords}
 	}
 
 	return items
 }
 
-func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) rangeDownloadingItemsLidarr(
+	ctx context.Context,
+	idx int,
+	app *apps.LidarrConfig,
+	records []*lidarr.QueueRecord,
+) []*lidarrRecord {
+	lidarrQueue := []*lidarrRecord{}
+	// repeatStomper is used to collapse duplicate download IDs.
+	repeatStomper := make(map[string]struct{})
+
+	for _, item := range records {
+		if len(lidarrQueue) >= maxQueuePayloadSize {
+			break
+		}
+
+		// Delay items have no download ID, so group (de-duplicate) them by size.
+		if item.DownloadID == "" {
+			item.DownloadID = fmt.Sprint(item.Size)
+		}
+
+		_, exists := repeatStomper[item.DownloadID]
+		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+			continue
+		}
+
+		var (
+			err       error
+			album     = &lidarr.Album{}
+			cacheItem = data.GetWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx)
+		)
+
+		// We have to connect back to the starr app and pull meta data for the active downloading item.
+		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		if cacheItem == nil || cacheItem.Data == nil {
+			album, err = app.GetAlbumByIDContext(ctx, item.AlbumID)
+			if err != nil {
+				c.Errorf("Getting data for downloading item: %v", err)
+				album = &lidarr.Album{Artist: &lidarr.Artist{}} //nolint:wsl
+			} else {
+				data.SaveWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx, album)
+			}
+		}
+
+		repeatStomper[item.DownloadID] = struct{}{}
+		lidarrQueue = append(lidarrQueue, &lidarrRecord{ //nolint:wsl
+			QueueRecord:     item,
+			Name:            album.Title,
+			ArtistTitle:     album.Artist.ArtistName,
+			ForeignAlbumID:  album.ForeignAlbumID,
+			ForeignArtistID: album.Artist.ForeignArtistID,
+		})
+	}
+
+	return lidarrQueue
+}
+
+func (c *cmd) getDownloadingItemsRadarr(ctx context.Context) itemList {
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -118,32 +185,68 @@ func (c *cmd) getDownloadingItemsRadarr(_ context.Context) itemList { //nolint:c
 		}
 
 		queue, _ := cacheItem.Data.(*radarr.Queue)
-		appList := listItem{}
-		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*radarr.QueueRecord)
-
-		for _, item := range queue.Records {
-			// Delay items have no download ID, so group them by size.
-			if item.DownloadID == "" {
-				item.DownloadID = fmt.Sprint(item.Size)
-			}
-
-			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
-				appList.Queue = append(appList.Queue, item)
-				repeatStomper[item.DownloadID] = item
-				appList.Name = app.Name
-			}
-		}
-
-		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue)
-		items[instance] = appList
+		radarrQueue := c.rangeDownloadingItemsRadarr(ctx, idx, app, queue.Records)
+		items[instance] = listItem{Name: app.Name, Queue: radarrQueue, Total: queue.TotalRecords}
 	}
 
 	return items
 }
 
-func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) rangeDownloadingItemsRadarr(
+	ctx context.Context,
+	idx int,
+	app *apps.RadarrConfig,
+	records []*radarr.QueueRecord,
+) []*radarrRecord {
+	radarrQueue := []*radarrRecord{}
+	// repeatStomper is used to collapse duplicate download IDs.
+	repeatStomper := make(map[string]struct{})
+
+	for _, item := range records {
+		if len(radarrQueue) >= maxQueuePayloadSize {
+			break
+		}
+
+		// Delay items have no download ID, so group (de-duplicate) them by size.
+		if item.DownloadID == "" {
+			item.DownloadID = fmt.Sprint(item.Size)
+		}
+
+		_, exists := repeatStomper[item.DownloadID]
+		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+			continue
+		}
+
+		var (
+			err       error
+			movie     = &radarr.Movie{}
+			cacheItem = data.GetWithID(fmt.Sprint("radarrMovie", item.MovieID), idx)
+		)
+
+		// We have to connect back to the starr app and pull meta data for the active downloading item.
+		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		if cacheItem == nil || cacheItem.Data == nil {
+			movie, err = app.GetMovieByIDContext(ctx, item.MovieID)
+			if err != nil {
+				c.Errorf("Getting data for downloading item: %v", err)
+				movie = &radarr.Movie{} //nolint:wsl
+			} else {
+				data.SaveWithID(fmt.Sprint("radarrMovie", item.MovieID), idx, movie)
+			}
+		}
+
+		repeatStomper[item.DownloadID] = struct{}{}
+		radarrQueue = append(radarrQueue, &radarrRecord{ //nolint:wsl
+			QueueRecord:    item,
+			Name:           movie.Title,
+			ForeignMovieID: movie.TmdbID,
+		})
+	}
+
+	return radarrQueue
+}
+
+func (c *cmd) getDownloadingItemsReadarr(ctx context.Context) itemList {
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -163,32 +266,70 @@ func (c *cmd) getDownloadingItemsReadarr(_ context.Context) itemList { //nolint:
 		}
 
 		queue, _ := cacheItem.Data.(*readarr.Queue)
-		appList := listItem{}
-		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*readarr.QueueRecord)
-
-		for _, item := range queue.Records {
-			// Delay items have no download ID, so group them by size.
-			if item.DownloadID == "" {
-				item.DownloadID = fmt.Sprint(item.Size)
-			}
-
-			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
-				appList.Queue = append(appList.Queue, item)
-				repeatStomper[item.DownloadID] = item
-				appList.Name = app.Name
-			}
-		}
-
-		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue)
-		items[instance] = appList
+		readarrQueue := c.rangeDownloadingItemsReadarr(ctx, idx, app, queue.Records)
+		items[instance] = listItem{Name: app.Name, Queue: readarrQueue, Total: queue.TotalRecords}
 	}
 
 	return items
 }
 
-func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) rangeDownloadingItemsReadarr(
+	ctx context.Context,
+	idx int,
+	app *apps.ReadarrConfig,
+	records []*readarr.QueueRecord,
+) []*readarrRecord {
+	readarrQueue := []*readarrRecord{}
+	// repeatStomper is used to collapse duplicate download IDs.
+	repeatStomper := make(map[string]struct{})
+
+	for _, item := range records {
+		if len(readarrQueue) >= maxQueuePayloadSize {
+			break
+		}
+
+		// Delay items have no download ID, so group (de-duplicate) them by size.
+		if item.DownloadID == "" {
+			item.DownloadID = fmt.Sprint(item.Size)
+		}
+
+		_, exists := repeatStomper[item.DownloadID]
+		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+			continue
+		}
+
+		var (
+			err       error
+			book      = &readarr.Book{}
+			cacheItem = data.GetWithID(fmt.Sprint("readarrBook", item.BookID), idx)
+		)
+
+		// We have to connect back to the starr app and pull meta data for the active downloading item.
+		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		if cacheItem == nil || cacheItem.Data == nil {
+			book, err = app.GetBookByIDContext(ctx, item.ID)
+			if err != nil {
+				c.Errorf("Getting data for downloading item: %v", err)
+				book = &readarr.Book{Author: &readarr.Author{}} //nolint:wsl
+			} else {
+				data.SaveWithID(fmt.Sprint("readarrBook", item.BookID), idx, book)
+			}
+		}
+
+		repeatStomper[item.DownloadID] = struct{}{}
+		readarrQueue = append(readarrQueue, &readarrRecord{ //nolint:wsl
+			QueueRecord:     item,
+			Name:            book.Title,
+			AuthorTitle:     book.AuthorTitle,
+			ForeignBookID:   book.ForeignBookID,
+			ForeignAuthorID: book.Author.ForeignAuthorID,
+		})
+	}
+
+	return readarrQueue
+}
+
+func (c *cmd) getDownloadingItemsSonarr(ctx context.Context) itemList {
 	items := make(itemList)
 
 	ci := clientinfo.Get()
@@ -208,35 +349,63 @@ func (c *cmd) getDownloadingItemsSonarr(_ context.Context) itemList { //nolint:c
 		}
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
-		appList := listItem{}
-		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]*sonarr.QueueRecord)
-
-		for _, item := range queue.Records {
-			// Delay items have no download ID, so group them by size.
-			if item.DownloadID == "" {
-				item.DownloadID = fmt.Sprint(item.Size)
-			}
-
-			if s := strings.ToLower(item.Status); (s == downloading || s == delay) && repeatStomper[item.DownloadID] == nil {
-				appList.Queue = append(appList.Queue, item)
-				repeatStomper[item.DownloadID] = item
-				appList.Name = app.Name
-			}
-		}
-
-		appList.Total = len(appList.Queue)
-		appList.Queue = truncateQueue(appList.Queue)
-		items[instance] = appList
+		sonarrQueue := c.rangeDownloadingItemsSonarr(ctx, idx, app, queue.Records)
+		items[instance] = listItem{Name: app.Name, Queue: sonarrQueue, Total: queue.TotalRecords}
 	}
 
 	return items
 }
 
-func truncateQueue(queue []any) []any {
-	if len(queue) <= maxQueuePayloadSize {
-		return queue
+func (c *cmd) rangeDownloadingItemsSonarr(
+	ctx context.Context,
+	idx int,
+	app *apps.SonarrConfig,
+	records []*sonarr.QueueRecord,
+) []*sonarrRecord {
+	sonarrQueue := []*sonarrRecord{}
+	// repeatStomper is used to collapse duplicate download IDs.
+	repeatStomper := make(map[string]struct{})
+
+	for _, item := range records {
+		if len(sonarrQueue) >= maxQueuePayloadSize {
+			break
+		}
+
+		// Delay items have no download ID, so group (de-duplicate) them by size.
+		if item.DownloadID == "" {
+			item.DownloadID = fmt.Sprint(item.Size)
+		}
+
+		_, exists := repeatStomper[item.DownloadID]
+		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+			continue
+		}
+
+		var (
+			err       error
+			series    = &sonarr.Series{}
+			cacheItem = data.GetWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx)
+		)
+
+		// We have to connect back to the starr app and pull meta data for the active downloading item.
+		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		if cacheItem == nil || cacheItem.Data == nil {
+			series, err = app.GetSeriesByIDContext(ctx, item.ID)
+			if err != nil {
+				c.Errorf("Getting data for downloading item: %v", err)
+				series = &sonarr.Series{} //nolint:wsl
+			} else {
+				data.SaveWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx, series)
+			}
+		}
+
+		repeatStomper[item.DownloadID] = struct{}{}
+		sonarrQueue = append(sonarrQueue, &sonarrRecord{ //nolint:wsl
+			QueueRecord:     item,
+			Name:            series.Title,
+			ForeignSeriesID: series.TvdbID,
+		})
 	}
 
-	return queue[:maxQueuePayloadSize]
+	return sonarrQueue
 }
