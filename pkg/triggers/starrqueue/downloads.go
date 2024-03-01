@@ -307,7 +307,7 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 		// We have to connect back to the starr app and pull meta data for the active downloading item.
 		// The data gets cached for a while so this extra api hit should only happen once for each item.
 		if cacheItem == nil || cacheItem.Data == nil {
-			book, err = app.GetBookByIDContext(ctx, item.ID)
+			book, err = app.GetBookByIDContext(ctx, item.BookID)
 			if err != nil {
 				c.Errorf("Getting data for downloading item: %v", err)
 				book = &readarr.Book{Author: &readarr.Author{}} //nolint:wsl
@@ -390,7 +390,7 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 		// We have to connect back to the starr app and pull meta data for the active downloading item.
 		// The data gets cached for a while so this extra api hit should only happen once for each item.
 		if cacheItem == nil || cacheItem.Data == nil {
-			series, err = app.GetSeriesByIDContext(ctx, item.ID)
+			series, err = app.GetSeriesByIDContext(ctx, item.SeriesID)
 			if err != nil {
 				c.Errorf("Getting data for downloading item: %v", err)
 				series = &sonarr.Series{} //nolint:wsl
