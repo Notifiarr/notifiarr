@@ -51,7 +51,7 @@ require (
 	golift.io/starr v1.0.1-0.20240208165736-094d58d6eb5f
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
-	modernc.org/sqlite v1.29.1
+	modernc.org/sqlite v1.29.2
 )
 
 require (
