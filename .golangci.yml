@@ -29,6 +29,7 @@ linters:
     - nonamedreturns
     - varnamelen
     - godot
+    - perfsprint
     # unneeded (broken because of generics)
     - rowserrcheck
     - wastedassign

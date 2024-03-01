@@ -41,7 +41,7 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 		systray.SetTooltip(version.Print(c.Flags.Name()))
 		// systray.SetOnClick(c.showMenu) // buggy
 		systray.SetOnRClick(c.showMenu)
-		systray.SetOnDClick(func(menu systray.IMenu) { c.openGUI() })
+		systray.SetOnDClick(func(_ systray.IMenu) { c.openGUI() })
 		c.makeMenus(ctx)         // make the menu before starting the web server.
 		c.setupMenus(clientInfo) // code that runs on reload, too.
 
