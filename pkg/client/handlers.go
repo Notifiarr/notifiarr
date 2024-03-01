@@ -188,6 +188,7 @@ func (c *Client) addUsernameHeader(next http.Handler) http.Handler {
 		if username, _ := c.getUserName(req); username != "" {
 			req.Header.Set("X-NotiClient-Username", username)
 		}
+
 		next.ServeHTTP(response, req)
 	})
 }
@@ -253,6 +254,8 @@ func _() {}
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/ping/{apps} [get]
 // @Security     ApiKeyAuth
+//
+//nolint:lll
 func _() {}
 
 // @Description  Returns true or false for each configured starr instance. True is up, false is down.
@@ -263,7 +266,7 @@ func _() {}
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/ping [get]
 // @Security     ApiKeyAuth
-func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) {
+func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) { //nolint:cyclop
 	apps := strings.Split(mux.Vars(req)["app"], ",")
 	instance, _ := strconv.Atoi(mux.Vars(req)["instance"])
 	output := make(map[string]map[int]bool)
@@ -307,7 +310,7 @@ func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) {
 }
 
 type instancePinger interface {
-	PingContext(context.Context) error
+	PingContext(ctx context.Context) error
 	Enabled() bool
 }
 
