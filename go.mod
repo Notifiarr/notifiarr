@@ -46,7 +46,7 @@ require (
 	golift.io/deluge v0.10.1
 	golift.io/mulery v0.0.6-0.20240209224629-534e48717ccd
 	golift.io/nzbget v0.1.5
-	golift.io/qbit v0.0.0-20240209173059-b27176f3d0f5
+	golift.io/qbit v0.0.0-20240203190039-8f98b32d1e66
 	golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7
 	golift.io/starr v1.0.1-0.20240301211050-ac9980369d44
 	golift.io/version v0.0.2
