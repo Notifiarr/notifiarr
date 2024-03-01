@@ -105,7 +105,7 @@ func (c *Cmd) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 		}
 
 		// An error here gets swallowed.
-		if eps, err := app.GetSeriesEpisodes(rec.SeriesID); err == nil {
+		if eps, err := app.GetSeriesEpisodes(&sonarr.GetEpisode{SeriesID: rec.SeriesID}); err == nil {
 			for _, episode := range eps {
 				if episode.ID == rec.EpisodeID {
 					table = append(table, &Sortable{
@@ -129,7 +129,7 @@ func (c *Cmd) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable) (
 	redo := []*Sortable{}
 
 	for _, item := range next {
-		eps, err := app.GetSeriesEpisodes(item.id)
+		eps, err := app.GetSeriesEpisodes(&sonarr.GetEpisode{SeriesID: item.id})
 		if err != nil {
 			return nil, fmt.Errorf("getting series ID %d (%s): %w", item.id, item.Name, err)
 		}

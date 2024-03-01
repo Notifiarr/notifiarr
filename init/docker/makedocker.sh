@@ -17,4 +17,4 @@ docker buildx build --load --pull --tag notifiarr \
     --build-arg "VENDOR=${VENDOR}" \
     --build-arg "AUTHOR=${MAINT}" \
     --build-arg "SOURCE_URL=${SOURCE_URL}" \
-    --file init/docker/Dockerfile .
+    --file init/docker/Dockerfile.scratch .
