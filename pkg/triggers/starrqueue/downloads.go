@@ -145,6 +145,7 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 				cacheItem = &cache.Item{Data: &lidarr.Album{Artist: &lidarr.Artist{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx, album)
+				cacheItem = &cache.Item{Data: album}
 			}
 		}
 
@@ -224,6 +225,7 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 				cacheItem = &cache.Item{Data: &radarr.Movie{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("radarrMovie", item.MovieID), idx, movie)
+				cacheItem = &cache.Item{Data: movie}
 			}
 		}
 
@@ -301,6 +303,7 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 				cacheItem = &cache.Item{Data: &readarr.Book{Author: &readarr.Author{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("readarrBook", item.BookID), idx, book)
+				cacheItem = &cache.Item{Data: book}
 			}
 		}
 
@@ -380,6 +383,7 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 				cacheItem = &cache.Item{Data: &sonarr.Series{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx, series)
+				cacheItem = &cache.Item{Data: series}
 			}
 		}
 
