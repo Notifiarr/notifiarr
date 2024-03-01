@@ -2,13 +2,14 @@ package data
 
 import (
 	"strconv"
+	"time"
 
 	"golift.io/cache"
 )
 
 // store provides a shared concurrency-safe data cache for our triggers (and web server).
 // This cache is also immune from being purged during reload.
-var store = cache.New(cache.Config{}) //nolint:gochecknoglobals
+var store = cache.New(cache.Config{PruneInterval: time.Minute}) //nolint:gochecknoglobals
 
 // Save a piece of data in the cache.
 func Save(key string, data interface{}) {
@@ -22,7 +23,7 @@ func Get(key string) *cache.Item {
 
 // SaveWithID saves data to the cache, and appends the key to an id.
 func SaveWithID(key string, id int, data interface{}) {
-	store.Save(key+strconv.Itoa(id), data, cache.Options{})
+	store.Save(key+strconv.Itoa(id), data, cache.Options{Prune: true})
 }
 
 // GetWithID returns data from the cache using a kay appended to an id.
