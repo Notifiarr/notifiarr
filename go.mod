@@ -32,7 +32,7 @@ require (
 	github.com/nxadm/tail v1.4.11
 	github.com/shirou/gopsutil/v3 v3.24.2
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
 	golang.org/x/crypto v0.20.0
 	golang.org/x/mod v0.15.0
@@ -48,7 +48,7 @@ require (
 	golift.io/nzbget v0.1.5
 	golift.io/qbit v0.0.0-20240203190039-8f98b32d1e66
 	golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7
-	golift.io/starr v1.0.1-0.20240301190001-8801b8e4f4df
+	golift.io/starr v1.0.1-0.20240301211050-ac9980369d44
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
 	modernc.org/sqlite v1.29.2
@@ -96,7 +96,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
-	github.com/stretchr/objx v0.5.1 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tadvi/systray v0.0.0-20190226123456-11a2b8fa57af // indirect
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.13 // indirect
