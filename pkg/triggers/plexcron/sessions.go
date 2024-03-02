@@ -2,6 +2,7 @@ package plexcron
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -40,9 +41,17 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 		return item.Data.(*plex.Sessions), nil //nolint:forcetypeassert
 	}
 
+	deadline, _ := ctx.Deadline()
+	start := time.Now()
+	timeout := deadline.Sub(start)
 	sessions, err := c.Plex.GetSessionsWithContext(ctx)
 
 	switch {
+	case errors.Is(err, context.DeadlineExceeded):
+		return &plex.Sessions{Name: c.Plex.Server.Name()}, fmt.Errorf("plex sessions timed out after %s: %w", timeout, err)
+	case errors.Is(err, context.Canceled):
+		return &plex.Sessions{Name: c.Plex.Server.Name()},
+			fmt.Errorf("plex sessions cancelled after %s: %w", time.Since(start), err)
 	case err != nil:
 		return &plex.Sessions{Name: c.Plex.Server.Name()}, fmt.Errorf("plex sessions: %w", err)
 	case item != nil && item.Data != nil:
