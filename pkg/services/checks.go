@@ -159,10 +159,20 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.Value, nil)
+	// Allow adding headers by apending them after a pipe symbol.
+	splitVal := strings.Split(s.Value, "|")
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, splitVal[0], nil)
 	if err != nil {
 		res.output = "creating request: " + RemoveSecrets(s.Value, err.Error())
 		return res
+	}
+
+	for _, val := range splitVal[1:] {
+		// s.Value: http://url.com|header=value|another-header=val
+		if sv := strings.SplitN(val, "=", 2); len(sv) == 2 { //nolint:gomnd
+			req.Header.Add(sv[0], sv[1])
+		}
 	}
 
 	resp, err := (&http.Client{Timeout: s.Timeout.Duration, Transport: &http.Transport{
@@ -202,7 +212,7 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 
 // RemoveSecrets removes secret token values in a message parsed from a url.
 func RemoveSecrets(appURL, message string) string {
-	url, err := url.Parse(appURL)
+	url, err := url.Parse(strings.SplitN(appURL, "|", 2)[0]) //nolint:gomnd
 	if err != nil {
 		return message
 	}
