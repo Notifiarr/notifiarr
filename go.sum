@@ -160,6 +160,8 @@ github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa/go.mod h1:I1uW6
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/jackpal/gateway v1.0.13 h1:fJccMvawxx0k7S1q7Fy/SXFE0R3hMXkMuw8y9SofWAk=
 github.com/jackpal/gateway v1.0.13/go.mod h1:6c8LjW+FVESFmwxaXySkt7fU98Yv806ADS3OY6Cvh2U=
+github.com/jackpal/gateway v1.0.14 h1:6ZfIuFvnvWrS59hHbvZGR/R33ojV2LASBODomt7zlJU=
+github.com/jackpal/gateway v1.0.14/go.mod h1:6c8LjW+FVESFmwxaXySkt7fU98Yv806ADS3OY6Cvh2U=
 github.com/jaypipes/ghw v0.12.0 h1:xU2/MDJfWmBhJnujHY9qwXQLs3DBsf0/Xa9vECY0Tho=
 github.com/jaypipes/ghw v0.12.0/go.mod h1:jeJGbkRB2lL3/gxYzNYzEDETV1ZJ56OKr+CSeSEym+g=
 github.com/jaypipes/pcidb v1.0.0 h1:vtZIfkiCUE42oYbJS0TAq9XSfSmcsgo9IdxSm9qzYU8=
