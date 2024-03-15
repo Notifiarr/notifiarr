@@ -1,3 +1,5 @@
+services:
+  # Replace or pass in APPDATA (below).
   notifiarr:
     container_name: notifiarr
     hostname: notifiarr
