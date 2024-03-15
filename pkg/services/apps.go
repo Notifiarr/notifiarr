@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	starrV3StatusURI = "/api/v3/system/status|X-API-Key="
-	starrV1StatusURI = "/api/v1/system/status|X-API-Key="
+	starrV3StatusURI = "/api/v3/system/status|X-API-Key:"
+	starrV1StatusURI = "/api/v1/system/status|X-API-Key:"
 )
 
 // collectApps turns app configs into service checks if they have a name.
@@ -365,7 +365,7 @@ func (c *Config) collectPlexApp(svcs []*Service) []*Service {
 	svcs = append(svcs, &Service{
 		Name:     "Plex Server",
 		Type:     CheckHTTP,
-		Value:    app.URL + "|X-Plex-Token=" + app.Token,
+		Value:    app.URL + "|X-Plex-Token:" + app.Token,
 		Expect:   "200",
 		Timeout:  app.Timeout,
 		Interval: interval,
