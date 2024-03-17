@@ -164,6 +164,7 @@ func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request
 		// s.Value: http://url.com|header=value|another-header=val
 		if sv := strings.SplitN(val, ":", 2); len(sv) == 2 { //nolint:gomnd
 			req.Header.Add(sv[0], sv[1])
+
 			if strings.EqualFold(sv[0], "host") {
 				req.Host = sv[1] // https://github.com/golang/go/issues/29865
 			}
@@ -171,7 +172,7 @@ func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request
 	}
 
 	return &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 		Timeout: s.Timeout.Duration, Transport: &http.Transport{
