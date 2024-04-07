@@ -198,6 +198,8 @@ type option struct {
 func intervaloptions(current cnfg.Duration) []*option { //nolint:funlen
 	times := []time.Duration{
 		-1 * time.Second, // Disable Service Checks
+		10 * time.Second,
+		15 * time.Second,
 		30 * time.Second,
 		45 * time.Second,
 		1 * time.Minute,

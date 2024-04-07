@@ -26,7 +26,7 @@ jobs:
           fetch-depth: '0'
       - uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
+          go-version-file: 'go.mod'
       - name: go-generate
         run: go generate ./...
       - name: make-signdmg
@@ -34,9 +34,10 @@ jobs:
           APPLE_SIGNING_KEY: ${{ secrets.APPLE_SIGNING_KEY }}
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+          AC_PROVIDER: ${{ secrets.AC_PROVIDER }}
         id: release
         run: |
-          brew install mitchellh/gon/gon jq
+          brew install Bearer/tap/gon
           make signdmg
       - name: upload artifacts
         uses: actions/upload-artifact@v4
@@ -60,7 +61,7 @@ jobs:
           fetch-depth: '0'
       - uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
+          go-version-file: 'go.mod'
       - name: make-release
         id: release
         run: |
@@ -156,7 +157,7 @@ jobs:
         with:
           name: ${{ matrix.files }}
       - name: Publish ${{ matrix.files }} artifacts to github
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             *.rpm

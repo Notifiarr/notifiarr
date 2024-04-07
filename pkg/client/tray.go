@@ -365,8 +365,6 @@ func (c *Client) buildDynamicTimerMenus() {
 	menu["timerinfo"].Disable()
 
 	for idx, timer := range timers {
-		idx := idx
-
 		desc := fmt.Sprintf("%s; config: interval: %s, path: %s", timer.Desc, timer.Interval, timer.URI)
 		if timer.Desc == "" {
 			desc = fmt.Sprintf("dynamic custom timer; config: interval: %s, path: %s", timer.Interval, timer.URI)

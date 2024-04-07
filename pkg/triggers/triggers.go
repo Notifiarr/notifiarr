@@ -109,7 +109,7 @@ func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
 	defer a.Timers.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
-	for i := 0; i < actions.NumField(); i++ {
+	for i := range actions.NumField() {
 		if !actions.Field(i).CanInterface() {
 			continue
 		}

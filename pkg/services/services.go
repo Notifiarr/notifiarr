@@ -74,7 +74,7 @@ func (c *Config) Start(ctx context.Context) {
 	c.triggerChan = make(chan website.EventType)
 	c.checkChan = make(chan triggerCheck)
 
-	for i := uint(0); i < c.Parallel; i++ {
+	for range c.Parallel {
 		go func() {
 			defer c.CapturePanic()
 
@@ -169,7 +169,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 	for {
 		select {
 		case <-c.stopChan:
-			for i := uint(0); i < c.Parallel; i++ {
+			for range c.Parallel {
 				c.checks <- nil
 				<-c.done
 			}
