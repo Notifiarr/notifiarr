@@ -1141,11 +1141,12 @@ func radarrDeleteQueue(req *http.Request) (int, interface{}) {
 		return http.StatusLocked, ErrRateLimit
 	}
 
+	removeFromClient := mux.Vars(req)["removeFromClient"] == "true"
 	opts := &starr.QueueDeleteOpts{
-		RemoveFromClient: starr.False(),
-		BlockList:        false,
-		SkipRedownload:   false,
-		ChangeCategory:   true,
+		RemoveFromClient: &removeFromClient,
+		BlockList:        mux.Vars(req)["blocklist"] == "true",
+		SkipRedownload:   mux.Vars(req)["skipRedownload"] == "true",
+		ChangeCategory:   mux.Vars(req)["changeCategory"] == "true",
 	}
 
 	err := getRadarr(req).DeleteQueueContext(req.Context(), queueID, opts)
