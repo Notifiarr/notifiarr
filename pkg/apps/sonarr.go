@@ -1265,12 +1265,12 @@ func sonarrDeleteQueue(req *http.Request) (int, interface{}) {
 		return http.StatusLocked, ErrRateLimit
 	}
 
-	removeFromClient := mux.Vars(req)["removeFromClient"] == "true"
+	removeFromClient := mux.Vars(req)["removeFromClient"] == mnd.True
 	opts := &starr.QueueDeleteOpts{
 		RemoveFromClient: &removeFromClient,
-		BlockList:        mux.Vars(req)["blocklist"] == "true",
-		SkipRedownload:   mux.Vars(req)["skipRedownload"] == "true",
-		ChangeCategory:   mux.Vars(req)["changeCategory"] == "true",
+		BlockList:        mux.Vars(req)["blocklist"] == mnd.True,
+		SkipRedownload:   mux.Vars(req)["skipRedownload"] == mnd.True,
+		ChangeCategory:   mux.Vars(req)["changeCategory"] == mnd.True,
 	}
 
 	err := getSonarr(req).DeleteQueueContext(req.Context(), queueID, opts)
