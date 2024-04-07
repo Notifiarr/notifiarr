@@ -904,11 +904,6 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 func lidarrDeleteQueue(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["queueID"]
 	queueID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
-
-	if !getLidarr(req).DelOK() {
-		return http.StatusLocked, ErrRateLimit
-	}
-
 	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True
 	opts := &starr.QueueDeleteOpts{
 		RemoveFromClient: &removeFromClient,
