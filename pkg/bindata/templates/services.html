@@ -20,7 +20,10 @@
                                     <p>The HTTP check type allows you to monitor a URL and expect a specific status code in response.
                                         The expect value should be a a valid HTTP response code like <code>200</code> or <code>400</code>.
                                         Providing an invalid code will default to 200. The check value must be a valid url beginning with
-                                        <code>http://</code> or <code>https://</code>.
+                                        <code>http://</code> or <code>https://</code>.<br>
+                                    </p><p>
+                                        HTTP request headers may be added by appending them to the url after a pipe <code>|</code>.
+                                        Example: <code>https://my.site|Host:another.site|X-Api-Key:secret-value</code>
                                     </p>
                                     <h3>TCP Port Check Type</h3>
                                     <p>The TCP Port check type allows you to monitor a TCP port's connectivity.
