@@ -34,9 +34,9 @@ require (
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
-	golang.org/x/crypto v0.20.0
+	golang.org/x/crypto v0.22.0
 	golang.org/x/mod v0.15.0
-	golang.org/x/sys v0.17.0
+	golang.org/x/sys v0.19.0
 	golang.org/x/text v0.14.0
 	golang.org/x/time v0.5.0
 	golift.io/cache v0.0.2
@@ -46,7 +46,7 @@ require (
 	golift.io/deluge v0.10.2-0.20240207200638-6ed30117018d
 	golift.io/mulery v0.0.6-0.20240209224629-534e48717ccd
 	golift.io/nzbget v0.1.5
-	golift.io/qbit v0.0.0-20240207075333-9d78e13d3151
+	golift.io/qbit v0.0.0-20240407164833-5de994cfd55e
 	golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7
 	golift.io/starr v1.0.1-0.20240301211050-ac9980369d44
 	golift.io/version v0.0.2
@@ -104,7 +104,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/tools v0.17.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
