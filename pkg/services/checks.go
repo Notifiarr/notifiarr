@@ -152,7 +152,7 @@ const maxBody = 150
 
 // checkHTTPReq builds the client and request for the http service check.
 func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request, error) {
-	// Allow adding headers by apending them after a pipe symbol.
+	// Allow adding headers by appending them after a pipe symbol.
 	splitVal := strings.Split(s.Value, "|")
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, splitVal[0], nil)
