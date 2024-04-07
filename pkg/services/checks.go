@@ -150,6 +150,37 @@ func (s *Service) update(res *result) bool {
 
 const maxBody = 150
 
+// checkHTTPReq builds the client and request for the http service check.
+func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request, error) {
+	// Allow adding headers by appending them after a pipe symbol.
+	splitVal := strings.Split(s.Value, "|")
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, splitVal[0], nil)
+	if err != nil {
+		return nil, nil, err //nolint:wrapcheck // handled by caller
+	}
+
+	for _, val := range splitVal[1:] {
+		// s.Value: http://url.com|header=value|another-header=val
+		if sv := strings.SplitN(val, ":", 2); len(sv) == 2 { //nolint:gomnd
+			req.Header.Add(sv[0], sv[1])
+
+			if strings.EqualFold(sv[0], "host") {
+				req.Host = sv[1] // https://github.com/golang/go/issues/29865
+			}
+		}
+	}
+
+	return &http.Client{
+		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+		Timeout: s.Timeout.Duration, Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: !s.validSSL}, //nolint:gosec
+		},
+	}, req, nil
+}
+
 func (s *Service) checkHTTP(ctx context.Context) *result {
 	res := &result{
 		state:  StateUnknown,
@@ -159,15 +190,13 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.Value, nil)
+	client, req, err := s.checkHTTPReq(ctx)
 	if err != nil {
 		res.output = "creating request: " + RemoveSecrets(s.Value, err.Error())
 		return res
 	}
 
-	resp, err := (&http.Client{Timeout: s.Timeout.Duration, Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: !s.validSSL}, //nolint:gosec
-	}}).Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		res.output = "making request: " + RemoveSecrets(s.Value, err.Error())
 		return res
@@ -202,7 +231,7 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 
 // RemoveSecrets removes secret token values in a message parsed from a url.
 func RemoveSecrets(appURL, message string) string {
-	url, err := url.Parse(appURL)
+	url, err := url.Parse(strings.SplitN(appURL, "|", 2)[0]) //nolint:gomnd
 	if err != nil {
 		return message
 	}

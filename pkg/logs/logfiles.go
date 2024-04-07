@@ -246,13 +246,15 @@ func GetFilePaths(files ...string) *LogFileInfos { //nolint:cyclop
 
 	output := &LogFileInfos{List: []*LogFileInfo{}, Dirs: map2list(dirs)}
 
+	var used bool
+
 	for filePath := range contain {
 		fileInfo, err := os.Stat(filePath)
 		if err != nil || fileInfo.IsDir() {
 			continue
 		}
 
-		used := false
+		used = false
 
 		for _, name := range files {
 			if name == filePath {
