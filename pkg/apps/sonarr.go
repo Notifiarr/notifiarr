@@ -58,7 +58,7 @@ func (a *Apps) sonarrHandlers() { //nolint:funlen
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Sonarr, "/delete/queue/{queueID}", sonarrDeleteQueue, "GET").Queries(
+	a.HandleAPIpath(starr.Sonarr, "/queue/{queueID}", sonarrDeleteQueue, "DELETE").Queries(
 		"removeFromClient", "{removeFromClient:true|false}",
 		"blocklist", "{blocklist:true|false}",
 		"skipRedownload", "{skipRedownload:true|false}",

@@ -53,7 +53,7 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Lidarr, "/delete/queue/{queueID}", lidarrDeleteQueue, "GET").Queries(
+	a.HandleAPIpath(starr.Lidarr, "/queue/{queueID}", lidarrDeleteQueue, "DELETE").Queries(
 		"removeFromClient", "{removeFromClient:true|false}",
 		"blocklist", "{blocklist:true|false}",
 		"skipRedownload", "{skipRedownload:true|false}",

@@ -38,7 +38,7 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Readarr, "/delete/queue/{queueID}", readarrDeleteQueue, "GET").Queries(
+	a.HandleAPIpath(starr.Readarr, "/queue/{queueID}", readarrDeleteQueue, "DELETE").Queries(
 		"removeFromClient", "{removeFromClient:true|false}",
 		"blocklist", "{blocklist:true|false}",
 		"skipRedownload", "{skipRedownload:true|false}",

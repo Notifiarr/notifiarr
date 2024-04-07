@@ -54,7 +54,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Radarr, "/delete/queue/{queueID}", radarrDeleteQueue, "GET").Queries(
+	a.HandleAPIpath(starr.Radarr, "/queue/{queueID}", radarrDeleteQueue, "DELETE").Queries(
 		"removeFromClient", "{removeFromClient:true|false}",
 		"blocklist", "{blocklist:true|false}",
 		"skipRedownload", "{skipRedownload:true|false}",
