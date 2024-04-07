@@ -19,6 +19,8 @@ const (
 	Base8         = 8
 	Bits64        = 64
 	Bits32        = 32
+	True          = "true"
+	False         = "false"
 	Windows       = "windows"
 	Disabled      = "disabled"
 	Success       = "success"
