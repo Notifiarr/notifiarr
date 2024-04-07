@@ -38,7 +38,12 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Readarr, "/delete/queue/{queueID}", readarrDeleteQueue, "GET")
+	a.HandleAPIpath(starr.Readarr, "/delete/queue/{queueID}", readarrDeleteQueue, "GET").Queries(
+		"removeFromClient", "{removeFromClient:true|false}",
+		"blocklist", "{blocklist:true|false}",
+		"skipRedownload", "{skipRedownload:true|false}",
+		"changeCategory", "{changeCategory:true|false}",
+	)
 }
 
 // ReadarrConfig represents the input data for a Readarr server.
@@ -695,8 +700,12 @@ func readarrAddNotification(req *http.Request) (int, interface{}) {
 // @Summary      Delete Queue Items
 // @Tags         Readarr
 // @Produce      json
-// @Param        instance  path   int64  true  "instance ID"
-// @Param        queueID  path   int64  true  "queue ID to delete"
+// @Param        instance         path    int64  true  "instance ID"
+// @Param        queueID          path    int64  true  "queue ID to delete"
+// @Param        removeFromClient query   bool  false  "remove download from download client?"
+// @Param        blocklist        query   bool  false  "add item to blocklist?"
+// @Param        skipRedownload   query   bool  false  "skip downloading this again?"
+// @Param        changeCategory   query   bool  false  "tell download client to change categories?"
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"

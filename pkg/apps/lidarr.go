@@ -53,7 +53,12 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Lidarr, "/delete/queue/{queueID}", lidarrDeleteQueue, "GET")
+	a.HandleAPIpath(starr.Lidarr, "/delete/queue/{queueID}", lidarrDeleteQueue, "GET").Queries(
+		"removeFromClient", "{removeFromClient:true|false}",
+		"blocklist", "{blocklist:true|false}",
+		"skipRedownload", "{skipRedownload:true|false}",
+		"changeCategory", "{changeCategory:true|false}",
+	)
 }
 
 // LidarrConfig represents the input data for a Lidarr server.
@@ -889,8 +894,12 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Summary      Delete Queue Items
 // @Tags         Lidarr
 // @Produce      json
-// @Param        instance  path   int64  true  "instance ID"
-// @Param        queueID  path   int64  true  "queue ID to delete"
+// @Param        instance         path    int64  true  "instance ID"
+// @Param        queueID          path    int64  true  "queue ID to delete"
+// @Param        removeFromClient query   bool  false  "remove download from download client?"
+// @Param        blocklist        query   bool  false  "add item to blocklist?"
+// @Param        skipRedownload   query   bool  false  "skip downloading this again?"
+// @Param        changeCategory   query   bool  false  "tell download client to change categories?"
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"

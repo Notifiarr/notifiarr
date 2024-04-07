@@ -54,7 +54,12 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Radarr, "/delete/queue/{queueID}", radarrDeleteQueue, "GET")
+	a.HandleAPIpath(starr.Radarr, "/delete/queue/{queueID}", radarrDeleteQueue, "GET").Queries(
+		"removeFromClient", "{removeFromClient:true|false}",
+		"blocklist", "{blocklist:true|false}",
+		"skipRedownload", "{skipRedownload:true|false}",
+		"changeCategory", "{changeCategory:true|false}",
+	)
 	a.HandleAPIpath(starr.Radarr, "/delete/{movieID:[0-9]+}", radarrDeleteMovie, "POST")
 	a.HandleAPIpath(starr.Radarr, "/delete/{movieFileID:[0-9]+}", radarrDeleteContent, "DELETE")
 }
@@ -1125,8 +1130,12 @@ func radarrAddNotification(req *http.Request) (int, interface{}) {
 // @Summary      Delete Queue Items
 // @Tags         Radarr
 // @Produce      json
-// @Param        instance  path   int64  true  "instance ID"
-// @Param        queueID  path   int64  true  "queue ID to delete"
+// @Param        instance         path    int64  true  "instance ID"
+// @Param        queueID          path    int64  true  "queue ID to delete"
+// @Param        removeFromClient query   bool  false  "remove download from download client?"
+// @Param        blocklist        query   bool  false  "add item to blocklist?"
+// @Param        skipRedownload   query   bool  false  "skip downloading this again?"
+// @Param        changeCategory   query   bool  false  "tell download client to change categories?"
 // @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
