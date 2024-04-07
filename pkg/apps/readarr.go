@@ -38,12 +38,7 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Readarr, "/notification", readarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Readarr, "/queue/{queueID}", readarrDeleteQueue, "DELETE").Queries(
-		"removeFromClient", "{removeFromClient:true|false}",
-		"blocklist", "{blocklist:true|false}",
-		"skipRedownload", "{skipRedownload:true|false}",
-		"changeCategory", "{changeCategory:true|false}",
-	)
+	a.HandleAPIpath(starr.Readarr, "/queue/{queueID}", readarrDeleteQueue, "DELETE")
 }
 
 // ReadarrConfig represents the input data for a Readarr server.
@@ -710,7 +705,7 @@ func readarrAddNotification(req *http.Request) (int, interface{}) {
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Failure      423  {object} string "rate limit reached"
-// @Router       /api/readarr/{instance}/delete/queue/{queueID} [get]
+// @Router       /api/readarr/{instance}/queue/{queueID} [delete]
 // @Security     ApiKeyAuth
 func readarrDeleteQueue(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["queueID"]
@@ -720,12 +715,12 @@ func readarrDeleteQueue(req *http.Request) (int, interface{}) {
 		return http.StatusLocked, ErrRateLimit
 	}
 
-	removeFromClient := mux.Vars(req)["removeFromClient"] == mnd.True
+	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True
 	opts := &starr.QueueDeleteOpts{
 		RemoveFromClient: &removeFromClient,
-		BlockList:        mux.Vars(req)["blocklist"] == mnd.True,
-		SkipRedownload:   mux.Vars(req)["skipRedownload"] == mnd.True,
-		ChangeCategory:   mux.Vars(req)["changeCategory"] == mnd.True,
+		BlockList:        req.URL.Query().Get("blocklist") == mnd.True,
+		SkipRedownload:   req.URL.Query().Get("skipRedownload") == mnd.True,
+		ChangeCategory:   req.URL.Query().Get("changeCategory") == mnd.True,
 	}
 
 	err := getReadarr(req).DeleteQueueContext(req.Context(), queueID, opts)

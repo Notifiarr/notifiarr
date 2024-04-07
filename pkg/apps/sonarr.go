@@ -58,12 +58,7 @@ func (a *Apps) sonarrHandlers() { //nolint:funlen
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/notification", sonarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Sonarr, "/queue/{queueID}", sonarrDeleteQueue, "DELETE").Queries(
-		"removeFromClient", "{removeFromClient:true|false}",
-		"blocklist", "{blocklist:true|false}",
-		"skipRedownload", "{skipRedownload:true|false}",
-		"changeCategory", "{changeCategory:true|false}",
-	)
+	a.HandleAPIpath(starr.Sonarr, "/queue/{queueID}", sonarrDeleteQueue, "DELETE")
 	a.HandleAPIpath(starr.Sonarr, "/delete/{episodeFileID:[0-9]+}", sonarrDeleteEpisode, "DELETE")
 }
 
@@ -1264,7 +1259,7 @@ func sonarrAddNotification(req *http.Request) (int, interface{}) {
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Failure      423  {object} string "rate limit reached"
-// @Router       /api/sonarr/{instance}/delete/queue/{queueID} [get]
+// @Router       /api/sonarr/{instance}/queue/{queueID} [delete]
 // @Security     ApiKeyAuth
 func sonarrDeleteQueue(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["queueID"]
@@ -1274,12 +1269,12 @@ func sonarrDeleteQueue(req *http.Request) (int, interface{}) {
 		return http.StatusLocked, ErrRateLimit
 	}
 
-	removeFromClient := mux.Vars(req)["removeFromClient"] == mnd.True
+	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True
 	opts := &starr.QueueDeleteOpts{
 		RemoveFromClient: &removeFromClient,
-		BlockList:        mux.Vars(req)["blocklist"] == mnd.True,
-		SkipRedownload:   mux.Vars(req)["skipRedownload"] == mnd.True,
-		ChangeCategory:   mux.Vars(req)["changeCategory"] == mnd.True,
+		BlockList:        req.URL.Query().Get("blocklist") == mnd.True,
+		SkipRedownload:   req.URL.Query().Get("skipRedownload") == mnd.True,
+		ChangeCategory:   req.URL.Query().Get("changeCategory") == mnd.True,
 	}
 
 	err := getSonarr(req).DeleteQueueContext(req.Context(), queueID, opts)

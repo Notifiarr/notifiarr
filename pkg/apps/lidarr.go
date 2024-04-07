@@ -53,12 +53,7 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Lidarr, "/notification", lidarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Lidarr, "/queue/{queueID}", lidarrDeleteQueue, "DELETE").Queries(
-		"removeFromClient", "{removeFromClient:true|false}",
-		"blocklist", "{blocklist:true|false}",
-		"skipRedownload", "{skipRedownload:true|false}",
-		"changeCategory", "{changeCategory:true|false}",
-	)
+	a.HandleAPIpath(starr.Lidarr, "/queue/{queueID}", lidarrDeleteQueue, "DELETE")
 }
 
 // LidarrConfig represents the input data for a Lidarr server.
@@ -904,7 +899,7 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Failure      423  {object} string "rate limit reached"
-// @Router       /api/lidarr/{instance}/delete/queue/{queueID} [get]
+// @Router       /api/lidarr/{instance}/queue/{queueID} [delete]
 // @Security     ApiKeyAuth
 func lidarrDeleteQueue(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["queueID"]
@@ -914,12 +909,12 @@ func lidarrDeleteQueue(req *http.Request) (int, interface{}) {
 		return http.StatusLocked, ErrRateLimit
 	}
 
-	removeFromClient := mux.Vars(req)["removeFromClient"] == mnd.True
+	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True
 	opts := &starr.QueueDeleteOpts{
 		RemoveFromClient: &removeFromClient,
-		BlockList:        mux.Vars(req)["blocklist"] == mnd.True,
-		SkipRedownload:   mux.Vars(req)["skipRedownload"] == mnd.True,
-		ChangeCategory:   mux.Vars(req)["changeCategory"] == mnd.True,
+		BlockList:        req.URL.Query().Get("blocklist") == mnd.True,
+		SkipRedownload:   req.URL.Query().Get("skipRedownload") == mnd.True,
+		ChangeCategory:   req.URL.Query().Get("changeCategory") == mnd.True,
 	}
 
 	err := getLidarr(req).DeleteQueueContext(req.Context(), queueID, opts)

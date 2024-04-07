@@ -54,12 +54,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrAddNotification, "POST")
-	a.HandleAPIpath(starr.Radarr, "/queue/{queueID}", radarrDeleteQueue, "DELETE").Queries(
-		"removeFromClient", "{removeFromClient:true|false}",
-		"blocklist", "{blocklist:true|false}",
-		"skipRedownload", "{skipRedownload:true|false}",
-		"changeCategory", "{changeCategory:true|false}",
-	)
+	a.HandleAPIpath(starr.Radarr, "/queue/{queueID}", radarrDeleteQueue, "DELETE")
 	a.HandleAPIpath(starr.Radarr, "/delete/{movieID:[0-9]+}", radarrDeleteMovie, "POST")
 	a.HandleAPIpath(starr.Radarr, "/delete/{movieFileID:[0-9]+}", radarrDeleteContent, "DELETE")
 }
@@ -1140,7 +1135,7 @@ func radarrAddNotification(req *http.Request) (int, interface{}) {
 // @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Failure      423  {object} string "rate limit reached"
-// @Router       /api/radarr/{instance}/delete/queue/{queueID} [get]
+// @Router       /api/radarr/{instance}/queue/{queueID} [delete]
 // @Security     ApiKeyAuth
 func radarrDeleteQueue(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["queueID"]
@@ -1150,12 +1145,12 @@ func radarrDeleteQueue(req *http.Request) (int, interface{}) {
 		return http.StatusLocked, ErrRateLimit
 	}
 
-	removeFromClient := mux.Vars(req)["removeFromClient"] == mnd.True
+	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True
 	opts := &starr.QueueDeleteOpts{
 		RemoveFromClient: &removeFromClient,
-		BlockList:        mux.Vars(req)["blocklist"] == mnd.True,
-		SkipRedownload:   mux.Vars(req)["skipRedownload"] == mnd.True,
-		ChangeCategory:   mux.Vars(req)["changeCategory"] == mnd.True,
+		BlockList:        req.URL.Query().Get("blocklist") == mnd.True,
+		SkipRedownload:   req.URL.Query().Get("skipRedownload") == mnd.True,
+		ChangeCategory:   req.URL.Query().Get("changeCategory") == mnd.True,
 	}
 
 	err := getRadarr(req).DeleteQueueContext(req.Context(), queueID, opts)
