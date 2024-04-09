@@ -449,6 +449,8 @@ golift.io/mulery v0.0.6-0.20240209224629-534e48717ccd h1:vTXqt5CYVUuUIbYRC6R2k3Y
 golift.io/mulery v0.0.6-0.20240209224629-534e48717ccd/go.mod h1:xIzxZSHGqWtqPsOd9SDhffsSne1sAHQy+njKRehO5qE=
 golift.io/nzbget v0.1.5 h1:TE/TPldaLr/Qy5wy+7R4Lvur1SosOpjTLs6BLK3TMrU=
 golift.io/nzbget v0.1.5/go.mod h1:YYGQsadsgvadzM6qlVBS21gz8DBhfbxexGMndsGelj8=
+golift.io/qbit v0.0.0-20240203190039-8f98b32d1e66 h1:ipkWG/7cwFrExfQuSuiFAmQjq+jiUIc0sZtYAk8+tyc=
+golift.io/qbit v0.0.0-20240203190039-8f98b32d1e66/go.mod h1:xdt9wiIDIfIyj6jM93JjAd9Lp5TN9G350E4il0uJyEM=
 golift.io/qbit v0.0.0-20240407164833-5de994cfd55e h1:MUKqgMVV3RuXrWXQoDUD2sqWX6kAL3qHa/7nZpL5mGc=
 golift.io/qbit v0.0.0-20240407164833-5de994cfd55e/go.mod h1:8fUXWdcWtuqnfJg/Z9yWbrOxovyhH0V9jE0eK7pFffA=
 golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7 h1:8reg8mRdLxCz168FaGPf/kVxmDRDc92/Dhub54trdOc=
@@ -535,6 +537,8 @@ modernc.org/sortutil v1.2.0 h1:jQiD3PfS2REGJNzNCMMaLSp/wdMNieTbKX920Cqdgqc=
 modernc.org/sortutil v1.2.0/go.mod h1:TKU2s7kJMf1AE84OoiGppNHJwvB753OYfNl2WRb++Ss=
 modernc.org/sqlite v1.29.5 h1:8l/SQKAjDtZFo9lkJLdk8g9JEOeYRG4/ghStDCCTiTE=
 modernc.org/sqlite v1.29.5/go.mod h1:S02dvcmm7TnTRvGhv8IGYyLnIt7AS2KPaB1F/71p75U=
+modernc.org/sqlite v1.29.6 h1:0lOXGrycJPptfHDuohfYgNqoe4hu+gYuN/pKgY5XjS4=
+modernc.org/sqlite v1.29.6/go.mod h1:S02dvcmm7TnTRvGhv8IGYyLnIt7AS2KPaB1F/71p75U=
 modernc.org/strutil v1.2.0 h1:agBi9dp1I+eOnxXeiZawM8F4LawKv4NzGWSaLfyeNZA=
 modernc.org/strutil v1.2.0/go.mod h1:/mdcBmfOibveCTBxUl5B5l6W+TTH1FXPLHZE6bTosX0=
 modernc.org/token v1.1.0 h1:Xl7Ap9dKaEs5kLoOQeQmPWevfnk/DM5qcLcYlA8ys6Y=
