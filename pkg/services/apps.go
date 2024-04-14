@@ -370,6 +370,7 @@ func (c *Config) collectPlexApp(svcs []*Service) []*Service {
 		Timeout:  app.Timeout,
 		Interval: interval,
 		validSSL: app.ValidSSL,
+		Tags:     map[string]any{"name": app.ExtraConfig.Name},
 	})
 
 	return svcs

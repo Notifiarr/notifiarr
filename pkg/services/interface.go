@@ -100,6 +100,7 @@ func (s *Service) copyResults() *CheckResult {
 		Check:       s.Value,
 		Expect:      s.Expect,
 		IntervalDur: s.Interval.Duration,
+		Metadata:    s.Tags,
 	}
 }
 

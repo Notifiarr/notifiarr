@@ -92,8 +92,9 @@ func (s *Service) CheckOnly(ctx context.Context) *CheckResult {
 	res := s.checkNow(ctx)
 
 	return &CheckResult{
-		Output: res.output,
-		State:  res.state,
+		Output:   res.output,
+		State:    res.state,
+		Metadata: s.Tags,
 	}
 }
 
