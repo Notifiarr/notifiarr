@@ -15,16 +15,28 @@ import (
 // ClientInfo is the client's startup data received from the website.
 type ClientInfo struct {
 	User struct {
-		ID         any             `json:"id"` // user id from notifiarr db.
-		WelcomeMSG string          `json:"welcome"`
-		Subscriber bool            `json:"subscriber"`
-		Patron     bool            `json:"patron"`
-		DevAllowed bool            `json:"devAllowed"`
-		DateFormat PHPDate         `json:"dateFormat"`
-		StopLogs   bool            `json:"stopLogs"`
-		TunnelURL  string          `json:"tunnelUrl"`
-		Tunnels    []string        `json:"tunnels"`
-		Mulery     []*MuleryServer `json:"mulery"`
+		// user id from notifiarr db.
+		ID any `json:"id"`
+		// This is printed on startup and on the UI landing page.
+		WelcomeMSG string `json:"welcome"`
+		// Is the user a subscriber?
+		Subscriber bool `json:"subscriber"`
+		// Is the user a patron?
+		Patron bool `json:"patron"`
+		// Is the user allowed to use non-production website apis?
+		DevAllowed bool `json:"devAllowed"`
+		// This is the date format the user selected on the website.
+		DateFormat PHPDate `json:"dateFormat"`
+		// The website can use this to tell the client not to send any logs.
+		StopLogs bool `json:"stopLogs"`
+		// This is the URL the website uses to connect to the client.
+		// It's just for info/debug here, and not used by the client.
+		TunnelURL string `json:"tunnelUrl"`
+		// This is the list of tunnels the website tells the client to connect to.
+		Tunnels []string `json:"tunnels"`
+		// List of tunnels that notifiarr.com recognizes.
+		// Any of these may be used.
+		Mulery []*MuleryServer `json:"mulery"`
 	} `json:"user"`
 	Actions struct {
 		Plex      PlexConfig      `json:"plex"`      // Site Config for Plex.
@@ -40,8 +52,8 @@ type ClientInfo struct {
 
 // MuleryServer is data from the website. It's a tunnel's https and wss urls.
 type MuleryServer struct {
-	Tunnel string `json:"tunnel"`
-	Socket string `json:"socket"`
+	Tunnel string `json:"tunnel"` // ex: "https://africa.notifiarr.com/"
+	Socket string `json:"socket"` // ex: "wss://africa.notifiarr.com/register"
 }
 
 // CronConfig defines a custom GET timer from the website.
