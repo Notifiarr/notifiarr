@@ -51,6 +51,21 @@
                                                 <td>{{if .ClientInfo}}{{.ClientInfo.User.DateFormat.String}} from {{.ClientInfo.User.DateFormat.PHP}}{{end}}</td>
                                                 <td style="display:none;"></td>
                                             </tr>
+                                            {{- range $socket, $stats := .PoolStats }}
+                                             <tr>
+                                                <td>Pool Stats ({{if $stats.Active}}active{{else}}inactive{{end}})</td>
+                                                <td>
+                                                    <strong>{{$socket}}</strong>
+                                                    Disconnects: {{$stats.Disconnects}},
+                                                    Connection Pool Size: {{$stats.Total}}
+                                                    (Connecting/Idle/Running:
+                                                        {{$stats.Connecting}}/{{$stats.Idle}}/{{$stats.Running}}),
+                                                        Last Conn: {{since $stats.LastConn}},
+                                                        Last Check: {{since $stats.LastTry}}
+                                                    </td>
+                                                <td style="display:none;"></td>
+                                             </tr>
+                                            {{- end}}
                                              <tr class="text-center">
                                                  <td style="display:none;"></td>
                                                  <td style="display:none;"></td>
