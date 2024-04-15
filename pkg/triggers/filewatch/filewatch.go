@@ -25,7 +25,7 @@ var (
 const (
 	Errors        = " Errors"
 	Matched       = " Matched"
-	maxRetries    = 6                                  // how many times to retry watching a file.
+	maxRetries    = 12                                 // how many times to retry watching a file.
 	retryInterval = 10 * time.Second                   // how often channels are checked for being closed.
 	specialCase   = 2                                  // We have two special channels in our select cases.
 	burstRate     = 6                                  // burst to this many 'matches' before throttling.
@@ -290,20 +290,23 @@ func (c *cmd) fileWatcherTicker(died bool) bool {
 		}
 
 		item.retries++
+		retries := item.retries
 		mnd.FileWatcher.Add(item.Path+" Retries", 1)
 
 		// move this back to debug.
-		c.Printf("Restarting File Watcher (retries: %d): %s", item.retries, item.Path)
+		c.Printf("Restarting File Watcher (retries: %d/%d): %s", item.retries, maxRetries, item.Path)
 
 		if err := c.addFileWatcher(item); err != nil {
-			c.Errorf("Restarting File Watcher (retries: %d): %s: %v", item.retries, item.Path, err)
+			c.Errorf("Restarting File Watcher (retries: %d/%d): %s: %v", item.retries, maxRetries, item.Path, err)
 			mnd.FileWatcher.Add(item.Path+Errors, 1)
 
 			stilldead = true
 		} else {
-			item.retries = 0
 			mnd.FileWatcher.Add(item.Path+" Restarts", 1)
 		}
+
+		// Calling addFileWatcher will reset the retries to 0, so undo that.
+		item.retries = retries
 	}
 
 	return stilldead
