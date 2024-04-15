@@ -7,6 +7,9 @@ import (
 	"golift.io/cnfg"
 )
 
+// This name is hard coded as the service name for Plex.
+const PlexServerName = "Plex Server"
+
 const (
 	starrV3StatusURI = "/api/v3/system/status|X-API-Key:"
 	starrV1StatusURI = "/api/v1/system/status|X-API-Key:"
@@ -363,7 +366,7 @@ func (c *Config) collectPlexApp(svcs []*Service) []*Service {
 	}
 
 	svcs = append(svcs, &Service{
-		Name:     "Plex Server",
+		Name:     PlexServerName,
 		Type:     CheckHTTP,
 		Value:    app.URL + "|X-Plex-Token:" + app.Token,
 		Expect:   "200",
