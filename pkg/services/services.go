@@ -67,6 +67,7 @@ func (c *Config) Start(ctx context.Context) {
 		c.services[name].svc.log = c.Logger
 	}
 
+	c.applyLocalOverrides()
 	c.loadServiceStates(ctx)
 	c.checks = make(chan *Service, DefaultBuffer)
 	c.done = make(chan bool)
@@ -100,6 +101,26 @@ func (c *Config) Start(ctx context.Context) {
 
 	c.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
 		word, len(c.services), c.Interval, c.Parallel)
+}
+
+func (c *Config) applyLocalOverrides() {
+	if !c.Apps.Plex.Enabled() {
+		return
+	}
+
+	name := c.Apps.Plex.Server.Name()
+	if name == "" {
+		return
+	}
+
+	// This is how we shoehorn the plex servr name into the service check.
+	// We do this because we don't have the name when the config file is parsed.
+	for _, svc := range c.services {
+		if svc.Name == PlexServerName {
+			svc.Tags = map[string]any{"name": name}
+			return
+		}
+	}
 }
 
 // loadServiceStates brings service states from the website into the fold.
