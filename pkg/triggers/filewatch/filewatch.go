@@ -315,6 +315,8 @@ func (c *cmd) fileWatcherTicker(died bool) bool {
 // checkLineMatch runs when a watched file has a new line written.
 // If a match is found a notification is sent.
 func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
+	tail.retries = 0 // reset retries once we get a line from the file.
+
 	if tail.re == nil || line.Text == "" || !tail.re.MatchString(line.Text) {
 		return // no match
 	}
