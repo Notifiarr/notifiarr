@@ -155,7 +155,7 @@ func deleteOldBackups(backupDir string) {
 	}
 
 	// Keep newest 10 files.
-	for i := 0; i < len(fileList)-9; i++ {
+	for i := range len(fileList) - 9 {
 		os.Remove(filepath.Join(backupDir, fileList[i].Name()))
 	}
 }

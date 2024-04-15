@@ -19,6 +19,6 @@ func redirectStderr(file *os.File) {
 	os.Stderr = file
 
 	const noIdeaWhatThisIs = 2
-	//nolint:staticcheck // I have no idea how to do this with syscallN. :( but we need to...
+	//nolint:staticcheck,nolintlint // I have no idea how to do this with syscallN. :( but we need to...
 	syscall.Syscall(setHandle.Addr(), noIdeaWhatThisIs, uintptr(stderr), file.Fd(), 0)
 }
