@@ -197,6 +197,9 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 		return res
 	}
 
+	// If there is an error at this point it's a bad request.
+	res.state = StateCritical
+
 	resp, err := client.Do(req)
 	if err != nil {
 		res.output = "making request: " + RemoveSecrets(s.Value, err.Error())
