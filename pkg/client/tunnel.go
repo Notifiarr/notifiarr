@@ -230,6 +230,8 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 			for k, v := range data {
 				list[k] = v
 			}
+
+			wait.Done()
 		}
 	}()
 
@@ -240,8 +242,6 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 		client := &http.Client{}
 
 		go func(ctx context.Context, idx int) {
-			defer wait.Done()
-
 			ctx, cancel := context.WithTimeout(ctx, pingTimeout)
 			defer cancel()
 
