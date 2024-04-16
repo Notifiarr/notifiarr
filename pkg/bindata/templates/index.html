@@ -68,6 +68,7 @@
                             </div>
                             <li class="ts-label" style="text-align: center;">Settings</li>
                             <li><i class="nav-icon fas fa-cogs"></i><a class="nav-link" href="#config" onclick="swapNavigationTemplate('config')">Configuration</a></li>
+                            <li><i class="nav-icon fas fa-satellite"></i><a class="nav-link" href="#tunnel" onclick="swapNavigationTemplate('tunnel')">Site Tunnel</a></li>
                             <li><i class="nav-icon fas fa-star"></i><a class="nav-link" href="#starr" onclick="swapNavigationTemplate('starr')">Starr Apps</a></li>
                             <li><i class="nav-icon fas fa-cart-arrow-down"></i><a href="#downloaders" class="nav-link" onclick="swapNavigationTemplate('downloaders')">Download Apps</a></li>
                             <li><i class="nav-icon fas fa-photo-video"></i><a class="nav-link" href="#media" onclick="swapNavigationTemplate('media')">Media Apps</a></li>
@@ -192,6 +193,9 @@
                             </div>
                             <div class="navigation-item" id="template-clientinfo" style="display: none;">
 {{ template "clientinfo.html" . }}
+                            </div>
+                            <div class="navigation-item" id="template-tunnel" style="display: none;">
+{{ template "tunnel.html" . }}
                             </div>
 {{- else }}       {{- /* if .Username */}}
 {{ template "login.html" . }}

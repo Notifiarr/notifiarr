@@ -416,7 +416,7 @@ type templateData struct {
 	PoolStats   map[string]*mulery.PoolSize    `json:"poolStats"`
 }
 
-func (c *Client) renderTemplate(
+func (c *Client) renderTemplate( //nolint:funlen
 	ctx context.Context,
 	response io.Writer,
 	req *http.Request,

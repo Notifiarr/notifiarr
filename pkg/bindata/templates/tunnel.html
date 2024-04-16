@@ -1,0 +1,81 @@
+<h1><i class="fas fa-satellite"></i> Site Tunnel</h1>
+<p>
+    This client keeps a persistent websocket connection to a notifiarr.com 
+    <a href="https://github.com/golift/mulery">Mulery</a> tunnel.
+    This tunnel allows the website to make requests to your client without the need
+    for opening a port, or having a static IP. This page allows you to select your
+    primary tunnel and which tunnels you want to use as backups in case the primary
+    becomes inaccessible.
+</p>
+<p>
+    Click the Ping button, and select the tunnel with the fastest response time as your primary.
+    Select one or two tunnels as backups. Again, choose one with a faster response time.
+    The primary tunnel may also be selected in the backup tunnel list. That's expected and normal.
+</p>
+<hr>
+
+<div class="row">
+    <div class="col-sm-12 text-center">
+        Primary Tunnel
+    </div>
+    <div class="col-sm-12">
+        <select name="primaryTunnel"  class="tunnel-param form-control input-sm">
+        {{- range $mule := .ClientInfo.User.Mulery}}
+        {{$primary := (eq $mule.Socket (index $.Tunnel.Targets 0))}}
+        <option value="{{$mule.Socket}}"{{if $primary}} selected{{end}}>
+            {{$mule.Socket}}{{if $primary}} (current primary){{end}}
+        </option>
+        {{- end}}
+        </select>  
+    </div>
+
+    <div class="col-sm-12 text-center">
+        Backup Tunnel
+    </div>
+    <div class="col-sm-12">
+        <form class="form-inline">
+            <div class="form-group" style="width:100%">
+            {{- range $idx, $mule := .ClientInfo.User.Mulery}}
+            <div class="input-group" style="width:100%">
+                <div style="width:30px; max-width:30px;" class="input input-group-addon input-sm">
+                 <input type="checkbox" value="{{$mule.Socket}}" class="tunnel-param" name="backupTunnel"{{if $.ClientInfo.User.Tunnels.Has $mule.Socket}} checked{{end}}>
+                </div>
+                <input readonly value="{{$mule.Socket}}" class="input form-control input-sm" type="text">
+                <div style="width:80px;" class="input-group-addon input-sm">
+                    <span class="text-warning text-center" id="tunnel-ping{{$idx}}"></span>
+                </div>
+            </div>
+            {{- end}}
+            </div>
+        </form>
+    </div>
+    <div class="col-sm-12">
+        <button class="btn btn-brand btn-sm" onClick="pingTunnels();">Ping</button>
+        <button class="btn btn-success btn-sm" onClick="saveTunnels();">Save</button>
+        <span id="tunnel-ping-spinner" style="display:none;"><i class="fas fa-cog fa-spin"></i> Pinging ...</span>
+        <span id="tunnel-save-spinner" style="display:none;"><i class="fas fa-cog fa-spin"></i> Saving ...</span>
+        <br>
+        <div id="tunnel-data"></div>
+    </div>
+</div>
+
+<hr>
+<h4>Tunnel Stats</h4>
+<div class="table-responsive">
+    <table style="width:100%" class="table table-striped table-bordered">
+        {{- range $socket, $stats := .PoolStats }}
+        <tr>
+        <td><strong>Socket URL</strong> ({{if $stats.Active}}active{{else}}inactive{{end}})</td>
+        <td><strong>{{$socket}}</strong></td>
+        </tr>
+        <tr><td>Disconnects</td><td>{{$stats.Disconnects}}</td></tr>
+        <tr><td>Connection Pool Size</td><td>{{$stats.Total}}</td></tr>
+        <tr><td>Connecting</td><td>{{$stats.Connecting}}</td></tr>
+        <tr><td>Idle</td><td>{{$stats.Idle}}</td></tr>
+        <tr><td>Running</td><td>{{$stats.Running}}</td></tr>
+        <tr><td>Last Connection</td><td>{{since $stats.LastConn}}</td></tr>
+        <tr><td>Last Active Check</td><td>{{since $stats.LastTry}}</td></tr>
+        <tr><td colspan="2"></td></tr>
+    {{- end}}
+    </table>
+</div>

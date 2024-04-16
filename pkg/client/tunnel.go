@@ -2,17 +2,21 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"github.com/gorilla/schema"
 	apachelog "github.com/lestrrat-go/apache-logformat/v2"
 	mulery "golift.io/mulery/client"
 )
@@ -59,6 +63,15 @@ func (c *Client) startTunnel(ctx context.Context) {
 		return
 	}
 
+	c.makeTunnel(ctx, ci)
+	c.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
+		len(c.tunnel.Targets), c.tunnel.PoolMaxSize, c.tunnel.CleanInterval,
+		c.tunnel.Backoff, ci.User.TunnelURL, c.tunnel.GetID())
+	c.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
+	c.tunnel.Start(ctx)
+}
+
+func (c *Client) makeTunnel(ctx context.Context, ci *clientinfo.ClientInfo) {
 	hostname, _ := os.Hostname()
 	if hostInfo, err := c.clientinfo.GetHostInfo(ctx); err != nil {
 		hostname = hostInfo.Hostname
@@ -82,16 +95,11 @@ func (c *Client) startTunnel(ctx context.Context) {
 		Handler:          remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
 		RoundRobinConfig: c.roundRobinConfig(ci),
 		Logger: &tunnelLogger{
+			ctx:            ctx,
 			Logger:         c.Logger,
 			sendSiteErrors: ci.User.DevAllowed,
 		},
 	})
-
-	c.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
-		len(c.tunnel.Targets), c.tunnel.PoolMaxSize, c.tunnel.CleanInterval,
-		c.tunnel.Backoff, ci.User.TunnelURL, c.tunnel.GetID())
-	c.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
-	c.tunnel.Start(ctx)
 }
 
 //nolint:gomnd // arbitrary failover time frames.
@@ -106,7 +114,6 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 	return &mulery.RoundRobinConfig{
 		RetryInterval: interval,
 		Callback: func(_ context.Context, socket string) {
-			// TODO: Austin needs to make this work on the website.
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
 			c.website.SendData(&website.Request{
 				Route:      website.TunnelRoute,
@@ -133,10 +140,13 @@ func getTunnels(ci *clientinfo.ClientInfo) []string {
 	// can bootstrap with no configuration present on the website.
 
 	// Otherwise, use the legacy selection and append all tunnels.
-	tunnels := []string{ci.User.Tunnels[0]}
+	tunnels := []string{}
+	if len(ci.User.Tunnels) != 0 {
+		tunnels = append(tunnels, ci.User.Tunnels[0])
+	}
 
 	for _, item := range ci.User.Mulery {
-		if item.Socket != ci.User.Tunnels[0] {
+		if len(ci.User.Tunnels) == 0 || item.Socket != ci.User.Tunnels[0] {
 			tunnels = append(tunnels, item.Socket)
 		}
 	}
@@ -170,6 +180,8 @@ func (c *Client) prefixURLbase(h http.Handler) http.Handler {
 
 // tunnelLogger lets us tune the logs from the mulery tunnel.
 type tunnelLogger struct {
+	// hide the app context here so we can use it when we restart a tunnel from an http request
+	ctx context.Context //nolint:containedctx
 	mnd.Logger
 	// sendSiteErrors true sends tunnel errors to website as notifications.
 	sendSiteErrors bool
@@ -193,4 +205,120 @@ func (l *tunnelLogger) Errorf(format string, v ...interface{}) {
 // Printf prints a message with INFO prefixed.
 func (l *tunnelLogger) Printf(format string, v ...interface{}) {
 	l.Logger.Printf(format, v...)
+}
+
+const pingTimeout = 2 * time.Second
+
+// pingTunnels is a gui request to check timing to each tunnel.
+func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request) {
+	ci := clientinfo.Get()
+	if ci == nil {
+		http.Error(response, "no client info, cannot ping tunnels", http.StatusInternalServerError)
+		return
+	}
+
+	var (
+		wait sync.WaitGroup
+		list = make(map[int]string)
+		inCh = make(chan map[int]string)
+	)
+
+	defer close(inCh)
+
+	go func() {
+		for data := range inCh {
+			for k, v := range data {
+				list[k] = v
+			}
+		}
+	}()
+
+	for idx, tunnel := range ci.User.Mulery {
+		wait.Add(1)
+		time.Sleep(70 * time.Millisecond) //nolint:gomnd
+
+		client := &http.Client{}
+
+		go func(ctx context.Context, idx int) {
+			defer wait.Done()
+
+			ctx, cancel := context.WithTimeout(ctx, pingTimeout)
+			defer cancel()
+
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet,
+				strings.Replace(tunnel.Socket, "wss://", "https://", 1), nil)
+			if err != nil {
+				c.Errorf("Pinging Tunnel: making request: %v", err)
+				return
+			}
+
+			start := time.Now()
+
+			if resp, err := client.Do(req); err == nil {
+				_, _ = io.Copy(io.Discard, resp.Body)
+				resp.Body.Close()
+			}
+
+			inCh <- map[int]string{idx: time.Since(start).Round(time.Millisecond / 10).String()} //nolint:gomnd
+		}(request.Context(), idx)
+	}
+
+	wait.Wait()
+
+	if err := json.NewEncoder(response).Encode(list); err != nil {
+		c.Errorf("Pinging Tunnel: encoding json: %v", err)
+	}
+}
+
+func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
+	input, _ := io.ReadAll(request.Body)
+
+	type tunnelS struct {
+		PrimaryTunnel string
+		BackupTunnel  []string
+	}
+
+	var data tunnelS
+
+	decodedValue, err := url.ParseQuery(string(input))
+	if err != nil {
+		c.Errorf("Saving Tunnel: parsing request: %v", err)
+		http.Error(response, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	err = schema.NewDecoder().Decode(&data, decodedValue)
+	if err != nil {
+		c.Errorf("Saving Tunnel: decoding request: %v", err)
+		http.Error(response, err.Error(), http.StatusInternalServerError)
+
+		return
+	}
+
+	sockets := []string{data.PrimaryTunnel}
+
+	for _, socket := range data.BackupTunnel {
+		if socket != data.PrimaryTunnel {
+			sockets = append(sockets, socket)
+		}
+	}
+
+	c.website.SendData(&website.Request{
+		Route:      website.TunnelRoute,
+		Event:      website.EventGUI,
+		Payload:    map[string]any{"sockets": sockets},
+		LogMsg:     "Update Tunnel Config",
+		LogPayload: true,
+	})
+
+	ci := clientinfo.Get()
+	ci.User.Tunnels = sockets // pass different data to makeTunnels().
+	tl, _ := c.tunnel.Config.Logger.(*tunnelLogger)
+
+	c.tunnel.Shutdown()
+	c.makeTunnel(tl.ctx, ci) //nolint:contextcheck // these cannot be inherited from the http request.
+	c.tunnel.Start(tl.ctx)   //nolint:contextcheck
+	http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
+		data.PrimaryTunnel, len(data.BackupTunnel)), http.StatusOK)
 }

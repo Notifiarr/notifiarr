@@ -74,6 +74,8 @@ func (c *Client) httpGuiHandlers(base string) {
 	gui.HandleFunc("/template/{template}", c.getTemplatePageHandler).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}/{content}", c.triggers.Handler).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}", c.triggers.Handler).Methods("GET")
+	gui.HandleFunc("/tunnel/ping", c.pingTunnels).Methods("GET")
+	gui.HandleFunc("/tunnel/save", c.saveTunnels).Methods("POST")
 	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
 	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
 	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")

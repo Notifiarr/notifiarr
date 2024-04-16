@@ -119,8 +119,7 @@ const (
 	CFSyncRoute  Route = userRoute1 + "/trash"
 	GapsRoute    Route = userRoute1 + "/gaps"
 	MdbListRoute Route = userRoute1 + "/mdblist"
-	TunnelRoute  Route = userRoute1 + "/tunnel"  // update active tunnel target
-	TunnelsRoute Route = userRoute1 + "/tunnels" // update allowed tunnel list
+	TunnelRoute  Route = userRoute1 + "/tunnel"
 
 	userRoute2  Route = "/api/v2/user"
 	ClientRoute Route = userRoute2 + "/client"

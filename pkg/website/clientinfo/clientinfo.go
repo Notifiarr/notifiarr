@@ -33,7 +33,7 @@ type ClientInfo struct {
 		// It's just for info/debug here, and not used by the client.
 		TunnelURL string `json:"tunnelUrl"`
 		// This is the list of tunnels the website tells the client to connect to.
-		Tunnels []string `json:"tunnels"`
+		Tunnels Tunnels `json:"tunnels"`
 		// List of tunnels that notifiarr.com recognizes.
 		// Any of these may be used.
 		Mulery []*MuleryServer `json:"mulery"`
@@ -48,6 +48,18 @@ type ClientInfo struct {
 		Custom    []*CronConfig   `json:"custom"`    // Site config for Custom Crons.
 		Snapshot  snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
 	} `json:"actions"`
+}
+
+type Tunnels []string
+
+func (t Tunnels) Has(socket string) bool {
+	for _, tunnel := range t {
+		if tunnel == socket {
+			return true
+		}
+	}
+
+	return false
 }
 
 // MuleryServer is data from the website. It's a tunnel's https and wss urls.
