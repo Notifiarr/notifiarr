@@ -240,6 +240,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 	for idx, tunnel := range ci.User.Mulery {
 		wait.Add(1)
 		time.Sleep(70 * time.Millisecond) //nolint:gomnd
+
 		go c.pingTunnel(request.Context(), idx, tunnel.Socket, inCh)
 	}
 
