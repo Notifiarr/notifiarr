@@ -1,17 +1,21 @@
 <h1><i class="fas fa-satellite"></i> Site Tunnel</h1>
 <p>
-    This client keeps a persistent websocket connection to a notifiarr.com 
+    This client keeps a persistent websocket connection to a notifiarr.com
     <a href="https://github.com/golift/mulery">Mulery</a> tunnel.
     This tunnel allows the website to make requests to your client without the need
     for opening a port, or having a static IP. This page allows you to select your
-    primary tunnel and which tunnels you want to use as backups in case the primary
+    primary tunnel and which tunnel you wish to use as backup in case the primary
     becomes inaccessible.
 </p>
 <p>
-    Click the Ping button, and select the tunnel with the fastest response time as your primary.
-    Select one or two tunnels as backups. Again, choose one with a faster response time.
-    The primary tunnel may also be selected in the backup tunnel list. That's expected and normal.
+    Click the <span class="text-brand">Ping</span> button, and select the tunnel with the fastest response time as your primary.
+    Select any other tunnel as backup. Again, choose one with a faster response time.
 </p>
+<p>
+    <li><i class="fas fa-star text-dgrey"></i> Active Tunnel: <b>{{(cache "activeTunnel").Data}}</b></li>
+</p>
+
+<p></p>
 <hr>
 
 <div class="row">
@@ -19,37 +23,38 @@
         Primary Tunnel
     </div>
     <div class="col-sm-12">
-        <select name="primaryTunnel"  class="tunnel-param form-control input-sm">
-        {{- range $mule := .ClientInfo.User.Mulery}}
-        {{$primary := (eq $mule.Socket (index $.Tunnel.Targets 0))}}
-        <option value="{{$mule.Socket}}"{{if $primary}} selected{{end}}>
-            {{$mule.Socket}}{{if $primary}} (current primary){{end}}
-        </option>
-        {{- end}}
-        </select>  
-    </div>
-
-    <div class="col-sm-12 text-center">
-        Backup Tunnel
-    </div>
-    <div class="col-sm-12">
         <form class="form-inline">
             <div class="form-group" style="width:100%">
             {{- range $idx, $mule := .ClientInfo.User.Mulery}}
+            {{$primary := and (gt (len $.ClientInfo.User.Tunnels) 0) (eq (index $.ClientInfo.User.Tunnels 0) $mule.Socket)}}
             <div class="input-group" style="width:100%">
-                <div style="width:30px; max-width:30px;" class="input input-group-addon input-sm">
-                 <input type="checkbox" value="{{$mule.Socket}}" class="tunnel-param" name="backupTunnel"{{if $.ClientInfo.User.Tunnels.Has $mule.Socket}} checked{{end}}>
-                </div>
-                <input readonly value="{{$mule.Socket}}" class="input form-control input-sm" type="text">
                 <div style="width:80px;" class="input-group-addon input-sm">
                     <span class="text-warning text-center" id="tunnel-ping{{$idx}}"></span>
                 </div>
+                <div style="width:30px; max-width:30px;" class="input input-group-addon input-sm">
+                    <input type="radio" value="{{$mule.Socket}}" class="tunnel-param" name="primaryTunnel"{{if $primary}} checked{{end}}>
+                </div>
+                <input readonly value="{{$mule.Socket}}" class="input form-control input-sm" type="text">
             </div>
             {{- end}}
             </div>
         </form>
     </div>
+    <div class="col-sm-12 text-center">
+        Backup Tunnel
+    </div>
     <div class="col-sm-12">
+        <select name="backupTunnel"  class="tunnel-param form-control input-sm">
+        {{- range $mule := .ClientInfo.User.Mulery}}
+        {{$backup := and (gt (len $.ClientInfo.User.Tunnels) 1) (eq (index $.ClientInfo.User.Tunnels 1) $mule.Socket)}}
+        <option value="{{$mule.Socket}}"{{if $backup}} selected{{end}}>
+            {{$mule.Socket}}
+        </option>
+        {{- end}}
+        </select>
+    </div>
+
+    <div class="col-sm-12 mt">
         <button class="btn btn-brand btn-sm" onClick="pingTunnels();">Ping</button>
         <button class="btn btn-success btn-sm" onClick="saveTunnels();">Save</button>
         <span id="tunnel-ping-spinner" style="display:none;"><i class="fas fa-cog fa-spin"></i> Pinging ...</span>

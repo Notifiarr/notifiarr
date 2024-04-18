@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/schema"
@@ -114,6 +115,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 	return &mulery.RoundRobinConfig{
 		RetryInterval: interval,
 		Callback: func(_ context.Context, socket string) {
+			data.Save("activeTunnel", socket)
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
 			c.website.SendData(&website.Request{
 				Route:      website.TunnelRoute,
@@ -207,7 +209,7 @@ func (l *tunnelLogger) Printf(format string, v ...interface{}) {
 	l.Logger.Printf(format, v...)
 }
 
-const pingTimeout = 2 * time.Second
+const pingTimeout = 7 * time.Second
 
 // pingTunnels is a gui request to check timing to each tunnel.
 func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request) {
@@ -238,29 +240,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 	for idx, tunnel := range ci.User.Mulery {
 		wait.Add(1)
 		time.Sleep(70 * time.Millisecond) //nolint:gomnd
-
-		client := &http.Client{}
-
-		go func(ctx context.Context, idx int) {
-			ctx, cancel := context.WithTimeout(ctx, pingTimeout)
-			defer cancel()
-
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet,
-				strings.Replace(tunnel.Socket, "wss://", "https://", 1), nil)
-			if err != nil {
-				c.Errorf("Pinging Tunnel: making request: %v", err)
-				return
-			}
-
-			start := time.Now()
-
-			if resp, err := client.Do(req); err == nil {
-				_, _ = io.Copy(io.Discard, resp.Body)
-				resp.Body.Close()
-			}
-
-			inCh <- map[int]string{idx: time.Since(start).Round(time.Millisecond / 10).String()} //nolint:gomnd
-		}(request.Context(), idx)
+		go c.pingTunnel(request.Context(), idx, tunnel.Socket, inCh)
 	}
 
 	wait.Wait()
@@ -270,17 +250,43 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 	}
 }
 
+func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh chan map[int]string) {
+	ctx, cancel := context.WithTimeout(ctx, pingTimeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
+		strings.Replace(socket, "wss://", "https://", 1), nil)
+	if err != nil {
+		c.Errorf("Pinging Tunnel: creating request: %v", err)
+		return
+	}
+
+	start := time.Now()
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		c.Errorf("Pinging Tunnel: making request: %v", err)
+		inCh <- map[int]string{idx: "error"}
+
+		return
+	}
+	defer resp.Body.Close()
+
+	_, _ = io.Copy(io.Discard, resp.Body)
+	inCh <- map[int]string{idx: time.Since(start).Round(time.Millisecond).String()}
+}
+
 func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
-	input, _ := io.ReadAll(request.Body)
+	body, _ := io.ReadAll(request.Body)
 
 	type tunnelS struct {
 		PrimaryTunnel string
 		BackupTunnel  []string
 	}
 
-	var data tunnelS
+	var input tunnelS
 
-	decodedValue, err := url.ParseQuery(string(input))
+	decodedValue, err := url.ParseQuery(string(body))
 	if err != nil {
 		c.Errorf("Saving Tunnel: parsing request: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
@@ -288,7 +294,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		return
 	}
 
-	err = schema.NewDecoder().Decode(&data, decodedValue)
+	err = schema.NewDecoder().Decode(&input, decodedValue)
 	if err != nil {
 		c.Errorf("Saving Tunnel: decoding request: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
@@ -296,10 +302,10 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		return
 	}
 
-	sockets := []string{data.PrimaryTunnel}
+	sockets := []string{input.PrimaryTunnel}
 
-	for _, socket := range data.BackupTunnel {
-		if socket != data.PrimaryTunnel {
+	for _, socket := range input.BackupTunnel {
+		if socket != input.PrimaryTunnel {
 			sockets = append(sockets, socket)
 		}
 	}
@@ -320,5 +326,5 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	c.makeTunnel(tl.ctx, ci) //nolint:contextcheck // these cannot be inherited from the http request.
 	c.tunnel.Start(tl.ctx)   //nolint:contextcheck
 	http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
-		data.PrimaryTunnel, len(data.BackupTunnel)), http.StatusOK)
+		input.PrimaryTunnel, len(input.BackupTunnel)), http.StatusOK)
 }
