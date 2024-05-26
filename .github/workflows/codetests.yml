@@ -48,7 +48,7 @@ jobs:
       - name: go-generate
         run: GOOS=darwin go generate ./...
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
           version: 'v1.56'
 
@@ -69,7 +69,7 @@ jobs:
       - name: go-generate
         run: GOOS=linux go generate ./...
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v6
         with:
           version: 'v1.56'
 
