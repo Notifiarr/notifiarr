@@ -22,7 +22,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hekmon/transmissionrpc/v3 v3.0.0
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
-	github.com/jackpal/gateway v1.0.14
+	github.com/jackpal/gateway v1.0.15
 	github.com/jaypipes/ghw v0.12.0
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0
 	github.com/kevinburke/go-bindata/v4 v4.0.2
@@ -34,10 +34,10 @@ require (
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
-	golang.org/x/crypto v0.22.0
+	golang.org/x/crypto v0.23.0
 	golang.org/x/mod v0.17.0
-	golang.org/x/sys v0.19.0
-	golang.org/x/text v0.14.0
+	golang.org/x/sys v0.20.0
+	golang.org/x/text v0.15.0
 	golang.org/x/time v0.5.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.3
@@ -105,7 +105,7 @@ require (
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/tools v0.20.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
