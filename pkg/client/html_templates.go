@@ -412,7 +412,7 @@ type templateData struct {
 	Headers     http.Header                    `json:"headers"`
 	ProxyAllow  bool                           `json:"proxyAllow"`
 	UpstreamIP  string                         `json:"upstreamIp"`
-	Tunnel      *mulery.Config                 `json:"tunnel"`
+	Tunnel      *mulery.Client                 `json:"tunnel"`
 	PoolStats   map[string]*mulery.PoolSize    `json:"poolStats"`
 }
 
@@ -450,8 +450,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(ctx),
 		Headers:     req.Header,
-		Tunnel:      c.tunnel.Config,
-		PoolStats:   c.tunnel.PoolStats(),
+		Tunnel:      c.tunnel,
 		Version: map[string]interface{}{
 			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),
