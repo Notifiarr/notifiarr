@@ -61,6 +61,8 @@ github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nos
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/gen2brain/beeep v0.0.0-20240112042604-c7bb2cd88fea h1:oWUHxzaBvwkRWiINbBOY39XIF+n9b4RJEPHdQ8waJUo=
 github.com/gen2brain/beeep v0.0.0-20240112042604-c7bb2cd88fea/go.mod h1:0W7dI87PvXJ1Sjs0QPvWXKcQmNERY77e8l7GFhZB/s4=
+github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4 h1:ygs9POGDQpQGLJPlq4+0LBUmMBNox1N4JSpw+OETcvI=
+github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4/go.mod h1:0W7dI87PvXJ1Sjs0QPvWXKcQmNERY77e8l7GFhZB/s4=
 github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d h1:dHYKX8CBAs1zSGXm3q3M15CLAEwPEkwrK1ed8FCo+Xo=
 github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d/go.mod h1:/eFcjDXaU2THSOOqLxOPETIbHETnamk8FA/hMjhg/gU=
 github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
