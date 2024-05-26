@@ -48,9 +48,9 @@ jobs:
       - name: go-generate
         run: GOOS=darwin go generate ./...
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v5
         with:
-          version: 'v1.56'
+          version: 'v1.57'
 
   golangci-linux:
     # description: "Runs golangci-lint on linux against linux and windows."
@@ -69,9 +69,9 @@ jobs:
       - name: go-generate
         run: GOOS=linux go generate ./...
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v5
         with:
-          version: 'v1.56'
+          version: 'v1.57'
 
   homebrew-test:
     # description: "Installs dependencies on macOS and runs `make install` to mimic a homebrew install."
