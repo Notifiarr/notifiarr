@@ -33,6 +33,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"golift.io/cnfg"
+	mulery "golift.io/mulery/client"
 	"golift.io/version"
 )
 
@@ -411,9 +412,11 @@ type templateData struct {
 	Headers     http.Header                    `json:"headers"`
 	ProxyAllow  bool                           `json:"proxyAllow"`
 	UpstreamIP  string                         `json:"upstreamIp"`
+	Tunnel      *mulery.Client                 `json:"tunnel"`
+	PoolStats   map[string]*mulery.PoolSize    `json:"poolStats"`
 }
 
-func (c *Client) renderTemplate(
+func (c *Client) renderTemplate( //nolint:funlen
 	ctx context.Context,
 	response io.Writer,
 	req *http.Request,
@@ -447,6 +450,7 @@ func (c *Client) renderTemplate(
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(ctx),
 		Headers:     req.Header,
+		Tunnel:      c.tunnel,
 		Version: map[string]interface{}{
 			"started":   version.Started.Round(time.Second),
 			"program":   c.Flags.Name(),

@@ -178,9 +178,18 @@ function loadMonitorTable(table) {
 
 function jsLoader()
 {
-    let path        = '';
-    let script      = '';
-    const files     = ['navigation', 'golists', 'fileViewer', 'services', 'triggers', 'websocket', 'filebrowser'];
+    let path    = '';
+    let script  = '';
+    const files = [
+        'tunnel', 
+        'navigation', 
+        'golists', 
+        'fileViewer',
+        'services',
+        'triggers', 
+        'websocket', 
+        'filebrowser',
+    ];
 
     for (const file of files) {
         path        = FilesBase+'/js/' + file + '.js';
@@ -348,7 +357,11 @@ function savePendingChanges()
                                 clearInterval(ping);
                                 setTimeout(function() {
                                     location.reload();
-                                }, 500);
+                                }, 1000);
+                            } else {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 2000);
                             }
                         }
                     });

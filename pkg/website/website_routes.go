@@ -113,13 +113,17 @@ api/v1/user/trash?app=...
   sonarr
 */
 const (
-	BaseURL             = "https://notifiarr.com"
-	userRoute1    Route = "/api/v1/user"
-	userRoute2    Route = "/api/v2/user"
-	ClientRoute   Route = userRoute2 + "/client"
-	CFSyncRoute   Route = userRoute1 + "/trash"
-	GapsRoute     Route = userRoute1 + "/gaps"
-	MdbListRoute  Route = userRoute1 + "/mdblist"
+	BaseURL = "https://notifiarr.com"
+
+	userRoute1   Route = "/api/v1/user"
+	CFSyncRoute  Route = userRoute1 + "/trash"
+	GapsRoute    Route = userRoute1 + "/gaps"
+	MdbListRoute Route = userRoute1 + "/mdblist"
+	TunnelRoute  Route = userRoute1 + "/tunnel"
+
+	userRoute2  Route = "/api/v2/user"
+	ClientRoute Route = userRoute2 + "/client"
+
 	notifiRoute   Route = "/api/v1/notification"
 	DashRoute     Route = notifiRoute + "/dashboard"
 	StuckRoute    Route = notifiRoute + "/stuck"
