@@ -59,6 +59,8 @@ VERSION_LDFLAGS:= -X \"golift.io/version.Branch=$(BRANCH) ($(COMMIT))\" \
 	-X \"golift.io/version.Revision=$(ITERATION)\" \
 	-X \"golift.io/version.Version=$(VERSION)\"
 
+WINDOWS_LDFLAGS:= -H=windowsgui
+
 # Makefile targets follow.
 
 all: notifiarr

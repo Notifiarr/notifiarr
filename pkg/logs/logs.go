@@ -16,7 +16,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/ui"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -168,7 +167,6 @@ func (l *Logger) Close() (errors []error) {
 // CapturePanic can be deferred in any go routine to log any panic that occurs.
 func (l *Logger) CapturePanic() {
 	if r := recover(); r != nil {
-		ui.ShowConsoleWindow()
 		l.ErrorLog.Output(callDepth, //nolint:errcheck
 			fmt.Sprintf("Go Panic! %s\n%s-%s %s %v\n%s", mnd.BugIssue,
 				version.Version, version.Revision, version.Branch, r, string(debug.Stack())))

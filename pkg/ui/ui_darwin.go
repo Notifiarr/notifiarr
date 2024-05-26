@@ -22,12 +22,6 @@ func HasGUI() bool {
 	return hasGUI
 }
 
-// HideConsoleWindow doesn't work on maacOS.
-func HideConsoleWindow() {}
-
-// ShowConsoleWindow does nothing on OSes besides Windows.
-func ShowConsoleWindow() {}
-
 func Notify(msg string, vars ...interface{}) error {
 	if !hasGUI {
 		return nil
