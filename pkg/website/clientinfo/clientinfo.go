@@ -52,8 +52,9 @@ type ClientInfo struct {
 
 // MuleryServer is data from the website. It's a tunnel's https and wss urls.
 type MuleryServer struct {
-	Tunnel string `json:"tunnel"` // ex: "https://africa.notifiarr.com/"
-	Socket string `json:"socket"` // ex: "wss://africa.notifiarr.com/register"
+	Tunnel   string `json:"tunnel"`   // ex: "https://africa.notifiarr.com/"
+	Socket   string `json:"socket"`   // ex: "wss://africa.notifiarr.com/register"
+	Location string `json:"location"` // ex: "Nairobi, Kenya, Africa"
 }
 
 // CronConfig defines a custom GET timer from the website.
