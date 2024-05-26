@@ -23,14 +23,12 @@ import (
 // @in header
 // @name X-API-Key
 func main() {
-	ui.HideConsoleWindow()
 	// setup log package in case we throw an error in main.go before logging is setup.
 	log.SetFlags(log.LstdFlags)
 	log.SetPrefix("[ERROR] ")
 
 	defer func() {
 		if r := recover(); r != nil {
-			ui.ShowConsoleWindow()
 			log.Printf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack()))
 		}
 	}()

@@ -12,7 +12,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gen2brain/beeep"
-	"github.com/gonutz/w32/v2"
 	"github.com/kardianos/osext"
 )
 
@@ -66,26 +65,6 @@ func getPNG() string {
 
 	// go log.Println("minmaxsize", minimumFileSize, maximumFileSize, f.Size(), len(data))
 	return pngPath
-}
-
-// HideConsoleWindow makes the console window vanish on startup.
-func HideConsoleWindow() {
-	if console := w32.GetConsoleWindow(); console != 0 {
-		_, consoleProcID := w32.GetWindowThreadProcessId(console)
-		if w32.GetCurrentProcessId() == consoleProcID {
-			w32.ShowWindowAsync(console, w32.SW_HIDE)
-		}
-	}
-}
-
-// ShowConsoleWindow does nothing on OSes besides Windows.
-func ShowConsoleWindow() {
-	if console := w32.GetConsoleWindow(); console != 0 {
-		_, consoleProcID := w32.GetWindowThreadProcessId(console)
-		if w32.GetCurrentProcessId() == consoleProcID {
-			w32.ShowWindowAsync(console, w32.SW_SHOW)
-		}
-	}
 }
 
 // StartCmd starts a command.

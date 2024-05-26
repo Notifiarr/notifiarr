@@ -25,12 +25,6 @@ func Notify(_ string, _ ...interface{}) error {
 	return nil
 }
 
-// HideConsoleWindow doesn't work on most OSes.
-func HideConsoleWindow() {}
-
-// ShowConsoleWindow does nothing on OSes besides Windows.
-func ShowConsoleWindow() {}
-
 // StartCmd starts a command.
 func StartCmd(c string, v ...string) error {
 	cmd := exec.Command(c, v...)

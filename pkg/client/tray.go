@@ -327,17 +327,6 @@ func (c *Client) debugMenu() {
 		c.Config.Services.RunChecks("log")
 	})
 
-	menu["console"] = debug.AddSubMenuItem("Console", "toggle the console window")
-	menu["console"].Click(func() {
-		if menu["console"].Checked() {
-			menu["console"].Uncheck()
-			ui.HideConsoleWindow()
-		} else {
-			menu["console"].Check()
-			ui.ShowConsoleWindow()
-		}
-	})
-
 	if runtime.GOOS != mnd.Windows {
 		menu["console"].Hide()
 	}

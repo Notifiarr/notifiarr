@@ -1,7 +1,7 @@
 <h1><i class="fas fa-satellite"></i> Site Tunnel</h1>
 <p>
     This client keeps a persistent websocket connection to a notifiarr.com
-    <a href="https://github.com/golift/mulery">Mulery</a> tunnel.
+    <a href="https://github.com/golift/mulery" target="_new">Mulery</a> tunnel.
     This tunnel allows the website to make requests to your client without the need
     for opening a port, or having a static IP. This page allows you to select your
     primary tunnel and which tunnel you wish to use as backup in case the primary
@@ -12,7 +12,7 @@
     Select another fast tunnel as backup.
 </p>
 <p> {{$activeTunnel := (cache "activeTunnel")}}
-    <li><i class="fas fa-star text-dgrey"></i> Active Tunnel: <b>{{if $activeTunnel}}{{$activeTunnel.Data}}{{else}}unknown{{end}}</b></li>
+    <li><b><i class="fas fa-star text-primary"></i> Active Tunnel: {{if $activeTunnel}}{{$activeTunnel.Data}}{{else}}unknown{{end}}</b></li>
 </p>
 
 <p></p>
@@ -33,10 +33,11 @@
             {{- range $idx, $mule := .ClientInfo.User.Mulery}}
             {{$primary := and (gt (len $.ClientInfo.User.Tunnels) 0) (eq (index $.ClientInfo.User.Tunnels 0) $mule.Socket)}}
             <tr>
-                <td style="width:80px;"><span class="text-warning text-center" id="tunnel-ping{{$idx}}"></span></td>
-                <td style="width:30px; max-width:30px;">
+                <td style="width:30px;">
                     <input type="radio" value="{{$mule.Socket}}" class="tunnel-param" name="primaryTunnel"{{if $primary}} checked{{end}}>
                 </td>
+                <td style="width:200px;">{{$mule.Location}}</td>
+                <td style="width:60px;"><span class="text-warning text-center" id="tunnel-ping{{$idx}}"></span></td>
                 <td>{{$mule.Socket}}</td>
             </tr>
             {{- end}}
@@ -48,7 +49,7 @@
         {{- range $mule := .ClientInfo.User.Mulery}}
         {{$backup := and (gt (len $.ClientInfo.User.Tunnels) 1) (eq (index $.ClientInfo.User.Tunnels 1) $mule.Socket)}}
         <option value="{{$mule.Socket}}"{{if $backup}} selected{{end}}>
-            {{$mule.Socket}}
+            {{$mule.Location}} &nbsp; {{$mule.Socket}}
         </option>
         {{- end}}
         </select>
@@ -62,7 +63,7 @@
     {{- if .Tunnel }}
     {{- range $socket, $stats := .Tunnel.PoolStats }}
         <tr>
-        <td><strong>Socket URL</strong> ({{if $stats.Active}}active{{else}}inactive{{end}})</td>
+        <td style="width:230px;"><strong>Socket URL</strong> ({{if $stats.Active}}active{{else}}inactive{{end}})</td>
         <td><strong>{{$socket}}</strong></td>
         </tr>
         <tr><td>Disconnects</td><td>{{$stats.Disconnects}}</td></tr>
