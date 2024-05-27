@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        docker: [ {name: 'scratch', sfx: ''}, {name: 'cuda', sfx: '-cuda'}, {name: 'alpine', sfx: '-alpine'} ]
+        docker: [ {name: 'latest', sfx: ''}, {name: 'cuda', sfx: '-cuda'}, {name: 'alpine', sfx: '-alpine'} ]
     permissions:
       contents: read
       packages: write
@@ -60,10 +60,11 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern=v{{version}}${{ matrix.docker.sfx }}
-            type=semver,pattern={{version}}${{ matrix.docker.sfx }}
-            type=semver,pattern={{major}}.{{minor}}${{ matrix.docker.sfx }}
-            type=semver,pattern={{major}}${{ matrix.docker.sfx }}
+            type=semver,priority=1010,pattern=${{ matrix.docker.name }}
+            type=semver,priority=1009,pattern={{major}}${{ matrix.docker.sfx }}
+            type=semver,priority=1008,pattern={{major}}.{{minor}}${{ matrix.docker.sfx }}
+            type=semver,priority=1007,pattern={{version}}${{ matrix.docker.sfx }}
+            type=semver,priority=1006,pattern=v{{version}}${{ matrix.docker.sfx }}
             type=ref,enable=true,event=branch,suffix=${{ matrix.docker.sfx }}
 
       # Build and push Docker image with Buildx
