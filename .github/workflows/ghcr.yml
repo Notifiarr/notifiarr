@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        docker: [ {name: 'latest', sfx: ''}, {name: 'cuda', sfx: '-cuda'}, {name: 'alpine', sfx: '-alpine'} ]
+        docker: [ {name: 'scratch', sfx: ''}, {name: 'cuda', sfx: '-cuda'}, {name: 'alpine', sfx: '-alpine'} ]
     permissions:
       contents: read
       packages: write
@@ -59,8 +59,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
+          flavor: latest=false
           tags: |
-            type=semver,priority=1010,pattern=${{ matrix.docker.name }}
+            type=semver,priority=1010,value=latest,enable=${{ matrix.docker.sfx == '' }}
+            type=semver,priority=1010,value=${{ matrix.docker.name }},enable=${{ matrix.docker.sfx != '' }}
             type=semver,priority=1009,pattern={{major}}${{ matrix.docker.sfx }}
             type=semver,priority=1008,pattern={{major}}.{{minor}}${{ matrix.docker.sfx }}
             type=semver,priority=1007,pattern={{version}}${{ matrix.docker.sfx }}
