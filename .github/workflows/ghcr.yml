@@ -61,8 +61,8 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           flavor: latest=false
           tags: |
-            type=semver,priority=1010,value=latest,enable=${{ matrix.docker.sfx == '' }}
-            type=semver,priority=1010,value=${{ matrix.docker.name }},enable=${{ matrix.docker.sfx != '' }}
+            type=semver,priority=1010,pattern=latest,enable=${{ matrix.docker.sfx == '' }}
+            type=semver,priority=1010,pattern=${{ matrix.docker.name }},enable=${{ matrix.docker.sfx != '' }}
             type=semver,priority=1009,pattern={{major}}${{ matrix.docker.sfx }}
             type=semver,priority=1008,pattern={{major}}.{{minor}}${{ matrix.docker.sfx }}
             type=semver,priority=1007,pattern={{version}}${{ matrix.docker.sfx }}
