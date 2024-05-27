@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 
@@ -326,10 +325,6 @@ func (c *Client) debugMenu() {
 		ui.Notify("Running and logging %d Service Checks.", c.Config.Services.SvcCount())
 		c.Config.Services.RunChecks("log")
 	})
-
-	if runtime.GOOS != mnd.Windows {
-		menu["console"].Hide()
-	}
 
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
 	menu["debug_panic"] = debug.AddSubMenuItem("Application Panic", "cause an application panic (crash)")
