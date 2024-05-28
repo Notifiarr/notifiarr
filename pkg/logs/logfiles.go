@@ -40,32 +40,48 @@ func (l *Logger) setDefaultLogPaths() {
 	}
 }
 
-// setLogPaths sets the log paths for app and http logs.
-func (l *Logger) setLogPaths() {
+// setAppLogPath sets the log path for app log.
+func (l *Logger) setAppLogPath() {
 	// Regular log file.
-	if l.LogConfig.LogFile != "" {
-		if f, err := homedir.Expand(l.LogConfig.LogFile); err == nil {
-			l.LogConfig.LogFile = f
-		} else if l.LogConfig.AppName != "" {
-			l.LogConfig.LogFile = l.LogConfig.AppName + defExt
-		}
-
-		if f, err := filepath.Abs(l.LogConfig.LogFile); err == nil {
-			l.LogConfig.LogFile = f
-		}
+	if l.LogConfig.LogFile == "" {
+		return
 	}
 
-	// HTTP log file.
-	if l.LogConfig.HTTPLog != "" {
-		if f, err := homedir.Expand(l.LogConfig.HTTPLog); err == nil {
-			l.LogConfig.HTTPLog = f
-		} else if l.LogConfig.AppName != "" {
-			l.LogConfig.HTTPLog = l.LogConfig.AppName + httpExt
-		}
+	if f, err := homedir.Expand(l.LogConfig.LogFile); err == nil {
+		l.LogConfig.LogFile = f
+	} else if l.LogConfig.AppName != "" {
+		l.LogConfig.LogFile = l.LogConfig.AppName + defExt
+	}
 
-		if f, err := filepath.Abs(l.LogConfig.HTTPLog); err == nil {
-			l.LogConfig.HTTPLog = f
-		}
+	if f, err := filepath.Abs(l.LogConfig.LogFile); err == nil {
+		l.LogConfig.LogFile = f
+	}
+
+	// If a directory was provided, append a file name.
+	if stat, _ := os.Stat(l.LogConfig.LogFile); stat != nil && stat.IsDir() {
+		l.LogConfig.LogFile = filepath.Join(l.LogConfig.LogFile, mnd.Title+defExt)
+	}
+}
+
+// setHTTPLogPath sets the log path for HTTP log.
+func (l *Logger) setHTTPLogPath() {
+	if l.LogConfig.HTTPLog == "" {
+		return
+	}
+
+	if f, err := homedir.Expand(l.LogConfig.HTTPLog); err == nil {
+		l.LogConfig.HTTPLog = f
+	} else if l.LogConfig.AppName != "" {
+		l.LogConfig.HTTPLog = l.LogConfig.AppName + httpExt
+	}
+
+	if f, err := filepath.Abs(l.LogConfig.HTTPLog); err == nil {
+		l.LogConfig.HTTPLog = f
+	}
+
+	// If a directory was provided, append a file name.
+	if stat, _ := os.Stat(l.LogConfig.HTTPLog); stat != nil && stat.IsDir() {
+		l.LogConfig.HTTPLog = filepath.Join(l.LogConfig.HTTPLog, mnd.Title+httpExt)
 	}
 }
 
@@ -128,6 +144,12 @@ func (l *Logger) openDebugLog() {
 
 	if f, err := filepath.Abs(l.LogConfig.DebugLog); err == nil {
 		l.LogConfig.DebugLog = f
+	}
+
+	if stat, err := os.Stat(l.LogConfig.DebugLog); err == nil {
+		if stat.IsDir() {
+			l.LogConfig.DebugLog = filepath.Join(l.LogConfig.DebugLog, mnd.Title+".debug"+defExt)
+		}
 	}
 
 	rotateDebug := &rotatorr.Config{

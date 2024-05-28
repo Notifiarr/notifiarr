@@ -101,7 +101,8 @@ func (l *Logger) SetupLogging(config *LogConfig) {
 	}
 
 	l.setDefaultLogPaths()
-	l.setLogPaths()
+	l.setAppLogPath()
+	l.setHTTPLogPath()
 	l.openLogFile()
 	l.openHTTPLog()
 	l.openDebugLog()
