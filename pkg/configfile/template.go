@@ -66,6 +66,11 @@ bind_addr = '''{{.BindAddr}}'''
 ## You may also set it to a Go duration like "12h" or "72h".
 ## THIS ONLY WORKS ON WINDOWS
 {{if .AutoUpdate}}auto_update = "{{.AutoUpdate}}"{{else}}auto_update = "off"{{end}}
+{{- if .UnstableCh}}
+
+## Setting this to true uses the unstable website instead of GitHub for auto updates.
+unstable_ch = true
+{{- end}}
 {{- end}}
 
 ## Quiet makes the app not log anything to output.
@@ -444,10 +449,10 @@ retries = {{.Retries}}
 [[snapshot.mysql]]
   name     = "{{.Name}}"
   host     = "{{.Host}}"
-	user     = "{{.User}}"
-	pass     = '''{{.Pass}}'''
+  user     = "{{.User}}"
+  pass     = '''{{.Pass}}'''
   interval = "{{.Interval}}" # Service check duration (if name is not empty).
-	timeout  = "{{.Timeout}}"
+  timeout  = "{{.Timeout}}"
 {{end}}
 {{else}}
 #[[snapshot.mysql]]
@@ -466,9 +471,9 @@ retries = {{.Retries}}
 # SMI Path is found automatically if left blank. Set it to path to nvidia-smi (nvidia-smi.exe on Windows).
 
 [snapshot.nvidia]
-disabled = {{.Snapshot.Nvidia.Disabled}}
-smi_path = '''{{.Snapshot.Nvidia.SMIPath}}'''
-bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
+  disabled = {{.Snapshot.Nvidia.Disabled}}
+  smi_path = '''{{.Snapshot.Nvidia.SMIPath}}'''
+  bus_ids  = [{{range $s := .Snapshot.Nvidia.BusIDs}}"{{$s}}",{{end}}]
 
 ##################
 # Service Checks #

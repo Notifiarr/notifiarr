@@ -66,7 +66,12 @@ func (c *Client) AutoWatchUpdate(ctx context.Context) {
 		}
 	}
 
-	c.Print("Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
+	pfx := ""
+	if c.Config.UnstableCh {
+		pfx = "Unstable Channel "
+	}
+
+	c.Print(pfx+"Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
 
 	go func() {
 		defer c.CapturePanic()
@@ -87,14 +92,28 @@ func (c *Client) AutoWatchUpdate(ctx context.Context) {
 }
 
 func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
-	c.Debugf("Checking GitHub for Update.")
+	var (
+		data  *update.Update
+		err   error
+		where = "GitHub"
+	)
 
-	u, err := update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
+	if c.Config.UnstableCh {
+		c.Debugf("[cron requested] Checking Unstable website for Update.")
+
+		data, err = update.CheckUnstable(ctx, mnd.Title, version.Version)
+		where = "Unstable website"
+	} else {
+		c.Debugf("[cron requested] Checking GitHub for Update.")
+
+		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
+	}
+
 	if err != nil {
-		return fmt.Errorf("checking GitHub for update: %w", err)
-	} else if !u.Outdate {
+		return fmt.Errorf("checking %s for update: %w", where, err)
+	} else if !data.Outdate {
 		return nil
-	} else if err = c.updateNow(ctx, u, how); err != nil {
+	} else if err = c.updateNow(ctx, data, how); err != nil {
 		return err
 	}
 
