@@ -66,25 +66,25 @@ func (c *Client) AutoWatchUpdate(ctx context.Context) {
 		}
 	}
 
+	c.startAutoUpdater(ctx, dur)
+}
+
+func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 	pfx := ""
 	if c.Config.UnstableCh {
 		pfx = "Unstable Channel "
 	}
 
-	c.Print(pfx+"Auto-updater enabled. Check interval:", durafmt.Parse(dur).String())
+	c.Print(pfx+"Auto-updater started. Check interval:", durafmt.Parse(dur).String())
 
-	go func() {
-		defer c.CapturePanic()
-
-		time.Sleep(update.SleepTime)
-		// Check for update on startup.
-		if err := c.checkAndUpdate(ctx, "startup check"); err != nil {
-			c.Errorf("Startup-Update Failed: %v", err)
-		}
-	}()
+	time.Sleep(update.SleepTime)
+	// Check for update on startup.
+	if err := c.checkAndUpdate(ctx, "startup check"); err != nil {
+		c.Errorf("Startup-Update Failed: %v", err)
+	}
 
 	ticker := time.NewTicker(dur)
-	for range ticker.C {
+	for range ticker.C { // the ticker never exits.
 		if err := c.checkAndUpdate(ctx, "automatic"); err != nil {
 			c.Errorf("Auto-Update Failed: %v", err)
 		}
