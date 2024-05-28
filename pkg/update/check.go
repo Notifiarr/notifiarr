@@ -27,8 +27,8 @@ var (
 	ErrNoFile = fmt.Errorf("no downloadable file found in release")
 )
 
-// Latest is where we find the latest release.
-const Latest = "https://api.github.com/repos/%s/releases/latest"
+// LatestGH is where we find the latest release.
+const LatestGH = "https://api.github.com/repos/%s/releases/latest"
 
 // GitHub API and JSON unmarshal timeout.
 const timeout = 10 * time.Second
@@ -36,16 +36,17 @@ const timeout = 10 * time.Second
 // Update contains running Version, Current version and Download URL for Current version.
 // Outdate is true if the running version is older than the current version.
 type Update struct {
-	Outdate bool
-	RelDate time.Time
-	Version string
-	Current string
-	CurrURL string
+	Outdate bool      // True if we're outdated, update available.
+	Version string    // Version passed in externally.
+	Current string    // Current release available on GH or US.
+	CurrURL string    // URL of current release on GH or US.
+	RelDate time.Time // Current version release date.
+	RelSize int64     // Current release file size.
 }
 
-// Check checks if the app this library lives in has an updated version on GitHub.
-func Check(ctx context.Context, userRepo string, version string) (*Update, error) {
-	release, err := GetRelease(ctx, fmt.Sprintf(Latest, userRepo))
+// CheckGitHub checks if the app this library lives in has an updated version on GitHub.
+func CheckGitHub(ctx context.Context, userRepo string, version string) (*Update, error) {
+	release, err := GetRelease(ctx, fmt.Sprintf(LatestGH, userRepo))
 	if err != nil {
 		return nil, err
 	}
@@ -104,6 +105,7 @@ func FillUpdate(release *GitHubReleasesLatest, version string) (*Update, error) 
 		if strings.HasSuffix(file.BrowserDownloadURL, suffix) {
 			update.CurrURL = file.BrowserDownloadURL
 			update.RelDate = file.UpdatedAt
+			update.RelSize = file.Size
 
 			break
 		}
@@ -148,7 +150,7 @@ type GHasset struct {
 	Uploader           GHuser    `json:"uploader"`
 	ContentType        string    `json:"content_type"`
 	State              string    `json:"state"`
-	Size               int       `json:"size"`
+	Size               int64     `json:"size"`
 	DownloadCount      int       `json:"download_count"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`

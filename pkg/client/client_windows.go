@@ -89,7 +89,7 @@ func (c *Client) AutoWatchUpdate(ctx context.Context) {
 func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 	c.Debugf("Checking GitHub for Update.")
 
-	u, err := update.Check(ctx, mnd.UserRepo, version.Version)
+	u, err := update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
 	if err != nil {
 		return fmt.Errorf("checking GitHub for update: %w", err)
 	} else if !u.Outdate {

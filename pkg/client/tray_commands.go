@@ -49,25 +49,46 @@ func (c *Client) rotateLogs() {
 	}
 }
 
-func (c *Client) checkForUpdate(ctx context.Context) {
-	c.Print("[user requested] GitHub Update Check")
+func (c *Client) checkForUpdate(ctx context.Context, unstable bool) {
+	var (
+		data  *update.Update
+		err   error
+		where = "GitHub"
+	)
 
-	switch update, err := update.Check(ctx, mnd.UserRepo, version.Version); {
+	if unstable {
+		c.Print("[user requested] Unstable Update Check")
+
+		data, err = update.CheckUnstable(ctx, mnd.Title, version.Version)
+		where = "Unstable website"
+	} else {
+		c.Print("[user requested] GitHub Update Check")
+
+		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
+	}
+
+	switch {
 	case err != nil:
 		c.Errorf("Update Check: %v", err)
-		_, _ = ui.Error(TitleError, "Checking version on GitHub: "+err.Error())
-	case update.Outdate && runtime.GOOS == mnd.Windows:
-		c.upgradeWindows(ctx, update)
-	case update.Outdate:
-		c.downloadOther(update)
+		_, _ = ui.Error(TitleError, "Checking version on "+where+": "+err.Error())
+	case data.Outdate && runtime.GOOS == mnd.Windows:
+		c.upgradeWindows(ctx, data)
+	case data.Outdate:
+		c.downloadOther(data, unstable)
 	default:
-		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+update.Version+"\n"+
-			"Updated: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate))
+		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+data.Version+"\n"+
+			"Updated: "+data.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(data.RelDate))
 	}
 }
 
-func (c *Client) downloadOther(update *update.Update) {
-	yes, _ := ui.Question(mnd.Title, "An Update is available! Download?\n\n"+
+func (c *Client) downloadOther(update *update.Update, unstable bool) {
+	msg := "An Update is available! Download?\n\n"
+
+	if unstable {
+		msg = "An Unstable Update is available! Download?\n\n"
+	}
+
+	yes, _ := ui.Question(mnd.Title, msg+
 		"Your Version: "+update.Version+"\n"+
 		"New Version: "+update.Current+"\n"+
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate), false)
