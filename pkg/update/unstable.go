@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 type UnstableFile struct {
@@ -30,7 +32,7 @@ func CheckUnstable(ctx context.Context, app string, revision string) (*Update, e
 
 	if runtime.GOOS == "darwin" {
 		uri = fmt.Sprintf("%s/%s/%s.dmg", unstableURL, app, app)
-	} else if runtime.GOOS != "windows" {
+	} else if !mnd.IsWindows {
 		uri = fmt.Sprintf("%s/%s/%s.%s.%s.gz", unstableURL, app, app, runtime.GOARCH, runtime.GOOS)
 	}
 
