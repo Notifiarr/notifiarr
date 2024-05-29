@@ -127,13 +127,13 @@ func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInf
 	c.debugMenu()
 
 	menu["update"] = systray.AddMenuItem("Update", "check GitHub for updated version")
+	menu["update"].Click(func() { go c.checkForUpdate(ctx, false) })
 
 	if mnd.IsUnstable || (clientInfo != nil && clientInfo.User.DevAllowed) {
 		menu["unstable"] = systray.AddMenuItem("Unstable", "check Unstable website for updated version")
+		menu["unstable"].Click(func() { go c.checkForUpdate(ctx, true) })
 	}
 
-	menu["update"].Click(func() { go c.checkForUpdate(ctx, false) })
-	menu["unstable"].Click(func() { go c.checkForUpdate(ctx, true) })
 	menu["gui"] = systray.AddMenuItem("Open WebUI", "open the web page for this Notifiarr client")
 	menu["gui"].Click(c.openGUI)
 	menu["sub"] = systray.AddMenuItem("Subscribe", "subscribe for premium features")
