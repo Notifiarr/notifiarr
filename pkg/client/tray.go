@@ -41,8 +41,8 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 		// systray.SetOnClick(c.showMenu) // buggy
 		systray.SetOnRClick(c.showMenu)
 		systray.SetOnDClick(func(_ systray.IMenu) { c.openGUI() })
-		c.makeMenus(ctx)         // make the menu before starting the web server.
-		c.setupMenus(clientInfo) // code that runs on reload, too.
+		c.makeMenus(ctx, clientInfo) // make the menu before starting the web server.
+		c.setupMenus(clientInfo)     // code that runs on reload, too.
 
 		// This starts the web server, and waits for reload/exit signals.
 		if err := c.Exit(ctx, cancel); err != nil {
@@ -116,7 +116,7 @@ func (c *Client) setupMenus(clientInfo *clientinfo.ClientInfo) {
 	}
 }
 
-func (c *Client) makeMenus(ctx context.Context) {
+func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInfo) {
 	menu["stat"] = systray.AddMenuItem("Running", "web server state unknown")
 	menu["stat"].Click(func() { c.toggleServer(ctx) })
 
@@ -127,7 +127,13 @@ func (c *Client) makeMenus(ctx context.Context) {
 	c.debugMenu()
 
 	menu["update"] = systray.AddMenuItem("Update", "check GitHub for updated version")
-	menu["update"].Click(func() { go c.checkForUpdate(ctx) })
+	menu["update"].Click(func() { go c.checkForUpdate(ctx, false) })
+
+	if mnd.IsUnstable || (clientInfo != nil && clientInfo.User.DevAllowed) {
+		menu["unstable"] = systray.AddMenuItem("Unstable", "check Unstable website for updated version")
+		menu["unstable"].Click(func() { go c.checkForUpdate(ctx, true) })
+	}
+
 	menu["gui"] = systray.AddMenuItem("Open WebUI", "open the web page for this Notifiarr client")
 	menu["gui"].Click(c.openGUI)
 	menu["sub"] = systray.AddMenuItem("Subscribe", "subscribe for premium features")

@@ -56,6 +56,7 @@ type Config struct {
 	SSLKeyFile string                 `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
 	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
 	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
+	UnstableCh bool                   `json:"unstableCh" toml:"unstable_ch" xml:"unstable_ch" yaml:"unstableCh"`
 	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
 	Retries    int                    `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
 	Snapshot   *snapshot.Config       `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`

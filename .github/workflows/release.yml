@@ -50,6 +50,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable' || github.ref == 'refs/heads/main'
     outputs:
       version: ${{ steps.release.outputs.version }}
+      revision: ${{ steps.release.outputs.revision }}
     name: Make Release Assets
     runs-on: ubuntu-latest
     env:
@@ -69,7 +70,9 @@ jobs:
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           make release
-          source settings.sh ; echo "version=${VERSION}-${ITERATION}" >> $GITHUB_OUTPUT
+          source settings.sh
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
       - name: upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -98,8 +101,8 @@ jobs:
             [ -f "$file" ] || continue;
             echo "Uploading: ${file}";
             curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}";
-            versionfile="${{needs.release-test.outputs.version}};filename=${file}.txt;type=text/plain";
-            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=${versionfile}";
+            echo '{"version":"${{needs.release-test.outputs.version}}","revision":${{needs.release-test.outputs.revision}},"size":'$(stat --printf="%s" ${file})'}' >> ${file}.txt
+            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}.txt";
           done
 
   deploy-unstable-packagecloud:
