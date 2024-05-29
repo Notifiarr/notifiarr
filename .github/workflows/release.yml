@@ -70,7 +70,8 @@ jobs:
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           make release
           source settings.sh ; echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          source settings.sh ; echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
+          source settings.sh ; echo "iteration=${ITERATION}" >> $GITHUB_OUTPUT
+          echo "v/i ${VERSION}-${ITERATION}"
       - name: upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -99,7 +100,7 @@ jobs:
             [ -f "$file" ] || continue;
             echo "Uploading: ${file}";
             curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}";
-            echo '{"version":"${{needs.release-test.outputs.version}}","revision":${{needs.release-test.outputs.revision}},"size":'$(stat --printf="%s" ${file})'}' >> ${file}.txt
+            echo '{"version":"${{needs.release-test.outputs.version}}","revision":${{needs.release-test.outputs.iteration}},"size":'$(stat --printf="%s" ${file})'}' >> ${file}.txt
             curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}.txt";
           done
 
