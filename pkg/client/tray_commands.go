@@ -43,7 +43,7 @@ func (c *Client) rotateLogs() {
 
 	for _, err := range c.Logger.Rotate() {
 		if err != nil {
-			ui.Notify("Error rotateing log files: %v", err) //nolint:errcheck
+			ui.Notify("Error rotating log files: %v", err) //nolint:errcheck
 			c.Errorf("Rotating Log Files: %v", err)
 		}
 	}
@@ -76,7 +76,7 @@ func (c *Client) checkForUpdate(ctx context.Context, unstable bool) {
 	case data.Outdate:
 		c.downloadOther(data, unstable)
 	default:
-		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+data.Version+"\n"+
+		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+data.Current+"\n"+
 			"Updated: "+data.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(data.RelDate))
 	}
 }
