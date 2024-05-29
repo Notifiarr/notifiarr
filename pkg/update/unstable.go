@@ -59,7 +59,7 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 	defer cancel()
 
 	release := UnstableFile{File: uri}
-	uri = uri + ".txt"
+	uri += ".txt"
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
