@@ -50,7 +50,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable' || github.ref == 'refs/heads/main'
     outputs:
       version: ${{ steps.release.outputs.version }}
-      revision: ${{ steps.release.outputs.version }}
+      revision: ${{ steps.release.outputs.revision }}
     name: Make Release Assets
     runs-on: ubuntu-latest
     env:
