@@ -89,7 +89,7 @@ func (c *Client) downloadOther(update *update.Update, unstable bool) {
 	}
 
 	yes, _ := ui.Question(mnd.Title, msg+
-		"Your Version: "+update.Version+"\n"+
+		"Your Version: "+version.Version+"-"+version.Revision+"\n"+
 		"New Version: "+update.Current+"\n"+
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate), false)
 	if yes {
