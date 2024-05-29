@@ -20,7 +20,7 @@ import (
 // This is the pop-up a user sees when they click update in the menu.
 func (c *Client) upgradeWindows(ctx context.Context, update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
-		"Your Version: "+update.Version+"\n"+
+		"Your Version: "+version.Version+"-"+version.Revision+"\n"+
 		"New Version: "+update.Current+"\n"+
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate), false)
 	if yes {

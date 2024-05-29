@@ -25,7 +25,7 @@ const unstableURL = "https://unstable.golift.io"
 // CheckUnstable checks if the provided app has an updated version on GitHub.
 // Pass in revision only, no version.
 func CheckUnstable(ctx context.Context, app string, revision string) (*Update, error) {
-	uri := fmt.Sprintf("%s/%s/%s.%s.installer.exe", unstableURL, strings.ToLower(app), app, runtime.GOARCH)
+	uri := fmt.Sprintf("%s/%s/%s.%s.exe.zip", unstableURL, strings.ToLower(app), app, runtime.GOARCH)
 	if runtime.GOOS == "linux" {
 		uri = fmt.Sprintf("%s/%s/%s.%s.gz", unstableURL, strings.ToLower(app), app, runtime.GOARCH)
 	} else if runtime.GOOS == "darwin" {
@@ -54,24 +54,25 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri+".txt", nil)
+	release := UnstableFile{File: uri}
+	uri = uri + ".txt"
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
-		return nil, fmt.Errorf("requesting unstable: %w", err)
+		return nil, fmt.Errorf("requesting %s: %w", uri, err)
 	}
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("querying unstable: %w", err)
+		return nil, fmt.Errorf("querying %s: %w", uri, err)
 	}
 	defer resp.Body.Close()
 
-	var release UnstableFile
 	if err = json.NewDecoder(resp.Body).Decode(&release); err != nil {
-		return nil, fmt.Errorf("decoding unstable response: %w", err)
+		return nil, fmt.Errorf("decoding %s response: %w", uri, err)
 	}
 
 	release.Time, _ = time.Parse(time.RFC1123, resp.Header.Get("last-modified"))
-	release.File = uri
 
 	return &release, nil
 }
