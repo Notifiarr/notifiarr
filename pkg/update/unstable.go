@@ -25,11 +25,13 @@ const unstableURL = "https://unstable.golift.io"
 // CheckUnstable checks if the provided app has an updated version on GitHub.
 // Pass in revision only, no version.
 func CheckUnstable(ctx context.Context, app string, revision string) (*Update, error) {
-	uri := fmt.Sprintf("%s/%s/%s.%s.exe.zip", unstableURL, strings.ToLower(app), app, runtime.GOARCH)
-	if runtime.GOOS == "linux" {
-		uri = fmt.Sprintf("%s/%s/%s.%s.gz", unstableURL, strings.ToLower(app), app, runtime.GOARCH)
-	} else if runtime.GOOS == "darwin" {
-		uri = fmt.Sprintf("%s/%s/%s.dmg", unstableURL, strings.ToLower(app), app)
+	app = strings.ToLower(app)
+	uri := fmt.Sprintf("%s/%s/%s.%s.exe.zip", unstableURL, app, app, runtime.GOARCH)
+
+	if runtime.GOOS == "darwin" {
+		uri = fmt.Sprintf("%s/%s/%s.dmg", unstableURL, app, app)
+	} else if runtime.GOOS != "windows" {
+		uri = fmt.Sprintf("%s/%s/%s.%s.%s.gz", unstableURL, app, app, runtime.GOARCH, runtime.GOOS)
 	}
 
 	release, err := GetUnstable(ctx, uri)
