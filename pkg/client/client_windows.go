@@ -17,6 +17,9 @@ import (
 	"golift.io/version"
 )
 
+// WaitTime is how long we wait, after startup, before doing an update check.
+const WaitTime = 10 * time.Minute
+
 // This is the pop-up a user sees when they click update in the menu.
 func (c *Client) upgradeWindows(ctx context.Context, update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
@@ -77,7 +80,7 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 
 	c.Print(pfx+"Auto-updater started. Check interval:", durafmt.Parse(dur).String())
 
-	time.Sleep(update.SleepTime)
+	time.Sleep(WaitTime)
 	// Check for update on startup.
 	if err := c.checkAndUpdate(ctx, "startup check"); err != nil {
 		c.Errorf("Startup-Update Failed: %v", err)

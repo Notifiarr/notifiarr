@@ -25,7 +25,7 @@ import (
 )
 
 // SleepTime is how long we wait after updating before exiting.
-const SleepTime = 10 * time.Minute
+const SleepTime = 4 * time.Second
 
 const downloadTimeout = 5 * time.Minute
 
