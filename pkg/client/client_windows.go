@@ -93,23 +93,20 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 
 func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 	var (
-		data  *update.Update
-		err   error
 		where = "GitHub"
+		cmd   = update.CheckGitHub
+		chk   = version.Version
 	)
 
 	if c.Config.UnstableCh {
-		c.Debugf("[cron requested] Checking Unstable website for Update.")
-
-		data, err = update.CheckUnstable(ctx, mnd.Title, version.Version)
 		where = "Unstable website"
-	} else {
-		c.Debugf("[cron requested] Checking GitHub for Update.")
-
-		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
+		cmd = update.CheckUnstable
+		chk = version.Revision
 	}
 
-	if err != nil {
+	c.Debugf("[cron requested] Checking %s for Update.", where)
+
+	if data, err := cmd(ctx, mnd.UserRepo, chk); err != nil {
 		return fmt.Errorf("checking %s for update: %w", where, err)
 	} else if !data.Outdate {
 		return nil
@@ -121,7 +118,8 @@ func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 }
 
 func (c *Client) updateNow(ctx context.Context, u *update.Update, msg string) error {
-	c.Printf("[UPDATE] Downloading and installing update! %s => %s: %s", u.Version, u.Current, u.CurrURL)
+	c.Printf("[UPDATE] Downloading and installing update! %s-%s => %s: %s",
+		version.Version, version.Revision, u.Current, u.CurrURL)
 
 	cmd := &update.Command{
 		URL:    u.CurrURL,

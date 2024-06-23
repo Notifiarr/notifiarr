@@ -25,11 +25,9 @@ import (
 )
 
 // SleepTime is how long we wait after updating before exiting.
-const SleepTime = 5 * time.Second
+const SleepTime = 10 * time.Minute
 
-const (
-	downloadTimeout = 5 * time.Minute
-)
+const downloadTimeout = 5 * time.Minute
 
 // Command is the input data to perform an in-place update.
 type Command struct {
