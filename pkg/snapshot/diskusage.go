@@ -36,6 +36,12 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 			continue
 		}
 
+		if usage.Fstype == "tmpfs" || // skip tmpfs volumes
+			(slices.Contains(partitions[idx].Opts, "ro") && slices.Contains(partitions[idx].Opts, "nodev")) || // skip read only volumes with no device.
+			(runtime.GOOS == "darwin" && slices.Contains(partitions[idx].Opts, "nobrowse")) { // skip hidden volumes on macos.
+			continue
+		}
+
 		if usage.Total == 0 ||
 			((runtime.GOOS == "darwin" || strings.HasSuffix(runtime.GOOS, "bsd")) &&
 				!strings.HasPrefix(partitions[idx].Device, "/dev/")) {

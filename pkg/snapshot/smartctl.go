@@ -4,14 +4,13 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"path"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/jaypipes/ghw"
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
@@ -38,7 +37,7 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	case "linux":
 		err = getSmartDisks(ctx, useSudo, disks)
 	case "darwin":
-		err = getBlocks(disks)
+		err = getParts(ctx, disks)
 	default:
 		err = getParts(ctx, disks)
 	}
@@ -87,40 +86,31 @@ func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) e
 	return runCommand(cmd, waitg)
 }
 
-// works well on mac and linux, probably windows too.
-func getBlocks(disks map[string]string) error {
-	block, err := ghw.Block()
-	if err != nil {
-		return fmt.Errorf("unable to get block devices: %w", err)
-	}
-
-	have := make(map[string]struct{})
-	for _, dev := range block.Disks {
-		if _, ok := have[dev.BusPath]; ok {
-			continue
-		}
-
-		have[dev.BusPath] = struct{}{}
-
-		if runtime.GOOS != mnd.Windows {
-			disks[path.Join("/dev", dev.Name)] = ""
-		} else {
-			disks[dev.Name] = ""
-		}
-	}
-
-	return nil
-}
-
 // use this for everything else....
 func getParts(ctx context.Context, disks map[string]string) error {
+	const macDiskPrefix = "/dev/disk"
+
 	partitions, err := disk.PartitionsWithContext(ctx, false)
 	if err != nil {
 		return fmt.Errorf("unable to get partitions: %w", err)
 	}
 
 	for _, part := range partitions {
-		disks[part.Device] = ""
+		switch runtime.GOOS {
+		case "darwin":
+			if !strings.HasPrefix(part.Device, macDiskPrefix) || slices.Contains(part.Opts, "nobrowse") {
+				continue
+			}
+
+			stop := strings.Index(strings.TrimPrefix(part.Device, macDiskPrefix), "s")
+			if stop > 0 {
+				part.Device = part.Device[:stop+len(macDiskPrefix)]
+			}
+
+			fallthrough
+		default:
+			disks[part.Device] = ""
+		}
 	}
 
 	return nil
