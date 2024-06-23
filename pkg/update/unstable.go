@@ -30,7 +30,7 @@ func CheckUnstable(ctx context.Context, app string, revision string) (*Update, e
 	app = strings.ToLower(app)
 	uri := fmt.Sprintf("%s/%s/%s.%s.exe.zip", unstableURL, app, app, runtime.GOARCH)
 
-	if runtime.GOOS == "darwin" {
+	if mnd.IsDarwin {
 		uri = fmt.Sprintf("%s/%s/%s.dmg", unstableURL, app, app)
 	} else if !mnd.IsWindows {
 		uri = fmt.Sprintf("%s/%s/%s.%s.%s.gz", unstableURL, app, app, runtime.GOARCH, runtime.GOOS)

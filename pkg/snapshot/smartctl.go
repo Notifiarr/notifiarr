@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -22,28 +21,13 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 		return nil
 	}
 
-	var (
-		disks = make(map[string]string)
-		err   error
-	)
-
-	switch runtime.GOOS {
-	case mnd.Windows:
-		if err := getParts(ctx, disks); err != nil {
+	disks := make(map[string]string)
+	if err := getParts(ctx, disks); err != nil {
+		errs = append(errs, err)
+		// parts failed, so try smart.
+		if err := getSmartDisks(ctx, useSudo, disks); err != nil {
 			errs = append(errs, err)
 		}
-
-		fallthrough
-	case "linux":
-		err = getSmartDisks(ctx, useSudo, disks)
-	case "darwin":
-		err = getParts(ctx, disks)
-	default:
-		err = getParts(ctx, disks)
-	}
-
-	if err != nil {
-		errs = append(errs, err)
 	}
 
 	if len(disks) == 0 {
@@ -96,8 +80,7 @@ func getParts(ctx context.Context, disks map[string]string) error {
 	}
 
 	for _, part := range partitions {
-		switch runtime.GOOS {
-		case "darwin":
+		if mnd.IsDarwin {
 			if !strings.HasPrefix(part.Device, macDiskPrefix) || slices.Contains(part.Opts, "nobrowse") {
 				continue
 			}
@@ -106,11 +89,9 @@ func getParts(ctx context.Context, disks map[string]string) error {
 			if stop > 0 {
 				part.Device = part.Device[:stop+len(macDiskPrefix)]
 			}
-
-			fallthrough
-		default:
-			disks[part.Device] = ""
 		}
+
+		disks[part.Device] = ""
 	}
 
 	return nil
