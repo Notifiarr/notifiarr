@@ -78,9 +78,9 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 		pfx = "Unstable Channel "
 	}
 
+	time.Sleep(WaitTime)
 	c.Print(pfx+"Auto-updater started. Check interval:", durafmt.Parse(dur).String())
 
-	time.Sleep(WaitTime)
 	// Check for update on startup.
 	if err := c.checkAndUpdate(ctx, "startup check"); err != nil {
 		c.Errorf("Startup-Update Failed: %v", err)

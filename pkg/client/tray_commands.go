@@ -3,8 +3,10 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"html/template"
 	"runtime"
 	"strings"
 
@@ -234,4 +236,37 @@ func (c *Client) updatePassword(ctx context.Context) {
 	if err = ui.Notify("Web UI password updated. Save config to persist this change."); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
 	}
+}
+
+// versionInfoTmpl contains the template used by systray tooltip.
+const versionInfoTmpl = `
+{{.program}} v{{.version}}-{{.revision}} [{{.branch}}]
+  build user: {{.buildUser}}
+  build date: {{.buildDate}}
+  go version: {{.goVersion}}
+  platform:   {{.platform}}
+  started:    {{.started}}
+`
+
+// Print returns version information.
+func SystrayTooltip(program string) string {
+	m := map[string]string{
+		"started":   version.Started.String(),
+		"program":   program,
+		"version":   version.Version,
+		"revision":  version.Revision,
+		"branch":    version.Branch,
+		"buildUser": version.BuildUser,
+		"buildDate": version.BuildDate,
+		"goVersion": version.GoVersion,
+		"platform":  runtime.GOOS + "/" + runtime.GOARCH,
+	}
+	t := template.Must(template.New("version").Parse(versionInfoTmpl))
+
+	var buf bytes.Buffer
+	if err := t.ExecuteTemplate(&buf, "version", m); err != nil {
+		panic(err)
+	}
+
+	return strings.TrimSpace(buf.String())
 }
