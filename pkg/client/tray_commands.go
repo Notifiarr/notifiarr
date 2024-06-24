@@ -59,7 +59,7 @@ func (c *Client) checkForUpdate(ctx context.Context, unstable bool) {
 	if unstable {
 		c.Print("[user requested] Unstable Update Check")
 
-		data, err = update.CheckUnstable(ctx, mnd.Title, version.Revision)
+		data, err = update.CheckUnstable(ctx, mnd.DefaultName, version.Revision)
 		where = "Unstable website"
 	} else {
 		c.Print("[user requested] GitHub Update Check")

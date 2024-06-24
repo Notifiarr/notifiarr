@@ -96,21 +96,21 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 
 func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 	var (
-		where = "GitHub"
-		cmd   = update.CheckGitHub
-		chk   = version.Version
+		data *update.Update
+		err  error
 	)
 
+	//nolint:wsl
 	if c.Config.UnstableCh {
-		where = "Unstable website"
-		cmd = update.CheckUnstable
-		chk = version.Revision
+		c.Debugf("[cron requested] Checking Unstable website for Update.")
+		data, err = update.CheckUnstable(ctx, mnd.DefaultName, version.Revision)
+	} else {
+		c.Debugf("[cron requested] Checking GitHub for Update.")
+		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
 	}
 
-	c.Debugf("[cron requested] Checking %s for Update.", where)
-
-	if data, err := cmd(ctx, mnd.UserRepo, chk); err != nil {
-		return fmt.Errorf("checking %s for update: %w", where, err)
+	if err != nil {
+		return fmt.Errorf("checking for update: %w", err)
 	} else if !data.Outdate {
 		return nil
 	} else if err = c.updateNow(ctx, data, how); err != nil {

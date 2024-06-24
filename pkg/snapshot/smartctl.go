@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"path"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/jaypipes/ghw"
 	"github.com/shirou/gopsutil/v3/disk"
 )
 
@@ -31,6 +34,10 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	if !mnd.IsDarwin {
 		// We also do this because getParts doesn't always return (all the) disk drives.
 		if err := getSmartDisks(ctx, useSudo, disks); err != nil {
+			errs = append(errs, err)
+		}
+
+		if err := getBlocks(disks); err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -159,4 +166,28 @@ func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.
 		}
 	}
 	waitg.Done()
+}
+
+func getBlocks(disks map[string]string) error {
+	block, err := ghw.Block()
+	if err != nil {
+		return fmt.Errorf("unable to get block devices: %w", err)
+	}
+
+	have := make(map[string]struct{})
+	for _, dev := range block.Disks {
+		if _, ok := have[dev.BusPath]; ok {
+			continue
+		}
+
+		have[dev.BusPath] = struct{}{}
+
+		if runtime.GOOS != mnd.Windows {
+			disks[path.Join("/dev", dev.Name)] = ""
+		} else {
+			disks[dev.Name] = ""
+		}
+	}
+
+	return nil
 }

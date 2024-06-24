@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"runtime"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -27,7 +26,6 @@ const unstableURL = "https://unstable.golift.io"
 // CheckUnstable checks if the provided app has an updated version on GitHub.
 // Pass in revision only, no version.
 func CheckUnstable(ctx context.Context, app string, revision string) (*Update, error) {
-	app = strings.ToLower(app)
 	uri := fmt.Sprintf("%s/%s/%s.%s.exe.zip", unstableURL, app, app, runtime.GOARCH)
 
 	if mnd.IsDarwin {
