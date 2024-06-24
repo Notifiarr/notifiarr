@@ -22,9 +22,14 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	}
 
 	disks := make(map[string]string)
-	if err := getParts(ctx, disks); err != nil {
+
+	err := getParts(ctx, disks)
+	if err != nil {
 		errs = append(errs, err)
-		// parts failed, so try smart.
+	}
+
+	if err != nil || mnd.IsLinux {
+		// We also do this because getParts doesn't always return (all the) disk drives.
 		if err := getSmartDisks(ctx, useSudo, disks); err != nil {
 			errs = append(errs, err)
 		}
