@@ -191,7 +191,7 @@ func (s *Snapshot) getBlocks(disks map[string]string) error {
 	for _, dev := range block.Disks {
 		s.Debug("Snapshot: block dev: %v", dev)
 
-		if _, ok := have[dev.BusPath]; ok {
+		if _, ok := have[dev.BusPath]; ok && strings.ToLower(dev.BusPath) != "unknown" {
 			continue
 		}
 
