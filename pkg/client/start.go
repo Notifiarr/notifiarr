@@ -98,7 +98,7 @@ func Start() error {
 	//nolint:forbidigo,wrapcheck
 	switch {
 	case client.Flags.LongVerReq: // print version and exit.
-		_, err := fmt.Println(SystrayTooltip(client.Flags.Name()))
+		_, err := fmt.Println(mnd.PrintVersionInfo(client.Flags.Name()))
 		return err
 	case client.Flags.VerReq: // print version and exit.
 		_, err := fmt.Println(client.Flags.Name() + " " + version.Version + "-" + version.Revision)

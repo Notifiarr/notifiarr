@@ -238,18 +238,8 @@ func (c *Client) updatePassword(ctx context.Context) {
 	}
 }
 
-// versionInfoTmpl contains the template used by systray tooltip.
-const versionInfoTmpl = `
-{{.program}} v{{.version}}-{{.revision}} [{{.branch}}]
-  build user: {{.buildUser}}
-  build date: {{.buildDate}}
-  go version: {{.goVersion}}
-  platform:   {{.platform}}
-  started:    {{.started}}
-`
-
-// Print returns version information.
-func SystrayTooltip(program string) string {
+// PrintVersionInfo returns version information.
+func PrintVersionInfo(program string) string {
 	m := map[string]string{
 		"started":   version.Started.String(),
 		"program":   program,
@@ -261,7 +251,13 @@ func SystrayTooltip(program string) string {
 		"goVersion": version.GoVersion,
 		"platform":  runtime.GOOS + "/" + runtime.GOARCH,
 	}
-	t := template.Must(template.New("version").Parse(versionInfoTmpl))
+	t := template.Must(template.New("version").Parse(
+		`{{.program}} v{{.version}}-{{.revision}} [{{.branch}}]
+  build user: {{.buildUser}}
+  build date: {{.buildDate}}
+  go version: {{.goVersion}}
+  platform:   {{.platform}}
+  started:    {{.started}}` + "\n"))
 
 	var buf bytes.Buffer
 	if err := t.ExecuteTemplate(&buf, "version", m); err != nil {

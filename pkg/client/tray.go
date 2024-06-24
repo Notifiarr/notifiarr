@@ -36,7 +36,7 @@ func (c *Client) startTray(ctx context.Context, cancel context.CancelFunc, clien
 
 		b, _ := bindata.Asset(ui.SystrayIcon)
 		systray.SetTemplateIcon(b, b)
-		systray.SetTooltip(SystrayTooltip(c.Flags.Name()))
+		systray.SetTooltip(mnd.PrintVersionInfo(c.Flags.Name()))
 		// systray.SetOnClick(c.showMenu) // buggy
 		systray.SetOnRClick(c.showMenu)
 		systray.SetOnDClick(func(_ systray.IMenu) { c.openGUI() })
