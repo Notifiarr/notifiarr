@@ -58,8 +58,10 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	release := UnstableFile{File: uri}
-	uri += ".txt"
+	// we use stamp to bust the cloudflare cache.
+	stamp := "?stamp=" + time.Now().UTC().Format("2006-01-02-15")
+	release := UnstableFile{File: uri + stamp}
+	uri += ".txt" + stamp
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
