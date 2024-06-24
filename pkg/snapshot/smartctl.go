@@ -21,34 +21,35 @@ var ErrNoDisks = fmt.Errorf("no disks found")
 
 func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (errs []error) {
 	if !run {
+		s.Debug("Snapshot: skipping drive data")
 		return nil
 	}
 
 	disks := make(map[string]string)
 
-	err := getParts(ctx, disks)
+	err := s.getParts(ctx, disks)
 	if err != nil {
 		errs = append(errs, err)
 	}
 
-	s.Debug("snapshot: got parts: %v", disks)
+	s.Debug("Snapshot: got parts: %v", disks)
 
 	if !mnd.IsDarwin {
 		// We also do this because getParts doesn't always return (all the) disk drives.
-		s.Debug("snapshot: getting smart disks %v", disks)
+		s.Debug("Snapshot: getting smart disks %v", disks)
 
-		if err := getSmartDisks(ctx, useSudo, disks); err != nil {
+		if err := s.getSmartDisks(ctx, useSudo, disks); err != nil {
 			errs = append(errs, err)
 		}
 
-		s.Debug("snapshot: getting blocks %v", disks)
+		s.Debug("Snapshot: getting blocks %v", disks)
 
-		if err := getBlocks(disks); err != nil {
+		if err := s.getBlocks(disks); err != nil {
 			errs = append(errs, err)
 		}
 	}
 
-	s.Debug("snapshot: disks %v", disks)
+	s.Debug("Snapshot: disks %v", disks)
 
 	if len(disks) == 0 {
 		return append(errs, ErrNoDisks)
@@ -65,7 +66,7 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	return errs
 }
 
-func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) error {
+func (s *Snapshot) getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) error {
 	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "smartctl", "--scan-open")
 	if err != nil {
 		return err
@@ -74,6 +75,8 @@ func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) e
 	go func() {
 		for stdout.Scan() {
 			fields := strings.Fields(stdout.Text())
+			s.Debug("Snapshot: scan-open %v", fields)
+
 			if len(fields) < 3 || fields[0] == "#" {
 				continue
 			}
@@ -91,7 +94,7 @@ func getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) e
 }
 
 // use this for everything else....
-func getParts(ctx context.Context, disks map[string]string) error {
+func (s *Snapshot) getParts(ctx context.Context, disks map[string]string) error {
 	const macDiskPrefix = "/dev/disk"
 
 	partitions, err := disk.PartitionsWithContext(ctx, false)
@@ -100,6 +103,8 @@ func getParts(ctx context.Context, disks map[string]string) error {
 	}
 
 	for _, part := range partitions {
+		s.Debug("Snapshot: partition: %v", part)
+
 		if mnd.IsDarwin {
 			if !strings.HasPrefix(part.Device, macDiskPrefix) || slices.Contains(part.Opts, "nobrowse") {
 				continue
@@ -176,7 +181,7 @@ func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.
 	waitg.Done()
 }
 
-func getBlocks(disks map[string]string) error {
+func (s *Snapshot) getBlocks(disks map[string]string) error {
 	block, err := ghw.Block()
 	if err != nil {
 		return fmt.Errorf("unable to get block devices: %w", err)
@@ -184,6 +189,8 @@ func getBlocks(disks map[string]string) error {
 
 	have := make(map[string]struct{})
 	for _, dev := range block.Disks {
+		s.Debug("Snapshot: block dev: %v", dev)
+
 		if _, ok := have[dev.BusPath]; ok {
 			continue
 		}
