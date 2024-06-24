@@ -94,7 +94,7 @@ func (c *cmd) printLog() {
 }
 
 func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
-	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx)
+	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx, c.Debugf)
 	for _, err := range errs {
 		if err != nil {
 			c.ErrorfNoShare("[%s requested] Snapshot: %v", input.Type, err)

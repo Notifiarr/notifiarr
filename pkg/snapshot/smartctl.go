@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"log"
 	"path"
 	"runtime"
 	"slices"
@@ -31,22 +30,25 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	if err != nil {
 		errs = append(errs, err)
 	}
-	log.Println("DEBUG got parts", disks)
+
+	s.Debug("snapshot: got parts: %v", disks)
 
 	if !mnd.IsDarwin {
 		// We also do this because getParts doesn't always return (all the) disk drives.
-		log.Println("DEBUG getting smart disks", disks)
+		s.Debug("snapshot: getting smart disks %v", disks)
+
 		if err := getSmartDisks(ctx, useSudo, disks); err != nil {
 			errs = append(errs, err)
 		}
 
-		log.Println("DEBUG getting blocks", disks)
+		s.Debug("snapshot: getting blocks %v", disks)
+
 		if err := getBlocks(disks); err != nil {
 			errs = append(errs, err)
 		}
 	}
 
-	log.Println("DEBUG disks", disks)
+	s.Debug("snapshot: disks %v", disks)
 
 	if len(disks) == 0 {
 		return append(errs, ErrNoDisks)
