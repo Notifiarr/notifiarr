@@ -131,7 +131,7 @@ func (s *Snapshot) getDiskData(ctx context.Context, name, dev string, useSudo bo
 		strings.HasPrefix(name, "/dev/zram") || strings.HasPrefix(name, "/dev/synoboot") ||
 		strings.HasPrefix(name, "/dev/nbd") || strings.HasPrefix(name, "/dev/vda"):
 		return nil
-	case mnd.IsSynology:
+	case mnd.IsSynology && !strings.EqualFold(dev, "nvme"):
 		args = []string{"-d", "sat", "-AH", name}
 	case dev != "" && strings.Contains(name, ","):
 		args = []string{"-d", name, "-AH", dev}
@@ -188,6 +188,7 @@ func (s *Snapshot) getBlocks(disks map[string]string) error {
 	}
 
 	have := make(map[string]struct{})
+
 	for _, dev := range block.Disks {
 		s.Debug("Snapshot: block dev: %v", dev)
 
