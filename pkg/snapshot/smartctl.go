@@ -21,30 +21,26 @@ var ErrNoDisks = fmt.Errorf("no disks found")
 
 func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (errs []error) {
 	if !run {
-		s.Debug("Snapshot: skipping drive data")
 		return nil
 	}
 
 	disks := make(map[string]string)
 
-	err := s.getParts(ctx, disks)
-	if err != nil {
+	if err := s.getBlocks(disks); err != nil {
 		errs = append(errs, err)
-	}
 
-	s.Debug("Snapshot: got parts: %v", disks)
+		s.Debug("Snapshot: getting parts: %v", disks)
+
+		if err := s.getParts(ctx, disks); err != nil {
+			errs = append(errs, err)
+		}
+	}
 
 	if !mnd.IsDarwin {
 		// We also do this because getParts doesn't always return (all the) disk drives.
 		s.Debug("Snapshot: getting smart disks %v", disks)
 
 		if err := s.getSmartDisks(ctx, useSudo, disks); err != nil {
-			errs = append(errs, err)
-		}
-
-		s.Debug("Snapshot: getting blocks %v", disks)
-
-		if err := s.getBlocks(disks); err != nil {
 			errs = append(errs, err)
 		}
 	}
