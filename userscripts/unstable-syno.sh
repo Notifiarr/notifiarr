@@ -12,7 +12,7 @@ set -e
 # It must exist, and be writable by the user running this script.
 WORKDIR="/volume1/homes/notifiarr/"
 # Unstable website URL. This redirects to glift.io/notifiarr/.
-UNSTABLE="https://unstable.notifiarr.app/"
+UNSTABLE="https://unstable.notifiarr.app"
 # File to download/check for updates. Do not include the .gz or .txt suffixes.
 FILE="notifiarr.amd64.linux"
 # Location for script output.
@@ -20,7 +20,7 @@ LOG_FILE="${WORKDIR}/update-log-notifiarr.txt"
 
 ####################################################################################################
 
-LATEST="notifiarr $(wget -qO- ${UNSTABLE}${FILE}.gz.txt | jq -r '"\(.version)-\(.revision)"')"
+LATEST="notifiarr $(wget -qO- ${UNSTABLE}/${FILE}.gz.txt | jq -r '"\(.version)-\(.revision)"')"
 INSTALLED=$(/usr/bin/notifiarr -v)
 TIMESTAMP() { date "+%Y-%m-%d %H:%M:%S" ;}
 
@@ -35,7 +35,7 @@ fi
 echo "`TIMESTAMP` Updating to ${LATEST} from ${INSTALLED}" >> "${LOG_FILE}"
 
 # Download current unstable binary.
-wget -qO "${WORKDIR}/${FILE}.gz" ${UNSTABLE}${FILE}.gz >> "${LOG_FILE}" 2>&1
+wget -qO "${WORKDIR}/${FILE}.gz" ${UNSTABLE}/${FILE}.gz >> "${LOG_FILE}" 2>&1
 
 # Decompress and make executable.
 gunzip -f "${WORKDIR}/${FILE}.gz" >> "${LOG_FILE}" 2>&1
