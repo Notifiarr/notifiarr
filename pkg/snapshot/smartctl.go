@@ -29,7 +29,7 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	if err := s.getBlocks(disks); err != nil {
 		errs = append(errs, err)
 
-		s.Debug("Snapshot: getting parts: %v", disks)
+		s.Debug("Snapshot: got blocks, %v", disks)
 
 		if err := s.getParts(ctx, disks); err != nil {
 			errs = append(errs, err)
@@ -38,14 +38,14 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 
 	if !mnd.IsDarwin {
 		// We also do this because getParts doesn't always return (all the) disk drives.
-		s.Debug("Snapshot: getting smart disks %v", disks)
+		s.Debug("Snapshot: getting smart disks, %v", disks)
 
 		if err := s.getSmartDisks(ctx, useSudo, disks); err != nil {
 			errs = append(errs, err)
 		}
 	}
 
-	s.Debug("Snapshot: disks %v", disks)
+	s.Debug("Snapshot: got disks: %v", disks)
 
 	if len(disks) == 0 {
 		return append(errs, ErrNoDisks)
@@ -63,7 +63,7 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 }
 
 func (s *Snapshot) getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) error {
-	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "smartctl", "--scan-open")
+	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "smartctl", "--scan")
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (s *Snapshot) getSmartDisks(ctx context.Context, useSudo bool, disks map[st
 	go func() {
 		for stdout.Scan() {
 			fields := strings.Fields(stdout.Text())
-			s.Debug("Snapshot: scan-open %v", fields)
+			s.Debug("Snapshot: smartctl scan %v", fields)
 
 			if len(fields) < 3 || fields[0] == "#" {
 				continue
