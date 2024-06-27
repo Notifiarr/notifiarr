@@ -11,7 +11,7 @@ set -e
 # This is where the log file goes, and where temporary downloads are stored.
 # It must exist, and be writable by the user running this script.
 WORKDIR="/volume1/homes/notifiarr/"
-# Unstable website URL. This redirects to glift.io/notifiarr/.
+# Unstable website URL. This redirects to golift.io/notifiarr/.
 UNSTABLE="https://unstable.notifiarr.app"
 # File to download/check for updates. Do not include the .gz or .txt suffixes.
 FILE="notifiarr.amd64.linux"
