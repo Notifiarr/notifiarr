@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# This is a quick and dirty script to install the latest notifiarr on Synology.
+# Use this script to install Notifiarr client on your Synology NAS.
+# Can also be used to keep the application up to date, see crontab instructions below.
 #
 # Use it like this, pick curl or wget:  (sudo is not optional for Synology)
 # ----
