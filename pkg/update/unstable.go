@@ -57,6 +57,7 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 	defer cancel()
 
 	// we use stamp to bust the cloudflare cache.
+	// If you remove or rename `stamp` then also update decompressFile().
 	stamp := "?stamp=" + time.Now().UTC().Format("2006-01-02-15")
 	release := UnstableFile{File: uri + stamp}
 	uri += ".txt" + stamp
