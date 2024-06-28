@@ -55,15 +55,29 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (er
 	s.DriveTemps = make(map[string]int)
 	s.DiskHealth = make(map[string]string)
 
-	for name, dev := range disks {
+	for name, dev := range s.dedupDisks(disks) {
 		errs = append(errs, s.getDiskData(ctx, name, dev, useSudo))
 	}
 
 	return errs
 }
 
+// dedupDisks was written to turn nvme0, nvme0n1s0, nvme0n1s1 into just nvme0.
+func (s *Snapshot) dedupDisks(disks map[string]string) map[string]string {
+	for name, dev1 := range disks {
+		for name2, dev2 := range disks {
+			if dev1 != dev2 && strings.HasPrefix(name, name2) {
+				delete(disks, name)
+				break
+			}
+		}
+	}
+
+	return disks
+}
+
 func (s *Snapshot) getSmartDisks(ctx context.Context, useSudo bool, disks map[string]string) error {
-	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "smartctl", "--scan")
+	cmd, stdout, waitg, err := readyCommand(ctx, useSudo, "smartctl", "--scan-open")
 	if err != nil {
 		return err
 	}
@@ -77,6 +91,9 @@ func (s *Snapshot) getSmartDisks(ctx context.Context, useSudo bool, disks map[st
 				continue
 			}
 
+			// The fields for dev and name get swapped in a specific case where the name has a comma.
+			// That's because the number after the comma designates the drive, but all the drives
+			// are connected to the same device bus. This happens with raid cards.
 			if strings.Contains(fields[2], ",") {
 				disks[fields[2]] = fields[0]
 			} else {
