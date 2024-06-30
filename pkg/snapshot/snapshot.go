@@ -71,7 +71,8 @@ var (
 
 // Snapshot is the output data sent to Notifiarr.
 type Snapshot struct {
-	Version string `json:"version"`
+	Debug   func(string, ...any) `json:"-"`
+	Version string               `json:"version"`
 	System  struct {
 		*host.InfoStat
 		Username string             `json:"username"`
@@ -108,10 +109,13 @@ type RaidData struct {
 
 // Partition is used for ZFS pools as well as normal Disk arrays.
 type Partition struct {
-	Device string `json:"name"`
-	Total  uint64 `json:"total"`
-	Free   uint64 `json:"free"`
-	Used   uint64 `json:"used"`
+	Device   string   `json:"name"`
+	Total    uint64   `json:"total"`
+	Free     uint64   `json:"free"`
+	Used     uint64   `json:"used"`
+	FSType   string   `json:"fsType,omitempty"`
+	ReadOnly bool     `json:"readOnly,omitempty"`
+	Opts     []string `json:"opts,omitempty"`
 }
 
 // Validate makes sure the snapshot configuration is valid.
@@ -140,11 +144,11 @@ func (c *Config) Validate() {
 }
 
 // GetSnapshot returns a system snapshot based on requested data in the config.
-func (c *Config) GetSnapshot(ctx context.Context) (*Snapshot, []error, []error) {
+func (c *Config) GetSnapshot(ctx context.Context, debugf func(string, ...any)) (*Snapshot, []error, []error) {
 	ctx, cancel := context.WithTimeout(ctx, c.Timeout.Duration)
 	defer cancel()
 
-	snap := &Snapshot{Version: version.Version + "-" + version.Revision}
+	snap := &Snapshot{Version: version.Version + "-" + version.Revision, Debug: debugf}
 	errs, debug := c.getSnapshot(ctx, snap)
 
 	return snap, errs, debug

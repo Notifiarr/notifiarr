@@ -95,8 +95,8 @@ type DelugeConfig struct {
 
 func (a *Apps) setupDeluge() error {
 	for idx, app := range a.Deluge {
-		if app == nil || app.Config == nil || app.URL == "" || app.Password == "" {
-			return fmt.Errorf("%w: missing url or password: Deluge config %d", ErrInvalidApp, idx+1)
+		if app == nil || app.Config == nil || app.URL == "" {
+			return fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, idx+1)
 		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
 			return fmt.Errorf("%w: URL must begin with http:// or https://: Deluge config %d", ErrInvalidApp, idx+1)
 		}
@@ -134,7 +134,7 @@ func (c *DelugeConfig) setup(maxBody int, logger mnd.Logger) error {
 
 // Enabled returns true if the instance is enabled and usable.
 func (c *DelugeConfig) Enabled() bool {
-	return c != nil && c.Config != nil && c.URL != "" && c.Password != "" && c.Timeout.Duration >= 0
+	return c != nil && c.Config != nil && c.URL != "" && c.Timeout.Duration >= 0
 }
 
 type SabNZBConfig struct {

@@ -37,6 +37,7 @@ const (
 	IsLinux       = runtime.GOOS == "linux"
 	IsWindows     = runtime.GOOS == Windows
 	IsFreeBSD     = runtime.GOOS == "freebsd"
+	IsDarwin      = runtime.GOOS == "darwin"
 )
 
 // Application Defaults.

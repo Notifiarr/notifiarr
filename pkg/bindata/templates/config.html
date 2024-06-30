@@ -117,7 +117,7 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            {{- if eq .Version.os "windows" }}
+                                            {{- if (eq .Version.os "windows") }}
                                                 <tr>
                                                     <td>
                                                         <div style="display:none;" class="dialogText">
@@ -145,12 +145,12 @@
                                                                 </div>
                                                                 {{- end}}
                                                                 <select class="client-parameter form-control input-sm" data-group="config" data-label="Auto Update" id="AutoUpdate" name="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
-                                                                    <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="">Disabled</option>
+                                                                    <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="off">Disabled</option>
                                                                     <option {{if eq .Config.AutoUpdate "daily"}}selected {{end}}value="daily">Enabled (daily)</option>
                                                                     <option {{if eq .Config.AutoUpdate "12h"}}selected {{end}}value="12h">Enabled (12 hours)</option>
                                                                     <option {{if eq .Config.AutoUpdate "6h"}}selected {{end}}value="6h">Enabled (6 hours)</option>
                                                                     <option {{if eq .Config.AutoUpdate "3h"}}selected {{end}}value="3h">Enabled (3 hours)</option>
-                                                                    {{- if not (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "daily") (eq .Config.AutoUpdate "12h") (eq .Config.AutoUpdate "6h") (eq .Config.AutoUpdate "3h")) }}
+                                                                    {{- if not (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "off") (eq .Config.AutoUpdate "daily") (eq .Config.AutoUpdate "12h") (eq .Config.AutoUpdate "6h") (eq .Config.AutoUpdate "3h")) }}
                                                                     <option selected value="{{.Config.AutoUpdate}}">{{.Config.AutoUpdate}} (custom)</option>
                                                                     {{- end}}
                                                                 </select>
