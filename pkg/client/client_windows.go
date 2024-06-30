@@ -17,6 +17,9 @@ import (
 	"golift.io/version"
 )
 
+// WaitTime is how long we wait, after startup, before doing an update check.
+const WaitTime = 10 * time.Minute
+
 // This is the pop-up a user sees when they click update in the menu.
 func (c *Client) upgradeWindows(ctx context.Context, update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
@@ -75,9 +78,9 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 		pfx = "Unstable Channel "
 	}
 
+	time.Sleep(WaitTime)
 	c.Print(pfx+"Auto-updater started. Check interval:", durafmt.Parse(dur).String())
 
-	time.Sleep(update.SleepTime)
 	// Check for update on startup.
 	if err := c.checkAndUpdate(ctx, "startup check"); err != nil {
 		c.Errorf("Startup-Update Failed: %v", err)
@@ -93,24 +96,21 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 
 func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 	var (
-		data  *update.Update
-		err   error
-		where = "GitHub"
+		data *update.Update
+		err  error
 	)
 
+	//nolint:wsl
 	if c.Config.UnstableCh {
 		c.Debugf("[cron requested] Checking Unstable website for Update.")
-
-		data, err = update.CheckUnstable(ctx, mnd.Title, version.Version)
-		where = "Unstable website"
+		data, err = update.CheckUnstable(ctx, mnd.DefaultName, version.Revision)
 	} else {
 		c.Debugf("[cron requested] Checking GitHub for Update.")
-
 		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
 	}
 
 	if err != nil {
-		return fmt.Errorf("checking %s for update: %w", where, err)
+		return fmt.Errorf("checking for update: %w", err)
 	} else if !data.Outdate {
 		return nil
 	} else if err = c.updateNow(ctx, data, how); err != nil {
@@ -121,7 +121,8 @@ func (c *Client) checkAndUpdate(ctx context.Context, how string) error {
 }
 
 func (c *Client) updateNow(ctx context.Context, u *update.Update, msg string) error {
-	c.Printf("[UPDATE] Downloading and installing update! %s => %s: %s", u.Version, u.Current, u.CurrURL)
+	c.Printf("[UPDATE] Downloading and installing update! %s-%s => %s: %s",
+		version.Version, version.Revision, u.Current, u.CurrURL)
 
 	cmd := &update.Command{
 		URL:    u.CurrURL,

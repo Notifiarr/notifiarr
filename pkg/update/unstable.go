@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"runtime"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -27,10 +26,9 @@ const unstableURL = "https://unstable.golift.io"
 // CheckUnstable checks if the provided app has an updated version on GitHub.
 // Pass in revision only, no version.
 func CheckUnstable(ctx context.Context, app string, revision string) (*Update, error) {
-	app = strings.ToLower(app)
 	uri := fmt.Sprintf("%s/%s/%s.%s.exe.zip", unstableURL, app, app, runtime.GOARCH)
 
-	if runtime.GOOS == "darwin" {
+	if mnd.IsDarwin {
 		uri = fmt.Sprintf("%s/%s/%s.dmg", unstableURL, app, app)
 	} else if !mnd.IsWindows {
 		uri = fmt.Sprintf("%s/%s/%s.%s.%s.gz", unstableURL, app, app, runtime.GOARCH, runtime.GOOS)
@@ -58,8 +56,11 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	release := UnstableFile{File: uri}
-	uri += ".txt"
+	// we use stamp to bust the cloudflare cache.
+	// If you remove or rename `stamp` then also update decompressFile().
+	stamp := "?stamp=" + time.Now().UTC().Format("2006-01-02-15")
+	release := UnstableFile{File: uri + stamp}
+	uri += ".txt" + stamp
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {

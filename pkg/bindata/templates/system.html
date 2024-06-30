@@ -236,10 +236,12 @@
                                                 <td style="display:none;">{{$v.Device}}</td>
                                                 <td>
                                                     <div class="row">
-                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">{{$v.Device}}</div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Total: {{megabyte $v.Total}}</div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Free: {{megabyte $v.Free}}</div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">Used: {{megabyte $v.Used}}</div>
+                                                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">{{$v.Device}}</div>
+                                                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">Total: {{megabyte $v.Total}}</div>
+                                                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">Free: {{megabyte $v.Free}}</div>
+                                                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">Used: {{megabyte $v.Used}}</div>
+                                                    <div class="col-lg-1 col-md-3 col-sm-4 col-xs-12">FS: {{$v.FSType}}{{if $v.ReadOnly}} <span title="read only">(ro)</span>{{end}}</div>
+                                                    {{if $.ClientInfo.User.DevAllowed}}<div class="col-lg-3 col-md-5 col-sm-12 col-xs-12">{{$v.Opts}}</div>{{end}}
                                                     </div>
                                                 </td>
                                             </tr>

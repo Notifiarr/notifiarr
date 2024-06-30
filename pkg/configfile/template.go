@@ -111,7 +111,7 @@ urlbase = '''{{.URLBase}}'''
 ## Uncomment both lines and add valid file paths. Make sure this app can read them.
 ##
 {{if .SSLKeyFile}}ssl_key_file  = '''{{.SSLKeyFile}}'''{{else}}#ssl_key_file  = '/path/to/cert.key'{{end}}
-{{if .SSLCrtFile}}ssl_cert_file = '''{{.SSLCrtFile}}''{{else}}#ssl_cert_file = '/path/to/cert.key'{{end}}
+{{if .SSLCrtFile}}ssl_cert_file = '''{{.SSLCrtFile}}'''{{else}}#ssl_cert_file = '/path/to/cert.key'{{end}}
 
 ## If you set these, logs will be written to these files.
 ## If blank on windows or macOS, log file paths are chosen for you.

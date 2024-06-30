@@ -705,7 +705,7 @@ func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 		UseSudo:   c.Config.Snapshot.UseSudo,
 		//		Raid:      c.Config.Snapshot.Raid,
 	}
-	snapshot, _, _ := snapcnfg.GetSnapshot(ctx)
+	snapshot, _, _ := snapcnfg.GetSnapshot(ctx, c.Debugf)
 
 	for k, v := range snapshot.DiskUsage {
 		output[k] = v
