@@ -24,6 +24,7 @@ func (s *Snapshot) getSystemTemps(ctx context.Context) error {
 		return nil
 	}
 
+	// Unmarshal the error for more info.
 	var warns *sensors.Warnings
 	if !errors.As(err, &warns) {
 		return fmt.Errorf("unable to get sensor temperatures: %w", err)
@@ -35,5 +36,4 @@ func (s *Snapshot) getSystemTemps(ctx context.Context) error {
 	}
 
 	return fmt.Errorf("getting sensor temperatures: %w: %s", err, strings.Join(errs, ", "))
-
 }
