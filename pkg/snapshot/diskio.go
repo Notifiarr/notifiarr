@@ -15,7 +15,7 @@ import (
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 )
 
 /* This files has procedures to structure data from iotop and iostat. */

@@ -15,7 +15,7 @@ require (
 	github.com/go-ping/ping v1.1.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gorilla/mux v1.8.1
-	github.com/gorilla/schema v1.4.0
+	github.com/gorilla/schema v1.4.1
 	github.com/gorilla/securecookie v1.1.2
 	github.com/gorilla/websocket v1.5.3
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
@@ -29,7 +29,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mrobinsn/go-rtorrent v1.8.0
 	github.com/nxadm/tail v1.4.11
-	github.com/shirou/gopsutil/v3 v3.24.5
+	github.com/shirou/gopsutil/v4 v4.24.5
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
@@ -112,7 +112,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.1 // indirect
 	modernc.org/gc/v3 v3.0.0-20240304020402-f0dba7c97c2b // indirect
-	modernc.org/libc v1.53.3 // indirect
+	modernc.org/libc v1.53.4 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
 	modernc.org/strutil v1.2.0 // indirect
