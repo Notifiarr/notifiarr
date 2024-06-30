@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v4/host"
 )
 
 var ErrNotSynology = fmt.Errorf("the running host is not a Synology")

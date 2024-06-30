@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"html"
 	"io"
 	"net"
 	"net/http"
@@ -19,6 +20,7 @@ import (
 const (
 	sslstring   = "SSL" // used for checking HTTPS certs
 	expectdelim = ","   // extra (split) delimiter
+	maxOutput   = 170   // maximum length of output.
 )
 
 type result struct {
@@ -149,8 +151,6 @@ func (s *Service) update(res *result) bool {
 	return true
 }
 
-const maxBody = 150
-
 // checkHTTPReq builds the client and request for the http service check.
 func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request, error) {
 	// Allow adding headers by appending them after a pipe symbol.
@@ -222,13 +222,20 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 		}
 	}
 
-	bodyStr := string(body)
-	if len(bodyStr) > maxBody {
-		bodyStr = bodyStr[:maxBody]
+	// Reduce the size of the string before processing it to speed things up on large body outputs.
+	if len(res.output) > maxOutput+maxOutput {
+		res.output = res.output[:maxOutput+maxOutput]
 	}
 
 	res.state = StateCritical
-	res.output = resp.Status + ": " + strings.TrimSpace(RemoveSecrets(s.Value, bodyStr))
+	res.output = resp.Status + ": " + strings.TrimSpace(
+		html.EscapeString(strings.Join(strings.Fields(RemoveSecrets(s.Value, string(body))), " ")))
+
+	// Reduce the string to the final max length.
+	// We do it this way so all secrets are properly escaped before string splitting.
+	if len(res.output) > maxOutput {
+		res.output = res.output[:maxOutput]
+	}
 
 	return res
 }

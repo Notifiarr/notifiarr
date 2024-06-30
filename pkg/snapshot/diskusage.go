@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 )
 
 func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error { //nolint:cyclop

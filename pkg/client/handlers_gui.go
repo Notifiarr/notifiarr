@@ -30,7 +30,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/swaggo/swag"
 	"golift.io/version"
 )
