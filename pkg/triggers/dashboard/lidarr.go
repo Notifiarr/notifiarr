@@ -91,7 +91,7 @@ func (c *Cmd) getLidarrState(ctx context.Context, instance int, app *apps.Lidarr
 func (c *Cmd) getLidarrHistory(ctx context.Context, app *apps.LidarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPageContext(ctx, &starr.PageReq{
 		Page:     1,
-		PageSize: showLatest + 20, //nolint:gomnd // grab extra in case some are tracks and not albums.
+		PageSize: showLatest + 20, //nolint:mnd // grab extra in case some are tracks and not albums.
 		SortDir:  starr.SortDescend,
 		SortKey:  "date",
 		Filter:   lidarr.FilterTrackFileImported,

@@ -16,6 +16,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -30,6 +31,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/dsnet/compress/bzip2"
+	"github.com/hako/durafmt"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v4/host"
 	"golift.io/cnfg"
@@ -139,6 +141,10 @@ func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *trigge
 		return nil, nil, fmt.Errorf("environment variables: %w", err)
 	}
 
+	if _, err := cnfgfile.Parse(c, nil); err != nil {
+		return nil, nil, fmt.Errorf("filepath variables: %w", err)
+	}
+
 	if err := c.setupPassword(); err != nil {
 		return nil, nil, err
 	}
@@ -225,15 +231,19 @@ func (c *Config) setup(logger *logs.Logger) *triggers.Actions {
 
 // FindAndReturn return a config file. Write one if requested.
 func (c *Config) FindAndReturn(ctx context.Context, configFile string, write bool) (string, string, string) {
-	var confFile string
+	var (
+		confFile string
+		stat     os.FileInfo
+	)
 
 	defaultConfigFile, configFileList := defaultLocactions()
 	for _, fileName := range append([]string{configFile}, configFileList...) {
-		if d, err := homedir.Expand(fileName); err == nil {
+		d, err := homedir.Expand(fileName)
+		if err == nil {
 			fileName = d
 		}
 
-		if _, err := os.Stat(fileName); err == nil {
+		if stat, err = os.Stat(fileName); err == nil {
 			confFile = fileName
 			break
 		} //  else { log.Printf("rip: %v", err) }
@@ -241,7 +251,8 @@ func (c *Config) FindAndReturn(ctx context.Context, configFile string, write boo
 
 	if configFile = ""; confFile != "" {
 		configFile, _ = filepath.Abs(confFile)
-		return configFile, "", MsgConfigFound + configFile
+		return configFile, "", MsgConfigFound + configFile + ", age: " + durafmt.Parse(time.Since(stat.ModTime())).
+			LimitFirstN(3).Format(mnd.DurafmtUnits) //nolint:mnd
 	}
 
 	if defaultConfigFile != "" && write {

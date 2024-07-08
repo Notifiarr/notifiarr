@@ -775,7 +775,7 @@ func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 }
 
 func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, request *http.Request, msg string) {
-	response.Header().Add("content-type", "text/html")
+	response.Header().Add("Content-Type", "text/html")
 
 	user, _ := c.getUserName(request)
 	if request.Method != http.MethodGet || (user == "" && c.webauth) {
@@ -856,7 +856,7 @@ func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http
 	}
 
 	mime := mime.TypeByExtension(path.Ext(request.URL.Path))
-	response.Header().Set("content-type", mime)
+	response.Header().Set("Content-Type", mime)
 
 	if _, err = response.Write(data); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)

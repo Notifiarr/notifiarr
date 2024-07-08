@@ -163,7 +163,7 @@ func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request
 
 	for _, val := range splitVal[1:] {
 		// s.Value: http://url.com|header=value|another-header=val
-		if sv := strings.SplitN(val, ":", 2); len(sv) == 2 { //nolint:gomnd
+		if sv := strings.SplitN(val, ":", 2); len(sv) == 2 { //nolint:mnd
 			req.Header.Add(sv[0], sv[1])
 
 			if strings.EqualFold(sv[0], "host") {
@@ -242,7 +242,7 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 
 // RemoveSecrets removes secret token values in a message parsed from a url.
 func RemoveSecrets(appURL, message string) string {
-	url, err := url.Parse(strings.SplitN(appURL, "|", 2)[0]) //nolint:gomnd
+	url, err := url.Parse(strings.SplitN(appURL, "|", 2)[0]) //nolint:mnd
 	if err != nil {
 		return message
 	}

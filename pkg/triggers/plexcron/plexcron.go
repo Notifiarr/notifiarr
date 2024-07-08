@@ -124,7 +124,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 		cancel()
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second) //nolint:gomnd // wait max 5 seconds for system info.
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second) //nolint:mnd // wait max 5 seconds for system info.
 	defer cancel()
 
 	c.SendData(&website.Request{

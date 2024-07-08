@@ -83,7 +83,7 @@ func (c *Cmd) getSonarrState(ctx context.Context, instance int, app *apps.Sonarr
 func (c *Cmd) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.PageReq{
 		Page:     1,
-		PageSize: showLatest + 5, //nolint:gomnd // grab extra in case there's an error.
+		PageSize: showLatest + 5, //nolint:mnd // grab extra in case there's an error.
 		SortDir:  starr.SortDescend,
 		SortKey:  "date",
 		Filter:   sonarr.FilterDownloadFolderImported,

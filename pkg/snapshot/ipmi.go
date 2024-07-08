@@ -1,4 +1,4 @@
-//nolint:gomnd
+//nolint:mnd
 package snapshot
 
 import (

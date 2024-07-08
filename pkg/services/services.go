@@ -180,7 +180,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 		ticker = time.NewTicker(c.Interval.Duration)
 		defer ticker.Stop()
 
-		second = time.NewTicker(10 * time.Second) //nolint:gomnd
+		second = time.NewTicker(10 * time.Second) //nolint:mnd
 		defer second.Stop()
 
 		c.runChecks(true)

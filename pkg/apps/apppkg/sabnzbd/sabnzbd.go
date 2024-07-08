@@ -262,7 +262,7 @@ func (s *SabNZBDate) UnmarshalJSON(b []byte) (err error) {
 	s.String = strings.Trim(string(b), `"`)
 
 	if s.String == "unknown" {
-		s.Time = time.Now().Add(time.Hour * 24 * 366) //nolint:gomnd
+		s.Time = time.Now().Add(time.Hour * 24 * 366) //nolint:mnd
 		return nil
 	}
 
@@ -284,7 +284,7 @@ func (s *SabNZBSize) UnmarshalJSON(b []byte) (err error) {
 		return fmt.Errorf("could not convert to number: %s: %w", split[0], err)
 	}
 
-	if len(split) < 2 { //nolint:gomnd
+	if len(split) < 2 { //nolint:mnd
 		s.Bytes = int64(bytes)
 		return nil
 	}

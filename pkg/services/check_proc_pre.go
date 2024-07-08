@@ -85,7 +85,7 @@ func (s *Service) fillExpectCounts(str string) (err error) {
 		}
 	}
 
-	if len(countSplit) > 2 { //nolint:gomnd
+	if len(countSplit) > 2 { //nolint:mnd
 		if s.svc.proc.countMax, err = strconv.Atoi(countSplit[2]); err != nil {
 			return fmt.Errorf("invalid maximum count: %s: %w", countSplit[2], err)
 		}

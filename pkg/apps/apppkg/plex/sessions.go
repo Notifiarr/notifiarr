@@ -137,7 +137,7 @@ func GetMediaTranscode(mediaList []*Media) []string {
 			if stream.Decision == "transcode" {
 				videoMsg += fmt.Sprintf(" → %s (%s)", media.VideoResolution, strings.ToUpper(stream.Codec))
 			}
-		} else if stream.StreamType == 2 { //nolint:gomnd
+		} else if stream.StreamType == 2 { //nolint:mnd
 			audioMsg = stream.DisplayTitle
 			if stream.Decision == "transcode" {
 				audioMsg += " → " + strings.ToUpper(stream.Codec)

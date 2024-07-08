@@ -22,7 +22,7 @@ func (s *Snapshot) GetMemoryUsage(ctx context.Context) error {
 
 	for scanner.Scan() {
 		switch fields := strings.Fields(scanner.Text()); {
-		case len(fields) < 3: //nolint:gomnd
+		case len(fields) < 3: //nolint:mnd
 			continue
 		case strings.EqualFold(fields[0], "MemTotal:"):
 			s.System.MemTotal, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)

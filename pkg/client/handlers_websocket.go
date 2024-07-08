@@ -86,7 +86,7 @@ func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Re
 func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 	var (
 		lastError  = ""
-		pingTicker = time.NewTicker(29 * time.Second) //nolint:gomnd
+		pingTicker = time.NewTicker(29 * time.Second) //nolint:mnd
 		writeWait  = 10 * time.Second
 	)
 

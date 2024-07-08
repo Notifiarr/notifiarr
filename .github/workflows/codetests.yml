@@ -50,7 +50,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: 'v1.57'
+          version: v1.59
 
   golangci-linux:
     # description: "Runs golangci-lint on linux against linux and windows."
@@ -71,7 +71,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: 'v1.57'
+          version: v1.59
 
   homebrew-test:
     # description: "Installs dependencies on macOS and runs `make install` to mimic a homebrew install."

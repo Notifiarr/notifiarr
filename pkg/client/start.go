@@ -283,7 +283,7 @@ func (c *Client) Exit(ctx context.Context, cancel context.CancelFunc) error {
 	defer func() {
 		defer c.CapturePanic()
 		cancel()
-		//nolint:gomnd
+		//nolint:mnd
 		c.Print(" ❌ Good bye! Uptime:", durafmt.Parse(time.Since(version.Started).Round(time.Second)).LimitFirstN(3))
 	}()
 

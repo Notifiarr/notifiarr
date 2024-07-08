@@ -82,7 +82,7 @@ func (c *Client) makeTunnel(ctx context.Context, ci *clientinfo.ClientInfo) {
 	remWs, _ := apachelog.New(`%{X-Forwarded-For}i %{X-User-ID}i env:%{X-User-Environment}i %t "%r" %>s %b ` +
 		`"%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
 
-	//nolint:gomnd // just attempting a tiny bit of splay.
+	//nolint:mnd // just attempting a tiny bit of splay.
 	c.tunnel = mulery.NewClient(&mulery.Config{
 		Name:             hostname,
 		ID:               c.Config.HostID,
@@ -103,7 +103,7 @@ func (c *Client) makeTunnel(ctx context.Context, ci *clientinfo.ClientInfo) {
 	})
 }
 
-//nolint:gomnd // arbitrary failover time frames.
+//nolint:mnd // arbitrary failover time frames.
 func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinConfig {
 	interval := 10 * time.Minute
 	if ci.IsSub() {
@@ -239,7 +239,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 
 	for idx, tunnel := range ci.User.Mulery {
 		wait.Add(1)
-		time.Sleep(70 * time.Millisecond) //nolint:gomnd
+		time.Sleep(70 * time.Millisecond) //nolint:mnd
 
 		go c.pingTunnel(request.Context(), idx, tunnel.Socket, inCh)
 	}

@@ -77,7 +77,7 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 		return nil, fmt.Errorf("decoding %s response: %w", uri, err)
 	}
 
-	release.Time, _ = time.Parse(time.RFC1123, resp.Header.Get("last-modified"))
+	release.Time, _ = time.Parse(time.RFC1123, resp.Header.Get("Last-Modified"))
 
 	return &release, nil
 }

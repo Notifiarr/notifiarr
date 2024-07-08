@@ -77,7 +77,7 @@ func GetKeys(mapName *expvar.Map) map[string]interface{} {
 	return output
 }
 
-//nolint:gomnd
+//nolint:mnd
 func GetSplitKeys(mapName *expvar.Map) map[string]map[string]interface{} {
 	output := make(map[string]map[string]interface{})
 

@@ -53,7 +53,7 @@ func (s *Service) fillPingExpect(icmp bool) (err error) {
 	}
 
 	splitStr := strings.Split(s.Expect, ":")
-	if len(splitStr) != 3 { //nolint:gomnd
+	if len(splitStr) != 3 { //nolint:mnd
 		return ErrPingExpect
 	}
 
