@@ -24,7 +24,7 @@ const (
 )
 
 type result struct {
-	output string
+	output *Output
 	state  CheckState
 }
 
@@ -185,7 +185,7 @@ func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request
 func (s *Service) checkHTTP(ctx context.Context) *result {
 	res := &result{
 		state:  StateUnknown,
-		output: "unknown",
+		output: &Output{str: "unknown"},
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
@@ -193,7 +193,7 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 
 	client, req, err := s.checkHTTPReq(ctx)
 	if err != nil {
-		res.output = "creating request: " + RemoveSecrets(s.Value, err.Error())
+		res.output = &Output{str: "creating request: " + RemoveSecrets(s.Value, err.Error())}
 		return res
 	}
 
@@ -202,39 +202,39 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		res.output = "making request: " + RemoveSecrets(s.Value, err.Error())
+		res.output = &Output{str: "making request: " + RemoveSecrets(s.Value, err.Error())}
 		return res
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		res.output = "reading body: " + RemoveSecrets(s.Value, err.Error())
+		res.output = &Output{str: "reading body: " + RemoveSecrets(s.Value, err.Error())}
 		return res
 	}
 
 	for _, code := range strings.Split(s.Expect, expectdelim) {
 		if strconv.Itoa(resp.StatusCode) == strings.TrimSpace(code) {
 			res.state = StateOK
-			res.output = resp.Status
+			res.output = &Output{str: resp.Status}
 
 			return res
 		}
 	}
 
 	// Reduce the size of the string before processing it to speed things up on large body outputs.
-	if len(res.output) > maxOutput+maxOutput {
-		res.output = res.output[:maxOutput+maxOutput]
+	if len(res.output.str) > maxOutput+maxOutput {
+		res.output.str = res.output.str[:maxOutput+maxOutput]
 	}
 
 	res.state = StateCritical
-	res.output = resp.Status + ": " + strings.TrimSpace(
-		html.EscapeString(strings.Join(strings.Fields(RemoveSecrets(s.Value, string(body))), " ")))
+	res.output = &Output{esc: true, str: resp.Status + ": " + strings.TrimSpace(
+		html.EscapeString(strings.Join(strings.Fields(RemoveSecrets(s.Value, string(body))), " ")))}
 
 	// Reduce the string to the final max length.
 	// We do it this way so all secrets are properly escaped before string splitting.
-	if len(res.output) > maxOutput {
-		res.output = res.output[:maxOutput]
+	if len(res.output.str) > maxOutput {
+		res.output.str = res.output.str[:maxOutput]
 	}
 
 	return res
@@ -259,21 +259,21 @@ func RemoveSecrets(appURL, message string) string {
 func (s *Service) checkTCP() *result {
 	res := &result{
 		state:  StateUnknown,
-		output: "unknown",
+		output: &Output{str: "unknown"},
 	}
 
 	switch conn, err := net.DialTimeout("tcp", s.Value, s.Timeout.Duration); {
 	case err != nil:
 		res.state = StateCritical
-		res.output = "connection error: " + err.Error()
+		res.output = &Output{str: "connection error: " + err.Error()}
 	case conn == nil:
 		res.state = StateUnknown
-		res.output = "connection failed, no specific error"
+		res.output = &Output{str: "connection failed, no specific error"}
 	default:
 		conn.Close()
 
 		res.state = StateOK
-		res.output = "connected to port " + strings.Split(s.Value, ":")[1] + " OK"
+		res.output = &Output{str: "connected to port " + strings.Split(s.Value, ":")[1] + " OK"}
 	}
 
 	return res

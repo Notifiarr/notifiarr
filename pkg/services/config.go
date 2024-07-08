@@ -1,7 +1,9 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
+	"html"
 	"sync"
 	"time"
 
@@ -87,7 +89,7 @@ type Results struct {
 type CheckResult struct {
 	Name        string         `json:"name"`     // "Radarr"
 	State       CheckState     `json:"state"`    // 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
-	Output      string         `json:"output"`   // metadata message
+	Output      *Output        `json:"output"`   // metadata message must never be nil.
 	Type        CheckType      `json:"type"`     // http, tcp, ping
 	Time        time.Time      `json:"time"`     // when it was checked, rounded to Microseconds
 	Since       time.Time      `json:"since"`    // how long it has been in this state, rounded to Microseconds
@@ -112,7 +114,7 @@ type Service struct {
 }
 
 type service struct {
-	Output       string     `json:"output"`
+	Output       *Output    `json:"output"`
 	State        CheckState `json:"state"`
 	Since        time.Time  `json:"since"`
 	LastCheck    time.Time  `json:"lastCheck"`
@@ -120,4 +122,24 @@ type service struct {
 	proc         *procExpect // only used for process checks.
 	ping         *pingExpect // only used for icmp/udp ping checks.
 	sync.RWMutex `json:"-"`
+}
+
+type Output struct {
+	str string // output string
+	esc bool   // html escaped?
+}
+
+func (o *Output) String() string {
+	switch {
+	case o == nil:
+		return ""
+	case o.esc:
+		return html.UnescapeString(o.str)
+	default:
+		return o.str
+	}
+}
+
+func (o *Output) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.str) //nolint:wrapcheck // do not unescape it.
 }

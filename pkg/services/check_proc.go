@@ -74,7 +74,7 @@ func (s *Service) checkProccess(ctx context.Context) *result {
 	if err != nil {
 		return &result{
 			state:  StateUnknown,
-			output: "process list error: " + err.Error(),
+			output: &Output{str: "process list error: " + err.Error()},
 		}
 	}
 
@@ -106,8 +106,8 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 			if !procinfo.Created.IsZero() && s.svc.proc.restarts && time.Since(procinfo.Created) < s.Interval.Duration {
 				return &result{
 					state: StateCritical,
-					output: fmt.Sprintf("%s: process restarted since last check, age: %v, pid: %d, proc: %s",
-						s.Value, time.Since(procinfo.Created), proc.Pid, procinfo.CmdLine),
+					output: &Output{str: fmt.Sprintf("%s: process restarted since last check, age: %v, pid: %d, proc: %s",
+						s.Value, time.Since(procinfo.Created), proc.Pid, procinfo.CmdLine)},
 				}
 			}
 		}
@@ -128,17 +128,17 @@ func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 	case count < s.svc.proc.countMin: // not enough running!
 		return &result{
 			state:  StateCritical,
-			output: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid),
+			output: &Output{str: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid)},
 		}
 	case s.svc.proc.running && count > 0: // running but should not be!
 		return &result{
 			state:  StateCritical,
-			output: fmt.Sprintf("%s: found %d processes; expected: 0%s%s", s.Value, count, age, pid),
+			output: &Output{str: fmt.Sprintf("%s: found %d processes; expected: 0%s%s", s.Value, count, age, pid)},
 		}
 	default: // running within thresholds!
 		return &result{
 			state:  StateOK,
-			output: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid),
+			output: &Output{str: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid)},
 		}
 	}
 }
