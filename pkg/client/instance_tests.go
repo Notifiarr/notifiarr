@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"html"
 	"net/http"
 	"net/url"
 	"os"
@@ -143,7 +144,7 @@ func (c *Client) testInstance(response http.ResponseWriter, request *http.Reques
 		reply, code = testTautulli(request.Context(), config.Apps.Tautulli)
 	}
 
-	http.Error(response, reply, code)
+	http.Error(response, html.EscapeString(reply), code)
 }
 
 func testDeluge(ctx context.Context, config *deluge.Config) (string, int) {
