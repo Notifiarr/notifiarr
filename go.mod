@@ -34,7 +34,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
 	golang.org/x/crypto v0.24.0
-	golang.org/x/mod v0.18.0
+	golang.org/x/mod v0.19.0
 	golang.org/x/sys v0.21.0
 	golang.org/x/text v0.16.0
 	golang.org/x/time v0.5.0
