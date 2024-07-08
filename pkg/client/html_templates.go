@@ -29,7 +29,7 @@ import (
 	"github.com/hako/durafmt"
 	"github.com/jackpal/gateway"
 	"github.com/mitchellh/go-homedir"
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v4/host"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"golift.io/cnfg"

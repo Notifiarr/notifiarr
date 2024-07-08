@@ -13,7 +13,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/jaypipes/ghw"
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v4/disk"
 )
 
 // ErrNoDisks is returned when no disks are found.

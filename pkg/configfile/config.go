@@ -31,7 +31,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/dsnet/compress/bzip2"
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v4/host"
 	"golift.io/cnfg"
 	"golift.io/cnfgfile"
 )
