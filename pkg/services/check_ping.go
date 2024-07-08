@@ -77,7 +77,7 @@ func (s *Service) checkPING() *result {
 	if err != nil {
 		return &result{
 			state:  StateUnknown,
-			output: "invalid ping value: " + err.Error(),
+			output: &Output{str: "invalid ping value: " + err.Error()},
 		}
 	}
 
@@ -89,7 +89,7 @@ func (s *Service) checkPING() *result {
 	if err = pinger.Run(); err != nil { // blocks.
 		return &result{
 			state:  StateCritical,
-			output: "error pinging service: " + err.Error(),
+			output: &Output{str: "error pinging service: " + err.Error()},
 		}
 	}
 
@@ -105,8 +105,8 @@ func (s *Service) checkPING() *result {
 
 	return &result{
 		state: state,
-		output: fmt.Sprintf("(%s) pkts sent:%d, rcvd:%d, loss:%.01f, max:%s, avg:%s",
+		output: &Output{str: fmt.Sprintf("(%s) pkts sent:%d, rcvd:%d, loss:%.01f, max:%s, avg:%s",
 			msg, stats.PacketsSent, stats.PacketsRecv, stats.PacketLoss,
-			stats.MaxRtt.Round(time.Millisecond), stats.AvgRtt.Round(time.Millisecond)),
+			stats.MaxRtt.Round(time.Millisecond), stats.AvgRtt.Round(time.Millisecond))},
 	}
 }

@@ -342,10 +342,10 @@ func testTCP(ctx context.Context, svc *services.Service) (string, int) {
 
 	res := svc.CheckOnly(ctx)
 	if res.State != services.StateOK {
-		return res.State.String() + " " + res.Output, http.StatusBadGateway
+		return res.State.String() + " " + res.Output.String(), http.StatusBadGateway
 	}
 
-	return "TCP Port is OPEN and reachable: " + res.Output, http.StatusOK
+	return "TCP Port is OPEN and reachable: " + res.Output.String(), http.StatusOK
 }
 
 func testHTTP(ctx context.Context, svc *services.Service) (string, int) {
@@ -355,11 +355,11 @@ func testHTTP(ctx context.Context, svc *services.Service) (string, int) {
 
 	res := svc.CheckOnly(ctx)
 	if res.State != services.StateOK {
-		return res.State.String() + " " + res.Output, http.StatusBadGateway
+		return res.State.String() + " " + res.Output.String(), http.StatusBadGateway
 	}
 
 	// add test
-	return "HTTP Response Code Acceptable! " + res.Output, http.StatusOK
+	return "HTTP Response Code Acceptable! " + res.Output.String(), http.StatusOK
 }
 
 func testProcess(ctx context.Context, svc *services.Service) (string, int) {
@@ -369,10 +369,10 @@ func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 
 	res := svc.CheckOnly(ctx)
 	if res.State != services.StateOK {
-		return res.State.String() + " " + res.Output, http.StatusBadGateway
+		return res.State.String() + " " + res.Output.String(), http.StatusBadGateway
 	}
 
-	return "Process Tested OK: " + res.Output, http.StatusOK
+	return "Process Tested OK: " + res.Output.String(), http.StatusOK
 }
 
 func testPing(ctx context.Context, svc *services.Service) (string, int) {
@@ -382,10 +382,10 @@ func testPing(ctx context.Context, svc *services.Service) (string, int) {
 
 	res := svc.CheckOnly(ctx)
 	if res.State != services.StateOK {
-		return res.State.String() + " " + res.Output, http.StatusBadGateway
+		return res.State.String() + " " + res.Output.String(), http.StatusBadGateway
 	}
 
-	return "Ping Tested OK: " + res.Output, http.StatusOK
+	return "Ping Tested OK: " + res.Output.String(), http.StatusOK
 }
 
 func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
