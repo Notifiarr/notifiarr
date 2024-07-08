@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
 	"sync"
@@ -140,5 +141,5 @@ func (o *Output) String() string {
 }
 
 func (o *Output) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + o.String() + `"`), nil
+	return json.Marshal(o.str) // do not unescape it.
 }
