@@ -17,6 +17,7 @@ var (
 	IsDocker        = os.Getpid() == 1
 	IsUnstable      = strings.HasPrefix(version.Branch, "unstable")
 	DurafmtUnits, _ = durafmt.DefaultUnitsCoder.Decode("year,week,day,hour,min,sec,ms:ms,µs:µs")
+	DurafmtShort, _ = durafmt.DefaultUnitsCoder.Decode("y:y,w:w,d:d,h:h,m:m,s:s,ms:ms,µs:µs")
 )
 
 // ErrDisabledInstance is returned when a request for a disabled instance is performed.

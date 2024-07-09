@@ -154,7 +154,7 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, a
 	}
 
 	if len(ages) == 1 && !ages[0].IsZero() {
-		age = fmt.Sprintf(", age: %v", durafmt.ParseShort(time.Since(ages[0]).Round(time.Second)))
+		age = ", age: " + durafmt.Parse(time.Since(ages[0])).Format(mnd.DurafmtShort)
 	}
 
 	for _, activePid := range pids {

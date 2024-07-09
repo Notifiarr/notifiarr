@@ -52,7 +52,7 @@ func FormatBytes(size interface{}) string { //nolint:cyclop
 // DurationAgo returns an elapsed-time formatted for humans.
 // Print this after a date to show how long ago it was.
 func DurationAgo(when time.Time) string {
-	return " (" + durafmt.Parse(time.Since(when).Round(time.Hour)).String() + " ago)"
+	return " (" + durafmt.Parse(time.Since(when)).Format(DurafmtShort) + " ago)"
 }
 
 // PrintVersionInfo returns version information.

@@ -284,7 +284,7 @@ func (c *Client) Exit(ctx context.Context, cancel context.CancelFunc) error {
 		defer c.CapturePanic()
 		cancel()
 		//nolint:mnd
-		c.Print(" ❌ Good bye! Uptime:", durafmt.Parse(time.Since(version.Started).Round(time.Second)).LimitFirstN(3))
+		c.Print(" ❌ Good bye! Uptime:", durafmt.Parse(time.Since(version.Started)).LimitFirstN(3).Format(mnd.DurafmtUnits))
 	}()
 
 	c.StartWebServer(ctx)

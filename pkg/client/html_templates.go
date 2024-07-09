@@ -326,15 +326,7 @@ func since(t time.Time) string {
 	}
 
 	return strings.ReplaceAll(durafmt.Parse(time.Since(t).Round(time.Second)).
-		LimitFirstN(3). //nolint:mnd
-		Format(durafmt.Units{
-			Year:   durafmt.Unit{Singular: "y", Plural: "y"},
-			Week:   durafmt.Unit{Singular: "w", Plural: "w"},
-			Day:    durafmt.Unit{Singular: "d", Plural: "d"},
-			Hour:   durafmt.Unit{Singular: "h", Plural: "h"},
-			Minute: durafmt.Unit{Singular: "m", Plural: "m"},
-			Second: durafmt.Unit{Singular: "s", Plural: "s"},
-		}), " ", "")
+		LimitFirstN(3).Format(mnd.DurafmtShort), " ", "") //nolint:mnd
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
