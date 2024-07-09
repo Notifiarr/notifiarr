@@ -182,7 +182,7 @@ func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.
 		case strings.Contains(text, "self-assessment ") ||
 			strings.Contains(text, "SMART Health Status:"):
 			s.DiskHealth[name] = fields[len(fields)-1]
-		case len(fields) < 10: //nolint: gomnd
+		case len(fields) < 10: //nolint:mnd
 			continue
 		case strings.HasPrefix(fields[1], "Airflow_Temp") ||
 			strings.HasPrefix(fields[1], "Temperature_Cel"):

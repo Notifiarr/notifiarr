@@ -73,7 +73,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", s.Config.Apps.APIKey)
+	req.Header.Set("X-Api-Key", s.Config.Apps.APIKey)
 
 	start := time.Now()
 
@@ -127,7 +127,7 @@ func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 	}
 
 	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("X-API-Key", s.Config.Apps.APIKey)
+	req.Header.Set("X-Api-Key", s.Config.Apps.APIKey)
 
 	start := time.Now()
 	msg := fmt.Sprintf("Upload %s, %d bytes", file.FileName, sent)
@@ -212,7 +212,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError &&
-				(resp.StatusCode != http.StatusBadRequest || resp.Header.Get("content-type") != "text/html") {
+				(resp.StatusCode != http.StatusBadRequest || resp.Header.Get("Content-Type") != "text/html") {
 				mnd.Website.Add(req.Method+mnd.BytesSent, resp.Request.ContentLength)
 				return resp, nil
 			}

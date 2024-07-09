@@ -128,11 +128,13 @@ func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, e
 	if err != nil {
 		mnd.Apps.Add("MySQL&&Errors", 1)
 		return nil, fmt.Errorf("getting processes: %w", err)
-	} else if err = rows.Err(); err != nil {
+	}
+	defer rows.Close()
+
+	if err = rows.Err(); err != nil {
 		mnd.Apps.Add("MySQL&&Errors", 1)
 		return nil, fmt.Errorf("getting processes rows: %w", err)
 	}
-	defer rows.Close()
 
 	var list MySQLProcesses
 
@@ -165,58 +167,64 @@ func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, e
 }
 
 func scanMySQLStatus(ctx context.Context, dbase *sql.DB) (MySQLStatus, error) {
-	var (
-		list  = make(MySQLStatus)
-		likes = []string{
-			"Aborted",
-			"Bytes",
-			"Connection",
-			"Created",
-			"Handler",
-			"Innodb",
-			"Key",
-			"Open",
-			"Q",
-			"Slow",
-			"Sort",
-			"Uptime",
-			"Table",
-			"Threads",
+	list := make(MySQLStatus)
+
+	for _, name := range []string{
+		"Aborted",
+		"Bytes",
+		"Connection",
+		"Created",
+		"Handler",
+		"Innodb",
+		"Key",
+		"Open",
+		"Q",
+		"Slow",
+		"Sort",
+		"Uptime",
+		"Table",
+		"Threads",
+	} {
+		if err := list.processStatus(ctx, dbase, name); err != nil {
+			return nil, err
 		}
-	)
-
-	for _, name := range likes {
-		mnd.Apps.Add("MySQL&&Global Status Queries", 1)
-
-		rows, err := dbase.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'") //nolint:execinquery
-		if err != nil {
-			mnd.Apps.Add("MySQL&&Errors", 1)
-			return nil, fmt.Errorf("getting global status: %w", err)
-		} else if err = rows.Err(); err != nil {
-			mnd.Apps.Add("MySQL&&Errors", 1)
-			return nil, fmt.Errorf("getting global status rows: %w", err)
-		}
-
-		for rows.Next() {
-			var vname, value string
-
-			if err := rows.Scan(&vname, &value); err != nil {
-				mnd.Apps.Add("MySQL&&Errors", 1)
-				return nil, fmt.Errorf("scanning global status rows: %w", err)
-			}
-
-			v, err := strconv.ParseFloat(value, mnd.Bits64)
-			if err != nil || v == 0 {
-				continue
-			}
-
-			list[vname] = v
-		}
-
-		rows.Close()
 	}
 
 	return list, nil
+}
+
+func (m MySQLStatus) processStatus(ctx context.Context, dbase *sql.DB, name string) error {
+	mnd.Apps.Add("MySQL&&Global Status Queries", 1)
+
+	rows, err := dbase.QueryContext(ctx, "SHOW GLOBAL STATUS LIKE '"+name+"%'")
+	if err != nil {
+		mnd.Apps.Add("MySQL&&Errors", 1)
+		return fmt.Errorf("getting global status: %w", err)
+	}
+	defer rows.Close()
+
+	if err = rows.Err(); err != nil {
+		mnd.Apps.Add("MySQL&&Errors", 1)
+		return fmt.Errorf("getting global status rows: %w", err)
+	}
+
+	for rows.Next() {
+		var vname, value string
+
+		if err := rows.Scan(&vname, &value); err != nil {
+			mnd.Apps.Add("MySQL&&Errors", 1)
+			return fmt.Errorf("scanning global status rows: %w", err)
+		}
+
+		v, err := strconv.ParseFloat(value, mnd.Bits64)
+		if err != nil || v == 0 {
+			continue
+		}
+
+		m[vname] = v
+	}
+
+	return nil
 }
 
 // Len allows us to sort MySQLProcesses.

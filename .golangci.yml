@@ -11,16 +11,8 @@ linters:
   enable-all: true
   disable:
   # deprecated
-    - maligned
-    - scopelint
-    - interfacer
-    - golint
-    - exhaustivestruct
-    - nosnakecase
-    - structcheck
-    - deadcode
-    - varcheck
-    - ifshort
+    - gomnd
+    - execinquery
     # unused
     - exhaustruct
     - exhaustive
@@ -28,14 +20,9 @@ linters:
     - nlreturn
     - nonamedreturns
     - varnamelen
-    - godot
+    - godot # does not work with annotations.
     - perfsprint
-    # unneeded (broken because of generics)
-    - rowserrcheck
-    - wastedassign
-    - sqlclosecheck
-    #- revive # TODO: fix this one.
-    - musttag # broken in 1.52.
+    - musttag # broken in 1.59.
     - depguard
     - tagalign
 run:

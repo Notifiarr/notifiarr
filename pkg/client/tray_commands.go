@@ -59,7 +59,7 @@ func (c *Client) checkForUpdate(ctx context.Context, unstable bool) {
 	if unstable {
 		c.Print("[user requested] Unstable Update Check")
 
-		data, err = update.CheckUnstable(ctx, mnd.DefaultName, version.Revision)
+		data, err = update.CheckUnstable(ctx, mnd.Title, version.Revision)
 		where = "Unstable website"
 	} else {
 		c.Print("[user requested] GitHub Update Check")
@@ -77,7 +77,7 @@ func (c *Client) checkForUpdate(ctx context.Context, unstable bool) {
 		c.downloadOther(data, unstable)
 	default:
 		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+data.Current+"\n"+
-			"Updated: "+data.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(data.RelDate))
+			"Updated: "+data.RelDate.Format("Jan 2, 2006")+mnd.DurationAge(data.RelDate))
 	}
 }
 
@@ -91,7 +91,7 @@ func (c *Client) downloadOther(update *update.Update, unstable bool) {
 	yes, _ := ui.Question(mnd.Title, msg+
 		"Your Version: "+version.Version+"-"+version.Revision+"\n"+
 		"New Version: "+update.Current+"\n"+
-		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate), false)
+		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAge(update.RelDate), false)
 	if yes {
 		_ = ui.OpenURL(update.CurrURL)
 	}

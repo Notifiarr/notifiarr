@@ -27,7 +27,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/securecookie"
-	"github.com/hako/durafmt"
 	flag "github.com/spf13/pflag"
 	mulery "golift.io/mulery/client"
 	"golift.io/version"
@@ -283,8 +282,7 @@ func (c *Client) Exit(ctx context.Context, cancel context.CancelFunc) error {
 	defer func() {
 		defer c.CapturePanic()
 		cancel()
-		//nolint:gomnd
-		c.Print(" ❌ Good bye! Uptime:", durafmt.Parse(time.Since(version.Started).Round(time.Second)).LimitFirstN(3))
+		c.Print(" ❌ Good bye! Exiting" + mnd.DurationAge(version.Started))
 	}()
 
 	c.StartWebServer(ctx)

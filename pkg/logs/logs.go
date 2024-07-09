@@ -235,7 +235,7 @@ func (l *Logger) writeMsg(msg string, log *log.Logger, name string, shared bool)
 // writeSplitMsg splits the message in half and attempts to write each half.
 // If the message is still too large, it'll be split again, and the process continues until it works.
 func (l *Logger) writeSplitMsg(msg string, log *log.Logger, name string) {
-	half := len(msg) / 2 //nolint:gomnd // split messages in half, recursively as needed.
+	half := len(msg) / 2 //nolint:mnd // split messages in half, recursively as needed.
 	part1 := msg[:half]
 	part2 := "...continuing: " + msg[half:]
 

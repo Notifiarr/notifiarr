@@ -139,6 +139,10 @@ func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *trigge
 		return nil, nil, fmt.Errorf("environment variables: %w", err)
 	}
 
+	if _, err := cnfgfile.Parse(c, nil); err != nil {
+		return nil, nil, fmt.Errorf("filepath variables: %w", err)
+	}
+
 	if err := c.setupPassword(); err != nil {
 		return nil, nil, err
 	}
@@ -225,15 +229,19 @@ func (c *Config) setup(logger *logs.Logger) *triggers.Actions {
 
 // FindAndReturn return a config file. Write one if requested.
 func (c *Config) FindAndReturn(ctx context.Context, configFile string, write bool) (string, string, string) {
-	var confFile string
+	var (
+		confFile string
+		stat     os.FileInfo
+	)
 
 	defaultConfigFile, configFileList := defaultLocactions()
 	for _, fileName := range append([]string{configFile}, configFileList...) {
-		if d, err := homedir.Expand(fileName); err == nil {
+		d, err := homedir.Expand(fileName)
+		if err == nil {
 			fileName = d
 		}
 
-		if _, err := os.Stat(fileName); err == nil {
+		if stat, err = os.Stat(fileName); err == nil {
 			confFile = fileName
 			break
 		} //  else { log.Printf("rip: %v", err) }
@@ -241,7 +249,7 @@ func (c *Config) FindAndReturn(ctx context.Context, configFile string, write boo
 
 	if configFile = ""; confFile != "" {
 		configFile, _ = filepath.Abs(confFile)
-		return configFile, "", MsgConfigFound + configFile
+		return configFile, "", MsgConfigFound + configFile + mnd.DurationAge(stat.ModTime())
 	}
 
 	if defaultConfigFile != "" && write {

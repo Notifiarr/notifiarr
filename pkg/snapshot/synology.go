@@ -58,7 +58,7 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 		}
 
 		lsplit := strings.Split(line, "=")
-		if len(lsplit) < 2 { //nolint:gomnd
+		if len(lsplit) < 2 { //nolint:mnd
 			continue
 		}
 

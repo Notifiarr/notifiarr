@@ -116,7 +116,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 // CheckAPIKey drops a 403 if the API key doesn't match, otherwise run next handler.
 func (a *Apps) CheckAPIKey(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-		if _, ok := a.keys[r.Header.Get("X-API-Key")]; !ok {
+		if _, ok := a.keys[r.Header.Get("X-Api-Key")]; !ok {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

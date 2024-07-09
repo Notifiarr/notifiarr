@@ -140,7 +140,7 @@ func (a *Apps) Setup() error { //nolint:cyclop
 func (a *Apps) InitHandlers() {
 	a.keys = make(map[string]struct{})
 	for _, key := range append(a.ExKeys, a.APIKey) {
-		if len(key) > 3 { //nolint:gomnd
+		if len(key) > 3 { //nolint:mnd
 			a.keys[key] = struct{}{}
 		}
 	}

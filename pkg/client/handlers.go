@@ -180,7 +180,7 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 		}
 
 		// save into a request header for the logger.
-		r.Header.Set("X-Redacted-URI", uri)
+		r.Header.Set("X-Redacted-Uri", uri)
 		next.ServeHTTP(w, r)
 	})
 }
@@ -188,7 +188,7 @@ func (c *Client) stripSecrets(next http.Handler) http.Handler {
 func (c *Client) addUsernameHeader(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, req *http.Request) {
 		if username, _ := c.getUserName(req); username != "" {
-			req.Header.Set("X-NotiClient-Username", username)
+			req.Header.Set("X-Noticlient-Username", username)
 		}
 
 		next.ServeHTTP(response, req)

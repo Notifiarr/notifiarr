@@ -154,7 +154,7 @@ func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen,cyclop
 		"locked":   func(env string) bool { return c.Flags.ConfigFile == "" || os.Getenv(env) != "" },
 		"contains": strings.Contains,
 		"since":    since,
-		"percent":  func(i, j float64) int64 { return int64(i / j * 100) }, //nolint:gomnd
+		"percent":  func(i, j float64) int64 { return int64(i / j * 100) }, //nolint:mnd
 		"min": func(s string) string {
 			for _, pieces := range strings.Split(s, ",") {
 				if split := strings.Split(pieces, ":"); len(split) >= 2 && split[0] == "count" {
@@ -324,17 +324,8 @@ func since(t time.Time) string {
 	if t.IsZero() {
 		return "N/A"
 	}
-
-	return strings.ReplaceAll(durafmt.Parse(time.Since(t).Round(time.Second)).
-		LimitFirstN(3). //nolint:gomnd
-		Format(durafmt.Units{
-			Year:   durafmt.Unit{Singular: "y", Plural: "y"},
-			Week:   durafmt.Unit{Singular: "w", Plural: "w"},
-			Day:    durafmt.Unit{Singular: "d", Plural: "d"},
-			Hour:   durafmt.Unit{Singular: "h", Plural: "h"},
-			Minute: durafmt.Unit{Singular: "m", Plural: "m"},
-			Second: durafmt.Unit{Singular: "s", Plural: "s"},
-		}), " ", "")
+	//nolint:mnd
+	return strings.ReplaceAll(durafmt.Parse(time.Since(t)).LimitFirstN(3).Format(mnd.DurafmtShort), " ", "")
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
@@ -484,7 +475,7 @@ func environ() map[string]string {
 	out := make(map[string]string)
 
 	for _, v := range os.Environ() {
-		if s := strings.SplitN(v, "=", 2); len(s) == 2 && s[0] != "" { //nolint:gomnd
+		if s := strings.SplitN(v, "=", 2); len(s) == 2 && s[0] != "" { //nolint:mnd
 			out[s[0]] = s[1]
 		}
 	}
@@ -612,7 +603,7 @@ func readFileTail(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 
 	// This is a magic number.
 	// We assume 150 characters per line to optimize the buffer.
-	output.Grow(count * 150) //nolint:gomnd
+	output.Grow(count * 150) //nolint:mnd
 
 	for {
 		location-- // read 1 byte
@@ -624,7 +615,7 @@ func readFileTail(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 			return nil, fmt.Errorf("reading open file: %w", err)
 		}
 
-		if location != -1 && (char[0] == 10) { //nolint:gomnd
+		if location != -1 && (char[0] == 10) { //nolint:mnd
 			found++ // we found a line
 		}
 
@@ -654,7 +645,7 @@ func readFileHead(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 
 	// This is a magic number.
 	// We assume 150 characters per line to optimize the buffer.
-	output.Grow(count * 150) //nolint:gomnd
+	output.Grow(count * 150) //nolint:mnd
 
 	for ; ; location++ {
 		if _, err := fileHandle.Seek(location, io.SeekStart); err != nil {
@@ -665,7 +656,7 @@ func readFileHead(fileHandle *os.File, fileSize int64, count, skip int) ([]byte,
 			return nil, fmt.Errorf("reading open file: %w", err)
 		}
 
-		if char[0] == 10 { //nolint:gomnd
+		if char[0] == 10 { //nolint:mnd
 			found++ // we have a line
 
 			if found <= skip {
