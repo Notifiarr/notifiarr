@@ -16,7 +16,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -31,7 +30,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/dsnet/compress/bzip2"
-	"github.com/hako/durafmt"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/shirou/gopsutil/v4/host"
 	"golift.io/cnfg"
@@ -251,8 +249,7 @@ func (c *Config) FindAndReturn(ctx context.Context, configFile string, write boo
 
 	if configFile = ""; confFile != "" {
 		configFile, _ = filepath.Abs(confFile)
-		return configFile, "", MsgConfigFound + configFile + ", age: " + durafmt.Parse(time.Since(stat.ModTime())).
-			LimitFirstN(3).Format(mnd.DurafmtUnits) //nolint:mnd
+		return configFile, "", MsgConfigFound + configFile + mnd.DurationAge(stat.ModTime())
 	}
 
 	if defaultConfigFile != "" && write {

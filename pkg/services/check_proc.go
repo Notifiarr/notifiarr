@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/hako/durafmt"
 	"github.com/shirou/gopsutil/v4/process"
 )
 
@@ -154,7 +153,7 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, a
 	}
 
 	if len(ages) == 1 && !ages[0].IsZero() {
-		age = ", age: " + durafmt.Parse(time.Since(ages[0])).Format(mnd.DurafmtShort)
+		age = mnd.DurationAge(ages[0])
 	}
 
 	for _, activePid := range pids {

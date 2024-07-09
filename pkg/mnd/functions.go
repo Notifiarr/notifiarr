@@ -49,10 +49,10 @@ func FormatBytes(size interface{}) string { //nolint:cyclop
 	}
 }
 
-// DurationAgo returns an elapsed-time formatted for humans.
+// DurationAge returns an elapsed-time formatted for humans.
 // Print this after a date to show how long ago it was.
-func DurationAgo(when time.Time) string {
-	return " (" + durafmt.Parse(time.Since(when)).Format(DurafmtShort) + " ago)"
+func DurationAge(when time.Time) string {
+	return "; age: " + durafmt.Parse(time.Since(when)).LimitFirstN(3).Format(DurafmtUnits) //nolint:mnd
 }
 
 // PrintVersionInfo returns version information.

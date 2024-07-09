@@ -324,9 +324,8 @@ func since(t time.Time) string {
 	if t.IsZero() {
 		return "N/A"
 	}
-
-	return strings.ReplaceAll(durafmt.Parse(time.Since(t).Round(time.Second)).
-		LimitFirstN(3).Format(mnd.DurafmtShort), " ", "") //nolint:mnd
+	//nolint:mnd
+	return strings.ReplaceAll(durafmt.Parse(time.Since(t)).LimitFirstN(3).Format(mnd.DurafmtShort), " ", "")
 }
 
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
