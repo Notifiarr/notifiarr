@@ -25,7 +25,7 @@ func (c *Client) upgradeWindows(ctx context.Context, update *update.Update) {
 	yes, _ := ui.Question(mnd.Title, "An Update is available! Upgrade Now?\n\n"+
 		"Your Version: "+version.Version+"-"+version.Revision+"\n"+
 		"New Version: "+update.Current+"\n"+
-		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAgo(update.RelDate), false)
+		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAge(update.RelDate), false)
 	if yes {
 		if err := c.updateNow(ctx, update, "user requested"); err != nil {
 			c.Errorf("Update Failed: %v", err)
@@ -79,7 +79,7 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 	}
 
 	time.Sleep(WaitTime)
-	c.Print(pfx+"Auto-updater started. Check interval:", durafmt.Parse(dur.Round(time.Second)).LimitFirstN(3))
+	c.Print(pfx+"Auto-updater started. Check interval:", durafmt.Parse(dur).LimitFirstN(3)) //nolint:mnd
 
 	// Check for update on startup.
 	if err := c.checkAndUpdate(ctx, "startup check"); err != nil {
