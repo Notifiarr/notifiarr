@@ -1,7 +1,7 @@
 package mnd
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"strings"
 
@@ -12,19 +12,23 @@ import (
 //nolint:gochecknoglobals
 var (
 	// IsSynology tells us if this we're running on a Synology.
-	IsSynology bool
-	// IsDocker tells us if this is our Docker container.
-	IsDocker        = os.Getpid() == 1
+	IsSynology = isSynology()
+	// IsDocker tells us if this is a Docker container.
+	IsDocker        = isDocker()
 	IsUnstable      = strings.HasPrefix(version.Branch, "unstable")
 	DurafmtUnits, _ = durafmt.DefaultUnitsCoder.Decode("year,week,day,hour,min,sec,ms:ms,µs:µs")
 	DurafmtShort, _ = durafmt.DefaultUnitsCoder.Decode("y:y,w:w,d:d,h:h,m:m,s:s,ms:ms,µs:µs")
 )
 
 // ErrDisabledInstance is returned when a request for a disabled instance is performed.
-var ErrDisabledInstance = fmt.Errorf("instance is administratively disabled")
+var ErrDisabledInstance = errors.New("instance is administratively disabled")
 
-//nolint:gochecknoinits
-func init() {
+func isSynology() bool {
 	_, err := os.Stat(Synology)
-	IsSynology = err == nil
+	return err == nil
+}
+
+func isDocker() bool {
+	_, err := os.Stat("/.dockerenv")
+	return os.Getpid() == 1 || err == nil
 }
