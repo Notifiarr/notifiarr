@@ -25,6 +25,9 @@ include /tmp/.metadata.make
 # Travis CI passes the version in. Local builds get it from the current git tag.
 ifneq ($(_VERSION),)
 VERSION:=$(_VERSION)
+endif
+
+ifneq ($(_ITERATION),)
 ITERATION:=$(_ITERATION)
 endif
 
