@@ -23,12 +23,12 @@ func hasConsoleWindow() bool {
 	}
 	defer file.Close()
 
-	const IMAGE_SUBSYSTEM_WINDOWS_CUI = 3
+	const windowsTerminal = 3
 
 	if header, ok := file.OptionalHeader.(*pe.OptionalHeader64); ok {
-		return header.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI
+		return header.Subsystem == windowsTerminal
 	} else if header, ok := file.OptionalHeader.(*pe.OptionalHeader32); ok {
-		return header.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_CUI
+		return header.Subsystem == windowsTerminal
 	}
 
 	return false
