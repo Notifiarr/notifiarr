@@ -7,6 +7,7 @@ package client
 
 import (
 	"context"
+	"os"
 	"path"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -42,8 +43,10 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 		c.Printf("==> Unique Host ID: %s (%s)", hi.HostID, hi.Hostname)
 	}
 
+	hostname, _ := os.Hostname()
+
 	c.Printf("==> %s <==", mnd.HelpLink)
-	c.Printf("==> Startup Settings <==")
+	c.Printf("==> %s Startup Settings <==", hostname)
 	c.printLidarr(&clientInfo.Actions.Apps.Lidarr)
 	c.printProwlarr(&clientInfo.Actions.Apps.Prowlarr)
 	c.printRadarr(&clientInfo.Actions.Apps.Radarr)
@@ -83,15 +86,21 @@ func (c *Client) printVersionChangeInfo(ctx context.Context) {
 		c.Errorf("XX> Getting version from database: %v", err)
 	}
 
+	currentVersion := version.Version + "-" + version.Revision
 	previousVersion := string(values[clientVersion])
-	if previousVersion == version.Version ||
-		version.Version == "" {
+
+	if previousVersion == currentVersion || version.Version == "" {
 		return
 	}
 
-	c.Printf("==> Detected application version change! %s => %s", previousVersion, version.Version)
+	if previousVersion == "" {
+		hostname, _ := os.Hostname()
+		c.Printf("==> Detected a new client, %s. Welcome to Notifiarr!", hostname)
+	} else {
+		c.Printf("==> Detected application version change! %s => %s", previousVersion, currentVersion)
+	}
 
-	err = c.website.SetState(ctx, clientVersion, []byte(version.Version))
+	err = c.website.SetState(ctx, clientVersion, []byte(currentVersion))
 	if err != nil {
 		c.Errorf("Updating version in database: %v", err)
 	}

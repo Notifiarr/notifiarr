@@ -151,9 +151,10 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 	}
 
 	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.Printf(" %s %s v%s-%s Starting! [PID: %v] %s",
-		mnd.TodaysEmoji(), c.Flags.Name(), version.Version, version.Revision, os.Getpid(),
-		version.Started.Format("Monday, January 2, 2006 @ 3:04:05 PM MST -0700"))
+	c.Printf(" %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
+		mnd.TodaysEmoji(), mnd.Title, version.Version, version.Revision,
+		os.Getpid(), os.Getuid(), os.Getgid(),
+		version.Started.Format("Mon, Jan 2, 2006 @ 3:04:05 PM MST -0700"))
 	c.Printf("==> %s", msg)
 	c.printUpdateMessage()
 
