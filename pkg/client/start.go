@@ -103,7 +103,7 @@ func Start() error {
 		_, err := fmt.Println(client.Flags.Name() + " " + version.Version + "-" + version.Revision)
 		return err
 	case client.Flags.PSlist: // print process list and exit.
-		ctx, cancel := context.WithTimeout(ctx, time.Minute)
+		ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 		defer cancel()
 
 		return printProcessList(ctx)
@@ -113,11 +113,11 @@ func Start() error {
 	case client.Flags.Curl != "": // curl a URL and exit.
 		return curlURL(client.Flags.Curl, client.Flags.Headers)
 	default:
-		return client.start(ctx)
+		return client.checkFlags(ctx)
 	}
 }
 
-func (c *Client) start(ctx context.Context) error { //nolint:cyclop
+func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 	msg, newPassword, err := c.loadConfiguration(ctx)
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -131,14 +131,14 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 			return fmt.Errorf("cannot reset admin password, got error reading configuration file: %w", err)
 		}
 
-		ctx, cancel := context.WithTimeout(ctx, time.Minute)
+		ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 		defer cancel()
 
 		return c.resetAdminPassword(ctx)
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
 		c.Printf("==> %s", msg)
 
-		ctx, cancel := context.WithTimeout(ctx, time.Minute)
+		ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 		defer cancel()
 
 		return c.forceWriteWithExit(ctx, c.Flags.Write)
@@ -148,8 +148,12 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 		return nil
 	case c.Config.APIKey == "":
 		return fmt.Errorf("%s: %w %s_API_KEY", msg, ErrNilAPIKey, c.Flags.EnvPrefix)
+	default:
+		return c.start(ctx, msg, newPassword)
 	}
+}
 
+func (c *Client) start(ctx context.Context, msg, newPassword string) error {
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.Printf(" %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
 		mnd.TodaysEmoji(), mnd.Title, version.Version, version.Revision,
@@ -174,15 +178,15 @@ func (c *Client) start(ctx context.Context) error { //nolint:cyclop
 
 	if ui.HasGUI() {
 		// This starts the web server and calls os.Exit() when done.
-		c.startTray(ctx, cancel, clientInfo)
+		c.startTray(ctx, clientInfo)
 		return nil
 	}
 
-	return c.Exit(ctx, cancel)
+	return c.Exit(ctx)
 }
 
 func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
-	ctx, cancel := context.WithTimeout(ctx, time.Minute)
+	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 	defer cancel()
 
 	_, _ = c.Config.Write(ctx, c.Flags.ConfigFile, false)
@@ -279,10 +283,9 @@ func (c *Client) triggerConfigReload(event website.EventType, source string) {
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
-func (c *Client) Exit(ctx context.Context, cancel context.CancelFunc) error {
+func (c *Client) Exit(ctx context.Context) error {
 	defer func() {
 		defer c.CapturePanic()
-		cancel()
 		c.Print(" ❌ Good bye! Exiting" + mnd.DurationAge(version.Started))
 	}()
 
