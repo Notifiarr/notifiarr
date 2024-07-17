@@ -42,17 +42,17 @@ require (
 	golang.org/x/time v0.5.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.3
-	golift.io/cnfgfile v0.0.0-20240710195711-cc964880efd6
+	golift.io/cnfgfile v0.0.0-20240713024420-a5436d84eb48
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/mulery v0.0.8
 	golift.io/nzbget v0.1.5
-	golift.io/qbit v0.0.0-20240407164833-5de994cfd55e
+	golift.io/qbit v0.0.0-20240715191156-11930ac2546e
 	golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7
 	golift.io/starr v1.0.1-0.20240315164714-247399771c46
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
-	modernc.org/sqlite v1.30.1
+	modernc.org/sqlite v1.30.2
 )
 
 require (
