@@ -6,12 +6,14 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/gorilla/mux"
 )
 
 func (c *Config) Setup(services []*Service) error {
@@ -259,4 +261,33 @@ func (c *Config) Stop() {
 // SvcCount returns the count of services being monitored.
 func (c *Config) SvcCount() int {
 	return len(c.services)
+}
+
+// APIHandler is passed into the webserver so services can be accessed by the API.
+func (c *Config) APIHandler(req *http.Request) (int, any) {
+	return c.handleTrigger(req, website.EventAPI)
+}
+
+func (c *Config) handleTrigger(req *http.Request, event website.EventType) (int, any) {
+	action := mux.Vars(req)["action"]
+	c.Debugf("[%s requested] Incoming Service Action: %s (%s)", event, action)
+
+	switch action {
+	case "list":
+		return c.returnServiceList()
+	default:
+		return http.StatusBadRequest, "unknown action: " + action
+	}
+}
+
+// @Description  Returns a list of service check results.
+// @Summary      Get service check results
+// @Tags         Triggers
+// @Produce      json
+// @Success      200  {object} apps.Respond.apiResponse{message=[]CheckResult} "list check results"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/services/list [get]
+// @Security     ApiKeyAuth
+func (c *Config) returnServiceList() (int, any) {
+	return http.StatusOK, c.GetResults()
 }

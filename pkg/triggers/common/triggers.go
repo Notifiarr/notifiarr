@@ -37,6 +37,15 @@ type Config struct {
 	rand     *rand.Rand
 }
 
+type Create interface {
+	Create()
+}
+
+type Run interface {
+	Run(context.Context)
+	Stop()
+}
+
 // SetReloadCh is used to set the reload channel for triggers.
 // This is an exported method because the channel is not always
 // available when triggers are initialized.

@@ -1,6 +1,7 @@
 package filewatch
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -118,8 +119,11 @@ func checkIgnored(ignored []string) ignored {
 	return output
 }
 
+// Verify the interfaces are satisfied.
+var _ = common.Run(&Action{nil})
+
 // Run compiles any regexp's and opens a tail -f on provided watch files.
-func (a *Action) Run() {
+func (a *Action) Run(_ context.Context) {
 	a.cmd.run()
 }
 
