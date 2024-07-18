@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -42,7 +41,7 @@ func (c *Client) StartWebServer(ctx context.Context) {
 	c.server = &http.Server{ //nolint: exhaustivestruct
 		Handler:           smx,
 		Addr:              c.Config.BindAddr,
-		IdleTimeout:       time.Minute,
+		IdleTimeout:       mnd.DefaultTimeout,
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,
 		ReadHeaderTimeout: c.Config.Timeout.Duration,

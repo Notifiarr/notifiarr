@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"github.com/hako/durafmt"
 	"golift.io/cnfg"
 )
 
@@ -82,14 +83,7 @@ func (c *cmd) create() {
 	ci := clientinfo.Get()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
 	if ci == nil {
-		c.Printf("==> Started Notifiarr Poller, have_clientinfo:%v interval:%s",
-			ci != nil, cnfg.Duration{Duration: pollDur.Round(time.Second)})
-		c.Add(&common.Action{
-			Name: TrigPollSite,
-			Fn:   c.PollForReload,
-			D:    cnfg.Duration{Duration: pollDur + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},
-		})
-
+		c.startWebsitePoller()
 		return
 	}
 
@@ -121,6 +115,19 @@ func (c *cmd) create() {
 	}
 
 	c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Actions.Custom))
+}
+
+func (c *cmd) startWebsitePoller() {
+	if c.ValidAPIKey() != nil {
+		return // only poll if the api key length is valid.
+	}
+
+	c.Printf("==> Started Notifiarr Website Poller, interval: %s", durafmt.Parse(pollDur))
+	c.Add(&common.Action{
+		Name: TrigPollSite,
+		Fn:   c.PollForReload,
+		D:    cnfg.Duration{Duration: pollDur + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},
+	})
 }
 
 // PollForReload is only started if the initial connection to the website failed.

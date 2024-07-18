@@ -315,6 +315,9 @@ func (c *Config) Write(ctx context.Context, file string, encode bool) (string, e
 	}
 	defer newFile.Close()
 
+	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
+	defer cancel()
+
 	if c.HostID == "" {
 		c.HostID, _ = host.HostIDWithContext(ctx)
 	}

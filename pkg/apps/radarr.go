@@ -980,7 +980,7 @@ func radarrAddImportList(req *http.Request) (int, interface{}) {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
-	output, err := getRadarr(req).CreateImportListContext(req.Context(), &ilist)
+	output, err := getRadarr(req).AddImportListContext(req.Context(), &ilist)
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "creating import list", err)
 	}

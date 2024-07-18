@@ -23,9 +23,9 @@ func (f *fakeMenu) Uncheck()               {}
 func (f *fakeMenu) Check()                 {}
 func (f *fakeMenu) SetTooltip(interface{}) {}
 
-func (c *Client) printUpdateMessage()           {}
-func (c *Client) setupMenus(interface{})        {}
-func (c *Client) startTray(_, _, _ interface{}) {}
+func (c *Client) printUpdateMessage()        {}
+func (c *Client) setupMenus(interface{})     {}
+func (c *Client) startTray(_, _ interface{}) {}
 func (c *Client) handleAptHook(_ context.Context) error {
 	return fmt.Errorf("this feature is not supported on this platform") //nolint:goerr113
 }

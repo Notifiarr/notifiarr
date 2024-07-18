@@ -24,7 +24,7 @@ type httpClient struct {
 	*http.Client
 }
 
-func (s *Server) validAPIKey() error {
+func (s *Server) ValidAPIKey() error {
 	if len(s.Config.Apps.APIKey) != APIKeyLength {
 		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
 	}
@@ -326,7 +326,7 @@ func (s *Server) watchSendDataChan(ctx context.Context) {
 }
 
 func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, time.Duration, error) {
-	if err := s.validAPIKey(); err != nil {
+	if err := s.ValidAPIKey(); err != nil {
 		if data.respChan != nil {
 			data.respChan <- &chResponse{
 				Response: nil,
