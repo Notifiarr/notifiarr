@@ -4,8 +4,6 @@ go 1.22
 
 // pflag and tail are pinned to master. 12/31/2022
 
-replace github.com/shirou/gopsutil/v4 => github.com/Girbons/gopsutil/v4 v4.0.0-20240708140948-ba82fefdee75
-
 require (
 	github.com/BurntSushi/toml v1.4.0
 	github.com/akavel/rsrc v0.10.2
