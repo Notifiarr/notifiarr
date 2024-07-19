@@ -328,29 +328,29 @@ func since(t time.Time) string {
 	return strings.ReplaceAll(durafmt.Parse(time.Since(t)).LimitFirstN(3).Format(mnd.DurafmtShort), " ", "")
 }
 
-const templates = "templates/"
-
 func (c *Client) parseTemplatesDirectory(filePath string) error {
-	items, err := bindata.Templates.ReadDir(strings.TrimSuffix(filePath, "/"))
+	items, err := bindata.Templates.ReadDir(filePath)
 	if err != nil {
 		return fmt.Errorf("failed reading internal templates: %w", err)
 	}
 
 	for _, entry := range items {
-		if entry.IsDir() {
-			if err := c.parseTemplatesDirectory(filepath.Join(filePath, entry.Name())); err != nil {
+		filePath := path.Join(filePath, entry.Name())
+
+		if entry.IsDir() { // Recursion.
+			if err := c.parseTemplatesDirectory(filePath); err != nil {
 				return err
 			}
 
 			continue
 		}
 
-		data, err := bindata.Templates.ReadFile(filepath.Join(filePath, entry.Name()))
+		data, err := bindata.Templates.ReadFile(filePath)
 		if err != nil {
-			return fmt.Errorf("failed reading internal template %s: %w", entry.Name(), err)
+			return fmt.Errorf("failed reading internal template %s: %w", filePath, err)
 		}
 
-		filePath = strings.TrimPrefix(filepath.Join(filePath, entry.Name()), templates)
+		filePath = strings.TrimPrefix(filePath, "templates/") // no leading junk.
 		if c.template, err = c.template.New(filePath).Parse(string(data)); err != nil {
 			return fmt.Errorf("bug parsing internal template: %w", err)
 		}
@@ -365,7 +365,7 @@ func (c *Client) ParseGUITemplates() error {
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
 	c.template = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
 
-	if err := c.parseTemplatesDirectory(templates); err != nil {
+	if err := c.parseTemplatesDirectory("templates"); err != nil {
 		return err
 	}
 
