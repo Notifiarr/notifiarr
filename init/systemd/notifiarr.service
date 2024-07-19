@@ -8,7 +8,6 @@ Requires=network.target
 [Service]
 Environment=DN_LOG_FILE=/var/log/notifiarr/app.log
 Environment=DN_HTTP_LOG=/var/log/notifiarr/http.log
-Environment=DN_DEBUG_LOG=/var/log/notifiarr/debug.log
 Environment=DN_SERVICES_LOG_FILE=/var/log/notifiarr/services.log
 Environment=DN_QUIET=true
 ExecStart=/usr/bin/notifiarr $DAEMON_OPTS
