@@ -1,6 +1,7 @@
 package sabnzbd
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -112,7 +113,18 @@ type HistorySlots struct {
 	ActionLine   string      `json:"action_line"`
 	Size         string      `json:"size"`
 	Loaded       bool        `json:"loaded"`
-	Retry        int         `json:"retry"`
+	Retry        Bool        `json:"retry"`
+}
+
+// Bool exists because once upon a time sab changed the retry value from int to bool.
+// https://github.com/sabnzbd/sabnzbd/issues/2911
+type Bool bool
+
+func (f *Bool) UnmarshalJSON(b []byte) error {
+	txt := string(bytes.Trim(b, `"`))
+	*f = Bool(txt == "true" || (txt != "0" && txt != "false"))
+
+	return nil
 }
 
 //nolint:tagliatelle
