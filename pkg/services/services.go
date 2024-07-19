@@ -276,7 +276,7 @@ func (c *Config) handleTrigger(req *http.Request, event website.EventType) (int,
 	case "list":
 		return c.returnServiceList()
 	default:
-		return http.StatusBadRequest, "unknown action: " + action
+		return http.StatusBadRequest, "unknown service action: " + action
 	}
 }
 
