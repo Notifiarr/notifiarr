@@ -58,6 +58,11 @@ func (c *Config) setup(services []*Service) error {
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
 func (c *Config) Start(ctx context.Context) {
+	if len(c.services) == 0 {
+		c.Printf("==> Service Checker Disabled! No services to check.")
+		return
+	}
+
 	c.stopLock.Lock()
 	defer c.stopLock.Unlock()
 
