@@ -42,7 +42,7 @@ type Create interface {
 }
 
 type Run interface {
-	Run(context.Context)
+	Run(ctx context.Context)
 	Stop()
 }
 

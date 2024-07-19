@@ -126,6 +126,7 @@ func (c *cmd) create() {
 		if custom.Interval.Duration < time.Minute {
 			c.Errorf("Website provided custom cron interval under 1 minute. Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
+
 			custom.Interval.Duration = time.Minute
 		}
 
