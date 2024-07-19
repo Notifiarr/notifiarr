@@ -849,7 +849,7 @@ func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.
 }
 
 func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http.Request) {
-	data, err := bindata.Asset(request.URL.Path[1:])
+	data, err := bindata.Files.ReadFile(request.URL.Path[1:])
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusNotFound)
 		return

@@ -163,6 +163,7 @@ func printCurlReply(resp *http.Response, body []byte) {
 
 // Fortune returns a fortune.
 func Fortune() string {
-	fortunes := strings.Split(bindata.MustAssetString("other/fortunes.txt"), "\n%\n")
+	file, _ := bindata.Files.ReadFile("other/fortunes.txt")
+	fortunes := strings.Split(string(file), "\n%\n")
 	return fortunes[rand.Intn(len(fortunes))] //nolint:gosec
 }

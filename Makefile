@@ -92,7 +92,7 @@ clean:
 	rm -f notifiarr notifiarr.*.{macos,freebsd,linux,exe}{,.gz,.zip} notifiarr.1{,.gz} notifiarr.rb
 	rm -f notifiarr{_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/notifiarr/README{,.html} README{,.html} ./notifiarr_manual.html rsrc.syso Notifiarr.*.app.zip
-	rm -f notifiarr.service pkg/bindata/bindata.go pack.temp.dmg notifiarr.conf.example
+	rm -f notifiarr.service pack.temp.dmg notifiarr.conf.example
 	rm -rf package_build_* release Notifiarr.*.app Notifiarr.app
 	rm -f pkg/bindata/docs/api_docs.go
 
@@ -355,12 +355,10 @@ lint: generate
 	GOOS=freebsd golangci-lint run
 	GOOS=windows golangci-lint run
 
-generate: pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go
+generate: pkg/bindata/docs/api_docs.go
 pkg/bindata/docs/api_docs.go: 
-	go generate ./pkg/bindata/docs
-pkg/bindata/bindata.go:
 	find pkg -name .DS\* -delete
-	go generate ./pkg/bindata/
+	go generate ./pkg/bindata/docs
 
 ##################
 ##### Docker #####

@@ -328,22 +328,45 @@ func since(t time.Time) string {
 	return strings.ReplaceAll(durafmt.Parse(time.Since(t)).LimitFirstN(3).Format(mnd.DurafmtShort), " ", "")
 }
 
+const templates = "templates/"
+
+func (c *Client) parseTemplatesDirectory(filePath string) error {
+	items, err := bindata.Templates.ReadDir(strings.TrimSuffix(filePath, "/"))
+	if err != nil {
+		return fmt.Errorf("failed reading internal templates: %w", err)
+	}
+
+	for _, entry := range items {
+		if entry.IsDir() {
+			if err := c.parseTemplatesDirectory(filepath.Join(filePath, entry.Name())); err != nil {
+				return err
+			}
+
+			continue
+		}
+
+		data, err := bindata.Templates.ReadFile(filepath.Join(filePath, entry.Name()))
+		if err != nil {
+			return fmt.Errorf("failed reading internal template %s: %w", entry.Name(), err)
+		}
+
+		filePath = strings.TrimPrefix(filepath.Join(filePath, entry.Name()), templates)
+		if c.template, err = c.template.New(filePath).Parse(string(data)); err != nil {
+			return fmt.Errorf("bug parsing internal template: %w", err)
+		}
+	}
+
+	return nil
+}
+
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
 func (c *Client) ParseGUITemplates() error {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
 	c.template = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
 
-	var err error
-
-	// Parse all our compiled-in templates.
-	for _, name := range bindata.AssetNames() {
-		if strings.HasPrefix(name, "templates/") {
-			trim := strings.TrimPrefix(name, "templates/")
-			if c.template, err = c.template.New(trim).Parse(bindata.MustAssetString(name)); err != nil {
-				return fmt.Errorf("bug parsing internal template: %w", err)
-			}
-		}
+	if err := c.parseTemplatesDirectory(templates); err != nil {
+		return err
 	}
 
 	if c.Flags.Assets != "" {

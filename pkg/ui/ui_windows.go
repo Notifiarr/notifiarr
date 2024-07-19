@@ -41,7 +41,7 @@ func getPNG() string {
 		return ""
 	}
 
-	data, err := bindata.Asset("files/favicon.png")
+	data, err := bindata.Files.ReadFile("files/favicon.png")
 	if err != nil {
 		return ""
 	}

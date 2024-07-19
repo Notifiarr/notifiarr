@@ -151,7 +151,7 @@ func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-	ico, err := bindata.Asset("files/images/favicon.ico")
+	ico, err := bindata.Files.ReadFile("files/images/favicon.ico")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
