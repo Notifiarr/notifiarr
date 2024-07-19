@@ -111,7 +111,7 @@ func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
 		}
 		// No 'else if' so you can have both if you need them.
 		if action, ok := actions.Field(i).Interface().(common.Run); ok {
-			action.Run(ctx)
+			go action.Run(ctx)
 		}
 	}
 }

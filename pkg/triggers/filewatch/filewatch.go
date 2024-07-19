@@ -150,10 +150,12 @@ func (c *cmd) run() {
 		validTails = append(validTails, item)
 	}
 
-	if len(validTails) != 0 {
-		cases, ticker := c.collectFileTails(validTails)
-		go c.tailFiles(cases, validTails, ticker)
+	if len(validTails) == 0 {
+		return
 	}
+
+	cases, ticker := c.collectFileTails(validTails)
+	c.tailFiles(cases, validTails, ticker)
 }
 
 func (w *WatchFile) setup(logger *logger, ignored ignored) error {

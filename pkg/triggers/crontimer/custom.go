@@ -29,7 +29,7 @@ const (
 	// This just tells the website the client is up.
 	upCheckDur = 14*time.Minute + 57*time.Second
 	// How long to be up before sending first up check.
-	checkWait          = 2 * time.Minute
+	checkWait          = 1*time.Minute + 23*time.Second
 	randomMilliseconds = 5000
 	randomSeconds      = 30
 )
@@ -95,8 +95,9 @@ var (
 	_ = common.Create(&Action{nil})
 )
 
-// Run files after create to take some immediate action.
+// Run fires in a go routine. Wait a minute or two then tell the website we're up.
 func (a *Action) Run(ctx context.Context) {
+	time.Sleep(checkWait)
 	a.cmd.PollUpCheck(ctx, &common.ActionInput{Type: website.EventStart})
 }
 
