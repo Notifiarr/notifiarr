@@ -162,9 +162,8 @@ func (c *cmd) PollUpCheck(ctx context.Context, input *common.ActionInput) {
 		Route:      website.ClientRoute,
 		Event:      website.EventCheck,
 		Payload:    c.CIC.Info(ctx, true), // true avoids polling tautulli.
-		LogPayload: true,
+		LogPayload: false,
 		ErrorsOnly: true,
-		LogMsg:     string(TrigUpCheck),
 	})
 	if err != nil {
 		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
