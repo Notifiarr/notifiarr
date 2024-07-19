@@ -87,7 +87,7 @@ func (c *Client) startAutoUpdater(ctx context.Context, dur time.Duration) {
 	}
 
 	ticker := time.NewTicker(dur)
-	for range ticker.C { // the ticker never exits.
+	for range ticker.C { // This is a never-ending loop.
 		if err := c.checkAndUpdate(ctx, "automatic"); err != nil {
 			c.Errorf("Auto-Update Failed: %v", err)
 		}
