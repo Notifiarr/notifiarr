@@ -143,3 +143,7 @@ func (o *Output) String() string {
 func (o *Output) MarshalJSON() ([]byte, error) {
 	return json.Marshal(o.str) //nolint:wrapcheck // do not unescape it.
 }
+
+func (o *Output) UnmarshalJSON(input []byte) error {
+	return json.Unmarshal(input, &o.str) //nolint:wrapcheck
+}

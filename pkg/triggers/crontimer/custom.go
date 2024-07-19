@@ -15,14 +15,21 @@ import (
 )
 
 // TrigPollSite is our site polling trigger identifier.
-const TrigPollSite common.TriggerName = "Polling Notifiarr for new settings."
+const (
+	TrigPollSite common.TriggerName = "Polling Notifiarr for new settings."
+	TrigUpCheck  common.TriggerName = "Telling Notifiarr website we are still up!"
+)
 
 const (
 	// How often to poll the website for changes.
 	// This only fires when:
-	// 1. the cliet isn't reachable from the website.
+	// 1. the client isn't reachable from the website.
 	// 2. the client didn't get a valid response to clientInfo.
-	pollDur            = 4 * time.Minute
+	pollDur = 4 * time.Minute
+	// This just tells the website the client is up.
+	upCheckDur = 14*time.Minute + 57*time.Second
+	// How long to be up before sending first up check.
+	checkWait          = 1*time.Minute + 23*time.Second
 	randomMilliseconds = 5000
 	randomSeconds      = 30
 )
@@ -79,6 +86,21 @@ func (a *Action) Create() {
 	a.cmd.create()
 }
 
+// Stop satisifies an interface.
+func (a *Action) Stop() {}
+
+// Verify the interfaces are satisfied.
+var (
+	_ = common.Run(&Action{nil})
+	_ = common.Create(&Action{nil})
+)
+
+// Run fires in a go routine. Wait a minute or two then tell the website we're up.
+func (a *Action) Run(ctx context.Context) {
+	time.Sleep(checkWait)
+	a.cmd.PollUpCheck(ctx, &common.ActionInput{Type: website.EventStart})
+}
+
 func (c *cmd) create() {
 	ci := clientinfo.Get()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
@@ -86,6 +108,13 @@ func (c *cmd) create() {
 		c.startWebsitePoller()
 		return
 	}
+
+	c.Printf("==> Started Notifiarr Website Up-Checker, interval: %s", durafmt.Parse(upCheckDur))
+	c.Add(&common.Action{
+		Name: TrigUpCheck,
+		Fn:   c.PollUpCheck,
+		D:    cnfg.Duration{Duration: upCheckDur},
+	})
 
 	for _, custom := range ci.Actions.Custom {
 		timer := &Timer{
@@ -95,13 +124,11 @@ func (c *cmd) create() {
 		}
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 
-		var randomTime time.Duration
-
 		if custom.Interval.Duration < time.Minute {
-			c.Errorf("Website provided custom cron interval under 1 minute. Ignored! Interval: %s Name: %s, URI: %s",
+			c.Errorf("Website provided custom cron interval under 1 minute. Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
-		} else {
-			randomTime = time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
+
+			custom.Interval.Duration = time.Minute
 		}
 
 		c.list = append(c.list, timer)
@@ -110,7 +137,7 @@ func (c *cmd) create() {
 			Name: common.TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s'", custom.Name)),
 			Fn:   timer.run,
 			C:    timer.ch,
-			D:    cnfg.Duration{Duration: custom.Interval.Duration + randomTime},
+			D:    cnfg.Duration{Duration: custom.Interval.Duration},
 		})
 	}
 
@@ -128,6 +155,20 @@ func (c *cmd) startWebsitePoller() {
 		Fn:   c.PollForReload,
 		D:    cnfg.Duration{Duration: pollDur + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},
 	})
+}
+
+func (c *cmd) PollUpCheck(ctx context.Context, input *common.ActionInput) {
+	_, err := c.GetData(&website.Request{
+		Route:      website.ClientRoute,
+		Event:      website.EventCheck,
+		Payload:    c.CIC.Info(ctx, true), // true avoids polling tautulli.
+		LogPayload: false,
+		ErrorsOnly: true,
+	})
+	if err != nil {
+		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		return
+	}
 }
 
 // PollForReload is only started if the initial connection to the website failed.
