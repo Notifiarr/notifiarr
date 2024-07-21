@@ -33,7 +33,7 @@ func StartCmd(c string, v ...string) error {
 }
 
 // ErrUnsupported is just an error.
-var ErrUnsupported = fmt.Errorf("unsupported OS")
+var ErrUnsupported = fmt.Errorf("unsupported OS, good with xwindows? help us!")
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {

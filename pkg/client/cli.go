@@ -173,7 +173,7 @@ func Fortune() string {
 // handleAptHook takes a payload as stdin from dpkg and relays it to notifiarr.com.
 // only useful as an apt integration on Debian-based operating systems.
 // NEVER return an error, we don't want to hang up apt.
-func (c *Client) handleAptHook(ctx context.Context) error {
+func (c *Client) handleAptHook(ctx context.Context) error { //nolint:cyclop
 	if !mnd.IsLinux {
 		return ErrUnsupport
 	} else if !c.Config.EnableApt {
