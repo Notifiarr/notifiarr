@@ -173,11 +173,11 @@ func (c *Client) configMenu(ctx context.Context) {
 		if menu["svcs"].Checked() {
 			menu["svcs"].Uncheck()
 			c.Config.Services.Stop()
-			ui.Notify("Stopped checking services!")
+			ui.Toast("Stopped checking services!")
 		} else {
 			menu["svcs"].Check()
 			c.Config.Services.Start(ctx)
-			ui.Notify("Service checks started!")
+			ui.Toast("Service checks started!")
 		}
 	})
 
@@ -275,7 +275,7 @@ func (c *Client) notifiarrMenuActions() {
 	menu["syncqp"].Click(func() { c.triggers.CFSync.SyncSonarrRP(website.EventUser) })
 	menu["svcs_prod"].Click(func() {
 		c.Print("[user requested] Checking services and sending results to Notifiarr.")
-		ui.Notify("Running and sending %d Service Checks.", c.Config.Services.SvcCount())
+		ui.Toast("Running and sending %d Service Checks.", c.Config.Services.SvcCount())
 		c.Config.Services.RunChecks(website.EventUser)
 	})
 	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(website.EventUser) })
@@ -326,7 +326,7 @@ func (c *Client) debugMenu() {
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
 	menu["svcs_log"].Click(func() {
 		c.Print("[user requested] Checking services and logging results.")
-		ui.Notify("Running and logging %d Service Checks.", c.Config.Services.SvcCount())
+		ui.Toast("Running and logging %d Service Checks.", c.Config.Services.SvcCount())
 		c.Config.Services.RunChecks("log")
 	})
 

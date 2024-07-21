@@ -25,7 +25,7 @@ func HasGUI() bool {
 	return hasGUI
 }
 
-func Notify(_ string, _ ...interface{}) error {
+func Toast(_ string, _ ...interface{}) error {
 	return nil
 }
 

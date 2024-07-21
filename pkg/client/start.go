@@ -165,7 +165,7 @@ func (c *Client) start(ctx context.Context, msg, newPassword string) error {
 	c.Printf("==> %s", msg)
 
 	if c.Flags.Updated {
-		go ui.Notify(mnd.Title + " updated to version " + version.Version) //nolint:errcheck
+		go ui.Toast(mnd.Title + " updated to version " + version.Version) //nolint:errcheck
 	}
 
 	if err := c.loadAssetsTemplates(ctx); err != nil {
@@ -351,7 +351,7 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 	c.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s",
 		c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile)
 
-	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
+	if err = ui.Toast("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
 	}
 

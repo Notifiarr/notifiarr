@@ -22,7 +22,7 @@ func HasGUI() bool {
 	return hasGUI
 }
 
-func Notify(msg string, vars ...interface{}) error {
+func Toast(msg string, vars ...interface{}) error {
 	if !hasGUI {
 		return nil
 	}
