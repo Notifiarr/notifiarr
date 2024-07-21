@@ -69,7 +69,7 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 // and the current session pull. if changes are present, a timestmp is added.
 func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Sessions) {
 	now := time.Now()
-	ci := clientinfo.Get()
+	info := clientinfo.Get()
 
 	// data.Save("plexPreviousSessions", previous)
 	data.Save("plexCurrentSessions", current)
@@ -83,7 +83,7 @@ func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Se
 			continue // this only happens once.
 		case c.checkExistingSession(ctx, currSess, current, previous):
 			continue // existing session.
-		case currSess.Player.State == playing && ci.Actions.Plex.TrackSess:
+		case currSess.Player.State == playing && info.Actions.Plex.TrackSess:
 			// We are tracking sessions (no webhooks); send this brand new session to website.
 			c.sendSessionPlaying(ctx, currSess, current, mediaPlay)
 		}

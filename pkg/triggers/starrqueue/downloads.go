@@ -86,14 +86,14 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 func (c *cmd) getDownloadingItemsLidarr(ctx context.Context) itemList {
 	items := make(itemList)
 
-	ci := clientinfo.Get()
-	if ci == nil {
+	info := clientinfo.Get()
+	if info == nil {
 		return items
 	}
 
 	for idx, app := range c.Apps.Lidarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Apps.Lidarr.Finished(instance) {
+		if !app.Enabled() || !info.Actions.Apps.Lidarr.Finished(instance) {
 			continue
 		}
 
@@ -166,14 +166,14 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 func (c *cmd) getDownloadingItemsRadarr(ctx context.Context) itemList {
 	items := make(itemList)
 
-	ci := clientinfo.Get()
-	if ci == nil {
+	info := clientinfo.Get()
+	if info == nil {
 		return items
 	}
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Apps.Radarr.Finished(instance) {
+		if !app.Enabled() || !info.Actions.Apps.Radarr.Finished(instance) {
 			continue
 		}
 
@@ -244,14 +244,14 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 func (c *cmd) getDownloadingItemsReadarr(ctx context.Context) itemList {
 	items := make(itemList)
 
-	ci := clientinfo.Get()
-	if ci == nil {
+	info := clientinfo.Get()
+	if info == nil {
 		return items
 	}
 
 	for idx, app := range c.Apps.Readarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Apps.Readarr.Finished(instance) {
+		if !app.Enabled() || !info.Actions.Apps.Readarr.Finished(instance) {
 			continue
 		}
 
@@ -324,14 +324,14 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 func (c *cmd) getDownloadingItemsSonarr(ctx context.Context) itemList {
 	items := make(itemList)
 
-	ci := clientinfo.Get()
-	if ci == nil {
+	info := clientinfo.Get()
+	if info == nil {
 		return items
 	}
 
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Apps.Sonarr.Finished(instance) {
+		if !app.Enabled() || !info.Actions.Apps.Sonarr.Finished(instance) {
 			continue
 		}
 

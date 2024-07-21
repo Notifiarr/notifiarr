@@ -51,17 +51,17 @@ func (c *cmd) setupRadarr() bool {
 	var enabled bool
 
 	for idx, app := range c.Apps.Radarr {
-		ci := clientinfo.Get()
-		if !app.Enabled() || ci == nil {
+		info := clientinfo.Get()
+		if !app.Enabled() || info == nil {
 			continue
 		}
 
 		var dur time.Duration
 
 		instance := idx + 1
-		if ci.Actions.Apps.Radarr.Finished(instance) {
+		if info.Actions.Apps.Radarr.Finished(instance) {
 			dur = finishedDuration
-		} else if ci.Actions.Apps.Radarr.Stuck(instance) {
+		} else if info.Actions.Apps.Radarr.Stuck(instance) {
 			dur = stuckDuration
 		}
 

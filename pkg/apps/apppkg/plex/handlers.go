@@ -70,16 +70,16 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/plex/1/directory [get]
 // @Security     ApiKeyAuth
-func (s *Server) HandleDirectory(r *http.Request) (int, interface{}) {
-	plexID, _ := r.Context().Value(starr.Plex).(int)
+func (s *Server) HandleDirectory(req *http.Request) (int, interface{}) {
+	plexID, _ := req.Context().Value(starr.Plex).(int)
 
-	directory, err := s.GetDirectoryWithContext(r.Context())
+	directory, err := s.GetDirectoryWithContext(req.Context())
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("directory request failed (%d): %w", plexID, err)
 	}
 
 	for idx, library := range directory.Directory {
-		directory.Directory[idx].TrashSize, err = s.GetDirectoryTrashSizeWithContext(r.Context(), library.Key)
+		directory.Directory[idx].TrashSize, err = s.GetDirectoryTrashSizeWithContext(req.Context(), library.Key)
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("directory trash request failed (%d): %w", plexID, err)
 		}

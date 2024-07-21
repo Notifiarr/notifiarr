@@ -26,7 +26,7 @@ func (s *Server) GetSessions() (*Sessions, error) {
 // GetSessionsWithContext returns the Plex sessions in JSON format.
 func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) {
 	var (
-		v struct {
+		output struct {
 			//nolint:tagliatelle
 			MediaContainer struct {
 				Sessions []*Session `json:"Metadata"`
@@ -40,11 +40,11 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 		return sessions, fmt.Errorf("%w: %s", err, string(body))
 	}
 
-	if err = json.Unmarshal(body, &v); err != nil {
+	if err = json.Unmarshal(body, &output); err != nil {
 		return sessions, fmt.Errorf("parsing plex sessions (TRY UPGRADING PLEX): %w: %s", err, string(body))
 	}
 
-	sessions.Sessions = v.MediaContainer.Sessions
+	sessions.Sessions = output.MediaContainer.Sessions
 
 	return sessions, nil
 }

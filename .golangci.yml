@@ -13,7 +13,6 @@ linters:
     - dupl
     - nlreturn
     - nonamedreturns
-    - varnamelen
     - godot # does not work with annotations.
     - perfsprint
     - musttag # broken in 1.59.

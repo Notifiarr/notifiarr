@@ -65,14 +65,14 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) run() {
-	ci := clientinfo.Get()
-	if !c.Plex.Enabled() || ci == nil {
+	info := clientinfo.Get()
+	if !c.Plex.Enabled() || info == nil {
 		return
 	}
 
 	var dur time.Duration
 
-	cfg := ci.Actions.Plex
+	cfg := info.Actions.Plex
 	if cfg.Interval.Duration > 0 {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = cfg.Interval.Duration + randomTime
@@ -150,34 +150,34 @@ func (a *Action) GetMetaSnap(ctx context.Context) *snapshot.Snapshot {
 func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 	var (
 		snap = &snapshot.Snapshot{}
-		wg   sync.WaitGroup
+		wait sync.WaitGroup
 	)
 
-	wg.Add(1)
+	wait.Add(1)
 
 	go func() {
-		defer wg.Done()
+		defer wait.Done()
 
 		_ = snap.GetCPUSample(ctx)
 	}()
 
-	wg.Add(1)
+	wait.Add(1)
 
 	go func() {
-		defer wg.Done()
+		defer wait.Done()
 
 		_ = snap.GetMemoryUsage(ctx)
 	}()
 
-	wg.Add(1)
+	wait.Add(1)
 
 	go func() {
-		defer wg.Done()
+		defer wait.Done()
 
 		_ = snap.GetLocalData(ctx)
 	}()
 
-	wg.Wait()
+	wait.Wait()
 
 	return snap
 }

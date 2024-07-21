@@ -2,7 +2,7 @@
 // This package also provides a web handler for incoming plex webhooks, and another
 // two handlers for requests from Notifiarr.com to list sessions and kill a session.
 // The purpose is to keep track of Plex viewers and send meaningful alerts to their
-// respective Disord server about user behavior.
+// respective Discord server about user behavior.
 // ie. user started watching something, paused it, resumed it, and finished something.
 // This package can be disabled by not providing a Plex Media Server URL or Token.
 package plex

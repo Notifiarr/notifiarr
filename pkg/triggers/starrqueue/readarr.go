@@ -49,8 +49,8 @@ func (c *cmd) setupReadarr() bool {
 	var enable bool
 
 	for idx, app := range c.Apps.Readarr {
-		ci := clientinfo.Get()
-		if !app.Enabled() || ci == nil {
+		info := clientinfo.Get()
+		if !app.Enabled() || info == nil {
 			continue
 		}
 
@@ -59,10 +59,10 @@ func (c *cmd) setupReadarr() bool {
 		instance := idx + 1
 
 		switch {
-		case ci.Actions.Apps.Readarr.Finished(instance):
+		case info.Actions.Apps.Readarr.Finished(instance):
 			enable = true
 			dur = finishedDuration
-		case ci.Actions.Apps.Readarr.Stuck(instance):
+		case info.Actions.Apps.Readarr.Stuck(instance):
 			enable = true
 			dur = stuckDuration
 		default:

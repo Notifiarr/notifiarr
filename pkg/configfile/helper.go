@@ -57,13 +57,13 @@ func (n AllowedIPs) Contains(ip string) bool {
 // MakeIPs turns a list of CIDR strings (or plain IPs) into a list of net.IPNet.
 // This "allowed" list is later used to check incoming IPs from web requests.
 func MakeIPs(upstreams []string) AllowedIPs {
-	a := AllowedIPs{
+	allowed := AllowedIPs{
 		Input: make([]string, len(upstreams)),
 		Nets:  []*net.IPNet{},
 	}
 
 	for idx, ipAddr := range upstreams {
-		a.Input[idx] = ipAddr
+		allowed.Input[idx] = ipAddr
 
 		if !strings.Contains(ipAddr, "/") {
 			if strings.Contains(ipAddr, ":") {
@@ -74,11 +74,11 @@ func MakeIPs(upstreams []string) AllowedIPs {
 		}
 
 		if _, i, err := net.ParseCIDR(ipAddr); err == nil {
-			a.Nets = append(a.Nets, i)
+			allowed.Nets = append(allowed.Nets, i)
 		}
 	}
 
-	return a
+	return allowed
 }
 
 // CheckPort attempts to bind to a port to check if it's in use or not.

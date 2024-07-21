@@ -69,13 +69,13 @@ func (c *Command) SetupRegexpArgs() error {
 		arg := matches[idx]
 		instance := idx + 1
 
-		re, err := regexp.Compile(c.cmd[arg[0]+2 : arg[1]-2])
+		regex, err := regexp.Compile(c.cmd[arg[0]+2 : arg[1]-2])
 		if err != nil {
 			return fmt.Errorf("parsing command '%s' arg %d regexp: %w", c.Name, instance, err)
 		}
 
 		c.cmd = c.cmd[:arg[0]] + fmt.Sprintf("%s%d%s", argPfx, instance, argSfx) + c.cmd[arg[1]:]
-		c.args[idx] = re
+		c.args[idx] = regex
 	}
 
 	return nil

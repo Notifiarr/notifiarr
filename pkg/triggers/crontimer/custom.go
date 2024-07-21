@@ -117,9 +117,9 @@ func (a *Action) Run(ctx context.Context) {
 }
 
 func (c *cmd) create() {
-	ci := clientinfo.Get()
+	info := clientinfo.Get()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
-	if ci == nil {
+	if info == nil {
 		c.startWebsitePoller()
 		return
 	}
@@ -131,7 +131,7 @@ func (c *cmd) create() {
 		D:    cnfg.Duration{Duration: upCheckDur},
 	})
 
-	for _, custom := range ci.Actions.Custom {
+	for _, custom := range info.Actions.Custom {
 		timer := &Timer{
 			CronConfig: custom,
 			ch:         make(chan *common.ActionInput, 1),
@@ -156,7 +156,7 @@ func (c *cmd) create() {
 		})
 	}
 
-	c.Printf("==> Custom Timers Enabled: %d timers provided", len(ci.Actions.Custom))
+	c.Printf("==> Custom Timers Enabled: %d timers provided", len(info.Actions.Custom))
 }
 
 func (c *cmd) startWebsitePoller() {
@@ -201,13 +201,13 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 		return
 	}
 
-	var v struct {
+	var resp struct {
 		Reload     bool      `json:"reload"`
 		LastSync   time.Time `json:"lastSync"`
 		LastChange time.Time `json:"lastChange"`
 	}
 
-	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
+	if err = json.Unmarshal(body.Details.Response, &resp); err != nil {
 		c.ErrorfNoShare("[%s requested] Polling Notifiarr: %v", input.Type, err)
 		return
 	}

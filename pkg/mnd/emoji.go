@@ -45,7 +45,7 @@ func emojiMonth(when time.Time) string {
 
 // TodaysEmoji returns an emoji specific to the month (or perhaps date).
 func TodaysEmoji() string {
-	if emoji, ok := map[int]string{
+	if emoji, exists := map[int]string{
 		1:          "🎉", // January 1
 		45:         "💝", // February 14
 		185:        "🧨", // July 4
@@ -56,7 +56,7 @@ func TodaysEmoji() string {
 		328:        "🦃", // November 24
 		359:        "🎄", // December 25
 		altLeapDay: "🤹", // February 29 (Leap Day)
-	}[today(version.Started)]; ok {
+	}[today(version.Started)]; exists {
 		return emoji
 	}
 

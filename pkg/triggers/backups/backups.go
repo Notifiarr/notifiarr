@@ -41,7 +41,7 @@ func (a *Action) Backup(input *common.ActionInput, app starr.App) error {
 	return nil
 }
 
-func (c *cmd) makeBackupTriggersLidarr(ci *clientinfo.ClientInfo) {
+func (c *cmd) makeBackupTriggersLidarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigLidarrBackup,
 		Fn:   c.sendLidarrBackups,
@@ -49,12 +49,12 @@ func (c *cmd) makeBackupTriggersLidarr(ci *clientinfo.ClientInfo) {
 	}
 	defer c.Add(action)
 
-	if ci == nil {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Lidarr {
-		if app.Enabled() && ci.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled {
+		if app.Enabled() && info.Actions.Apps.Lidarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
 				time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
@@ -64,7 +64,7 @@ func (c *cmd) makeBackupTriggersLidarr(ci *clientinfo.ClientInfo) {
 	}
 }
 
-func (c *cmd) makeBackupTriggersRadarr(ci *clientinfo.ClientInfo) {
+func (c *cmd) makeBackupTriggersRadarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigRadarrBackup,
 		Fn:   c.sendRadarrBackups,
@@ -72,12 +72,12 @@ func (c *cmd) makeBackupTriggersRadarr(ci *clientinfo.ClientInfo) {
 	}
 	defer c.Add(action)
 
-	if ci == nil {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Radarr {
-		if app.Enabled() && ci.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled {
+		if app.Enabled() && info.Actions.Apps.Radarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
 				time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
@@ -87,7 +87,7 @@ func (c *cmd) makeBackupTriggersRadarr(ci *clientinfo.ClientInfo) {
 	}
 }
 
-func (c *cmd) makeBackupTriggersReadarr(ci *clientinfo.ClientInfo) {
+func (c *cmd) makeBackupTriggersReadarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigReadarrBackup,
 		Fn:   c.sendReadarrBackups,
@@ -95,12 +95,12 @@ func (c *cmd) makeBackupTriggersReadarr(ci *clientinfo.ClientInfo) {
 	}
 	defer c.Add(action)
 
-	if ci == nil {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Readarr {
-		if app.Enabled() && ci.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled {
+		if app.Enabled() && info.Actions.Apps.Readarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
 				time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
@@ -110,7 +110,7 @@ func (c *cmd) makeBackupTriggersReadarr(ci *clientinfo.ClientInfo) {
 	}
 }
 
-func (c *cmd) makeBackupTriggersSonarr(ci *clientinfo.ClientInfo) {
+func (c *cmd) makeBackupTriggersSonarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigSonarrBackup,
 		Fn:   c.sendSonarrBackups,
@@ -118,12 +118,12 @@ func (c *cmd) makeBackupTriggersSonarr(ci *clientinfo.ClientInfo) {
 	}
 	defer c.Add(action)
 
-	if ci == nil {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Sonarr {
-		if app.Enabled() && ci.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled {
+		if app.Enabled() && info.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
 				time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
@@ -133,7 +133,7 @@ func (c *cmd) makeBackupTriggersSonarr(ci *clientinfo.ClientInfo) {
 	}
 }
 
-func (c *cmd) makeBackupTriggersProwlarr(ci *clientinfo.ClientInfo) {
+func (c *cmd) makeBackupTriggersProwlarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigProwlarrBackup,
 		Fn:   c.sendProwlarrBackups,
@@ -141,12 +141,12 @@ func (c *cmd) makeBackupTriggersProwlarr(ci *clientinfo.ClientInfo) {
 	}
 	defer c.Add(action)
 
-	if ci == nil {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Prowlarr {
-		if app.Enabled() && ci.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled {
+		if app.Enabled() && info.Actions.Apps.Prowlarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
 				time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 			action.D = cnfg.Duration{Duration: checkInterval + randomTime}

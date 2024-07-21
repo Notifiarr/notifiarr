@@ -90,19 +90,19 @@ func (c *Cmd) getNZBGetState(ctx context.Context, instance int, n *apps.NZBGetCo
 func getNzbData(
 	ctx context.Context,
 	instance int,
-	n *apps.NZBGetConfig,
+	nzb *apps.NZBGetConfig,
 ) ([]*nzbget.Group, *nzbget.Status, []*nzbget.History, error) {
-	queue, err := n.ListGroupsContext(ctx)
+	queue, err := nzb.ListGroupsContext(ctx)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting file groups (queue) from instance %d: %w", instance, err)
 	}
 
-	stat, err := n.StatusContext(ctx)
+	stat, err := nzb.StatusContext(ctx)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}
 
-	hist, err := n.HistoryContext(ctx, true)
+	hist, err := nzb.HistoryContext(ctx, true)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("getting status from instance %d: %w", instance, err)
 	}

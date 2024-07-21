@@ -51,18 +51,18 @@ func (c *cmd) setupSonarr() bool {
 	var enable bool
 
 	for idx, app := range c.Apps.Sonarr {
-		ci := clientinfo.Get()
-		if !app.Enabled() || ci == nil {
+		info := clientinfo.Get()
+		if !app.Enabled() || info == nil {
 			continue
 		}
 
 		var dur time.Duration
 
 		instance := idx + 1
-		if ci.Actions.Apps.Sonarr.Finished(instance) {
+		if info.Actions.Apps.Sonarr.Finished(instance) {
 			enable = true
 			dur = finishedDuration
-		} else if ci.Actions.Apps.Sonarr.Stuck(instance) {
+		} else if info.Actions.Apps.Sonarr.Stuck(instance) {
 			enable = true
 			dur = stuckDuration
 		}

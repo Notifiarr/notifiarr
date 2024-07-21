@@ -208,13 +208,13 @@ func (s *Snapshot) getIoStat(ctx context.Context, run bool) error {
 		return fmt.Errorf("%v: %w: %s", cmd.Args, err, e)
 	}
 
-	var v IoStatData
-	if err = json.NewDecoder(stdout).Decode(&v); err != nil {
+	var output IoStatData
+	if err = json.NewDecoder(stdout).Decode(&output); err != nil {
 		return fmt.Errorf("%v: output error: %w, %s", cmd.Args, err, stderr)
 	}
 
-	if len(v.Sysstat.Hosts) > 0 && len(v.Sysstat.Hosts[0].Statistics) > 0 {
-		s.IOStat = &v.Sysstat.Hosts[0].Statistics[0].Disk
+	if len(output.Sysstat.Hosts) > 0 && len(output.Sysstat.Hosts[0].Statistics) > 0 {
+		s.IOStat = &output.Sysstat.Hosts[0].Statistics[0].Disk
 	}
 
 	return nil
