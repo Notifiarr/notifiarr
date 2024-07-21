@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/cfsync"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
@@ -37,6 +38,9 @@ type Config struct {
 	LogFiles   []string
 	Commands   []*commands.Command
 	CIC        *clientinfo.Config
+	ConfigFile string
+	AutoUpdate string
+	UnstableCh bool
 	common.Services
 	*logs.Logger
 }
@@ -59,6 +63,7 @@ type Actions struct {
 	EmptyTrash *emptytrash.Action
 	MDbList    *mdblist.Action
 	FileUpload *fileupload.Action
+	AutoUpdate *autoupdate.Action
 }
 
 // New turns a populated Config into a pile of Actions.
@@ -88,6 +93,7 @@ func New(config *Config) *Actions {
 		MDbList:    mdblist.New(common),
 		FileUpload: fileupload.New(common),
 		Timers:     common,
+		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
 	}
 }
 
@@ -95,8 +101,10 @@ func New(config *Config) *Actions {
 // They execute all Create(), Run() and Stop() procedures defined in our Actions.
 
 // Start creates all the triggers and runs the timers.
-func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
+func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
 	a.Timers.SetReloadCh(reloadCh)
+	a.Timers.SetStopCh(stopCh)
+
 	defer a.Timers.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()

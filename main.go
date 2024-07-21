@@ -10,7 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
-// @title Notifiarr Client API Docs
+// @title Notifiarr Client API Documentation
 // @version 1.0
 // @description Notifiarr Client monitors local services and sends notifications.
 // @termsOfService https://notifiarr.com
@@ -27,14 +27,16 @@ func main() {
 	log.SetFlags(log.LstdFlags)
 	log.SetPrefix("[ERROR] ")
 
-	defer func() {
-		if r := recover(); r != nil {
-			log.Printf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack()))
-		}
-	}()
+	defer logPanic()
 
 	if err := client.Start(); err != nil {
-		_, _ = ui.Error(mnd.Title, err.Error())
-		log.Fatal(err) //nolint:gocritic // defer does not need to run if we have an error.
+		_, _ = ui.Error(err.Error())
+		defer log.Fatal(err)
+	}
+}
+
+func logPanic() {
+	if r := recover(); r != nil {
+		log.Printf("Go Panic! %s\n%v\n%s", mnd.BugIssue, r, string(debug.Stack()))
 	}
 }

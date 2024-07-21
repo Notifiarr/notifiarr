@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -42,6 +43,8 @@ type Action struct {
 type cmd struct {
 	*common.Config
 	list []*Timer
+	sync.Mutex
+	stop bool
 }
 
 // Timer is used to trigger actions.
@@ -86,8 +89,12 @@ func (a *Action) Create() {
 	a.cmd.create()
 }
 
-// Stop satisifies an interface.
-func (a *Action) Stop() {}
+// Stop satisfies an interface.
+func (a *Action) Stop() {
+	a.cmd.Lock()
+	defer a.cmd.Unlock()
+	a.cmd.stop = true
+}
 
 // Verify the interfaces are satisfied.
 var (
@@ -96,9 +103,17 @@ var (
 )
 
 // Run fires in a go routine. Wait a minute or two then tell the website we're up.
+// If app reloads in first checkWait duration, this throws an error. That's ok.
 func (a *Action) Run(ctx context.Context) {
-	time.Sleep(checkWait)
-	a.cmd.PollUpCheck(ctx, &common.ActionInput{Type: website.EventStart})
+	if a.cmd.ValidAPIKey() == nil {
+		time.Sleep(checkWait)
+		a.cmd.Lock()
+		defer a.cmd.Unlock()
+
+		if !a.cmd.stop { // Wait a while then make sure we didn't stop.
+			a.cmd.PollUpCheck(ctx, &common.ActionInput{Type: website.EventStart})
+		}
+	}
 }
 
 func (c *cmd) create() {
@@ -125,7 +140,7 @@ func (c *cmd) create() {
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 
 		if custom.Interval.Duration < time.Minute {
-			c.Errorf("Website provided custom cron interval under 1 minute. Interval: %s Name: %s, URI: %s",
+			c.ErrorfNoShare("Website provided custom cron interval under 1 minute. Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
 
 			custom.Interval.Duration = time.Minute
@@ -157,16 +172,17 @@ func (c *cmd) startWebsitePoller() {
 	})
 }
 
-func (c *cmd) PollUpCheck(ctx context.Context, input *common.ActionInput) {
+// PollUpCheck just tells the website the client is still up. It doesn't process the return payload.
+func (c *cmd) PollUpCheck(_ context.Context, input *common.ActionInput) {
 	_, err := c.GetData(&website.Request{
 		Route:      website.ClientRoute,
 		Event:      website.EventCheck,
-		Payload:    c.CIC.Info(ctx, true), // true avoids polling tautulli.
-		LogPayload: false,
+		Payload:    "up",
+		LogPayload: true,
 		ErrorsOnly: true,
 	})
 	if err != nil {
-		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		c.ErrorfNoShare("[%s requested] UpChecking Notifiarr: %v", input.Type, err)
 		return
 	}
 }
@@ -181,7 +197,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 		LogPayload: true,
 	})
 	if err != nil {
-		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		c.ErrorfNoShare("[%s requested] Polling Notifiarr: %v", input.Type, err)
 		return
 	}
 
@@ -192,7 +208,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 	}
 
 	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
-		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		c.ErrorfNoShare("[%s requested] Polling Notifiarr: %v", input.Type, err)
 		return
 	}
 
