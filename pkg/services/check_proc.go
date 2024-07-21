@@ -143,8 +143,13 @@ func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 }
 
 // getProcessStrings compiles output strings for a process service check.
-func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, age, pid string) {
-	if min = "min: 1"; s.svc.proc.countMin > 0 { // min always exists.
+func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (string, string, string, string) {
+	var (
+		min           = "min: 1"
+		max, age, pid string
+	)
+
+	if s.svc.proc.countMin > 0 { // min always exists.
 		min = fmt.Sprintf("min: %d", s.svc.proc.countMin)
 	}
 
@@ -166,7 +171,7 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (min, max, a
 		pid += strconv.Itoa(int(activePid))
 	}
 
-	return
+	return min, max, age, pid
 }
 
 // getProcInfo returns age and cli args for a process.

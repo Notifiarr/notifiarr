@@ -3,6 +3,7 @@ package website
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -26,10 +27,10 @@ const (
 
 // Errors returned by this library.
 var (
-	ErrNon200          = fmt.Errorf("return code was not 200")
-	ErrInvalidResponse = fmt.Errorf("invalid response")
-	ErrNoChannel       = fmt.Errorf("the website send-data channel is closed")
-	ErrInvalidAPIKey   = fmt.Errorf("configured notifiarr API key is invalid")
+	ErrNon200          = errors.New("return code was not 200")
+	ErrInvalidResponse = errors.New("invalid response")
+	ErrNoChannel       = errors.New("the website send-data channel is closed")
+	ErrInvalidAPIKey   = errors.New("configured notifiarr API key is invalid")
 )
 
 // Config is the input data needed to send payloads to notifiarr.
@@ -54,21 +55,21 @@ type Server struct {
 	stopSendData chan struct{}
 }
 
-func New(c *Config) *Server {
-	c.BaseURL = BaseURL
+func New(config *Config) *Server {
+	config.BaseURL = BaseURL
 
-	if c.Retries < 0 {
-		c.Retries = 0
-	} else if c.Retries == 0 {
-		c.Retries = DefaultRetries
+	if config.Retries < 0 {
+		config.Retries = 0
+	} else if config.Retries == 0 {
+		config.Retries = DefaultRetries
 	}
 
 	return &Server{
-		Config: c,
+		Config: config,
 		// clientInfo:   &ClientInfo{},
 		client: &httpClient{
-			Retries: c.Retries,
-			Logger:  c.Logger,
+			Retries: config.Retries,
+			Logger:  config.Logger,
 			Client:  &http.Client{},
 		},
 		hostInfo:     nil, // must start nil

@@ -15,9 +15,9 @@ import (
 
 // Config is the Tautulli configuration.
 type Config struct {
-	URL          string `toml:"url" xml:"url" json:"url"`
-	APIKey       string `toml:"api_key" xml:"api_key" json:"apiKey"`
-	*http.Client `toml:"-" xml:"-" json:"-"`
+	URL          string `json:"url"    toml:"url"     xml:"url"`
+	APIKey       string `json:"apiKey" toml:"api_key" xml:"api_key"`
+	*http.Client `json:"-"      toml:"-"       xml:"-"`
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.

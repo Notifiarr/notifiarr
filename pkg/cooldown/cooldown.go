@@ -25,13 +25,13 @@ type Timer struct {
 
 // NewTimer returns a struct for which you can use Active().
 func NewTimer(skipCleanup bool, cleanTimer time.Duration) *Timer {
-	t := &Timer{
+	timer := &Timer{
 		skipCleanup: skipCleanup,
 		ticker:      cleanTimer,
 	}
-	t.start()
+	timer.start()
 
-	return t
+	return timer
 }
 
 // Active returns true if a cooldown timer is active for a key. If it's not active, it's saved (for next time).

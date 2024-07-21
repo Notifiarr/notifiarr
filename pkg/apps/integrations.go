@@ -90,7 +90,7 @@ func (c *TautulliConfig) Enabled() bool {
 type DelugeConfig struct {
 	ExtraConfig
 	*deluge.Config
-	*deluge.Deluge `toml:"-" xml:"-" json:"-"`
+	*deluge.Deluge `json:"-" toml:"-" xml:"-"`
 }
 
 func (a *Apps) setupDeluge() error {
@@ -184,7 +184,7 @@ func (c *SabNZBConfig) Enabled() bool {
 type QbitConfig struct {
 	ExtraConfig
 	*qbit.Config
-	*qbit.Qbit `toml:"-" xml:"-" json:"-"`
+	*qbit.Qbit `json:"-" toml:"-" xml:"-"`
 }
 
 func (a *Apps) setupQbit() error {
@@ -233,9 +233,9 @@ func (c *QbitConfig) Enabled() bool {
 type RtorrentConfig struct {
 	ExtraConfig
 	*xmlrpc.Client
-	URL  string `toml:"url" xml:"url" json:"url"`
-	User string `toml:"user" xml:"user" json:"user"`
-	Pass string `toml:"pass" xml:"pass" json:"pass"`
+	URL  string `json:"url"  toml:"url"  xml:"url"`
+	User string `json:"user" toml:"user" xml:"user"`
+	Pass string `json:"pass" toml:"pass" xml:"pass"`
 }
 
 func (a *Apps) setupRtorrent() error {
@@ -289,7 +289,7 @@ func (c *RtorrentConfig) Enabled() bool {
 type NZBGetConfig struct {
 	ExtraConfig
 	*nzbget.Config
-	*nzbget.NZBGet `toml:"-" xml:"-" json:"-"`
+	*nzbget.NZBGet `json:"-" toml:"-" xml:"-"`
 }
 
 func (a *Apps) setupNZBGet() error {
@@ -325,11 +325,11 @@ func (c *NZBGetConfig) Enabled() bool {
 
 // XmissionConfig is the Transmission input configuration.
 type XmissionConfig struct {
-	URL  string `toml:"url" xml:"url" json:"url"`
-	User string `toml:"user" xml:"user" json:"user"`
-	Pass string `toml:"pass" xml:"pass" json:"pass"`
+	URL  string `json:"url"  toml:"url"  xml:"url"`
+	User string `json:"user" toml:"user" xml:"user"`
+	Pass string `json:"pass" toml:"pass" xml:"pass"`
 	ExtraConfig
-	*transmissionrpc.Client `toml:"-" xml:"-" json:"-"`
+	*transmissionrpc.Client `json:"-" toml:"-" xml:"-"`
 }
 
 // Enabled returns true if the instance is enabled and usable.

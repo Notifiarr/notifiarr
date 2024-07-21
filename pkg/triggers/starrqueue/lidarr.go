@@ -49,17 +49,17 @@ func (c *cmd) setupLidarr() bool {
 	var enabled bool
 
 	for idx, app := range c.Apps.Lidarr {
-		ci := clientinfo.Get()
-		if !app.Enabled() || ci == nil {
+		info := clientinfo.Get()
+		if !app.Enabled() || info == nil {
 			continue
 		}
 
 		var dur time.Duration
 
 		instance := idx + 1
-		if ci.Actions.Apps.Lidarr.Finished(instance) {
+		if info.Actions.Apps.Lidarr.Finished(instance) {
 			dur = finishedDuration
-		} else if ci.Actions.Apps.Lidarr.Stuck(instance) {
+		} else if info.Actions.Apps.Lidarr.Stuck(instance) {
 			dur = stuckDuration
 		}
 

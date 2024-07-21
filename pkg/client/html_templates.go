@@ -111,7 +111,8 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 	}
 }
 
-func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen,cyclop
+//nolint:funlen,cyclop,nonamedreturns
+func (c *Client) getFuncMap() template.FuncMap {
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{
@@ -293,24 +294,24 @@ func durShort(dur time.Duration) string {
 	output = strings.ReplaceAll(output, "s", " sec")
 	output = strings.ReplaceAll(output, "h", " hour")
 
-	s := ""
+	suffix := ""
 	if dur.Hours() != 1 {
-		s = "s"
+		suffix = "s"
 	}
 
 	if dur.Minutes() != 0 {
-		output = strings.ReplaceAll(output, "hour", "hour"+s+" ")
+		output = strings.ReplaceAll(output, "hour", "hour"+suffix+" ")
 	}
 
-	s = ""
+	suffix = ""
 	if dur.Minutes() != 1 {
-		s = "s"
+		suffix = "s"
 	}
 
 	if dur.Seconds() > 60 && int(dur.Seconds())%60 != 0 || int(dur.Hours()) > 0 {
 		output = strings.ReplaceAll(output, "min", "min ")
 	} else {
-		output = strings.ReplaceAll(output, "min", "minute"+s)
+		output = strings.ReplaceAll(output, "min", "minute"+suffix)
 	}
 
 	if dur.Minutes() < 1 {
@@ -752,21 +753,21 @@ func getIfNameAndNetmask(ipAddr string) (string, string) {
 		return "", ""
 	}
 
-	for _, i := range ifaces {
-		addrs, err := i.Addrs()
+	for _, iface := range ifaces {
+		addrs, err := iface.Addrs()
 		if err != nil {
 			continue
 		}
 
-		for _, a := range addrs {
-			switch v := a.(type) {
+		for _, addr := range addrs {
+			switch address := addr.(type) {
 			case *net.IPNet:
-				if v.IP.String() == ipAddr {
-					return i.Name, a.String()
+				if address.IP.String() == ipAddr {
+					return iface.Name, addr.String()
 				}
 			case *net.IPAddr:
-				if v.IP.String() == ipAddr {
-					return i.Name, a.String()
+				if address.IP.String() == ipAddr {
+					return iface.Name, addr.String()
 				}
 			}
 		}

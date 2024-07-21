@@ -4,6 +4,7 @@ package update
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime"
@@ -24,7 +25,7 @@ var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
 
 // Custom errors.
 var (
-	ErrNoFile = fmt.Errorf("no downloadable file found in release")
+	ErrNoFile = errors.New("no downloadable file found in release")
 )
 
 // LatestGH is where we find the latest release.

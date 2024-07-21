@@ -3,11 +3,10 @@ package snapshot
 import (
 	// wapi "github.com/iamacarpet/go-win64api"
 	"context"
-	"fmt"
 )
 
 // ErrNilUsers is a custom error to hopefully avoid a stack trace panic. Not sure.
-var ErrNilUsers = fmt.Errorf("user list was nil")
+// var ErrNilUsers = errors.New("user list was nil")
 
 // GetUsers collects logged in users.
 func (s *Snapshot) GetUsers(_ context.Context) error {

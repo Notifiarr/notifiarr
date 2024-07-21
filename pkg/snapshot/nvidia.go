@@ -17,9 +17,9 @@ import (
 
 // NvidiaConfig is our input data.
 type NvidiaConfig struct {
-	SMIPath  string   `toml:"smi_path" xml:"smi_path" json:"smiPath"`
-	BusIDs   []string `toml:"bus_ids" xml:"bus_id" json:"busIDs"`
-	Disabled bool     `toml:"disabled" xml:"disabled" json:"disabled"`
+	SMIPath  string   `json:"smiPath"  toml:"smi_path" xml:"smi_path"`
+	BusIDs   []string `json:"busIDs"   toml:"bus_ids"  xml:"bus_id"`
+	Disabled bool     `json:"disabled" toml:"disabled" xml:"disabled"`
 }
 
 // NvidiaOutput is what we send to the website.

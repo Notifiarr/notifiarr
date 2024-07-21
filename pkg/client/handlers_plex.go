@@ -49,63 +49,63 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	c.Debugf("Plex Webhook Payload: %s", payload)
 	r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 
-	var v plex.IncomingWebhook
+	var hook plex.IncomingWebhook
 
-	switch err := json.Unmarshal([]byte(payload), &v); {
+	switch err := json.Unmarshal([]byte(payload), &hook); {
 	case err != nil:
 		mnd.Apps.Add("Plex&&Webhook Errors", 1)
 		http.Error(w, "payload error", http.StatusBadRequest)
 		c.Errorf("Unmarshalling Plex payload: %v", err)
-	case strings.EqualFold(v.Event, "admin.database.backup"):
+	case strings.EqualFold(hook.Event, "admin.database.backup"):
 		fallthrough
-	case strings.EqualFold(v.Event, "device.new"):
+	case strings.EqualFold(hook.Event, "device.new"):
 		fallthrough
-	case strings.EqualFold(v.Event, "media.rate"):
+	case strings.EqualFold(hook.Event, "media.rate"):
 		fallthrough
-	case strings.EqualFold(v.Event, "library.new"):
+	case strings.EqualFold(hook.Event, "library.new"):
 		fallthrough
-	case strings.EqualFold(v.Event, "admin.database.corrupt"):
+	case strings.EqualFold(hook.Event, "admin.database.corrupt"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
-			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 		c.website.SendData(&website.Request{
 			Route:      website.PlexRoute,
 			Event:      website.EventHook,
 			LogPayload: true,
-			LogMsg:     fmt.Sprintf("Plex Webhook: %s '%s' ~> %s", v.Account.Title, v.Event, v.Metadata.Title),
+			LogMsg:     fmt.Sprintf("Plex Webhook: %s '%s' ~> %s", hook.Account.Title, hook.Event, hook.Metadata.Title),
 			Payload: &website.Payload{
 				Snap: c.triggers.PlexCron.GetMetaSnap(r.Context()),
-				Load: &v,
+				Load: &hook,
 				Plex: &plex.Sessions{Name: c.Config.Plex.Server.Name()},
 			},
 		})
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "process", http.StatusAccepted)
-	case strings.EqualFold(v.Event, "media.resume") && c.plexTimer.Active(v.Metadata.Key+"resume", c.plexCooldown()):
+	case strings.EqualFold(hook.Event, "media.resume") && c.plexTimer.Active(hook.Metadata.Key+"resume", c.plexCooldown()):
 		c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
-			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 		http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
-	case strings.EqualFold(v.Event, "media.play"), strings.EqualFold(v.Event, "playback.started"):
-		if c.plexTimer.Active(v.Metadata.Key+"play", c.plexCooldown()) {
+	case strings.EqualFold(hook.Event, "media.play"), strings.EqualFold(hook.Event, "playback.started"):
+		if c.plexTimer.Active(hook.Metadata.Key+"play", c.plexCooldown()) {
 			c.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
-				v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+				hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 			http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
 
 			return
 		}
 
 		fallthrough
-	case strings.EqualFold(v.Event, "media.scrobble"):
+	case strings.EqualFold(hook.Event, "media.scrobble"):
 		fallthrough
-	case strings.EqualFold(v.Event, "media.resume"):
-		c.triggers.PlexCron.SendWebhook(&v) //nolint:contextcheck,nolintlint
+	case strings.EqualFold(hook.Event, "media.resume"):
+		c.triggers.PlexCron.SendWebhook(&hook) //nolint:contextcheck,nolintlint
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
-			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "processing", http.StatusAccepted)
 	default:
 		http.Error(w, "ignored, unsupported", http.StatusAlreadyReported)
 		c.Printf("Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' ~> %s",
-			v.Server.Title, v.Account.Title, v.Event, v.Metadata.Title)
+			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 	}
 }
 

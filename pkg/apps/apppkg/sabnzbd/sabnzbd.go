@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,12 +16,12 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-var ErrUnknownByteType = fmt.Errorf("unknown byte type")
+var ErrUnknownByteType = errors.New("unknown byte type")
 
 type Config struct {
-	URL          string `toml:"url" xml:"url"`
+	URL          string `toml:"url"     xml:"url"`
 	APIKey       string `toml:"api_key" xml:"api_key"`
-	*http.Client `toml:"-" xml:"-" json:"-"`
+	*http.Client `json:"-"       toml:"-"      xml:"-"`
 }
 
 // QueueSlots has the following data structure.
@@ -270,13 +271,15 @@ type SabNZBDate struct {
 }
 
 // UnmarshalJSON exists because weird date formats and "unknown" seem sane in json output.
-func (s *SabNZBDate) UnmarshalJSON(b []byte) (err error) {
+func (s *SabNZBDate) UnmarshalJSON(b []byte) error {
 	s.String = strings.Trim(string(b), `"`)
 
 	if s.String == "unknown" {
 		s.Time = time.Now().Add(time.Hour * 24 * 366) //nolint:mnd
 		return nil
 	}
+
+	var err error
 
 	s.Time, err = time.Parse("15:04 Mon 02 Jan 2006", s.String+" "+strconv.Itoa(time.Now().Year()))
 	if err != nil {
@@ -287,7 +290,7 @@ func (s *SabNZBDate) UnmarshalJSON(b []byte) (err error) {
 }
 
 // UnmarshalJSON exists because someone decided that bytes should be strings with letters.
-func (s *SabNZBSize) UnmarshalJSON(b []byte) (err error) {
+func (s *SabNZBSize) UnmarshalJSON(b []byte) error {
 	s.String = strings.Trim(string(b), `"`)
 	split := strings.Split(s.String, " ")
 

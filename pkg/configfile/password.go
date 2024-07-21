@@ -1,6 +1,7 @@
 package configfile
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-var ErrEmptyHeader = fmt.Errorf("auth header may not be empty")
+var ErrEmptyHeader = errors.New("auth header may not be empty")
 
 // CryptPass allows us to validate an input password easily.
 type CryptPass string

@@ -2,13 +2,14 @@
 // This package also provides a web handler for incoming plex webhooks, and another
 // two handlers for requests from Notifiarr.com to list sessions and kill a session.
 // The purpose is to keep track of Plex viewers and send meaningful alerts to their
-// respective Disord server about user behavior.
+// respective Discord server about user behavior.
 // ie. user started watching something, paused it, resumed it, and finished something.
 // This package can be disabled by not providing a Plex Media Server URL or Token.
 package plex
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -24,9 +25,9 @@ type Server struct {
 }
 
 type Config struct {
-	URL    string       `toml:"url" json:"url" xml:"url"`
-	Token  string       `toml:"token" json:"token" xml:"token"`
-	Client *http.Client `toml:"-" json:"-" xml:"-"`
+	URL    string       `json:"url"   toml:"url"   xml:"url"`
+	Token  string       `json:"token" toml:"token" xml:"token"`
+	Client *http.Client `json:"-"     toml:"-"     xml:"-"`
 }
 
 // New turns a config into a server.
@@ -48,7 +49,7 @@ func (s *Server) Name() string {
 }
 
 // ErrNoURLToken is returned when there is no token or URL.
-var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
+var ErrNoURLToken = errors.New("token or URL for Plex missing")
 
 func (s *Server) getPlexURL(ctx context.Context, url string, params url.Values) ([]byte, error) {
 	return s.reqPlexURL(ctx, url, http.MethodGet, params, nil)

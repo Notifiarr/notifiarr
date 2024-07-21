@@ -47,8 +47,8 @@ func (a *Action) SyncLidarrInstanceCF(event website.EventType, instance int) err
 
 // syncLidarr triggers a custom format sync for Lidarr.
 func (c *cmd) syncLidarr(ctx context.Context, input *common.ActionInput) {
-	ci := clientinfo.Get()
-	if ci == nil || len(ci.Actions.Sync.LidarrInstances) < 1 {
+	info := clientinfo.Get()
+	if info == nil || len(info.Actions.Sync.LidarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Lidarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Lidarr) < 1 {
@@ -58,9 +58,9 @@ func (c *cmd) syncLidarr(ctx context.Context, input *common.ActionInput) {
 
 	for idx, app := range c.Apps.Lidarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Sync.LidarrInstances.Has(instance) {
+		if !app.Enabled() || !info.Actions.Sync.LidarrInstances.Has(instance) {
 			c.Debugf("[%s requested] Profiles and formats sync skipping Lidarr instance %d. Not in sync list: %v",
-				input.Type, instance, ci.Actions.Sync.LidarrInstances)
+				input.Type, instance, info.Actions.Sync.LidarrInstances)
 			continue
 		}
 

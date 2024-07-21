@@ -23,8 +23,8 @@ func (a *Apps) prowlarrHandlers() {
 type ProwlarrConfig struct {
 	ExtraConfig
 	*starr.Config
-	*prowlarr.Prowlarr `toml:"-" xml:"-" json:"-"`
-	errorf             func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	*prowlarr.Prowlarr `json:"-" toml:"-" xml:"-"`
+	errorf             func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
 func getProwlarr(r *http.Request) *prowlarr.Prowlarr {

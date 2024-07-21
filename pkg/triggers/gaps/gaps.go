@@ -61,8 +61,8 @@ func (a *Action) Send(event website.EventType) {
 }
 
 func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
-	ci := clientinfo.Get()
-	if ci == nil || len(ci.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
+	info := clientinfo.Get()
+	if info == nil || len(info.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
 		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
 			input.Type, len(c.Apps.Radarr))
 		return
@@ -70,7 +70,7 @@ func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Gaps.Instances.Has(instance) {
+		if !app.Enabled() || !info.Actions.Gaps.Instances.Has(instance) {
 			continue
 		}
 

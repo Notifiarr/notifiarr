@@ -196,15 +196,15 @@ func (s *Server) GetPlexSectionKeyWithContext(ctx context.Context, keyPath strin
 		return nil, err
 	}
 
-	var v struct {
+	var output struct {
 		MediaContainer *MediaSection `json:"MediaContainer"`
 	}
 
-	if err := json.Unmarshal(data, &v); err != nil {
+	if err := json.Unmarshal(data, &output); err != nil {
 		return nil, fmt.Errorf("parsing library section from %s: %w; failed payload: %s", url, err, string(data))
 	}
 
-	return v.MediaContainer, nil
+	return output.MediaContainer, nil
 }
 
 // GetDirectory returns data about all the library sections.
@@ -221,15 +221,15 @@ func (s *Server) GetDirectoryWithContext(ctx context.Context) (*SectionDirectory
 		return nil, err
 	}
 
-	var v struct {
+	var output struct {
 		MediaContainer *SectionDirectory `json:"MediaContainer"`
 	}
 
-	if err := json.Unmarshal(data, &v); err != nil {
+	if err := json.Unmarshal(data, &output); err != nil {
 		return nil, fmt.Errorf("unmarshaling directory from %s: %w; failed payload: %s", url, err, string(data))
 	}
 
-	return v.MediaContainer, nil
+	return output.MediaContainer, nil
 }
 
 // GetDirectoryWithContext returns data about all the library sections.
@@ -244,13 +244,13 @@ func (s *Server) GetDirectoryTrashSizeWithContext(ctx context.Context, key strin
 		return 0, err
 	}
 
-	var v struct {
+	var output struct {
 		MediaContainer *SectionDirectory `json:"MediaContainer"`
 	}
 
-	if err := json.Unmarshal(data, &v); err != nil {
+	if err := json.Unmarshal(data, &output); err != nil {
 		return 0, fmt.Errorf("unmarshaling trash directory from %s: %w; failed payload: %s", uri, err, string(data))
 	}
 
-	return v.MediaContainer.Size, nil
+	return output.MediaContainer.Size, nil
 }

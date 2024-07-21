@@ -14,17 +14,17 @@ func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
 		return nil, err
 	}
 
-	var v struct {
+	var output struct {
 		MediaContainer *PMSInfo `json:"MediaContainer"`
 	}
 
-	if err := json.Unmarshal(data, &v); err != nil {
+	if err := json.Unmarshal(data, &output); err != nil {
 		return nil, fmt.Errorf("unmarshaling main page from %s: %w", s.config.URL, err)
 	}
 
-	s.name = v.MediaContainer.FriendlyName
+	s.name = output.MediaContainer.FriendlyName
 
-	return v.MediaContainer, nil
+	return output.MediaContainer, nil
 }
 
 // PMSInfo is the `/` path on Plex.

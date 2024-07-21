@@ -100,7 +100,7 @@ func (s *Service) CheckOnly(ctx context.Context) *CheckResult {
 	}
 }
 
-func (s *Service) checkNow(ctx context.Context) (res *result) {
+func (s *Service) checkNow(ctx context.Context) *result {
 	switch s.Type {
 	case CheckHTTP:
 		return s.checkHTTP(ctx)

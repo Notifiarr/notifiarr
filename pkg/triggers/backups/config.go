@@ -2,7 +2,7 @@ package backups
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -27,7 +27,7 @@ type cmd struct {
 
 // Errors returned by this package.
 var (
-	ErrNoDBInBackup = fmt.Errorf("no database file found in backup")
+	ErrNoDBInBackup = errors.New("no database file found in backup")
 )
 
 // Intervals at which these apps database backups are checked for corruption.
@@ -104,15 +104,15 @@ func New(config *common.Config) *Action {
 
 // Create sets up all the triggers.
 func (a *Action) Create() {
-	ci := clientinfo.Get()
-	a.cmd.makeBackupTriggersLidarr(ci)
-	a.cmd.makeBackupTriggersRadarr(ci)
-	a.cmd.makeBackupTriggersReadarr(ci)
-	a.cmd.makeBackupTriggersSonarr(ci)
-	a.cmd.makeBackupTriggersProwlarr(ci)
-	a.cmd.makeCorruptionTriggersLidarr(ci)
-	a.cmd.makeCorruptionTriggersRadarr(ci)
-	a.cmd.makeCorruptionTriggersReadarr(ci)
-	a.cmd.makeCorruptionTriggersSonarr(ci)
-	a.cmd.makeCorruptionTriggersProwlarr(ci)
+	info := clientinfo.Get()
+	a.cmd.makeBackupTriggersLidarr(info)
+	a.cmd.makeBackupTriggersRadarr(info)
+	a.cmd.makeBackupTriggersReadarr(info)
+	a.cmd.makeBackupTriggersSonarr(info)
+	a.cmd.makeBackupTriggersProwlarr(info)
+	a.cmd.makeCorruptionTriggersLidarr(info)
+	a.cmd.makeCorruptionTriggersRadarr(info)
+	a.cmd.makeCorruptionTriggersReadarr(info)
+	a.cmd.makeCorruptionTriggersSonarr(info)
+	a.cmd.makeCorruptionTriggersProwlarr(info)
 }

@@ -3,12 +3,16 @@
 package ui
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"runtime"
 )
+
+// ErrUnsupported is just an error.
+var ErrUnsupported = errors.New("unsupported OS")
 
 // SystrayIcon is the icon in the system tray or task bar.
 const SystrayIcon = "files/images/favicon.png"
@@ -33,9 +37,6 @@ func StartCmd(c string, v ...string) error {
 
 	return cmd.Start() //nolint:wrapcheck
 }
-
-// ErrUnsupported is just an error.
-var ErrUnsupported = fmt.Errorf("unsupported OS")
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {

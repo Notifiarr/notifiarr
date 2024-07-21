@@ -10,6 +10,7 @@ import (
 	"compress/bzip2"
 	"compress/gzip"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -37,6 +38,12 @@ type Command struct {
 	*log.Logger          // debug logs.
 }
 
+// Errors. Don't trigger these.
+var (
+	ErrInvalidURL = errors.New("invalid URL provided")
+	ErrNoPath     = errors.New("a path to the file being replaced must be provided")
+)
+
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
 func Restart(u *Command) error {
 	// We sleep for a few seconds so the original app has time to exit.
@@ -51,12 +58,6 @@ func Restart(u *Command) error {
 
 	return nil
 }
-
-// Errors. Don't trigger these.
-var (
-	ErrInvalidURL = fmt.Errorf("invalid URL provided")
-	ErrNoPath     = fmt.Errorf("a path to the file being replaced must be provided")
-)
 
 // Now downloads the new file to a temp name in the same folder as the running file.
 // Moves the running file to a backup name in the same folder.

@@ -37,13 +37,13 @@ func (a *Action) Create() {
 func (c *cmd) create() {
 	var dur time.Duration
 
-	ci := clientinfo.Get()
-	if ci != nil && ci.Actions.Mdblist.Interval.Duration > 0 &&
-		(len(ci.Actions.Mdblist.Radarr) > 0 || len(ci.Actions.Mdblist.Sonarr) > 0) {
+	info := clientinfo.Get()
+	if info != nil && info.Actions.Mdblist.Interval.Duration > 0 &&
+		(len(info.Actions.Mdblist.Radarr) > 0 || len(info.Actions.Mdblist.Sonarr) > 0) {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
-		dur = ci.Actions.Mdblist.Interval.Duration + randomTime
+		dur = info.Actions.Mdblist.Interval.Duration + randomTime
 		c.Printf("==> MDB List Timer Enabled, interval:%s, Radarr/Sonarr: %d/%d instances",
-			ci.Actions.Mdblist.Interval, len(ci.Actions.Mdblist.Radarr), len(ci.Actions.Mdblist.Sonarr))
+			info.Actions.Mdblist.Interval, len(info.Actions.Mdblist.Radarr), len(info.Actions.Mdblist.Sonarr))
 	}
 
 	c.Add(&common.Action{
