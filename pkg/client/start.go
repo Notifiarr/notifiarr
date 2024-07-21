@@ -64,7 +64,8 @@ type customReload struct {
 
 // Errors returned by this package.
 var (
-	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file, OR with environment variable")
+	ErrUnsupport = errors.New("this feature is not supported on this platform")
+	ErrNilAPIKey = errors.New("API key may not be empty: set a key in config file, OR with environment variable")
 )
 
 // newDefaults returns a new Client pointer with default settings.
@@ -160,7 +161,10 @@ func (c *Client) start(ctx context.Context, msg, newPassword string) error {
 		os.Getpid(), os.Getuid(), os.Getgid(),
 		version.Started.Format("Mon, Jan 2, 2006 @ 3:04:05 PM MST -0700"))
 	c.Printf("==> %s", msg)
-	c.printUpdateMessage()
+
+	if c.Flags.Updated {
+		go ui.Notify(mnd.Title + " updated to version " + version.Version) //nolint:errcheck
+	}
 
 	if err := c.loadAssetsTemplates(ctx); err != nil {
 		return err
@@ -171,9 +175,6 @@ func (c *Client) start(ctx context.Context, msg, newPassword string) error {
 	if newPassword != "" {
 		// If newPassword is set it means we need to write out a new config file for a new installation. Do that now.
 		c.makeNewConfigFile(ctx, newPassword)
-	} else if c.Config.AutoUpdate != "" {
-		// do not run updater if there's a brand new config file.
-		go c.AutoWatchUpdate(ctx)
 	}
 
 	if ui.HasGUI() {
@@ -191,11 +192,11 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 
 	_, _ = c.Config.Write(ctx, c.Flags.ConfigFile, false)
 	_ = ui.OpenFile(c.Flags.ConfigFile)
-	_, _ = ui.Warning(mnd.Title, "A new configuration file was created @ "+
-		c.Flags.ConfigFile+" - it should open in a text editor. "+
-		"Please edit the file and reload this application using the tray menu. "+
-		"Your Web UI password was set to "+newPassword+
-		" and was also printed in the log file '"+c.Config.LogFile+"' and/or app ouptput.")
+	_, _ = ui.Warning("A new configuration file was created @ " +
+		c.Flags.ConfigFile + " - it should open in a text editor. " +
+		"Please edit the file and reload this application using the tray menu. " +
+		"Your Web UI password was set to " + newPassword +
+		" and was also printed in the log file '" + c.Config.LogFile + "' and/or app output.")
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running configuration.
@@ -259,7 +260,7 @@ func (c *Client) configureServices(ctx context.Context) *clientinfo.ClientInfo {
 	c.configureServicesPlex(ctx)
 	c.Config.Snapshot.Validate()
 	c.PrintStartupInfo(ctx, clientInfo)
-	c.triggers.Start(ctx, c.sighup)
+	c.triggers.Start(ctx, c.sighup, c.sigkil)
 	c.Config.Services.Start(ctx)
 
 	return clientInfo

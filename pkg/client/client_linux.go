@@ -67,12 +67,6 @@ func (c *Client) handleAptHook(ctx context.Context) error {
 	return nil
 }
 
-func (c *Client) printUpdateMessage()             {}
-func (c *Client) upgradeWindows(_, _ interface{}) {}
-
-// AutoWatchUpdate is not used on this OS.
-func (c *Client) AutoWatchUpdate(_ interface{}) {}
-
 func (c *Client) checkReloadSignal(ctx context.Context, sigc os.Signal) error {
 	return c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
 }

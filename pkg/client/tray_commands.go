@@ -5,19 +5,13 @@ package client
 import (
 	"context"
 	"fmt"
-	"runtime"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
-	"github.com/Notifiarr/notifiarr/pkg/update"
-	"golift.io/version"
 )
 
 /* This file contains methods that are triggered from the GUI menu. */
-
-const TitleError = mnd.Title + " Error"
 
 func (c *Client) toggleServer(ctx context.Context) {
 	if !menu["stat"].Checked() {
@@ -46,54 +40,6 @@ func (c *Client) rotateLogs() {
 			ui.Notify("Error rotating log files: %v", err) //nolint:errcheck
 			c.Errorf("Rotating Log Files: %v", err)
 		}
-	}
-}
-
-func (c *Client) checkForUpdate(ctx context.Context, unstable bool) {
-	var (
-		data  *update.Update
-		err   error
-		where = "GitHub"
-	)
-
-	if unstable {
-		c.Print("[user requested] Unstable Update Check")
-
-		data, err = update.CheckUnstable(ctx, mnd.Title, version.Revision)
-		where = "Unstable website"
-	} else {
-		c.Print("[user requested] GitHub Update Check")
-
-		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
-	}
-
-	switch {
-	case err != nil:
-		c.Errorf("Update Check: %v", err)
-		_, _ = ui.Error(TitleError, "Checking version on "+where+": "+err.Error())
-	case data.Outdate && runtime.GOOS == mnd.Windows:
-		c.upgradeWindows(ctx, data)
-	case data.Outdate:
-		c.downloadOther(data, unstable)
-	default:
-		_, _ = ui.Info(mnd.Title, "You're up to date! Version: "+data.Current+"\n"+
-			"Updated: "+data.RelDate.Format("Jan 2, 2006")+mnd.DurationAge(data.RelDate))
-	}
-}
-
-func (c *Client) downloadOther(update *update.Update, unstable bool) {
-	msg := "An Update is available! Download?\n\n"
-
-	if unstable {
-		msg = "An Unstable Update is available! Download?\n\n"
-	}
-
-	yes, _ := ui.Question(mnd.Title, msg+
-		"Your Version: "+version.Version+"-"+version.Revision+"\n"+
-		"New Version: "+update.Current+"\n"+
-		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAge(update.RelDate), false)
-	if yes {
-		_ = ui.OpenURL(update.CurrURL)
 	}
 }
 
@@ -163,10 +109,10 @@ func (c *Client) displayConfig() (s string) { //nolint: funlen,cyclop
 }
 
 func (c *Client) writeConfigFile(ctx context.Context) {
-	val, _, _ := ui.Entry(mnd.Title, "Enter path to write config file:", c.Flags.ConfigFile)
+	val, _, _ := ui.Entry("Enter path to write config file:", c.Flags.ConfigFile)
 
 	if val == "" {
-		_, _ = ui.Error(TitleError, "No Config File Provided")
+		_, _ = ui.Error("No Config File Provided")
 		return
 	}
 
@@ -174,18 +120,18 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 
 	if _, err := c.Config.Write(ctx, val, false); err != nil {
 		c.Errorf("Writing Config File: %v", err)
-		_, _ = ui.Error(TitleError, "Writing Config File: "+err.Error())
+		_, _ = ui.Error("Writing Config File: " + err.Error())
 
 		return
 	}
 
-	_, _ = ui.Info(mnd.Title, "Wrote Config File: "+val)
+	_, _ = ui.Info("Wrote Config File: " + val)
 }
 
 func (c *Client) menuPanic() {
 	defer c.CapturePanic()
 
-	yes, err := ui.Question(mnd.Title, "You really want to panic?", true)
+	yes, err := ui.Question("You really want to panic?", true)
 	if !yes || err != nil {
 		return
 	}
@@ -206,7 +152,7 @@ func (c *Client) openGUI() {
 }
 
 func (c *Client) updatePassword(ctx context.Context) {
-	pass, _, err := ui.Entry(mnd.Title, "Enter new Web UI admin password (must be 9+ characters):", "")
+	pass, _, err := ui.Entry("Enter new Web UI admin password (must be 9+ characters):", "")
 	if err != nil {
 		c.Errorf("err: %v", err)
 		return
@@ -228,7 +174,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 
 	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
 		c.Errorf("Updating Web UI Password: %v", err)
-		_, _ = ui.Error(TitleError, "Updating Web UI Password: "+err.Error())
+		_, _ = ui.Error("Updating Web UI Password: " + err.Error())
 	}
 
 	if err = ui.Notify("Web UI password updated. Save config to persist this change."); err != nil {

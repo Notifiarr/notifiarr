@@ -4,7 +4,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,25 +12,21 @@ import (
 )
 
 // If you need more fake methods, add them.
-//
+
 //nolint:gochecknoglobals
 var menu = make(map[string]*fakeMenu)
 
 type fakeMenu struct{}
 
-func (f *fakeMenu) Uncheck()               {}
-func (f *fakeMenu) Check()                 {}
-func (f *fakeMenu) SetTooltip(interface{}) {}
+func (f *fakeMenu) Uncheck()       {}
+func (f *fakeMenu) Check()         {}
+func (f *fakeMenu) SetTooltip(any) {}
 
-func (c *Client) printUpdateMessage()        {}
-func (c *Client) setupMenus(interface{})     {}
-func (c *Client) startTray(_, _ interface{}) {}
+func (c *Client) setupMenus(any)     {}
+func (c *Client) startTray(_, _ any) {}
 func (c *Client) handleAptHook(_ context.Context) error {
-	return fmt.Errorf("this feature is not supported on this platform") //nolint:goerr113
+	return ErrUnsupport
 }
-
-// AutoWatchUpdate is not used on this OS.
-func (c *Client) AutoWatchUpdate(_ interface{}) {}
 
 func (c *Client) checkReloadSignal(ctx context.Context, sigc os.Signal) error {
 	return c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
