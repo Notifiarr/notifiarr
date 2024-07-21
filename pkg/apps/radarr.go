@@ -63,8 +63,8 @@ func (a *Apps) radarrHandlers() {
 type RadarrConfig struct {
 	ExtraConfig
 	*starr.Config
-	*radarr.Radarr `toml:"-" xml:"-" json:"-"`
-	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	*radarr.Radarr `json:"-" toml:"-" xml:"-"`
+	errorf         func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
 func getRadarr(r *http.Request) *RadarrConfig {

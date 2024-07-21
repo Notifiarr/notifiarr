@@ -49,22 +49,22 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
-	HostID     string                 `json:"hostId" toml:"host_id" xml:"host_id" yaml:"hostId"`
-	UIPassword CryptPass              `json:"uiPassword" toml:"ui_password" xml:"ui_password" yaml:"uiPassword"`
-	BindAddr   string                 `json:"bindAddr" toml:"bind_addr" xml:"bind_addr" yaml:"bindAddr"`
+	HostID     string                 `json:"hostId"      toml:"host_id"       xml:"host_id"       yaml:"hostId"`
+	UIPassword CryptPass              `json:"uiPassword"  toml:"ui_password"   xml:"ui_password"   yaml:"uiPassword"`
+	BindAddr   string                 `json:"bindAddr"    toml:"bind_addr"     xml:"bind_addr"     yaml:"bindAddr"`
 	SSLCrtFile string                 `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
-	SSLKeyFile string                 `json:"sslKeyFile" toml:"ssl_key_file" xml:"ssl_key_file" yaml:"sslKeyFile"`
-	Upstreams  []string               `json:"upstreams" toml:"upstreams" xml:"upstreams" yaml:"upstreams"`
-	AutoUpdate string                 `json:"autoUpdate" toml:"auto_update" xml:"auto_update" yaml:"autoUpdate"`
-	UnstableCh bool                   `json:"unstableCh" toml:"unstable_ch" xml:"unstable_ch" yaml:"unstableCh"`
-	Timeout    cnfg.Duration          `json:"timeout" toml:"timeout" xml:"timeout" yaml:"timeout"`
-	Retries    int                    `json:"retries" toml:"retries" xml:"retries" yaml:"retries"`
-	Snapshot   *snapshot.Config       `json:"snapshot" toml:"snapshot" xml:"snapshot" yaml:"snapshot"`
-	Services   *services.Config       `json:"services" toml:"services" xml:"services" yaml:"services"`
-	Service    []*services.Service    `json:"service" toml:"service" xml:"service" yaml:"service"`
-	EnableApt  bool                   `json:"apt" toml:"apt" xml:"apt" yaml:"apt"`
-	WatchFiles []*filewatch.WatchFile `json:"watchFiles" toml:"watch_file" xml:"watch_file" yaml:"watchFiles"`
-	Commands   []*commands.Command    `json:"commands" toml:"command" xml:"command" yaml:"commands"`
+	SSLKeyFile string                 `json:"sslKeyFile"  toml:"ssl_key_file"  xml:"ssl_key_file"  yaml:"sslKeyFile"`
+	Upstreams  []string               `json:"upstreams"   toml:"upstreams"     xml:"upstreams"     yaml:"upstreams"`
+	AutoUpdate string                 `json:"autoUpdate"  toml:"auto_update"   xml:"auto_update"   yaml:"autoUpdate"`
+	UnstableCh bool                   `json:"unstableCh"  toml:"unstable_ch"   xml:"unstable_ch"   yaml:"unstableCh"`
+	Timeout    cnfg.Duration          `json:"timeout"     toml:"timeout"       xml:"timeout"       yaml:"timeout"`
+	Retries    int                    `json:"retries"     toml:"retries"       xml:"retries"       yaml:"retries"`
+	Snapshot   *snapshot.Config       `json:"snapshot"    toml:"snapshot"      xml:"snapshot"      yaml:"snapshot"`
+	Services   *services.Config       `json:"services"    toml:"services"      xml:"services"      yaml:"services"`
+	Service    []*services.Service    `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
+	EnableApt  bool                   `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
+	WatchFiles []*filewatch.WatchFile `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
+	Commands   []*commands.Command    `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
 	*logs.LogConfig
 	*apps.Apps
 	Allow AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`

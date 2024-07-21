@@ -50,13 +50,13 @@ type Action struct {
 
 // WatchFile is the input data needed to watch files.
 type WatchFile struct {
-	Path      string `json:"path" toml:"path" xml:"path" yaml:"path"`
-	Regexp    string `json:"regex" toml:"regex" xml:"regex" yaml:"regex"`
-	Skip      string `json:"skip" toml:"skip" xml:"skip" yaml:"skip"`
-	Poll      bool   `json:"poll" toml:"poll" xml:"poll" yaml:"poll"`
-	Pipe      bool   `json:"pipe" toml:"pipe" xml:"pipe" yaml:"pipe"`
+	Path      string `json:"path"      toml:"path"       xml:"path"       yaml:"path"`
+	Regexp    string `json:"regex"     toml:"regex"      xml:"regex"      yaml:"regex"`
+	Skip      string `json:"skip"      toml:"skip"       xml:"skip"       yaml:"skip"`
+	Poll      bool   `json:"poll"      toml:"poll"       xml:"poll"       yaml:"poll"`
+	Pipe      bool   `json:"pipe"      toml:"pipe"       xml:"pipe"       yaml:"pipe"`
 	MustExist bool   `json:"mustExist" toml:"must_exist" xml:"must_exist" yaml:"mustExist"`
-	LogMatch  bool   `json:"logMatch" toml:"log_match" xml:"log_match" yaml:"logMatch"`
+	LogMatch  bool   `json:"logMatch"  toml:"log_match"  xml:"log_match"  yaml:"logMatch"`
 	re        *regexp.Regexp
 	skip      *regexp.Regexp
 	tail      *tail.Tail

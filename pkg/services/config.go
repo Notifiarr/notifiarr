@@ -37,13 +37,13 @@ var (
 
 // Config for this Services plugin comes from a config file.
 type Config struct {
-	Interval    cnfg.Duration     `toml:"interval" xml:"interval" json:"interval"`
-	Parallel    uint              `toml:"parallel" xml:"parallel" json:"parallel"`
-	Disabled    bool              `toml:"disabled" xml:"disabled" json:"disabled"`
-	LogFile     string            `toml:"log_file" xml:"log_file" json:"logFile"`
-	Apps        *apps.Apps        `toml:"-" json:"-"`
-	Website     *website.Server   `toml:"-" json:"-"`
-	Plugins     *snapshot.Plugins `toml:"-" json:"-"` // pass this in so we can service-check mysql
+	Interval    cnfg.Duration     `json:"interval" toml:"interval" xml:"interval"`
+	Parallel    uint              `json:"parallel" toml:"parallel" xml:"parallel"`
+	Disabled    bool              `json:"disabled" toml:"disabled" xml:"disabled"`
+	LogFile     string            `json:"logFile"  toml:"log_file" xml:"log_file"`
+	Apps        *apps.Apps        `json:"-"        toml:"-"`
+	Website     *website.Server   `json:"-"        toml:"-"`
+	Plugins     *snapshot.Plugins `json:"-"        toml:"-"` // pass this in so we can service-check mysql
 	mnd.Logger  `json:"-"`        // log file writer
 	services    map[string]*Service
 	checks      chan *Service
@@ -102,13 +102,13 @@ type CheckResult struct {
 
 // Service is a thing we check and report results for.
 type Service struct {
-	Name     string         `toml:"name" xml:"name" json:"name"`             // Radarr
-	Type     CheckType      `toml:"type" xml:"type" json:"type"`             // http
-	Value    string         `toml:"check" xml:"check" json:"value"`          // http://some.url
-	Expect   string         `toml:"expect" xml:"expect" json:"expect"`       // 200
-	Timeout  cnfg.Duration  `toml:"timeout" xml:"timeout" json:"timeout"`    // 10s
-	Interval cnfg.Duration  `toml:"interval" xml:"interval" json:"interval"` // 1m
-	Tags     map[string]any `toml:"tags" xml:"tags" json:"tags"`             // copied to Metadata.
+	Name     string         `json:"name"     toml:"name"     xml:"name"`     // Radarr
+	Type     CheckType      `json:"type"     toml:"type"     xml:"type"`     // http
+	Value    string         `json:"value"    toml:"check"    xml:"check"`    // http://some.url
+	Expect   string         `json:"expect"   toml:"expect"   xml:"expect"`   // 200
+	Timeout  cnfg.Duration  `json:"timeout"  toml:"timeout"  xml:"timeout"`  // 10s
+	Interval cnfg.Duration  `json:"interval" toml:"interval" xml:"interval"` // 1m
+	Tags     map[string]any `json:"tags"     toml:"tags"     xml:"tags"`     // copied to Metadata.
 	validSSL bool           // can be set for https checks.
 	svc      service
 }

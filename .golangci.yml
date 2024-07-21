@@ -1,14 +1,6 @@
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-rules:
-    # Exclude funlen for testing files.
-    - linters:
-        - nonamedreturns
-        - wsl
-        - cyclop
-        - nolintlint
-      path: 'cmd/'
 linters:
   enable-all: true
   disable:
@@ -26,7 +18,6 @@ linters:
     - perfsprint
     - musttag # broken in 1.59.
     - depguard
-    - tagalign
 run:
   timeout: 5m
 output:

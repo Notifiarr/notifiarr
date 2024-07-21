@@ -64,10 +64,10 @@ func (a *Apps) sonarrHandlers() { //nolint:funlen
 
 // SonarrConfig represents the input data for a Sonarr server.
 type SonarrConfig struct {
-	*sonarr.Sonarr `toml:"-" xml:"-" json:"-"`
+	*sonarr.Sonarr `json:"-" toml:"-" xml:"-"`
 	ExtraConfig
 	*starr.Config
-	errorf func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	errorf func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
 func getSonarr(r *http.Request) *SonarrConfig {
