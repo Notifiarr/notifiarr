@@ -54,8 +54,7 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 				ErrNon200, url, code, http.StatusText(code), err, buf.String()) //nolint:errorlint
 		}
 
-		return &resp, fmt.Errorf("%w: %s: %d %s",
-			ErrNon200, url, code, http.StatusText(code))
+		return &resp, fmt.Errorf("%w: %s: %d %s", ErrNon200, url, code, http.StatusText(code))
 	}
 
 	if err != nil {

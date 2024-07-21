@@ -97,6 +97,7 @@ func (c *Client) httpAPIHandlers() {
 	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.clientinfo.VersionHandlerInstance, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
+	c.Config.HandleAPIpath("", "services/{action}", c.Config.Services.APIHandler, "GET")
 	c.Config.HandleAPIpath("", "triggers", c.triggers.HandleGetTriggers, "GET")
 	c.Config.HandleAPIpath("", "ping", c.handleInstancePing, "GET")
 	c.Config.HandleAPIpath("", "ping/{app:[a-z,]+}", c.handleInstancePing, "GET")

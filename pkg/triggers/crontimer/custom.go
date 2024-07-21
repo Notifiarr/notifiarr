@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -15,14 +16,21 @@ import (
 )
 
 // TrigPollSite is our site polling trigger identifier.
-const TrigPollSite common.TriggerName = "Polling Notifiarr for new settings."
+const (
+	TrigPollSite common.TriggerName = "Polling Notifiarr for new settings."
+	TrigUpCheck  common.TriggerName = "Telling Notifiarr website we are still up!"
+)
 
 const (
 	// How often to poll the website for changes.
 	// This only fires when:
-	// 1. the cliet isn't reachable from the website.
+	// 1. the client isn't reachable from the website.
 	// 2. the client didn't get a valid response to clientInfo.
-	pollDur            = 4 * time.Minute
+	pollDur = 4 * time.Minute
+	// This just tells the website the client is up.
+	upCheckDur = 14*time.Minute + 57*time.Second
+	// How long to be up before sending first up check.
+	checkWait          = 1*time.Minute + 23*time.Second
 	randomMilliseconds = 5000
 	randomSeconds      = 30
 )
@@ -35,6 +43,8 @@ type Action struct {
 type cmd struct {
 	*common.Config
 	list []*Timer
+	sync.Mutex
+	stop bool
 }
 
 // Timer is used to trigger actions.
@@ -79,6 +89,33 @@ func (a *Action) Create() {
 	a.cmd.create()
 }
 
+// Stop satisfies an interface.
+func (a *Action) Stop() {
+	a.cmd.Lock()
+	defer a.cmd.Unlock()
+	a.cmd.stop = true
+}
+
+// Verify the interfaces are satisfied.
+var (
+	_ = common.Run(&Action{nil})
+	_ = common.Create(&Action{nil})
+)
+
+// Run fires in a go routine. Wait a minute or two then tell the website we're up.
+// If app reloads in first checkWait duration, this throws an error. That's ok.
+func (a *Action) Run(ctx context.Context) {
+	if a.cmd.ValidAPIKey() == nil {
+		time.Sleep(checkWait)
+		a.cmd.Lock()
+		defer a.cmd.Unlock()
+
+		if !a.cmd.stop { // Wait a while then make sure we didn't stop.
+			a.cmd.PollUpCheck(ctx, &common.ActionInput{Type: website.EventStart})
+		}
+	}
+}
+
 func (c *cmd) create() {
 	ci := clientinfo.Get()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
@@ -86,6 +123,13 @@ func (c *cmd) create() {
 		c.startWebsitePoller()
 		return
 	}
+
+	c.Printf("==> Started Notifiarr Website Up-Checker, interval: %s", durafmt.Parse(upCheckDur))
+	c.Add(&common.Action{
+		Name: TrigUpCheck,
+		Fn:   c.PollUpCheck,
+		D:    cnfg.Duration{Duration: upCheckDur},
+	})
 
 	for _, custom := range ci.Actions.Custom {
 		timer := &Timer{
@@ -95,13 +139,11 @@ func (c *cmd) create() {
 		}
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 
-		var randomTime time.Duration
-
 		if custom.Interval.Duration < time.Minute {
-			c.Errorf("Website provided custom cron interval under 1 minute. Ignored! Interval: %s Name: %s, URI: %s",
+			c.ErrorfNoShare("Website provided custom cron interval under 1 minute. Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
-		} else {
-			randomTime = time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
+
+			custom.Interval.Duration = time.Minute
 		}
 
 		c.list = append(c.list, timer)
@@ -110,7 +152,7 @@ func (c *cmd) create() {
 			Name: common.TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s'", custom.Name)),
 			Fn:   timer.run,
 			C:    timer.ch,
-			D:    cnfg.Duration{Duration: custom.Interval.Duration + randomTime},
+			D:    cnfg.Duration{Duration: custom.Interval.Duration},
 		})
 	}
 
@@ -130,6 +172,21 @@ func (c *cmd) startWebsitePoller() {
 	})
 }
 
+// PollUpCheck just tells the website the client is still up. It doesn't process the return payload.
+func (c *cmd) PollUpCheck(_ context.Context, input *common.ActionInput) {
+	_, err := c.GetData(&website.Request{
+		Route:      website.ClientRoute,
+		Event:      website.EventCheck,
+		Payload:    "up",
+		LogPayload: true,
+		ErrorsOnly: true,
+	})
+	if err != nil {
+		c.ErrorfNoShare("[%s requested] UpChecking Notifiarr: %v", input.Type, err)
+		return
+	}
+}
+
 // PollForReload is only started if the initial connection to the website failed.
 // This will keep checking until it works, then reload to grab settings and start properly.
 func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
@@ -140,7 +197,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 		LogPayload: true,
 	})
 	if err != nil {
-		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		c.ErrorfNoShare("[%s requested] Polling Notifiarr: %v", input.Type, err)
 		return
 	}
 
@@ -151,7 +208,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 	}
 
 	if err = json.Unmarshal(body.Details.Response, &v); err != nil {
-		c.Errorf("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		c.ErrorfNoShare("[%s requested] Polling Notifiarr: %v", input.Type, err)
 		return
 	}
 

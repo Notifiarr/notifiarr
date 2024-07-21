@@ -27,6 +27,7 @@ const (
 	EventMovie   EventType = "movie"
 	EventEpisode EventType = "episode"
 	EventPoll    EventType = "poll"
+	EventCheck   EventType = "upcheck"
 	EventSignal  EventType = "signal"
 	EventFile    EventType = "file"
 	EventSet     EventType = "setStates"

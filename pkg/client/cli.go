@@ -1,12 +1,15 @@
 package client
 
 import (
+	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -15,6 +18,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/rotatorr"
 )
 
@@ -24,7 +28,7 @@ const curlTimeout = 15 * time.Second
 
 // Errors.
 var (
-	ErrInvalidHeader = fmt.Errorf("invalid header provided; must contain a colon")
+	ErrInvalidHeader = errors.New("invalid header provided; must contain a colon")
 )
 
 // forceWriteWithExit is called only when a user passes --write or --reset on the command line.
@@ -165,4 +169,61 @@ func printCurlReply(resp *http.Response, body []byte) {
 func Fortune() string {
 	fortunes := strings.Split(bindata.Fortunes, "\n%\n")
 	return fortunes[rand.Intn(len(fortunes))] //nolint:gosec
+}
+
+// handleAptHook takes a payload as stdin from dpkg and relays it to notifiarr.com.
+// only useful as an apt integration on Debian-based operating systems.
+// NEVER return an error, we don't want to hang up apt.
+func (c *Client) handleAptHook(ctx context.Context) error { //nolint:cyclop
+	if !mnd.IsLinux {
+		return ErrUnsupport
+	} else if !c.Config.EnableApt {
+		return nil // apt integration is not enabled, bail.
+	}
+
+	var (
+		grab   bool
+		output struct {
+			Data    []string `json:"data"`
+			CLI     string   `json:"cli"`
+			Install int      `json:"install"`
+			Remove  int      `json:"remove"`
+		}
+	)
+
+	for scanner := bufio.NewScanner(os.Stdin); scanner.Scan(); {
+		switch line := scanner.Text(); {
+		case strings.HasPrefix(line, "CommandLine"):
+			output.CLI = line
+		case line == "":
+			grab = true // grab everything after the empty line.
+		case grab:
+			output.Data = append(output.Data, line)
+
+			if strings.HasSuffix(line, ".deb") {
+				output.Install++
+			} else if strings.HasSuffix(line, "**REMOVE**") {
+				output.Remove++
+			}
+
+			fallthrough
+		default: /* debug /**/
+			// fmt.Println("hook line", line)
+		} //nolint:wsl
+	}
+
+	resp, _, err := c.website.RawGetData(ctx, &website.Request{
+		Route:   website.PkgRoute,
+		Event:   "apt",
+		Payload: output,
+	})
+	//nolint:forbidigo
+	if err != nil {
+		fmt.Printf("ERROR Sending Notification to notifiarr.com: %v%s\n", err, resp)
+	} else {
+		fmt.Printf("Sent notification to notifiarr.com; install: %d, remove: %d%s\n",
+			output.Install, output.Remove, resp)
+	}
+
+	return nil
 }

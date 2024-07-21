@@ -84,7 +84,7 @@ func NewConfig(logger mnd.Logger) *Config {
 		BindAddr: mnd.DefaultBindAddr,
 		Snapshot: &snapshot.Config{
 			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
-			Plugins: &snapshot.Plugins{
+			Plugins: snapshot.Plugins{
 				Nvidia: &snapshot.NvidiaConfig{},
 			},
 		},
@@ -174,7 +174,7 @@ func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *trigge
 		BindAddr: c.BindAddr,
 	})
 
-	return c.Services.Website, c.setup(logger), err
+	return c.Services.Website, c.setup(logger, flag), err
 }
 
 func (c *Config) fixConfig() {
@@ -189,10 +189,10 @@ func (c *Config) fixConfig() {
 	}
 
 	c.Services.Apps = c.Apps
-	c.Services.Plugins = c.Snapshot.Plugins
+	c.Services.Plugins = &c.Snapshot.Plugins
 }
 
-func (c *Config) setup(logger *logs.Logger) *triggers.Actions {
+func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 	c.Allow = MakeIPs(c.Upstreams)
 
@@ -219,6 +219,9 @@ func (c *Config) setup(logger *logs.Logger) *triggers.Actions {
 		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
 		Commands:   c.Commands,
 		CIC:        cic,
+		ConfigFile: flag.ConfigFile,
+		AutoUpdate: c.AutoUpdate,
+		UnstableCh: c.UnstableCh,
 		Services:   c.Services,
 		Logger:     logger,
 	})

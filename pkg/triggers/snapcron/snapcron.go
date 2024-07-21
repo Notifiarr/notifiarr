@@ -69,7 +69,7 @@ func (c *cmd) printLog() {
 		"ipmiSudo": c.Snapshot.IPMI && c.Snapshot.IPMISudo,
 		"iotop":    c.Snapshot.IOTop > 0,
 		"pstop":    c.Snapshot.PSTop > 0,
-		"mysql":    c.Snapshot.Plugins != nil && len(c.Snapshot.MySQL) > 0,
+		"mysql":    len(c.Snapshot.MySQL) > 0,
 		"zfs":      len(c.Snapshot.ZFSPools) > 0,
 		"sudo":     c.Snapshot.UseSudo && c.Snapshot.DriveData,
 	} {

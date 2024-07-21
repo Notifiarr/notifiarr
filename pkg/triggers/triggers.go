@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/cfsync"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
@@ -37,6 +38,9 @@ type Config struct {
 	LogFiles   []string
 	Commands   []*commands.Command
 	CIC        *clientinfo.Config
+	ConfigFile string
+	AutoUpdate string
+	UnstableCh bool
 	common.Services
 	*logs.Logger
 }
@@ -59,6 +63,7 @@ type Actions struct {
 	EmptyTrash *emptytrash.Action
 	MDbList    *mdblist.Action
 	FileUpload *fileupload.Action
+	AutoUpdate *autoupdate.Action
 }
 
 // New turns a populated Config into a pile of Actions.
@@ -88,24 +93,18 @@ func New(config *Config) *Actions {
 		MDbList:    mdblist.New(common),
 		FileUpload: fileupload.New(common),
 		Timers:     common,
+		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
 	}
 }
 
 // These methods use reflection so they never really need to be updated.
 // They execute all Create(), Run() and Stop() procedures defined in our Actions.
 
-type create interface {
-	Create()
-}
-
-type run interface {
-	Run()
-	Stop()
-}
-
 // Start creates all the triggers and runs the timers.
-func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
+func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
 	a.Timers.SetReloadCh(reloadCh)
+	a.Timers.SetStopCh(stopCh)
+
 	defer a.Timers.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
@@ -115,12 +114,12 @@ func (a *Actions) Start(ctx context.Context, reloadCh chan os.Signal) {
 		}
 
 		// A panic here means you screwed up the code somewhere else.
-		if action, ok := actions.Field(i).Interface().(create); ok {
+		if action, ok := actions.Field(i).Interface().(common.Create); ok {
 			action.Create()
 		}
 		// No 'else if' so you can have both if you need them.
-		if action, ok := actions.Field(i).Interface().(run); ok {
-			action.Run()
+		if action, ok := actions.Field(i).Interface().(common.Run); ok {
+			go action.Run(ctx)
 		}
 	}
 }
@@ -136,7 +135,7 @@ func (a *Actions) Stop(event website.EventType) {
 			continue
 		}
 
-		if action, ok := actions.Field(i).Interface().(run); ok {
+		if action, ok := actions.Field(i).Interface().(common.Run); ok {
 			action.Stop()
 		}
 	}
