@@ -689,7 +689,7 @@ func revBytes(output bytes.Buffer) []byte {
 func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 	output := make(map[string]*snapshot.Partition)
 	snapcnfg := &snapshot.Config{
-		Plugins:   &snapshot.Plugins{},
+		Plugins:   snapshot.Plugins{},
 		DiskUsage: true,
 		AllDrives: true,
 		ZFSPools:  c.Config.Snapshot.ZFSPools,

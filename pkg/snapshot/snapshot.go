@@ -52,7 +52,7 @@ type Config struct {
 	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                           // number of processes to include from mysql servers.
 	IPMI      bool          `toml:"ipmi" xml:"ipmi" json:"ipmi"`                              // get ipmi sensor info.
 	IPMISudo  bool          `toml:"ipmiSudo" xml:"ipmiSudo" json:"ipmiSudo"`                  // use sudo to get ipmi sensor info.
-	*Plugins
+	Plugins
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
 }
 
@@ -64,9 +64,9 @@ type Plugins struct {
 
 // Errors this package generates.
 var (
-	ErrPlatformUnsup = fmt.Errorf("the requested metric is not available on this platform, " +
+	ErrPlatformUnsup = errors.New("the requested metric is not available on this platform, " +
 		"if you know how to collect it, please open an issue on the github repo")
-	ErrNonZeroExit = fmt.Errorf("cmd exited non-zero")
+	ErrNonZeroExit = errors.New("cmd exited non-zero")
 )
 
 // Snapshot is the output data sent to Notifiarr.
