@@ -1,5 +1,3 @@
-//go:build !windows && !darwin && !linux
-
 package ui
 
 import (
@@ -14,7 +12,7 @@ import (
 const SystrayIcon = "files/images/favicon.png"
 
 //nolint:gochecknoglobals
-var hasGUI = os.Getenv("USEGUI") == "true" && runtime.GOOS == "linux"
+var hasGUI = os.Getenv("USEGUI") == "true"
 
 // HasGUI tries to determine if the app was invoked as a GUI app.
 func HasGUI() bool {

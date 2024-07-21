@@ -12,8 +12,10 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
@@ -291,7 +293,8 @@ func (c *Client) Exit(ctx context.Context) error {
 	}()
 
 	c.StartWebServer(ctx)
-	c.setSignals()
+	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(c.sighup, syscall.SIGHUP)
 
 	// For non-GUI systems, this is where the main go routine stops (and waits).
 	for {
@@ -304,8 +307,9 @@ func (c *Client) Exit(ctx context.Context) error {
 			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
 			return c.stop(ctx, website.EventSignal)
 		case sigc := <-c.sighup:
-			if err := c.checkReloadSignal(ctx, sigc); err != nil {
-				return err // reloadConfiguration()
+			err := c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
+			if err != nil {
+				return err
 			}
 		}
 	}
