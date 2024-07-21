@@ -1,8 +1,7 @@
-//go:build !windows && !darwin && !linux
-
 package ui
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -14,7 +13,7 @@ import (
 const SystrayIcon = "files/images/favicon.png"
 
 //nolint:gochecknoglobals
-var hasGUI = os.Getenv("USEGUI") == "true" && runtime.GOOS == "linux"
+var hasGUI = os.Getenv("USEGUI") == "true"
 
 // HasGUI tries to determine if the app was invoked as a GUI app.
 func HasGUI() bool {
@@ -35,7 +34,7 @@ func StartCmd(c string, v ...string) error {
 }
 
 // ErrUnsupported is just an error.
-var ErrUnsupported = fmt.Errorf("unsupported OS")
+var ErrUnsupported = errors.New("unsupported OS, good with xwindows? help us")
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {

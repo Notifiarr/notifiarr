@@ -34,6 +34,7 @@ type Config struct {
 	list     []*Action      // List of action triggers
 	Services                // for running service checks.
 	reloadCh chan os.Signal // so triggers can reload the app.
+	stopCh   chan os.Signal // so triggers can stop the app.
 	rand     *rand.Rand
 }
 
@@ -64,6 +65,22 @@ func (c *Config) ReloadApp(reason string) {
 	}
 
 	c.reloadCh <- &update.Signal{Text: reason}
+}
+
+// SetReloadCh is used to set the stop channel for triggers.
+// This is an exported method because the channel is not always
+// available when triggers are initialized.
+func (c *Config) SetStopCh(stopCh chan os.Signal) {
+	c.stopCh = stopCh
+}
+
+// StopApp shuts down the application.
+func (c *Config) StopApp(reason string) {
+	if c.stopCh == nil {
+		panic("attempt to stop with no stop channel")
+	}
+
+	c.stopCh <- &update.Signal{Text: reason}
 }
 
 // ActionInput is used to send data to a trigger action.
@@ -149,5 +166,5 @@ func (c *Config) Rand() *rand.Rand {
 
 // WithInstance returns a trigger name with an instance ID.
 func (name TriggerName) WithInstance(instance int) TriggerName {
-	return TriggerName(fmt.Sprintf(string(name), instance))
+	return TriggerName(fmt.Sprint(name, instance))
 }

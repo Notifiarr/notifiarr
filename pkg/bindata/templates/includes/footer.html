@@ -2,7 +2,7 @@
                     </div> <!-- index :: content-wrapper -->
                 </div> <!-- index :: ts-main-content -->
             </div> <!-- index :: page-body -->
-            <div class="page-footer {{if not .Flags.ConfigFile}}bk-danger{{end}}">
+            <div class="page-footer{{if not .Flags.ConfigFile}} bk-danger{{end}}">
                 {{- if not .Flags.ConfigFile}}
                 <div style="display:none;" class="dialogText">
                     The application is currently running without a config file. Saving changes is disabled.
