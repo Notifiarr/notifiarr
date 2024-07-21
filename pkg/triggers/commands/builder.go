@@ -17,8 +17,8 @@ import (
 
 // Errors produced by this file.
 var (
-	ErrArgCount = fmt.Errorf("wrong count of args provided")
-	ErrArgValue = fmt.Errorf("provided argument value invalid")
+	ErrArgCount = errors.New("wrong count of args provided")
+	ErrArgValue = errors.New("provided argument value invalid")
 )
 
 type cmdBuilder struct {

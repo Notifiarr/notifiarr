@@ -47,8 +47,8 @@ func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) err
 
 // syncRadarr triggers a custom format sync for Radarr.
 func (c *cmd) syncRadarr(ctx context.Context, input *common.ActionInput) {
-	ci := clientinfo.Get()
-	if ci == nil || len(ci.Actions.Sync.RadarrInstances) < 1 {
+	info := clientinfo.Get()
+	if info == nil || len(info.Actions.Sync.RadarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Radarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Radarr) < 1 {
@@ -58,9 +58,9 @@ func (c *cmd) syncRadarr(ctx context.Context, input *common.ActionInput) {
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Sync.RadarrInstances.Has(instance) {
+		if !app.Enabled() || !info.Actions.Sync.RadarrInstances.Has(instance) {
 			c.Debugf("[%s requested] Profiles and formats sync skipping Radarr instance %d. Not in sync list: %v",
-				input.Type, instance, ci.Actions.Sync.RadarrInstances)
+				input.Type, instance, info.Actions.Sync.RadarrInstances)
 			continue
 		}
 

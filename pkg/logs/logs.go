@@ -47,7 +47,7 @@ var (
 
 // Custom errors.
 var (
-	ErrCloseCustom = fmt.Errorf("cannot close custom logs directly")
+	ErrCloseCustom = errors.New("cannot close custom logs directly")
 )
 
 // satisfy gomnd.
@@ -64,15 +64,15 @@ const (
 // Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
 type LogConfig struct {
 	AppName   string   `json:"-"`
-	LogFile   string   `json:"logFile" toml:"log_file" xml:"log_file" yaml:"logFile"`
-	DebugLog  string   `json:"debugLog" toml:"debug_log" xml:"debug_log" yaml:"debugLog"`
-	HTTPLog   string   `json:"httpLog" toml:"http_log" xml:"http_log" yaml:"httpLog"`
-	LogFiles  int      `json:"logFiles" toml:"log_files" xml:"log_files" yaml:"logFiles"`
+	LogFile   string   `json:"logFile"   toml:"log_file"    xml:"log_file"    yaml:"logFile"`
+	DebugLog  string   `json:"debugLog"  toml:"debug_log"   xml:"debug_log"   yaml:"debugLog"`
+	HTTPLog   string   `json:"httpLog"   toml:"http_log"    xml:"http_log"    yaml:"httpLog"`
+	LogFiles  int      `json:"logFiles"  toml:"log_files"   xml:"log_files"   yaml:"logFiles"`
 	LogFileMb int      `json:"logFileMb" toml:"log_file_mb" xml:"log_file_mb" yaml:"logFileMb"`
-	FileMode  FileMode `json:"fileMode" toml:"file_mode" xml:"file_mode" yaml:"fileMode"`
-	Debug     bool     `json:"debug" toml:"debug" xml:"debug" yaml:"debug"`
-	Quiet     bool     `json:"quiet" toml:"quiet" xml:"quiet" yaml:"quiet"`
-	NoUploads bool     `json:"noUploads" toml:"no_uploads" xml:"no_uploads" yaml:"noUploads"`
+	FileMode  FileMode `json:"fileMode"  toml:"file_mode"   xml:"file_mode"   yaml:"fileMode"`
+	Debug     bool     `json:"debug"     toml:"debug"       xml:"debug"       yaml:"debug"`
+	Quiet     bool     `json:"quiet"     toml:"quiet"       xml:"quiet"       yaml:"quiet"`
+	NoUploads bool     `json:"noUploads" toml:"no_uploads"  xml:"no_uploads"  yaml:"noUploads"`
 }
 
 // New returns a new Logger with debug off and sends everything to stdout.
@@ -106,12 +106,14 @@ func (l *Logger) SetupLogging(config *LogConfig) {
 }
 
 // Rotate rotates the log files. If called on a custom log, only rotates that log file.
-func (l *Logger) Rotate() (errors []error) {
+func (l *Logger) Rotate() []error {
 	if l.custom != nil {
 		if _, err := l.custom.Rotate(); err != nil {
 			return []error{fmt.Errorf("rotating Custom Log: %w", err)}
 		}
 	}
+
+	var errors []error
 
 	for name, logger := range map[string]*rotatorr.Logger{
 		"HTTP":  l.web,
@@ -135,10 +137,12 @@ func (l *Logger) Rotate() (errors []error) {
 }
 
 // Close closes all open log files. Does not work on custom logs.
-func (l *Logger) Close() (errors []error) {
+func (l *Logger) Close() []error {
 	if l.custom != nil {
 		return []error{ErrCloseCustom}
 	}
+
+	var errors []error
 
 	for name, logger := range map[string]*rotatorr.Logger{
 		"HTTP":  l.web,

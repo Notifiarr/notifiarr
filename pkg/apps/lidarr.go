@@ -60,8 +60,8 @@ func (a *Apps) lidarrHandlers() {
 type LidarrConfig struct {
 	ExtraConfig
 	*starr.Config
-	*lidarr.Lidarr `toml:"-" xml:"-" json:"-"`
-	errorf         func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	*lidarr.Lidarr `json:"-" toml:"-" xml:"-"`
+	errorf         func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
 func getLidarr(r *http.Request) *LidarrConfig {

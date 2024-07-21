@@ -65,13 +65,15 @@ func (s *Snapshot) getMemoryUsageShared(ctx context.Context) error {
 }
 
 // GetLocalData collects current username, logged in user and host info.
-func (s *Snapshot) GetLocalData(ctx context.Context) (errs []error) {
+func (s *Snapshot) GetLocalData(ctx context.Context) []error {
 	u, err := user.Current()
 	if err != nil {
 		s.System.Username = "uid:" + strconv.Itoa(os.Getuid())
 	} else {
 		s.System.Username = u.Username
 	}
+
+	var errs []error
 
 	if err := s.GetUsers(ctx); err != nil &&
 		!errors.Is(err, os.ErrNotExist) && !errors.Is(err, os.ErrPermission) {

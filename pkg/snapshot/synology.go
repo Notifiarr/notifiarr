@@ -12,7 +12,7 @@ import (
 	"github.com/shirou/gopsutil/v4/host"
 )
 
-var ErrNotSynology = fmt.Errorf("the running host is not a Synology")
+var ErrNotSynology = errors.New("the running host is not a Synology")
 
 // Synology is the data we care about from the config file.
 //

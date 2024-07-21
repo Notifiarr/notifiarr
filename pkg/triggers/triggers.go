@@ -108,17 +108,17 @@ func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
 	defer a.Timers.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
-	for i := range actions.NumField() {
-		if !actions.Field(i).CanInterface() {
+	for idx := range actions.NumField() {
+		if !actions.Field(idx).CanInterface() {
 			continue
 		}
 
 		// A panic here means you screwed up the code somewhere else.
-		if action, ok := actions.Field(i).Interface().(common.Create); ok {
+		if action, ok := actions.Field(idx).Interface().(common.Create); ok {
 			action.Create()
 		}
 		// No 'else if' so you can have both if you need them.
-		if action, ok := actions.Field(i).Interface().(common.Run); ok {
+		if action, ok := actions.Field(idx).Interface().(common.Run); ok {
 			go action.Run(ctx)
 		}
 	}

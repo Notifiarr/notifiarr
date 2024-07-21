@@ -33,14 +33,14 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 		clientInfo = &clientinfo.ClientInfo{}
 	}
 
-	switch hi, err := c.website.GetHostInfo(ctx); {
+	switch host, err := c.website.GetHostInfo(ctx); {
 	case err != nil:
 		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
 	case c.Config.HostID == "":
-		c.Config.HostID = hi.HostID
-		c.Printf("==> {UNSAVED} Unique Host ID: %s (%s)", c.Config.HostID, hi.Hostname)
+		c.Config.HostID = host.HostID
+		c.Printf("==> {UNSAVED} Unique Host ID: %s (%s)", c.Config.HostID, host.Hostname)
 	default:
-		c.Printf("==> Unique Host ID: %s (%s)", hi.HostID, hi.Hostname)
+		c.Printf("==> Unique Host ID: %s (%s)", host.HostID, host.Hostname)
 	}
 
 	hostname, _ := os.Hostname()

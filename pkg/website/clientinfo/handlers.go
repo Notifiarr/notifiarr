@@ -159,16 +159,16 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 		read = make([]*ReadarrConTest, len(c.Apps.Readarr))
 		son  = make([]*SonarrConTest, len(c.Apps.Sonarr))
 		plx  = []*PlexConTest{}
-		wg   sync.WaitGroup
+		wait sync.WaitGroup
 	)
 
-	c.getPlexVersion(ctx, &wg, c.Apps.Plex, &plx)
-	c.getLidarrVersion(ctx, &wg, c.Apps.Lidarr, lid)
-	c.getProwlarrVersion(ctx, &wg, c.Apps.Prowlarr, prl)
-	c.getRadarrVersion(ctx, &wg, c.Apps.Radarr, rad)
-	c.getReadarrVersion(ctx, &wg, c.Apps.Readarr, read)
-	c.getSonarrVersion(ctx, &wg, c.Apps.Sonarr, son)
-	wg.Wait()
+	c.getPlexVersion(ctx, &wait, c.Apps.Plex, &plx)
+	c.getLidarrVersion(ctx, &wait, c.Apps.Lidarr, lid)
+	c.getProwlarrVersion(ctx, &wait, c.Apps.Prowlarr, prl)
+	c.getRadarrVersion(ctx, &wait, c.Apps.Radarr, rad)
+	c.getReadarrVersion(ctx, &wait, c.Apps.Readarr, read)
+	c.getSonarrVersion(ctx, &wait, c.Apps.Sonarr, son)
+	wait.Wait()
 
 	return &AppStatuses{
 		Lidarr:   lid,

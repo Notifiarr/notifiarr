@@ -57,7 +57,7 @@ func DurationAge(when time.Time) string {
 
 // PrintVersionInfo returns version information.
 func PrintVersionInfo(program string) string {
-	m := map[string]string{
+	input := map[string]string{
 		"started":   version.Started.String(),
 		"program":   program,
 		"version":   version.Version,
@@ -68,7 +68,7 @@ func PrintVersionInfo(program string) string {
 		"goVersion": version.GoVersion,
 		"platform":  runtime.GOOS + "/" + runtime.GOARCH,
 	}
-	t := template.Must(template.New("version").Parse(
+	tmpl := template.Must(template.New("version").Parse(
 		`{{.program}} v{{.version}}-{{.revision}} [{{.branch}}]
   build user: {{.buildUser}}
   build date: {{.buildDate}}
@@ -77,7 +77,7 @@ func PrintVersionInfo(program string) string {
   started:    {{.started}}` + "\n"))
 
 	var buf bytes.Buffer
-	if err := t.ExecuteTemplate(&buf, "version", m); err != nil {
+	if err := tmpl.ExecuteTemplate(&buf, "version", input); err != nil {
 		panic(err)
 	}
 

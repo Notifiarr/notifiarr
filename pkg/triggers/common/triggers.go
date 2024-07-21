@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"os"
@@ -17,10 +18,10 @@ import (
 )
 
 // ErrInvalidApp is returned by triggers when a non-existent app is requested.
-var ErrInvalidApp = fmt.Errorf("invalid application provided")
+var ErrInvalidApp = errors.New("invalid application provided")
 
 // ErrNoChannel is returned when the go routine is stopped.
-var ErrNoChannel = fmt.Errorf("no channel to send request")
+var ErrNoChannel = errors.New("no channel to send request")
 
 // Config is the input data shared by most triggers.
 // Everything is mandatory.

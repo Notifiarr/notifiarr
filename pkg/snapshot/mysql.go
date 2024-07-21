@@ -16,10 +16,10 @@ import (
 
 // MySQLConfig allows us to gather a process list for the snapshot.
 type MySQLConfig struct {
-	Name    string        `toml:"name" xml:"name"`
-	Host    string        `toml:"host" xml:"host"`
-	User    string        `toml:"user" xml:"user"`
-	Pass    string        `toml:"pass" xml:"pass"`
+	Name    string        `toml:"name"    xml:"name"`
+	Host    string        `toml:"host"    xml:"host"`
+	User    string        `toml:"user"    xml:"user"`
+	Pass    string        `toml:"pass"    xml:"pass"`
 	Timeout cnfg.Duration `toml:"timeout" xml:"timeout"`
 	// only used by service checks, snapshot interval is used for mysql.
 	Interval cnfg.Duration `toml:"interval" xml:"interval"`
@@ -63,8 +63,10 @@ func (n NullString) MarshalJSON() ([]byte, error) {
 }
 
 // GetMySQL grabs the process list from a bunch of servers.
-func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit int) (errs []error) {
+func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit int) []error {
 	s.MySQL = make(map[string]*MySQLServerData)
+
+	var errs []error
 
 	for _, server := range servers {
 		if server.Host == "" {

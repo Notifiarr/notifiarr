@@ -22,55 +22,55 @@ import (
 //
 //nolint:lll
 type Apps struct {
-	APIKey       string            `json:"apiKey" toml:"api_key" xml:"api_key" yaml:"apiKey"`
-	ExKeys       []string          `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
-	URLBase      string            `json:"urlbase" toml:"urlbase" xml:"urlbase" yaml:"urlbase"`
-	MaxBody      int               `toml:"max_body" xml:"max_body" json:"maxBody"`
-	Serial       bool              `json:"serial" toml:"serial" xml:"serial" yaml:"serial"`
-	Sonarr       []*SonarrConfig   `json:"sonarr,omitempty" toml:"sonarr" xml:"sonarr" yaml:"sonarr,omitempty"`
-	Radarr       []*RadarrConfig   `json:"radarr,omitempty" toml:"radarr" xml:"radarr" yaml:"radarr,omitempty"`
-	Lidarr       []*LidarrConfig   `json:"lidarr,omitempty" toml:"lidarr" xml:"lidarr" yaml:"lidarr,omitempty"`
-	Readarr      []*ReadarrConfig  `json:"readarr,omitempty" toml:"readarr" xml:"readarr" yaml:"readarr,omitempty"`
-	Prowlarr     []*ProwlarrConfig `json:"prowlarr,omitempty" toml:"prowlarr" xml:"prowlarr" yaml:"prowlarr,omitempty"`
-	Deluge       []*DelugeConfig   `json:"deluge,omitempty" toml:"deluge" xml:"deluge" yaml:"deluge,omitempty"`
-	Qbit         []*QbitConfig     `json:"qbit,omitempty" toml:"qbit" xml:"qbit" yaml:"qbit,omitempty"`
-	Rtorrent     []*RtorrentConfig `json:"rtorrent,omitempty" toml:"rtorrent" xml:"rtorrent" yaml:"rtorrent,omitempty"`
-	SabNZB       []*SabNZBConfig   `json:"sabnzbd,omitempty" toml:"sabnzbd" xml:"sabnzbd" yaml:"sabnzbd,omitempty"`
-	NZBGet       []*NZBGetConfig   `json:"nzbget,omitempty" toml:"nzbget" xml:"nzbget" yaml:"nzbget,omitempty"`
-	Transmission []*XmissionConfig `json:"transmission,omitempty" toml:"transmission" xml:"transmission" yaml:"transmission,omitempty"`
-	Tautulli     *TautulliConfig   `json:"tautulli,omitempty" toml:"tautulli" xml:"tautulli" yaml:"tautulli,omitempty"`
-	Plex         *PlexConfig       `json:"plex" toml:"plex" xml:"plex" yaml:"plex"`
-	Router       *mux.Router       `json:"-" toml:"-" xml:"-" yaml:"-"`
-	mnd.Logger   `toml:"-" xml:"-" json:"-"`
-	keys         map[string]struct{} `toml:"-"` // for fast key lookup.
+	APIKey       string              `json:"apiKey"                 toml:"api_key"      xml:"api_key"      yaml:"apiKey"`
+	ExKeys       []string            `json:"extraKeys"              toml:"extra_keys"   xml:"extra_keys"   yaml:"extraKeys"`
+	URLBase      string              `json:"urlbase"                toml:"urlbase"      xml:"urlbase"      yaml:"urlbase"`
+	MaxBody      int                 `json:"maxBody"                toml:"max_body"     xml:"max_body"     yaml:"maxBody"`
+	Serial       bool                `json:"serial"                 toml:"serial"       xml:"serial"       yaml:"serial"`
+	Sonarr       []*SonarrConfig     `json:"sonarr,omitempty"       toml:"sonarr"       xml:"sonarr"       yaml:"sonarr,omitempty"`
+	Radarr       []*RadarrConfig     `json:"radarr,omitempty"       toml:"radarr"       xml:"radarr"       yaml:"radarr,omitempty"`
+	Lidarr       []*LidarrConfig     `json:"lidarr,omitempty"       toml:"lidarr"       xml:"lidarr"       yaml:"lidarr,omitempty"`
+	Readarr      []*ReadarrConfig    `json:"readarr,omitempty"      toml:"readarr"      xml:"readarr"      yaml:"readarr,omitempty"`
+	Prowlarr     []*ProwlarrConfig   `json:"prowlarr,omitempty"     toml:"prowlarr"     xml:"prowlarr"     yaml:"prowlarr,omitempty"`
+	Deluge       []*DelugeConfig     `json:"deluge,omitempty"       toml:"deluge"       xml:"deluge"       yaml:"deluge,omitempty"`
+	Qbit         []*QbitConfig       `json:"qbit,omitempty"         toml:"qbit"         xml:"qbit"         yaml:"qbit,omitempty"`
+	Rtorrent     []*RtorrentConfig   `json:"rtorrent,omitempty"     toml:"rtorrent"     xml:"rtorrent"     yaml:"rtorrent,omitempty"`
+	SabNZB       []*SabNZBConfig     `json:"sabnzbd,omitempty"      toml:"sabnzbd"      xml:"sabnzbd"      yaml:"sabnzbd,omitempty"`
+	NZBGet       []*NZBGetConfig     `json:"nzbget,omitempty"       toml:"nzbget"       xml:"nzbget"       yaml:"nzbget,omitempty"`
+	Transmission []*XmissionConfig   `json:"transmission,omitempty" toml:"transmission" xml:"transmission" yaml:"transmission,omitempty"`
+	Tautulli     *TautulliConfig     `json:"tautulli,omitempty"     toml:"tautulli"     xml:"tautulli"     yaml:"tautulli,omitempty"`
+	Plex         *PlexConfig         `json:"plex"                   toml:"plex"         xml:"plex"         yaml:"plex"`
+	Router       *mux.Router         `json:"-"                      toml:"-"            xml:"-"            yaml:"-"`
+	keys         map[string]struct{} `json:"-"                      toml:"-"            xml:"-"` // for fast key lookup.
+	mnd.Logger   `json:"-"                      toml:"-"            xml:"-"`
 }
 
 type ExtraConfig struct {
-	Name     string        `toml:"name" xml:"name" json:"name"`
-	Timeout  cnfg.Duration `toml:"timeout" xml:"timeout" json:"timeout"`
-	Interval cnfg.Duration `toml:"interval" xml:"interval" json:"interval"`
-	ValidSSL bool          `toml:"valid_ssl" xml:"valid_ssl" json:"validSsl"`
-	Deletes  int           `toml:"deletes" xml:"deletes" json:"deletes"`
+	Name     string        `json:"name"     toml:"name"      xml:"name"`
+	Timeout  cnfg.Duration `json:"timeout"  toml:"timeout"   xml:"timeout"`
+	Interval cnfg.Duration `json:"interval" toml:"interval"  xml:"interval"`
+	ValidSSL bool          `json:"validSsl" toml:"valid_ssl" xml:"valid_ssl"`
+	Deletes  int           `json:"deletes"  toml:"deletes"   xml:"deletes"`
 	delLimit *rate.Limiter
 }
 
 // Errors sent to client web requests.
 var (
-	ErrNoTMDB     = fmt.Errorf("TMDB ID must not be empty")
-	ErrNoGRID     = fmt.Errorf("GRID ID must not be empty")
-	ErrNoTVDB     = fmt.Errorf("TVDB ID must not be empty")
-	ErrNoMBID     = fmt.Errorf("MBID ID must not be empty")
+	ErrNoTMDB     = errors.New("TMDB ID must not be empty")
+	ErrNoGRID     = errors.New("GRID ID must not be empty")
+	ErrNoTVDB     = errors.New("TVDB ID must not be empty")
+	ErrNoMBID     = errors.New("MBID ID must not be empty")
 	ErrNoRadarr   = fmt.Errorf("configured %s ID not found", starr.Radarr)
 	ErrNoSonarr   = fmt.Errorf("configured %s ID not found", starr.Sonarr)
 	ErrNoLidarr   = fmt.Errorf("configured %s ID not found", starr.Lidarr)
 	ErrNoReadarr  = fmt.Errorf("configured %s ID not found", starr.Readarr)
 	ErrNoProwlarr = fmt.Errorf("configured %s ID not found", starr.Prowlarr)
-	ErrNotFound   = fmt.Errorf("the request returned an empty payload")
-	ErrNonZeroID  = fmt.Errorf("provided ID must be non-zero")
+	ErrNotFound   = errors.New("the request returned an empty payload")
+	ErrNonZeroID  = errors.New("provided ID must be non-zero")
 	// ErrWrongCount is returned when an app returns the wrong item count.
-	ErrWrongCount = fmt.Errorf("wrong item count returned")
-	ErrInvalidApp = fmt.Errorf("invalid application configuration provided")
-	ErrRateLimit  = fmt.Errorf("rate limit reached")
+	ErrWrongCount = errors.New("wrong item count returned")
+	ErrInvalidApp = errors.New("invalid application configuration provided")
+	ErrRateLimit  = errors.New("rate limit reached")
 )
 
 // Setup creates request interfaces and sets the timeout for each server.

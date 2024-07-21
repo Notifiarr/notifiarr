@@ -202,7 +202,12 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running configuration.
-func (c *Client) loadConfiguration(ctx context.Context) (msg string, newPassword string, err error) {
+func (c *Client) loadConfiguration(ctx context.Context) (string, string, error) {
+	var (
+		msg         string
+		newPassword string
+		err         error
+	)
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.

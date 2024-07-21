@@ -48,8 +48,8 @@ func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) err
 
 // syncSonarr triggers a custom format sync for Sonarr.
 func (c *cmd) syncSonarr(ctx context.Context, input *common.ActionInput) {
-	ci := clientinfo.Get()
-	if ci == nil || len(ci.Actions.Sync.SonarrInstances) < 1 {
+	info := clientinfo.Get()
+	if info == nil || len(info.Actions.Sync.SonarrInstances) < 1 {
 		c.Debugf("[%s requested] Cannot sync Sonarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Sonarr) < 1 {
@@ -59,9 +59,9 @@ func (c *cmd) syncSonarr(ctx context.Context, input *common.ActionInput) {
 
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Sync.SonarrInstances.Has(instance) {
+		if !app.Enabled() || !info.Actions.Sync.SonarrInstances.Has(instance) {
 			c.Debugf("[%s requested] Profiles and formats sync skipping Sonarr instance %d. Not in sync list: %v",
-				input.Type, instance, ci.Actions.Sync.SonarrInstances)
+				input.Type, instance, info.Actions.Sync.SonarrInstances)
 			continue
 		}
 

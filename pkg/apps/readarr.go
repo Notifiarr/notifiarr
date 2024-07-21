@@ -45,8 +45,8 @@ func (a *Apps) readarrHandlers() {
 type ReadarrConfig struct {
 	ExtraConfig
 	*starr.Config
-	*readarr.Readarr `toml:"-" xml:"-" json:"-"`
-	errorf           func(string, ...interface{}) `toml:"-" xml:"-" json:"-"`
+	*readarr.Readarr `json:"-" toml:"-" xml:"-"`
+	errorf           func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
 func getReadarr(r *http.Request) *ReadarrConfig {

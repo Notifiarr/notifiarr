@@ -1,32 +1,19 @@
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-rules:
-    # Exclude funlen for testing files.
-    - linters:
-        - nonamedreturns
-        - wsl
-        - cyclop
-        - nolintlint
-      path: 'cmd/'
 linters:
   enable-all: true
   disable:
   # deprecated
     - gomnd
     - execinquery
-    # unused
-    - exhaustruct
-    - exhaustive
-    - dupl
-    - nlreturn
-    - nonamedreturns
-    - varnamelen
-    - godot # does not work with annotations.
-    - perfsprint
-    - musttag # broken in 1.59.
-    - depguard
-    - tagalign
+  # unused
+    - exhaustruct # This will never work in this app.
+    - dupl        # Maybe one day we can reduce the duplicate code with generics.
+    - nlreturn    # Not needed because wsl is good enough; better actually.
+    - godot       # Does not work with annotations.
+    - musttag     # Broken in 1.59: https://github.com/go-simpler/musttag/issues/98
+    - depguard    # Not even sure why this is useful. We have too many deps to care.
 run:
   timeout: 5m
 output:

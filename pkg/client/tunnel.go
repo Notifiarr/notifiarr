@@ -33,7 +33,7 @@ const (
 // This basically dictates how many parallel requests the website
 // may send to this client. Realistically very few clients create
 // more than 4 or 5 connections.
-func (c *Client) poolMax(ci *clientinfo.ClientInfo) int {
+func (c *Client) poolMax(info *clientinfo.ClientInfo) int {
 	poolmax := len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
 		len(c.Config.Apps.Readarr) + len(c.Config.Apps.Prowlarr) + len(c.Config.Apps.Deluge) +
 		len(c.Config.Apps.Qbit) + len(c.Config.Apps.Rtorrent) + len(c.Config.Apps.SabNZB) +
@@ -47,7 +47,7 @@ func (c *Client) poolMax(ci *clientinfo.ClientInfo) int {
 		poolmax++
 	}
 
-	if poolmax > maxPoolSize || ci.IsSub() {
+	if poolmax > maxPoolSize || info.IsSub() {
 		poolmax = maxPoolSize
 	} else if poolmax < maxPoolMin {
 		poolmax = maxPoolMin
@@ -58,21 +58,21 @@ func (c *Client) poolMax(ci *clientinfo.ClientInfo) int {
 
 func (c *Client) startTunnel(ctx context.Context) {
 	// If clientinfo is nil, then we probably have a bad API key.
-	ci := clientinfo.Get()
-	if ci == nil {
+	info := clientinfo.Get()
+	if info == nil {
 		c.Errorf("Skipping tunnel creation because there is no client info.")
 		return
 	}
 
-	c.makeTunnel(ctx, ci)
+	c.makeTunnel(ctx, info)
 	c.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
 		len(c.tunnel.Targets), c.tunnel.PoolMaxSize, c.tunnel.CleanInterval,
-		c.tunnel.Backoff, ci.User.TunnelURL, c.tunnel.GetID())
+		c.tunnel.Backoff, info.User.TunnelURL, c.tunnel.GetID())
 	c.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
 	c.tunnel.Start(ctx)
 }
 
-func (c *Client) makeTunnel(ctx context.Context, ci *clientinfo.ClientInfo) {
+func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 	hostname, _ := os.Hostname()
 	if hostInfo, err := c.clientinfo.GetHostInfo(ctx); err != nil {
 		hostname = hostInfo.Hostname
@@ -86,19 +86,19 @@ func (c *Client) makeTunnel(ctx context.Context, ci *clientinfo.ClientInfo) {
 	c.tunnel = mulery.NewClient(&mulery.Config{
 		Name:             hostname,
 		ID:               c.Config.HostID,
-		ClientIDs:        []any{ci.User.ID},
-		Targets:          getTunnels(ci),
+		ClientIDs:        []any{info.User.ID},
+		Targets:          getTunnels(info),
 		PoolIdleSize:     1,
-		PoolMaxSize:      c.poolMax(ci),
+		PoolMaxSize:      c.poolMax(info),
 		CleanInterval:    time.Second + time.Duration(c.triggers.Timers.Rand().Intn(1000))*time.Millisecond,
 		Backoff:          600*time.Millisecond + time.Duration(c.triggers.Timers.Rand().Intn(600))*time.Millisecond,
 		SecretKey:        c.Config.APIKey,
 		Handler:          remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
-		RoundRobinConfig: c.roundRobinConfig(ci),
+		RoundRobinConfig: c.roundRobinConfig(info),
 		Logger: &tunnelLogger{
 			ctx:            ctx,
 			Logger:         c.Logger,
-			sendSiteErrors: ci.User.DevAllowed,
+			sendSiteErrors: info.User.DevAllowed,
 		},
 	})
 }
@@ -129,10 +129,10 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 }
 
 // getTunnels returns a list of tunnels the client will round robin.
-func getTunnels(ci *clientinfo.ClientInfo) []string {
+func getTunnels(info *clientinfo.ClientInfo) []string {
 	// If the user has already selected their preferred tunnels, use them.
-	if len(ci.User.Tunnels) > 1 {
-		return ci.User.Tunnels
+	if len(info.User.Tunnels) > 1 {
+		return info.User.Tunnels
 	}
 
 	// The above is the new way, the below is the 'transition' way.
@@ -143,12 +143,12 @@ func getTunnels(ci *clientinfo.ClientInfo) []string {
 
 	// Otherwise, use the legacy selection and append all tunnels.
 	tunnels := []string{}
-	if len(ci.User.Tunnels) != 0 {
-		tunnels = append(tunnels, ci.User.Tunnels[0])
+	if len(info.User.Tunnels) != 0 {
+		tunnels = append(tunnels, info.User.Tunnels[0])
 	}
 
-	for _, item := range ci.User.Mulery {
-		if len(ci.User.Tunnels) == 0 || item.Socket != ci.User.Tunnels[0] {
+	for _, item := range info.User.Mulery {
+		if len(info.User.Tunnels) == 0 || item.Socket != info.User.Tunnels[0] {
 			tunnels = append(tunnels, item.Socket)
 		}
 	}
@@ -159,24 +159,24 @@ func getTunnels(ci *clientinfo.ClientInfo) []string {
 // prefixURLbase adds a prefix to an http request.
 // We need this to fix websocket-tunneled requests
 // from the website when url base is not the default.
-func (c *Client) prefixURLbase(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (c *Client) prefixURLbase(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		if c.Config.URLBase == "" || c.Config.URLBase == "/" {
-			h.ServeHTTP(w, r)
+			handler.ServeHTTP(writer, req)
 			return
 		}
 
-		r2 := new(http.Request)
-		*r2 = *r
-		r2.URL = new(url.URL)
-		*r2.URL = *r.URL
-		r2.URL.Path = path.Join(c.Config.URLBase, r.URL.Path)
+		req2 := new(http.Request)
+		*req2 = *req
+		req2.URL = new(url.URL)
+		*req2.URL = *req.URL
+		req2.URL.Path = path.Join(c.Config.URLBase, req.URL.Path)
 
-		if r.URL.RawPath != "" {
-			r2.URL.RawPath = path.Join(c.Config.URLBase, r.URL.RawPath)
+		if req.URL.RawPath != "" {
+			req2.URL.RawPath = path.Join(c.Config.URLBase, req.URL.RawPath)
 		}
 
-		h.ServeHTTP(w, r2)
+		handler.ServeHTTP(writer, req2)
 	})
 }
 
@@ -213,8 +213,8 @@ const pingTimeout = 7 * time.Second
 
 // pingTunnels is a gui request to check timing to each tunnel.
 func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request) {
-	ci := clientinfo.Get()
-	if ci == nil {
+	info := clientinfo.Get()
+	if info == nil {
 		http.Error(response, "no client info, cannot ping tunnels", http.StatusInternalServerError)
 		return
 	}
@@ -237,7 +237,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 		}
 	}()
 
-	for idx, tunnel := range ci.User.Mulery {
+	for idx, tunnel := range info.User.Mulery {
 		wait.Add(1)
 		time.Sleep(70 * time.Millisecond) //nolint:mnd
 

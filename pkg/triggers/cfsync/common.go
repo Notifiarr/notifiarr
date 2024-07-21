@@ -43,26 +43,26 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create() {
-	ci := clientinfo.Get()
-	c.setupRadarr(ci)
-	c.setupSonarr(ci)
-	c.setupLidarr(ci)
+	info := clientinfo.Get()
+	c.setupRadarr(info)
+	c.setupSonarr(info)
+	c.setupLidarr(info)
 
 	// Check each instance and enable only if needed.
-	if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
-		if len(ci.Actions.Sync.RadarrInstances) > 0 {
+	if info != nil && info.Actions.Sync.Interval.Duration > 0 {
+		if len(info.Actions.Sync.RadarrInstances) > 0 {
 			c.Printf("==> Radarr TRaSH Sync: interval: %s, %s ",
-				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.RadarrSync, ", "))
+				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.RadarrSync, ", "))
 		}
 
-		if len(ci.Actions.Sync.SonarrInstances) > 0 {
+		if len(info.Actions.Sync.SonarrInstances) > 0 {
 			c.Printf("==> Sonarr TRaSH Sync: interval: %s, %s ",
-				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
+				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.SonarrSync, ", "))
 		}
 
-		if len(ci.Actions.Sync.LidarrInstances) > 0 {
+		if len(info.Actions.Sync.LidarrInstances) > 0 {
 			c.Printf("==> Lidarr profile and format sync interval: %s, %s",
-				ci.Actions.Sync.Interval, strings.Join(ci.Actions.Sync.SonarrSync, ", "))
+				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.SonarrSync, ", "))
 		}
 	}
 
@@ -88,22 +88,22 @@ type lidarrApp struct {
 	idx int
 }
 
-func (c *cmd) setupLidarr(ci *clientinfo.ClientInfo) {
-	if ci == nil {
+func (c *cmd) setupLidarr(info *clientinfo.ClientInfo) {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Lidarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Sync.LidarrInstances.Has(instance) {
+		if !app.Enabled() || !info.Actions.Sync.LidarrInstances.Has(instance) {
 			continue
 		}
 
 		var dur cnfg.Duration
 
-		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
+		if info != nil && info.Actions.Sync.Interval.Duration > 0 {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
-			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
+			dur = cnfg.Duration{Duration: info.Actions.Sync.Interval.Duration + randomTime}
 		}
 
 		c.Add(&common.Action{
@@ -122,22 +122,22 @@ type radarrApp struct {
 	idx int
 }
 
-func (c *cmd) setupRadarr(ci *clientinfo.ClientInfo) {
-	if ci == nil {
+func (c *cmd) setupRadarr(info *clientinfo.ClientInfo) {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Sync.RadarrInstances.Has(instance) {
+		if !app.Enabled() || !info.Actions.Sync.RadarrInstances.Has(instance) {
 			continue
 		}
 
 		var dur cnfg.Duration
 
-		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
+		if info != nil && info.Actions.Sync.Interval.Duration > 0 {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
-			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
+			dur = cnfg.Duration{Duration: info.Actions.Sync.Interval.Duration + randomTime}
 		}
 
 		c.Add(&common.Action{
@@ -156,22 +156,22 @@ type sonarrApp struct {
 	idx int
 }
 
-func (c *cmd) setupSonarr(ci *clientinfo.ClientInfo) {
-	if ci == nil {
+func (c *cmd) setupSonarr(info *clientinfo.ClientInfo) {
+	if info == nil {
 		return
 	}
 
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
-		if !app.Enabled() || !ci.Actions.Sync.SonarrInstances.Has(instance) {
+		if !app.Enabled() || !info.Actions.Sync.SonarrInstances.Has(instance) {
 			continue
 		}
 
 		var dur cnfg.Duration
 
-		if ci != nil && ci.Actions.Sync.Interval.Duration > 0 {
+		if info != nil && info.Actions.Sync.Interval.Duration > 0 {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
-			dur = cnfg.Duration{Duration: ci.Actions.Sync.Interval.Duration + randomTime}
+			dur = cnfg.Duration{Duration: info.Actions.Sync.Interval.Duration + randomTime}
 		}
 
 		c.Add(&common.Action{
