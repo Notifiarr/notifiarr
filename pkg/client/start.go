@@ -242,7 +242,7 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 	clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins
 	c.Config.Snapshot = &clientInfo.Actions.Snapshot
 	c.triggers.Timers.Snapshot = c.Config.Snapshot
-	c.Config.Services.Plugins = c.Config.Snapshot.Plugins
+	c.Config.Services.Plugins = &c.Config.Snapshot.Plugins
 
 	return clientInfo
 }

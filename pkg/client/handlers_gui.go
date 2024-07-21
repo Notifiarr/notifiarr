@@ -20,6 +20,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
+	"github.com/Notifiarr/notifiarr/pkg/checkapp"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -29,7 +30,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/schema"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/swaggo/swag"
 	"golift.io/version"
@@ -53,13 +53,13 @@ const (
 type userNameValue int
 
 //nolint:gochecknoglobals // used as context value key.
-var userNameStr interface{} = userNameValue(1)
+var userNameStr = userNameValue(1)
 
 func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 		userName, dynamic := c.getUserName(request)
 		if userName != "" {
-			ctx := context.WithValue(request.Context(), userNameStr, []interface{}{userName, dynamic})
+			ctx := context.WithValue(request.Context(), userNameStr, []any{userName, dynamic})
 			next.ServeHTTP(response, request.WithContext(ctx))
 		} else {
 			http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
@@ -70,7 +70,7 @@ func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 // getUserName returns the username and a bool if it's dynamic (not the one from the config file).
 func (c *Client) getUserName(request *http.Request) (string, bool) {
 	if userName := request.Context().Value(userNameStr); userName != nil {
-		u, _ := userName.([]interface{})
+		u, _ := userName.([]any)
 		username, _ := u[0].(string)
 		found, _ := u[1].(bool)
 
@@ -429,7 +429,7 @@ func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request
 }
 
 func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http.Request) {
-	configPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
+	mnd.ConfigPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
 		return reflect.ValueOf(strings.Fields(input))
 	})
 
@@ -438,7 +438,7 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 		return
 	}
 
-	c.testInstance(response, request)
+	checkapp.Test(c.Config, response, request)
 }
 
 // handleFileBrowser returns a list of files and folders in a path.
@@ -670,13 +670,9 @@ func (c *Client) saveNewConfig(ctx context.Context, config *configfile.Config) e
 	return nil
 }
 
-// Set a Decoder instance as a package global, because it caches
-// meta-data about structs, and an instance can be shared safely.
-var configPostDecoder = schema.NewDecoder() //nolint:gochecknoglobals
-
 func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *http.Request) error {
 	// This turns text fields into a []string (extra keys and upstreams use this).
-	configPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
+	mnd.ConfigPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
 		return reflect.ValueOf(strings.Fields(input))
 	})
 
@@ -686,10 +682,6 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 
 	if config.Snapshot == nil {
 		config.Snapshot = &snapshot.Config{}
-	}
-
-	if config.Snapshot.Plugins == nil {
-		config.Snapshot.Plugins = &snapshot.Plugins{}
 	}
 
 	if config.Apps != nil {
@@ -719,7 +711,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	// }
 
 	// Decode the POST'd data directly into the mostly-empty config struct.
-	if err := configPostDecoder.Decode(config, request.PostForm); err != nil {
+	if err := mnd.ConfigPostDecoder.Decode(config, request.PostForm); err != nil {
 		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
 	}
 

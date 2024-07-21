@@ -84,7 +84,7 @@ func NewConfig(logger mnd.Logger) *Config {
 		BindAddr: mnd.DefaultBindAddr,
 		Snapshot: &snapshot.Config{
 			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
-			Plugins: &snapshot.Plugins{
+			Plugins: snapshot.Plugins{
 				Nvidia: &snapshot.NvidiaConfig{},
 			},
 		},
@@ -189,7 +189,7 @@ func (c *Config) fixConfig() {
 	}
 
 	c.Services.Apps = c.Apps
-	c.Services.Plugins = c.Snapshot.Plugins
+	c.Services.Plugins = &c.Snapshot.Plugins
 }
 
 func (c *Config) setup(logger *logs.Logger) *triggers.Actions {

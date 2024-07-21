@@ -330,10 +330,6 @@ func (c *Client) printTautulli() {
 
 // printMySQL is called on startup to print info about each configured SQL server.
 func (c *Client) printMySQL() {
-	if c.Config.Snapshot.Plugins == nil { // unlikely.
-		return
-	}
-
 	s := servers
 	if len(c.Config.Snapshot.MySQL) == 1 {
 		s = server

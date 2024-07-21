@@ -52,7 +52,7 @@ type Config struct {
 	MyTop     int           `toml:"mytop" xml:"mytop" json:"myTop"`                           // number of processes to include from mysql servers.
 	IPMI      bool          `toml:"ipmi" xml:"ipmi" json:"ipmi"`                              // get ipmi sensor info.
 	IPMISudo  bool          `toml:"ipmiSudo" xml:"ipmiSudo" json:"ipmiSudo"`                  // use sudo to get ipmi sensor info.
-	*Plugins
+	Plugins
 	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
 }
 
