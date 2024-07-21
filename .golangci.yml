@@ -1,4 +1,6 @@
 issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
   exclude-rules:
     # Exclude funlen for testing files.
     - linters:
@@ -27,3 +29,5 @@ linters:
     - tagalign
 run:
   timeout: 5m
+output:
+  sort-results: true

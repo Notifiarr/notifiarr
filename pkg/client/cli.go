@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -24,7 +25,7 @@ const curlTimeout = 15 * time.Second
 
 // Errors.
 var (
-	ErrInvalidHeader = fmt.Errorf("invalid header provided; must contain a colon")
+	ErrInvalidHeader = errors.New("invalid header provided; must contain a colon")
 )
 
 // forceWriteWithExit is called only when a user passes --write or --reset on the command line.

@@ -64,7 +64,7 @@ type customReload struct {
 
 // Errors returned by this package.
 var (
-	ErrNilAPIKey = fmt.Errorf("API key may not be empty: set a key in config file, OR with environment variable")
+	ErrNilAPIKey = errors.New("API key may not be empty: set a key in config file, OR with environment variable")
 )
 
 // newDefaults returns a new Client pointer with default settings.

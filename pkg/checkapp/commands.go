@@ -13,7 +13,7 @@ import (
 func testCommand(ctx context.Context, input *Input) (string, int) {
 	if len(input.Real.Commands) > input.Index {
 		input.Real.Commands[input.Index].Run(&common.ActionInput{Type: website.EventGUI})
-		return fmt.Sprintf("Command Triggered: %s", input.Real.Commands[input.Index].Name), http.StatusOK
+		return "Command Triggered: " + input.Real.Commands[input.Index].Name, http.StatusOK
 	} else if len(input.Post.Commands) > input.Index { // check POST input for "new" command.
 		input.Post.Commands[input.Index].Setup(input.Real.Logger, input.Real.Services.Website)
 
@@ -36,5 +36,5 @@ func testCustomCommand(ctx context.Context, cmd *commands.Command) (string, int)
 		return fmt.Sprintf("Command Failed! Error: %v", err), http.StatusInternalServerError
 	}
 
-	return fmt.Sprintf("Command Successful! Output: %s", output), http.StatusOK
+	return "Command Successful! Output: " + output, http.StatusOK
 }
