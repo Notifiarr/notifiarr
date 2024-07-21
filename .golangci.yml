@@ -9,7 +9,6 @@ linters:
     - execinquery
     # unused
     - exhaustruct
-    - exhaustive
     - dupl
     - nlreturn
     - godot # does not work with annotations.

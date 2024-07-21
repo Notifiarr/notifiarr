@@ -22,7 +22,7 @@ import (
 
 // Corruption initializes a corruption check for all instances of the provided app.
 func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
-	switch app {
+	switch app { //nolint:exhaustive // We only check starr apps.
 	default:
 		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
 	case "":
