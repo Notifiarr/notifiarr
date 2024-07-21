@@ -111,7 +111,8 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 	}
 }
 
-func (c *Client) getFuncMap() template.FuncMap { //nolint:funlen,cyclop
+//nolint:funlen,cyclop,nonamedreturns
+func (c *Client) getFuncMap() template.FuncMap {
 	title := cases.Title(language.AmericanEnglish)
 
 	return template.FuncMap{

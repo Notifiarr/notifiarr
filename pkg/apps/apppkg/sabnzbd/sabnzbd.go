@@ -271,13 +271,15 @@ type SabNZBDate struct {
 }
 
 // UnmarshalJSON exists because weird date formats and "unknown" seem sane in json output.
-func (s *SabNZBDate) UnmarshalJSON(b []byte) (err error) {
+func (s *SabNZBDate) UnmarshalJSON(b []byte) error {
 	s.String = strings.Trim(string(b), `"`)
 
 	if s.String == "unknown" {
 		s.Time = time.Now().Add(time.Hour * 24 * 366) //nolint:mnd
 		return nil
 	}
+
+	var err error
 
 	s.Time, err = time.Parse("15:04 Mon 02 Jan 2006", s.String+" "+strconv.Itoa(time.Now().Year()))
 	if err != nil {
@@ -288,7 +290,7 @@ func (s *SabNZBDate) UnmarshalJSON(b []byte) (err error) {
 }
 
 // UnmarshalJSON exists because someone decided that bytes should be strings with letters.
-func (s *SabNZBSize) UnmarshalJSON(b []byte) (err error) {
+func (s *SabNZBSize) UnmarshalJSON(b []byte) error {
 	s.String = strings.Trim(string(b), `"`)
 	split := strings.Split(s.String, " ")
 

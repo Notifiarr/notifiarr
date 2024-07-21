@@ -48,7 +48,7 @@ func (s *Service) checkPingValues(icmp bool) error {
 	return nil
 }
 
-func (s *Service) fillPingExpect(icmp bool) (err error) {
+func (s *Service) fillPingExpect(icmp bool) error {
 	s.svc.ping = &pingExpect{
 		icmp: icmp,
 	}
@@ -58,6 +58,7 @@ func (s *Service) fillPingExpect(icmp bool) (err error) {
 		return ErrPingExpect
 	}
 
+	var err error
 	if s.svc.ping.count, err = strconv.Atoi(splitStr[0]); err != nil {
 		return fmt.Errorf("invalid packet send count: %s: %w", splitStr[0], err)
 	}

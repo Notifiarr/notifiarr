@@ -63,8 +63,10 @@ func (n NullString) MarshalJSON() ([]byte, error) {
 }
 
 // GetMySQL grabs the process list from a bunch of servers.
-func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit int) (errs []error) {
+func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit int) []error {
 	s.MySQL = make(map[string]*MySQLServerData)
+
+	var errs []error
 
 	for _, server := range servers {
 		if server.Host == "" {

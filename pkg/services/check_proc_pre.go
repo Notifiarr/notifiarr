@@ -37,7 +37,7 @@ func (s *Service) checkProcValues() error {
 	return nil
 }
 
-func (s *Service) fillExpect() (err error) {
+func (s *Service) fillExpect() error {
 	s.svc.proc = &procExpect{}
 
 	splitStr := strings.Split(s.Expect, ",")
@@ -66,9 +66,11 @@ func (s *Service) fillExpect() (err error) {
 }
 
 // check Value for regex and attempt to compile it for later use.
-func (s *Service) fillExpectRegex() (err error) {
+func (s *Service) fillExpectRegex() error {
 	// Denote a regex by providing a string with slahes at each end.
 	if s.Value[0] == '/' && len(s.Value) > 2 && s.Value[len(s.Value)-1] == '/' {
+		var err error
+
 		s.svc.proc.checkRE, err = regexp.Compile(s.Value[1 : len(s.Value)-1]) // strip slashes.
 		if err != nil {
 			return fmt.Errorf("invalid regex %s: %w", s.Value[1:len(s.Value)-1], err)
@@ -78,7 +80,9 @@ func (s *Service) fillExpectRegex() (err error) {
 	return nil
 }
 
-func (s *Service) fillExpectCounts(str string) (err error) {
+func (s *Service) fillExpectCounts(str string) error {
+	var err error
+
 	countSplit := strings.Split(str, ":")
 	if len(countSplit) > 1 {
 		if s.svc.proc.countMin, err = strconv.Atoi(countSplit[1]); err != nil {

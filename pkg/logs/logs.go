@@ -106,12 +106,14 @@ func (l *Logger) SetupLogging(config *LogConfig) {
 }
 
 // Rotate rotates the log files. If called on a custom log, only rotates that log file.
-func (l *Logger) Rotate() (errors []error) {
+func (l *Logger) Rotate() []error {
 	if l.custom != nil {
 		if _, err := l.custom.Rotate(); err != nil {
 			return []error{fmt.Errorf("rotating Custom Log: %w", err)}
 		}
 	}
+
+	var errors []error
 
 	for name, logger := range map[string]*rotatorr.Logger{
 		"HTTP":  l.web,
@@ -135,10 +137,12 @@ func (l *Logger) Rotate() (errors []error) {
 }
 
 // Close closes all open log files. Does not work on custom logs.
-func (l *Logger) Close() (errors []error) {
+func (l *Logger) Close() []error {
 	if l.custom != nil {
 		return []error{ErrCloseCustom}
 	}
+
+	var errors []error
 
 	for name, logger := range map[string]*rotatorr.Logger{
 		"HTTP":  l.web,

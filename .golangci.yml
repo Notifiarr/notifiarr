@@ -12,7 +12,6 @@ linters:
     - exhaustive
     - dupl
     - nlreturn
-    - nonamedreturns
     - godot # does not work with annotations.
     - musttag # broken in 1.59.
     - depguard

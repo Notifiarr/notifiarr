@@ -25,20 +25,22 @@ type AllowedIPs struct {
 var _ = fmt.Stringer(AllowedIPs{})
 
 // String turns a list of allowedIPs into a printable masterpiece.
-func (n AllowedIPs) String() (s string) {
+func (n AllowedIPs) String() string {
 	if len(n.Nets) < 1 {
 		return "(none)"
 	}
 
+	var output string
+
 	for i := range n.Nets {
-		if s != "" {
-			s += ", "
+		if output != "" {
+			output += ", "
 		}
 
-		s += n.Nets[i].String()
+		output += n.Nets[i].String()
 	}
 
-	return s
+	return output
 }
 
 // Contains returns true if an IP is allowed.

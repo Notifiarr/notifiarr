@@ -221,13 +221,13 @@ func (s *Snapshot) getIoStat(ctx context.Context, run bool) error {
 }
 
 // getIoStat2 works on most platforms, but returns unusual data.
-func (s *Snapshot) getIoStat2(ctx context.Context, run bool) (err error) {
+func (s *Snapshot) getIoStat2(ctx context.Context, run bool) error {
 	if !run {
 		return nil
 	}
 
-	s.IOStat2, err = disk.IOCountersWithContext(ctx)
-	if err != nil {
+	var err error
+	if s.IOStat2, err = disk.IOCountersWithContext(ctx); err != nil {
 		return fmt.Errorf("disk IO counters: %w", err)
 	}
 
