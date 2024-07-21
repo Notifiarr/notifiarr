@@ -2,6 +2,7 @@ package clientinfo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"runtime"
@@ -120,7 +121,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo { //nolint:fun
 
 	host, err := c.GetHostInfo(ctx)
 	if err == nil {
-		err = fmt.Errorf("") //nolint:goerr113
+		err = errors.New("") //nolint:goerr113
 	}
 
 	split := strings.Split(c.Config.BindAddr, ":")

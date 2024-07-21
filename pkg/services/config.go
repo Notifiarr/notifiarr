@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html"
 	"sync"
@@ -28,11 +29,11 @@ const (
 
 // Errors returned by this Services package.
 var (
-	ErrNoName      = fmt.Errorf("service check is missing a unique name")
-	ErrNoCheck     = fmt.Errorf("service check is missing a check value")
+	ErrNoName      = errors.New("service check is missing a unique name")
+	ErrNoCheck     = errors.New("service check is missing a check value")
 	ErrInvalidType = fmt.Errorf("service check type must be one of %s, %s, %s, %s, %s",
 		CheckTCP, CheckHTTP, CheckPROC, CheckPING, CheckICMP)
-	ErrBadTCP = fmt.Errorf("tcp checks must have an ip:port or host:port combo; the :port is required")
+	ErrBadTCP = errors.New("tcp checks must have an ip:port or host:port combo; the :port is required")
 )
 
 // Config for this Services plugin comes from a config file.

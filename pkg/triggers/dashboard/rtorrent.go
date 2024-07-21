@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"time"
@@ -9,7 +10,7 @@ import (
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
-var ErrInvalidResponse = fmt.Errorf("invalid response")
+var ErrInvalidResponse = errors.New("invalid response")
 
 func (c *Cmd) getRtorrentStates() []*State {
 	states := []*State{}

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,7 +16,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-var ErrUnknownByteType = fmt.Errorf("unknown byte type")
+var ErrUnknownByteType = errors.New("unknown byte type")
 
 type Config struct {
 	URL          string `toml:"url"     xml:"url"`

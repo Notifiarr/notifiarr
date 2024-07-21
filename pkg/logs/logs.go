@@ -47,7 +47,7 @@ var (
 
 // Custom errors.
 var (
-	ErrCloseCustom = fmt.Errorf("cannot close custom logs directly")
+	ErrCloseCustom = errors.New("cannot close custom logs directly")
 )
 
 // satisfy gomnd.

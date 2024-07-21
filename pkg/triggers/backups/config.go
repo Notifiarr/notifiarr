@@ -2,7 +2,7 @@ package backups
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -27,7 +27,7 @@ type cmd struct {
 
 // Errors returned by this package.
 var (
-	ErrNoDBInBackup = fmt.Errorf("no database file found in backup")
+	ErrNoDBInBackup = errors.New("no database file found in backup")
 )
 
 // Intervals at which these apps database backups are checked for corruption.

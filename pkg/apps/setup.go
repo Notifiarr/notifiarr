@@ -56,21 +56,21 @@ type ExtraConfig struct {
 
 // Errors sent to client web requests.
 var (
-	ErrNoTMDB     = fmt.Errorf("TMDB ID must not be empty")
-	ErrNoGRID     = fmt.Errorf("GRID ID must not be empty")
-	ErrNoTVDB     = fmt.Errorf("TVDB ID must not be empty")
-	ErrNoMBID     = fmt.Errorf("MBID ID must not be empty")
+	ErrNoTMDB     = errors.New("TMDB ID must not be empty")
+	ErrNoGRID     = errors.New("GRID ID must not be empty")
+	ErrNoTVDB     = errors.New("TVDB ID must not be empty")
+	ErrNoMBID     = errors.New("MBID ID must not be empty")
 	ErrNoRadarr   = fmt.Errorf("configured %s ID not found", starr.Radarr)
 	ErrNoSonarr   = fmt.Errorf("configured %s ID not found", starr.Sonarr)
 	ErrNoLidarr   = fmt.Errorf("configured %s ID not found", starr.Lidarr)
 	ErrNoReadarr  = fmt.Errorf("configured %s ID not found", starr.Readarr)
 	ErrNoProwlarr = fmt.Errorf("configured %s ID not found", starr.Prowlarr)
-	ErrNotFound   = fmt.Errorf("the request returned an empty payload")
-	ErrNonZeroID  = fmt.Errorf("provided ID must be non-zero")
+	ErrNotFound   = errors.New("the request returned an empty payload")
+	ErrNonZeroID  = errors.New("provided ID must be non-zero")
 	// ErrWrongCount is returned when an app returns the wrong item count.
-	ErrWrongCount = fmt.Errorf("wrong item count returned")
-	ErrInvalidApp = fmt.Errorf("invalid application configuration provided")
-	ErrRateLimit  = fmt.Errorf("rate limit reached")
+	ErrWrongCount = errors.New("wrong item count returned")
+	ErrInvalidApp = errors.New("invalid application configuration provided")
+	ErrRateLimit  = errors.New("rate limit reached")
 )
 
 // Setup creates request interfaces and sets the timeout for each server.

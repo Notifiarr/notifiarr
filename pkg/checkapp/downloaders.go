@@ -42,7 +42,7 @@ func testRtorrent(_ context.Context, config *apps.RtorrentConfig) (string, int) 
 	}
 
 	if name, ok := result.(string); ok {
-		return fmt.Sprintf("Connection Successful! Server name: %s", name), http.StatusOK
+		return "Connection Successful! Server name: " + name, http.StatusOK
 	}
 
 	return "Getting Server Name: result was not a string?", http.StatusBadGateway
@@ -94,5 +94,5 @@ func testTransmission(ctx context.Context, config *apps.XmissionConfig) (string,
 		return "Getting Server Version: " + err.Error(), http.StatusBadGateway
 	}
 
-	return fmt.Sprintln("Transmission Server version:", *args.Version), http.StatusOK
+	return "Transmission Server version: " + *args.Version, http.StatusOK
 }

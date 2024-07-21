@@ -87,7 +87,7 @@ func (c *cmd) uploadFile(_ context.Context, event website.EventType, fileName st
 	c.SendData(&website.Request{
 		Route:  website.UploadRoute,
 		Event:  event,
-		LogMsg: fmt.Sprintf("Upload file %s", fileName),
+		LogMsg: "Upload file " + fileName,
 		UploadFile: &website.UploadFile{
 			FileName:   filepath.Base(fileName),
 			ReadCloser: file,

@@ -3,6 +3,7 @@ package website
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -26,10 +27,10 @@ const (
 
 // Errors returned by this library.
 var (
-	ErrNon200          = fmt.Errorf("return code was not 200")
-	ErrInvalidResponse = fmt.Errorf("invalid response")
-	ErrNoChannel       = fmt.Errorf("the website send-data channel is closed")
-	ErrInvalidAPIKey   = fmt.Errorf("configured notifiarr API key is invalid")
+	ErrNon200          = errors.New("return code was not 200")
+	ErrInvalidResponse = errors.New("invalid response")
+	ErrNoChannel       = errors.New("the website send-data channel is closed")
+	ErrInvalidAPIKey   = errors.New("configured notifiarr API key is invalid")
 )
 
 // Config is the input data needed to send payloads to notifiarr.

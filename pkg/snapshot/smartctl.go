@@ -3,6 +3,7 @@ package snapshot
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"path"
 	"runtime"
@@ -17,7 +18,7 @@ import (
 )
 
 // ErrNoDisks is returned when no disks are found.
-var ErrNoDisks = fmt.Errorf("no disks found")
+var ErrNoDisks = errors.New("no disks found")
 
 func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) (errs []error) {
 	if !run {

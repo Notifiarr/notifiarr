@@ -9,6 +9,7 @@ package plex
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -48,7 +49,7 @@ func (s *Server) Name() string {
 }
 
 // ErrNoURLToken is returned when there is no token or URL.
-var ErrNoURLToken = fmt.Errorf("token or URL for Plex missing")
+var ErrNoURLToken = errors.New("token or URL for Plex missing")
 
 func (s *Server) getPlexURL(ctx context.Context, url string, params url.Values) ([]byte, error) {
 	return s.reqPlexURL(ctx, url, http.MethodGet, params, nil)

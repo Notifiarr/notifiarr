@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -11,9 +12,9 @@ import (
 
 // Custom errors.
 var (
-	ErrPingExpect    = fmt.Errorf("ping/icmp expect must contain three integers separated by two colons. ex: 3:2:500")
-	ErrNoPingVal     = fmt.Errorf("ping or icmp 'check' must not be empty")
-	ErrPingCountZero = fmt.Errorf("none of the ping expect values may be set to 0")
+	ErrPingExpect    = errors.New("ping/icmp expect must contain three integers separated by two colons. ex: 3:2:500")
+	ErrNoPingVal     = errors.New("ping or icmp 'check' must not be empty")
+	ErrPingCountZero = errors.New("none of the ping expect values may be set to 0")
 )
 
 /*

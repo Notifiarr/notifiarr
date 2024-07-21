@@ -14,7 +14,6 @@ linters:
     - nlreturn
     - nonamedreturns
     - godot # does not work with annotations.
-    - perfsprint
     - musttag # broken in 1.59.
     - depguard
 run:

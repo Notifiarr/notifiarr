@@ -2,6 +2,7 @@ package filewatch
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -19,8 +20,8 @@ import (
 )
 
 var (
-	ErrInvalidRegexp = fmt.Errorf("invalid regexp")
-	ErrIgnoredLog    = fmt.Errorf("the requested path is internally ignored")
+	ErrInvalidRegexp = errors.New("invalid regexp")
+	ErrIgnoredLog    = errors.New("the requested path is internally ignored")
 )
 
 const (

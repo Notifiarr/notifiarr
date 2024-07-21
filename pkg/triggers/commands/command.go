@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -17,7 +18,7 @@ import (
 	"github.com/hugelgupf/go-shlex"
 )
 
-var ErrDisabled = fmt.Errorf("the command is disabled due to an error")
+var ErrDisabled = errors.New("the command is disabled due to an error")
 
 const hashLen = 64
 

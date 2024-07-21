@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -11,10 +12,10 @@ import (
 
 // Custom errors.
 var (
-	ErrProcExpect = fmt.Errorf("invalid process expect type")
-	ErrNoProcVal  = fmt.Errorf("process 'check' must not be empty")
-	ErrCountZero  = fmt.Errorf("process 'count' may not be used with 'running'")
-	ErrBSDRestart = fmt.Errorf("process 'restart' check does not work on FreeBSD") // one day.
+	ErrProcExpect = errors.New("invalid process expect type")
+	ErrNoProcVal  = errors.New("process 'check' must not be empty")
+	ErrCountZero  = errors.New("process 'count' may not be used with 'running'")
+	ErrBSDRestart = errors.New("process 'restart' check does not work on FreeBSD") // one day.
 )
 
 /*
