@@ -18,11 +18,11 @@ import (
 )
 
 // TrigAutoUpdate is our auto update trigger identifier.
-const TrigAutoUpdate common.TriggerName = "Automatically checking for application update."
+const TrigAutoUpdate common.TriggerName = "Automatically check for application update."
 
 const (
 	minimumUpdateDur = 1 * time.Hour
-	// WaitTime is how long we wait, after startup, before doing an update check.
+	// waitTime is how long we wait, after startup, before doing an update check.
 	waitTime = 6 * time.Minute
 )
 
@@ -118,7 +118,7 @@ func (c *cmd) create() {
 		pfx = "Unstable"
 	}
 
-	c.Printf("==> %s Channel: Client Auto-updater started. Check interval: %s",
+	c.Printf("==> Client auto-updater started. %s channel check interval: %s",
 		pfx, durafmt.Parse(dur).LimitFirstN(3)) //nolint:mnd
 
 	c.Add(&common.Action{

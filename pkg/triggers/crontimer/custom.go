@@ -173,7 +173,7 @@ func (c *cmd) startWebsitePoller() {
 }
 
 // PollUpCheck just tells the website the client is still up. It doesn't process the return payload.
-func (c *cmd) PollUpCheck(ctx context.Context, input *common.ActionInput) {
+func (c *cmd) PollUpCheck(_ context.Context, input *common.ActionInput) {
 	_, err := c.GetData(&website.Request{
 		Route:      website.ClientRoute,
 		Event:      website.EventCheck,
