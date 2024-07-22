@@ -30,12 +30,17 @@ var (
 func (l *Logger) setDefaultLogPaths() {
 	// Make sure log file paths exist if AppName is provided; this indicates GUI OS.
 	if l.LogConfig.AppName != "" {
+		base := ".notifiarr" // windows and macos
+		if mnd.IsLinux {
+			base = ".config/notifiarr" // linux desktop
+		}
+
 		if l.LogConfig.LogFile == "" {
-			l.LogConfig.LogFile = filepath.Join("~", ".notifiarr", l.LogConfig.AppName+defExt)
+			l.LogConfig.LogFile = filepath.Join("~", base, l.LogConfig.AppName+defExt)
 		}
 
 		if l.LogConfig.HTTPLog == "" {
-			l.LogConfig.HTTPLog = filepath.Join("~", ".notifiarr", l.LogConfig.AppName+httpExt)
+			l.LogConfig.HTTPLog = filepath.Join("~", base, l.LogConfig.AppName+httpExt)
 		}
 	}
 }

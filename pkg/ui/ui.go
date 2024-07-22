@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 
@@ -34,7 +33,7 @@ func GetPNG() string {
 		}
 	}
 
-	data, err := bindata.Asset("files/favicon.png")
+	data, err := bindata.Asset("files/images/favicon.png")
 	if err != nil {
 		return ""
 	}
@@ -51,15 +50,14 @@ func GetPNG() string {
 	file, err := os.Stat(pngPath)
 	if err != nil || file.Size() < minimumFileSize || file.Size() > maximumFileSize {
 		// File does not exist, or not within 1% of correct size. Overwrite it.
-		if err := os.WriteFile(pngPath, data, mnd.Mode0644); err != nil {
+		if err = os.WriteFile(pngPath, data, mnd.Mode0644); err != nil {
 			return ""
 		}
 	}
 
 	pngPathCache = pngPath // Save it for next time.
 
-	// TODO: comment this debug log, and remove the TODO.
-	go log.Println("minmaxsize", minimumFileSize, maximumFileSize, file.Size(), len(data))
+	// go log.Println("minmaxsize", minimumFileSize, maximumFileSize, file.Size(), len(data))
 
 	return pngPath
 }

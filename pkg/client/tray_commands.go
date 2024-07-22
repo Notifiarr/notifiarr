@@ -148,7 +148,10 @@ func (c *Client) openGUI() {
 
 	// This always has a colon, or the app will not start.
 	port := strings.Split(c.Config.BindAddr, ":")[1]
-	go ui.OpenURL(uri + ":" + port + c.Config.URLBase) //nolint:errcheck
+	err := ui.OpenURL(uri + ":" + port + c.Config.URLBase)
+	if err != nil {
+		c.Errorf("Opening URL: %v", err)
+	}
 }
 
 func (c *Client) updatePassword(ctx context.Context) {

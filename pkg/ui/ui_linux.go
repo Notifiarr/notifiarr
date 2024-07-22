@@ -20,13 +20,13 @@ var (
 )
 
 func getOpener() string {
-	if env := os.Getenv("FILE_OPENER"); env != "" {
-		return env
+	if path := os.Getenv("FILE_OPENER"); path != "" {
+		return path
 	} else if path, err := exec.LookPath("xdg-open"); err != nil {
 		return path
-	} else if path, err := exec.LookPath("gnome-open"); err != nil {
+	} else if path, err = exec.LookPath("gnome-open"); err != nil {
 		return path
-	} else if path, err := exec.LookPath("slopen"); err != nil {
+	} else if path, err = exec.LookPath("slopen"); err != nil {
 		return path
 	}
 
@@ -53,7 +53,7 @@ func StartCmd(c string, v ...string) error {
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
-	return cmd.Run() //nolint:wrapcheck
+	return cmd.Start() //nolint:wrapcheck
 }
 
 // OpenCmd opens anything.

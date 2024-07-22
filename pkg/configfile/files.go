@@ -5,21 +5,25 @@ import (
 	"runtime"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
 // First string is default config file.
 // It is created (later) if no config files are found.
 func defaultLocactions() (string, []string) {
-	defaultConf := ""
+	defaultLinuxConf := ""
 
 	if mnd.IsDocker {
 		// Provide a default config on Docker if /config dir exists.
 		if f, err := os.Stat("/config"); err == nil && f.IsDir() {
-			defaultConf = "/config/notifiarr.conf"
+			defaultLinuxConf = "/config/notifiarr.conf"
 		}
 	} else if mnd.IsSynology {
 		// Provide a default config on Synology.
-		defaultConf = "/etc/notifiarr/notifiarr.conf"
+		defaultLinuxConf = "/etc/notifiarr/notifiarr.conf"
+	} else if ui.HasGUI() {
+		// Provide a default config for Linux Desktop users.
+		defaultLinuxConf = "~/.config/notifiarr/notifiarr.conf"
 	}
 
 	switch runtime.GOOS {
@@ -42,7 +46,7 @@ func defaultLocactions() (string, []string) {
 			"./notifiarr.conf",
 		}
 	case "freebsd", "netbsd", "openbsd":
-		return defaultConf, []string{
+		return defaultLinuxConf, []string{
 			"/usr/local/etc/notifiarr/notifiarr.conf",
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",
 			"/etc/notifiarr/notifiarr.conf",
@@ -54,16 +58,17 @@ func defaultLocactions() (string, []string) {
 	case "android", "dragonfly", "linux", "nacl", "plan9", "solaris":
 		fallthrough
 	default:
-		return defaultConf, []string{
+		return defaultLinuxConf, []string{
+			"./notifiarr.conf",
+			"~/.config/notifiarr/notifiarr.conf",
+			"~/.notifiarr/notifiarr.conf",
+			"~/.dnclient/dnclient.conf",
 			"/etc/notifiarr/notifiarr.conf",
 			"/etc/discordnotifier-client/dnclient.conf",
 			"/config/notifiarr.conf",
 			"/config/dnclient.conf",
 			"/usr/local/etc/notifiarr/notifiarr.conf",
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",
-			"~/.notifiarr/notifiarr.conf",
-			"~/.dnclient/dnclient.conf",
-			"./notifiarr.conf",
 		}
 	}
 }

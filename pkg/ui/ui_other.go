@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"runtime"
 )
@@ -17,14 +16,12 @@ var ErrUnsupported = errors.New("unsupported OS")
 // SystrayIcon is the icon in the system tray or task bar.
 const SystrayIcon = "files/images/favicon.png"
 
-//nolint:gochecknoglobals
-var hasGUI = os.Getenv("USEGUI") == "true" && runtime.GOOS == "linux"
-
-// HasGUI tries to determine if the app was invoked as a GUI app.
+// HasGUI returns false on this OS.
 func HasGUI() bool {
-	return hasGUI
+	return false
 }
 
+// Toast does not do anything on this OS.
 func Toast(_ string, _ ...interface{}) error {
 	return nil
 }
