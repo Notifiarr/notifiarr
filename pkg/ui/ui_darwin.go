@@ -14,9 +14,6 @@ import (
 // SystrayIcon is the icon in the menu bar.
 const SystrayIcon = "files/images/macos.png"
 
-//nolint:gochecknoglobals
-var hasGUI = os.Getenv("USEGUI") == "true"
-
 // HasGUI returns true on macOS if USEGUI env var is true.
 func HasGUI() bool {
 	return hasGUI
@@ -57,7 +54,7 @@ func StartCmd(command string, args ...string) error {
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {
-	return StartCmd("open", cmd...)
+	return StartCmd(opener, cmd...)
 }
 
 // OpenURL opens URL Links.

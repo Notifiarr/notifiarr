@@ -40,7 +40,7 @@ func StartCmd(command string, args ...string) error {
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {
-	return StartCmd("cmd", append([]string{"/c", "start"}, cmd...)...)
+	return StartCmd(opener, append([]string{"/c", "start"}, cmd...)...)
 }
 
 // OpenURL opens URL Links.

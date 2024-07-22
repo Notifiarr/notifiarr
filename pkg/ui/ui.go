@@ -2,6 +2,7 @@ package ui
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
@@ -9,9 +10,15 @@ import (
 	"github.com/kardianos/osext"
 )
 
-// pngPathCache caches the path to the application icon.
-// Do not use this variable directly. Call GetPNG()
-var pngPathCache = "" //nolint:gochecknoglobals
+//nolint:gochecknoglobals
+var (
+	// pngPathCache caches the path to the application icon.
+	// Do not use this variable directly. Call GetPNG()
+	pngPathCache = ""
+	// hasGUI is used on Linux and Darwin.
+	hasGUI = os.Getenv("USEGUI") == "true" //nolint:unused,nolintlint
+	opener = getOpener()
+)
 
 // GetPNG purposely returns an empty string when there is no verified file.
 // This is used to give the toast notification an icon.
@@ -60,4 +67,25 @@ func GetPNG() string {
 	// go log.Println("minmaxsize", minimumFileSize, maximumFileSize, file.Size(), len(data))
 
 	return pngPath
+}
+
+// getOpener returns the app that can open a file or url in a GUI.
+func getOpener() string {
+	if mnd.IsWindows {
+		return "cmd"
+	} else if mnd.IsDarwin {
+		return "open"
+	}
+
+	if path := os.Getenv("FILE_OPENER"); path != "" {
+		return path
+	} else if path, _ := exec.LookPath("xdg-open"); path != "" {
+		return path
+	} else if path, _ = exec.LookPath("gnome-open"); path != "" {
+		return path
+	} else if path, _ = exec.LookPath("slopen"); path != "" {
+		return path
+	}
+
+	return "xdg-open" // Is there a better default?
 }
