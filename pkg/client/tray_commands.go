@@ -148,8 +148,7 @@ func (c *Client) openGUI() {
 
 	// This always has a colon, or the app will not start.
 	port := strings.Split(c.Config.BindAddr, ":")[1]
-	err := ui.OpenURL(uri + ":" + port + c.Config.URLBase)
-	if err != nil {
+	if err := ui.OpenURL(uri + ":" + port + c.Config.URLBase); err != nil {
 		c.Errorf("Opening URL: %v", err)
 	}
 }

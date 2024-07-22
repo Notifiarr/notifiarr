@@ -10,18 +10,19 @@ import (
 
 // First string is default config file.
 // It is created (later) if no config files are found.
-func defaultLocactions() (string, []string) {
+func defaultLocactions() (string, []string) { //nolint:cyclop,funlen
 	defaultLinuxConf := ""
 
-	if mnd.IsDocker {
+	switch {
+	case mnd.IsDocker:
 		// Provide a default config on Docker if /config dir exists.
 		if f, err := os.Stat("/config"); err == nil && f.IsDir() {
 			defaultLinuxConf = "/config/notifiarr.conf"
 		}
-	} else if mnd.IsSynology {
+	case mnd.IsSynology:
 		// Provide a default config on Synology.
 		defaultLinuxConf = "/etc/notifiarr/notifiarr.conf"
-	} else if ui.HasGUI() {
+	case ui.HasGUI():
 		// Provide a default config for Linux Desktop users.
 		defaultLinuxConf = "~/.config/notifiarr/notifiarr.conf"
 	}
