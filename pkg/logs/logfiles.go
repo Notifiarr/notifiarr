@@ -29,10 +29,10 @@ var (
 // These are enforced on GUI OSes (like macOS.app and Windows).
 func (l *Logger) setDefaultLogPaths() {
 	// Make sure log file paths exist if AppName is provided; this indicates GUI OS.
-	if l.LogConfig.AppName != "" {
+	if l.LogConfig.AppName != "" { // This only happens if ui.HasGUI() is true.
 		base := ".notifiarr" // windows and macos
-		if mnd.IsLinux {
-			base = ".config/notifiarr" // linux desktop
+		if !mnd.IsWindows && !mnd.IsDarwin {
+			base = ".config/notifiarr" // *nix desktop
 		}
 
 		if l.LogConfig.LogFile == "" {

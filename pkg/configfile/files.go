@@ -11,20 +11,20 @@ import (
 // First string is default config file.
 // It is created (later) if no config files are found.
 func defaultLocactions() (string, []string) { //nolint:cyclop,funlen
-	defaultLinuxConf := ""
+	defaultUnixConf := ""
 
 	switch {
 	case mnd.IsDocker:
 		// Provide a default config on Docker if /config dir exists.
 		if f, err := os.Stat("/config"); err == nil && f.IsDir() {
-			defaultLinuxConf = "/config/notifiarr.conf"
+			defaultUnixConf = "/config/notifiarr.conf"
 		}
 	case mnd.IsSynology:
 		// Provide a default config on Synology.
-		defaultLinuxConf = "/etc/notifiarr/notifiarr.conf"
+		defaultUnixConf = "/etc/notifiarr/notifiarr.conf"
 	case ui.HasGUI():
-		// Provide a default config for Linux Desktop users.
-		defaultLinuxConf = "~/.config/notifiarr/notifiarr.conf"
+		// Provide a default config for *nix Desktop users.
+		defaultUnixConf = "~/.config/notifiarr/notifiarr.conf"
 	}
 
 	switch runtime.GOOS {
@@ -47,7 +47,7 @@ func defaultLocactions() (string, []string) { //nolint:cyclop,funlen
 			"./notifiarr.conf",
 		}
 	case "freebsd", "netbsd", "openbsd":
-		return defaultLinuxConf, []string{
+		return defaultUnixConf, []string{
 			"/usr/local/etc/notifiarr/notifiarr.conf",
 			"/usr/local/etc/discordnotifier-client/dnclient.conf",
 			"/etc/notifiarr/notifiarr.conf",
@@ -59,7 +59,7 @@ func defaultLocactions() (string, []string) { //nolint:cyclop,funlen
 	case "android", "dragonfly", "linux", "nacl", "plan9", "solaris":
 		fallthrough
 	default:
-		return defaultLinuxConf, []string{
+		return defaultUnixConf, []string{
 			"./notifiarr.conf",
 			"~/.config/notifiarr/notifiarr.conf",
 			"~/.notifiarr/notifiarr.conf",

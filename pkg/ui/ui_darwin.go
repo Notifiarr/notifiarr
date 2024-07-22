@@ -17,7 +17,7 @@ const SystrayIcon = "files/images/macos.png"
 //nolint:gochecknoglobals
 var hasGUI = os.Getenv("USEGUI") == "true"
 
-// HasGUI returns false on Linux, true on Windows and optional on macOS.
+// HasGUI returns true on macOS if USEGUI env var is true.
 func HasGUI() bool {
 	return hasGUI
 }
@@ -47,8 +47,8 @@ func Toast(msg string, vars ...interface{}) error {
 }
 
 // StartCmd starts a command.
-func StartCmd(c string, v ...string) error {
-	cmd := exec.Command(c, v...)
+func StartCmd(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 

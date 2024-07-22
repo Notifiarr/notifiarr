@@ -1,4 +1,6 @@
-//go:build !windows && !darwin && !linux
+//go:build !windows && !darwin && !linux && !freebsd
+
+/* Not sure what OS this will get. */
 
 package ui
 
@@ -27,8 +29,8 @@ func Toast(_ string, _ ...interface{}) error {
 }
 
 // StartCmd starts a command.
-func StartCmd(c string, v ...string) error {
-	cmd := exec.Command(c, v...)
+func StartCmd(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
@@ -42,15 +44,15 @@ func OpenCmd(cmd ...string) error {
 
 // OpenURL opens URL Links.
 func OpenURL(url string) error {
-	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, url)
+	return OpenCmd(url)
 }
 
 // OpenLog opens Log Files.
 func OpenLog(logFile string) error {
-	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, logFile)
+	return OpenCmd(logFile)
 }
 
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
-	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, filePath)
+	return OpenCmd(filePath)
 }
