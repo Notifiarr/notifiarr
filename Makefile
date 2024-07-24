@@ -268,7 +268,7 @@ package_build_linux_rpm: readme man linux notifiarr.conf.example
 	cp *.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
+	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
@@ -282,7 +282,7 @@ package_build_linux_deb: readme man linux notifiarr.conf.example
 	cp *.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE *.html examples/*?.?* $@/usr/share/doc/notifiarr/
+	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/deb" ] || cp -r init/linux/deb/* $@
@@ -324,7 +324,7 @@ package_build_freebsd: readme man freebsd notifiarr.conf.example
 	cp *.1.gz $@/usr/local/share/man/man1
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/notifiarr.conf
-	cp LICENSE *.html examples/*?.?* $@/usr/local/share/doc/notifiarr/
+	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/local/share/doc/notifiarr/
 	mkdir -p $@/usr/local/etc/rc.d
 	cp init/bsd/freebsd.rc.d $@/usr/local/etc/rc.d/notifiarr
 	chmod +x $@/usr/local/etc/rc.d/notifiarr
@@ -384,4 +384,4 @@ install: man readme notifiarr
 	/usr/bin/install -m 0644 -cp notifiarr.1.gz $(PREFIX)/share/man/man1
 	/usr/bin/install -m 0644 -cp examples/notifiarr.conf.example $(ETC)/notifiarr/
 	[ -f $(ETC)/notifiarr/notifiarr.conf ] || /usr/bin/install -m 0644 -cp examples/notifiarr.conf.example $(ETC)/notifiarr/notifiarr.conf
-	/usr/bin/install -m 0644 -cp LICENSE *.html examples/* $(PREFIX)/share/doc/notifiarr/
+	/usr/bin/install -m 0644 -cp LICENSE *.html examples/* pkg/bindata/files/images/logo/notifiarr.png $(PREFIX)/share/doc/notifiarr/

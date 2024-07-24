@@ -12,7 +12,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/hako/durafmt"
-	"github.com/kardianos/osext"
 	"golift.io/cnfg"
 	"golift.io/version"
 )
@@ -167,7 +166,7 @@ func (c *cmd) updateNow(ctx context.Context, u *update.Update, msg website.Event
 		Path:   os.Args[0],
 	}
 
-	if path, err := osext.Executable(); err == nil {
+	if path, err := os.Executable(); err == nil {
 		cmd.Path = path
 	}
 

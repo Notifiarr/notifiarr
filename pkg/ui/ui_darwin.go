@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/kardianos/osext"
 )
 
 // SystrayIcon is the icon in the menu bar.
@@ -25,10 +24,10 @@ func Toast(msg string, vars ...interface{}) error {
 	}
 
 	// This finds terminal-notifier inside this app or in your PATH.
-	app, err := osext.ExecutableFolder()
+	app, err := os.Executable()
 	if err != nil {
 		return fmt.Errorf("cannot find application running directory: %w", err)
-	} else if filepath.Base(app) == "MacOS" {
+	} else if app = filepath.Dir(app); filepath.Base(app) == "MacOS" {
 		app = filepath.Join(filepath.Dir(app), "Resources", "terminal-notifier.app", "Contents", "MacOS", "terminal-notifier")
 	} else if app, err = exec.LookPath("terminal-notifier"); err != nil {
 		list, _ := os.ReadDir(filepath.Dir(app))
