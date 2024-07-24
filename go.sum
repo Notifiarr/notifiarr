@@ -440,6 +440,8 @@ golift.io/qbit v0.0.0-20240715191156-11930ac2546e h1:JtgHLTF8YPH9fuyHxUYvteJMKyD
 golift.io/qbit v0.0.0-20240715191156-11930ac2546e/go.mod h1:rW0J8ruEeqTiICfWSk54gja8WLqUjNkbcsFN3wVdO94=
 golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7 h1:8reg8mRdLxCz168FaGPf/kVxmDRDc92/Dhub54trdOc=
 golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7/go.mod h1:59bC4ue06MetIY4iiHu3PCqVbzW0leGoCONZhH8dPZ8=
+golift.io/rotatorr v0.0.0-20240723172740-cb73b9c4894c h1:/YAFK+YHhXfx/jdeQ8Hti7iFJKo0BXNwWLPhUj/4MAg=
+golift.io/rotatorr v0.0.0-20240723172740-cb73b9c4894c/go.mod h1:OzsfIeAOPI4rjyv5GU8oOTdfJcq78urn2ncdfg9q/4Y=
 golift.io/starr v1.0.1-0.20240717055349-aa3e015cc8a4 h1:8ijJymuEKA2xvSuRh3/k6G1esCGQxL6RiuFQ4jjN5Kk=
 golift.io/starr v1.0.1-0.20240717055349-aa3e015cc8a4/go.mod h1:hoY+g9EudDC7lbpJxdSjfdxfFMeEtU3ko9BKon0qUrs=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
@@ -512,6 +514,8 @@ modernc.org/gc/v3 v3.0.0-20240304020402-f0dba7c97c2b h1:BnN1t+pb1cy61zbvSUV7SeI0
 modernc.org/gc/v3 v3.0.0-20240304020402-f0dba7c97c2b/go.mod h1:Qz0X07sNOR1jWYCrJMEnbW/X55x206Q7Vt4mz6/wHp4=
 modernc.org/libc v1.54.3 h1:pcPjjPJUHBRIJka4/R6AJ9FvxxuGRy0097QPjSMOdJs=
 modernc.org/libc v1.54.3/go.mod h1:s3b2r/5Fre7gAEhWiMf+X1czfZ9KYx2rz4BBsnUf16E=
+modernc.org/libc v1.55.3 h1:AzcW1mhlPNrRtjS5sS+eW2ISCgSOLLNyFzRh/V3Qj/U=
+modernc.org/libc v1.55.3/go.mod h1:qFXepLhz+JjFThQ4kzwzOjA/y/artDeg+pcYnY+Q83w=
 modernc.org/mathutil v1.6.0 h1:fRe9+AmYlaej+64JsEEhoWuAYBkOtQiMEU7n/XgfYi4=
 modernc.org/mathutil v1.6.0/go.mod h1:Ui5Q9q1TR2gFm0AQRqQUaBWFLAhQpCwNcuhBOSedWPo=
 modernc.org/memory v1.8.0 h1:IqGTL6eFMaDZZhEWwcREgeMXYwmW83LYW8cROZYkg+E=
@@ -522,6 +526,8 @@ modernc.org/sortutil v1.2.0 h1:jQiD3PfS2REGJNzNCMMaLSp/wdMNieTbKX920Cqdgqc=
 modernc.org/sortutil v1.2.0/go.mod h1:TKU2s7kJMf1AE84OoiGppNHJwvB753OYfNl2WRb++Ss=
 modernc.org/sqlite v1.30.2 h1:IPVVkhLu5mMVnS1dQgh3h0SAACRWcVk7aoLP9Us3UCk=
 modernc.org/sqlite v1.30.2/go.mod h1:DUmsiWQDaAvU4abhc/N+djlom/L2o8f7gZ95RCvyoLU=
+modernc.org/sqlite v1.31.1 h1:XVU0VyzxrYHlBhIs1DiEgSl0ZtdnPtbLVy8hSkzxGrs=
+modernc.org/sqlite v1.31.1/go.mod h1:UqoylwmTb9F+IqXERT8bW9zzOWN8qwAIcLdzeBZs4hA=
 modernc.org/strutil v1.2.0 h1:agBi9dp1I+eOnxXeiZawM8F4LawKv4NzGWSaLfyeNZA=
 modernc.org/strutil v1.2.0/go.mod h1:/mdcBmfOibveCTBxUl5B5l6W+TTH1FXPLHZE6bTosX0=
 modernc.org/token v1.1.0 h1:Xl7Ap9dKaEs5kLoOQeQmPWevfnk/DM5qcLcYlA8ys6Y=

@@ -46,11 +46,11 @@ require (
 	golift.io/mulery v0.0.8
 	golift.io/nzbget v0.1.5
 	golift.io/qbit v0.0.0-20240715191156-11930ac2546e
-	golift.io/rotatorr v0.0.0-20230911015553-cd2abbd726c7
+	golift.io/rotatorr v0.0.0-20240723172740-cb73b9c4894c
 	golift.io/starr v1.0.1-0.20240717055349-aa3e015cc8a4
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.2.2
-	modernc.org/sqlite v1.30.2
+	modernc.org/sqlite v1.31.1
 )
 
 require (
@@ -112,7 +112,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	howett.net/plist v1.0.1 // indirect
 	modernc.org/gc/v3 v3.0.0-20240304020402-f0dba7c97c2b // indirect
-	modernc.org/libc v1.54.3 // indirect
+	modernc.org/libc v1.55.3 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
 	modernc.org/strutil v1.2.0 // indirect
