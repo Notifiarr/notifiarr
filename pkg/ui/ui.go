@@ -11,6 +11,7 @@ import (
 
 //nolint:gochecknoglobals
 var (
+	asset = bindata.Asset
 	// pngPathCache caches the path to the application icon.
 	// Do not use this variable directly. Call GetPNG()
 	pngPathCache = ""
@@ -49,7 +50,7 @@ func GetPNG() string {
 		folder = filepath.Dir(folder)
 	}
 
-	data, err := bindata.Asset("files/images/logo/notifiarr.png")
+	data, err := asset(SystrayIcon)
 	if err != nil {
 		return ""
 	}
