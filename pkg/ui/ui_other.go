@@ -15,9 +15,6 @@ import (
 // ErrUnsupported is just an error.
 var ErrUnsupported = errors.New("unsupported OS")
 
-// SystrayIcon is the icon in the system tray or task bar.
-const SystrayIcon = "files/images/favicon.png"
-
 // HasGUI returns false on this gui-unsupported OS.
 func HasGUI() bool {
 	return false

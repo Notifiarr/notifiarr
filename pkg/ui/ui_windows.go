@@ -11,9 +11,6 @@ import (
 	"github.com/gen2brain/beeep"
 )
 
-// SystrayIcon is the icon in the system tray or task bar.
-const SystrayIcon = "files/images/favicon.ico"
-
 // HasGUI always returns true on Windows.
 func HasGUI() bool {
 	return true

@@ -10,9 +10,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-// SystrayIcon is the icon in the menu bar.
-const SystrayIcon = "files/images/macos.png"
-
 // HasGUI returns true on macOS if USEGUI env var is true.
 func HasGUI() bool {
 	return hasGUI
@@ -26,7 +23,7 @@ func Toast(msg string, vars ...interface{}) error {
 	// This finds terminal-notifier inside this app or in your PATH.
 	app, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("cannot find application running directory: %w", err)
+		return fmt.Errorf("cannot find application: %w", err)
 	} else if app = filepath.Dir(app); filepath.Base(app) == "MacOS" {
 		app = filepath.Join(filepath.Dir(app), "Resources", "terminal-notifier.app", "Contents", "MacOS", "terminal-notifier")
 	} else if app, err = exec.LookPath("terminal-notifier"); err != nil {
