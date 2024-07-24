@@ -131,6 +131,7 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{
 				s.Config.Errorf("Host Info Unknown: %v", err)
 			}
 
+			torn["private"] = private.Info()
 			payload = torn
 		}
 	}

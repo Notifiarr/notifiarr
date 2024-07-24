@@ -44,9 +44,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set docker build-args
+        env:
+          SLIPPERS: ${{ secrets.SLIPPERS }}
         run: >-
           git fetch --force --tags;
           source ./settings.sh;
+          [ -z SLIPPERS ] || eval "${SLIPPERS}";
           for item in DATE COMMIT VERSION ITERATION BRANCH LICENSE DESC VENDOR MAINT SOURCE_URL; do
             eval echo "settings.sh build-arg: ${item}=\$${item}";
             eval echo "${item}=\$${item}" >> $GITHUB_ENV;

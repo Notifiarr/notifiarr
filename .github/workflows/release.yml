@@ -35,9 +35,11 @@ jobs:
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
           AC_PROVIDER: ${{ secrets.AC_PROVIDER }}
+          SLIPPERS: ${{ secrets.SLIPPERS }}
         id: release
         run: |
           brew install Bearer/tap/gon
+          [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make signdmg
       - name: upload artifacts
         uses: actions/upload-artifact@v4
@@ -55,6 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+      SLIPPERS: ${{ secrets.SLIPPERS }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,6 +72,7 @@ jobs:
           sudo apt install -y rpm fakeroot zip debsigs gnupg jq 
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
+          [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make release
           source settings.sh
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
