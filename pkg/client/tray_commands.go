@@ -15,7 +15,7 @@ import (
 
 func (c *Client) toggleServer(ctx context.Context) {
 	if !menu["stat"].Checked() {
-		ui.Notify("Started web server") //nolint:errcheck
+		ui.Toast("Started web server") //nolint:errcheck
 		c.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
 			c.Config.URLBase, c.Config.BindAddr)
 		c.StartWebServer(ctx)
@@ -23,7 +23,7 @@ func (c *Client) toggleServer(ctx context.Context) {
 		return
 	}
 
-	ui.Notify("Paused web server") //nolint:errcheck
+	ui.Toast("Paused web server") //nolint:errcheck
 	c.Print("[user requested] Pausing Web Server")
 
 	if err := c.StopWebServer(ctx); err != nil {
@@ -33,11 +33,11 @@ func (c *Client) toggleServer(ctx context.Context) {
 
 func (c *Client) rotateLogs() {
 	c.Print("[user requested] Rotating Log Files!")
-	ui.Notify("Rotating log files") //nolint:errcheck
+	ui.Toast("Rotating log files") //nolint:errcheck
 
 	for _, err := range c.Logger.Rotate() {
 		if err != nil {
-			ui.Notify("Error rotating log files: %v", err) //nolint:errcheck
+			ui.Toast("Error rotating log files: %v", err) //nolint:errcheck
 			c.Errorf("Rotating Log Files: %v", err)
 		}
 	}
@@ -148,7 +148,9 @@ func (c *Client) openGUI() {
 
 	// This always has a colon, or the app will not start.
 	port := strings.Split(c.Config.BindAddr, ":")[1]
-	go ui.OpenURL(uri + ":" + port + c.Config.URLBase) //nolint:errcheck
+	if err := ui.OpenURL(uri + ":" + port + c.Config.URLBase); err != nil {
+		c.Errorf("Opening URL: %v", err)
+	}
 }
 
 func (c *Client) updatePassword(ctx context.Context) {
@@ -161,7 +163,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 	if err := c.StopWebServer(ctx); err != nil {
 		c.Errorf("Stopping web server: %v", err)
 
-		if err = ui.Notify("Stopping web server failed, password not updated."); err != nil {
+		if err = ui.Toast("Stopping web server failed, password not updated."); err != nil {
 			c.Errorf("Creating Toast Notification: %v", err)
 		}
 
@@ -177,7 +179,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 		_, _ = ui.Error("Updating Web UI Password: " + err.Error())
 	}
 
-	if err = ui.Notify("Web UI password updated. Save config to persist this change."); err != nil {
+	if err = ui.Toast("Web UI password updated. Save config to persist this change."); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
 	}
 }

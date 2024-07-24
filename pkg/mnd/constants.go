@@ -11,6 +11,7 @@ const (
 	Mode0755      = 0o755
 	Mode0750      = 0o750
 	Mode0600      = 0o600
+	Mode0644      = 0o644
 	Kilobyte      = 1024
 	Megabyte      = Kilobyte * Kilobyte
 	KB100         = Kilobyte * 100

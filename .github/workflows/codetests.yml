@@ -51,6 +51,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59
+          args: --build-tags nodbus
 
   golangci-linux:
     # description: "Runs golangci-lint on linux against linux and windows."

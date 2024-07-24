@@ -1,4 +1,6 @@
-//go:build !windows && !darwin && !linux
+//go:build !windows && !darwin && !linux && !freebsd
+
+/* Not sure what OS this will get. */
 
 package ui
 
@@ -6,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"runtime"
 )
@@ -17,21 +18,19 @@ var ErrUnsupported = errors.New("unsupported OS")
 // SystrayIcon is the icon in the system tray or task bar.
 const SystrayIcon = "files/images/favicon.png"
 
-//nolint:gochecknoglobals
-var hasGUI = os.Getenv("USEGUI") == "true" && runtime.GOOS == "linux"
-
-// HasGUI tries to determine if the app was invoked as a GUI app.
+// HasGUI returns false on this gui-unsupported OS.
 func HasGUI() bool {
-	return hasGUI
+	return false
 }
 
-func Notify(_ string, _ ...interface{}) error {
+// Toast does not do anything on this OS.
+func Toast(_ string, _ ...interface{}) error {
 	return nil
 }
 
 // StartCmd starts a command.
-func StartCmd(c string, v ...string) error {
-	cmd := exec.Command(c, v...)
+func StartCmd(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
@@ -45,15 +44,15 @@ func OpenCmd(cmd ...string) error {
 
 // OpenURL opens URL Links.
 func OpenURL(url string) error {
-	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, url)
+	return OpenCmd(url)
 }
 
 // OpenLog opens Log Files.
 func OpenLog(logFile string) error {
-	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, logFile)
+	return OpenCmd(logFile)
 }
 
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
-	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, filePath)
+	return OpenCmd(filePath)
 }

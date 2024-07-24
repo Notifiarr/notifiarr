@@ -12,11 +12,12 @@ import (
 // SystrayIcon is the icon in the system tray or task bar.
 const SystrayIcon = "files/images/favicon.png"
 
-// HasGUI returns true on Linux if USEGUI env var is true.
+// HasGUI returns true on FreeBSD if USEGUI env var is true.
 func HasGUI() bool {
 	return hasGUI
 }
 
+// Toast does not work on FreeBSD. :(
 func Toast(msg string, v ...interface{}) error {
 	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), GetPNG())
 	if err != nil {

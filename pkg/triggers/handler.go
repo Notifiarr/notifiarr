@@ -446,7 +446,7 @@ func (a *Actions) handleConfigReload() (int, string) {
 // @Security     ApiKeyAuth
 func (a *Actions) notification(content string) (int, string) {
 	if content != "" {
-		ui.Notify("Notification: %s", content) //nolint:errcheck
+		ui.Toast("Notification: %s", content) //nolint:errcheck
 		a.Timers.Printf("NOTIFICATION: %s", content)
 
 		return http.StatusOK, "Local Nntification sent."

@@ -14,15 +14,12 @@ import (
 // SystrayIcon is the icon in the menu bar.
 const SystrayIcon = "files/images/macos.png"
 
-//nolint:gochecknoglobals
-var hasGUI = os.Getenv("USEGUI") == "true"
-
-// HasGUI returns false on Linux, true on Windows and optional on macOS.
+// HasGUI returns true on macOS if USEGUI env var is true.
 func HasGUI() bool {
 	return hasGUI
 }
 
-func Notify(msg string, vars ...interface{}) error {
+func Toast(msg string, vars ...interface{}) error {
 	if !hasGUI {
 		return nil
 	}
@@ -46,59 +43,18 @@ func Notify(msg string, vars ...interface{}) error {
 	return nil
 }
 
-/*
-// getPNG purposely returns an empty string when there is no verified file.
-// This is used to give the toast notification an icon.
-// Do not throw errors if the icon is missing, it'd nbd, just return empty "".
-func getPNG() string {
-	folder, err := osext.ExecutableFolder()
-	if err != nil {
-		return ""
-	}
-
-	pngPath := filepath.Join(folder, "notifiarr.png")
-	if _, err := os.Stat(pngPath); err == nil {
-		return pngPath // most code paths land here.
-	}
-
-	try := "/Applications/Notifiarr.app/Contents/MacOS/notifiarr.png"
-	if _, err := os.Stat(try); err == nil {
-		return try
-	}
-
-	data, err := bindata.Files.ReadFile("files/favicon.png")
-	if err != nil {
-		return ""
-	}
-
-	if err := os.WriteFile(pngPath, data, mnd.Mode0600); err == nil {
-		return pngPath
-	}
-
-	if err := os.WriteFile(try, data, mnd.Mode0600); err == nil {
-		return try
-	}
-
-	if err := os.WriteFile("/tmp/notifiarr.png", data, mnd.Mode0600); err == nil {
-		return "/tmp/notifiarr.png"
-	}
-
-	return ""
-}
-*/
-
 // StartCmd starts a command.
-func StartCmd(c string, v ...string) error {
-	cmd := exec.Command(c, v...)
+func StartCmd(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
-	return cmd.Run() //nolint:wrapcheck
+	return cmd.Start() //nolint:wrapcheck
 }
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {
-	return StartCmd("open", cmd...)
+	return StartCmd(opener, cmd...)
 }
 
 // OpenURL opens URL Links.
