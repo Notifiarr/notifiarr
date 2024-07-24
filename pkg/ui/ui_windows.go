@@ -3,16 +3,12 @@ package ui
 import (
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"syscall"
 
-	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gen2brain/beeep"
-	"github.com/kardianos/osext"
 )
 
 // SystrayIcon is the icon in the system tray or task bar.
@@ -23,8 +19,8 @@ func HasGUI() bool {
 	return true
 }
 
-func Notify(msg string, v ...interface{}) error {
-	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), getPNG())
+func Toast(msg string, v ...interface{}) error {
+	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), GetPNG())
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}
@@ -32,44 +28,9 @@ func Notify(msg string, v ...interface{}) error {
 	return nil
 }
 
-// getPNG purposely returns an empty string when there is no verified file.
-// This is used to give the toast notification an icon.
-// Do not throw errors if the icon is missing, it'd nbd, just return empty "".
-func getPNG() string {
-	folder, err := osext.ExecutableFolder()
-	if err != nil {
-		return ""
-	}
-
-	data, err := bindata.Asset("files/favicon.png")
-	if err != nil {
-		return ""
-	}
-
-	const (
-		percent99  = 0.99
-		percent101 = 1.01
-	)
-
-	minimumFileSize := int64(float64(len(data)) * percent99)
-	maximumFileSize := int64(float64(len(data)) * percent101)
-	pngPath := filepath.Join(folder, "notifiarr.png")
-
-	f, err := os.Stat(pngPath)
-	if err != nil || f.Size() < minimumFileSize || f.Size() > maximumFileSize {
-		// File does not exist, or not within 1% of correct size. Overwrite it.
-		if err := os.WriteFile(pngPath, data, mnd.Mode0600); err != nil {
-			return ""
-		}
-	}
-
-	// go log.Println("minmaxsize", minimumFileSize, maximumFileSize, f.Size(), len(data))
-	return pngPath
-}
-
 // StartCmd starts a command.
-func StartCmd(c string, v ...string) error {
-	cmd := exec.Command(c, v...)
+func StartCmd(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
@@ -79,7 +40,7 @@ func StartCmd(c string, v ...string) error {
 
 // OpenCmd opens anything.
 func OpenCmd(cmd ...string) error {
-	return StartCmd("cmd", append([]string{"/c", "start"}, cmd...)...)
+	return StartCmd(opener, append([]string{"/c", "start"}, cmd...)...)
 }
 
 // OpenURL opens URL Links.

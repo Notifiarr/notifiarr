@@ -161,15 +161,15 @@ notifiarr.arm64.macos: generate main.go
 
 freebsd: notifiarr.amd64.freebsd
 notifiarr.amd64.freebsd: generate main.go
-	GOOS=freebsd GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=amd64 go build $(BUILD_FLAGS),nodbus -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 freebsd386: notifiarr.i386.freebsd
 notifiarr.i386.freebsd: generate main.go
-	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=386 go build $(BUILD_FLAGS),nodbus -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 freebsdarm: notifiarr.armhf.freebsd
 notifiarr.armhf.freebsd: generate main.go
-	GOOS=freebsd GOARCH=arm go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	GOOS=freebsd GOARCH=arm go build $(BUILD_FLAGS),nodbus -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
 
 exe: notifiarr.amd64.exe
 windows: notifiarr.amd64.exe
@@ -352,7 +352,7 @@ lint: generate
 	# Checking lint.
 	golangci-lint version
 	GOOS=linux golangci-lint run
-	GOOS=freebsd golangci-lint run
+	GOOS=freebsd golangci-lint --build-tags nodbus run
 	GOOS=windows golangci-lint run
 
 generate: pkg/bindata/bindata.go pkg/bindata/docs/api_docs.go

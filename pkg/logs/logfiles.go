@@ -29,13 +29,18 @@ var (
 // These are enforced on GUI OSes (like macOS.app and Windows).
 func (l *Logger) setDefaultLogPaths() {
 	// Make sure log file paths exist if AppName is provided; this indicates GUI OS.
-	if l.LogConfig.AppName != "" {
+	if l.LogConfig.AppName != "" { // This only happens if ui.HasGUI() is true.
+		base := ".notifiarr" // windows and macos
+		if !mnd.IsWindows && !mnd.IsDarwin {
+			base = ".config/notifiarr" // *nix desktop
+		}
+
 		if l.LogConfig.LogFile == "" {
-			l.LogConfig.LogFile = filepath.Join("~", ".notifiarr", l.LogConfig.AppName+defExt)
+			l.LogConfig.LogFile = filepath.Join("~", base, l.LogConfig.AppName+defExt)
 		}
 
 		if l.LogConfig.HTTPLog == "" {
-			l.LogConfig.HTTPLog = filepath.Join("~", ".notifiarr", l.LogConfig.AppName+httpExt)
+			l.LogConfig.HTTPLog = filepath.Join("~", base, l.LogConfig.AppName+httpExt)
 		}
 	}
 }

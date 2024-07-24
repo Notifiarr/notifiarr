@@ -11,6 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/private"
 	"github.com/shirou/gopsutil/v4/host"
 	"golift.io/cnfg"
 )
@@ -131,6 +132,7 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{
 				s.Config.Errorf("Host Info Unknown: %v", err)
 			}
 
+			torn["private"] = private.Info()
 			payload = torn
 		}
 	}

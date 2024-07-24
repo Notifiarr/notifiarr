@@ -165,7 +165,7 @@ func (c *Client) start(ctx context.Context, msg, newPassword string) error {
 	c.Printf("==> %s", msg)
 
 	if c.Flags.Updated {
-		go ui.Notify(mnd.Title + " updated to version " + version.Version) //nolint:errcheck
+		go ui.Toast(mnd.Title + " updated to version " + version.Version) //nolint:errcheck
 	}
 
 	if err := c.loadAssetsTemplates(ctx); err != nil {
@@ -348,11 +348,21 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	clientInfo := c.configureServices(ctx)
 	c.setupMenus(clientInfo)
-	c.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s",
-		c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile)
 
-	if err = ui.Notify("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
-		c.Errorf("Creating Toast Notification: %v", err)
+	if c.Flags.ConfigFile == "" {
+		c.Printf(" 🌀 %s v%s-%s Configuration Reloaded! No config file.",
+			c.Flags.Name(), version.Version, version.Revision)
+
+		if err = ui.Toast("Configuration Reloaded! No config file."); err != nil {
+			c.Errorf("Creating Toast Notification: %v", err)
+		}
+	} else {
+		c.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s",
+			c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile)
+
+		if err = ui.Toast("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
+			c.Errorf("Creating Toast Notification: %v", err)
+		}
 	}
 
 	// This doesn't need to lock because web server is not running.
