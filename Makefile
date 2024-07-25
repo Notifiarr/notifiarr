@@ -320,6 +320,7 @@ package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 # Build an environment that can be packaged for freebsd.
 package_build_freebsd: readme man freebsd notifiarr.conf.example
 	mkdir -p $@/usr/local/bin $@/usr/local/etc/notifiarr $@/usr/local/share/man/man1 $@/usr/local/share/doc/notifiarr $@/usr/local/var/log/notifiarr
+	date "+%Y/%m/%d %H:%M:%S Built Package - this file may be safely deleted" > $@/usr/local/var/log/notifiarr/placeholder.txt
 	cp notifiarr.amd64.freebsd $@/usr/local/bin/notifiarr
 	cp *.1.gz $@/usr/local/share/man/man1
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/
