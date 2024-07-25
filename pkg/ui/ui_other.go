@@ -12,6 +12,9 @@ import (
 	"runtime"
 )
 
+// SystrayIcon is the icon in the system tray or task bar.
+const SystrayIcon = "files/images/logo/notifiarr.png"
+
 // ErrUnsupported is just an error.
 var ErrUnsupported = errors.New("unsupported OS")
 

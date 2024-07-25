@@ -7,12 +7,12 @@ VENDOR="Go Lift <code@golift.io>"
 export MAINT DESC LICENSE SOURCE_URL VENDOR
 
 DATE="$(date -u +%Y-%m-%dT%H:%M:00Z)"
-VERSION=$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1) | tr -d v)
+VERSION=$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1 2>/dev/null) 2>/dev/null | tr -d v)
 [ "$VERSION" != "" ] || VERSION=development
 # This produces a 0 in some environments (like Homebrew), but it's only used for packages.
-ITERATION=$(git rev-list --count --all || echo 0)
-COMMIT="$(git rev-parse --short HEAD || echo 0)"
-GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD || echo unknown)"
+ITERATION=$(git rev-list --count --all 2>/dev/null || echo 0)
+COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo 0)"
+GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)"
 BRANCH="${GIT_BRANCH:-${GITHUB_REF_NAME}}"
 export DATE VERSION ITERATION COMMIT BRANCH
 

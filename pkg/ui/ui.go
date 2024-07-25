@@ -20,8 +20,8 @@ var (
 	opener = getOpener()
 )
 
-// SystrayIcon is the icon in the menu bar.
-const SystrayIcon = "files/images/logo/notifiarr.png"
+// ToastIcon is the icon in the menu bar.
+const ToastIcon = "files/images/logo/notifiarr.png"
 
 // GetPNG purposely returns an empty string when there is no verified file.
 // This is used to give the toast notification an icon.
@@ -50,7 +50,7 @@ func GetPNG() string {
 		folder = filepath.Dir(folder)
 	}
 
-	data, err := asset(SystrayIcon)
+	data, err := asset(ToastIcon)
 	if err != nil {
 		return ""
 	}

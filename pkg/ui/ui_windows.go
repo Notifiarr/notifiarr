@@ -15,6 +15,9 @@ import (
 	"golang.org/x/sys/windows"
 )
 
+// SystrayIcon is the icon in the system tray or task bar.
+const SystrayIcon = "files/images/favicon.ico"
+
 // HasGUI always returns true on Windows.
 func HasGUI() bool {
 	return true

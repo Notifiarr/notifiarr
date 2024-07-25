@@ -11,6 +11,9 @@ import (
 	"github.com/gen2brain/beeep"
 )
 
+// SystrayIcon is the icon in the system tray or task bar.
+const SystrayIcon = "files/images/logo/notifiarr.png"
+
 // HasGUI returns true on FreeBSD if USEGUI env var is true.
 func HasGUI() bool {
 	return hasGUI
@@ -93,7 +96,7 @@ func CreateStartupLink() (bool, string, error) {
 	}
 
 	dir = filepath.Join(dir, ".config", "autostart")
-	if err := os.MkdirAll(dir, mnd.Mode0644); err != nil {
+	if err := os.MkdirAll(dir, mnd.Mode0755); err != nil {
 		return false, "", fmt.Errorf("making autostart: %w", err)
 	}
 

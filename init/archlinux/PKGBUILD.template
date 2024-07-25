@@ -16,8 +16,7 @@ build() {
   cd "$pkgname-$pkgver"
   export EXTRA_LDFLAGS=-linkmode=external
   export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-  make man VERSION="${pkgver}" ITERATION="${pkgrel}"
-  make "${pkgname}.service" VERSION="${pkgver}" ITERATION="${pkgrel}"
+  make clean man VERSION="${pkgver}" ITERATION="${pkgrel}"
 
   if [ "$CARCH" == "x86_64" ]; then
     make linux VERSION="${pkgver}" ITERATION="${pkgrel}"
@@ -62,5 +61,5 @@ package() {
   install -Dm0644 "sysusers.conf" "${pkgdir}/usr/lib/sysusers.d/notifiarr.conf"
   rm sysusers.conf
   # Systemd Service Unit.
-  install -Dm644 "${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
+  install -Dm644 "init/systemd/${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
 }
