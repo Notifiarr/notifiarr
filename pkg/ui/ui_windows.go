@@ -36,11 +36,7 @@ func StartCmd(command string, args ...string) error {
 	cmd.Stderr = io.Discard
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("starting cmd: %w", err)
-	}
-
-	if err := cmd.Wait(); err != nil {
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("running cmd: %w", err)
 	}
 

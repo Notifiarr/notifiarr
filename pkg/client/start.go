@@ -217,7 +217,7 @@ func (c *Client) loadConfiguration(ctx context.Context) (string, string, error) 
 	if c.Flags.Restart {
 		return msg, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
-			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
+			Args: []string{"--updated", "--delay", "5s", "--config", c.Flags.ConfigFile},
 		})
 	}
 
