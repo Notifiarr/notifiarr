@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
 	"text/template"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
@@ -127,8 +126,11 @@ func CreateStartupLink() (bool, string, error) {
 
 	err = template.Must(template.New("launchAgent").
 		Funcs(template.FuncMap{
-			"exe": func() string { exe, _ := os.Executable(); return exe }}).
-		Parse(bindata.MustAssetString("other/io.golift.notifiarr.plist"))).
+			"exe": func() string {
+				exe, _ := os.Executable()
+				return exe
+			},
+		}).Parse(bindata.MustAssetString("other/io.golift.notifiarr.plist"))).
 		Execute(file, nil)
 	if err != nil {
 		return false, "", fmt.Errorf("writing launch agent: %w", err)

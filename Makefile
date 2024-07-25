@@ -353,6 +353,7 @@ lint: generate
 	# Checking lint.
 	golangci-lint version
 	GOOS=linux golangci-lint run
+	GOOS=darwin golangci-lint run
 	GOOS=freebsd golangci-lint --build-tags nodbus run
 	GOOS=windows golangci-lint run
 
