@@ -17,7 +17,7 @@ ifeq ($(OUTPUTDIR),)
      OUTPUTDIR=.
 endif
 
-# Preserve the passed-in version & iteration (homebrew).
+# Preserve the passed-in version & iteration (local development testing).
 _VERSION:=$(VERSION)
 _ITERATION:=$(ITERATION)
 include /tmp/.metadata.make
@@ -320,7 +320,7 @@ package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 # Build an environment that can be packaged for freebsd.
 package_build_freebsd: readme man freebsd notifiarr.conf.example
 	mkdir -p $@/usr/local/bin $@/usr/local/etc/notifiarr $@/usr/local/share/man/man1 $@/usr/local/share/doc/notifiarr $@/usr/local/var/log/notifiarr
-	date "+%Y/%m/%d %H:%M:%S Built Package - this file may be safely deleted" > $@/usr/local/var/log/notifiarr/placeholder.txt
+	date "+%Y/%m/%d %H:%M:%S Built Package Notifiarr $(VERSION)-$(ITERATION) - this file may be safely deleted" >> $@/usr/local/var/log/notifiarr/buildlog.txt
 	cp notifiarr.amd64.freebsd $@/usr/local/bin/notifiarr
 	cp *.1.gz $@/usr/local/share/man/man1
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/
@@ -369,20 +369,3 @@ pkg/bindata/bindata.go:
 
 docker:
 	init/docker/makedocker.sh
-
-# Used for Homebrew only. Other distros can create packages.
-install: man readme notifiarr
-	@echo -  Done Building  -
-	@echo -  Local installation with the Makefile is only supported on macOS.
-	@echo -  Otherwise, build and install a package: make rpm -or- make deb
-	@[ "$(shell uname)" = "Darwin" ] || (echo "Unable to continue, not a Mac." && false)
-	@[ "$(PREFIX)" != "" ] || (echo "Unable to continue, PREFIX not set. Use: make install PREFIX=/usr/local ETC=/usr/local/etc" && false)
-	@[ "$(ETC)" != "" ] || (echo "Unable to continue, ETC not set. Use: make install PREFIX=/usr/local ETC=/usr/local/etc" && false)
-	./notifiarr -c examples/notifiarr.conf.example -w --- && mv examples/notifiarr.conf.example.new examples/notifiarr.conf.example
-	# Copying the binary, config file, unit file, and man page into the env.
-	/usr/bin/install -m 0755 -d $(PREFIX)/bin $(PREFIX)/share/man/man1 $(ETC)/notifiarr $(PREFIX)/share/doc/notifiarr $(PREFIX)/lib/notifiarr
-	/usr/bin/install -m 0755 -cp notifiarr $(PREFIX)/bin/notifiarr
-	/usr/bin/install -m 0644 -cp notifiarr.1.gz $(PREFIX)/share/man/man1
-	/usr/bin/install -m 0644 -cp examples/notifiarr.conf.example $(ETC)/notifiarr/
-	[ -f $(ETC)/notifiarr/notifiarr.conf ] || /usr/bin/install -m 0644 -cp examples/notifiarr.conf.example $(ETC)/notifiarr/notifiarr.conf
-	/usr/bin/install -m 0644 -cp LICENSE *.html examples/* pkg/bindata/files/images/logo/notifiarr.png $(PREFIX)/share/doc/notifiarr/

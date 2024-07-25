@@ -188,17 +188,3 @@ jobs:
         run: bash init/archlinux/aur-deploy.sh
         env:
           DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
-
-  homebrew-formula:
-    # description: creates and uploads a homebrew formula file to the golift/homebrew-mugs repo.
-    needs: deploy-github-release
-    name: Deploy Homebrew Formula
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
-      - name: Deploy Homebrew Formula
-        run: bash init/homebrew/formula-deploy.sh
-        env:
-          DEPLOY_KEY: ${{ secrets.HOMEBREW_DEPLOY_KEY }}
