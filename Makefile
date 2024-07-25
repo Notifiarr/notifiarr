@@ -66,7 +66,7 @@ WINDOWS_LDFLAGS:= -H=windowsgui
 
 # Makefile targets follow.
 
-all: notifiarr
+all: clean generate notifiarr
 
 ####################
 ##### Releases #####

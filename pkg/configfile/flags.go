@@ -3,6 +3,7 @@ package configfile
 import (
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	flag "github.com/spf13/pflag"
@@ -15,21 +16,22 @@ import (
 // Flags are our CLI input flags.
 type Flags struct {
 	*flag.FlagSet `json:"-"`
-	VerReq        bool     `json:"verReq"`
-	LongVerReq    bool     `json:"longVerReq"`
-	Restart       bool     `json:"restart"`
-	AptHook       bool     `json:"aptHook"`
-	Updated       bool     `json:"updated"`
-	PSlist        bool     `json:"pslist"`
-	Fortune       bool     `json:"fortune"`
-	Write         string   `json:"write"`
-	Reset         bool     `json:"reset"`
-	Curl          string   `json:"curl"`
-	ConfigFile    string   `json:"configFile"`
-	ExtraConf     []string `json:"extraConf"`
-	EnvPrefix     string   `json:"envPrefix"`
-	Headers       []string `json:"headers"`
-	Assets        string   `json:"staticDif"`
+	VerReq        bool          `json:"verReq"`
+	LongVerReq    bool          `json:"longVerReq"`
+	Restart       bool          `json:"restart"`
+	AptHook       bool          `json:"aptHook"`
+	Updated       bool          `json:"updated"`
+	PSlist        bool          `json:"pslist"`
+	Fortune       bool          `json:"fortune"`
+	Write         string        `json:"write"`
+	Reset         bool          `json:"reset"`
+	Curl          string        `json:"curl"`
+	ConfigFile    string        `json:"configFile"`
+	ExtraConf     []string      `json:"extraConf"`
+	EnvPrefix     string        `json:"envPrefix"`
+	Headers       []string      `json:"headers"`
+	Assets        string        `json:"staticDif"`
+	Delay         time.Duration `json:"delay"`
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
@@ -51,6 +53,7 @@ func (f *Flags) ParseArgs(args []string) {
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
 	f.StringVarP(&f.Assets, "assets", "a", "", "Provide path to custom web assets: static files and templates")
 	f.BoolVar(&f.AptHook, "apthook", false, "Process a payload from a dpkg Pre-Install-Pkgs hook.")
+	f.DurationVar(&f.Delay, "delay", time.Millisecond, "Delay web server startup by this duration.")
 
 	if runtime.GOOS == mnd.Windows {
 		f.BoolVar(&f.Restart, "restart", false, "This is used by auto-update, do not call it.")

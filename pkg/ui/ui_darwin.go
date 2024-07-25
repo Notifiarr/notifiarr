@@ -7,6 +7,9 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"text/template"
+
+	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
@@ -45,7 +48,15 @@ func StartCmd(command string, args ...string) error {
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
-	return cmd.Start() //nolint:wrapcheck
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("starting cmd: %w", err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("running cmd: %w", err)
+	}
+
+	return nil
 }
 
 // OpenCmd opens anything.
@@ -66,4 +77,71 @@ func OpenLog(logFile string) error {
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
 	return OpenCmd("-t", filePath)
+}
+
+func HasStartupLink() (string, bool) {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		return "", false
+	}
+
+	path := filepath.Join(dir, "Library", "LaunchAgents", "io.golift.notifiarr.plist")
+	if _, err := os.Stat(path); err != nil {
+		return "", false
+	}
+
+	return path, true
+}
+
+func DeleteStartupLink() (string, error) {
+	link, has := HasStartupLink()
+	if !has {
+		return "", nil
+	}
+
+	if err := os.Remove(link); err != nil {
+		return "", fmt.Errorf("removing launch agent: %w", err)
+	}
+
+	return link, nil
+}
+
+func CreateStartupLink() (bool, string, error) {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		return false, "", fmt.Errorf("finding home dir: %w", err)
+	}
+
+	dir = filepath.Join(dir, "Library", "LaunchAgents")
+	if err := os.MkdirAll(dir, mnd.Mode0644); err != nil {
+		return false, "", fmt.Errorf("making launch agent path: %w", err)
+	}
+
+	path := filepath.Join(dir, "io.golift.notifiarr.plist")
+
+	file, err := os.OpenFile(path, os.O_TRUNC|os.O_RDWR|os.O_CREATE, mnd.Mode0644)
+	if err != nil {
+		return false, "", fmt.Errorf("creating launch agent: %w", err)
+	}
+	defer file.Close()
+
+	err = template.Must(template.New("launchAgent").
+		Funcs(template.FuncMap{
+			"exe": func() string { exe, _ := os.Executable(); return exe }}).
+		Parse(bindata.MustAssetString("other/io.golift.notifiarr.plist"))).
+		Execute(file, nil)
+	if err != nil {
+		return false, "", fmt.Errorf("writing launch agent: %w", err)
+	}
+
+	loaded := false
+	if err := StartCmd("launchctl", "list", "io.golift.notifiarr"); err == nil {
+		loaded = true
+	}
+
+	if err := StartCmd("launchctl", "load", "-w", path); err != nil {
+		return loaded, path, fmt.Errorf("loading launch agent: %w", err)
+	}
+
+	return loaded, path, nil
 }

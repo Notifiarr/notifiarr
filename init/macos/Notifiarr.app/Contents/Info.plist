@@ -28,6 +28,8 @@
 	<dict>
 	     <key>USEGUI</key>
 	     <string>true</string>
+	     <key>DN_QUIET</key>
+	     <string>true</string>
 	</dict>
 </dict>
 </plist>

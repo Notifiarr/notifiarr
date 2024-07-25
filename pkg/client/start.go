@@ -297,7 +297,11 @@ func (c *Client) Exit(ctx context.Context) error {
 		c.Print(" ❌ Good bye! Exiting" + mnd.DurationAge(version.Started))
 	}()
 
-	c.StartWebServer(ctx)
+	go func() {
+		time.Sleep(c.Flags.Delay)
+		c.StartWebServer(ctx)
+	}()
+
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 

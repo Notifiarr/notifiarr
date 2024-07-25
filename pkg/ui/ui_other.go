@@ -31,7 +31,15 @@ func StartCmd(command string, args ...string) error {
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
-	return cmd.Start() //nolint:wrapcheck
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("starting cmd: %w", err)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return fmt.Errorf("running cmd: %w", err)
+	}
+
+	return nil
 }
 
 // OpenCmd opens anything.
@@ -52,4 +60,16 @@ func OpenLog(logFile string) error {
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
 	return OpenCmd(filePath)
+}
+
+func HasStartupLink() (string, bool) {
+	return "", false
+}
+
+func DeleteStartupLink() (string, error) {
+	return "", ErrUnsupported
+}
+
+func CreateStartupLink() (bool, string, error) {
+	return false, "", ErrUnsupported
 }

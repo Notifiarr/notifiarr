@@ -8,7 +8,9 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
+	"github.com/Notifiarr/notifiarr/pkg/update"
 )
 
 /* This file contains methods that are triggered from the GUI menu. */
@@ -150,6 +152,37 @@ func (c *Client) openGUI() {
 	port := strings.Split(c.Config.BindAddr, ":")[1]
 	if err := ui.OpenURL(uri + ":" + port + c.Config.URLBase); err != nil {
 		c.Errorf("Opening URL: %v", err)
+	}
+}
+
+//nolint:errcheck
+func (c *Client) autoStart() {
+	if menu["auto"].Checked() {
+		menu["auto"].Uncheck()
+
+		if file, err := ui.DeleteStartupLink(); err != nil {
+			ui.Toast("Failed disabling autostart: %s", err.Error())
+			c.Errorf("[user requested] Disabling auto start: %v", err)
+		} else {
+			ui.Toast("Removed auto start file: %s", file)
+			c.Printf("[user requested] Removed auto start file: %s", file)
+		}
+
+		return
+	}
+
+	menu["auto"].Check()
+
+	if loaded, file, err := ui.CreateStartupLink(); err != nil {
+		ui.Toast("Failed enabling autostart: %s", err.Error())
+		c.Errorf("[user requested] Enabling auto start: %v", err)
+	} else if mnd.IsDarwin && !loaded {
+		ui.Toast("Created auto start file: %s - Exiting so launchctl can restart the app.", file)
+		c.Printf("[user requested] Created auto start file: %s (exiting)", file)
+		c.sigkil <- &update.Signal{Text: "launchctl restart"}
+	} else {
+		ui.Toast("Created auto start file: %s", file)
+		c.Printf("[user requested] Created auto start file: %s", file)
 	}
 }
 

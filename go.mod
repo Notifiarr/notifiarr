@@ -23,6 +23,7 @@ require (
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
 	github.com/jackpal/gateway v1.0.15
 	github.com/jaypipes/ghw v0.12.0
+	github.com/jxeng/shortcut v1.0.2
 	github.com/kevinburke/go-bindata/v4 v4.0.2
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
 	github.com/mitchellh/go-homedir v1.1.0

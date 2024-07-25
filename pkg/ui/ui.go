@@ -75,7 +75,7 @@ func getPNGnotWindows() string {
 	}
 
 	for _, path := range []string{
-		getMacOSResources(),
+		getMacOSResources("Images"),
 		"/usr/share/doc/notifiarr/",
 		"/usr/local/share/doc/notifiarr/",
 		"/opt/homebrew/share/doc/notifiarr/",
@@ -93,7 +93,7 @@ func getPNGnotWindows() string {
 }
 
 // This returns the absolute path to the mac app Resources folder. Or an empty string.
-func getMacOSResources() string {
+func getMacOSResources(subFolder string) string {
 	if !mnd.IsDarwin {
 		return ""
 	}
@@ -102,7 +102,7 @@ func getMacOSResources() string {
 	if err != nil {
 		return ""
 	} else if output = filepath.Dir(output); filepath.Base(output) == "MacOS" {
-		return filepath.Join(filepath.Dir(output), "Resources")
+		return filepath.Join(filepath.Dir(output), "Resources", subFolder)
 	}
 
 	return ""
