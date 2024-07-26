@@ -165,7 +165,7 @@ func (c *Client) start(ctx context.Context, msg, newPassword string) error {
 	c.Printf("==> %s", msg)
 
 	if c.Flags.Updated {
-		go ui.Toast(mnd.Title + " updated to version " + version.Version + "-" + version.Revision) //nolint:errcheck
+		go ui.Toast("%s updated to v%s-%s", mnd.Title, version.Version, version.Revision) //nolint:errcheck
 	}
 
 	if err := c.loadAssetsTemplates(ctx); err != nil {
