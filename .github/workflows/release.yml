@@ -88,6 +88,9 @@ jobs:
       - release-test
     name: Built v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}}
     runs-on: ubuntu-latest
+    steps:
+      - name: Built v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}}
+        run: echo Built v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}}
 
   deploy-unstable-unstable:
     # description: "Uploads pre-built binaries to unstable.golift.io."
