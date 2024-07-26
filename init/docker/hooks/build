@@ -27,6 +27,13 @@ read -r -d '' BUILD_ARGS << EOF
 --file ${DOCKERFILE_PATH} .
 EOF
 
+echo "############################################"
+echo "############################################"
+echo "################# BUILDING #################"
+echo "==============>   v${VERSION}-${ITERATION}"
+echo "############################################"
+echo "############################################"
+
 echo "Build Args: ${BUILD_ARGS}"
 eval "docker buildx build --load --tag current:amd64 --platform linux/amd64 $BUILD_ARGS"
 eval "docker buildx build --load --tag current:arm64 --platform linux/arm64/v8 $BUILD_ARGS"

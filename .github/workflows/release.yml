@@ -41,18 +41,18 @@ jobs:
           brew install Bearer/tap/gon
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make signdmg
-      - name: upload artifacts
+      - name: Upload DMG Artifact
         uses: actions/upload-artifact@v4
         with:
           name: dmg-release
           path: release
 
-  release-test:
+  release:
     # description: "Builds all the Notifiarr client binaries and packages for a release."
     if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/unstable' || github.ref == 'refs/heads/main'
     outputs:
-      version: ${{ steps.release.outputs.version }}
-      revision: ${{ steps.release.outputs.revision }}
+      version: ${{ steps.vars.outputs.version }}
+      revision: ${{ steps.vars.outputs.revision }}
     name: Make Release Assets
     runs-on: ubuntu-latest
     env:
@@ -66,22 +66,35 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-      - name: make-release
+      - name: Get Version and Iteration
+        id: vars
+        run: |
+          source settings.sh
+          echo "Building v${VERSION}-${ITERATION}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
+      - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         id: release
         run: |
-          sudo apt install -y rpm fakeroot zip debsigs gnupg jq 
+          sudo apt install -y rpm fakeroot zip debsigs gnupg jq
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make release
-          source settings.sh
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
-      - name: upload artifacts
+      - name: Upload Release Artifacts v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         uses: actions/upload-artifact@v4
         with:
           name: release
           path: release
+
+  print-built-version:
+    needs:
+      - release
+    name: Built v${{needs.release.outputs.version}}-${{needs.release.outputs.revision}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Built v${{needs.release.outputs.version}}-${{needs.release.outputs.revision}}
+        run: echo Built v${{needs.release.outputs.version}}-${{needs.release.outputs.revision}}
 
   deploy-unstable-unstable:
     # description: "Uploads pre-built binaries to unstable.golift.io."
@@ -90,9 +103,9 @@ jobs:
       matrix:
         files: [release, dmg-release]
     needs:
-      - release-test
+      - release
       - macapp-test
-    name: Deploy Unstable.app
+    name: GoLift Unstable Deploy
     runs-on: ubuntu-latest
     steps:
       - name: "Download files: ${{ matrix.files }}"
@@ -105,15 +118,16 @@ jobs:
             [ -f "$file" ] || continue;
             echo "Uploading: ${file}";
             curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}";
-            echo '{"version":"${{needs.release-test.outputs.version}}","revision":${{needs.release-test.outputs.revision}},"size":'$(stat --printf="%s" ${file})'}' >> ${file}.txt
+            echo '{"version":"${{needs.release.outputs.version}}","revision":${{needs.release.outputs.revision}},"size":'$(stat --printf="%s" ${file})'}' >> ${file}.txt
             curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}.txt";
           done
 
   deploy-unstable-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     if: github.ref == 'refs/heads/unstable'
-    needs: release-test
-    name: Deploy Unstable PackageCloud
+    needs:
+      - release
+    name: PackageCloud Unstable Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
@@ -131,8 +145,9 @@ jobs:
   deploy-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: release-test
-    name: Deploy Release PackageCloud
+    needs:
+      - release
+    name: PackageCloud Release Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
@@ -147,12 +162,14 @@ jobs:
           rpmdists: el/6
           debdists: ubuntu/focal
 
-  deploy-github-release:
+  deploy-github:
     # description: uploads all the built release assets to the GitHub Release.
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
-    needs: [release-test, macapp-test]
+    needs:
+      - release
+      - macapp-test
     strategy:
       matrix:
         files: [release, dmg-release]
@@ -177,7 +194,9 @@ jobs:
 
   archlinux-aur:
     # description: creates and uploads and aur file to the golift/aur repo for arch linux.
-    needs: deploy-github-release
+    needs:
+      - release
+      - deploy-github
     name: Deploy ArchLinux AUR
     runs-on: ubuntu-latest
     steps:
