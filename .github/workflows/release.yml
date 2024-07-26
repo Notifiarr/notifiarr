@@ -41,10 +41,7 @@ jobs:
           brew install Bearer/tap/gon
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make signdmg
-          source settings.sh
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
-      - name: Upload v${{steps.release.outputs.version}}-${{steps.release.outputs.revision}} DMG Artifact
+      - name: Upload DMG Artifact
         uses: actions/upload-artifact@v4
         with:
           name: dmg-release
@@ -80,11 +77,17 @@ jobs:
           source settings.sh
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
-      - name: Upload v${{steps.release.outputs.version}}-${{steps.release.outputs.revision}} Release Artifacts
+      - name: Upload Release Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: release
           path: release
+
+  print-built-version:
+    needs:
+      - release-test
+    name: Built v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}}
+    runs-on: ubuntu-latest
 
   deploy-unstable-unstable:
     # description: "Uploads pre-built binaries to unstable.golift.io."
@@ -95,7 +98,7 @@ jobs:
     needs:
       - release-test
       - macapp-test
-    name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} Unstable Release and DMG
+    name: GoLift Unstable Deploy
     runs-on: ubuntu-latest
     steps:
       - name: "Download files: ${{ matrix.files }}"
@@ -117,7 +120,7 @@ jobs:
     if: github.ref == 'refs/heads/unstable'
     needs:
       - release-test
-    name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} Unstable PackageCloud
+    name: PackageCloud Unstable Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
@@ -137,7 +140,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     needs:
       - release-test
-    name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} Release PackageCloud
+    name: PackageCloud Release Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
@@ -187,7 +190,7 @@ jobs:
     needs:
       - release-test
       - deploy-github-release
-    name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} ArchLinux AUR
+    name: Deploy ArchLinux AUR
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
