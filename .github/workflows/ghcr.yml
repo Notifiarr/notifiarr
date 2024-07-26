@@ -24,7 +24,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        with:
+          # we need the whole thing so we can count commits.
+          fetch-depth: '0'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
