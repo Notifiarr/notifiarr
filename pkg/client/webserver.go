@@ -64,6 +64,7 @@ func (c *Client) runWebServer() {
 	var err error
 
 	if menu["stat"] != nil {
+		menu["stat"].Enable()
 		menu["stat"].Check()
 		menu["stat"].SetTooltip("web server running, uncheck to pause")
 	}
@@ -82,6 +83,13 @@ func (c *Client) runWebServer() {
 
 // StopWebServer stops the web servers. Panics if that causes an error or timeout.
 func (c *Client) StopWebServer(ctx context.Context) error {
+	c.Lock()
+	defer c.Unlock()
+
+	if c.server == nil {
+		return nil
+	}
+
 	c.Print("==> Stopping Web Server!")
 
 	ctx, cancel := context.WithTimeout(ctx, c.Config.Timeout.Duration)

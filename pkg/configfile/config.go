@@ -16,6 +16,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -123,7 +124,7 @@ func (c *Config) CopyConfig() (*Config, error) {
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 // You should only run this after getting a config with NewConfig().
-func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *triggers.Actions, error) {
+func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *triggers.Actions, error) { //nolint:cyclop
 	if flag.ConfigFile != "" {
 		files := append([]string{flag.ConfigFile}, flag.ExtraConf...)
 		if err := cnfgfile.Unmarshal(c, files...); err != nil {
@@ -162,6 +163,10 @@ func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *trigge
 
 	// Make sure the port is not in use before starting the web server.
 	c.BindAddr, err = CheckPort(c.BindAddr)
+	if flag.Delay > time.Second {
+		err = nil // dont check the port if delay is set.
+	}
+
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
 	c.Services.Website = website.New(&website.Config{

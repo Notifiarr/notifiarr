@@ -10,4 +10,6 @@ var (
 	Templates embed.FS
 	//go:embed other/fortunes.txt
 	Fortunes string
+	//go:embed other/io.golift.notifiarr.plist
+	Plist string
 )

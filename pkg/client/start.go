@@ -165,7 +165,7 @@ func (c *Client) start(ctx context.Context, msg, newPassword string) error {
 	c.Printf("==> %s", msg)
 
 	if c.Flags.Updated {
-		go ui.Toast(mnd.Title + " updated to version " + version.Version) //nolint:errcheck
+		go ui.Toast("%s updated to v%s-%s", mnd.Title, version.Version, version.Revision) //nolint:errcheck
 	}
 
 	if err := c.loadAssetsTemplates(ctx); err != nil {
@@ -217,7 +217,7 @@ func (c *Client) loadConfiguration(ctx context.Context) (string, string, error) 
 	if c.Flags.Restart {
 		return msg, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
-			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
+			Args: []string{"--updated", "--delay", "5s", "--config", c.Flags.ConfigFile},
 		})
 	}
 
@@ -297,7 +297,11 @@ func (c *Client) Exit(ctx context.Context) error {
 		c.Print(" ❌ Good bye! Exiting" + mnd.DurationAge(version.Started))
 	}()
 
-	c.StartWebServer(ctx)
+	go func() {
+		time.Sleep(c.Flags.Delay)
+		c.StartWebServer(ctx)
+	}()
+
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 

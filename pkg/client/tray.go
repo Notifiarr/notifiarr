@@ -115,8 +115,9 @@ func (c *Client) setupMenus(clientInfo *clientinfo.ClientInfo) {
 }
 
 func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInfo) {
-	menu["stat"] = systray.AddMenuItem("Running", "web server state unknown")
+	menu["stat"] = systray.AddMenuItemCheckbox("Running", "web server state unknown", false)
 	menu["stat"].Click(func() { c.toggleServer(ctx) })
+	menu["stat"].Disable() // so the webserver cannot be started twice on startup.
 
 	c.configMenu(ctx)
 	c.linksMenu()
@@ -134,6 +135,10 @@ func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInf
 
 	menu["gui"] = systray.AddMenuItem("Open WebUI", "open the web page for this Notifiarr client")
 	menu["gui"].Click(c.openGUI)
+
+	_, hasLink := ui.HasStartupLink()
+	menu["auto"] = systray.AddMenuItemCheckbox("Auto Start", "start the Notifiarr client after login", hasLink)
+	menu["auto"].Click(c.autoStart)
 	menu["sub"] = systray.AddMenuItem("Subscribe", "subscribe for premium features")
 	menu["sub"].Click(func() { ui.OpenURL("https://github.com/sponsors/Notifiarr") })
 	menu["exit"] = systray.AddMenuItem("Quit", "exit "+c.Flags.Name())

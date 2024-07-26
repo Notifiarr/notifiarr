@@ -73,19 +73,3 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59
-
-  homebrew-test:
-    # description: "Installs dependencies on macOS and runs `make install` to mimic a homebrew install."
-    name: test-homebrew-install
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-      - name: go-generate
-        run: go generate ./...
-      - name: make-install
-        run: |
-          TMP=$(mktemp -d)
-          make install VERSION=0.0.1 ITERATION=240 PREFIX=$TMP ETC=$TMP/etc

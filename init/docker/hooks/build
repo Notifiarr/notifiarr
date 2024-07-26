@@ -5,12 +5,12 @@
 pushd ../..
 source settings.sh
 
-docker buildx inspect
-
 if ! (docker buildx inspect | grep -Eq 'docker-container'); then
   echo "Creating docker builder instance"
   docker buildx create --use
 fi
+
+[ -z SLIPPERS ] || eval "${SLIPPERS}"
 
 read -r -d '' BUILD_ARGS << EOF
 --build-arg "BUILD_DATE=${DATE}" \
