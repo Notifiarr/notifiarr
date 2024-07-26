@@ -41,7 +41,10 @@ jobs:
           brew install Bearer/tap/gon
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make signdmg
-      - name: upload artifacts
+          source settings.sh
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
+      - name: Upload v${{steps.release.outputs.version}}-${{steps.release.outputs.revision}} DMG Artifact
         uses: actions/upload-artifact@v4
         with:
           name: dmg-release
@@ -77,7 +80,7 @@ jobs:
           source settings.sh
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
-      - name: Upload v${{steps.release.version}}-${{steps.release.revision}} DMG Artifact
+      - name: Upload v${{steps.release.outputs.version}}-${{steps.release.outputs.revision}} Release Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: release
