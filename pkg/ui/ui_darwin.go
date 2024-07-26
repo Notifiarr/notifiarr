@@ -6,13 +6,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"text/template"
 
+	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/kardianos/osext"
 )
 
-// SystrayIcon is the icon in the menu bar.
-const SystrayIcon = "files/images/macos.png"
+// SystrayIcon is the icon in the system tray or task bar.
+const SystrayIcon = "files/images/logo/notifiarr.png"
 
 // HasGUI returns true on macOS if USEGUI env var is true.
 func HasGUI() bool {
@@ -25,10 +26,10 @@ func Toast(msg string, vars ...interface{}) error {
 	}
 
 	// This finds terminal-notifier inside this app or in your PATH.
-	app, err := osext.ExecutableFolder()
+	app, err := os.Executable()
 	if err != nil {
-		return fmt.Errorf("cannot find application running directory: %w", err)
-	} else if filepath.Base(app) == "MacOS" {
+		return fmt.Errorf("cannot find application: %w", err)
+	} else if app = filepath.Dir(app); filepath.Base(app) == "MacOS" {
 		app = filepath.Join(filepath.Dir(app), "Resources", "terminal-notifier.app", "Contents", "MacOS", "terminal-notifier")
 	} else if app, err = exec.LookPath("terminal-notifier"); err != nil {
 		list, _ := os.ReadDir(filepath.Dir(app))
@@ -49,7 +50,11 @@ func StartCmd(command string, args ...string) error {
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
-	return cmd.Start() //nolint:wrapcheck
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("running cmd: %w", err)
+	}
+
+	return nil
 }
 
 // OpenCmd opens anything.
@@ -70,4 +75,74 @@ func OpenLog(logFile string) error {
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
 	return OpenCmd("-t", filePath)
+}
+
+func HasStartupLink() (string, bool) {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		return "", false
+	}
+
+	path := filepath.Join(dir, "Library", "LaunchAgents", "io.golift.notifiarr.plist")
+	if _, err := os.Stat(path); err != nil {
+		return "", false
+	}
+
+	return path, true
+}
+
+func DeleteStartupLink() (string, error) {
+	link, has := HasStartupLink()
+	if !has {
+		return "", nil
+	}
+
+	if err := os.Remove(link); err != nil {
+		return "", fmt.Errorf("removing launch agent: %w", err)
+	}
+
+	return link, nil
+}
+
+func CreateStartupLink() (bool, string, error) {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		return false, "", fmt.Errorf("finding home dir: %w", err)
+	}
+
+	dir = filepath.Join(dir, "Library", "LaunchAgents")
+	if err := os.MkdirAll(dir, mnd.Mode0755); err != nil {
+		return false, "", fmt.Errorf("making launch agent path: %w", err)
+	}
+
+	path := filepath.Join(dir, "io.golift.notifiarr.plist")
+
+	file, err := os.OpenFile(path, os.O_TRUNC|os.O_RDWR|os.O_CREATE, mnd.Mode0644)
+	if err != nil {
+		return false, "", fmt.Errorf("creating launch agent: %w", err)
+	}
+	defer file.Close()
+
+	err = template.Must(template.New("launchAgent").
+		Funcs(template.FuncMap{
+			"exe": func() string {
+				exe, _ := os.Executable()
+				return exe
+			},
+		}).Parse(bindata.MustAssetString("other/io.golift.notifiarr.plist"))).
+		Execute(file, nil)
+	if err != nil {
+		return false, "", fmt.Errorf("writing launch agent: %w", err)
+	}
+
+	loaded := false
+	if err := StartCmd("launchctl", "list", "io.golift.notifiarr"); err == nil {
+		loaded = true
+	}
+
+	if err := StartCmd("launchctl", "load", "-w", path); err != nil {
+		return loaded, path, fmt.Errorf("loading launch agent: %w", err)
+	}
+
+	return loaded, path, nil
 }

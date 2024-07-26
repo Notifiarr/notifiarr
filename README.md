@@ -53,15 +53,9 @@ On FreeBSD, Notifiarr runs as `user:group` of `notifiarr:notifiarr`.
 
 #### Homebrew
 
-- Edit config file at `/usr/local/etc/notifiarr/notifiarr.conf`
-- Start it.
-- Like this:
-
-```shell
-brew install golift/mugs/notifiarr
-vi /usr/local/etc/notifiarr/notifiarr.conf
-brew services start notifiarr
-```
+Homebrew is no longer a supported installation method.
+[Download the DMG](https://github.com/Notifiarr/notifiarr/releases/latest)
+and put `Notifiarr.app` in `/Applications` instead.
 
 #### macOS App
 
@@ -138,11 +132,11 @@ To enable the webui, add this parameter to your config file, toward the top next
 ui_password = "username:9CharacterPassword"
 ```
 
-Use a password that is at least 9 characters long. 
+Use a password that is at least 9 characters long.
 Once you log into the web interface, you can change the password and it will be saved encrypted (so no one can snoop it).
 
-You may also set `ui_password` to the value of `"webauth"` to enable proxy authentication support. 
-You must also add your auth proxy IP or CIDR to the `upstreams` setting for this to work. 
+You may also set `ui_password` to the value of `"webauth"` to enable proxy authentication support.
+You must also add your auth proxy IP or CIDR to the `upstreams` setting for this to work.
 The proxy must pass `x-webauth-user: username` as a header, and you will be automatically logged in.
 
 ### Config Settings
@@ -339,7 +333,7 @@ You can add supported downloaders so they show up on the dashboard integration.
 You may easily add service checks to these downloaders by adding a name.
 Any number of downloaders of any type may be configured.
 
-All application instances also have `interval` and `timeout` inputs represented as a Go Duration. 
+All application instances also have `interval` and `timeout` inputs represented as a Go Duration.
 Setting `interval` to `-1s` disables service checks for that application.
 Setting `timeout` to `-1s` disables that instance entirely. Useful if an instacne is down temporarily.
 Example Go Durations: `1m`, `1m30s`, `3m15s`, 1h5m`. Valid units are `s`, `m`, and `h`. Combining units is additive.
@@ -394,7 +388,7 @@ Example Go Durations: `1m`, `1m30s`, `3m15s`, 1h5m`. Valid units are `s`, `m`, a
 
 ### Plex
 
-This application can also send Plex sessions to Notifiarr so you can receive notifications when users interact with your server. 
+This application can also send Plex sessions to Notifiarr so you can receive notifications when users interact with your server.
 This has three different features:
 
 - Notify all sessions on a longer interval (30+ minutes).
@@ -417,7 +411,7 @@ You may also need to add a webhook to Plex so it sends notices to this applicati
 
 ### Tautulli
 
-Only 1 Tautulli instance may be configured per client. 
+Only 1 Tautulli instance may be configured per client.
 Providing Tautulli allows Notifiarr to use the "Friendly Name" for your Plex users and it allows you to easily enable a service check.
 
 | Config Name      | Variable Name         | Note                                                                    |
@@ -534,11 +528,10 @@ Here are two more example Nginx configs:
 
 You can set a log file in the config. You should do that. Otherwise, find your logs here:
 
-- Linux: `/var/log/notifiarr/app.log`
-- FreeBSD: `/var/log/syslog` (w/ default syslog)
-- Homebrew: `/usr/local/var/log/notifiarr.log` or `/opt/homebrew/var/log/notifiarr.log`
-- macOS: `~/.notifiarr/notifiarr.log`
-- Windows: `<home folder>/.notifiarr/notifiarr.log`
+- Linux: `/var/log/notifiarr/app.log` (daemon), or `~/.notifiarr/Notifiarr.log` (desktop)
+- FreeBSD: `/usr/local/var/log/notifiarr/app.log` (service), or `~/.notifiarr/Notifiarr.log` (desktop)
+- macOS: `~/.notifiarr/Notifiarr.log`
+- Windows: `C:\Users\YOURNAME\.notifiarr\Notifiarr.log`
 
 Still having problems?
 [Let us know!](https://github.com/Notifiarr/notifiarr/issues/new)

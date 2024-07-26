@@ -33,7 +33,6 @@ chown -R $notifiarr_user $(dirname ${pidfile})
 
 export DN_LOG_FILE=/usr/local/var/log/notifiarr/app.log
 export DN_HTTP_LOG=/usr/local/var/log/notifiarr/http.log
-export DN_DEBUG_LOG=/usr/local/var/log/notifiarr/debug.log
 export DN_SERVICES_LOG_FILE=/usr/local/var/log/notifiarr/services.log
 export DN_QUIET=true
 

@@ -12,11 +12,11 @@ import (
 	"runtime"
 )
 
+// SystrayIcon is the icon in the system tray or task bar.
+const SystrayIcon = "files/images/logo/notifiarr.png"
+
 // ErrUnsupported is just an error.
 var ErrUnsupported = errors.New("unsupported OS")
-
-// SystrayIcon is the icon in the system tray or task bar.
-const SystrayIcon = "files/images/favicon.png"
 
 // HasGUI returns false on this gui-unsupported OS.
 func HasGUI() bool {
@@ -34,7 +34,11 @@ func StartCmd(command string, args ...string) error {
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
-	return cmd.Start() //nolint:wrapcheck
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("running cmd: %w", err)
+	}
+
+	return nil
 }
 
 // OpenCmd opens anything.
@@ -55,4 +59,16 @@ func OpenLog(logFile string) error {
 // OpenFile open Config Files.
 func OpenFile(filePath string) error {
 	return OpenCmd(filePath)
+}
+
+func HasStartupLink() (string, bool) {
+	return "", false
+}
+
+func DeleteStartupLink() (string, error) {
+	return "", ErrUnsupported
+}
+
+func CreateStartupLink() (bool, string, error) {
+	return false, "", ErrUnsupported
 }

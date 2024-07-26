@@ -9,6 +9,7 @@ var menu = make(map[string]*fakeMenu)
 
 type fakeMenu struct{}
 
+func (f *fakeMenu) Enable()          {}
 func (f *fakeMenu) Uncheck()         {}
 func (f *fakeMenu) Check()           {}
 func (f *fakeMenu) SetTooltip(any)   {}

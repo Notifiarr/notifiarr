@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Notifiarr
+Exec=env USEGUI=true /usr/bin/notifiarr
+Icon=/usr/share/doc/notifiarr/notifiarr.png
+Type=Application
+Terminal=false
+StartupWMClass=Notifiarr

@@ -64,4 +64,5 @@ pre_remove() {
 }
 EOF
 
-push_it
+
+[ "$1" == "-nopush" ] || push_it
