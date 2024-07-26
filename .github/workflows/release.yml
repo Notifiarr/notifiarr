@@ -77,7 +77,7 @@ jobs:
           source settings.sh
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
-      - name: upload artifacts
+      - name: Upload v${{steps.release.version}}-${{steps.release.revision}} DMG Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release
@@ -92,7 +92,7 @@ jobs:
     needs:
       - release-test
       - macapp-test
-    name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} Unstable.app
+    name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} Unstable Release and DMG
     runs-on: ubuntu-latest
     steps:
       - name: "Download files: ${{ matrix.files }}"
@@ -112,7 +112,8 @@ jobs:
   deploy-unstable-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     if: github.ref == 'refs/heads/unstable'
-    needs: release-test
+    needs:
+      - release-test
     name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} Unstable PackageCloud
     runs-on: ubuntu-latest
     steps:
@@ -131,7 +132,8 @@ jobs:
   deploy-packagecloud:
     # description: "Uploads pre-built RPM and DEB packages to packagecloud.io/golift"
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: release-test
+    needs:
+      - release-test
     name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} Release PackageCloud
     runs-on: ubuntu-latest
     steps:
@@ -152,7 +154,9 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
-    needs: [release-test, macapp-test]
+    needs:
+      - release-test
+      - macapp-test
     strategy:
       matrix:
         files: [release, dmg-release]
@@ -177,7 +181,9 @@ jobs:
 
   archlinux-aur:
     # description: creates and uploads and aur file to the golift/aur repo for arch linux.
-    needs: [release-test, deploy-github-release]
+    needs:
+      - release-test
+      - deploy-github-release
     name: Deploy v${{needs.release-test.outputs.version}}-${{needs.release-test.outputs.revision}} ArchLinux AUR
     runs-on: ubuntu-latest
     steps:
