@@ -70,9 +70,10 @@ jobs:
         id: vars
         run: |
           source settings.sh
+          echo "Building v${VERSION}-${ITERATION}"
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
-      - name: make-release
+      - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         id: release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg jq
