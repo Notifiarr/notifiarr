@@ -33,7 +33,7 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 		defer os.Exit(0)
 		defer c.CapturePanic()
 
-		b := bindata.AssetMust(ui.SystrayIcon)
+		b := bindata.MustAsset(ui.SystrayIcon)
 		systray.SetTemplateIcon(b, b)
 		systray.SetTooltip(mnd.PrintVersionInfo(c.Flags.Name()))
 		// systray.SetOnClick(c.showMenu) // buggy
