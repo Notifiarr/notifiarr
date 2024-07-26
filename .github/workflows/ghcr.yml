@@ -74,7 +74,7 @@ jobs:
 
       # Build and push Docker image with Buildx
       # https://github.com/docker/build-push-action
-      - name: Build and push ${{ matrix.docker.name }} Docker image
+      - name: Build v${{ env.VERSION }}-${{ env.ITERATION }} and push ${{ matrix.docker.name }} Docker image
         uses: docker/build-push-action@v6
         with:
           platforms: |-
