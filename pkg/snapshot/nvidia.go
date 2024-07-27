@@ -60,9 +60,7 @@ func (s *Snapshot) GetNvidia(ctx context.Context, config *NvidiaConfig) error {
 			return fmt.Errorf("unable to locate nvidia-smi at provided path '%s': %w", cmdPath, err)
 		}
 	} else if cmdPath, err = exec.LookPath(nvidiaSMIname()); err != nil {
-		// do not throw an error if nvidia-smi is missing.
-		// return fmt.Errorf("nvidia-smi missing! %w", err)
-		return nil
+		return fmt.Errorf("nvidia-smi missing from PATH! %w", err)
 	}
 
 	cmd := exec.CommandContext(ctx, cmdPath, "--format=csv,noheader", "--query-gpu="+

@@ -13,7 +13,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -33,10 +32,10 @@ const (
 
 // Command is the input data to perform an in-place update.
 type Command struct {
-	URL         string   // file to download.
-	Path        string   // file to be updated.
-	Args        []string // optional, but non-nil will crash.
-	*log.Logger          // debug logs.
+	URL        string   // file to download.
+	Path       string   // file to be updated.
+	Args       []string // optional, but non-nil will crash.
+	mnd.Logger          // debug logs.
 }
 
 // Errors. Don't trigger these.
@@ -47,6 +46,8 @@ var (
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
 func Restart(u *Command) error {
+	// A small pause to give the parent time to exit.
+	time.Sleep(time.Second)
 	// A small pause to give the new app time to fork.
 	defer time.Sleep(time.Second)
 
@@ -119,13 +120,13 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 
 	backupFile := strings.TrimSuffix(u.Path, dotExe)
 	backupFile += ".backup." + time.Now().Format(backupTimeFormat) + suff
-	u.Printf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
+	u.Debugf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
 
 	if err := os.Rename(u.Path, backupFile); err != nil {
 		return backupFile, fmt.Errorf("renaming original file: %w", err)
 	}
 
-	u.Printf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
+	u.Debugf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
 
 	u.cleanOldBackups()
 
@@ -143,7 +144,7 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 	}
 	defer tempFile.Close()
 
-	u.Printf("[UPDATE] Primed Temp File: %s", tempFile.Name())
+	u.Debugf("[UPDATE] Primed Temp File: %s", tempFile.Name())
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.URL, nil)
 	if err != nil {
@@ -226,7 +227,7 @@ func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error
 		}
 	}
 
-	u.Println("[UPDATE] exe file not found in zip file")
+	u.Errorf("[UPDATE] exe file not found in zip file")
 
 	return nil
 }

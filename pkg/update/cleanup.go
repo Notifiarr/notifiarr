@@ -24,7 +24,7 @@ func (f fileList) Len() int {
 }
 
 func (f fileList) Less(i, j int) bool {
-	return f[i].when.UnixMicro() > f[j].when.UnixMicro()
+	return f[i].when.UnixMicro() < f[j].when.UnixMicro()
 }
 
 func (f fileList) Swap(i, j int) {
@@ -56,12 +56,11 @@ func (u *Command) cleanOldBackups() {
 	sort.Sort(consider)
 
 	for idx, file := range consider {
-		total := len(consider)
-		if total-1-idx < keepBackups {
+		if len(consider)-idx <= keepBackups {
 			return
 		}
 
 		err := os.Remove(filepath.Join(dir, file.name))
-		u.Printf("Deleted old backup file: %s%s (error: %v)", file.name, mnd.DurationAge(file.when), err)
+		u.Printf("[UPDATE] Deleted old backup file: %s%s (error: %v)", file.name, mnd.DurationAge(file.when), err)
 	}
 }
