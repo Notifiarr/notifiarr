@@ -25,7 +25,11 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-const downloadTimeout = 5 * time.Minute
+const (
+	downloadTimeout  = 5 * time.Minute
+	backupTimeFormat = "060102T150405"
+	dotExe           = ".exe"
+)
 
 // Command is the input data to perform an in-place update.
 type Command struct {
@@ -109,12 +113,12 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 	}
 
 	suff := ""
-	if strings.HasSuffix(u.Path, ".exe") {
-		suff = ".exe"
+	if strings.HasSuffix(u.Path, dotExe) {
+		suff = dotExe
 	}
 
-	backupFile := strings.TrimSuffix(u.Path, ".exe")
-	backupFile += ".backup." + time.Now().Format("060102T150405") + suff
+	backupFile := strings.TrimSuffix(u.Path, dotExe)
+	backupFile += ".backup." + time.Now().Format(backupTimeFormat) + suff
 	u.Printf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
 
 	if err := os.Rename(u.Path, backupFile); err != nil {
@@ -123,16 +127,12 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 
 	u.Printf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
 
+	u.cleanOldBackups()
+
 	if err := os.Rename(tempFile, u.Path); err != nil {
 		return backupFile, fmt.Errorf("renaming downloaded file: %w", err)
 	}
-	/* // Hack used for testing.
-	u.Printf("[UPDATE] Renaming [HACK] %s => %s", backupFile, u.Path)
 
-	if err := os.Rename(backupFile, u.Path); err != nil {
-		return backupFile, fmt.Errorf("renaming downloaded file %w", err)
-	}
-	/**/
 	return backupFile, nil
 }
 
@@ -211,7 +211,7 @@ func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error
 
 	// Find the exe file and write that.
 	for _, zipFile := range zipReader.File {
-		if runtime.GOOS == mnd.Windows && strings.HasSuffix(zipFile.Name, ".exe") {
+		if runtime.GOOS == mnd.Windows && strings.HasSuffix(zipFile.Name, dotExe) {
 			zipOpen, err := zipFile.Open()
 			if err != nil {
 				return fmt.Errorf("reading zipped exe file: %w", err)
