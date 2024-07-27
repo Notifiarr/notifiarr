@@ -53,7 +53,6 @@ type Config struct {
 	IPMI      bool          `json:"ipmi"          toml:"ipmi"           xml:"ipmi"`           // get ipmi sensor info.
 	IPMISudo  bool          `json:"ipmiSudo"      toml:"ipmiSudo"       xml:"ipmiSudo"`       // use sudo to get ipmi sensor info.
 	Plugins
-	// Debug     bool          `toml:"debug" xml:"debug" json:"debug"`
 }
 
 // Plugins is optional configuration for "plugins".
