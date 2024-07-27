@@ -14,3 +14,7 @@ type Output struct {
 func Info() any {
 	return &Output{Kind: kind, From: from}
 }
+
+func MD5() string {
+	return kind
+}
