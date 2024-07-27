@@ -174,17 +174,13 @@ func (c *cmd) startWebsitePoller() {
 
 // PollUpCheck just tells the website the client is still up. It doesn't process the return payload.
 func (c *cmd) PollUpCheck(_ context.Context, input *common.ActionInput) {
-	_, err := c.GetData(&website.Request{
+	c.SendData(&website.Request{
 		Route:      website.ClientRoute,
 		Event:      website.EventCheck,
-		Payload:    "up",
+		Payload:    map[string]any{"up": "up"},
 		LogPayload: true,
 		ErrorsOnly: true,
 	})
-	if err != nil {
-		c.ErrorfNoShare("[%s requested] UpChecking Notifiarr: %v", input.Type, err)
-		return
-	}
 }
 
 // PollForReload is only started if the initial connection to the website failed.
