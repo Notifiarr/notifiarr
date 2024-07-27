@@ -177,7 +177,7 @@ func (c *cmd) PollUpCheck(_ context.Context, input *common.ActionInput) {
 	c.SendData(&website.Request{
 		Route:      website.ClientRoute,
 		Event:      website.EventCheck,
-		Payload:    map[string]any{"up": "up"},
+		Payload:    map[string]any{"up": input.Type},
 		LogPayload: true,
 		ErrorsOnly: true,
 	})
