@@ -705,6 +705,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	config.Commands = nil
 	config.Service = nil
 	config.Snapshot.Plugins.MySQL = nil
+	config.Snapshot.Plugins.Nvidia = nil
 
 	// for k, v := range request.PostForm {
 	// 	c.Errorf("Config Post: %s = %+v", k, v)

@@ -63,7 +63,7 @@ const (
 // LogConfig allows sending logs to rotating files.
 // Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
 type LogConfig struct {
-	AppName   string   `json:"-"`
+	AppName   string   `json:"-"         toml:"-"           xml:"-"           yaml:"-"`
 	LogFile   string   `json:"logFile"   toml:"log_file"    xml:"log_file"    yaml:"logFile"`
 	DebugLog  string   `json:"debugLog"  toml:"debug_log"   xml:"debug_log"   yaml:"debugLog"`
 	HTTPLog   string   `json:"httpLog"   toml:"http_log"    xml:"http_log"    yaml:"httpLog"`
