@@ -21,6 +21,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/private"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
@@ -394,7 +395,7 @@ type templateData struct {
 	Dynamic     bool                           `json:"dynamic"`
 	Webauth     bool                           `json:"webauth"`
 	Msg         string                         `json:"msg,omitempty"`
-	Version     map[string]interface{}         `json:"version"`
+	Version     map[string]any                 `json:"version"`
 	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
 	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
 	ClientInfo  *clientinfo.ClientInfo         `json:"clientInfo"`
@@ -463,6 +464,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 			"gateway":   getGateway(),
 			"ifName":    ifName,
 			"netmask":   netmask,
+			"md5":       private.MD5(),
 		},
 		Expvar:   mnd.GetAllData(),
 		HostInfo: hostInfo,

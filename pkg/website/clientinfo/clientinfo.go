@@ -48,6 +48,7 @@ type ClientInfo struct {
 		Custom    []*CronConfig   `json:"custom"`    // Site config for Custom Crons.
 		Snapshot  snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
 	} `json:"actions"`
+	IntegrityCheck bool `json:"integrityCheck"`
 }
 
 // MuleryServer is data from the website. It's a tunnel's https and wss urls.
