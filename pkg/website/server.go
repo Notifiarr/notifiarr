@@ -98,7 +98,7 @@ func (s *Server) Stop() {
 	s.sendData = nil
 }
 
-// GetData sends data to a notifiarr URL as JSON.
+// GetData sends data to a notifiarr URL as JSON and returns a response.
 func (s *Server) GetData(req *Request) (*Response, error) {
 	s.sdMutex.RLock()
 	defer s.sdMutex.RUnlock()
@@ -123,10 +123,10 @@ func (s *Server) RawGetData(ctx context.Context, req *Request) (*Response, time.
 	return s.sendRequest(ctx, req)
 }
 
-func (s *Server) sendPayload(ctx context.Context, uri string, payload interface{}, log bool) (*Response, error) {
+func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
 	data, err := json.Marshal(payload)
 	if err == nil {
-		var torn map[string]interface{}
+		var torn map[string]any
 		if err := json.Unmarshal(data, &torn); err == nil {
 			if torn["host"], err = s.GetHostInfo(ctx); err != nil {
 				s.Config.Errorf("Host Info Unknown: %v", err)
