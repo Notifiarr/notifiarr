@@ -45,13 +45,13 @@ var (
 )
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
-func Restart(u *Command) error {
+func Restart(cmd *Command) error {
 	// A small pause to give the parent time to exit.
 	time.Sleep(time.Second)
 	// A small pause to give the new app time to fork.
 	defer time.Sleep(time.Second)
 
-	if err := exec.Command(u.Path, u.Args...).Start(); err != nil { //nolint:gosec
+	if err := exec.Command(cmd.Path, cmd.Args...).Start(); err != nil { //nolint:gosec
 		return fmt.Errorf("executing command %w", err)
 	}
 
