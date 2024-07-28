@@ -16,7 +16,7 @@ build() {
   cd "$pkgname-$pkgver"
   export EXTRA_LDFLAGS=-linkmode=external
   export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
-  make clean man VERSION="${pkgver}" ITERATION="${pkgrel}"
+  make clean man generate VERSION="${pkgver}" ITERATION="${pkgrel}"
 
   if [ "$CARCH" == "x86_64" ]; then
     make linux VERSION="${pkgver}" ITERATION="${pkgrel}"
