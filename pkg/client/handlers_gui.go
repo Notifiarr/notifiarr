@@ -824,10 +824,11 @@ func (c *Client) handleStaticAssets(resp http.ResponseWriter, req *http.Request)
 		}
 	}
 
+	internalServer := statigz.FileServer(bindata.Files)
 	if c.Flags.Assets == "" {
-		statigz.FileServer(bindata.Files).ServeHTTP(resp, req)
+		internalServer.ServeHTTP(resp, req)
 	} else {
 		statigz.FileServer(os.DirFS(c.Flags.Assets).(fs.ReadDirFS), //nolint:forcetypeassert // This is OK!
-			statigz.OnNotFound(statigz.FileServer(bindata.Files).ServeHTTP)).ServeHTTP(resp, req)
+			statigz.OnNotFound(internalServer.ServeHTTP)).ServeHTTP(resp, req)
 	}
 }
