@@ -161,7 +161,7 @@ func (c *cmd) updateNow(ctx context.Context, u *update.Update, msg website.Event
 
 	cmd := &update.Command{
 		URL:    u.CurrURL,
-		Logger: c.Logger.DebugLog,
+		Logger: c.Logger,
 		Args:   []string{"--restart", "--config", c.ConfigFile},
 		Path:   os.Args[0],
 	}
