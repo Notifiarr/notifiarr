@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NYTimes/gziphandler"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -22,20 +23,20 @@ func (c *Client) httpHandlers() {
 	c.httpAPIHandlers() // Init API handlers up front.
 	// 404 (or redirect to base path) everything else
 	defer func() {
-		c.Config.Router.PathPrefix("/").HandlerFunc(c.notFound)
+		c.Config.Router.PathPrefix("/").Handler(gz(c.notFound))
 	}()
 
 	base := path.Join("/", c.Config.URLBase)
 
-	c.Config.Router.HandleFunc("/favicon.ico", c.favIcon).Methods("GET")
-	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.slash).Methods("GET")
-	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.loginHandler).Methods("POST")
+	c.Config.Router.Handle("/favicon.ico", gz(c.favIcon)).Methods("GET")
+	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gz(c.slash)).Methods("GET")
+	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gz(c.loginHandler)).Methods("POST")
 
 	// Handle the same URLs as above on the different base URL too.
 	if !strings.EqualFold(base, "/") {
-		c.Config.Router.HandleFunc(path.Join(base, "favicon.ico"), c.favIcon).Methods("GET")
-		c.Config.Router.HandleFunc(base, c.slash).Methods("GET")
-		c.Config.Router.HandleFunc(base, c.loginHandler).Methods("POST")
+		c.Config.Router.Handle(path.Join(base, "favicon.ico"), gz(c.favIcon)).Methods("GET")
+		c.Config.Router.Handle(base, gz(c.slash)).Methods("GET")
+		c.Config.Router.Handle(base, gz(c.loginHandler)).Methods("POST")
 	}
 
 	if c.Config.UIPassword == "" {
@@ -44,14 +45,19 @@ func (c *Client) httpHandlers() {
 
 	c.Config.Router.PathPrefix(path.Join(base, "/files/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
-	c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("GET", "POST")
+	c.Config.Router.Handle(path.Join(base, "/logout"), gz(c.logoutHandler)).Methods("GET", "POST")
 	c.httpGuiHandlers(base)
+}
+
+func gz(handler http.HandlerFunc) http.Handler {
+	return gziphandler.GzipHandler(handler)
 }
 
 func (c *Client) httpGuiHandlers(base string) {
 	// gui is used for authorized paths. All these paths have a prefix of /ui.
 	gui := c.Config.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
 	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
+	gui.Use(gziphandler.GzipHandler)
 	gui.Handle("/debug/vars", expvar.Handler()).Methods("GET")
 	gui.HandleFunc("/deleteFile/{source}/{id}", c.getFileDeleteHandler).Methods("GET")
 	gui.HandleFunc("/downloadFile/{source}/{id}", c.getFileDownloadHandler).Methods("GET")

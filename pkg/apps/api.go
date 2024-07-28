@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/NYTimes/gziphandler"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/datacounter"
@@ -37,7 +38,7 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 
 	uri = path.Join(a.URLBase, "api", app.Lower(), id, uri)
 
-	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
+	return a.Router.Handle(uri, a.CheckAPIKey(gziphandler.GzipHandler(a.handleAPI(app, api)))).Methods(method...)
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.

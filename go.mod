@@ -6,6 +6,7 @@ go 1.22
 
 require (
 	github.com/BurntSushi/toml v1.4.0
+	github.com/NYTimes/gziphandler v1.1.1
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
 	github.com/energye/systray v1.0.2
