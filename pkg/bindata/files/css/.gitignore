@@ -1,2 +1,2 @@
-# The files only get gziped during build. Do not commit these gzip'd.
+# The files only get gzipped during build. Do not commit these gzip'd.
 *.gz
