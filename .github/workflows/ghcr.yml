@@ -52,6 +52,7 @@ jobs:
           git fetch --force --tags;
           source ./settings.sh;
           [ -z SLIPPERS ] || eval "${SLIPPERS}";
+          gzip -9 pkg/bindata/files/{css,js}/*
           for item in DATE COMMIT VERSION ITERATION BRANCH LICENSE DESC VENDOR MAINT SOURCE_URL; do
             eval echo "settings.sh build-arg: ${item}=\$${item}";
             eval echo "${item}=\$${item}" >> $GITHUB_ENV;

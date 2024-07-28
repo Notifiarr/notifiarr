@@ -40,6 +40,7 @@ jobs:
         run: |
           brew install Bearer/tap/gon
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
+          gzip -9 pkg/bindata/files/{css,js}/*
           make signdmg
       - name: Upload DMG Artifact
         uses: actions/upload-artifact@v4
@@ -80,6 +81,7 @@ jobs:
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
+          gzip -9 pkg/bindata/files/{css,js}/*
           make release
       - name: Upload Release Artifacts v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         uses: actions/upload-artifact@v4

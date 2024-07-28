@@ -24,7 +24,6 @@ require (
 	github.com/jackpal/gateway v1.0.15
 	github.com/jaypipes/ghw v0.12.0
 	github.com/jxeng/shortcut v1.0.2
-	github.com/kevinburke/go-bindata/v4 v4.0.2
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mrobinsn/go-rtorrent v1.8.0
@@ -33,6 +32,7 @@ require (
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
+	github.com/vearutop/statigz v1.4.0
 	golang.org/x/crypto v0.25.0
 	golang.org/x/mod v0.19.0
 	golang.org/x/sys v0.22.0
