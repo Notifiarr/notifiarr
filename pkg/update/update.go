@@ -162,17 +162,17 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 
 func (u *Command) decompressFile(tempFile *os.File, resp io.Reader, size int64) error {
 	switch {
-	case strings.Contains(u.URL, ".zip?stamp"):
+	case strings.Contains(u.URL, ".zip?stamp"), strings.HasSuffix(u.URL, ".zip"):
 		if body, err := io.ReadAll(resp); err != nil {
 			return fmt.Errorf("reading file from URL: %w", err)
 		} else if err := u.writeZipFile(tempFile, body, size); err != nil {
 			return err
 		}
-	case strings.Contains(u.URL, ".gz?stamp"):
+	case strings.Contains(u.URL, ".gz?stamp"), strings.HasSuffix(u.URL, ".gz"):
 		if err := u.writeGZipFile(tempFile, resp); err != nil {
 			return err
 		}
-	case strings.Contains(u.URL, ".bz2?stamp"):
+	case strings.Contains(u.URL, ".bz2?stamp"), strings.HasSuffix(u.URL, ".bz2"):
 		if _, err := io.Copy(tempFile, bzip2.NewReader(resp)); err != nil {
 			return fmt.Errorf("bzunzipping temporary file: %w", err)
 		}
