@@ -14,8 +14,6 @@ install="${pkgname}.aur.install"
 
 build() {
   cd "$pkgname-$pkgver"
-  export EXTRA_LDFLAGS=-linkmode=external
-  export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
   make clean man generate VERSION="${pkgver}" ITERATION="${pkgrel}"
 
   if [ "$CARCH" == "x86_64" ]; then
@@ -43,7 +41,7 @@ package() {
   # Binary.
   install -Dm755 "${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
   # Directories.
-  install -dm0755 "${pkgdir}/usr/share/doc/${pkgname}" \
+  install -dm0755 "${pkgdir}/usr/share/doc/${pkgname}" "${pkgdir}/usr/share/applications" \
     "${pkgdir}/usr/share/licenses/${pkgname}" "${pkgdir}/etc/${pkgname}"
   # Man file.
   install -Dm644 "${pkgname}.1.gz" "${pkgdir}/usr/share/man/man1/${pkgname}.1.gz"
