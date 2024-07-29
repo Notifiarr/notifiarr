@@ -1,0 +1,2 @@
+# The files only get gzipped during build. Do not commit these gzip'd.
+*.gz

@@ -129,7 +129,7 @@ func CreateStartupLink() (bool, string, error) {
 				exe, _ := os.Executable()
 				return exe
 			},
-		}).Parse(bindata.MustAssetString("other/io.golift.notifiarr.plist"))).
+		}).Parse(bindata.Plist)).
 		Execute(file, nil)
 	if err != nil {
 		return false, "", fmt.Errorf("writing launch agent: %w", err)

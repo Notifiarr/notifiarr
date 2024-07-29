@@ -137,7 +137,7 @@ func getTunnels(info *clientinfo.ClientInfo) []string {
 
 	// The above is the new way, the below is the 'transition' way.
 	// The above allows the user to pick 2 or 3 tunnels. If they haven't
-	// picked anything yet, then they all of them (below) until they do
+	// picked anything yet, then they get all of them (below) until they do
 	// pick some. The below code probably can't be removed, so a client
 	// can bootstrap with no configuration present on the website.
 

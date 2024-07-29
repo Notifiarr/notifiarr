@@ -6,10 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"mime"
+	"io/fs"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -32,6 +31,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/swaggo/swag"
+	"github.com/vearutop/statigz"
 	"golift.io/version"
 )
 
@@ -815,43 +815,20 @@ func (c *Client) handleSwaggerIndex(response http.ResponseWriter, request *http.
 	c.renderTemplate(request.Context(), response, request, "swagger/index.html", "")
 }
 
-// handleStaticAssets checks for a file on disk then falls back to compiled-in files.
-func (c *Client) handleStaticAssets(response http.ResponseWriter, request *http.Request) {
-	if request.URL.Path == "/files/css/custom.css" {
-		if cssFileDir := c.haveCustomFile("custom.css"); cssFileDir != "" {
+func (c *Client) handleStaticAssets(resp http.ResponseWriter, req *http.Request) {
+	if req.URL.Path == "/files/css/custom.css" {
+		if cssFile := c.haveCustomFile("custom.css"); cssFile != "" {
 			// custom css file exists on disk, use http.FileServer to serve the dir it's in.
-			http.StripPrefix("/files/css", http.FileServer(http.Dir(filepath.Dir(cssFileDir)))).ServeHTTP(response, request)
+			http.StripPrefix("/files/css", http.FileServer(http.Dir(filepath.Dir(cssFile)))).ServeHTTP(resp, req)
 			return
 		}
 	}
 
+	internalServer := statigz.FileServer(bindata.Files)
 	if c.Flags.Assets == "" {
-		c.handleInternalAsset(response, request)
-		return
-	}
-
-	// get the absolute path to prevent directory traversal
-	f, err := filepath.Abs(filepath.Join(c.Flags.Assets, request.URL.Path))
-	if _, err2 := os.Stat(f); err != nil || err2 != nil { // Check if it exists.
-		c.handleInternalAsset(response, request)
-		return
-	}
-
-	// file exists on disk, use http.FileServer to serve the static dir it's in.
-	http.FileServer(http.Dir(c.Flags.Assets)).ServeHTTP(response, request)
-}
-
-func (c *Client) handleInternalAsset(response http.ResponseWriter, request *http.Request) {
-	data, err := bindata.Asset(request.URL.Path[1:])
-	if err != nil {
-		http.Error(response, err.Error(), http.StatusNotFound)
-		return
-	}
-
-	mime := mime.TypeByExtension(path.Ext(request.URL.Path))
-	response.Header().Set("Content-Type", mime)
-
-	if _, err = response.Write(data); err != nil {
-		c.Errorf("Writing HTTP Response: %v", err)
+		internalServer.ServeHTTP(resp, req)
+	} else {
+		statigz.FileServer(os.DirFS(c.Flags.Assets).(fs.ReadDirFS), //nolint:forcetypeassert // This is OK!
+			statigz.OnNotFound(internalServer.ServeHTTP)).ServeHTTP(resp, req)
 	}
 }

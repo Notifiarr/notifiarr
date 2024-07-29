@@ -8,8 +8,10 @@ package apps
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
+	"github.com/CAFxX/httpcompression"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -22,27 +24,28 @@ import (
 //
 //nolint:lll
 type Apps struct {
-	APIKey       string              `json:"apiKey"                 toml:"api_key"      xml:"api_key"      yaml:"apiKey"`
-	ExKeys       []string            `json:"extraKeys"              toml:"extra_keys"   xml:"extra_keys"   yaml:"extraKeys"`
-	URLBase      string              `json:"urlbase"                toml:"urlbase"      xml:"urlbase"      yaml:"urlbase"`
-	MaxBody      int                 `json:"maxBody"                toml:"max_body"     xml:"max_body"     yaml:"maxBody"`
-	Serial       bool                `json:"serial"                 toml:"serial"       xml:"serial"       yaml:"serial"`
-	Sonarr       []*SonarrConfig     `json:"sonarr,omitempty"       toml:"sonarr"       xml:"sonarr"       yaml:"sonarr,omitempty"`
-	Radarr       []*RadarrConfig     `json:"radarr,omitempty"       toml:"radarr"       xml:"radarr"       yaml:"radarr,omitempty"`
-	Lidarr       []*LidarrConfig     `json:"lidarr,omitempty"       toml:"lidarr"       xml:"lidarr"       yaml:"lidarr,omitempty"`
-	Readarr      []*ReadarrConfig    `json:"readarr,omitempty"      toml:"readarr"      xml:"readarr"      yaml:"readarr,omitempty"`
-	Prowlarr     []*ProwlarrConfig   `json:"prowlarr,omitempty"     toml:"prowlarr"     xml:"prowlarr"     yaml:"prowlarr,omitempty"`
-	Deluge       []*DelugeConfig     `json:"deluge,omitempty"       toml:"deluge"       xml:"deluge"       yaml:"deluge,omitempty"`
-	Qbit         []*QbitConfig       `json:"qbit,omitempty"         toml:"qbit"         xml:"qbit"         yaml:"qbit,omitempty"`
-	Rtorrent     []*RtorrentConfig   `json:"rtorrent,omitempty"     toml:"rtorrent"     xml:"rtorrent"     yaml:"rtorrent,omitempty"`
-	SabNZB       []*SabNZBConfig     `json:"sabnzbd,omitempty"      toml:"sabnzbd"      xml:"sabnzbd"      yaml:"sabnzbd,omitempty"`
-	NZBGet       []*NZBGetConfig     `json:"nzbget,omitempty"       toml:"nzbget"       xml:"nzbget"       yaml:"nzbget,omitempty"`
-	Transmission []*XmissionConfig   `json:"transmission,omitempty" toml:"transmission" xml:"transmission" yaml:"transmission,omitempty"`
-	Tautulli     *TautulliConfig     `json:"tautulli,omitempty"     toml:"tautulli"     xml:"tautulli"     yaml:"tautulli,omitempty"`
-	Plex         *PlexConfig         `json:"plex"                   toml:"plex"         xml:"plex"         yaml:"plex"`
-	Router       *mux.Router         `json:"-"                      toml:"-"            xml:"-"            yaml:"-"`
-	keys         map[string]struct{} `json:"-"                      toml:"-"            xml:"-"` // for fast key lookup.
+	APIKey       string            `json:"apiKey"                 toml:"api_key"      xml:"api_key"      yaml:"apiKey"`
+	ExKeys       []string          `json:"extraKeys"              toml:"extra_keys"   xml:"extra_keys"   yaml:"extraKeys"`
+	URLBase      string            `json:"urlbase"                toml:"urlbase"      xml:"urlbase"      yaml:"urlbase"`
+	MaxBody      int               `json:"maxBody"                toml:"max_body"     xml:"max_body"     yaml:"maxBody"`
+	Serial       bool              `json:"serial"                 toml:"serial"       xml:"serial"       yaml:"serial"`
+	Sonarr       []*SonarrConfig   `json:"sonarr,omitempty"       toml:"sonarr"       xml:"sonarr"       yaml:"sonarr,omitempty"`
+	Radarr       []*RadarrConfig   `json:"radarr,omitempty"       toml:"radarr"       xml:"radarr"       yaml:"radarr,omitempty"`
+	Lidarr       []*LidarrConfig   `json:"lidarr,omitempty"       toml:"lidarr"       xml:"lidarr"       yaml:"lidarr,omitempty"`
+	Readarr      []*ReadarrConfig  `json:"readarr,omitempty"      toml:"readarr"      xml:"readarr"      yaml:"readarr,omitempty"`
+	Prowlarr     []*ProwlarrConfig `json:"prowlarr,omitempty"     toml:"prowlarr"     xml:"prowlarr"     yaml:"prowlarr,omitempty"`
+	Deluge       []*DelugeConfig   `json:"deluge,omitempty"       toml:"deluge"       xml:"deluge"       yaml:"deluge,omitempty"`
+	Qbit         []*QbitConfig     `json:"qbit,omitempty"         toml:"qbit"         xml:"qbit"         yaml:"qbit,omitempty"`
+	Rtorrent     []*RtorrentConfig `json:"rtorrent,omitempty"     toml:"rtorrent"     xml:"rtorrent"     yaml:"rtorrent,omitempty"`
+	SabNZB       []*SabNZBConfig   `json:"sabnzbd,omitempty"      toml:"sabnzbd"      xml:"sabnzbd"      yaml:"sabnzbd,omitempty"`
+	NZBGet       []*NZBGetConfig   `json:"nzbget,omitempty"       toml:"nzbget"       xml:"nzbget"       yaml:"nzbget,omitempty"`
+	Transmission []*XmissionConfig `json:"transmission,omitempty" toml:"transmission" xml:"transmission" yaml:"transmission,omitempty"`
+	Tautulli     *TautulliConfig   `json:"tautulli,omitempty"     toml:"tautulli"     xml:"tautulli"     yaml:"tautulli,omitempty"`
+	Plex         *PlexConfig       `json:"plex"                   toml:"plex"         xml:"plex"         yaml:"plex"`
+	Router       *mux.Router       `json:"-"                      toml:"-"            xml:"-"            yaml:"-"`
 	mnd.Logger   `json:"-"                      toml:"-"            xml:"-"`
+	keys         map[string]struct{} // for fast key lookup.
+	compress     func(h http.Handler) http.Handler
 }
 
 type ExtraConfig struct {
@@ -77,6 +80,7 @@ var (
 // This is part of the config/startup init.
 func (a *Apps) Setup() error { //nolint:cyclop
 	a.APIKey = strings.TrimSpace(a.APIKey)
+	a.compress, _ = httpcompression.DefaultAdapter()
 
 	if err := a.setupLidarr(); err != nil {
 		return err

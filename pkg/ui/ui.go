@@ -11,7 +11,7 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	asset = bindata.Asset
+	asset = bindata.Files.ReadFile
 	// pngPathCache caches the path to the application icon.
 	// Do not use this variable directly. Call GetPNG()
 	pngPathCache = ""

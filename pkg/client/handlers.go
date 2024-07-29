@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/CAFxX/httpcompression"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -20,22 +21,28 @@ import (
 // httpHandlers initializes GUI HTTP routes.
 func (c *Client) httpHandlers() {
 	c.httpAPIHandlers() // Init API handlers up front.
+
+	compress, _ := httpcompression.DefaultAdapter()
+	gzip := func(handler http.HandlerFunc) http.Handler {
+		return compress(handler)
+	}
+
 	// 404 (or redirect to base path) everything else
 	defer func() {
-		c.Config.Router.PathPrefix("/").HandlerFunc(c.notFound)
+		c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
 	}()
 
 	base := path.Join("/", c.Config.URLBase)
 
-	c.Config.Router.HandleFunc("/favicon.ico", c.favIcon).Methods("GET")
-	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.slash).Methods("GET")
-	c.Config.Router.HandleFunc(strings.TrimSuffix(base, "/")+"/", c.loginHandler).Methods("POST")
+	c.Config.Router.Handle("/favicon.ico", gzip(c.favIcon)).Methods("GET")
+	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")
+	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginHandler)).Methods("POST")
 
 	// Handle the same URLs as above on the different base URL too.
 	if !strings.EqualFold(base, "/") {
-		c.Config.Router.HandleFunc(path.Join(base, "favicon.ico"), c.favIcon).Methods("GET")
-		c.Config.Router.HandleFunc(base, c.slash).Methods("GET")
-		c.Config.Router.HandleFunc(base, c.loginHandler).Methods("POST")
+		c.Config.Router.Handle(path.Join(base, "favicon.ico"), gzip(c.favIcon)).Methods("GET")
+		c.Config.Router.Handle(base, gzip(c.slash)).Methods("GET")
+		c.Config.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
 	}
 
 	if c.Config.UIPassword == "" {
@@ -44,14 +51,15 @@ func (c *Client) httpHandlers() {
 
 	c.Config.Router.PathPrefix(path.Join(base, "/files/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
-	c.Config.Router.HandleFunc(path.Join(base, "/logout"), c.logoutHandler).Methods("GET", "POST")
-	c.httpGuiHandlers(base)
+	c.Config.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")
+	c.httpGuiHandlers(base, compress)
 }
 
-func (c *Client) httpGuiHandlers(base string) {
+func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler) http.Handler) {
 	// gui is used for authorized paths. All these paths have a prefix of /ui.
 	gui := c.Config.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
 	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
+	gui.Use(compress)
 	gui.Handle("/debug/vars", expvar.Handler()).Methods("GET")
 	gui.HandleFunc("/deleteFile/{source}/{id}", c.getFileDeleteHandler).Methods("GET")
 	gui.HandleFunc("/downloadFile/{source}/{id}", c.getFileDownloadHandler).Methods("GET")
@@ -152,7 +160,7 @@ func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
 }
 
 func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-	ico, err := bindata.Asset("files/images/favicon.ico")
+	ico, err := bindata.Files.ReadFile("files/images/favicon.ico")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

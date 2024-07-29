@@ -37,13 +37,13 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 
 	uri = path.Join(a.URLBase, "api", app.Lower(), id, uri)
 
-	return a.Router.Handle(uri, a.CheckAPIKey(a.handleAPI(app, api))).Methods(method...)
+	return a.Router.Handle(uri, a.CheckAPIKey(a.compress(a.handleAPI(app, api)))).Methods(method...)
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
 func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop,funlen
-	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+	return func(resp http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		var (
 			msg     interface{}
 			ctx     = r.Context()
@@ -92,7 +92,7 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, aID)))
 		}
 
-		wrote := a.Respond(w, code, msg)
+		wrote := a.Respond(resp, code, msg)
 
 		if str, _ := json.MarshalIndent(msg, "", " "); len(post) > 0 {
 			a.Debugf("Incoming API: %s %s (%s): %s\nStatus: %d, Reply (%s): %s",

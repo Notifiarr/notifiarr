@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -330,22 +331,70 @@ func since(t time.Time) string {
 	return strings.ReplaceAll(durafmt.Parse(time.Since(t)).LimitFirstN(3).Format(mnd.DurafmtShort), " ", "")
 }
 
+func (c *Client) parseTemplatesDirectory(filePath string) error {
+	items, err := bindata.Templates.ReadDir(filePath)
+	if err != nil {
+		return fmt.Errorf("failed reading internal templates: %w", err)
+	}
+
+	var data []byte
+
+	for _, entry := range items {
+		filePath := path.Join(filePath, entry.Name())
+
+		if entry.IsDir() { // Recursion.
+			if err := c.parseTemplatesDirectory(filePath); err != nil {
+				return err
+			}
+
+			continue
+		}
+
+		if strings.HasSuffix(filePath, ".gz") {
+			if data, err = decompressTemplate(filePath); err != nil {
+				return err
+			}
+		} else if data, err = bindata.Templates.ReadFile(filePath); err != nil {
+			return fmt.Errorf("failed reading internal template %s: %w", filePath, err)
+		}
+
+		filePath = strings.TrimSuffix(strings.TrimPrefix(filePath, "templates/"), ".gz") // no leading junk.
+		if c.template, err = c.template.New(filePath).Parse(string(data)); err != nil {
+			return fmt.Errorf("bug parsing internal template: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func decompressTemplate(filePath string) ([]byte, error) {
+	data, err := bindata.Templates.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("opening compressed internal template %s: %w", filePath, err)
+	}
+	defer data.Close()
+
+	gzip, err := gzip.NewReader(data)
+	if err != nil {
+		return nil, fmt.Errorf("decompressing internal template %s: %w", filePath, err)
+	}
+
+	output, err := io.ReadAll(gzip)
+	if err != nil {
+		return nil, fmt.Errorf("reading compressed internal template %s: %w", filePath, err)
+	}
+
+	return output, nil
+}
+
 // ParseGUITemplates parses the baked-in templates, and overrides them if a template directory is provided.
 func (c *Client) ParseGUITemplates() error {
 	// Index and 404 do not have template files, but they can be customized.
 	index := "<p>" + c.Flags.Name() + `: <strong>working</strong></p>`
 	c.template = template.Must(template.New("index.html").Parse(index)).Funcs(c.getFuncMap())
 
-	var err error
-
-	// Parse all our compiled-in templates.
-	for _, name := range bindata.AssetNames() {
-		if strings.HasPrefix(name, "templates/") {
-			trim := strings.TrimPrefix(name, "templates/")
-			if c.template, err = c.template.New(trim).Parse(bindata.MustAssetString(name)); err != nil {
-				return fmt.Errorf("bug parsing internal template: %w", err)
-			}
-		}
+	if err := c.parseTemplatesDirectory("templates"); err != nil {
+		return err
 	}
 
 	if c.Flags.Assets != "" {
@@ -362,25 +411,38 @@ func (c *Client) parseCustomTemplates() error {
 
 	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error { //nolint:wrapcheck
 		if err != nil {
-			return fmt.Errorf("walking custom template path: %w", err)
+			return fmt.Errorf("walking custom template path %s: %w", path, err)
 		}
 
 		if info.IsDir() {
 			return nil // cannot parse directories.
 		}
 
-		// Convert windows paths to unix paths for template names.
-		trim := strings.TrimPrefix(strings.ReplaceAll(strings.TrimPrefix(path, templatePath), `\`, "/"), "/")
-		c.Debugf("Parsing Template File '%s' to %s", path, trim)
-
 		data, err := os.ReadFile(path)
 		if err != nil {
-			return fmt.Errorf("reading custom template: %w", err)
+			return fmt.Errorf("reading custom template %s: %w", path, err)
 		}
+
+		if strings.HasSuffix(path, ".gz") {
+			gz, err := gzip.NewReader(bytes.NewBuffer(data))
+			if err != nil {
+				return fmt.Errorf("decompressing custom template %s: %w", path, err)
+			}
+
+			data, err = io.ReadAll(gz)
+			if err != nil {
+				return fmt.Errorf("reading compressed custom template %s: %w", path, err)
+			}
+		}
+
+		// Convert windows paths to unix paths for template names.
+		trim := strings.TrimSuffix(strings.TrimPrefix(strings.ReplaceAll(
+			strings.TrimPrefix(path, templatePath), `\`, "/"), "/"), ".gz")
+		c.Debugf("Parsed Template File '%s' to %s", path, trim)
 
 		c.template, err = c.template.New(trim).Parse(string(data))
 		if err != nil {
-			return fmt.Errorf("parsing custom template: %w", err)
+			return fmt.Errorf("parsing custom template %s: %w", path, err)
 		}
 
 		return nil

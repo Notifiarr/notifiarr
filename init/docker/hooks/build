@@ -11,6 +11,8 @@ if ! (docker buildx inspect | grep -Eq 'docker-container'); then
 fi
 
 [ -z SLIPPERS ] || eval "${SLIPPERS}"
+gzip -9 pkg/bindata/files/{css,js}/*
+gzip -9r pkg/bindata/templates/*
 
 read -r -d '' BUILD_ARGS << EOF
 --build-arg "BUILD_DATE=${DATE}" \
