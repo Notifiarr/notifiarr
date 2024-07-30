@@ -317,7 +317,7 @@ package_build_linux_zst: generate readme man linux notifiarr.conf.example
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
 	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/usr/lib/systemd/system $@/usr/lib/sysusers.d
-	echo 'u notifiarr - "notifiarr.com client" -' > $@/usr/lib/sysusers.d/notifiarr.conf
+	chmod 775 $@/var/log/notifiarr $@/usr/share/doc/notifiarr $@/etc/notifiarr
 	cp init/systemd/notifiarr.service $@/usr/lib/systemd/system/
 	[ ! -d "init/linux/zst" ] || cp -r init/linux/zst/* $@
 
