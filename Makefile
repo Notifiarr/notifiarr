@@ -242,6 +242,12 @@ notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm: package_build_linux_armhf_rpm ch
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a armhf -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
 	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm
 
+debarmhf: notifiarr_$(VERSION)-$(ITERATION)_armhf.deb
+notifiarr_$(VERSION)-$(ITERATION)_armhf.deb: package_build_linux_armhf_deb check_fpm
+	@echo "Building 32-bit ARM6/7 HF 'deb' package for notifiarr version '$(VERSION)-$(ITERATION)'."
+	fpm -s dir -t deb $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
+	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin notifiarr_$(VERSION)-$(ITERATION)_armhf.deb
+
 zst: notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst
 notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst: package_build_linux_zst check_fpm
 	@echo "Building 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
