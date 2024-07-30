@@ -78,7 +78,7 @@ jobs:
       - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         id: release
         run: |
-          sudo apt install -y rpm fakeroot zip debsigs gnupg jq
+          sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
