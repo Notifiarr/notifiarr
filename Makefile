@@ -6,7 +6,7 @@
 IGNORED:=$(shell bash -c "source settings.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > /tmp/.metadata.make")
 
 BUILD_FLAGS=-tags osusergo,netgo
-GOFLAGS=-buildmode=pie -trimpath -mod=readonly -modcacherw
+GOFLAGS=-trimpath -mod=readonly -modcacherw
 CGO_CPPFLAGS=$(CPPFLAGS)
 CGO_CFLAGS=$(CFLAGS)
 CGO_CXXFLAGS=$(CXXFLAGS)
@@ -245,7 +245,7 @@ notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm: package_build_linux_armhf_rpm ch
 zst: notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst
 notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst: package_build_linux_zst check_fpm
 	@echo "Building 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
-	fpm -s dir -t pacman $(PACKAGE_ARGS) -a amd64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
+	fpm -s dir -t pacman $(PACKAGE_ARGS) -a x86_64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
 
 zstarm: notifiarr_$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst
 notifiarr_$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst: package_build_linux_aarch64_zst check_fpm
