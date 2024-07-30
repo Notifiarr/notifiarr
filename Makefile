@@ -78,7 +78,7 @@ release: clean generate linux_packages freebsd_packages windows
 	mv notifiarr.*.linux notifiarr.*.freebsd $@/
 	gzip -9r $@/
 	for i in notifiarr*.exe ; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
-	mv *.rpm *.deb *.txz $@/
+	mv *.rpm *.deb *.txz *.zst $@/
 	# Generating File Hashes
 	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
 
