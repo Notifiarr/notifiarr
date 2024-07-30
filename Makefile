@@ -111,13 +111,18 @@ notifiarr.1.gz:
 	mv examples/MANUAL.html notifiarr_manual.html
 
 readme: README.html
-README.html: 
+README.html:
 	# This turns README.md into README.html
 	go run github.com/davidnewhall/md2roff@v0.0.1 --manual notifiarr --version $(VERSION) --date "$(DATE)" README.md
 
 rsrc: rsrc.syso
 rsrc.syso: init/windows/application.ico init/windows/manifest.xml
 	go run github.com/akavel/rsrc@latest -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
+
+generate: pkg/bindata/docs/api_docs.go
+pkg/bindata/docs/api_docs.go:
+	find pkg -name .DS\* -delete
+	go generate ./pkg/bindata/docs
 
 ####################
 ##### Binaries #####
@@ -181,7 +186,7 @@ notifiarr.amd64.exe: generate rsrc.syso main.go
 ##### Packages #####
 ####################
 
-linux_packages: rpm deb rpm386 deb386 debarm rpmarm debarmhf rpmarmhf
+linux_packages: rpm deb zst rpm386 deb386 debarm rpmarm zstarm debarmhf rpmarmhf zstarmhf
 
 freebsd_packages: freebsd_pkg freebsd386_pkg freebsdarm_pkg
 
@@ -238,11 +243,20 @@ notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm: package_build_linux_armhf_rpm ch
 	fpm -s dir -t rpm $(PACKAGE_ARGS) -a armhf -v $(RPMVERSION) -C $< $(EXTRA_FPM_FLAGS)
 	[ "$(SIGNING_KEY)" = "" ] || rpmsign --key-id=$(SIGNING_KEY) --resign notifiarr-$(RPMVERSION)-$(ITERATION).armhf.rpm
 
-debarmhf: notifiarr_$(VERSION)-$(ITERATION)_armhf.deb
-notifiarr_$(VERSION)-$(ITERATION)_armhf.deb: package_build_linux_armhf_deb check_fpm
-	@echo "Building 32-bit ARM6/7 HF 'deb' package for notifiarr version '$(VERSION)-$(ITERATION)'."
-	fpm -s dir -t deb $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin notifiarr_$(VERSION)-$(ITERATION)_armhf.deb
+zst: notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst
+notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst: package_build_linux_zst check_fpm
+	@echo "Building 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
+	fpm -s dir -t pacman $(PACKAGE_ARGS) -a x86_64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
+
+zstarm: notifiarr_$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst
+notifiarr_$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst: package_build_linux_aarch64_zst check_fpm
+	@echo "Building 64-bit ARM8 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
+	fpm -s dir -t pacman $(PACKAGE_ARGS) -a aarch64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
+
+zstarmhf: notifiarr_$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst
+notifiarr_$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst: package_build_linux_armhf_zst check_fpm
+	@echo "Building 32-bit ARM6/7 HF 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
+	fpm -s dir -t pacman $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
 
 freebsd_pkg: notifiarr-$(VERSION)_$(ITERATION).amd64.txz
 notifiarr-$(VERSION)_$(ITERATION).amd64.txz: package_build_freebsd check_fpm
@@ -259,10 +273,10 @@ notifiarr-$(VERSION)_$(ITERATION).armhf.txz: package_build_freebsd_arm check_fpm
 	@echo "Building 32-bit ARM6/7 HF 'freebsd pkg' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t freebsd $(PACKAGE_ARGS) -a arm -v $(VERSION) -p notifiarr-$(VERSION)_$(ITERATION).armhf.txz -C $< $(EXTRA_FPM_FLAGS)
 
-# Build an environment that can be packaged for linux.
-package_build_linux_rpm: readme man linux notifiarr.conf.example
+# Build an environment that can be packaged for redhat linux.
+package_build_linux_rpm: generate readme man linux notifiarr.conf.example
 	# Building package environment for linux.
-	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
+	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
 	cp *.1.gz $@/usr/share/man/man1
@@ -273,10 +287,10 @@ package_build_linux_rpm: readme man linux notifiarr.conf.example
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
 
-# Build an environment that can be packaged for linux.
-package_build_linux_deb: readme man linux notifiarr.conf.example
+# Build an environment that can be packaged for debian linux.
+package_build_linux_deb: generate readme man linux notifiarr.conf.example
 	# Building package environment for linux.
-	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/usr/lib/notifiarr $@/var/log/notifiarr
+	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
 	cp *.1.gz $@/usr/share/man/man1
@@ -286,6 +300,21 @@ package_build_linux_deb: readme man linux notifiarr.conf.example
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/deb" ] || cp -r init/linux/deb/* $@
+
+# Build an environment that can be packaged for arch linux.
+package_build_linux_zst: generate readme man linux notifiarr.conf.example
+	# Building package environment for linux.
+	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/var/log/notifiarr
+	# Copying the binary, config file, unit file, and man page into the env.
+	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
+	cp *.1.gz $@/usr/share/man/man1
+	cp notifiarr.conf.example $@/etc/notifiarr/
+	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
+	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
+	mkdir -p $@/usr/lib/systemd/system $@/usr/lib/sysusers.d
+	echo 'u notifiarr - "notifiarr.com client" -' > $@/usr/lib/sysusers.d/notifiarr.conf
+	cp init/systemd/notifiarr.service $@/usr/lib/systemd/system/
+	[ ! -d "init/linux/zst" ] || cp -r init/linux/zst/* $@
 
 package_build_linux_386_deb: package_build_linux_deb linux386
 	mkdir -p $@
@@ -317,8 +346,18 @@ package_build_linux_armhf_rpm: package_build_linux_rpm armhf
 	cp -r $</* $@/
 	cp notifiarr.arm.linux $@/usr/bin/notifiarr
 
+package_build_linux_armhf_zst: package_build_linux_zst armhf
+	mkdir -p $@
+	cp -r $</* $@/
+	cp notifiarr.arm.linux $@/usr/bin/notifiarr
+
+package_build_linux_aarch64_zst: package_build_linux_zst arm64
+	mkdir -p $@
+	cp -r $</* $@/
+	cp notifiarr.arm64.linux $@/usr/bin/notifiarr
+
 # Build an environment that can be packaged for freebsd.
-package_build_freebsd: readme man freebsd notifiarr.conf.example
+package_build_freebsd: generate readme man freebsd notifiarr.conf.example
 	mkdir -p $@/usr/local/bin $@/usr/local/etc/notifiarr $@/usr/local/share/man/man1 $@/usr/local/share/doc/notifiarr $@/usr/local/var/log/notifiarr
 	date "+%Y/%m/%d %H:%M:%S Built Package Notifiarr $(VERSION)-$(ITERATION) - this file may be safely deleted" >> $@/usr/local/var/log/notifiarr/buildlog.txt
 	cp notifiarr.amd64.freebsd $@/usr/local/bin/notifiarr
@@ -356,11 +395,6 @@ lint: generate
 	GOOS=darwin golangci-lint run
 	GOOS=freebsd golangci-lint --build-tags nodbus run
 	GOOS=windows golangci-lint run
-
-generate: pkg/bindata/docs/api_docs.go
-pkg/bindata/docs/api_docs.go: 
-	find pkg -name .DS\* -delete
-	go generate ./pkg/bindata/docs
 
 ##################
 ##### Docker #####

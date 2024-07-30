@@ -21,6 +21,10 @@ func HasGUI() bool {
 
 // Toast does not work properly on FreeBSD because we cross compile it without dbus. :(
 func Toast(msg string, v ...interface{}) error {
+	if !hasGUI {
+		return nil
+	}
+
 	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), GetPNG())
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)

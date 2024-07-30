@@ -20,6 +20,10 @@ func HasGUI() bool {
 }
 
 func Toast(msg string, v ...interface{}) error {
+	if !hasGUI {
+		return nil
+	}
+
 	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), GetPNG())
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)

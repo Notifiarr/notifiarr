@@ -118,7 +118,7 @@ jobs:
           name: ${{ matrix.files }}
       - name: Upload files to unstable.golift.io
         run: >-
-          for file in *.{zip,dmg,gz}; do
+          for file in *.{zip,dmg,gz,zst}; do
             [ -f "$file" ] || continue;
             echo "Uploading: ${file}";
             curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}";
@@ -195,19 +195,20 @@ jobs:
             *.dmg
             *.gz
             *.txt
+            *.zst
 
-  archlinux-aur:
-    # description: creates and uploads and aur file to the golift/aur repo for arch linux.
-    needs:
-      - release
-      - deploy-github
-    name: Deploy ArchLinux AUR
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
-      - name: Deploy Aurch AUR
-        run: bash init/archlinux/aur-deploy.sh
-        env:
-          DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
+  # archlinux-aur:
+  #   # description: creates and uploads a PKGBUILD file to the golift/aur repo for arch linux.
+  #   needs:
+  #     - release
+  #     - deploy-github
+  #   name: Deploy ArchLinux AUR
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: '0'
+  #     - name: Deploy Aurch AUR
+  #       run: bash init/archlinux/aur-deploy.sh
+  #       env:
+  #         DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
