@@ -78,7 +78,7 @@ jobs:
       - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         id: release
         run: |
-          sudo apt install -y rpm fakeroot zip debsigs gnupg jq
+          sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
@@ -90,6 +90,11 @@ jobs:
         with:
           name: release
           path: release
+      - name: upload sha512sums.txt
+        uses: actions/upload-artifact@v4
+        with:
+          name: sha512sums.txt
+          path: release/sha512sums.txt
 
   print-built-version:
     needs:
@@ -195,18 +200,24 @@ jobs:
             *.dmg
             *.gz
             *.txt
+            *.zst
+            *.sig
 
   archlinux-aur:
-    # description: creates and uploads and aur file to the golift/aur repo for arch linux.
+    if: startsWith(github.ref, 'refs/tags/v')
+    # description: creates and uploads a PKGBUILD file to the official aur repo from Arch Linux.
     needs:
       - release
-      - deploy-github
     name: Deploy ArchLinux AUR
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: '0'
+      - name: Download ${{ matrix.files }} Files
+        uses: actions/download-artifact@v4
+        with:
+          name: sha512sums.txt
       - name: Deploy Aurch AUR
         run: bash init/archlinux/aur-deploy.sh
         env:

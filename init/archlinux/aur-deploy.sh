@@ -1,15 +1,38 @@
 #!/bin/bash -x
 
-# Deploys a new aur PKGBUILD file to am arch linux aur github repo.
+# Deploys a new aur PKGBUILD file to the Arch Linux AUR repo.
 # Run by GitHub Actions when a new release is created on GitHub.
 
 source settings.sh
 
-SOURCE_PATH=https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz
+sha512sum=sha512sum
+$sha512sum -v 2>/dev/null || sha512sum="shasum -a 512" # macos
+
+SOURCE_PATH="https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz"
 echo "==> Using URL: $SOURCE_PATH"
-SHA256=$(curl -sL $SOURCE_PATH | openssl dgst -r -sha256 | awk '{print $1}')
+SHA=$(curl -sL "$SOURCE_PATH" | $sha512sum | awk '{print $1}')
+
+if [ -f sha512sums.txt ]; then
+  echo "==> Using SHA512SUMS file"
+  SHA_X64=$(grep notifiarr.amd64.linux.gz sha512sums.txt | awk '{print $1}')
+  SHA_ARMHF=$(grep notifiarr.arm.linux.gz sha512sums.txt | awk '{print $1}')
+  SHA_ARCH64=$(grep notifiarr.arm64.linux.gz sha512sums.txt | awk '{print $1}')
+  SHA_386=$(grep notifiarr.386.linux.gz sha512sums.txt | awk '{print $1}')
+else
+  echo "==> Not Using SHA512SUMS file"
+  source_x64="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.amd64.linux.gz"
+  source_armhf="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.arm.linux.gz"
+  source_arm64="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.arm64.linux.gz"
+  source_386="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.386.linux.gz"
+  SHA_X64=$(curl -sL "$source_x64" | $sha512sum | awk '{print $1}')
+  SHA_ARMHF=$(curl -sL "$source_armhf" | $sha512sum | awk '{print $1}')
+  SHA_ARCH64=$(curl -sL "$source_arm64" | $sha512sum | awk '{print $1}')
+  SHA_386=$(curl -sL "$source_386" | $sha512sum | awk '{print $1}')
+fi
 
 push_it() {
+  git config user.email "code@golift.io"
+  git config user.name "notifiarr-github-releaser"
   pushd release_repo
   git add .
   git commit -m "Update notifiarr on Release: v${VERSION}-${ITERATION}"
@@ -18,51 +41,38 @@ push_it() {
   rm -rf release_repo
 }
 
-# Make an id_rsa file with our secret.
-mkdir -p $HOME/.ssh
-KEY_FILE="$(mktemp -u $HOME/.ssh/XXXXX)"
-echo "${DEPLOY_KEY}" > "${KEY_FILE}"
-chmod 600 "${KEY_FILE}"
-# Configure ssh to use this secret on a custom github hostname.
-GITHUB_HOST="github.$(basename $KEY_FILE)"
-printf "%s\n" \
-  "Host $GITHUB_HOST" \
-  "  HostName github.com" \
-  "  IdentityFile ${KEY_FILE}" \
-  "  StrictHostKeyChecking no" \
-  "  LogLevel ERROR" | tee -a $HOME/.ssh/config
+set -e
 
-git config --global user.email "notifiarr@auto.releaser"
-git config --global user.name "notifiarr-auto-releaser"
+if [[ -n $DEPLOY_KEY ]]; then
+  mkdir "${HOME}/.ssh/"
+  KEY_FILE=$(mktemp -u "${HOME}/.ssh/XXXXX")
+  echo "${DEPLOY_KEY}" > "${KEY_FILE}"
+  chmod 600 "${KEY_FILE}"
+  # Configure ssh to use this secret.
+  export GIT_SSH_COMMAND="ssh -i ${KEY_FILE} -o 'StrictHostKeyChecking no'"
+fi
 
 rm -rf release_repo
-git clone git@${GITHUB_HOST}:golift/aur.git release_repo
-mkdir -p release_repo/notifiarr
+git clone aur@aur.archlinux.org:notifiarr-bin.git release_repo
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
-    -e "s/{{SHA256}}/${SHA256}/g" \
+    -e "s/{{SHA}}/${SHA}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
-    -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    init/archlinux/PKGBUILD.template | tee release_repo/notifiarr/PKGBUILD
+    -e "s%{{SHA_X64}}%${SHA_X64}%g" \
+    -e "s%{{SHA_ARMHF}}%${SHA_ARMHF}%g" \
+    -e "s%{{SHA_ARCH64}}%${SHA_ARCH64}%g" \
+    -e "s%{{SHA_386}}%${SHA_386}%g" \
+    init/archlinux/PKGBUILD.template | tee release_repo/PKGBUILD
 
 sed -e "s/{{VERSION}}/${VERSION}/g" \
     -e "s/{{Iter}}/${ITERATION}/g" \
-    -e "s/{{SHA256}}/${SHA256}/g" \
+    -e "s/{{SHA}}/${SHA}/g" \
     -e "s/{{Desc}}/${DESC}/g" \
-    -e "s%{{SOURCE_PATH}}%${SOURCE_PATH}%g" \
-    init/archlinux/SRCINFO.template | tee release_repo/notifiarr/.SRCINFO
+    -e "s%{{SHA_X64}}%${SHA_X64}%g" \
+    -e "s%{{SHA_ARMHF}}%${SHA_ARMHF}%g" \
+    -e "s%{{SHA_ARCH64}}%${SHA_ARCH64}%g" \
+    -e "s%{{SHA_386}}%${SHA_386}%g" \
+    init/archlinux/SRCINFO.template | tee release_repo/.SRCINFO
 
-tee release_repo/notifiarr/notifiarr.aur.install << EOF
-post_upgrade() {
-  /bin/systemctl restart notifiarr
-}
-
-pre_remove() {
-  /bin/systemctl stop notifiarr
-  /bin/systemctl disable notifiarr
-}
-EOF
-
-
-[ "$1" == "-nopush" ] || push_it
+[ "$1" != "" ] || push_it

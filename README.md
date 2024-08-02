@@ -10,7 +10,7 @@ The client enables content requests from Media Bot in your Discord Server and al
 Linux repository hosting provided by
 [![packagecloud](https://docs.golift.io/integrations/packagecloud-full.png "PackageCloud.io")](http://packagecloud.io)
 
-This works on any system with apt or yum. If your system does not use APT or YUM, then download a binary from the [Releases](https://github.com/Notifiarr/notifiarr/releases) page.
+This works on any system with apt or yum. If your system does not use APT or YUM, then download a binary from the [Releases](https://github.com/Notifiarr/notifiarr/releases/latest) page.
 
 On Linux, Notifiarr runs as `user:group` of `notifiarr:notifiarr`.
 
@@ -29,13 +29,24 @@ sudo systemctl restart notifiarr
 
 #### Arch Linux
 
-This one is special; hope you know what you're doing.
-Build a package with `makepkg` using the `aur` source.
-Here: <https://github.com/golift/aur>
+- Download a `zst` package from the
+  [Releases](https://github.com/Notifiarr/notifiarr/releases/latest) page.
+- Install it:  `pacman -U *.zst`
+- Edit config: `nano /etc/notifiarr/notifiarr.conf`
+- Restart it:  `systemctl start notifiarr`
+
+Example of the above in shell form:
+
+```shell
+curl https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install.sh | sudo bash
+
+nano /etc/notifiarr/notifiarr.conf
+systemctl start notifiarr
+```
 
 ### FreeBSD
 
-- Download a package from the [Releases](https://github.com/Notifiarr/notifiarr/releases) page.
+- Download a `txz` package from the [Releases](https://github.com/Notifiarr/notifiarr/releases/latest) page.
 - Install it, edit config, start it.
 
 Example of the above in shell form:
