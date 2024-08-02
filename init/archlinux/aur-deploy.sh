@@ -44,7 +44,8 @@ push_it() {
 set -e
 
 if [[ -n $DEPLOY_KEY ]]; then
-  KEY_FILE=$(mktemp -u "$HOME"/.ssh/XXXXX)
+  mkdir "${HOME}/.ssh/"
+  KEY_FILE=$(mktemp -u "${HOME}/.ssh/XXXXX")
   echo "${DEPLOY_KEY}" > "${KEY_FILE}"
   chmod 600 "${KEY_FILE}"
   # Configure ssh to use this secret.
