@@ -79,8 +79,9 @@ release: clean generate linux_packages freebsd_packages windows
 	gzip -9r $@/
 	for i in notifiarr*.exe ; do zip -9qj $@/$$i.zip $$i examples/*.example *.html; rm -f $$i;done
 	mv *.rpm *.deb *.txz *.zst $@/
+	mv *.sig $@/ || echo "...ignoring previous error"
 	# Generating File Hashes
-	openssl dgst -r -sha256 $@/* | sed 's#release/##' | tee $@/checksums.sha256.txt
+	openssl dgst -r -sha512 $@/* | sed 's#release/##' | tee $@/sha512sums.txt
 
 # requires a mac.
 signdmg: Notifiarr.app
@@ -89,7 +90,7 @@ signdmg: Notifiarr.app
 # Delete all build assets.
 clean:
 	rm -f notifiarr notifiarr.*.{macos,freebsd,linux,exe}{,.gz,.zip} notifiarr.1{,.gz} notifiarr.rb
-	rm -f notifiarr{_,-}*.{deb,rpm,txz} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
+	rm -f notifiarr{_,-}*.{deb,rpm,txz,zst,sig} v*.tar.gz.sha256 examples/MANUAL .metadata.make rsrc_*.syso
 	rm -f cmd/notifiarr/README{,.html} README{,.html} ./notifiarr_manual.html rsrc.syso Notifiarr.*.app.zip
 	rm -f notifiarr.service pack.temp.dmg notifiarr.conf.example
 	rm -rf package_build_* release Notifiarr.*.app Notifiarr.app
@@ -248,20 +249,26 @@ notifiarr_$(VERSION)-$(ITERATION)_armhf.deb: package_build_linux_armhf_deb check
 	fpm -s dir -t deb $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
 	[ "$(SIGNING_KEY)" = "" ] || debsigs --default-key="$(SIGNING_KEY)" --sign=origin notifiarr_$(VERSION)-$(ITERATION)_armhf.deb
 
-zst: notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst
-notifiarr_$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst: package_build_linux_zst check_fpm
+zst: notifiarr-$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst notifiarr-$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst.sig
+notifiarr-$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst: package_build_linux_zst check_fpm
 	@echo "Building 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t pacman $(PACKAGE_ARGS) -a x86_64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
+notifiarr-$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst.sig: notifiarr-$(VERSION)-$(ITERATION)-x86_64.pkg.tar.zst
+	[ "$(SIGNING_KEY)" = "" ] || gpg --local-user "$(SIGNING_KEY)" --output $@ --detach-sig $<
 
-zstarm: notifiarr_$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst
-notifiarr_$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst: package_build_linux_aarch64_zst check_fpm
+zstarm: notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst.sig
+notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst: package_build_linux_aarch64_zst check_fpm
 	@echo "Building 64-bit ARM8 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t pacman $(PACKAGE_ARGS) -a aarch64 -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
+notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst.sig: notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst
+	[ "$(SIGNING_KEY)" = "" ] || gpg --local-user "$(SIGNING_KEY)" --output $@ --detach-sig $<
 
-zstarmhf: notifiarr_$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst
-notifiarr_$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst: package_build_linux_armhf_zst check_fpm
+zstarmhf: notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst.sig
+notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst: package_build_linux_armhf_zst check_fpm
 	@echo "Building 32-bit ARM6/7 HF 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t pacman $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
+notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst.sig: notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst
+	[ "$(SIGNING_KEY)" = "" ] || gpg --local-user "$(SIGNING_KEY)" --output $@ --detach-sig $<
 
 freebsd_pkg: notifiarr-$(VERSION)_$(ITERATION).amd64.txz
 notifiarr-$(VERSION)_$(ITERATION).amd64.txz: package_build_freebsd check_fpm
@@ -284,10 +291,10 @@ package_build_linux_rpm: generate readme man linux notifiarr.conf.example
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
-	cp *.1.gz $@/usr/share/man/man1
+	cp ./*.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
@@ -298,10 +305,10 @@ package_build_linux_deb: generate readme man linux notifiarr.conf.example
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
-	cp *.1.gz $@/usr/share/man/man1
+	cp ./*.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/deb" ] || cp -r init/linux/deb/* $@
@@ -312,10 +319,10 @@ package_build_linux_zst: generate readme man linux notifiarr.conf.example
 	mkdir -p $@/usr/bin $@/etc/notifiarr $@/usr/share/man/man1 $@/usr/share/doc/notifiarr $@/var/log/notifiarr
 	# Copying the binary, config file, unit file, and man page into the env.
 	cp notifiarr.amd64.linux $@/usr/bin/notifiarr
-	cp *.1.gz $@/usr/share/man/man1
+	cp ./*.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/usr/lib/systemd/system $@/usr/lib/sysusers.d
 	chmod 775 $@/var/log/notifiarr $@/usr/share/doc/notifiarr $@/etc/notifiarr
 	cp init/systemd/notifiarr.service $@/usr/lib/systemd/system/
@@ -366,10 +373,10 @@ package_build_freebsd: generate readme man freebsd notifiarr.conf.example
 	mkdir -p $@/usr/local/bin $@/usr/local/etc/notifiarr $@/usr/local/share/man/man1 $@/usr/local/share/doc/notifiarr $@/usr/local/var/log/notifiarr
 	date "+%Y/%m/%d %H:%M:%S Built Package Notifiarr $(VERSION)-$(ITERATION) - this file may be safely deleted" >> $@/usr/local/var/log/notifiarr/buildlog.txt
 	cp notifiarr.amd64.freebsd $@/usr/local/bin/notifiarr
-	cp *.1.gz $@/usr/local/share/man/man1
+	cp ./*.1.gz $@/usr/local/share/man/man1
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/notifiarr.conf
-	cp LICENSE *.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/local/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/local/share/doc/notifiarr/
 	mkdir -p $@/usr/local/etc/rc.d
 	cp init/bsd/freebsd.rc.d $@/usr/local/etc/rc.d/notifiarr
 	chmod +x $@/usr/local/etc/rc.d/notifiarr
