@@ -29,8 +29,20 @@ sudo systemctl restart notifiarr
 
 #### Arch Linux
 
-Download the `zst` pacman package file for your architecture on the [Releases](https://github.com/Notifiarr/notifiarr/releases/latest) page.
-Install it: `pacman -U *.zst`
+- Download a `zst` package from the
+  [Releases](https://github.com/Notifiarr/notifiarr/releases/latest) page.
+- Install it:  `pacman -U *.zst`
+- Edit config: `nano /etc/notifiarr/notifiarr.conf`
+- Restart it:  `systemctl start notifiarr`
+
+Example of the above in shell form:
+
+```shell
+curl https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install.sh | sudo bash
+
+nano /etc/notifiarr/notifiarr.conf
+systemctl start notifiarr
+```
 
 ### FreeBSD
 
