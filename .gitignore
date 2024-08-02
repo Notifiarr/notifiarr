@@ -31,7 +31,7 @@
 .DS_Store
 *~
 /package_build_*
-/release
+/release*
 MANUAL
 MANUAL.html
 README
