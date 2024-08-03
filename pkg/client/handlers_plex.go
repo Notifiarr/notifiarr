@@ -67,7 +67,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(hook.Event, "admin.database.corrupt"):
 		c.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
 			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
-		c.Config.Services.Website.SendData(&website.Request{
+		c.Config.SendData(&website.Request{
 			Route:      website.PlexRoute,
 			Event:      website.EventHook,
 			LogPayload: true,

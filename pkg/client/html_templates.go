@@ -486,7 +486,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 
 	binary, _ := os.Executable()
 	userName, dynamic := c.getUserName(req)
-	hostInfo, _ := c.Config.Services.Website.GetHostInfo(ctx)
+	hostInfo, _ := c.Config.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	outboundIP := clientinfo.GetOutboundIP()
 	ifName, netmask := getIfNameAndNetmask(outboundIP)

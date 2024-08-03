@@ -45,7 +45,7 @@ const (
 		"and will not be printed again. Log in, and change it."
 	MsgConfigFound  = "Using Config File: "
 	DefaultUsername = "admin"
-	DefaultHeader   = "x-webauth-user"
+	DefaultHeader   = "X-Webauth-User"
 )
 
 // Config represents the data in our config file.
@@ -68,7 +68,8 @@ type Config struct {
 	Commands   []*commands.Command    `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
 	*logs.LogConfig
 	*apps.Apps
-	Allow AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
+	*website.Server `json:"-" toml:"-" xml:"-" yaml:"-"`
+	Allow           AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
 }
 
 // NewConfig returns a fresh config with only defaults and a logger ready to go.
@@ -173,7 +174,7 @@ func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*triggers.Actions, err
 
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
-	c.Services.Website = website.New(&website.Config{
+	c.Server = website.New(&website.Config{
 		Apps:     c.Apps,
 		Logger:   c.Apps.Logger,
 		BaseURL:  website.BaseURL,
@@ -182,6 +183,7 @@ func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*triggers.Actions, err
 		HostID:   c.HostID,
 		BindAddr: c.BindAddr,
 	})
+	c.Services.SetWebsite(c.Server)
 
 	return c.setup(logger, flag), err
 }
@@ -216,25 +218,25 @@ func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 	}
 
 	// Ordering.....
-	cic := &clientinfo.Config{
-		Server: c.Services.Website,
+	clientinfo := &clientinfo.Config{
+		Server: c.Server,
 		Apps:   c.Apps,
 	}
 	triggers := triggers.New(&triggers.Config{
 		Apps:       c.Apps,
-		Website:    c.Services.Website,
+		Website:    c.Server,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
 		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
 		Commands:   c.Commands,
-		ClientInfo: cic,
+		ClientInfo: clientinfo,
 		ConfigFile: flag.ConfigFile,
 		AutoUpdate: c.AutoUpdate,
 		UnstableCh: c.UnstableCh,
 		Services:   c.Services,
 		Logger:     logger,
 	})
-	cic.CmdList = triggers.Commands.List()
+	clientinfo.CmdList = triggers.Commands.List()
 
 	return triggers
 }

@@ -254,11 +254,11 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices(ctx context.Context) *clientinfo.ClientInfo {
-	c.Config.Services.Website.Start(ctx)
+	c.Config.Start(ctx)
 
 	clientInfo := c.loadSiteConfig(ctx)
 	if clientInfo != nil && !clientInfo.User.StopLogs {
-		share.Setup(c.Config.Services.Website)
+		share.Setup(c.Config)
 	}
 
 	c.configureServicesPlex(ctx)
@@ -380,7 +380,7 @@ func (c *Client) stop(ctx context.Context, event website.EventType) error {
 		defer c.CapturePanic()
 		c.triggers.Stop(event)
 		c.Config.Services.Stop()
-		c.Config.Services.Website.Stop()
+		c.Config.Stop()
 		c.Print("==> All systems powered down!")
 	}()
 

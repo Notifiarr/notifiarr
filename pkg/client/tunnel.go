@@ -117,7 +117,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 		Callback: func(_ context.Context, socket string) {
 			defer data.Save("activeTunnel", socket)
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
-			c.Config.Services.Website.SendData(&website.Request{
+			c.Config.SendData(&website.Request{
 				Route:      website.TunnelRoute,
 				Event:      website.EventSignal,
 				Payload:    map[string]interface{}{"socket": socket, "previous": data.Get("activeTunnel")},
@@ -311,7 +311,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		}
 	}
 
-	c.Config.Services.Website.SendData(&website.Request{
+	c.Config.SendData(&website.Request{
 		Route:      website.TunnelRoute,
 		Event:      website.EventGUI,
 		Payload:    map[string]any{"sockets": sockets},

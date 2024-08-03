@@ -55,6 +55,10 @@ func (c *Config) setup(services []*Service) error {
 	return nil
 }
 
+func (c *Config) SetWebsite(website *website.Server) {
+	c.website = website
+}
+
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
 func (c *Config) Start(ctx context.Context) {
@@ -142,7 +146,7 @@ func (c *Config) loadServiceStates(ctx context.Context) {
 		return
 	}
 
-	values, err := c.Website.GetState(ctx, names...)
+	values, err := c.website.GetState(ctx, names...)
 	if err != nil {
 		c.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return
