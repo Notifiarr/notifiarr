@@ -102,10 +102,10 @@ func New(config *Config) *Actions {
 
 // Start creates all the triggers and runs the timers.
 func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
-	a.Config.SetReloadCh(reloadCh)
-	a.Config.SetStopCh(stopCh)
+	a.SetReloadCh(reloadCh)
+	a.SetStopCh(stopCh)
 
-	defer a.Config.Run(ctx)
+	defer a.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
 	for idx := range actions.NumField() {
