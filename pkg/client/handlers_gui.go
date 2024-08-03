@@ -736,7 +736,12 @@ func (c *Client) validateNewConfig(config *configfile.Config) error {
 		return fmt.Errorf("copying config: %w", err)
 	}
 
-	if _, err := cnfgfile.Parse(copied, nil); err != nil {
+	_, err = cnfgfile.Parse(copied, &cnfgfile.Opts{
+		Name:          mnd.Title,
+		TransformPath: configfile.ExpandHomedir,
+		Prefix:        "filepath:",
+	})
+	if err != nil {
 		return fmt.Errorf("filepath: %w", err)
 	}
 

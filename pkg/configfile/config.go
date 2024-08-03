@@ -144,26 +144,40 @@ func (c *Config) Get(flag *Flags) (*Config, error) {
 	return c.CopyConfig()
 }
 
-func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*triggers.Actions, error) {
-	if _, err := cnfgfile.Parse(c, nil); err != nil {
-		return nil, fmt.Errorf("filepath variables: %w", err)
+// ExpandHomedir expands a ~ to a homedir, or returns the original path in case of any error.
+func ExpandHomedir(filePath string) string {
+	expanded, err := homedir.Expand(filePath)
+	if err != nil {
+		return filePath
+	}
+
+	return expanded
+}
+
+func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*triggers.Actions, map[string]string, error) {
+	output, err := cnfgfile.Parse(c, &cnfgfile.Opts{
+		Name:          mnd.Title,
+		TransformPath: ExpandHomedir,
+		Prefix:        "filepath:",
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("filepath variables: %w", err)
 	}
 
 	if err := c.setupPassword(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	c.fixConfig()
 	logger.LogConfig = c.LogConfig // this is sorta hacky.
 
 	if err := c.Services.Setup(c.Service); err != nil {
-		return nil, fmt.Errorf("service checks: %w", err)
+		return nil, nil, fmt.Errorf("service checks: %w", err)
 	}
 
 	// Make sure each app has a sane timeout.
-	err := c.Apps.Setup()
-	if err != nil {
-		return nil, fmt.Errorf("setting up app: %w", err)
+	if err = c.Apps.Setup(); err != nil {
+		return nil, nil, fmt.Errorf("setting up app: %w", err)
 	}
 
 	// Make sure the port is not in use before starting the web server.
@@ -185,7 +199,7 @@ func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*triggers.Actions, err
 	})
 	c.Services.SetWebsite(c.Server)
 
-	return c.setup(logger, flag), err
+	return c.setup(logger, flag), output, err
 }
 
 func (c *Config) fixConfig() {
