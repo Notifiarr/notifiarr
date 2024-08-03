@@ -210,7 +210,7 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	var (
 		msg, newPassword string
 		err              error
-		moreMsgs         = make(map[string]string)
+		moreMsgs         map[string]string
 	)
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
@@ -352,6 +352,7 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 	}
 
 	var output map[string]string
+
 	if c.triggers, output, err = c.Config.Setup(c.Flags, c.Logger); err != nil {
 		return fmt.Errorf("setting config: %w", err)
 	}
