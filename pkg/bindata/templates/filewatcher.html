@@ -1,246 +1,252 @@
-                                <h1><i class="fas fa-binoculars"></i> File Watcher</h1>
-                                <p>
-                                    This application can watch (log) files for lines matching a regular expression.
-                                    This is similar to <code>tail -f file | grep string</code> and allows you to send notifications
-                                    when, for instance, a log file has a new line written that matches a regular expression.
-                                </p>
-                                <hr>
-                                <p>
-                                    <h3><i class="fas fa-comment text-orange"></i> Notes</h3>
-                                    <li><i class="fas fa-star text-dgrey"></i> You must enable the <b>Log Watcher</b> feature and choose a channel on the Notifiarr website for this to work!</li>
-                                    <li><i class="fas fa-star text-dgrey"></i> Use <code>(?i)</code> as a prefix to make regular expressions case insensitive.</li>
-                                    <li><i class="fas fa-star text-dgrey"></i> Save and reload to enable newly added file watchers.</li>
-                                </p>
-                                <div class="table-responsive">
-                                    <table class="table bk-dark table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <td colspan="8" class="text-center mobile-hide">
-                                                    <div style="float: left;font-size:35px;"><i class="fas fa-glasses"></i></div>
-                                                    <h2 style="margin-bottom:-45px">Watch Files</h2>
-                                                    <div style="float: right;">
-                                                        <button onclick="addWatchFiles()" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                                    </div>
-                                                </td>
-                                                <td colspan="8" class="tablet-hide desktop-hide">
-                                                    <button id="files-WatchFiles-addbutton" onclick="addWatchFiles()" data-names='["Path","Regexp","Skip","Poll","Pipe","MustExist","LogMatch"]' data-samplepath="{{if eq .Version.os "windows"}}c:\some\file.log{{else}}/some/file.log{{end}}" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
-                                                    <h2 style="margin-left:5px;display:inline;">WatchFiles</h2>
-                                                    <div style="float:right;font-size:35px;"><i class="fas fa-glasses"></i></div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width:90px;min-width:90px;">
-                                                    <div style="display:none;" class="dialogText">
-                                                        The <span class="text-danger">red</span> button deletes the file watcher.<br>
-                                                        The <span class="text-primary">blue</span> button adds a new file watcher.<br>
-                                                        The <span class="text-success">green</span> button stops <i class="fas fa-stop-circle text-danger"></i> or starts <i class="fas fa-play-circle text-primary"></i> a file watcher.<br>
-                                                        <hr>
-                                                        A <span class="text-brand">purple</span> table cell here means the file watcher is running.<br>
-                                                        A <span class="text-danger">red</span> table cell means the file watcher channel is closed, likely due to an error.
-                                                    </div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">Actions</span>
-                                                </td>
-                                                <td style="min-width:120px;">
-                                                    <div style="display:none;" class="dialogText">Full or relative path to the file to be watched.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">File Path</span>
-                                                </td>
-                                                <td style="min-width:120px;">
-                                                    <div style="display:none;" class="dialogText">Regular expression to match lines against.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">Regular Expression</span>
-                                                </td>
-                                                <td style="min-width:120px;">
-                                                    <div style="display:none;" class="dialogText">Regular expression used to skip lines that are matched. This negates the matches.</div>
-                                                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">Skip Expression</span>
-                                                </td>
-                                                <td style="min-width:110px;width:110px;">
-                                                    <div style="display:none;" class="dialogText">In some cases polling needs to be enabled for this feature to work.</div>
-                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">Polling</span>
-                                                </td>
-                                                <td style="min-width:110px;width:110px;">
-                                                    <div style="display:none;" class="dialogText">Enable this if the file you're watching is a named FIFO pipe.</div>
-                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">FIFO Pipe</span>
-                                                </td>
-                                                <td style="min-width:110px;width:110px;">
-                                                    <div style="display:none;" class="dialogText">Enabling this will skip watching the file if it does not exist when the application starts. <b>Watching files that do not exist is still buggy and may not work at all.</b></div>
-                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">Must Exist</span>
-                                                </td>
-                                                <td style="min-width:110px;width:110px;">
-                                                    <div style="display:none;" class="dialogText">Enabling this will write the matched line to the notifiarr log. This is good for debugging, but may be noisy.</div>
-                                                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                    <span class="dialogTitle">Log Match</span>
-                                                </td>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="files-WatchFiles-container">
-                                        {{- range $index, $app := .Config.WatchFiles}}
-                                            <input disabled style="display: none;" class="client-parameter files-WatchFiles{{$index}}-deleted" data-group="files" data-label="Files {{instance $index}} Deleted" data-original="false" value="false">
-                                            <tr class="files-WatchFiles" id="files-WatchFiles-{{$index}}">
-                                                <td style="white-space:nowrap;" id="activeFileCell{{$index}}" class="{{if $app.Active}}bk-brand{{else}}bk-danger{{end}}">
-                                                    <div class="btn-group" role="group" style="display:flex;font-size:18px;">
-                                                        <button onclick="removeInstance('files-WatchFiles', '{{$index}}')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-trash-alt"></i></button>
-                                                        <button id="WatchFilesIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                                                        <button onClick="stopFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if not $app.Active}}display:none;{{end}}"><i class="fas fa-stop-circle text-danger"></i></button>
-                                                        <button onClick="startFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if $app.Active}}display:none;{{end}}"><i class="fas fa-play-circle text-primary"></i></button>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_WATCH_FILES_%d_PATH" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_PATH" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="WatchFiles.{{$index}}.Path" name="WatchFiles.{{$index}}.Path"  data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Name" data-original="{{$app.Path}}" value="{{$app.Path}}">
-                                                                <div onClick="browseFiles('#WatchFiles\\.{{$index}}\\.Path');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_WATCH_FILES_%d_REGEX" $.Flags.EnvPrefix $index) )}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_REGEX" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="WatchFiles.{{$index}}.Regexp" name="WatchFiles.{{$index}}.Regexp" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Regex" data-original="{{$app.Regexp}}" value="{{$app.Regexp}}">
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_WATCH_FILES_%d_SKIP" $.Flags.EnvPrefix $index))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_SKIP" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="WatchFiles.{{$index}}.Skip" name="WatchFiles.{{$index}}.Skip" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Skip" data-original="{{$app.Skip}}" value="{{$app.Skip}}">
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_WATCH_FILES_%d_POLL" $.Flags.EnvPrefix $index))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_POLL" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select autocomplete="off" id="WatchFiles.{{$index}}.Poll" name="WatchFiles.{{$index}}.Poll" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Poll" data-original="{{$app.Poll}}" value="{{$app.Poll}}">
-                                                                    <option {{if $app.Poll}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not $app.Poll}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_WATCH_FILES_%d_PIPE" $.Flags.EnvPrefix $index)) }}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_PIPE" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select autocomplete="off" id="WatchFiles.{{$index}}.Pipe" name="WatchFiles.{{$index}}.Pipe" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Pipe" data-original="{{$app.Pipe}}" value="{{$app.Pipe}}">
-                                                                    <option {{if $app.Pipe}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not $app.Pipe}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_WATCH_FILES_%d_MUST_EXIST" $.Flags.EnvPrefix $index) )}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_MUST_EXIST" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select autocomplete="off" id="WatchFiles.{{$index}}.MustExist" name="WatchFiles.{{$index}}.MustExist" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} MustExist" data-original="{{$app.MustExist}}" value="{{$app.MustExist}}">
-                                                                    <option {{if $app.MustExist}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not $app.MustExist}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                                <td>
-                                                    <form class="form-inline">
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_WATCH_FILES_%d_LOG_MATCH" $.Flags.EnvPrefix $index) )}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_LOG_MATCH" $.Flags.EnvPrefix $index}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select autocomplete="off" id="WatchFiles.{{$index}}.LogMatch" name="WatchFiles.{{$index}}.LogMatch" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} LogMatch" data-original="{{$app.LogMatch}}" value="{{$app.LogMatch}}">
-                                                                    <option {{if $app.LogMatch}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not $app.LogMatch}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        {{- end}}
-                                            <tr id="files-WatchFiles-none"{{if .Config.WatchFiles}} style="display: none;"{{end}}><td colspan="8">No file watchers configured.</td></tr>
-                                        </tbody>
-                                    </table>
+<h1><i class="fas fa-binoculars"></i> File Watcher</h1>
+<p>
+    This application can watch (log) files for lines matching a regular expression.
+    This is similar to <code>tail -f file | grep string</code> and allows you to send notifications
+    when, for instance, a log file has a new line written that matches a regular expression.
+</p>
+<hr>
+<p>
+    <h3><i class="fas fa-comment text-orange"></i> Notes</h3>
+    <li><i class="fas fa-star text-dgrey"></i> You must enable the <b>Log Watcher</b> feature and choose a channel on the Notifiarr website for this to work!</li>
+    <li><i class="fas fa-star text-dgrey"></i> Use <code>(?i)</code> as a prefix to make regular expressions case insensitive.</li>
+    <li><i class="fas fa-star text-dgrey"></i> Save and reload to enable newly added file watchers.</li>
+</p>
+<div class="table-responsive">
+    <table class="table bk-dark table-bordered">
+        <thead>
+            <tr>
+                <td colspan="8" class="text-center mobile-hide">
+                    <div style="float: left;font-size:35px;"><i class="fas fa-glasses"></i></div>
+                    <h2 style="margin-bottom:-45px">Watch Files</h2>
+                    <div style="float: right;">
+                        <button onclick="addWatchFiles()" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                    </div>
+                </td>
+                <td colspan="8" class="tablet-hide desktop-hide">
+                    <button id="files-WatchFiles-addbutton" onclick="addWatchFiles()" data-names='["Path","Regexp","Skip","Poll","Pipe","MustExist","LogMatch"]' data-samplepath="{{if eq .Version.os "windows"}}c:\some\file.log{{else}}/some/file.log{{end}}" type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                    <h2 style="margin-left:5px;display:inline;">WatchFiles</h2>
+                    <div style="float:right;font-size:35px;"><i class="fas fa-glasses"></i></div>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:90px;min-width:90px;">
+                    <div style="display:none;" class="dialogText">
+                        The <span class="text-danger">red</span> button deletes the file watcher.<br>
+                        The <span class="text-primary">blue</span> button adds a new file watcher.<br>
+                        The <span class="text-success">green</span> button stops <i class="fas fa-stop-circle text-danger"></i> or starts <i class="fas fa-play-circle text-primary"></i> a file watcher.<br>
+                        <hr>
+                        A <span class="text-brand">purple</span> table cell here means the file watcher is running.<br>
+                        A <span class="text-danger">red</span> table cell means the file watcher channel is closed, likely due to an error.
+                    </div>
+                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">Actions</span>
+                </td>
+                <td style="min-width:120px;">
+                    <div style="display:none;" class="dialogText">Full or relative path to the file to be watched.</div>
+                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">File Path</span>
+                </td>
+                <td style="min-width:120px;">
+                    <div style="display:none;" class="dialogText">Regular expression to match lines against.</div>
+                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">Regular Expression</span>
+                </td>
+                <td style="min-width:120px;">
+                    <div style="display:none;" class="dialogText">Regular expression used to skip lines that are matched. This negates the matches.</div>
+                    <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">Skip Expression</span>
+                </td>
+                <td style="min-width:110px;width:110px;">
+                    <div style="display:none;" class="dialogText">In some cases polling needs to be enabled for this feature to work.</div>
+                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">Polling</span>
+                </td>
+                <td style="min-width:110px;width:110px;">
+                    <div style="display:none;" class="dialogText">Enable this if the file you're watching is a named FIFO pipe.</div>
+                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">FIFO Pipe</span>
+                </td>
+                <td style="min-width:110px;width:110px;">
+                    <div style="display:none;" class="dialogText">Enabling this will skip watching the file if it does not exist when the application starts. <b>Watching files that do not exist is still buggy and may not work at all.</b></div>
+                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">Must Exist</span>
+                </td>
+                <td style="min-width:110px;width:110px;">
+                    <div style="display:none;" class="dialogText">Enabling this will write the matched line to the notifiarr log. This is good for debugging, but may be noisy.</div>
+                    <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                    <span class="dialogTitle">Log Match</span>
+                </td>
+            </tr>
+        </thead>
+        <tbody id="files-WatchFiles-container">
+        {{- range $index, $app := .Config.WatchFiles}}
+            <input disabled style="display: none;" class="client-parameter files-WatchFiles{{$index}}-deleted" data-group="files" data-label="Files {{instance $index}} Deleted" data-original="false" value="false">
+            <tr class="files-WatchFiles" id="files-WatchFiles-{{$index}}">
+                <td style="white-space:nowrap;" id="activeFileCell{{$index}}" class="{{if $app.Active}}bk-brand{{else}}bk-danger{{end}}">
+                    <div class="btn-group" role="group" style="display:flex;font-size:18px;">
+                        <button onclick="removeInstance('files-WatchFiles', '{{$index}}')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-trash-alt"></i></button>
+                        <button id="WatchFilesIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
+                        <button onClick="stopFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if not $app.Active}}display:none;{{end}}"><i class="fas fa-stop-circle text-danger"></i></button>
+                        <button onClick="startFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if $app.Active}}display:none;{{end}}"><i class="fas fa-play-circle text-primary"></i></button>
+                    </div>
+                </td>
+                <td>
+                    <form class="form-inline">
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_WATCH_FILES_%d_PATH" $.Flags.EnvPrefix $index)) }}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_PATH" $.Flags.EnvPrefix $index}}</span>
                                 </div>
-                                <h3><i class="fas fa-vial"></i> Regular Expression Tester</h3>
-                                <div class="table-responsive">
-                                    <table class="table bk-dark">
-                                        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Expression</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestRegex" name="regexTestRegex" placeholder="(?i)(error|warning|panic)"></td></tr>
-                                        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Test String</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestLine" name="regexTestLine" placeholder="2059/01/23 16:20:32 [INFO] Log Line goes here"></td></tr>
-                                        <tr><td><button onClick="testRegex();" class="btn btn-sm btn-success" style="width:100%;font-size:14px;"><i class="fas fa-check-double"></i> Test Regex</button></td><td></td></tr>
-                                    </table>
+                                {{- end}}
+                                <input type="text" id="WatchFiles.{{$index}}.Path" name="WatchFiles.{{$index}}.Path" data-index="{{$index}}" 
+                                    data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Name"
+                                    data-original="{{(index $.Input.WatchFiles $index).Path}}" value="{{(index $.Input.WatchFiles $index).Path}}">
+                                <div onClick="browseFiles('#WatchFiles\\.{{$index}}\\.Path');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form class="form-inline">
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_WATCH_FILES_%d_REGEX" $.Flags.EnvPrefix $index) )}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_REGEX" $.Flags.EnvPrefix $index}}</span>
                                 </div>
+                                {{- end}}
+                                <input type="text" id="WatchFiles.{{$index}}.Regexp" name="WatchFiles.{{$index}}.Regexp" data-index="{{$index}}"
+                                    data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Regex"
+                                    data-original="{{(index $.Input.WatchFiles $index).Regexp}}" value="{{(index $.Input.WatchFiles $index).Regexp}}">
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form class="form-inline">
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_WATCH_FILES_%d_SKIP" $.Flags.EnvPrefix $index))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_SKIP" $.Flags.EnvPrefix $index}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" id="WatchFiles.{{$index}}.Skip" name="WatchFiles.{{$index}}.Skip" data-index="{{$index}}" data-app="WatchFiles"
+                                    class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Skip"
+                                    data-original="{{(index $.Input.WatchFiles $index).Skip}}" value="{{(index $.Input.WatchFiles $index).Skip}}">
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form class="form-inline">
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_WATCH_FILES_%d_POLL" $.Flags.EnvPrefix $index))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_POLL" $.Flags.EnvPrefix $index}}</span>
+                                </div>
+                                {{- end}}
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.Poll" name="WatchFiles.{{$index}}.Poll" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Poll" data-original="{{$app.Poll}}" value="{{$app.Poll}}">
+                                    <option {{if $app.Poll}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not $app.Poll}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form class="form-inline">
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_WATCH_FILES_%d_PIPE" $.Flags.EnvPrefix $index)) }}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_PIPE" $.Flags.EnvPrefix $index}}</span>
+                                </div>
+                                {{- end}}
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.Pipe" name="WatchFiles.{{$index}}.Pipe" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Pipe" data-original="{{$app.Pipe}}" value="{{$app.Pipe}}">
+                                    <option {{if $app.Pipe}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not $app.Pipe}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form class="form-inline">
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_WATCH_FILES_%d_MUST_EXIST" $.Flags.EnvPrefix $index) )}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_MUST_EXIST" $.Flags.EnvPrefix $index}}</span>
+                                </div>
+                                {{- end}}
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.MustExist" name="WatchFiles.{{$index}}.MustExist" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} MustExist" data-original="{{$app.MustExist}}" value="{{$app.MustExist}}">
+                                    <option {{if $app.MustExist}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not $app.MustExist}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form class="form-inline">
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_WATCH_FILES_%d_LOG_MATCH" $.Flags.EnvPrefix $index) )}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'left')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_LOG_MATCH" $.Flags.EnvPrefix $index}}</span>
+                                </div>
+                                {{- end}}
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.LogMatch" name="WatchFiles.{{$index}}.LogMatch" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} LogMatch" data-original="{{$app.LogMatch}}" value="{{$app.LogMatch}}">
+                                    <option {{if $app.LogMatch}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not $app.LogMatch}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        {{- end}}
+            <tr id="files-WatchFiles-none"{{if .Config.WatchFiles}} style="display: none;"{{end}}><td colspan="8">No file watchers configured.</td></tr>
+        </tbody>
+    </table>
+</div>
+<h3><i class="fas fa-vial"></i> Regular Expression Tester</h3>
+<div class="table-responsive">
+    <table class="table bk-dark">
+        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Expression</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestRegex" name="regexTestRegex" placeholder="(?i)(error|warning|panic)"></td></tr>
+        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Test String</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestLine" name="regexTestLine" placeholder="2059/01/23 16:20:32 [INFO] Log Line goes here"></td></tr>
+        <tr><td><button onClick="testRegex();" class="btn btn-sm btn-success" style="width:100%;font-size:14px;"><i class="fas fa-check-double"></i> Test Regex</button></td><td></td></tr>
+    </table>
+</div>
 {{- /* end of filewatcher (leave this comment) */ -}}

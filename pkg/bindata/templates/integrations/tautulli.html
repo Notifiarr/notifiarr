@@ -1,68 +1,68 @@
-                                    {{- $app := .Config.Apps.Tautulli}}
-                                    {{- $appStatus := cacheID "tautulliStatus" 1 }}
-                                    {{- $appUsers := cache "tautulliUsers" }}
-                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-bordered">
-                                                <tr>
-                                                    <td style="width:75px;">Tautulli</td>
-                                                    <td style="width:25px;min-width:25px;">
-                                                        <img src="{{files}}/images/logo/tautulli.png" style="width:25px">
-                                                    </td>
-                                                    <td>{{$app.Name}}</td>
-                                                </tr>
-                                                <tr><td colspan="2">URL</td><td><a href="{{$app.URL}}">{{$app.URL}}</a></td></tr>
-                                            {{- if and $appStatus $appStatus.Data }}
-                                                <tr>
-                                                    <td colspan="2">
-                                                        <a href="#integrations" onClick="dialog($(this), 'left')">Cache Age</a>
-                                                        <span style="display:none;" class="dialogTitle">Tautulli Info</span>
-                                                        <div style="display:none;" class="dialogText">
-                                                            <pre>{{tojson $appStatus.Data}}</pre>
-                                                        </div>
-                                                    </td>
-                                                    <td>{{since $appStatus.Time}}</td>
-                                                </tr>
-                                                <tr><td colspan="2">Version</td><td>{{$appStatus.Data.Version}}</td></tr>
-                                                <tr><td colspan="2">Branch</td><td>{{$appStatus.Data.Branch}}</td></tr>
-                                                <tr><td colspan="2">Platform</td><td>{{$appStatus.Data.Platform}}</td></tr>
-                                            {{- end }}
-                                            {{- if and $appStatus $appUsers}}
-                                                <tr><td colspan="3"></td></tr>
-                                            {{- end }}
-                                            {{- if $appUsers }}
-                                                <tr>
-                                                    <td colspan="2">Users</td>
-                                                    <td colspan="2">
-                                                        <a href="#integrations" onClick="dialog($(this), 'left')">{{len $appUsers.Data.Response.Data}}</a>
-                                                        <span style="display:none;" class="dialogTitle">Tautulli Users</span>
-                                                        <div style="display:none;" class="dialogText table-responsive">
-                                                            <table class="table table-striped">
-                                                                <tr><td colspan="2">Plex Username</td><td>Custom Name</td><td>Email</td></tr>
-                                                            {{- range $usr := $appUsers.Data.Response.Data }}
-                                                                <tr>
-                                                                    <td style="width:25px;"><img style="max-width:25px;height:25px;" src="{{$usr.Thumb}}"></td>
-                                                                    <td>{{$usr.Username}}</td>
-                                                                    <td>{{$usr.FriendlyName}}</td>
-                                                                    <td><a href="mailto:{{$usr.Email}}">{{$usr.Email}}</a></td>
-                                                                </tr>
-                                                            {{- end }}
-                                                        </table>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                        <a href="#integrations" onClick="dialog($(this), 'left')">Cache Age</a>
-                                                        <span style="display:none;" class="dialogTitle">Tautulli Users</span>
-                                                        <div style="display:none;" class="dialogText">
-                                                            <pre>{{tojson $appUsers.Data.Response.Data}}</pre>
-                                                        </div>
-                                                    </td>
-                                                    <td>{{since $appUsers.Time}}</td>
-                                                </tr>
-                                            {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                    {{- /* end of app integration (leave this comment) */ -}}
+{{- $app := .Config.Apps.Tautulli}}
+{{- $appStatus := cacheID "tautulliStatus" 1 }}
+{{- $appUsers := cache "tautulliUsers" }}
+<div class="col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <td style="width:75px;">Tautulli</td>
+                <td style="width:25px;min-width:25px;">
+                    <img src="{{files}}/images/logo/tautulli.png" style="width:25px">
+                </td>
+                <td>{{$app.Name}}</td>
+            </tr>
+            <tr><td colspan="2">URL</td><td><a href="{{$app.URL}}">{{$app.URL}}</a></td></tr>
+{{- if and $appStatus $appStatus.Data }}
+            <tr>
+                <td colspan="2">
+                    <a href="#integrations" onClick="dialog($(this), 'left')">Cache Age</a>
+                    <span style="display:none;" class="dialogTitle">Tautulli Info</span>
+                    <div style="display:none;" class="dialogText">
+                        <pre>{{tojson $appStatus.Data}}</pre>
+                    </div>
+                </td>
+                <td>{{since $appStatus.Time}}</td>
+            </tr>
+            <tr><td colspan="2">Version</td><td>{{$appStatus.Data.Version}}</td></tr>
+            <tr><td colspan="2">Branch</td><td>{{$appStatus.Data.Branch}}</td></tr>
+            <tr><td colspan="2">Platform</td><td>{{$appStatus.Data.Platform}}</td></tr>
+{{- end }}
+{{- if and $appStatus $appUsers}}
+            <tr><td colspan="3"></td></tr>
+{{- end }}
+{{- if $appUsers }}
+            <tr>
+                <td colspan="2">Users</td>
+                <td colspan="2">
+                    <a href="#integrations" onClick="dialog($(this), 'left')">{{len $appUsers.Data.Response.Data}}</a>
+                    <span style="display:none;" class="dialogTitle">Tautulli Users</span>
+                    <div style="display:none;" class="dialogText table-responsive">
+                        <table class="table table-striped">
+                            <tr><td colspan="2">Plex Username</td><td>Custom Name</td><td>Email</td></tr>
+                        {{- range $usr := $appUsers.Data.Response.Data }}
+                            <tr>
+                                <td style="width:25px;"><img style="max-width:25px;height:25px;" src="{{$usr.Thumb}}"></td>
+                                <td>{{$usr.Username}}</td>
+                                <td>{{$usr.FriendlyName}}</td>
+                                <td><a href="mailto:{{$usr.Email}}">{{$usr.Email}}</a></td>
+                            </tr>
+                        {{- end }}
+                    </table>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <a href="#integrations" onClick="dialog($(this), 'left')">Cache Age</a>
+                    <span style="display:none;" class="dialogTitle">Tautulli Users</span>
+                    <div style="display:none;" class="dialogText">
+                        <pre>{{tojson $appUsers.Data.Response.Data}}</pre>
+                    </div>
+                </td>
+                <td>{{since $appUsers.Time}}</td>
+            </tr>
+{{- end }}
+        </table>
+    </div>
+</div>
+{{- /* end of app integration (leave this comment) */ -}}

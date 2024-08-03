@@ -1,30 +1,30 @@
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="col-md-1">
-                                            <h1 class="text-center text-bold mt-4x"></h1>
-                                        </div>
-                                        <div class="col-md-10">
-                                            <h1 class="text-center text-bold mt-4x">Bienvenidos!</h1>
-                                            <p>
-                                                You made it! Welcome to your Notifiarr Client. Use this interface to
-                                                find running application information, and configuration settings.
-                                                If you have more ideas for this interface, or find any bugs,
-                                                <a href="https://github.com/Notifiarr/notifiarr/issues/new">please let us know!</a>
-                                            </p>
-                                            <p>{{todaysemoji}} <b>{{.ClientInfo.String}}</b></p>
-                                            <p class="text-center"><img src="{{files}}/images/golift.png" style="height:150px;"></p>
-                                        </div>
-                                        <div class="col-md-1">
-                                            <h1 class="text-center text-bold mt-4x"></h1>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-10 col-md-offset-1"><pre class="bk-dark text-white">{{fortune}}</pre></div>
-                                    <div class="col-sm-12"><hr></div>
-                                    <div class="col-md-8 col-md-offset-2">
-                                        <p>
-                                        This application has an API; it's heavily used by the website to communicate with this client.
-                                        Find the documentation for the API <a href="{{base}}docs/">locally here</a>.
-                                        </p>
-                                    </div>
-                                </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-1">
+            <h1 class="text-center text-bold mt-4x"></h1>
+        </div>
+        <div class="col-md-10">
+            <h1 class="text-center text-bold mt-4x">Bienvenidos!</h1>
+            <p>
+                You made it! Welcome to your Notifiarr Client. Use this interface to
+                find running application information, and configuration settings.
+                If you have more ideas for this interface, or find any bugs,
+                <a href="https://github.com/Notifiarr/notifiarr/issues/new">please let us know!</a>
+            </p>
+            <p>{{todaysemoji}} <b>{{.ClientInfo.String}}</b></p>
+            <p class="text-center"><img src="{{files}}/images/golift.png" style="height:150px;"></p>
+        </div>
+        <div class="col-md-1">
+            <h1 class="text-center text-bold mt-4x"></h1>
+        </div>
+    </div>
+    <div class="col-md-10 col-md-offset-1"><pre class="bk-dark text-white">{{fortune}}</pre></div>
+    <div class="col-sm-12"><hr></div>
+    <div class="col-md-8 col-md-offset-2">
+        <p>
+        This application has an API; it's heavily used by the website to communicate with this client.
+        Find the documentation for the API <a href="{{base}}docs/">locally here</a>.
+        </p>
+    </div>
+</div>
 {{- /* end of landing (leave this comment) */ -}}

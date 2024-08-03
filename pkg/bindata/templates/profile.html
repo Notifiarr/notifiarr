@@ -1,217 +1,217 @@
-                                <h1><i class="fas fa-unlock-alt"></i> Trust Profile</h1>
-                                <p>
-                                    <li><i class="fas fa-star text-dgrey"></i> This page controls how you log into this Notifiarr client application.</li>
-                                    <li><i class="fas fa-star text-dgrey"></i> Username and Password are only used if Auth Type is set to Password.</li>
-                                    <li><i class="fas fa-star text-dgrey"></i> Auth Header is only used if Auth Type is <i>not</i> set to Password.</li>
-                                    <li><i class="fas fa-star text-dgrey"></i> See <a href="https://notifiarr.wiki/en/Client/ReverseProxy">the wiki</a> for instructions setting up an authentication proxy.</li>
-                                    <li><i class="fas fa-star text-dgrey"></i> If Auth Type changes, log out <a href="logout#profile"><i class="fas fa-sign-out-alt text-danger"></i></a> to complete the process.</li>
-                                    {{- if not .ProxyAllow}}
-                                    <li><i class="fas fa-star text-danger"></i> Proxy authentication is disabled because your upstream (<b>{{.UpstreamIP}}</b>) is not in the allowed upstreams list.</li>
-                                    {{- end}}
-                                </p>
-                                <table class="table bk-dark table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <td><b>Setting</b></td>
-                                            <td><b>Current Value</b></td>
-                                            <td><b>New Value</b></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                <span class="dialogTitle">Auth Type</span>
-                                                <div style="display:none;" class="dialogText">
-                                                    Three auth types are currently supported.
-                                                    Auth Proxy and No Password are only available if the current request comes from a valid, configured
-                                                    upstream IP address.
-                                                    <h4>Password: Local Username</h4>
-                                                    This is the default auth type.
-                                                    Select the Password option to log into this application with a configured username and password.
-                                                    Only 1 username and password is supported.
-                                                    When selecting this option, you must fill in the username and new password fields.
-                                                    If this is the current auth type you must also fill in the current password field to make changes.
-                                                    <h4>Auth Proxy: Header</h4>
-                                                    Select this option to log into this application using an HTTP header that contains a username.
-                                                    This is commonly known as proxy authentication. We have
-                                                    <a href="https://notifiarr.wiki/en/Client/ReverseProxy">a wiki page</a>
-                                                    that provides instructions to configure Nginx for this feature.
-                                                    When selecting this option, you must also select a header for the auth proxy.
-                                                    If no headers are displayed, then no valid headers were provided by the upstream proxy.
-                                                    <h4>No Password</h4>
-                                                    This configuration is not recommended.
-                                                    The No Password auth type allows any request from any configured <code>upstream</code> IP.
-                                                    It also works with an auth proxy to set the username. If no username is in the provided header,
-                                                    then it defaults to admin.
-                                                </div>
-                                            </td>
-                                            <td>{{.Config.UIPassword.Type.String}}</td>
-                                            <td>
-                                                <select id="AuthType" name="AuthType" class="profile-parameter form-control input-sm" type="select">
-                                                    <option value="password"{{if eq .Config.UIPassword.Type 0}} selected{{end}}>Password: Local Username</option>
-                                                    <option value="header"{{if eq .Config.UIPassword.Type 1}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>Auth Proxy: Header</option>
-                                                    <option value="nopass"{{if eq .Config.UIPassword.Type 2}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>No Password (danger)</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div style="display:none;" class="dialogText">
-                                                    If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you should add that proxy IP here. You can also specify full networks.
-                                                    This controls which IP is written to the web server log file (requester or <span class="text-warning">x-forwarded-for</span> header).
-                                                    It also allows the <span class="text-warning">x-webauth-user</span> header for proxy authentication. Separate with spaces or new lines.<br>
-                                                    <b>Information</b>:<br>
-                                                    <i>Upstream</i>: <b>{{.UpstreamIP}}<</b><br>
-                                                    <i>X-Forwarded-For</i>: <b>{{.Headers.Get "x-forwarded-for"}}<</b><br>
-                                                    <b>Current Values</b>:<br>
-                                                    {{- range $i, $s := .Config.Allow.Input}}<i>{{instance $i}}</i>: <b>{{$s}}</b><br>{{end}}
-                                                    {{- if not .Config.Allow.Input}}<i>нет значения, ноль</i>{{end}}{{/* "no value, null" */}}
-                                                </div>
-                                                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                <span class="dialogTitle">Upstreams</span>
-                                            </td>
-                                            <td class="mobile-hide">
-                                                {{range $i, $s := .Config.Allow.Input}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}{{if not .Config.Allow.Input}}<i>no value, null</i>{{end}}
-                                            </td>
-                                            <td class="form-inline">
-                                                <div class="form-group" style="width:100%">
-                                                {{- if (locked (printf "%s_UPSTREAMS_0" .Flags.EnvPrefix))}}
-                                                    <div class="input-group" style="width:100%">
-                                                        <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                            <div style="display:none;" class="dialogText">
-                                                                An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                            </div>
-                                                            <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                            <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UPSTREAMS_0" .Flags.EnvPrefix}}</span>
-                                                        </div>
-                                                        <input type="text" id="Upstreams" name="Upstreams" placeholder="127.0.0.1 ::1" class="profile-parameter form-control input-sm" data-group="config" data-label="Upstreams" style="width: 100%;" data-original="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}" value="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}">
-                                                    </div>
-                                                {{- else}}
-                                                    <input type="text" id="Upstreams" name="Upstreams" placeholder="127.0.0.1 ::1" class="profile-parameter form-control input-sm" data-group="config" data-label="Upstreams" style="width: 100%;" data-original="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}" value="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}">
-                                                {{- end}}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                <span class="dialogTitle">Auth Header</span>
-                                                <div style="display:none;" class="dialogText">
-                                                    This displays headers that are provided by the client or upstream that may be used for
-                                                    proxy authentication. This selection is only used if auth type is set to header.
-                                                    Choose the header that displays your proper username.
-                                                </div>
-                                            </td>
-                                            <td>{{if .Config.UIPassword.Webauth}}{{.Config.UIPassword.Header}}{{else}}none{{end}}</td>
-                                            <td>
-                                                <select id="AuthHeader" name="AuthHeader" class="profile-parameter form-control input-sm" type="select">
-                                                    {{- range $header, $val := .Headers }}
-                                                        {{- /* Ignored Headers. Hide some headers, but not the one that's currently selected. */ -}}
-                                                        {{ if or (eq (lower $header) (lower $.Config.UIPassword.Header)) (and 
-                                                            (ne (lower $header) "accept") (ne (lower $header) "accept-encoding") 
-                                                            (ne (lower $header) "accept-language") (ne (lower $header) "cache-control") 
-                                                            (ne (lower $header) "cdn-loop") (ne (lower $header) "cf-connecting-ip") 
-                                                            (ne (lower $header) "cf-ipcity") (ne (lower $header) "cf-ipcontinent") 
-                                                            (ne (lower $header) "cf-ipcountry") (ne (lower $header) "cf-iplatitude") 
-                                                            (ne (lower $header) "cf-iplongitude") (ne (lower $header) "cf-metro-code") 
-                                                            (ne (lower $header) "cf-postal-code") (ne (lower $header) "cf-ray") 
-                                                            (ne (lower $header) "cf-region") (ne (lower $header) "cf-region-code") 
-                                                            (ne (lower $header) "cf-timezone") (ne (lower $header) "cf-visitor") 
-                                                            (ne (lower $header) "connection") (ne (lower $header) "cookie") 
-                                                            (ne (lower $header) "dnt") (ne (lower $header) "expect") 
-                                                            (ne (lower $header) "pragma") (ne (lower $header) "priority") 
-                                                            (ne (lower $header) "referer") (ne (lower $header) "sec-ch-ua") 
-                                                            (ne (lower $header) "sec-ch-ua-mobile") (ne (lower $header) "sec-ch-ua-platform") 
-                                                            (ne (lower $header) "sec-fetch-dest") (ne (lower $header) "sec-fetch-mode") 
-                                                            (ne (lower $header) "sec-fetch-site") (ne (lower $header) "strict-transport-security") 
-                                                            (ne (lower $header) "te") (ne (lower $header) "upgrade-insecure-requests") 
-                                                            (ne (lower $header) "user-agent") (ne (lower $header) "x-content-type-options") 
-                                                            (ne (lower $header) "x-forwarded-for") (ne (lower $header) "x-forwarded-host") 
-                                                            (ne (lower $header) "x-forwarded-method") (ne (lower $header) "x-forwarded-port") 
-                                                            (ne (lower $header) "x-forwarded-proto") (ne (lower $header) "x-forwarded-server") 
-                                                            (ne (lower $header) "x-forwarded-ssl") (ne (lower $header) "x-forwarded-uri") 
-                                                            (ne (lower $header) "x-noticlient-username") (ne (lower $header) "x-original-method") 
-                                                            (ne (lower $header) "x-original-uri") (ne (lower $header) "x-original-url") 
-                                                            (ne (lower $header) "x-real-ip") (ne (lower $header) "x-redacted-uri") 
-                                                            (ne (lower $header) "x-request-id")
+<h1><i class="fas fa-unlock-alt"></i> Trust Profile</h1>
+<p>
+    <li><i class="fas fa-star text-dgrey"></i> This page controls how you log into this Notifiarr client application.</li>
+    <li><i class="fas fa-star text-dgrey"></i> Username and Password are only used if Auth Type is set to Password.</li>
+    <li><i class="fas fa-star text-dgrey"></i> Auth Header is only used if Auth Type is <i>not</i> set to Password.</li>
+    <li><i class="fas fa-star text-dgrey"></i> See <a href="https://notifiarr.wiki/en/Client/ReverseProxy">the wiki</a> for instructions setting up an authentication proxy.</li>
+    <li><i class="fas fa-star text-dgrey"></i> If Auth Type changes, log out <a href="logout#profile"><i class="fas fa-sign-out-alt text-danger"></i></a> to complete the process.</li>
+    {{- if not .ProxyAllow}}
+    <li><i class="fas fa-star text-danger"></i> Proxy authentication is disabled because your upstream (<b>{{.UpstreamIP}}</b>) is not in the allowed upstreams list.</li>
+    {{- end}}
+</p>
+<table class="table bk-dark table-bordered">
+    <thead>
+        <tr>
+            <td><b>Setting</b></td>
+            <td><b>Current Value</b></td>
+            <td><b>New Value</b></td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                <span class="dialogTitle">Auth Type</span>
+                <div style="display:none;" class="dialogText">
+                    Three auth types are currently supported.
+                    Auth Proxy and No Password are only available if the current request comes from a valid, configured
+                    upstream IP address.
+                    <h4>Password: Local Username</h4>
+                    This is the default auth type.
+                    Select the Password option to log into this application with a configured username and password.
+                    Only 1 username and password is supported.
+                    When selecting this option, you must fill in the username and new password fields.
+                    If this is the current auth type you must also fill in the current password field to make changes.
+                    <h4>Auth Proxy: Header</h4>
+                    Select this option to log into this application using an HTTP header that contains a username.
+                    This is commonly known as proxy authentication. We have
+                    <a href="https://notifiarr.wiki/en/Client/ReverseProxy">a wiki page</a>
+                    that provides instructions to configure Nginx for this feature.
+                    When selecting this option, you must also select a header for the auth proxy.
+                    If no headers are displayed, then no valid headers were provided by the upstream proxy.
+                    <h4>No Password</h4>
+                    This configuration is not recommended.
+                    The No Password auth type allows any request from any configured <code>upstream</code> IP.
+                    It also works with an auth proxy to set the username. If no username is in the provided header,
+                    then it defaults to admin.
+                </div>
+            </td>
+            <td>{{.Config.UIPassword.Type.String}}</td>
+            <td>
+                <select id="AuthType" name="AuthType" class="profile-parameter form-control input-sm" type="select">
+                    <option value="password"{{if eq .Config.UIPassword.Type 0}} selected{{end}}>Password: Local Username</option>
+                    <option value="header"{{if eq .Config.UIPassword.Type 1}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>Auth Proxy: Header</option>
+                    <option value="nopass"{{if eq .Config.UIPassword.Type 2}} selected{{end}}{{if not .ProxyAllow}} disabled{{end}}>No Password (danger)</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="display:none;" class="dialogText">
+                    If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you should add that proxy IP here. You can also specify full networks.
+                    This controls which IP is written to the web server log file (requester or <span class="text-warning">x-forwarded-for</span> header).
+                    It also allows the <span class="text-warning">x-webauth-user</span> header for proxy authentication. Separate with spaces or new lines.<br>
+                    <b>Information</b>:<br>
+                    <i>Upstream</i>: <b>{{.UpstreamIP}}<</b><br>
+                    <i>X-Forwarded-For</i>: <b>{{.Headers.Get "x-forwarded-for"}}<</b><br>
+                    <b>Current Values</b>:<br>
+                    {{- range $i, $s := .Config.Allow.Input}}<i>{{instance $i}}</i>: <b>{{$s}}</b><br>{{end}}
+                    {{- if not .Config.Allow.Input}}<i>нет значения, ноль</i>{{end}}{{/* "no value, null" */}}
+                </div>
+                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                <span class="dialogTitle">Upstreams</span>
+            </td>
+            <td class="mobile-hide">
+                {{range $i, $s := .Config.Allow.Input}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}{{if not .Config.Allow.Input}}<i>no value, null</i>{{end}}
+            </td>
+            <td class="form-inline">
+                <div class="form-group" style="width:100%">
+                {{- if (locked (printf "%s_UPSTREAMS_0" .Flags.EnvPrefix))}}
+                    <div class="input-group" style="width:100%">
+                        <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                            <div style="display:none;" class="dialogText">
+                                An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                            </div>
+                            <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                            <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UPSTREAMS_0" .Flags.EnvPrefix}}</span>
+                        </div>
+                        <input type="text" id="Upstreams" name="Upstreams" placeholder="127.0.0.1 ::1" class="profile-parameter form-control input-sm" data-group="config" data-label="Upstreams" style="width: 100%;" data-original="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}" value="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}">
+                    </div>
+                {{- else}}
+                    <input type="text" id="Upstreams" name="Upstreams" placeholder="127.0.0.1 ::1" class="profile-parameter form-control input-sm" data-group="config" data-label="Upstreams" style="width: 100%;" data-original="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}" value="{{range $s := .Config.Allow.Input}}{{$s}} {{end}}">
+                {{- end}}
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                <span class="dialogTitle">Auth Header</span>
+                <div style="display:none;" class="dialogText">
+                    This displays headers that are provided by the client or upstream that may be used for
+                    proxy authentication. This selection is only used if auth type is set to header.
+                    Choose the header that displays your proper username.
+                </div>
+            </td>
+            <td>{{if .Config.UIPassword.Webauth}}{{.Config.UIPassword.Header}}{{else}}none{{end}}</td>
+            <td>
+                <select id="AuthHeader" name="AuthHeader" class="profile-parameter form-control input-sm" type="select">
+                    {{- range $header, $val := .Headers }}
+                        {{- /* Ignored Headers. Hide some headers, but not the one that's currently selected. */ -}}
+                        {{ if or (eq (lower $header) (lower $.Config.UIPassword.Header)) (and 
+                            (ne (lower $header) "accept") (ne (lower $header) "accept-encoding") 
+                            (ne (lower $header) "accept-language") (ne (lower $header) "cache-control") 
+                            (ne (lower $header) "cdn-loop") (ne (lower $header) "cf-connecting-ip") 
+                            (ne (lower $header) "cf-ipcity") (ne (lower $header) "cf-ipcontinent") 
+                            (ne (lower $header) "cf-ipcountry") (ne (lower $header) "cf-iplatitude") 
+                            (ne (lower $header) "cf-iplongitude") (ne (lower $header) "cf-metro-code") 
+                            (ne (lower $header) "cf-postal-code") (ne (lower $header) "cf-ray") 
+                            (ne (lower $header) "cf-region") (ne (lower $header) "cf-region-code") 
+                            (ne (lower $header) "cf-timezone") (ne (lower $header) "cf-visitor") 
+                            (ne (lower $header) "connection") (ne (lower $header) "cookie") 
+                            (ne (lower $header) "dnt") (ne (lower $header) "expect") 
+                            (ne (lower $header) "pragma") (ne (lower $header) "priority") 
+                            (ne (lower $header) "referer") (ne (lower $header) "sec-ch-ua") 
+                            (ne (lower $header) "sec-ch-ua-mobile") (ne (lower $header) "sec-ch-ua-platform") 
+                            (ne (lower $header) "sec-fetch-dest") (ne (lower $header) "sec-fetch-mode") 
+                            (ne (lower $header) "sec-fetch-site") (ne (lower $header) "strict-transport-security") 
+                            (ne (lower $header) "te") (ne (lower $header) "upgrade-insecure-requests") 
+                            (ne (lower $header) "user-agent") (ne (lower $header) "x-content-type-options") 
+                            (ne (lower $header) "x-forwarded-for") (ne (lower $header) "x-forwarded-host") 
+                            (ne (lower $header) "x-forwarded-method") (ne (lower $header) "x-forwarded-port") 
+                            (ne (lower $header) "x-forwarded-proto") (ne (lower $header) "x-forwarded-server") 
+                            (ne (lower $header) "x-forwarded-ssl") (ne (lower $header) "x-forwarded-uri") 
+                            (ne (lower $header) "x-noticlient-username") (ne (lower $header) "x-original-method") 
+                            (ne (lower $header) "x-original-uri") (ne (lower $header) "x-original-url") 
+                            (ne (lower $header) "x-real-ip") (ne (lower $header) "x-redacted-uri") 
+                            (ne (lower $header) "x-request-id")
 
-                                                        )}}
-                                                    <option value="{{$header}}"{{if eq (lower $header) (lower $.Config.UIPassword.Header)}} selected{{end}}>{{$header}}: {{index $val 0}}</option>
-                                                        {{- end }}
-                                                    {{- end }}
-                                                </select>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Username</td>
-                                            <td id="current-username">{{.Username}}</td>
-                                            <td>
-                                                <form class="form-inline">
-                                                    <div class="form-group" style="width:100%">
-                                                        {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
-                                                        <div class="input-group" style="width:100%">
-                                                            <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                <div style="display:none;" class="dialogText">
-                                                                    An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                </div>
-                                                                <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UI_PASSWORD" .Flags.EnvPrefix}}</span>
-                                                            </div>
-                                                            <input type="text" id="NewUsername" name="NewUsername" value="{{.Username}}" class="profile-parameter form-control input-sm" style="width:100%;">
-                                                        </div>
-                                                        {{ else }}
-                                                        <input type="text" id="NewUsername" name="NewUsername" value="{{.Username}}" class="profile-parameter form-control input-sm" style="width: 100%;">
-                                                        {{- end}}
-                                                        </div>
-                                                    </div>
-                                                </form><!-- in its own form to avoid browser auto complete -->
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Password</td>
-                                            <td>
-                                                {{- if .Webauth}}
-                                                none
-                                                {{- else}}
-                                                <input placeholder="enter current password" type="password" id="Password" name="Password" class="profile-parameter form-control input-sm" style="width: 100%;">
-                                                {{- end}}
-                                            </td>
-                                            <td>
-                                                <form class="form-inline">
-                                                    <div class="form-group" style="width:100%">
-                                                        <div class="input-group" style="width:100%">
-                                                            {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UI_PASSWORD" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                            {{- end}}
-                                                            <input placeholder="9 character minimum" type="password" autocomplete="new-password" id="NewPassword" name="NewPassword" class="profile-parameter form-control input-sm" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
-                                                            <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('NewPassword', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <p>
-                                    <button onclick="saveProfileChanges()" class="btn btn-primary">Save Changes</button>
-                                    {{- if not .Webauth}}
-                                    &nbsp;You must enter your current password to make changes.{{end}}
-                                </p>
-                                <hr>
-                                {{- if .ClientInfo.IsSub}}
-                                <h2><font color="green"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-tie{{end}}"></i></font> Fortune</h2>
-                                {{- else if .ClientInfo.IsPatron}}
-                                <h2><font color="purple"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-ninja{{end}}"></i></font> Fortune</h2>
-                                {{- else}}
-                                <h2><i class="fas fa-user-alt" style="float:left;font-size:40px"></i> Fortune</h2>
-                                {{- end}}
-                                <div class="col-md-10 col-md-offset-1"><pre class="bk-dark text-white">{{fortune}}</pre></div>
+                        )}}
+                    <option value="{{$header}}"{{if eq (lower $header) (lower $.Config.UIPassword.Header)}} selected{{end}}>{{$header}}: {{index $val 0}}</option>
+                        {{- end }}
+                    {{- end }}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Username</td>
+            <td id="current-username">{{.Username}}</td>
+            <td>
+                <form class="form-inline">
+                    <div class="form-group" style="width:100%">
+                        {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
+                        <div class="input-group" style="width:100%">
+                            <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                <div style="display:none;" class="dialogText">
+                                    An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                </div>
+                                <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UI_PASSWORD" .Flags.EnvPrefix}}</span>
+                            </div>
+                            <input type="text" id="NewUsername" name="NewUsername" value="{{.Username}}" class="profile-parameter form-control input-sm" style="width:100%;">
+                        </div>
+                        {{ else }}
+                        <input type="text" id="NewUsername" name="NewUsername" value="{{.Username}}" class="profile-parameter form-control input-sm" style="width: 100%;">
+                        {{- end}}
+                        </div>
+                    </div>
+                </form><!-- in its own form to avoid browser auto complete -->
+            </td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td>
+                {{- if .Webauth}}
+                none
+                {{- else}}
+                <input placeholder="enter current password" type="password" id="Password" name="Password" class="profile-parameter form-control input-sm" style="width: 100%;">
+                {{- end}}
+            </td>
+            <td>
+                <form class="form-inline">
+                    <div class="form-group" style="width:100%">
+                        <div class="input-group" style="width:100%">
+                            {{- if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UI_PASSWORD" .Flags.EnvPrefix}}</span>
+                                </div>
+                            {{- end}}
+                            <input placeholder="9 character minimum" type="password" autocomplete="new-password" id="NewPassword" name="NewPassword" class="profile-parameter form-control input-sm" style="width: {{if (locked (printf "%s_UI_PASSWORD" .Flags.EnvPrefix))}}calc(100% - 15px){{else}}100%{{end}};">
+                            <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('NewPassword', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                        </div>
+                    </div>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p>
+    <button onclick="saveProfileChanges()" class="btn btn-primary">Save Changes</button>
+    {{- if not .Webauth}}
+    &nbsp;You must enter your current password to make changes.{{end}}
+</p>
+<hr>
+{{- if .ClientInfo.IsSub}}
+<h2><font color="green"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-tie{{end}}"></i></font> Fortune</h2>
+{{- else if .ClientInfo.IsPatron}}
+<h2><font color="purple"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-ninja{{end}}"></i></font> Fortune</h2>
+{{- else}}
+<h2><i class="fas fa-user-alt" style="float:left;font-size:40px"></i> Fortune</h2>
+{{- end}}
+<div class="col-md-10 col-md-offset-1"><pre class="bk-dark text-white">{{fortune}}</pre></div>
 {{- /* end of profile (leave this comment) */ -}}
