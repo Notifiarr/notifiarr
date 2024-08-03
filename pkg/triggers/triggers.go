@@ -37,7 +37,7 @@ type Config struct {
 	WatchFiles []*filewatch.WatchFile
 	LogFiles   []string
 	Commands   []*commands.Command
-	CIC        *clientinfo.Config
+	ClientInfo *clientinfo.Config
 	ConfigFile string
 	AutoUpdate string
 	UnstableCh bool
@@ -48,7 +48,7 @@ type Config struct {
 // Actions defines all our triggers and timers.
 // Any action here will automatically have its interface methods called.
 type Actions struct {
-	Timers *common.Config
+	*common.Config
 	// Order is important here.
 	PlexCron   *plexcron.Action
 	Backups    *backups.Action
@@ -73,7 +73,7 @@ func New(config *Config) *Actions {
 		Snapshot: config.Snapshot,
 		Apps:     config.Apps,
 		Logger:   config.Logger,
-		CIC:      config.CIC,
+		CI:       config.ClientInfo,
 		Services: config.Services,
 	}
 	plex := plexcron.New(common, config.Apps.Plex)
@@ -92,7 +92,7 @@ func New(config *Config) *Actions {
 		EmptyTrash: emptytrash.New(common),
 		MDbList:    mdblist.New(common),
 		FileUpload: fileupload.New(common),
-		Timers:     common,
+		Config:     common,
 		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
 	}
 }
@@ -102,10 +102,10 @@ func New(config *Config) *Actions {
 
 // Start creates all the triggers and runs the timers.
 func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
-	a.Timers.SetReloadCh(reloadCh)
-	a.Timers.SetStopCh(stopCh)
+	a.Config.SetReloadCh(reloadCh)
+	a.Config.SetStopCh(stopCh)
 
-	defer a.Timers.Run(ctx)
+	defer a.Config.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
 	for idx := range actions.NumField() {
@@ -126,7 +126,7 @@ func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
 
 // Stop all internal cron timers and Triggers.
 func (a *Actions) Stop(event website.EventType) {
-	a.Timers.Stop(event)
+	a.Config.Stop(event)
 
 	actions := reflect.ValueOf(a).Elem()
 	// Stop them in reverse order they were started.

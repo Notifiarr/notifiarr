@@ -58,7 +58,7 @@ type triggerOutput struct {
 // @Router       /api/triggers [get]
 // @Security     ApiKeyAuth
 func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
-	triggers, timers := a.Timers.GatherTriggerInfo()
+	triggers, timers := a.Config.GatherTriggerInfo()
 	temp := make(map[string]*trigger) // used to dedup.
 
 	for name, dur := range triggers {
@@ -93,7 +93,7 @@ func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
 			Name: action.Name,
 			Dur:  action.Interval.String(),
 			Idx:  idx,
-			Path: path.Join(a.Timers.Apps.URLBase, fmt.Sprint("api/trigger/custom/", idx)),
+			Path: path.Join(a.Config.Apps.URLBase, fmt.Sprint("api/trigger/custom/", idx)),
 		}
 	}
 
@@ -107,9 +107,9 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	content := mux.Vars(req)["content"]
 
 	if content != "" {
-		a.Timers.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
+		a.Config.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
 	} else {
-		a.Timers.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
+		a.Config.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
 	}
 
 	_ = req.ParseForm()
@@ -196,7 +196,7 @@ func (a *Actions) customTimer(input *common.ActionInput, content string) (int, s
 // @Security     ApiKeyAuth
 func (a *Actions) clientLogs(content string) (int, string) {
 	if content == "true" || content == "on" || content == "enable" {
-		share.Setup(a.Timers.Server)
+		share.Setup(a.Config.Server)
 		return http.StatusOK, "Client log notifications enabled."
 	}
 
@@ -297,7 +297,7 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 // @Router       /api/trigger/services [get]
 // @Security     ApiKeyAuth
 func (a *Actions) services(input *common.ActionInput) (int, string) {
-	a.Timers.RunChecks(input.Type)
+	a.Config.RunChecks(input.Type)
 	return http.StatusOK, "All service checks rescheduled for immediate execution."
 }
 
@@ -311,7 +311,7 @@ func (a *Actions) services(input *common.ActionInput) (int, string) {
 // @Router       /api/trigger/sessions [get]
 // @Security     ApiKeyAuth
 func (a *Actions) sessions(input *common.ActionInput) (int, string) {
-	if !a.Timers.Apps.Plex.Enabled() {
+	if !a.Config.Apps.Plex.Enabled() {
 		return http.StatusNotImplemented, "Plex Sessions are not enabled."
 	}
 
@@ -428,7 +428,7 @@ func (a *Actions) handleConfigReload() (int, string) {
 	go func() {
 		// Until we have a way to reliably finish the tunnel requests, this is the best I got.
 		time.Sleep(200 * time.Millisecond) //nolint:mnd
-		a.Timers.ReloadApp("HTTP Triggered Reload")
+		a.Config.ReloadApp("HTTP Triggered Reload")
 	}()
 
 	return http.StatusOK, "Application reload initiated."
@@ -447,7 +447,7 @@ func (a *Actions) handleConfigReload() (int, string) {
 func (a *Actions) notification(content string) (int, string) {
 	if content != "" {
 		ui.Toast("Notification: %s", content) //nolint:errcheck
-		a.Timers.Printf("NOTIFICATION: %s", content)
+		a.Config.Printf("NOTIFICATION: %s", content)
 
 		return http.StatusOK, "Local Nntification sent."
 	}
@@ -466,7 +466,7 @@ func (a *Actions) notification(content string) (int, string) {
 // @Router       /api/trigger/emptyplextrash/{libraryKeys} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int, string) {
-	if !a.Timers.Apps.Plex.Enabled() {
+	if !a.Config.Apps.Plex.Enabled() {
 		return http.StatusNotImplemented, "Plex is not enabled."
 	}
 
@@ -500,7 +500,7 @@ func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 // @Router       /api/trigger/uploadlog/{file} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string) {
-	if a.Timers.LogConfig.NoUploads {
+	if a.Config.LogConfig.NoUploads {
 		return http.StatusFailedDependency, "Uploads Administratively Disabled"
 	}
 

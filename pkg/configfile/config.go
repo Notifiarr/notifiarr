@@ -124,41 +124,45 @@ func (c *Config) CopyConfig() (*Config, error) {
 // Get parses a config file and environment variables.
 // Sometimes the app runs without a config file entirely.
 // You should only run this after getting a config with NewConfig().
-func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *triggers.Actions, error) { //nolint:cyclop
+func (c *Config) Get(flag *Flags) (*Config, error) {
 	if flag.ConfigFile != "" {
 		files := append([]string{flag.ConfigFile}, flag.ExtraConf...)
 		if err := cnfgfile.Unmarshal(c, files...); err != nil {
-			return nil, nil, fmt.Errorf("config file: %w", err)
+			return nil, fmt.Errorf("config file: %w", err)
 		}
 	} else if len(flag.ExtraConf) != 0 {
 		if err := cnfgfile.Unmarshal(c, flag.ExtraConf...); err != nil {
-			return nil, nil, fmt.Errorf("extra config file: %w", err)
+			return nil, fmt.Errorf("extra config file: %w", err)
 		}
 	}
 
 	if _, err := cnfg.UnmarshalENV(c, flag.EnvPrefix); err != nil {
-		return nil, nil, fmt.Errorf("environment variables: %w", err)
+		return nil, fmt.Errorf("environment variables: %w", err)
 	}
 
+	return c.CopyConfig()
+}
+
+func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*triggers.Actions, error) {
 	if _, err := cnfgfile.Parse(c, nil); err != nil {
-		return nil, nil, fmt.Errorf("filepath variables: %w", err)
+		return nil, fmt.Errorf("filepath variables: %w", err)
 	}
 
 	if err := c.setupPassword(); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	c.fixConfig()
 	logger.LogConfig = c.LogConfig // this is sorta hacky.
 
-	err := c.Services.Setup(c.Service)
-	if err != nil {
-		return nil, nil, fmt.Errorf("service checks: %w", err)
+	if err := c.Services.Setup(c.Service); err != nil {
+		return nil, fmt.Errorf("service checks: %w", err)
 	}
 
 	// Make sure each app has a sane timeout.
-	if err := c.Apps.Setup(); err != nil {
-		return nil, nil, fmt.Errorf("setting up app: %w", err)
+	err := c.Apps.Setup()
+	if err != nil {
+		return nil, fmt.Errorf("setting up app: %w", err)
 	}
 
 	// Make sure the port is not in use before starting the web server.
@@ -179,7 +183,7 @@ func (c *Config) Get(flag *Flags, logger *logs.Logger) (*website.Server, *trigge
 		BindAddr: c.BindAddr,
 	})
 
-	return c.Services.Website, c.setup(logger, flag), err
+	return c.setup(logger, flag), err
 }
 
 func (c *Config) fixConfig() {
@@ -223,7 +227,7 @@ func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 		WatchFiles: c.WatchFiles,
 		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
 		Commands:   c.Commands,
-		CIC:        cic,
+		ClientInfo: cic,
 		ConfigFile: flag.ConfigFile,
 		AutoUpdate: c.AutoUpdate,
 		UnstableCh: c.UnstableCh,

@@ -74,7 +74,7 @@ func (c *Client) startTunnel(ctx context.Context) {
 
 func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 	hostname, _ := os.Hostname()
-	if hostInfo, err := c.clientinfo.GetHostInfo(ctx); err != nil {
+	if hostInfo, err := c.triggers.CI.GetHostInfo(ctx); err != nil {
 		hostname = hostInfo.Hostname
 	}
 
@@ -90,8 +90,8 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 		Targets:          getTunnels(info),
 		PoolIdleSize:     1,
 		PoolMaxSize:      c.poolMax(info),
-		CleanInterval:    time.Second + time.Duration(c.triggers.Timers.Rand().Intn(1000))*time.Millisecond,
-		Backoff:          600*time.Millisecond + time.Duration(c.triggers.Timers.Rand().Intn(600))*time.Millisecond,
+		CleanInterval:    time.Second + time.Duration(c.triggers.Rand().Intn(1000))*time.Millisecond,
+		Backoff:          600*time.Millisecond + time.Duration(c.triggers.Rand().Intn(600))*time.Millisecond,
 		SecretKey:        c.Config.APIKey,
 		Handler:          remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
 		RoundRobinConfig: c.roundRobinConfig(info),
@@ -117,7 +117,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 		Callback: func(_ context.Context, socket string) {
 			defer data.Save("activeTunnel", socket)
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
-			c.website.SendData(&website.Request{
+			c.Config.Services.Website.SendData(&website.Request{
 				Route:      website.TunnelRoute,
 				Event:      website.EventSignal,
 				Payload:    map[string]interface{}{"socket": socket, "previous": data.Get("activeTunnel")},
@@ -311,7 +311,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		}
 	}
 
-	c.website.SendData(&website.Request{
+	c.Config.Services.Website.SendData(&website.Request{
 		Route:      website.TunnelRoute,
 		Event:      website.EventGUI,
 		Payload:    map[string]any{"sockets": sockets},

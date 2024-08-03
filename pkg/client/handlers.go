@@ -100,9 +100,9 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 
 // httpAPIHandlers initializes API routes.
 func (c *Client) httpAPIHandlers() {
-	c.Config.HandleAPIpath("", "info", c.clientinfo.InfoHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version", c.clientinfo.VersionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.clientinfo.VersionHandlerInstance, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "info", c.triggers.CI.InfoHandler, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version", c.triggers.CI.VersionHandler, "GET", "HEAD")
+	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.triggers.CI.VersionHandlerInstance, "GET", "HEAD")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
 	c.Config.HandleAPIpath("", "services/{action}", c.Config.Services.APIHandler, "GET")
