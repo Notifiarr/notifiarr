@@ -1,958 +1,958 @@
-                                <h1><i class="fas fa-cogs"></i> Configuration</h1>
-                                <form class="form-inline">
-                                    <div class="table-responsive">
-                                        <table style="width:100%;" class="table table-bordered configtable bk-dark">
-                                            <thead>
-                                                <tr>
-                                                    <th style="min-width:140px;"><b>Setting</b></th>
-                                                    <th class="mobile-hide"><b>Current Value</b></th>
-                                                    <th style="min-width:320px;"><b>New Value</b></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="text-center no-filter">
-                                                    <td style="display:none;"></td><!-- this makes datatables work -->
-                                                    <td style="display:none;"></td>
-                                                    <td colspan="3">
-                                                        <h2 class="mb-3">General</h2>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            API key from your Notifiarr.com account. Find it at <a href="https://notifiarr.com">Notifiarr.com</a> => Profile => API Keys. Required for security validation.<br>
-                                                            This must be an <span class="text-warning">All</span> Integration key!<br>
-                                                            <!-- b>Current Value</b>: <i>{{ .Config.APIKey }}</i -->
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">API Key</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        &lt;redacted&gt; {{/* .Config.APIKey */}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_API_KEY" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_API_KEY" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input class="client-parameter form-control input-sm" data-group="config" data-label="API Key" type="password" autocomplete="off" name="APIKey" id="APIKey" data-original="{{.Config.APIKey}}" value="{{.Config.APIKey}}">
-                                                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This application uses the Notifiarr.com API key (set above) for incoming authentication.
-                                                            It's not safe to give that key to any other website, person, or third party service.
-                                                            This is because that key is <i>also</i> used for authentication to the Notifiarr.com API.
-                                                            If you want third parties to authenticate to this application's API, you should create
-                                                            custom keys for each integration. As of March 8, 2022, there are no existing integrations,
-                                                            so this is for future use. You can use this section to add extra API keys.
-                                                            Whatever you want. Separate them with newlines or spaces.<br>
-                                                            <b>Current Values</b>:<br>
-                                                            {{- range $i, $s := .Config.ExKeys}}<i>{{instance $i}}</i>: <b>{{$s}}</b><br>{{end}}
-                                                            {{- if not .Config.ExKeys}}<i>нет значения, ноль</i>{{end}}{{/* "no value, null" */}}
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Extra Keys</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{range $i, $s := .Config.ExKeys}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}{{if not .Config.ExKeys}}<i>no value, null</i>{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <textarea id="ExKeys" name="ExKeys" class="client-parameter form-control input-sm" data-group="config" data-label="Extra Keys" data-original="{{range $s := .Config.ExKeys}}{{$s}} {{end}}">{{range $s := .Config.ExKeys}}{{$s}} {{end}}</textarea>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This is the IP and port the app will listen on.
-                                                            <span class="text-warning">0.0.0.0</span> means all IPs, and you should use that in almost all cases!
-                                                            Change the port if the default 5454 does not work for you.<br>
-                                                            <b>Example</b>: <i class="text-warning">0.0.0.0:5454</i><br>
-                                                            <b>Current Value</b>: <i>{{ .Config.BindAddr }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Bind Address</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.BindAddr}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_BIND_ADDR" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_BIND_ADDR" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input class="client-parameter form-control input-sm" data-group="config" data-label="Bind Address" type="text" id="BindAddr" name="BindAddr" data-original="{{.Config.BindAddr}}" value="{{.Config.BindAddr}}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {{- if (eq .Version.os "windows") }}
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This is how often the application will check for updates.
-                                                            When one is found it will be installed automatically.
-                                                            This only works on Windows.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.AutoUpdate }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Auto Update</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.AutoUpdate}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_AUTO_UPDATE" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_AUTO_UPDATE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Auto Update" id="AutoUpdate" name="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
-                                                                    <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="off">Disabled</option>
-                                                                    <option {{if eq .Config.AutoUpdate "daily"}}selected {{end}}value="daily">Enabled (daily)</option>
-                                                                    <option {{if eq .Config.AutoUpdate "12h"}}selected {{end}}value="12h">Enabled (12 hours)</option>
-                                                                    <option {{if eq .Config.AutoUpdate "6h"}}selected {{end}}value="6h">Enabled (6 hours)</option>
-                                                                    <option {{if eq .Config.AutoUpdate "3h"}}selected {{end}}value="3h">Enabled (3 hours)</option>
-                                                                    {{- if not (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "off") (eq .Config.AutoUpdate "daily") (eq .Config.AutoUpdate "12h") (eq .Config.AutoUpdate "6h") (eq .Config.AutoUpdate "3h")) }}
-                                                                    <option selected value="{{.Config.AutoUpdate}}">{{.Config.AutoUpdate}} (custom)</option>
-                                                                    {{- end}}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {{- if .ClientInfo.User.DevAllowed }}
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Enabling the unstable updates channel will make the application check the unstable website for auto-updates instead of GitHub.
-                                                            <b>Current Value</b>: <i>{{if .Config.UnstableCh}}Enabled{{else}}Disabled{{end}}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Unstable Channel</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{if .Config.UnstableCh}}Enabled{{else}}Disabled{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if locked (printf "%s_UNSTABLE_CH" .Flags.EnvPrefix)}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UNSTABLE_CH" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="UnstableCh" id="UnstableCh" name="UnstableCh" data-original="{{.Config.UnstableCh}}">
-                                                                    <option {{if .Config.UnstableCh}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not .Config.UnstableCh}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {{- end }}
-                                            {{- end }}
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This application serves HTTP on <span class="text-warning">/</span> by default.
-                                                            You can change that by typing in something else here.<br>
-                                                            <b>Example</b>: <i class="text-warning">/notifiarr/</i><br>
-                                                            <b>Current Value</b>: <i>{{ .Config.URLBase }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">URL Base</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.URLBase}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_URLBASE" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_URLBASE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="URLBase" name="URLBase" class="client-parameter form-control input-sm" data-group="config" data-label="URL Base" data-original="{{.Config.URLBase}}" value="{{.Config.URLBase}}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            The Host ID parameter is used to uniquely identify this client installation.
-                                                            Changing this value is discouraged; it should be found automatically.
-                                                            Do not copy this value to another Notifiarr client installation.
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Host ID</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.HostID}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_HOST_ID" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_HOST_ID" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="HostID" name="HostID" class="client-parameter form-control input-sm" data-group="config" data-label="HostID" data-original="{{.Config.HostID}}" value="{{.Config.HostID}}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications.
-                                                            Spreads out CPU usage and lowers memory footprint.<br>
-                                                            <b>Current Value</b>: <i>{{if .Config.Serial}}Disabled{{else}}Enabled{{end}}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">
-                                                        Parallel Threads</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{if .Config.Serial}}Disabled{{else}}Enabled{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SERIAL" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERIAL" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Serial" id="Serial" name="Serial" data-original="{{.Config.Serial}}">
-                                                                    <option {{if .Config.Serial}}selected {{end}}value="true">Disabled</option>
-                                                                    <option {{if not .Config.Serial}}selected {{end}}value="false">Enabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures.<br>
-                                                            <b>Default</b>: <i>4</i> (<i>setting 0 uses default of 4</i>)<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.Retries }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Retries</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.Retries}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_RETRIES" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_RETRIES" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Retries" name="Retries" id="Retries" data-original="{{.Config.Retries}}">
-                                                                    <option {{if eq .Config.Retries 1}}selected {{end}}value="1">1</option>
-                                                                    <option {{if eq .Config.Retries 2}}selected {{end}}value="2">2</option>
-                                                                    <option {{if eq .Config.Retries 3}}selected {{end}}value="3">3</option>
-                                                                    <option {{if eq .Config.Retries 4}}selected {{end}}value="4">4</option>
-                                                                    <option {{if eq .Config.Retries 5}}selected {{end}}value="5">5</option>
-                                                                    <option {{if eq .Config.Retries 6}}selected {{end}}value="6">6</option>
-                                                                    <option {{if eq .Config.Retries 7}}selected {{end}}value="7">7</option>
-                                                                    <option {{if eq .Config.Retries 8}}selected {{end}}value="8">8</option>
-                                                                    <option {{if eq .Config.Retries 9}}selected {{end}}value="9">9</option>
-                                                                    <option {{if eq .Config.Retries 10}}selected {{end}}value="10">10</option>
-                                                                    <option {{if eq .Config.Retries 11}}selected {{end}}value="11">11</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                {{- if and (eq .Version.os "linux") (not .Version.docker)}}
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            The Notifiarr Debian (and Ubuntu) packages include an APT integration.
-                                                            This integration invokes every time an <span class="text-warning">apt</span> command is executed.
-                                                            To enable it, set this field to Enabled, and then <b>enable the Package Manager integration on Notifiarr.com.</b>
-                                                            This feature does not require the client to be running; it only requires the client deb package to be installed.
-                                                            This does not work on RHEL or non-Debian Linux.<br>
-                                                            <b>Current Value</b>: <i>{{if .Config.EnableApt}}Enabled{{else}}Disabled{{end}}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">APT Hook</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{if .Config.EnableApt}}Enabled{{else}}Disabled{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_APT" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_APT" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="APT Hook" id="EnableApt" name="EnableApt" data-original="{{.Config.EnableApt}}">
-                                                                    <option {{if .Config.EnableApt}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not .Config.EnableApt}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                {{- end }}
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This is the timeout for API requests to Notifiarr.com.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.Timeout }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Timeout</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.Timeout}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_TIMEOUT" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_TIMEOUT" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Timeout" id="Timeout" name="Timeout" data-original="{{.Config.Timeout}}">
-                                                                    <option {{if eq .Config.Timeout.String "15s"}}selected {{end}}value="15s">15 seconds</option>
-                                                                    <option {{if eq .Config.Timeout.String "30s"}}selected {{end}}value="30s">30 seconds</option>
-                                                                    <option {{if eq .Config.Timeout.String "1m"}}selected {{end}}value="1m">1 minute</option>
-                                                                    <option {{if eq .Config.Timeout.String "1m30s"}}selected {{end}}value="1m30s">90 seconds</option>
-                                                                    <option {{if eq .Config.Timeout.String "2m"}}selected {{end}}value="2m">2 minutes</option>
-                                                                    {{- if not (or (eq .Config.Timeout.String "15s") (eq .Config.Timeout.String "30s") (eq .Config.Timeout.String "1m") (eq .Config.Timeout.String "1m30s") (eq .Config.Timeout.String "2m")) }}
-                                                                    <option selected value="{{.Config.Timeout}}">{{.Config.Timeout}} (custom)</option>
-                                                                    {{- end}}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr class="text-center">
-                                                    <td style="display:none;"></td>
-                                                    <td style="display:none;"></td>
-                                                    <td colspan="3">
-                                                        <h2 class="mb-3">SSL</h2>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This is the path to the SSL certificate key file. This is a secret! See Certificate File help for more info.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.SSLKeyFile }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Cert Key File Path</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.SSLKeyFile}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" name="SSLKeyFile" id="SSLKeyFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Key File" data-original="{{.Config.SSLKeyFile}}" value="{{.Config.SSLKeyFile}}">
-                                                                <div onClick="browseFiles('#SSLKeyFile');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This application can serve HTTPS. Enable that by specifying a certificate file path and key file path.
-                                                            The certificate file should have the full CA chain included.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.SSLCrtFile }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Cert File Path</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.SSLCrtFile}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" name="SSLCrtFile" id="SSLCrtFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Cert File" data-original="{{.Config.SSLCrtFile}}" value="{{.Config.SSLCrtFile}}">
-                                                                <div onClick="browseFiles('#SSLCrtFile');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr class="text-center">
-                                                    <td style="display:none;"></td>
-                                                    <td style="display:none;"></td>
-                                                    <td colspan="3">
-                                                        <h2 class="mb-3">Services</h2>
-                                                        <a href="#services" onClick="swapNavigationTemplate('services')" style="margin-top:-20px;float:right;">Service Checks</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Disable or enable monitoring all network and services checks right here.<br>
-                                                            <b>Current Value</b>: <i>{{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Run Checks</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Run Checks" id="Services.Disabled" name="Services.Disabled" data-original="{{.Config.Services.Disabled}}">
-                                                                    <option {{if .Config.Services.Disabled}}selected {{end}}value="true">Disabled</option>
-                                                                    <option {{if not .Config.Services.Disabled}}selected {{end}}value="false">Enabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this.
-                                                            This controls how many checks may run at once.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.Services.Parallel }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Parallel Checks</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.Services.Parallel}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Parallel Checks" name="Services.Parallel" id="Services.Parallel" data-original="{{.Config.Services.Parallel}}">
-                                                                    <option {{if eq .Config.Services.Parallel 1}}selected {{end}}value="1">1</option>
-                                                                    <option {{if eq .Config.Services.Parallel 2}}selected {{end}}value="2">2</option>
-                                                                    <option {{if eq .Config.Services.Parallel 3}}selected {{end}}value="3">3</option>
-                                                                    <option {{if eq .Config.Services.Parallel 4}}selected {{end}}value="4">4</option>
-                                                                    <option {{if eq .Config.Services.Parallel 5}}selected {{end}}value="5">5</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            How often to send service check results to Notifiarr.com.<br>
-                                                            <b>Default</b>: <i>10m</i><br>
-                                                            <b>Minimum</b>: <i>5m</i><br>
-                                                            <b>Current Value</b>: <i>{{ .Config.Services.Interval }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Update Interval</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.Services.Interval}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Update Interval" id="Services.Interval" name="Services.Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}">
-                                                                    <option {{if eq .Config.Services.Interval.String "5m"}}selected {{end}}value="5m">5 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "6m"}}selected {{end}}value="6m">6 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "7m"}}selected {{end}}value="7m">7 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "8m"}}selected {{end}}value="8m">8 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "9m"}}selected {{end}}value="9m">9 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "10m"}}selected {{end}}value="10m">10 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "15m"}}selected {{end}}value="15m">15 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "20m"}}selected {{end}}value="20m">20 minutes</option>
-                                                                    <option {{if eq .Config.Services.Interval.String "30m"}}selected {{end}}value="30m">30 minutes</option>
-                                                                    {{- if not (or (eq .Config.Services.Interval.String "5m") (eq .Config.Services.Interval.String "6m") (eq .Config.Services.Interval.String "7m")
-                                                                    (eq .Config.Services.Interval.String "8m") (eq .Config.Services.Interval.String "9m") (eq .Config.Services.Interval.String "10m")
-                                                                    (eq .Config.Services.Interval.String "15m") (eq .Config.Services.Interval.String "20m") (eq .Config.Services.Interval.String "30m")) }}
-                                                                    <option selected value="{{.Config.Services.Interval}}">{{.Config.Services.Interval}} (custom)</option>
-                                                                    {{- end}}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr class="text-center">
-                                                    <td style="display:none;"></td>
-                                                    <td style="display:none;"></td>
-                                                    <td colspan="3">
-                                                        <h2 class="mb-3">Logging</h2>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Enabling debug logging causes a lot more data to write to the log.
-                                                            Includes payloads to and from Notifiarr.com and starr apps.
-                                                            Use Max Body settings to control payloads sizes.<br>
-                                                            <b>Current Value</b>: <i>{{if .Config.Debug}}Enabled{{else}}Disabled{{end}}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Debug Logging</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{if .Config.Debug}}Enabled{{else}}Disabled{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_DEBUG" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_DEBUG" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Debug" id="Debug" name="Debug" data-original="{{.Config.Debug}}">
-                                                                    <option {{if .Config.Debug}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not .Config.Debug}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too.<br>
-                                                            <b>Current Value</b>: <i>{{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Quiet Logging</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_QUIET" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_QUIET" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Quiet" id="Quiet" name="Quiet" data-original="{{.Config.Quiet}}">
-                                                                    <option {{if .Config.Quiet}}selected {{end}}value="true">Enabled</option>
-                                                                    <option {{if not .Config.Quiet}}selected {{end}}value="false">Disabled</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write logs to this path.<br>
-                                                            Highly recommended!<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.LogFile }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">App Log File</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.LogFile}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_LOG_FILE" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="LogFile" name="LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Log File" data-original="{{.Config.LogFile}}" value="{{.Config.LogFile}}">
-                                                                <div onClick="browseFiles('#LogFile', 'notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write the HTTP logs to a dedicated file.
-                                                            The file format is in apachelog. Highly recommended.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.HTTPLog }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">HTTP Log File</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.HTTPLog}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_HTTP_LOG" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_HTTP_LOG" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" name="HTTPLog" id="HTTPLog" class="client-parameter form-control input-sm" data-group="config" data-label="HTTP Log" data-original="{{.Config.HTTPLog}}" value="{{.Config.HTTPLog}}">
-                                                                <div onClick="browseFiles('#HTTPLog', 'http-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write service check results to a dedicated file.
-                                                            Recommended if you have a lot of services.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.Services.LogFile }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Services Log File</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.Services.LogFile}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="Services.LogFile" name="Services.LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Service Log" data-original="{{.Config.Services.LogFile}}" value="{{.Config.Services.LogFile}}">
-                                                                <div onClick="browseFiles('#Services\\.LogFile', 'services-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            Setting a log file path here will make the application write debug messages to a dedicated log file.
-                                                            Otherwise debug messages write to the main application log.<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.LogConfig.DebugLog }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Debug Log File</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.LogConfig.DebugLog}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_DEBUG_LOG" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_DEBUG_LOG" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="LogConfig.DebugLog" name="LogConfig.DebugLog" class="client-parameter form-control input-sm" data-group="config" data-label="Debug Log" data-original="{{.Config.LogConfig.DebugLog}}" value="{{.Config.LogConfig.DebugLog}}">
-                                                                <div onClick="browseFiles('#LogConfig\\.DebugLog', 'debug-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {{- if not (eq .Version.os "windows") }}
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This is the unix file mode used when writing new log files. Recommended values in order of openness: 0600, 0640, 0644<br>
-                                                            <b>Current Value</b>: <i>{{ .Config.FileMode }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Log File Unix Mode</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.FileMode}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_FILE_MODE" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_FILE_MODE" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="text" id="FileMode" name="FileMode" class="client-parameter form-control input-sm" data-group="config" data-label="File Mode" data-original="{{.Config.FileMode}}" value="{{.Config.FileMode}}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {{ end }}
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com.<br>
-                                                            <b>Recommend</b>: <i>1000-5000</i><br>
-                                                            <b>Current Value</b>: <i>{{ .Config.MaxBody }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Max Body Size</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.MaxBody}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_MAX_BODY" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_MAX_BODY" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="number" min="500" max="50000" name="MaxBody" id="MaxBody" class="client-parameter form-control input-sm" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation.<br>
-                                                            <b>Recommend</b>: <i>5</i><br>
-                                                            <b>Current Value</b>: <i>{{ .Config.LogFileMb }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Log File Size (MB)</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.LogFileMb}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_LOG_FILE_MB" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILE_MB" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="number" min="1" max="999" name="LogFileMb" id="LogFileMb" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            When this setting is 0 or 1, log file rotation is disabled.
-                                                            Setting this to a higher value will rotate all log files, and keep this many of each on disk.
-                                                            Controls all log files.<br>
-                                                            <b>Recommend</b>: <i>5</i><br>
-                                                            <b>Current Value</b>: <i>{{ .Config.LogFiles }}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Log File Count</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{.Config.LogFiles}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_LOG_FILES" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILES" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <input type="number" min="0" max="999" name="LogFiles" id="LogFiles" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:none;" class="dialogText">
-                                                            This setting controls the Notifiarr.com website and Notifiarr administrators ability to trigger
-                                                            this client to upload log files to the website. Sometimes we need to see log entries while
-                                                            diagnosing problems and this trigger allows us to make the client upload the app and debug
-                                                            log files. You may remove our ability to request logs by disabling this setting.
-                                                            <br><b>Current Value</b>: <i>{{if .Config.NoUploads}}Disabled{{else}}Allowed{{end}}</i>
-                                                        </div>
-                                                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
-                                                        <span class="dialogTitle">Upload Trigger</span>
-                                                    </td>
-                                                    <td class="mobile-hide">
-                                                        {{if .Config.NoUploads}}Disabled{{else}}Allowed{{end}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group" style="width:100%">
-                                                            <div class="input-group" style="width:100%">
-                                                                {{- if (locked (printf "%s_NO_UPLOADS" .Flags.EnvPrefix))}}
-                                                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
-                                                                    <div style="display:none;" class="dialogText">
-                                                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
-                                                                    </div>
-                                                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
-                                                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_NO_UPLOADS" .Flags.EnvPrefix}}</span>
-                                                                </div>
-                                                                {{- end}}
-                                                                <select class="client-parameter form-control input-sm" data-group="config" data-label="NoUploads" id="NoUploads" name="NoUploads" data-original="{{.Config.NoUploads}}">
-                                                                    <option {{if .Config.NoUploads}}selected {{end}}value="true">Disabled</option>
-                                                                    <option {{if not .Config.NoUploads}}selected {{end}}value="false">Allowed</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+<h1><i class="fas fa-cogs"></i> Configuration</h1>
+<form class="form-inline">
+    <div class="table-responsive">
+        <table style="width:100%;" class="table table-bordered configtable bk-dark">
+            <thead>
+                <tr>
+                    <th style="min-width:140px;"><b>Setting</b></th>
+                    <th class="mobile-hide"><b>Current Value</b></th>
+                    <th style="min-width:320px;"><b>New Value</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="text-center no-filter">
+                    <td style="display:none;"></td><!-- this makes datatables work -->
+                    <td style="display:none;"></td>
+                    <td colspan="3">
+                        <h2 class="mb-3">General</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            API key from your Notifiarr.com account. Find it at <a href="https://notifiarr.com">Notifiarr.com</a> => Profile => API Keys. Required for security validation.<br>
+                            This must be an <span class="text-warning">All</span> Integration key!<br>
+                            <!-- b>Current Value</b>: <i>{{ .Config.APIKey }}</i -->
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">API Key</span>
+                    </td>
+                    <td class="mobile-hide">
+                        &lt;redacted&gt; {{/* .Config.APIKey */}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_API_KEY" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
                                     </div>
-                                </form>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_API_KEY" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input class="client-parameter form-control input-sm" data-group="config" data-label="API Key" type="password" autocomplete="off" name="APIKey" id="APIKey" data-original="{{.Input.APIKey}}" value="{{.Input.APIKey}}">
+                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This application uses the Notifiarr.com API key (set above) for incoming authentication.
+                            It's not safe to give that key to any other website, person, or third party service.
+                            This is because that key is <i>also</i> used for authentication to the Notifiarr.com API.
+                            If you want third parties to authenticate to this application's API, you should create
+                            custom keys for each integration. As of March 8, 2022, there are no existing integrations,
+                            so this is for future use. You can use this section to add extra API keys.
+                            Whatever you want. Separate them with newlines or spaces.<br>
+                            <b>Current Values</b>:<br>
+                            {{- range $i, $s := .Config.ExKeys}}<i>{{instance $i}}</i>: <b>{{$s}}</b><br>{{end}}
+                            {{- if not .Config.ExKeys}}<i>нет значения, ноль</i>{{end}}{{/* "no value, null" */}}
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Extra Keys</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{range $i, $s := .Config.ExKeys}}{{instance $i}}: <b>{{$s}}</b><br>{{end}}{{if not .Config.ExKeys}}<i>no value, null</i>{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_EXTRA_KEYS_0" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <textarea id="ExKeys" name="ExKeys" class="client-parameter form-control input-sm" data-group="config" data-label="Extra Keys" data-original="{{range $s := .Config.ExKeys}}{{$s}} {{end}}">{{range $s := .Config.ExKeys}}{{$s}} {{end}}</textarea>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This is the IP and port the app will listen on.
+                            <span class="text-warning">0.0.0.0</span> means all IPs, and you should use that in almost all cases!
+                            Change the port if the default 5454 does not work for you.<br>
+                            <b>Example</b>: <i class="text-warning">0.0.0.0:5454</i><br>
+                            <b>Current Value</b>: <i>{{ .Config.BindAddr }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Bind Address</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.BindAddr}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_BIND_ADDR" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_BIND_ADDR" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input class="client-parameter form-control input-sm" data-group="config" data-label="Bind Address" type="text" id="BindAddr" name="BindAddr" data-original="{{.Input.BindAddr}}" value="{{.Input.BindAddr}}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {{- if (eq .Version.os "windows") }}
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This is how often the application will check for updates.
+                            When one is found it will be installed automatically.
+                            This only works on Windows.<br>
+                            <b>Current Value</b>: <i>{{ .Config.AutoUpdate }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Auto Update</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.AutoUpdate}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if locked (printf "%s_AUTO_UPDATE" .Flags.EnvPrefix)}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_AUTO_UPDATE" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Auto Update" id="AutoUpdate" name="AutoUpdate" data-original="{{.Config.AutoUpdate}}">
+                                    <option {{if eq .Config.AutoUpdate "off"}}selected {{end}}value="off">Disabled</option>
+                                    <option {{if eq .Config.AutoUpdate "daily"}}selected {{end}}value="daily">Enabled (daily)</option>
+                                    <option {{if eq .Config.AutoUpdate "12h"}}selected {{end}}value="12h">Enabled (12 hours)</option>
+                                    <option {{if eq .Config.AutoUpdate "6h"}}selected {{end}}value="6h">Enabled (6 hours)</option>
+                                    <option {{if eq .Config.AutoUpdate "3h"}}selected {{end}}value="3h">Enabled (3 hours)</option>
+                                    {{- if not (or (eq .Config.AutoUpdate "") (eq .Config.AutoUpdate "off") (eq .Config.AutoUpdate "daily") (eq .Config.AutoUpdate "12h") (eq .Config.AutoUpdate "6h") (eq .Config.AutoUpdate "3h")) }}
+                                    <option selected value="{{.Config.AutoUpdate}}">{{.Config.AutoUpdate}} (custom)</option>
+                                    {{- end}}
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {{- if .ClientInfo.User.DevAllowed }}
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Enabling the unstable updates channel will make the application check the unstable website for auto-updates instead of GitHub.
+                            <b>Current Value</b>: <i>{{if .Config.UnstableCh}}Enabled{{else}}Disabled{{end}}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Unstable Channel</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{if .Config.UnstableCh}}Enabled{{else}}Disabled{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if locked (printf "%s_UNSTABLE_CH" .Flags.EnvPrefix)}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_UNSTABLE_CH" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="UnstableCh" id="UnstableCh" name="UnstableCh" data-original="{{.Input.UnstableCh}}">
+                                    <option {{if .Config.UnstableCh}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not .Config.UnstableCh}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {{- end }}
+            {{- end }}
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This application serves HTTP on <span class="text-warning">/</span> by default.
+                            You can change that by typing in something else here.<br>
+                            <b>Example</b>: <i class="text-warning">/notifiarr/</i><br>
+                            <b>Current Value</b>: <i>{{ .Config.URLBase }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">URL Base</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.URLBase}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_URLBASE" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_URLBASE" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" id="URLBase" name="URLBase" class="client-parameter form-control input-sm" data-group="config" data-label="URL Base" data-original="{{.Input.URLBase}}" value="{{.Input.URLBase}}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            The Host ID parameter is used to uniquely identify this client installation.
+                            Changing this value is discouraged; it should be found automatically.
+                            Do not copy this value to another Notifiarr client installation.
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Host ID</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.HostID}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_HOST_ID" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_HOST_ID" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" id="HostID" name="HostID" class="client-parameter form-control input-sm" data-group="config" data-label="HostID" data-original="{{.Input.HostID}}" value="{{.Config.HostID}}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications.
+                            Spreads out CPU usage and lowers memory footprint.<br>
+                            <b>Current Value</b>: <i>{{if .Config.Serial}}Disabled{{else}}Enabled{{end}}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">
+                        Parallel Threads</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{if .Config.Serial}}Disabled{{else}}Enabled{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_SERIAL" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERIAL" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Serial" id="Serial" name="Serial" data-original="{{.Input.Serial}}">
+                                    <option {{if .Config.Serial}}selected {{end}}value="true">Disabled</option>
+                                    <option {{if not .Config.Serial}}selected {{end}}value="false">Enabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures.<br>
+                            <b>Default</b>: <i>4</i> (<i>setting 0 uses default of 4</i>)<br>
+                            <b>Current Value</b>: <i>{{ .Config.Retries }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Retries</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.Retries}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_RETRIES" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_RETRIES" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Retries" name="Retries" id="Retries" data-original="{{.Config.Retries}}">
+                                    <option {{if eq .Config.Retries 1}}selected {{end}}value="1">1</option>
+                                    <option {{if eq .Config.Retries 2}}selected {{end}}value="2">2</option>
+                                    <option {{if eq .Config.Retries 3}}selected {{end}}value="3">3</option>
+                                    <option {{if eq .Config.Retries 4}}selected {{end}}value="4">4</option>
+                                    <option {{if eq .Config.Retries 5}}selected {{end}}value="5">5</option>
+                                    <option {{if eq .Config.Retries 6}}selected {{end}}value="6">6</option>
+                                    <option {{if eq .Config.Retries 7}}selected {{end}}value="7">7</option>
+                                    <option {{if eq .Config.Retries 8}}selected {{end}}value="8">8</option>
+                                    <option {{if eq .Config.Retries 9}}selected {{end}}value="9">9</option>
+                                    <option {{if eq .Config.Retries 10}}selected {{end}}value="10">10</option>
+                                    <option {{if eq .Config.Retries 11}}selected {{end}}value="11">11</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {{- if and (eq .Version.os "linux") (not .Version.docker)}}
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            The Notifiarr Debian (and Ubuntu) packages include an APT integration.
+                            This integration invokes every time an <span class="text-warning">apt</span> command is executed.
+                            To enable it, set this field to Enabled, and then <b>enable the Package Manager integration on Notifiarr.com.</b>
+                            This feature does not require the client to be running; it only requires the client deb package to be installed.
+                            This does not work on RHEL or non-Debian Linux.<br>
+                            <b>Current Value</b>: <i>{{if .Config.EnableApt}}Enabled{{else}}Disabled{{end}}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">APT Hook</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{if .Config.EnableApt}}Enabled{{else}}Disabled{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_APT" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_APT" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="APT Hook" id="EnableApt" name="EnableApt" data-original="{{.Input.EnableApt}}">
+                                    <option {{if .Config.EnableApt}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not .Config.EnableApt}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {{- end }}
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This is the timeout for API requests to Notifiarr.com.<br>
+                            <b>Current Value</b>: <i>{{ .Config.Timeout }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Timeout</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.Timeout}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_TIMEOUT" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_TIMEOUT" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Timeout" id="Timeout" name="Timeout" data-original="{{.Config.Timeout}}">
+                                    <option {{if eq .Config.Timeout.String "15s"}}selected {{end}}value="15s">15 seconds</option>
+                                    <option {{if eq .Config.Timeout.String "30s"}}selected {{end}}value="30s">30 seconds</option>
+                                    <option {{if eq .Config.Timeout.String "1m"}}selected {{end}}value="1m">1 minute</option>
+                                    <option {{if eq .Config.Timeout.String "1m30s"}}selected {{end}}value="1m30s">90 seconds</option>
+                                    <option {{if eq .Config.Timeout.String "2m"}}selected {{end}}value="2m">2 minutes</option>
+                                    {{- if not (or (eq .Config.Timeout.String "15s") (eq .Config.Timeout.String "30s") (eq .Config.Timeout.String "1m") (eq .Config.Timeout.String "1m30s") (eq .Config.Timeout.String "2m")) }}
+                                    <option selected value="{{.Config.Timeout}}">{{.Config.Timeout}} (custom)</option>
+                                    {{- end}}
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td style="display:none;"></td>
+                    <td style="display:none;"></td>
+                    <td colspan="3">
+                        <h2 class="mb-3">SSL</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This is the path to the SSL certificate key file. This is a secret! See Certificate File help for more info.<br>
+                            <b>Current Value</b>: <i>{{ .Config.SSLKeyFile }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Cert Key File Path</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.SSLKeyFile}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SSL_KEY_FILE" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" name="SSLKeyFile" id="SSLKeyFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Key File" data-original="{{.Input.SSLKeyFile}}" value="{{.Input.SSLKeyFile}}">
+                                <div onClick="browseFiles('#SSLKeyFile');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This application can serve HTTPS. Enable that by specifying a certificate file path and key file path.
+                            The certificate file should have the full CA chain included.<br>
+                            <b>Current Value</b>: <i>{{ .Config.SSLCrtFile }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Cert File Path</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.SSLCrtFile}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SSL_CERT_FILE" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" name="SSLCrtFile" id="SSLCrtFile" class="client-parameter form-control input-sm" data-group="config" data-label="SSL Cert File" data-original="{{.Input.SSLCrtFile}}" value="{{.Input.SSLCrtFile}}">
+                                <div onClick="browseFiles('#SSLCrtFile');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td style="display:none;"></td>
+                    <td style="display:none;"></td>
+                    <td colspan="3">
+                        <h2 class="mb-3">Services</h2>
+                        <a href="#services" onClick="swapNavigationTemplate('services')" style="margin-top:-20px;float:right;">Service Checks</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Disable or enable monitoring all network and services checks right here.<br>
+                            <b>Current Value</b>: <i>{{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Run Checks</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{if .Config.Services.Disabled}}Disabled{{else}}Enabled{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_DISABLED" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Run Checks" id="Services.Disabled" name="Services.Disabled" data-original="{{.Input.Services.Disabled}}">
+                                    <option {{if .Config.Services.Disabled}}selected {{end}}value="true">Disabled</option>
+                                    <option {{if not .Config.Services.Disabled}}selected {{end}}value="false">Enabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this.
+                            This controls how many checks may run at once.<br>
+                            <b>Current Value</b>: <i>{{ .Config.Services.Parallel }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Parallel Checks</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.Services.Parallel}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_PARALLEL" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Parallel Checks" name="Services.Parallel" id="Services.Parallel" data-original="{{.Config.Services.Parallel}}">
+                                    <option {{if eq .Config.Services.Parallel 1}}selected {{end}}value="1">1</option>
+                                    <option {{if eq .Config.Services.Parallel 2}}selected {{end}}value="2">2</option>
+                                    <option {{if eq .Config.Services.Parallel 3}}selected {{end}}value="3">3</option>
+                                    <option {{if eq .Config.Services.Parallel 4}}selected {{end}}value="4">4</option>
+                                    <option {{if eq .Config.Services.Parallel 5}}selected {{end}}value="5">5</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            How often to send service check results to Notifiarr.com.<br>
+                            <b>Default</b>: <i>10m</i><br>
+                            <b>Minimum</b>: <i>5m</i><br>
+                            <b>Current Value</b>: <i>{{ .Config.Services.Interval }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Update Interval</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.Services.Interval}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_INTERVAL" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Update Interval" id="Services.Interval" name="Services.Interval" data-original="{{.Config.Services.Interval}}" value="{{.Config.Services.Interval}}">
+                                    <option {{if eq .Config.Services.Interval.String "5m"}}selected {{end}}value="5m">5 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "6m"}}selected {{end}}value="6m">6 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "7m"}}selected {{end}}value="7m">7 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "8m"}}selected {{end}}value="8m">8 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "9m"}}selected {{end}}value="9m">9 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "10m"}}selected {{end}}value="10m">10 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "15m"}}selected {{end}}value="15m">15 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "20m"}}selected {{end}}value="20m">20 minutes</option>
+                                    <option {{if eq .Config.Services.Interval.String "30m"}}selected {{end}}value="30m">30 minutes</option>
+                                    {{- if not (or (eq .Config.Services.Interval.String "5m") (eq .Config.Services.Interval.String "6m") (eq .Config.Services.Interval.String "7m")
+                                    (eq .Config.Services.Interval.String "8m") (eq .Config.Services.Interval.String "9m") (eq .Config.Services.Interval.String "10m")
+                                    (eq .Config.Services.Interval.String "15m") (eq .Config.Services.Interval.String "20m") (eq .Config.Services.Interval.String "30m")) }}
+                                    <option selected value="{{.Config.Services.Interval}}">{{.Config.Services.Interval}} (custom)</option>
+                                    {{- end}}
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td style="display:none;"></td>
+                    <td style="display:none;"></td>
+                    <td colspan="3">
+                        <h2 class="mb-3">Logging</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Enabling debug logging causes a lot more data to write to the log.
+                            Includes payloads to and from Notifiarr.com and starr apps.
+                            Use Max Body settings to control payloads sizes.<br>
+                            <b>Current Value</b>: <i>{{if .Config.Debug}}Enabled{{else}}Disabled{{end}}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Debug Logging</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{if .Config.Debug}}Enabled{{else}}Disabled{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_DEBUG" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_DEBUG" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Debug" id="Debug" name="Debug" data-original="{{.Input.Debug}}">
+                                    <option {{if .Config.Debug}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not .Config.Debug}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too.<br>
+                            <b>Current Value</b>: <i>{{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Quiet Logging</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{if .Config.Quiet}}Enabled{{else}}Disabled{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_QUIET" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_QUIET" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="Quiet" id="Quiet" name="Quiet" data-original="{{.Input.Quiet}}">
+                                    <option {{if .Config.Quiet}}selected {{end}}value="true">Enabled</option>
+                                    <option {{if not .Config.Quiet}}selected {{end}}value="false">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Setting a log file path here will make the application write logs to this path.<br>
+                            Highly recommended!<br>
+                            <b>Current Value</b>: <i>{{ .Config.LogFile }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">App Log File</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.LogFile}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_LOG_FILE" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILE" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" id="LogFile" name="LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Log File" data-original="{{.Input.LogFile}}" value="{{.Input.LogFile}}">
+                                <div onClick="browseFiles('#LogFile', 'notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Setting a log file path here will make the application write the HTTP logs to a dedicated file.
+                            The file format is in apachelog. Highly recommended.<br>
+                            <b>Current Value</b>: <i>{{ .Config.HTTPLog }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">HTTP Log File</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.HTTPLog}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_HTTP_LOG" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_HTTP_LOG" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" name="HTTPLog" id="HTTPLog" class="client-parameter form-control input-sm" data-group="config" data-label="HTTP Log" data-original="{{.Input.HTTPLog}}" value="{{.Input.HTTPLog}}">
+                                <div onClick="browseFiles('#HTTPLog', 'http-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Setting a log file path here will make the application write service check results to a dedicated file.
+                            Recommended if you have a lot of services.<br>
+                            <b>Current Value</b>: <i>{{ .Config.Services.LogFile }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Services Log File</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.Services.LogFile}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_SERVICES_LOG_FILE" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" id="Services.LogFile" name="Services.LogFile" class="client-parameter form-control input-sm" data-group="config" data-label="Service Log" data-original="{{.Input.Services.LogFile}}" value="{{.Input.Services.LogFile}}">
+                                <div onClick="browseFiles('#Services\\.LogFile', 'services-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            Setting a log file path here will make the application write debug messages to a dedicated log file.
+                            Otherwise debug messages write to the main application log.<br>
+                            <b>Current Value</b>: <i>{{ .Config.LogConfig.DebugLog }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Debug Log File</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.LogConfig.DebugLog}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_DEBUG_LOG" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_DEBUG_LOG" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" id="LogConfig.DebugLog" name="LogConfig.DebugLog" class="client-parameter form-control input-sm" data-group="config" data-label="Debug Log" data-original="{{.Input.LogConfig.DebugLog}}" value="{{.Input.LogConfig.DebugLog}}">
+                                <div onClick="browseFiles('#LogConfig\\.DebugLog', 'debug-notifiarr.log');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {{- if not (eq .Version.os "windows") }}
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This is the unix file mode used when writing new log files. Recommended values in order of openness: 0600, 0640, 0644<br>
+                            <b>Current Value</b>: <i>{{ .Config.FileMode }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Log File Unix Mode</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.FileMode}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_FILE_MODE" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_FILE_MODE" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="text" id="FileMode" name="FileMode" class="client-parameter form-control input-sm" data-group="config" data-label="File Mode" data-original="{{.Input.FileMode}}" value="{{.Input.FileMode}}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {{ end }}
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com.<br>
+                            <b>Recommend</b>: <i>1000-5000</i><br>
+                            <b>Current Value</b>: <i>{{ .Config.MaxBody }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Max Body Size</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.MaxBody}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_MAX_BODY" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_MAX_BODY" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="number" min="500" max="50000" name="MaxBody" id="MaxBody" class="client-parameter form-control input-sm" data-group="config" data-label="Max Body" data-original="{{.Config.MaxBody}}" value="{{.Config.MaxBody}}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation.<br>
+                            <b>Recommend</b>: <i>5</i><br>
+                            <b>Current Value</b>: <i>{{ .Config.LogFileMb }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Log File Size (MB)</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.LogFileMb}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_LOG_FILE_MB" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILE_MB" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="number" min="1" max="999" name="LogFileMb" id="LogFileMb" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files Mb" data-original="{{.Config.LogFileMb}}" value="{{.Config.LogFileMb}}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            When this setting is 0 or 1, log file rotation is disabled.
+                            Setting this to a higher value will rotate all log files, and keep this many of each on disk.
+                            Controls all log files.<br>
+                            <b>Recommend</b>: <i>5</i><br>
+                            <b>Current Value</b>: <i>{{ .Config.LogFiles }}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Log File Count</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{.Config.LogFiles}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_LOG_FILES" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_LOG_FILES" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <input type="number" min="0" max="999" name="LogFiles" id="LogFiles" class="client-parameter form-control input-sm" data-group="config" data-label="Log Files" data-original="{{.Config.LogFiles}}" value="{{.Config.LogFiles}}">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="display:none;" class="dialogText">
+                            This setting controls the Notifiarr.com website and Notifiarr administrators ability to trigger
+                            this client to upload log files to the website. Sometimes we need to see log entries while
+                            diagnosing problems and this trigger allows us to make the client upload the app and debug
+                            log files. You may remove our ability to request logs by disabling this setting.
+                            <br><b>Current Value</b>: <i>{{if .Config.NoUploads}}Disabled{{else}}Allowed{{end}}</i>
+                        </div>
+                        <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
+                        <span class="dialogTitle">Upload Trigger</span>
+                    </td>
+                    <td class="mobile-hide">
+                        {{if .Config.NoUploads}}Disabled{{else}}Allowed{{end}}
+                    </td>
+                    <td>
+                        <div class="form-group" style="width:100%">
+                            <div class="input-group" style="width:100%">
+                                {{- if (locked (printf "%s_NO_UPLOADS" .Flags.EnvPrefix))}}
+                                <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
+                                    <div style="display:none;" class="dialogText">
+                                        An environment variable exists for this value. Your new value will write to the config file, but the application will not use it.
+                                    </div>
+                                    <i onClick="dialog($(this), 'right')" class="text-danger help-icon fas fa-outdent"></i>
+                                    <span class="dialogTitle" style="display:none;">Env Variable: {{printf "%s_NO_UPLOADS" .Flags.EnvPrefix}}</span>
+                                </div>
+                                {{- end}}
+                                <select class="client-parameter form-control input-sm" data-group="config" data-label="NoUploads" id="NoUploads" name="NoUploads" data-original="{{.Input.NoUploads}}">
+                                    <option {{if .Config.NoUploads}}selected {{end}}value="true">Disabled</option>
+                                    <option {{if not .Config.NoUploads}}selected {{end}}value="false">Allowed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</form>
 {{- /* end of config (leave this comment) */ -}}

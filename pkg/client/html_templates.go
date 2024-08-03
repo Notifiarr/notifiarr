@@ -450,6 +450,7 @@ func (c *Client) parseCustomTemplates() error {
 }
 
 type templateData struct {
+	Input       *configfile.Config             `json:"input"`
 	Config      *configfile.Config             `json:"config"`
 	Flags       *configfile.Flags              `json:"flags"`
 	Actions     *triggers.Actions              `json:"actions"`
@@ -485,7 +486,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 
 	binary, _ := os.Executable()
 	userName, dynamic := c.getUserName(req)
-	hostInfo, _ := c.website.GetHostInfo(ctx)
+	hostInfo, _ := c.Config.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	outboundIP := clientinfo.GetOutboundIP()
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
@@ -495,6 +496,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 		UpstreamIP:  strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]"),
 		Actions:     c.triggers,
 		Config:      c.Config,
+		Input:       c.Input,
 		Flags:       c.Flags,
 		Username:    userName,
 		Dynamic:     dynamic,

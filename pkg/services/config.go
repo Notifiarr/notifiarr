@@ -43,7 +43,7 @@ type Config struct {
 	Disabled    bool              `json:"disabled" toml:"disabled" xml:"disabled"`
 	LogFile     string            `json:"logFile"  toml:"log_file" xml:"log_file"`
 	Apps        *apps.Apps        `json:"-"        toml:"-"`
-	Website     *website.Server   `json:"-"        toml:"-"`
+	website     *website.Server   `json:"-"        toml:"-"`
 	Plugins     *snapshot.Plugins `json:"-"        toml:"-"` // pass this in so we can service-check mysql
 	mnd.Logger  `json:"-"`        // log file writer
 	services    map[string]*Service

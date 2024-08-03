@@ -189,7 +189,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 	body, err := c.GetData(&website.Request{
 		Route:      website.ClientRoute,
 		Event:      website.EventPoll,
-		Payload:    c.CIC.Info(ctx, true), // true avoids polling tautulli.
+		Payload:    c.CI.Info(ctx, true), // true avoids polling tautulli.
 		LogPayload: true,
 	})
 	if err != nil {

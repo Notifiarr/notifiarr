@@ -15,7 +15,7 @@ func testCommand(ctx context.Context, input *Input) (string, int) {
 		input.Real.Commands[input.Index].Run(&common.ActionInput{Type: website.EventGUI})
 		return "Command Triggered: " + input.Real.Commands[input.Index].Name, http.StatusOK
 	} else if len(input.Post.Commands) > input.Index { // check POST input for "new" command.
-		input.Post.Commands[input.Index].Setup(input.Real.Logger, input.Real.Services.Website)
+		input.Post.Commands[input.Index].Setup(input.Real.Logger, input.Real.Server)
 
 		if err := input.Post.Commands[input.Index].SetupRegexpArgs(); err != nil {
 			return err.Error(), http.StatusInternalServerError

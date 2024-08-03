@@ -26,7 +26,7 @@ var ErrNoChannel = errors.New("no channel to send request")
 // Config is the input data shared by most triggers.
 // Everything is mandatory.
 type Config struct {
-	CIC             *clientinfo.Config
+	CI              *clientinfo.Config
 	*website.Server // send trigger responses to website.
 	Snapshot        *snapshot.Config
 	Apps            *apps.Apps

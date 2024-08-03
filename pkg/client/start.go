@@ -40,12 +40,11 @@ type Client struct {
 	plexTimer  *cooldown.Timer
 	Flags      *configfile.Flags
 	Config     *configfile.Config
+	Input      *configfile.Config
 	server     *http.Server
 	sigkil     chan os.Signal
 	sighup     chan os.Signal
 	reload     chan customReload
-	website    *website.Server
-	clientinfo *clientinfo.Config
 	triggers   *triggers.Actions
 	cookies    *securecookie.SecureCookie
 	template   *template.Template
@@ -121,7 +120,7 @@ func Start() error {
 }
 
 func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
-	msg, newPassword, err := c.loadConfiguration(ctx)
+	msgs, newPassword, err := c.loadConfiguration(ctx)
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -139,30 +138,35 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 
 		return c.resetAdminPassword(ctx)
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
-		c.Printf("==> %s", msg)
+		for _, msg := range msgs {
+			c.Printf("==> %s", msg)
+		}
 
 		ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 		defer cancel()
 
 		return c.forceWriteWithExit(ctx, c.Flags.Write)
 	case err != nil:
-		return fmt.Errorf("%s: %w", msg, err)
+		return fmt.Errorf("messages: %q, error: %w", msgs, err)
 	case c.Flags.Restart:
 		return nil
 	case c.Config.APIKey == "":
-		return fmt.Errorf("%s: %w %s_API_KEY", msg, ErrNilAPIKey, c.Flags.EnvPrefix)
+		return fmt.Errorf("messages: %q, %w %s_API_KEY", msgs, ErrNilAPIKey, c.Flags.EnvPrefix)
 	default:
-		return c.start(ctx, msg, newPassword)
+		return c.start(ctx, msgs, newPassword)
 	}
 }
 
-func (c *Client) start(ctx context.Context, msg, newPassword string) error {
+func (c *Client) start(ctx context.Context, msgs []string, newPassword string) error {
 	c.Logger.SetupLogging(c.Config.LogConfig)
 	c.Printf(" %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
 		mnd.TodaysEmoji(), mnd.Title, version.Version, version.Revision,
 		os.Getpid(), os.Getuid(), os.Getgid(),
 		version.Started.Format("Mon, Jan 2, 2006 @ 3:04:05 PM MST -0700"))
-	c.Printf("==> %s", msg)
+
+	for _, msg := range msgs {
+		c.Printf("==> %s", msg)
+	}
 
 	if c.Flags.Updated {
 		go ui.Toast("%s updated to v%s-%s", mnd.Title, version.Version, version.Revision) //nolint:errcheck
@@ -202,39 +206,45 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running configuration.
-func (c *Client) loadConfiguration(ctx context.Context) (string, string, error) {
+func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error) {
 	var (
-		msg         string
-		newPassword string
-		err         error
+		msg, newPassword string
+		err              error
+		moreMsgs         map[string]string
 	)
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.
 	write := (!c.Flags.Restart && ui.HasGUI()) || mnd.IsDocker
 	c.Flags.ConfigFile, newPassword, msg = c.Config.FindAndReturn(ctx, c.Flags.ConfigFile, write)
+	output := []string{msg}
 
 	if c.Flags.Restart {
-		return msg, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
+		return output, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
 			Args: []string{"--updated", "--delay", "5s", "--config", c.Flags.ConfigFile},
 		})
 	}
 
 	// Parse the config file and environment variables.
-	c.website, c.triggers, err = c.Config.Get(c.Flags, c.Logger)
-	if err != nil {
-		return msg, newPassword, fmt.Errorf("getting config: %w", err)
+	if c.Input, err = c.Config.Get(c.Flags); err != nil {
+		return output, newPassword, fmt.Errorf("getting config: %w", err)
 	}
 
-	c.clientinfo = c.triggers.Timers.CIC
+	if c.triggers, moreMsgs, err = c.Config.Setup(c.Flags, c.Logger); err != nil {
+		return output, newPassword, fmt.Errorf("setting config: %w", err)
+	}
 
-	return msg, newPassword, nil
+	for file, path := range moreMsgs {
+		output = append(output, fmt.Sprintf("Extra Config File: %s => %s", file, path))
+	}
+
+	return output, newPassword, nil
 }
 
 // Load configuration from the website.
 func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
-	clientInfo, err := c.clientinfo.SaveClientInfo(ctx, true)
+	clientInfo, err := c.triggers.CI.SaveClientInfo(ctx, true)
 	if err != nil || clientInfo == nil {
 		if errors.Is(err, website.ErrInvalidAPIKey) {
 			c.ErrorfNoShare("==> Problem validating API key: %v", err)
@@ -249,7 +259,7 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 	// Snapshot is a bit complicated because config-file data (plugins) merges with site-data (snapshot config).
 	clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins
 	c.Config.Snapshot = &clientInfo.Actions.Snapshot
-	c.triggers.Timers.Snapshot = c.Config.Snapshot
+	c.triggers.Snapshot = c.Config.Snapshot
 	c.Config.Services.Plugins = &c.Config.Snapshot.Plugins
 
 	return clientInfo
@@ -257,11 +267,11 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
 func (c *Client) configureServices(ctx context.Context) *clientinfo.ClientInfo {
-	c.website.Start(ctx)
+	c.Config.Start(ctx)
 
 	clientInfo := c.loadSiteConfig(ctx)
 	if clientInfo != nil && !clientInfo.User.StopLogs {
-		share.Setup(c.website)
+		share.Setup(c.Config)
 	}
 
 	c.configureServicesPlex(ctx)
@@ -337,14 +347,18 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 
 	// start over.
 	c.Config = configfile.NewConfig(c.Logger)
-	if c.website, c.triggers, err = c.Config.Get(c.Flags, c.Logger); err != nil {
-		return fmt.Errorf("getting configuration: %w", err)
+	if c.Input, err = c.Config.Get(c.Flags); err != nil {
+		return fmt.Errorf("getting config: %w", err)
 	}
 
-	c.clientinfo = c.triggers.Timers.CIC
+	var output map[string]string
+
+	if c.triggers, output, err = c.Config.Setup(c.Flags, c.Logger); err != nil {
+		return fmt.Errorf("setting config: %w", err)
+	}
 
 	if errs := c.Logger.Close(); len(errs) > 0 {
-		return fmt.Errorf("closing logger(s): %w", errs[0])
+		return fmt.Errorf("closing logger: %w", errs[0])
 	}
 
 	defer c.StartWebServer(ctx)
@@ -369,6 +383,10 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 		}
 	}
 
+	for path, file := range output {
+		c.Printf(" => Extra Config File: %s => %s", file, path)
+	}
+
 	// This doesn't need to lock because web server is not running.
 	c.reloading = false // We're done.
 
@@ -381,7 +399,7 @@ func (c *Client) stop(ctx context.Context, event website.EventType) error {
 		defer c.CapturePanic()
 		c.triggers.Stop(event)
 		c.Config.Services.Stop()
-		c.website.Stop()
+		c.Config.Stop()
 		c.Print("==> All systems powered down!")
 	}()
 
