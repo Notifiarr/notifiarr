@@ -1,77 +1,77 @@
-                                    <div class="col-sm-12 col-md-12 col-lg-12">
-                                        <table class="table table-striped">
-                                            <tr>
-                                                <td rowspan="20" style="width:120px;vertical-align: middle;">
-                                                    <img src="{{files}}/images/logo/plex.png" style="height:120px;float:left;margin-right:5px;">
-                                                </td>
-                                            </tr>
-                                            {{- $sessions := cache "plexCurrentSessions" }}
-                                            {{- $plexStatus := cache "plexStatus" }}
-                                            {{- if $sessions }}
-                                            <tr>
-                                                <td colspan="2">
-                                                    <h3>{{$sessions.Data.Name}}</h3>
-                                                    <a href="{{.Config.Plex.URL}}">{{.Config.Plex.URL}}</a>
-                                                </td>
-                                            </tr>
-                                            <tr><td style="width:200px;min-width:200px;">Sessions Cached</td><td>{{len $sessions.Data.Sessions}}</td></tr>
-                                            <tr><td style="width:200px;min-width:200px;">Cache Age</td><td>{{since $sessions.Time}}</td></tr>
-                                            {{- else }}
-                                                {{- if $plexStatus }}
-                                            <tr>
-                                                <td colspan="2">
-                                                    <h3>{{$plexStatus.Data.FriendlyName}}</h3>
-                                                    <a href="{{.Config.Plex.URL}}">{{.Config.Plex.URL}}</a>
-                                                </td>
-                                            </tr>
-                                                {{- end }}
-                                            <tr><td colspan="2">No Plex sessions cached.</td></tr>
-                                            {{- end }}
-                                            {{- if and $plexStatus $sessions }}
-                                            <tr><td colspan="2"></td></tr>
-                                            {{- end }}
-                                            {{- if $plexStatus }}
-                                            <tr><td style="width:200px;min-width:200px;">Version</td><td>{{$plexStatus.Data.Version}}</td></tr>
-                                            <tr><td>Plex Pass</td><td>{{$plexStatus.Data.MyPlexSubscription}}</td></tr>
-                                            <tr><td>Server Owner</td><td>{{$plexStatus.Data.MyPlexUsername}}</td></tr>
-                                            <tr><td>Platform</td><td>{{$plexStatus.Data.Platform}}</td></tr>
-                                            <tr>
-                                                <td>
-                                                    <a href="#integrations" onClick="dialog($(this), 'left')">Cache Age</a>
-                                                    <span style="display:none;" class="dialogTitle">Plex Media Server Info</span>
-                                                    <div style="display:none;" class="dialogText">
-                                                        <pre>{{tojson $plexStatus.Data}}</pre>
-                                                    </div>
-                                                </td>
-                                                <td>{{since $plexStatus.Time}}</td>
-                                            </tr>
-                                            {{- end }}
-                                        </table>
-                                    </div>
-                                    {{- if $sessions }}
-                                    <div class="col-sm-12 col-md-12 col-lg-12 table-responsive">
-                                        <table class="table table-striped table-bordered">
-                                            <tr>
-                                                <td colspan="2"><b>User</b></td>
-                                                <td><b>Session</b></td>
-                                                <td><b>Complete</b></td>
-                                                <td><b>Encoding</b></td>
-                                                <td><b>Title</b></td>
-                                            </tr>
-                                            {{- range  $session := $sessions.Data.Sessions }}
-                                            <tr>
-                                                <td style="width:25px;"><img src="{{$session.User.Thumb}}" style="height:25px;"></td>
-                                                <td title="uid: {{$session.User.ID}}"><font size="4">{{ $session.User.Title }}</font></td>
-                                                <td>{{ title $session.Type }} <i style="color:{{if eq $session.Player.State "paused"}}red{{else}}green{{end}}">{{$session.Player.State}} for {{ since $session.Player.StateTime.Time}}</i></td>
-                                                <td>{{ $session.Player.Title }}, {{ percent $session.ViewOffset $session.Duration }}%</td>
-                                                <td>
-                                                    {{- $codecs := plexmedia $session.Media}}
-                                                    {{index $codecs 0}}, {{index $codecs 1}}
-                                                </td>
-                                                <td>{{ if $session.GrandparentTitle }}{{ $session.GrandparentTitle }}; {{end}}{{ $session.Title }} {{ if $session.GrandparentTitle }}(S{{printf "%02d" $session.ParentIndex}}E{{printf "%02d" $session.Index}}){{else if $session.Year}}({{ $session.Year }}){{end}}</td>
-                                            </tr>
-                                            {{- end }}
-                                        </table>
-                                    </div>
-                                    {{- end }}
+<div class="col-sm-12 col-md-12 col-lg-12">
+    <table class="table table-striped">
+        <tr>
+            <td rowspan="20" style="width:120px;vertical-align: middle;">
+                <img src="{{files}}/images/logo/plex.png" style="height:120px;float:left;margin-right:5px;">
+            </td>
+        </tr>
+{{- $sessions := cache "plexCurrentSessions" }}
+{{- $plexStatus := cache "plexStatus" }}
+{{- if $sessions }}
+        <tr>
+            <td colspan="2">
+                <h3>{{$sessions.Data.Name}}</h3>
+                <a href="{{.Config.Plex.URL}}">{{.Config.Plex.URL}}</a>
+            </td>
+        </tr>
+        <tr><td style="width:200px;min-width:200px;">Sessions Cached</td><td>{{len $sessions.Data.Sessions}}</td></tr>
+        <tr><td style="width:200px;min-width:200px;">Cache Age</td><td>{{since $sessions.Time}}</td></tr>
+{{- else }}
+    {{- if $plexStatus }}
+        <tr>
+            <td colspan="2">
+                <h3>{{$plexStatus.Data.FriendlyName}}</h3>
+                <a href="{{.Config.Plex.URL}}">{{.Config.Plex.URL}}</a>
+            </td>
+        </tr>
+    {{- end }}
+        <tr><td colspan="2">No Plex sessions cached.</td></tr>
+{{- end }}
+{{- if and $plexStatus $sessions }}
+        <tr><td colspan="2"></td></tr>
+{{- end }}
+{{- if $plexStatus }}
+        <tr><td style="width:200px;min-width:200px;">Version</td><td>{{$plexStatus.Data.Version}}</td></tr>
+        <tr><td>Plex Pass</td><td>{{$plexStatus.Data.MyPlexSubscription}}</td></tr>
+        <tr><td>Server Owner</td><td>{{$plexStatus.Data.MyPlexUsername}}</td></tr>
+        <tr><td>Platform</td><td>{{$plexStatus.Data.Platform}}</td></tr>
+        <tr>
+            <td>
+                <a href="#integrations" onClick="dialog($(this), 'left')">Cache Age</a>
+                <span style="display:none;" class="dialogTitle">Plex Media Server Info</span>
+                <div style="display:none;" class="dialogText">
+                    <pre>{{tojson $plexStatus.Data}}</pre>
+                </div>
+            </td>
+            <td>{{since $plexStatus.Time}}</td>
+        </tr>
+{{- end }}
+    </table>
+</div>
+{{- if $sessions }}
+<div class="col-sm-12 col-md-12 col-lg-12 table-responsive">
+    <table class="table table-striped table-bordered">
+        <tr>
+            <td colspan="2"><b>User</b></td>
+            <td><b>Session</b></td>
+            <td><b>Complete</b></td>
+            <td><b>Encoding</b></td>
+            <td><b>Title</b></td>
+        </tr>
+    {{- range  $session := $sessions.Data.Sessions }}
+        <tr>
+            <td style="width:25px;"><img src="{{$session.User.Thumb}}" style="height:25px;"></td>
+            <td title="uid: {{$session.User.ID}}"><font size="4">{{ $session.User.Title }}</font></td>
+            <td>{{ title $session.Type }} <i style="color:{{if eq $session.Player.State "paused"}}red{{else}}green{{end}}">{{$session.Player.State}} for {{ since $session.Player.StateTime.Time}}</i></td>
+            <td>{{ $session.Player.Title }}, {{ percent $session.ViewOffset $session.Duration }}%</td>
+            <td>
+                {{- $codecs := plexmedia $session.Media}}
+                {{index $codecs 0}}, {{index $codecs 1}}
+            </td>
+            <td>{{ if $session.GrandparentTitle }}{{ $session.GrandparentTitle }}; {{end}}{{ $session.Title }} {{ if $session.GrandparentTitle }}(S{{printf "%02d" $session.ParentIndex}}E{{printf "%02d" $session.Index}}){{else if $session.Year}}({{ $session.Year }}){{end}}</td>
+        </tr>
+    {{- end }}
+    </table>
+</div>
+{{- end }}
 {{- /* end of plex integrations (leave this comment) */ -}}

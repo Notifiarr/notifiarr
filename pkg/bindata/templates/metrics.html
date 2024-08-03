@@ -1,144 +1,144 @@
-                                <h1><i class="fas fa-chart-line"></i> Metrics</h1>
-                                <p>
-                                    The counters on this page reset when the application exits.<br>
-                                    Application Uptime: &nbsp; <b style="font-size:17px;">{{since .Version.started}}</b>
-                                    &nbsp;<a href="#metrics" class="fas fa-sync" onClick="refreshPage('metrics');"> Refresh</a>
-                                </p>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <h3>Log Files</h3>
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := .Expvar.LogFiles }}
-                                                <tr>
-                                                    {{- if ne $count 0 }}{{/* Do not display zero log counters. */}}
-                                                    <td>{{ $key }}</td>
-                                                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
-                                                    {{- end }}
-                                                </tr>
-                                                {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <h3>Incoming API Requests</h3>
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := .Expvar.APIHits }}
-                                                <tr>
-                                                    {{- if ne $count 0 }}{{/* Do not display zero api counters. */}}
-                                                    <td>{{ $key }}</td>
-                                                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
-                                                    {{- end }}
-                                                </tr>
-                                                {{- end }}
-                                                {{- if not .Expvar.APIHits }}
-                                                <tr><td colspan="2">No API requests yet.</td></tr>
-                                                {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                                        <h3>Incoming HTTP Requests</h3>
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := .Expvar.HTTPRequests }}
-                                                <tr>
-                                                    <td>{{ $key }}</td>
-                                                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
-                                                </tr>
-                                                {{- end }}
-                                                {{- if not .Expvar.HTTPRequests }}
-                                                <tr><td colspan="2">No HTTP requests yet.</td></tr>
-                                                {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                                        <h3>Requests to Notifiarr.com</h3>
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := .Expvar.Website }}
-                                                <tr>
-                                                    <td>{{ $key }}</td>
-                                                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
-                                                </tr>
-                                                {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                    {{- if .Config.WatchFiles}}
-                                    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                                        <h3>File Watcher</h3>
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := .Expvar.FileWatcher }}
-                                                <tr>
-                                                    <td>{{ $key }}</td>
-                                                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
-                                                </tr>
-                                                {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                    {{- end}}
-                                </div>
-                                <hr>
-                                <h3>Application Requests</h3>
-                                <p>These counters do not include service checks.</p>
-                                <div class="row">
-                                {{- range $source, $sub := .Expvar.Apps }}
-                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                                        <h5>{{ $source }}</h5>
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := $sub }}
-                                                <tr>
-                                                    <td>{{ $key }}</td>
-                                                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
-                                                </tr>
-                                                {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                {{- end }}
-                                {{- if not .Expvar.Apps }}
-                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                <tr><td>No timers nor triggers executed yet.</td></tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                {{- end }}
-                                </div><!-- class=row -->
-                                <hr>
-                                <h3>Triggers and Timers Executed</h3>
-                                <div class="row">
-                                {{- range $source, $sub := .Expvar.TimerEvents }}
-                                    <div class="col-sm-12 col-md-6 col-lg-6">
-                                        <h5>{{ $source }}</h5>
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                {{- range $key, $count := $sub }}
-                                                <tr>
-                                                    <td>{{ $key }}</td>
-                                                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
-                                                </tr>
-                                                {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                {{- end }}
-                                {{- if not .Expvar.TimerEvents }}
-                                    <div class="col-sm-12 col-md-12 col-lg-12">
-                                        <div class="table-responsive">
-                                            <table style="width:100%" class="table table-striped table-bordered">
-                                                <tr><td>No timers nor triggers executed yet.</td></tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                {{- end }}
-                                </div><!-- class=row -->
+<h1><i class="fas fa-chart-line"></i> Metrics</h1>
+<p>
+    The counters on this page reset when the application exits.<br>
+    Application Uptime: &nbsp; <b style="font-size:17px;">{{since .Version.started}}</b>
+    &nbsp;<a href="#metrics" class="fas fa-sync" onClick="refreshPage('metrics');"> Refresh</a>
+</p>
+<hr>
+<div class="row">
+    <div class="col-sm-12 col-md-6 col-lg-6">
+        <h3>Log Files</h3>
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                {{- range $key, $count := .Expvar.LogFiles }}
+                <tr>
+                    {{- if ne $count 0 }}{{/* Do not display zero log counters. */}}
+                    <td>{{ $key }}</td>
+                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
+                    {{- end }}
+                </tr>
+                {{- end }}
+            </table>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-6">
+        <h3>Incoming API Requests</h3>
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                {{- range $key, $count := .Expvar.APIHits }}
+                <tr>
+                    {{- if ne $count 0 }}{{/* Do not display zero api counters. */}}
+                    <td>{{ $key }}</td>
+                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
+                    {{- end }}
+                </tr>
+                {{- end }}
+                {{- if not .Expvar.APIHits }}
+                <tr><td colspan="2">No API requests yet.</td></tr>
+                {{- end }}
+            </table>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <h3>Incoming HTTP Requests</h3>
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                {{- range $key, $count := .Expvar.HTTPRequests }}
+                <tr>
+                    <td>{{ $key }}</td>
+                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
+                </tr>
+                {{- end }}
+                {{- if not .Expvar.HTTPRequests }}
+                <tr><td colspan="2">No HTTP requests yet.</td></tr>
+                {{- end }}
+            </table>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <h3>Requests to Notifiarr.com</h3>
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                {{- range $key, $count := .Expvar.Website }}
+                <tr>
+                    <td>{{ $key }}</td>
+                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
+                </tr>
+                {{- end }}
+            </table>
+        </div>
+    </div>
+    {{- if .Config.WatchFiles}}
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <h3>File Watcher</h3>
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                {{- range $key, $count := .Expvar.FileWatcher }}
+                <tr>
+                    <td>{{ $key }}</td>
+                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
+                </tr>
+                {{- end }}
+            </table>
+        </div>
+    </div>
+    {{- end}}
+</div>
+<hr>
+<h3>Application Requests</h3>
+<p>These counters do not include service checks.</p>
+<div class="row">
+{{- range $source, $sub := .Expvar.Apps }}
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <h5>{{ $source }}</h5>
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                {{- range $key, $count := $sub }}
+                <tr>
+                    <td>{{ $key }}</td>
+                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
+                </tr>
+                {{- end }}
+            </table>
+        </div>
+    </div>
+{{- end }}
+{{- if not .Expvar.Apps }}
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                <tr><td>No timers nor triggers executed yet.</td></tr>
+            </table>
+        </div>
+    </div>
+{{- end }}
+</div><!-- class=row -->
+<hr>
+<h3>Triggers and Timers Executed</h3>
+<div class="row">
+{{- range $source, $sub := .Expvar.TimerEvents }}
+    <div class="col-sm-12 col-md-6 col-lg-6">
+        <h5>{{ $source }}</h5>
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                {{- range $key, $count := $sub }}
+                <tr>
+                    <td>{{ $key }}</td>
+                    <td data-sort="{{$count}}" style="min-width:100px;max-width:100px;width:100px;">{{if contains $key "Bytes"}}{{megabyte $count}}{{else}}{{$count}}{{end}}</td>
+                </tr>
+                {{- end }}
+            </table>
+        </div>
+    </div>
+{{- end }}
+{{- if not .Expvar.TimerEvents }}
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="table-responsive">
+            <table style="width:100%" class="table table-striped table-bordered">
+                <tr><td>No timers nor triggers executed yet.</td></tr>
+            </table>
+        </div>
+    </div>
+{{- end }}
+</div><!-- class=row -->
 {{- /* end of metrics (leave this comment) */ -}}

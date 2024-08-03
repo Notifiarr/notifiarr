@@ -1,87 +1,87 @@
-                                <h1><i class="fas fa-temperature-high"></i> Monitoring</h1>
-                                <p>
-                                    This page provides an overview of your running service checks.
-                                    Configure the service checks displayed on the <a href="#services" onClick="swapNavigationTemplate('services')">Services page</a>.
-                                </p>
-                                <div class="row">
-                                    <div class="col-lg-12 col-md-12">
-                                    {{- if .Config.Services.Disabled }}
-                                        <h2 class="text-danger">Service Checks: Disabled</h2>
-                                        <p>Enable service checks on the <a href="#config" onClick="swapNavigationTemplate('config')">Configuration page</a>.</p>
-                                    {{- else if not .Config.Services.Running }}
-                                        <h2 class="text-danger">Service Checks: Stopped</h2>
-                                        <button class="btn btn-md btn-success" style="float:right;margin-top:-45px" onClick="servicesAction('start', 'monitoring');">Start Service Checks</button>
-                                    {{- else}}
-                                        <button class="btn btn-md btn-primary" onclick="refreshPage('monitoring')">Refresh Page</button>
-                                        <button class="btn btn-md btn-danger" style="float:right;" onClick="servicesAction('stop', 'monitoring');">Stop Service Checks</button>
-                                    {{- end}}
-                                    </div>
-                                </div>
-                                <div class="row mt">
-                                  <div class="col-lg-12 col-md-12">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered monitortable" style="width:100%">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="min-width:100px;">Name</th>
-                                                        <th style="min-width:50px;">State</th>
-                                                        <th style="min-width:50px;">Type/Expect</th>
-                                                        <th style="min-width:70px;">
-                                                            <div style="display:none;" class="dialogText">How long ago this service was checked.</div>
-                                                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle">Last </span>
-                                                        </th>
-                                                        <th style="min-width:70px;">
-                                                            <div style="display:none;" class="dialogText">How long the service has been in this state.</div>
-                                                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle">Since </span>
-                                                        </th>
-                                                        <th style="min-width:90px;">
-                                                            <div style="display:none;" class="dialogText">How often this service is checked.</div>
-                                                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle">Interval </span>
-                                                        </th>
-                                                        <th style="min-width:150px;">Output</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                {{- range .Config.Services.GetResults }}
-                                                    <tr class="bk-{{if eq .State 0}}success{{else if eq .State 1}}warning{{else if eq .State 2}}danger{{else}}brand{{end}}">
-                                                        <td>
-                                                            <span class="text-bold">{{.Name}}</span>
-                                                            <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo"></a>
-                                                        </td>
-                                                        <td data-sort="{{.State.Value}}">
-                                                            <div style="display:none;" class="dialogText">
-                                                                <h4>Service Check Counters</h4><hr>
-                                                                {{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}<br> {{- end }}
-                                                            </div>
-                                                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle" style="display:none;">Current State: {{.State}}</span>
-                                                            {{.State}}
-                                                        </td>
-                                                        <td>
-                                                            {{.Type}}; {{.Expect}}
-                                                        </td>
-                                                        <td data-sort="{{.Time.Unix}}">
-                                                            <div style="display:none;" class="dialogText">Service last checked at: <h4>{{dateFmt .Time}}</h4>{{.Time}}</div>
-                                                            <a onClick="dialog($(this), 'middle')" style="float:right;" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle" style="display:none;">Last Check: {{since .Time}} ago</span>
-                                                            {{since .Time}}
-                                                        </td>
-                                                        <td data-sort="{{.Since.Unix}}">
-                                                            <div style="display:none;" class="dialogText">Service has been in this state since: <h4>{{dateFmt .Since}}</h4>{{.Since}}</div>
-                                                            <a onClick="dialog($(this), 'right')" style="float:right;" class="help-icon far fa-question-circle"></a>
-                                                            <span class="dialogTitle" style="display:none;">Current State Duration: {{since .Since}}</span>
-                                                            {{since .Since}}
-                                                        </td>
-                                                        <td data-sort="{{.IntervalDur.Seconds}}">{{.IntervalDur}}</td>
-                                                        <td>{{.Output}}</td>
-                                                    </tr>
-                                                {{- end}}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+<h1><i class="fas fa-temperature-high"></i> Monitoring</h1>
+<p>
+    This page provides an overview of your running service checks.
+    Configure the service checks displayed on the <a href="#services" onClick="swapNavigationTemplate('services')">Services page</a>.
+</p>
+<div class="row">
+    <div class="col-lg-12 col-md-12">
+    {{- if .Config.Services.Disabled }}
+        <h2 class="text-danger">Service Checks: Disabled</h2>
+        <p>Enable service checks on the <a href="#config" onClick="swapNavigationTemplate('config')">Configuration page</a>.</p>
+    {{- else if not .Config.Services.Running }}
+        <h2 class="text-danger">Service Checks: Stopped</h2>
+        <button class="btn btn-md btn-success" style="float:right;margin-top:-45px" onClick="servicesAction('start', 'monitoring');">Start Service Checks</button>
+    {{- else}}
+        <button class="btn btn-md btn-primary" onclick="refreshPage('monitoring')">Refresh Page</button>
+        <button class="btn btn-md btn-danger" style="float:right;" onClick="servicesAction('stop', 'monitoring');">Stop Service Checks</button>
+    {{- end}}
+    </div>
+</div>
+<div class="row mt">
+    <div class="col-lg-12 col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered monitortable" style="width:100%">
+                <thead>
+                    <tr>
+                        <th style="min-width:100px;">Name</th>
+                        <th style="min-width:50px;">State</th>
+                        <th style="min-width:50px;">Type/Expect</th>
+                        <th style="min-width:70px;">
+                            <div style="display:none;" class="dialogText">How long ago this service was checked.</div>
+                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                            <span class="dialogTitle">Last </span>
+                        </th>
+                        <th style="min-width:70px;">
+                            <div style="display:none;" class="dialogText">How long the service has been in this state.</div>
+                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                            <span class="dialogTitle">Since </span>
+                        </th>
+                        <th style="min-width:90px;">
+                            <div style="display:none;" class="dialogText">How often this service is checked.</div>
+                            <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
+                            <span class="dialogTitle">Interval </span>
+                        </th>
+                        <th style="min-width:150px;">Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{- range .Config.Services.GetResults }}
+                    <tr class="bk-{{if eq .State 0}}success{{else if eq .State 1}}warning{{else if eq .State 2}}danger{{else}}brand{{end}}">
+                        <td>
+                            <span class="text-bold">{{.Name}}</span>
+                            <a href="#monitoring" onClick="servicesAction('check/{{.Name}}', 'monitoring', 2500);" style="float:right;" title="Recheck this service." class="far fa-redo"></a>
+                        </td>
+                        <td data-sort="{{.State.Value}}">
+                            <div style="display:none;" class="dialogText">
+                                <h4>Service Check Counters</h4><hr>
+                                {{- range $type, $cnt := (index $.Expvar.ServiceChecks .Name) }} {{ $type }}: {{ $cnt }}<br> {{- end }}
+                            </div>
+                            <a onClick="dialog($(this), 'left')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                            <span class="dialogTitle" style="display:none;">Current State: {{.State}}</span>
+                            {{.State}}
+                        </td>
+                        <td>
+                            {{.Type}}; {{.Expect}}
+                        </td>
+                        <td data-sort="{{.Time.Unix}}">
+                            <div style="display:none;" class="dialogText">Service last checked at: <h4>{{dateFmt .Time}}</h4>{{.Time}}</div>
+                            <a onClick="dialog($(this), 'middle')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                            <span class="dialogTitle" style="display:none;">Last Check: {{since .Time}} ago</span>
+                            {{since .Time}}
+                        </td>
+                        <td data-sort="{{.Since.Unix}}">
+                            <div style="display:none;" class="dialogText">Service has been in this state since: <h4>{{dateFmt .Since}}</h4>{{.Since}}</div>
+                            <a onClick="dialog($(this), 'right')" style="float:right;" class="help-icon far fa-question-circle"></a>
+                            <span class="dialogTitle" style="display:none;">Current State Duration: {{since .Since}}</span>
+                            {{since .Since}}
+                        </td>
+                        <td data-sort="{{.IntervalDur.Seconds}}">{{.IntervalDur}}</td>
+                        <td>{{.Output}}</td>
+                    </tr>
+                {{- end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {{- /* end of monitoring (leave this comment) */ -}}

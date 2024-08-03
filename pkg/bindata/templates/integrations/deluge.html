@@ -1,45 +1,45 @@
-                                {{- range $idx, $app := .Config.Apps.Deluge }}
-                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-bordered">
-                                                <tr>
-                                                    <td style="width:75px;">Deluge</td>
-                                                    <td style="width:25px;min-width:25px;">
-                                                        <img src="{{files}}/images/logo/deluge.png" style="width:25px">
-                                                    </td>
-                                                    <td>{{instance $idx}}, {{$app.Name}}</td>
-                                                </tr>
-                                                <tr><td colspan="2">URL</td><td><a href="{{$app.URL}}">{{$app.URL}}</a></td></tr>
-                                                {{- $dashboard := cache "dashboard" }}
-                                                {{- if and $dashboard $dashboard.Data $dashboard.Data.Deluge}}
-                                                {{ range $app := $dashboard.Data.Deluge }}
-                                                    {{- if eq $app.Instance (instance $idx) }}
-                                                <tr>
-                                                    <td colspan="2">
-                                                        <a href="#integrations" onClick="dialog($(this), 'left')">Dashboard Age</a>
-                                                        <span style="display:none;" class="dialogTitle">Deluge {{instance $idx}} Dashboard</span>
-                                                        <div style="display:none;" class="dialogText">
-                                                            <pre>{{tojson $app}}</pre>
-                                                        </div>
-                                                    </td>
-                                                    <td>{{since $dashboard.Time}}</td>
-                                                </tr>
-                                                <tr><td colspan="2">Elapsed</td><td>{{$app.Elapsed}}</td></tr>
-                                                <tr><td colspan="2">Downloads</td><td>{{$app.Downloads}}</td></tr>
-                                                <tr><td colspan="2">Incomplete</td><td>{{$app.Incomplete}}</td></tr>
-                                                <tr><td colspan="2">Downloading</td><td>{{$app.Downloading}}</td></tr>
-                                                <tr><td colspan="2">Uploading</td><td>{{$app.Uploading}}</td></tr>
-                                                <tr><td colspan="2">Seeding</td><td>{{$app.Seeding}}</td></tr>
-                                                <tr><td colspan="2">Paused</td><td>{{$app.Paused}}</td></tr>
-                                                <tr><td colspan="2">Errors</td><td>{{$app.Errors}}</td></tr>
-                                                <tr><td colspan="2">Size</td><td>{{megabyte $app.Size}}</td></tr>
-                                                <tr><td colspan="2">Uploaded</td><td>{{megabyte $app.Uploaded}}</td></tr>
-                                                <tr><td colspan="2">Downloaded</td><td>{{megabyte $app.Downloaded}}</td></tr>
-                                                    {{- end}}
-                                                {{- end }}
-                                            {{- end }}
-                                            </table>
-                                        </div>
-                                    </div>
-                                {{- end }}
+{{- range $idx, $app := .Config.Apps.Deluge }}
+<div class="col-sm-6 col-md-4 col-lg-4 col-xl-3 col-xxl-3">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <td style="width:75px;">Deluge</td>
+                <td style="width:25px;min-width:25px;">
+                    <img src="{{files}}/images/logo/deluge.png" style="width:25px">
+                </td>
+                <td>{{instance $idx}}, {{$app.Name}}</td>
+            </tr>
+            <tr><td colspan="2">URL</td><td><a href="{{$app.URL}}">{{$app.URL}}</a></td></tr>
+    {{- $dashboard := cache "dashboard" }}
+    {{- if and $dashboard $dashboard.Data $dashboard.Data.Deluge}}
+        {{ range $app := $dashboard.Data.Deluge }}
+            {{- if eq $app.Instance (instance $idx) }}
+            <tr>
+                <td colspan="2">
+                    <a href="#integrations" onClick="dialog($(this), 'left')">Dashboard Age</a>
+                    <span style="display:none;" class="dialogTitle">Deluge {{instance $idx}} Dashboard</span>
+                    <div style="display:none;" class="dialogText">
+                        <pre>{{tojson $app}}</pre>
+                    </div>
+                </td>
+                <td>{{since $dashboard.Time}}</td>
+            </tr>
+            <tr><td colspan="2">Elapsed</td><td>{{$app.Elapsed}}</td></tr>
+            <tr><td colspan="2">Downloads</td><td>{{$app.Downloads}}</td></tr>
+            <tr><td colspan="2">Incomplete</td><td>{{$app.Incomplete}}</td></tr>
+            <tr><td colspan="2">Downloading</td><td>{{$app.Downloading}}</td></tr>
+            <tr><td colspan="2">Uploading</td><td>{{$app.Uploading}}</td></tr>
+            <tr><td colspan="2">Seeding</td><td>{{$app.Seeding}}</td></tr>
+            <tr><td colspan="2">Paused</td><td>{{$app.Paused}}</td></tr>
+            <tr><td colspan="2">Errors</td><td>{{$app.Errors}}</td></tr>
+            <tr><td colspan="2">Size</td><td>{{megabyte $app.Size}}</td></tr>
+            <tr><td colspan="2">Uploaded</td><td>{{megabyte $app.Uploaded}}</td></tr>
+            <tr><td colspan="2">Downloaded</td><td>{{megabyte $app.Downloaded}}</td></tr>
+            {{- end}}
+        {{- end }}
+    {{- end }}
+        </table>
+    </div>
+</div>
+{{- end }}
 {{- /* end of app integration (leave this comment) */ -}}

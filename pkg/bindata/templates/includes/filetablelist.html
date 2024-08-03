@@ -1,36 +1,36 @@
 {{- /* This is imported by configfiles and logfiles. */}}
-                                    {{- range $file := . }}
-                                        <table class="table table-bordered fileinfo-table" style="display:none;table-layout:fixed;" id="fileinfo-{{$file.ID}}" data-url="{{base}}ws" data-name="{{$file.Name}}" data-id="{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
-                                            <tr>
-                                                <th style="width:15%;">Path</th>
-                                                <td style="word-wrap:break-word;">{{$file.Path}}</td>
-                                            </tr>
-                                        {{- if and $file.Mode (ne $file.Mode.String "")}}
-                                            <tr>
-                                                <th>Mode</th>
-                                                <td>{{$file.Mode}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Owner</th>
-                                                <td>{{$file.User}}</td>
-                                            </tr>
-                                        {{- end}}
-                                            <tr>
-                                                <th>Size</th>
-                                                <td title="{{$file.Size}} Bytes"><span>{{megabyte $file.Size}}</span></td>
-                                            </tr>
-                                            <tr>
-                                                <th>Date</th>
-                                                <td title="Last Write: {{since $file.Time}}"><span>{{dateFmt $file.Time}}</span></td>
-                                            </tr>
-                                            <tr>
-                                                <th>Used</th>
-                                                <td title="True indicates the file is being actively used (possibly written to).">
-                                                    <i class="help-icon far fa-question-circle">
-                                                        {{$file.Used}}
-                                                    </i>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    {{- end -}}
+{{- range $file := . }}
+<table class="table table-bordered fileinfo-table" style="display:none;table-layout:fixed;" id="fileinfo-{{$file.ID}}" data-url="{{base}}ws" data-name="{{$file.Name}}" data-id="{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
+    <tr>
+        <th style="width:15%;">Path</th>
+        <td style="word-wrap:break-word;">{{$file.Path}}</td>
+    </tr>
+    {{- if and $file.Mode (ne $file.Mode.String "")}}
+    <tr>
+        <th>Mode</th>
+        <td>{{$file.Mode}}</td>
+    </tr>
+    <tr>
+        <th>Owner</th>
+        <td>{{$file.User}}</td>
+    </tr>
+    {{- end}}
+    <tr>
+        <th>Size</th>
+        <td title="{{$file.Size}} Bytes"><span>{{megabyte $file.Size}}</span></td>
+    </tr>
+    <tr>
+        <th>Date</th>
+        <td title="Last Write: {{since $file.Time}}"><span>{{dateFmt $file.Time}}</span></td>
+    </tr>
+    <tr>
+        <th>Used</th>
+        <td title="True indicates the file is being actively used (possibly written to).">
+            <i class="help-icon far fa-question-circle">
+                {{$file.Used}}
+            </i>
+        </td>
+    </tr>
+</table>
+{{- end -}}
 {{- /* end of filetablelist (leave this comment) */ -}}

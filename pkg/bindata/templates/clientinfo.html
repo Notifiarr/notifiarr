@@ -1,18 +1,18 @@
-                                <h1>
-                                    {{- if .ClientInfo.IsSub}}
-                                    <font color="green"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-tie{{end}}" style="float:left;font-size:40px"></i></font>
-                                    {{- else if .ClientInfo.IsPatron}}
-                                    <font color="purple"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-ninja{{end}}" style="float:left;font-size:40px"></i></font>
-                                    {{- else}}
-                                    <i class="fas fa-user-alt" style="float:left;font-size:40px"> </i>
-                                    {{- end}}
-                                    &nbsp;Client Info
-                                </h1>
-                                <h3>
-                                    <a class="nav-link" onClick="swapNavigationTemplate('system')" href="#system">
-                                    <i class="fas fa-angle-double-left"></i> Go Back</a>
-                                </h3>
-                                <div id="process-list-content" class="well well-sm file-content scroll-bar-sm bk-brown brdr">
+<h1>
+    {{- if .ClientInfo.IsSub}}
+    <font color="green"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-tie{{end}}" style="float:left;font-size:40px"></i></font>
+    {{- else if .ClientInfo.IsPatron}}
+    <font color="purple"><i class="fas fa-{{if .ClientInfo.User.DevAllowed}}user-secret{{else}}user-ninja{{end}}" style="float:left;font-size:40px"></i></font>
+    {{- else}}
+    <i class="fas fa-user-alt" style="float:left;font-size:40px"> </i>
+    {{- end}}
+    &nbsp;Client Info
+</h1>
+<h3>
+    <a class="nav-link" onClick="swapNavigationTemplate('system')" href="#system">
+    <i class="fas fa-angle-double-left"></i> Go Back</a>
+</h3>
+<div id="process-list-content" class="well well-sm file-content scroll-bar-sm bk-brown brdr">
 {{ tojson .ClientInfo }}
-                                </div>
+</div>
 {{- /* end of clientinfo (leave this comment) */ -}}
