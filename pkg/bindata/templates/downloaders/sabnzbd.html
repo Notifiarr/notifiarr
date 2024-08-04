@@ -91,7 +91,7 @@
                         {{- end}}
                         <input type="text" id="Apps.SabNZB.{{$index}}.Name" name="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB"
                             class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Name"
-                            data-original="{{$app.Name}}" value="{{$app.Name}}">.
+                            data-original="{{(index .Config.Apps.SabNZB $index).Name}}" value="{{(index .Config.Apps.SabNZB $index).Name}}">.
                     </div>
                 </div>
             </form>
@@ -111,7 +111,7 @@
                         {{- end}}
                         <input type="text" id="Apps.SabNZB.{{$index}}.URL" onChange="showhttps($(this).val(), '#SabNZB{{$index}}SSL');" name="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}"
                             data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} URL"
-                            data-original="{{$app.URL}}" value="{{$app.URL}}">
+                            data-original="{{(index .Config.Apps.SabNZB $index).URL}}" value="{{(index .Config.Apps.SabNZB $index).URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="SabNZB{{$index}}SSL" class="input-group-addon input-sm">
                             <input type="checkbox" id="Apps.SabNZB.{{$index}}.ValidSSL" name="Apps.SabNZB.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter"
                                 data-group="download" data-label="SabNZB {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
@@ -135,7 +135,7 @@
                         {{- end}}
                         <input type="password" autocomplete="off" id="Apps.SabNZB.{{$index}}.APIKey" name="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB"
                             class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} APIKey"
-                            data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                            data-original="{{(index .Config.Apps.SabNZB $index).APIKey}}" value="{{(index .Config.Apps.SabNZB $index).APIKey}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.SabNZB.{{$index}}.APIKey', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>

@@ -91,7 +91,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Deluge.{{$index}}.Name" name="Apps.Deluge.{{$index}}.Name" data-index="{{$index}}" data-app="Deluge"
                             class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Name"
-                            data-original="{{$app.Name}}" value="{{$app.Name}}">
+                            data-original="{{(index .Config.Apps.Deluge $index).Name}}" value="{{(index .Config.Apps.Deluge $index).Name}}">
                     </div>
                 </div>
             </form>
@@ -111,7 +111,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Deluge.{{$index}}.Config.URL" onChange="showhttps($(this).val(), '#Deluge{{$index}}SSL');" name="Apps.Deluge.{{$index}}.Config.URL"
                             data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} URL"
-                            data-original="{{$app.URL}}" value="{{$app.URL}}">
+                            data-original="{{(index .Config.Apps.Deluge $index).URL}}" value="{{(index .Config.Apps.Deluge $index).URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Deluge{{$index}}SSL" class="input-group-addon input-sm">
                             <input type="checkbox" id="Apps.Deluge.{{$index}}.ValidSSL" name="Apps.Deluge.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Deluge" class="client-parameter"
                                 data-group="download" data-label="Deluge {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
@@ -135,7 +135,7 @@
                         {{- end}}
                         <input type="password" autocomplete="off" id="Apps.Deluge.{{$index}}.Config.Password" name="Apps.Deluge.{{$index}}.Config.Password"
                             data-index="{{$index}}" data-app="Deluge" class="client-parameter form-control input-sm" data-group="download" data-label="Deluge {{instance $index}} Password"
-                            data-original="{{$app.Password}}" value="{{$app.Password}}">
+                            data-original="{{(index .Config.Apps.Deluge $index).Password}}" value="{{(index .Config.Apps.Deluge $index).Password}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Deluge.{{$index}}.Config.Password', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>
