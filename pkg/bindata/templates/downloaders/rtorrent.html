@@ -91,7 +91,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Rtorrent.{{$index}}.Name" name="Apps.Rtorrent.{{$index}}.Name" data-index="{{$index}}" data-app="Rtorrent"
                             class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Name"
-                            data-original="{{(index .Config.Apps.Rtorrent $index).Name}}" value="{{(index .Config.Apps.Rtorrent $index).Name}}">
+                            data-original="{{(index $.Input.Apps.Rtorrent $index).Name}}" value="{{(index $.Input.Apps.Rtorrent $index).Name}}">
                     </div>
                 </div>
             </form>
@@ -111,7 +111,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Rtorrent.{{$index}}.URL" onChange="showhttps($(this).val(), '#Rtorrent{{$index}}SSL');" name="Apps.Rtorrent.{{$index}}.URL"
                             data-index="{{$index}}" data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} URL"
-                            data-original="{{(index .Config.Apps.Rtorrent $index).URL}}" value="{{(index .Config.Apps.Rtorrent $index).URL}}">
+                            data-original="{{(index $.Input.Apps.Rtorrent $index).URL}}" value="{{(index $.Input.Apps.Rtorrent $index).URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Rtorrent{{$index}}SSL" class="input-group-addon input-sm">
                             <input type="checkbox" id="Apps.Rtorrent.{{$index}}.ValidSSL" name="Apps.Rtorrent.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Rtorrent" class="client-parameter"
                                 data-group="download" data-label="Rtorrent {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
@@ -135,7 +135,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Rtorrent.{{$index}}.User" name="Apps.Rtorrent.{{$index}}.User" data-index="{{$index}}" data-app="Rtorrent"
                             class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} User"
-                            data-original="{{(index .Config.Apps.Rtorrent $index).User}}" value="{{(index .Config.Apps.Rtorrent $index).User}}">
+                            data-original="{{(index $.Input.Apps.Rtorrent $index).User}}" value="{{(index $.Input.Apps.Rtorrent $index).User}}">
                     </div>
                 </div>
             </form>
@@ -155,7 +155,7 @@
                         {{- end}}
                         <input type="password" autocomplete="off" id="Apps.Rtorrent.{{$index}}.Pass" name="Apps.Rtorrent.{{$index}}.Pass" data-index="{{$index}}"
                             data-app="Rtorrent" class="client-parameter form-control input-sm" data-group="download" data-label="rTorrent {{instance $index}} Pass"
-                            data-original="{{(index .Config.Apps.Rtorrent $index).Pass}}" value="{{(index .Config.Apps.Rtorrent $index).Pass}}">
+                            data-original="{{(index $.Input.Apps.Rtorrent $index).Pass}}" value="{{(index $.Input.Apps.Rtorrent $index).Pass}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Rtorrent.{{$index}}.Pass', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>

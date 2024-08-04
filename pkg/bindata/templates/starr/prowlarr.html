@@ -110,7 +110,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Prowlarr.{{$index}}.Name" name="Apps.Prowlarr.{{$index}}.Name" data-index="{{$index}}" data-app="Prowlarr"
                             class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Name"
-                            data-original="{{(index .Config.Apps.Prowlarr $index).Name}}" value="{{(index .Config.Apps.Prowlarr $index).Name}}">
+                            data-original="{{(index $.Input.Apps.Prowlarr $index).Name}}" value="{{(index $.Input.Apps.Prowlarr $index).Name}}">
                     </div>
                 </div>
             </div>
@@ -130,7 +130,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Prowlarr.{{$index}}.URL" name="Apps.Prowlarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Prowlarr{{$index}}SSL');"
                             data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} URL"
-                            data-original="{{(index .Config.Apps.Prowlarr $index).URL}}" value="{{(index .Config.Apps.Prowlarr $index).URL}}">
+                            data-original="{{(index $.Input.Apps.Prowlarr $index).URL}}" value="{{(index $.Input.Apps.Prowlarr $index).URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Prowlarr{{$index}}SSL" class="input-group-addon input-sm">
                             <input type="checkbox" id="Apps.Prowlarr.{{$index}}.ValidSSL" name="Apps.Prowlarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Prowlarr"
                                 class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} SSL"
@@ -155,7 +155,7 @@
                         {{- end}}
                         <input type="password" autocomplete="new-password" id="Apps.Prowlarr.{{$index}}.APIKey" name="Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}"
                             data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} API Key"
-                            data-original="{{(index .Config.Apps.Prowlarr $index).APIKey}}" value="{{(index .Config.Apps.Prowlarr $index).APIKey}}">
+                            data-original="{{(index $.Input.Apps.Prowlarr $index).APIKey}}" value="{{(index $.Input.Apps.Prowlarr $index).APIKey}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.APIKey', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>
@@ -178,7 +178,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Prowlarr.{{$index}}.Username" name="Apps.Prowlarr.{{$index}}.Username" data-index="{{$index}}" data-app="Prowlarr"
                             class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Username"
-                            data-original="{{(index .Config.Apps.Prowlarr $index).Username}}" value="{{(index .Config.Apps.Prowlarr $index).Username}}">
+                            data-original="{{(index $.Input.Apps.Prowlarr $index).Username}}" value="{{(index $.Input.Apps.Prowlarr $index).Username}}">
                     </div>
                 </div>
             </div>
@@ -198,7 +198,7 @@
                         {{- end}}
                         <input type="password" autocomplete="new-password" id="Apps.Prowlarr.{{$index}}.Password" name="Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}"
                             data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Password"
-                            data-original="{{(index .Config.Apps.Prowlarr $index).Password}}" value="{{(index .Config.Apps.Prowlarr $index).Password}}">
+                            data-original="{{(index $.Input.Apps.Prowlarr $index).Password}}" value="{{(index $.Input.Apps.Prowlarr $index).Password}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.Password', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>

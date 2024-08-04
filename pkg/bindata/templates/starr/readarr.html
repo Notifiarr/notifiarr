@@ -113,7 +113,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Readarr.{{$index}}.Name" name="Apps.Readarr.{{$index}}.Name" onChange="showhttps($(this).val(), '#Readarr{{$index}}SSL');"
                             data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Name"
-                            data-original="{{(index .Config.Apps.Readarr $index).Name}}" value="{{(index .Config.Apps.Readarr $index).Name}}">
+                            data-original="{{(index $.Input.Apps.Readarr $index).Name}}" value="{{(index $.Input.Apps.Readarr $index).Name}}">
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Readarr.{{$index}}.URL" name="Apps.Readarr.{{$index}}.URL" data-index="{{$index}}" data-app="Readarr"
                             class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} URL"
-                            data-original="{{(index .Config.Apps.Readarr $index).URL}}" value="{{(index .Config.Apps.Readarr $index).URL}}">
+                            data-original="{{(index $.Input.Apps.Readarr $index).URL}}" value="{{(index $.Input.Apps.Readarr $index).URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Readarr{{$index}}SSL" class="input-group-addon input-sm">
                             <input type="checkbox" id="Apps.Readarr.{{$index}}.ValidSSL" name="Apps.Readarr.{{$index}}.ValidSSL" data-index="{{$index}}"
                                 data-app="Readarr" class="client-parameter" data-group="starr" data-label="Readarr {{instance $index}} SSL"
@@ -158,7 +158,7 @@
                         {{- end}}
                         <input type="password" autocomplete="new-password" id="Apps.Readarr.{{$index}}.APIKey" name="Apps.Readarr.{{$index}}.APIKey" data-index="{{$index}}"
                         data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} API Key"
-                        data-original="{{(index .Config.Apps.Readarr $index).APIKey}}" value="{{(index .Config.Apps.Readarr $index).APIKey}}">
+                        data-original="{{(index $.Input.Apps.Readarr $index).APIKey}}" value="{{(index $.Input.Apps.Readarr $index).APIKey}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.APIKey', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>
@@ -181,7 +181,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Readarr.{{$index}}.Username" name="Apps.Readarr.{{$index}}.Username" data-index="{{$index}}" data-app="Readarr"
                             class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Username"
-                            data-original="{{(index .Config.Apps.Readarr $index).Username}}" value="{{(index .Config.Apps.Readarr $index).Username}}">
+                            data-original="{{(index $.Input.Apps.Readarr $index).Username}}" value="{{(index $.Input.Apps.Readarr $index).Username}}">
                     </div>
                 </div>
             </div>
@@ -201,7 +201,7 @@
                         {{- end}}
                         <input type="password" autocomplete="new-password" id="Apps.Readarr.{{$index}}.Password" name="Apps.Readarr.{{$index}}.Password"
                             data-index="{{$index}}" data-app="Readarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Readarr {{instance $index}} Password"
-                            data-original="{{(index .Config.Apps.Readarr $index).Password}}" value="{{(index .Config.Apps.Readarr $index).Password}}">
+                            data-original="{{(index $.Input.Apps.Readarr $index).Password}}" value="{{(index $.Input.Apps.Readarr $index).Password}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Readarr.{{$index}}.Password', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>
