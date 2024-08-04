@@ -12,11 +12,17 @@
                     <div style="float: left;"><img src="{{files}}/images/logo/mysql.png" style="height:50px;"></div>
                     <h2 style="margin-bottom:-45px">MySQL</h2>
                     <div style="float: right;">
-                        <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                        <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot"
+                            data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary">
+                            <i class="fa fa-plus"></i>
+                        </button>
                     </div>
                 </td>
                 <td colspan="7" class="tablet-hide desktop-hide">
-                    <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot" data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                    <button id="snaps-MySQL-addbutton" onclick="addInstance('snaps', 'MySQL')" data-prefix="Snapshot"
+                        data-names='["Name","Host","User","Pass","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary">
+                        <i class="fa fa-plus"></i>
+                    </button>
                     <h2 style="margin-left:5px;display:inline;">MySQL</h2>
                     <div style="float:right;"><img src="{{files}}/images/logo/mysql.png" style="height:50px;"></div>
                 </td>
@@ -32,7 +38,9 @@
                     <span class="dialogTitle">Actions</span>
                 </td>
                 <td style="min-width:120px;">
-                    <div style="display:none;" class="dialogText">Name is optional, but required to be unique if you wish to enable service checks on the instance. Otherwise, it's used to identify the instance easier.</div>
+                    <div style="display:none;" class="dialogText">
+                        Name is optional, but required to be unique if you wish to enable service checks on the instance. Otherwise, it's used to identify the instance easier.
+                    </div>
                     <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
                     <span class="dialogTitle">Name</span>
                 </td>
@@ -57,7 +65,10 @@
                     <span class="dialogTitle">Interval</span>
                 </td>
                 <td style="min-width:120px;width:120px">
-                    <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
+                    <div style="display:none;" class="dialogText">
+                        This controls the maximum duration a request to this application may elapse.
+                        Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.
+                    </div>
                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                     <span class="dialogTitle">Timeout</span>
                 </td>
@@ -65,13 +76,18 @@
         </thead>
         <tbody id="snaps-MySQL-container">
         {{- range $index, $app := .Config.Snapshot.MySQL}}
-            <input disabled style="display: none;" class="client-parameter snaps-MySQL{{$index}}-deleted" data-group="snaps" data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
+            <input disabled style="display: none;" class="client-parameter snaps-MySQL{{$index}}-deleted" data-group="snaps"
+                data-label="MySQL {{instance $index}} Deleted" data-original="false" value="false">
             <tr class="snaps-MySQL {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="snaps-MySQL-{{$index}}">
                 <td style="white-space:nowrap;">
                     <div class="btn-group" role="group" style="display:flex;font-size:18px;">
-                        <button onclick="removeInstance('snaps-MySQL', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-minus"></i></button>
+                        <button onclick="removeInstance('snaps-MySQL', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;">
+                            <i class="fa fa-minus"></i>
+                        </button>
                         <button id="MySQLIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                        <button onClick="testInstance($(this), 'MySQL', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                        <button onClick="testInstance($(this), 'MySQL', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;">
+                            <i class="fas fa-check-double"></i>
+                        </button>
                     </div>
                 </td>
                 <td>
@@ -150,7 +166,9 @@
                                 <input type="password" autocomplete="off" id="Snapshot.MySQL.{{$index}}.Pass" name="Snapshot.MySQL.{{$index}}.Pass" data-index="{{$index}}"
                                     data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Pass"
                                     data-original="{{(index $.Input.Snapshot.MySQL $index).Pass}}" value="{{(index $.Input.Snapshot.MySQL $index).Pass}}">
-                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Snapshot.MySQL.{{$index}}.Pass', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                                <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Snapshot.MySQL.{{$index}}.Pass', $(this).find('i'));">
+                                    <i class="fas fa-low-vision secret-input"></i>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -168,7 +186,9 @@
                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                 </div>
                                 {{- end}}
-                                <select type="select" id="Snapshot.MySQL.{{$index}}.Interval" name="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Interval" data-original="{{$app.Interval}}">
+                                <select type="select" id="Snapshot.MySQL.{{$index}}.Interval" name="Snapshot.MySQL.{{$index}}.Interval" data-index="{{$index}}"
+                                    class="client-parameter form-control input-sm" data-label="MySQL {{instance $index}} Interval"
+                                    data-app="MySQL" data-group="snaps" data-original="{{$app.Interval}}">
 {{template "includes/intervaloptions.html" $app.Interval}}
                                 </select>
                             </div>
@@ -188,7 +208,9 @@
                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SNAPSHOT_MYSQL_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                 </div>
                                 {{- end}}
-                                <select type="text" id="Snapshot.MySQL.{{$index}}.Timeout" name="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}" data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps" data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                                <select type="text" id="Snapshot.MySQL.{{$index}}.Timeout" name="Snapshot.MySQL.{{$index}}.Timeout" data-index="{{$index}}"
+                                    data-app="MySQL" class="client-parameter form-control input-sm" data-group="snaps"
+                                    data-label="MySQL {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                                     <option value="-1s">Disabled</option>
                                     <option value="0s">No Timeout</option>
                                     {{- range $i := one259 }}
