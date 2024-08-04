@@ -45,7 +45,9 @@
             <tr class="snaps-Nvidia" id="snaps-Nvidia">
                 <td class="text-center">
                     <div class="btn-group" role="group" style="font-size:18px;">
-                        <button onClick="testInstance($(this), 'Nvidia', 0)" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                        <button onClick="testInstance($(this), 'Nvidia', 0)" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;">
+                            <i class="fas fa-check-double"></i>
+                        </button>
                     </div>
                 </td>
                 <td>
@@ -87,7 +89,10 @@
                                 <input type="text" id="Snapshot.Nvidia.SMIPath" name="Snapshot.Nvidia.SMIPath" data-app="Nvidia"
                                     class="client-parameter form-control input-sm" data-group="snaps" data-label="Nvidia SMI Path"
                                     data-original="{{.Input.Snapshot.Nvidia.SMIPath}}" value="{{.Input.Snapshot.Nvidia.SMIPath}}">
-                                <div onClick="browseFiles('#Snapshot\\.Nvidia\\.SMIPath', 'nvidia-smi{{if eq .Version.os "windows"}}.exe{{end}}');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                                <div onClick="browseFiles('#Snapshot\\.Nvidia\\.SMIPath', 'nvidia-smi{{if eq .Version.os "windows"}}.exe{{end}}');"
+                                    style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm">
+                                <a class="help-icon fas fa-folder-open"></a>
+                            </div>
                             </div>
                         </div>
                     </form>

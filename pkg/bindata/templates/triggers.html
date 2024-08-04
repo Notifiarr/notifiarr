@@ -28,121 +28,104 @@
         <tr>
             <td>{{index .Expvar.TimerCounts "Starting Radarr profile and format sync."}}</td>
             <td>{{.ClientInfo.Actions.Sync.Interval}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('cfsync')">Radarr TRaSH Sync</a></td><td>Sync custom profiles and formats to Radarr.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('cfsync')">Radarr TRaSH Sync</a>
+            </td><td>Sync custom profiles and formats to Radarr.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Starting Sonarr profile and format sync."}}</td>
             <td>{{.ClientInfo.Actions.Sync.Interval}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('rpsync')">Sonarr TRaSH Sync</a></td><td>Sync custom profiles and formats to Sonarr.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('rpsync')">Sonarr TRaSH Sync</a></td>
+            <td>Sync custom profiles and formats to Sonarr.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Gathering and sending System Snapshot."}}</td>
             <td>{{.ClientInfo.Actions.Snapshot.Interval}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('snapshot')">Send System Snapshot</a></td><td>Sends a system snapshot.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('snapshot')">Send System Snapshot</a></td>
+            <td>Sends a system snapshot.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Initiating State Collection for Dashboard."}}</td>
             <td>{{.ClientInfo.Actions.Dashboard.Interval}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('dashboard')">Send Dashboard States</a></td><td>Collects dashboard data from all your apps and sends it.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('dashboard')">Send Dashboard States</a></td>
+            <td>Collects dashboard data from all your apps and sends it.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Gathering and sending Plex Sessions."}}</td>
             <td>{{.ClientInfo.Actions.Plex.Interval}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('sessions')">Send Plex Sessions</a></td><td>Collects active plex sessions and sends them if any exist.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('sessions')">Send Plex Sessions</a></td>
+            <td>Collects active plex sessions and sends them if any exist.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Sending cached stuck items to website."}}</td>
             <td>{{$action := .Actions.Get "Sending cached stuck items to website."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('stuckitems')">Send Stuck Queue Items</a></td><td>Sends cached stuck queue items to website.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('stuckitems')">Send Stuck Queue Items</a></td>
+            <td>Sends cached stuck queue items to website.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Sending Library contents for MDBList."}}</td>
             <td>{{.ClientInfo.Actions.Mdblist.Interval}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('mdblist')">Send MDB List</a></td><td>Sends Sonarr and/or Radarr libraries to <a href="https://mdblist.com">MDB List</a> for processing.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('mdblist')">Send MDB List</a></td>
+            <td>Sends Sonarr and/or Radarr libraries to <a href="https://mdblist.com">MDB List</a> for processing.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Checking Lidarr for database backup corruption."}}</td>
             <td>{{$action := .Actions.Get "Checking Lidarr for database backup corruption."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('corrupt/lidarr')">Check Lidarr for Corruption</a></td><td>Checks all Lidarr instances' database backups for corruption and sends an update.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('corrupt/lidarr')">Check Lidarr for Corruption</a></td>
+            <td>Checks all Lidarr instances' database backups for corruption and sends an update.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Checking Prowlarr for database backup corruption."}}</td>
             <td>{{$action := .Actions.Get "Checking Prowlarr for database backup corruption."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('corrupt/prowlarr')">Check Prowlarr for Corruption</a></td><td>Checks all Prowlarr instances' database backups for corruption and sends an update.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('corrupt/prowlarr')">Check Prowlarr for Corruption</a></td>
+            <td>Checks all Prowlarr instances' database backups for corruption and sends an update.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Checking Radarr for database backup corruption."}}</td>
             <td>{{$action := .Actions.Get "Checking Radarr for database backup corruption."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('corrupt/radarr')">Check Radarr for Corruption</a></td><td>Checks all Radarr instances' database backups for corruption and sends an update.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('corrupt/radarr')">Check Radarr for Corruption</a></td>
+            <td>Checks all Radarr instances' database backups for corruption and sends an update.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Checking Readarr for database backup corruption."}}</td>
             <td>{{$action := .Actions.Get "Checking Readarr for database backup corruption."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('corrupt/readarr')">Check Readarr for Corruption</a></td><td>Checks all Readarr instances' database backups for corruption and sends an update.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('corrupt/readarr')">Check Readarr for Corruption</a></td>
+            <td>Checks all Readarr instances' database backups for corruption and sends an update.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Checking Sonarr for database backup corruption."}}</td>
             <td>{{$action := .Actions.Get "Checking Sonarr for database backup corruption."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('corrupt/sonarr')">Check Sonarr for Corruption</a></td><td>Checks all Sonarr instances' database backups for corruption and sends an update.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('corrupt/sonarr')">Check Sonarr for Corruption</a></td>
+            <td>Checks all Sonarr instances' database backups for corruption and sends an update.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Sending Lidarr Backup File List to Notifiarr."}}</td>
             <td>{{$action := .Actions.Get "Sending Lidarr Backup File List to Notifiarr."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('backup/lidarr')">Check Lidarr Backups</a></td><td>Grabs all Lidarr instances' database backup info and sends an update. If there's a new backup a notification appears.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('backup/lidarr')">Check Lidarr Backups</a></td>
+            <td>Grabs all Lidarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Sending Prowlarr Backup File List to Notifiarr."}}</td>
             <td>{{$action := .Actions.Get "Sending Prowlarr Backup File List to Notifiarr."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('backup/prowlarr')">Check Prowlarr Backups</a></td><td>Grabs all Prowlarr instances' database backup info and sends an update. If there's a new backup a notification appears.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('backup/prowlarr')">Check Prowlarr Backups</a></td>
+            <td>Grabs all Prowlarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Sending Radarr Backup File List to Notifiarr."}}</td>
             <td>{{$action := .Actions.Get "Sending Radarr Backup File List to Notifiarr."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('backup/radarr')">Check Radarr Backups</a></td><td>Grabs all Radarr instances' database backup info and sends an update. If there's a new backup a notification appears.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('backup/radarr')">Check Radarr Backups</a></td>
+            <td>Grabs all Radarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Sending Readarr Backup File List to Notifiarr."}}</td>
             <td>{{$action := .Actions.Get "Sending Readarr Backup File List to Notifiarr."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('backup/readarr')">Check Readarr Backups</a></td><td>Grabs all Readarr instances' database backup info and sends an update. If there's a new backup a notification appears.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('backup/readarr')">Check Readarr Backups</a></td>
+            <td>Grabs all Readarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td>
         </tr>
         <tr>
             <td>{{index .Expvar.TimerCounts "Sending Sonarr Backup File List to Notifiarr."}}</td>
             <td>{{$action := .Actions.Get "Sending Sonarr Backup File List to Notifiarr."}}{{if and $action $action.D.Duration}}{{$action.D}}{{else}}0s{{end}}</td>
-            <td>
-                <a href="#triggers" onClick="triggerAction('backup/sonarr')">Check Sonarr Backups</a></td><td>Grabs all Sonarr instances' database backup info and sends an update. If there's a new backup a notification appears.
-            </td>
+            <td><a href="#triggers" onClick="triggerAction('backup/sonarr')">Check Sonarr Backups</a></td>
+            <td>Grabs all Sonarr instances' database backup info and sends an update. If there's a new backup a notification appears.</td>
         </tr>
     </table>
     {{- if .Actions.CronTimer.List }}

@@ -4,11 +4,16 @@
             <div style="float: left;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
             <h2 class="mb-3" style="margin-bottom:-45px">SabNZB</h2>
             <div style="float: right;">
-                <button id="download-SabNZB-addbutton" onclick="addInstance('download','SabNZB')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","", "URL","APIKey","Interval","extraConfig.Timeout"]' type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                <button id="download-SabNZB-addbutton" onclick="addInstance('download','SabNZB')" data-prefix="Apps" data-sslname="ValidSSL" type="button"
+                    data-names='["Name","", "URL","APIKey","Interval","extraConfig.Timeout"]' title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary">
+                    <i class="fa fa-plus"></i>
+                </button>
             </div>
         </td>
         <td colspan="7" class="tablet-hide desktop-hide">
-            <button onclick="addInstance('download','SabNZB')" data-prefix="Apps" type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+            <button onclick="addInstance('download','SabNZB')" data-prefix="Apps" type="button" title="Add another instance of SabNZB." class="add-new-item-button btn btn-primary">
+                <i class="fa fa-plus"></i>
+            </button>
             <h2 class="mb-3" style="margin-left:5px;display:inline;">SabNZB</h2>
             <div style="float:right;"><img src="{{files}}/images/logo/sabnzbd.png" style="height:50px;"></div>
         </td>
@@ -24,13 +29,16 @@
             <span class="dialogTitle">Actions</span>
         </td>
         <td>
-            <div style="display:none;" class="dialogText">Name is optional, but required to be unique if you wish to enable service checks on the instance. Otherwise, it's used to identify the instance easier.</div>
+            <div style="display:none;" class="dialogText">
+                Name is optional, but required to be unique if you wish to enable service checks on the instance.
+                Otherwise, it's used to identify the instance easier.
+            </div>
             <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
             <span class="dialogTitle">Name</span>
         </td>
         <td colspan="2">
             <div style="display:none;" class="dialogText">
-                http:// or https:// URL for the application instance. Providing an https:// URL reveals a checkbox. 
+                http:// or https:// URL for the application instance. Providing an https:// URL reveals a checkbox.
                 Checking this box enables SSL certificate validation; invalid certificates generate an error.
             </div>
             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
@@ -43,7 +51,10 @@
             <span class="dialogTitle">Interval</span>
         </td>
         <td>
-            <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
+            <div style="display:none;" class="dialogText">
+                This controls the maximum duration a request to this application may elapse.
+                Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.
+            </div>
             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
             <span class="dialogTitle">Timeout</span>
         </td>
@@ -51,13 +62,18 @@
 </thead>
 <tbody id="download-SabNZB-container">
 {{- range $index, $app := .Config.Apps.SabNZB}}
-    <input disabled style="display: none;" class="client-parameter download-SabNZB{{$index}}-deleted" data-group="download" data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
+    <input disabled style="display: none;" class="client-parameter download-SabNZB{{$index}}-deleted" data-group="download"
+        data-label="SabNZB {{instance $index}} Deleted" data-original="false" value="false">
     <tr class="download-SabNZB {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="download-SabNZB-{{$index}}">
         <td style="white-space:nowrap;">
             <div class="btn-group" role="group" style="display:flex;">
-                <button onclick="removeInstance('download-SabNZB', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
+                <button onclick="removeInstance('download-SabNZB', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;">
+                    <i class="fa fa-minus"></i>
+                </button>
                 <button id="SabNZBIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                <button onClick="testInstance($(this), 'SabNZB', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                <button onClick="testInstance($(this), 'SabNZB', '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;">
+                    <i class="fas fa-check-double"></i>
+                </button>
             </div>
         </td>
         <td>
@@ -73,7 +89,9 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_NAME" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="text" id="Apps.SabNZB.{{$index}}.Name" name="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                        <input type="text" id="Apps.SabNZB.{{$index}}.Name" name="Apps.SabNZB.{{$index}}.Name" data-index="{{$index}}" data-app="SabNZB"
+                            class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Name"
+                            data-original="{{$app.Name}}" value="{{$app.Name}}">.
                     </div>
                 </div>
             </form>
@@ -91,9 +109,12 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_URL" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="text" id="Apps.SabNZB.{{$index}}.URL" onChange="showhttps($(this).val(), '#SabNZB{{$index}}SSL');" name="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                        <input type="text" id="Apps.SabNZB.{{$index}}.URL" onChange="showhttps($(this).val(), '#SabNZB{{$index}}SSL');" name="Apps.SabNZB.{{$index}}.URL" data-index="{{$index}}"
+                            data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} URL"
+                            data-original="{{$app.URL}}" value="{{$app.URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="SabNZB{{$index}}SSL" class="input-group-addon input-sm">
-                            <input type="checkbox" id="Apps.SabNZB.{{$index}}.ValidSSL" name="Apps.SabNZB.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter" data-group="download" data-label="SabNZB {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                            <input type="checkbox" id="Apps.SabNZB.{{$index}}.ValidSSL" name="Apps.SabNZB.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="SabNZB" class="client-parameter"
+                                data-group="download" data-label="SabNZB {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
                         </div>
                     </div>
                 </div>
@@ -112,8 +133,12 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="password" autocomplete="off" id="Apps.SabNZB.{{$index}}.APIKey" name="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} APIKey" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
-                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.SabNZB.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                        <input type="password" autocomplete="off" id="Apps.SabNZB.{{$index}}.APIKey" name="Apps.SabNZB.{{$index}}.APIKey" data-index="{{$index}}" data-app="SabNZB"
+                            class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} APIKey"
+                            data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.SabNZB.{{$index}}.APIKey', $(this).find('i'));">
+                            <i class="fas fa-low-vision secret-input"></i>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -131,7 +156,9 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <select type="select" id="Apps.SabNZB.{{$index}}.Interval" name="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                        <select type="select" id="Apps.SabNZB.{{$index}}.Interval" name="Apps.SabNZB.{{$index}}.Interval" data-index="{{$index}}" data-app="SabNZB"
+                            class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Interval"
+                            data-original="{{$app.Interval}}" value="{{$app.Interval}}">
 {{template "includes/intervaloptions.html" $app.Interval}}
                         </select>
                     </div>
@@ -151,7 +178,8 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SABNZBD_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <select type="select" id="Apps.SabNZB.{{$index}}.extraConfig.Timeout" name="Apps.SabNZB.{{$index}}.extraConfig.Timeout" data-index="{{$index}}" data-app="SabNZB" class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                        <select type="select" id="Apps.SabNZB.{{$index}}.extraConfig.Timeout" name="Apps.SabNZB.{{$index}}.extraConfig.Timeout" data-index="{{$index}}" data-app="SabNZB"
+                            class="client-parameter form-control input-sm" data-group="download" data-label="SabNZB {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                             <option value="-1s" {{if eq $app.Timeout.Seconds (add 0 -1)}}selected {{end}}>Disabled</option>
                             <option value="0s" {{if eq $app.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
                             {{- range $i := one259 }}
