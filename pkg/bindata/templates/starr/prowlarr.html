@@ -4,11 +4,16 @@
             <div style="float: left;"><img src="{{files}}/images/logo/prowlarr.png" style="height:50px;"></div>
             <h2 style="margin-bottom:-45px">Prowlarr</h2>
             <div style="float: right;">
-                <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps" data-sslname="ValidSSL" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps"
+                    data-sslname="ValidSSL" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'
+                    type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
             </div>
         </td>
         <td colspan="9" class="tablet-hide desktop-hide">
-            <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps" data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]'  type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+            <button id="starr-Prowlarr-addbutton" onclick="addInstance('starr', 'Prowlarr')" data-prefix="Apps" type="button"
+                data-names='["Name","URL","APIKey","Username","Password","Interval","Timeout"]' class="add-new-item-button btn btn-primary">
+                <i class="fa fa-plus"></i>
+            </button>
             <h2 style="margin-left:5px;display:inline;">Prowlarr</h2>
             <div style="float:right;"><img src="{{files}}/images/logo/prowlarr.png" style="height:50px;"></div>
         </td>
@@ -24,7 +29,8 @@
             <span class="dialogTitle">Actions</span>
         </td>
         <td>
-            <div style="display:none;" class="dialogText">Name is optional, but required to be unique if you wish to enable service checks on the instance. Otherwise, it's used to identify the instance easier.</div>
+            <div style="display:none;" class="dialogText">Name is optional, but required to be unique if you wish to enable service checks on the instance.
+                Otherwise, it's used to identify the instance easier.</div>
             <a onClick="dialog($(this), 'left')" class="help-icon far fa-question-circle"></a>
             <span class="dialogTitle">Name</span>
         </td>
@@ -43,12 +49,16 @@
             <span class="dialogTitle">API Key</span>
         </td>
         <td>
-            <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+            <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application,
+                AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated.
+                If you get 401 errors when doing Corruption checks, add your username and password.</div>
             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
             <span class="dialogTitle">Username</span>
         </td>
         <td>
-            <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application, AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated. If you get 401 errors when doing Corruption checks, add your username and password.</div>
+            <div style="display:none;" class="dialogText">Username and password are required when authentication is enabled in the application,
+                AND you enabled corruption checks. Database backups cannot be download from the API, and they must be downloaded from a non-API path that may be authenticated.
+                If you get 401 errors when doing Corruption checks, add your username and password.</div>
             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
             <span class="dialogTitle">Password</span>
         </td>
@@ -71,13 +81,18 @@
 </thead>
 <tbody id="starr-Prowlarr-container">
     {{- range $index, $app := .Config.Apps.Prowlarr}}
-    <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Prowlarr{{$index}}-deleted" data-group="starr" data-label="Prowlarr {{instance $index}} Deleted" data-original="false" value="false">
+    <input disabled style="display: none;" class="client-parameter form-control input-sm starr-Prowlarr{{$index}}-deleted" data-group="starr"
+        data-label="Prowlarr {{instance $index}} Deleted" data-original="false" value="false">
     <tr class="starr-Prowlarr {{if (lt $app.Timeout.Seconds (add 0 0))}}bk-danger{{end}}" id="starr-Prowlarr-{{$index}}">
         <td style="white-space:nowrap;">
             <div class="btn-group" role="group" style="display:flex;">
-                <button onclick="removeInstance('starr-Prowlarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
+                <button onclick="removeInstance('starr-Prowlarr', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;">
+                    <i class="fa fa-minus"></i>
+                </button>
                 <button id="ProwlarrIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                <button onClick="testInstance($(this), 'Prowlarr', '{{$index}}')" style="font-size:18px;" type="button" class="btn btn-success btn-sm checkInstanceBtn"><i class="fas fa-check-double"></i></button>
+                <button onClick="testInstance($(this), 'Prowlarr', '{{$index}}')" style="font-size:18px;" type="button" class="btn btn-success btn-sm checkInstanceBtn">
+                    <i class="fas fa-check-double"></i>
+                </button>
             </div>
         </td>
         <td>
@@ -93,7 +108,9 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_NAME" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="text" id="Apps.Prowlarr.{{$index}}.Name" name="Apps.Prowlarr.{{$index}}.Name" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Name" data-original="{{$app.Name}}" value="{{$app.Name}}">
+                        <input type="text" id="Apps.Prowlarr.{{$index}}.Name" name="Apps.Prowlarr.{{$index}}.Name" data-index="{{$index}}" data-app="Prowlarr"
+                            class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Name"
+                            data-original="{{$app.Name}}" value="{{$app.Name}}">
                     </div>
                 </div>
             </div>
@@ -111,9 +128,13 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_URL" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="text" id="Apps.Prowlarr.{{$index}}.URL" name="Apps.Prowlarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Prowlarr{{$index}}SSL');" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} URL" data-original="{{$app.URL}}" value="{{$app.URL}}">
+                        <input type="text" id="Apps.Prowlarr.{{$index}}.URL" name="Apps.Prowlarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Prowlarr{{$index}}SSL');"
+                            data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} URL"
+                            data-original="{{$app.URL}}" value="{{$app.URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Prowlarr{{$index}}SSL" class="input-group-addon input-sm">
-                            <input type="checkbox" id="Apps.Prowlarr.{{$index}}.ValidSSL" name="Apps.Prowlarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} SSL" data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
+                            <input type="checkbox" id="Apps.Prowlarr.{{$index}}.ValidSSL" name="Apps.Prowlarr.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Prowlarr"
+                                class="client-parameter" data-group="starr" data-label="Prowlarr {{instance $index}} SSL"
+                                data-original="{{$app.ValidSSL}}" {{if $app.ValidSSL}}checked {{end}}value="true">
                         </div>
                     </div>
                 </div>
@@ -132,8 +153,12 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_API_KEY" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="password" autocomplete="new-password" id="Apps.Prowlarr.{{$index}}.APIKey" name="Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} API Key" data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
-                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.APIKey', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                        <input type="password" autocomplete="new-password" id="Apps.Prowlarr.{{$index}}.APIKey" name="Apps.Prowlarr.{{$index}}.APIKey" data-index="{{$index}}"
+                            data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} API Key"
+                            data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.APIKey', $(this).find('i'));">
+                            <i class="fas fa-low-vision secret-input"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,7 +176,9 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_USERNAME" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="text" id="Apps.Prowlarr.{{$index}}.Username" name="Apps.Prowlarr.{{$index}}.Username" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Username" data-original="{{$app.Username}}" value="{{$app.Username}}">
+                        <input type="text" id="Apps.Prowlarr.{{$index}}.Username" name="Apps.Prowlarr.{{$index}}.Username" data-index="{{$index}}" data-app="Prowlarr"
+                            class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Username"
+                            data-original="{{$app.Username}}" value="{{$app.Username}}">
                     </div>
                 </div>
             </div>
@@ -169,8 +196,12 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_PASSWORD" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <input type="password" autocomplete="new-password" id="Apps.Prowlarr.{{$index}}.Password" name="Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Password" data-original="{{$app.Password}}" value="{{$app.Password}}">
-                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.Password', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                        <input type="password" autocomplete="new-password" id="Apps.Prowlarr.{{$index}}.Password" name="Apps.Prowlarr.{{$index}}.Password" data-index="{{$index}}"
+                            data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Password"
+                            data-original="{{$app.Password}}" value="{{$app.Password}}">
+                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Prowlarr.{{$index}}.Password', $(this).find('i'));">
+                            <i class="fas fa-low-vision secret-input"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -188,7 +219,9 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <select type="select" id="Apps.Prowlarr.{{$index}}.Interval" name="Apps.Prowlarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Interval" data-original="{{$app.Interval}}" value="{{$app.Interval}}">
+                        <select type="select" id="Apps.Prowlarr.{{$index}}.Interval" name="Apps.Prowlarr.{{$index}}.Interval" data-index="{{$index}}" data-app="Prowlarr"
+                            class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Interval"
+                            data-original="{{$app.Interval}}" value="{{$app.Interval}}">
 {{template "includes/intervaloptions.html" $app.Interval}}
                         </select>
                     </div>
@@ -208,7 +241,8 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <select type="select" id="Apps.Prowlarr.{{$index}}.Timeout" name="Apps.Prowlarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
+                        <select type="select" id="Apps.Prowlarr.{{$index}}.Timeout" name="Apps.Prowlarr.{{$index}}.Timeout" data-index="{{$index}}" data-app="Prowlarr"
+                            class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Timeout" data-original="{{$app.Timeout}}">
                             <option value="-1s" {{if eq $app.Timeout.Seconds (add 0 -1)}}selected {{end}}>Disabled</option>
                             <option value="0s" {{if eq $app.Timeout.Seconds (add 0 0)}}selected {{end}}>No Timeout</option>
                             {{- range $i := one259 }}
@@ -236,7 +270,9 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PROWLARR_%d_DELETES" $.Flags.EnvPrefix $index}}</span>
                         </div>
                         {{- end}}
-                        <select type="select" id="Apps.Prowlarr.{{$index}}.Deletes" name="Apps.Prowlarr.{{$index}}.Deletes" data-index="{{$index}}" data-app="Prowlarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Deletes" data-original="{{$app.Deletes}}" value="{{$app.Deletes}}">
+                        <select type="select" id="Apps.Prowlarr.{{$index}}.Deletes" name="Apps.Prowlarr.{{$index}}.Deletes" data-index="{{$index}}" data-app="Prowlarr"
+                            class="client-parameter form-control input-sm" data-group="starr" data-label="Prowlarr {{instance $index}} Deletes"
+                            data-original="{{$app.Deletes}}" value="{{$app.Deletes}}">
                             <option {{if eq $app.Deletes 0}}selected {{end}}value="0">Disabled</option>
                             {{- range $i := oneto 100 }}
                             <option {{if eq $app.Deletes $i}}selected {{end}}value="{{$i}}">{{$i}}</option>

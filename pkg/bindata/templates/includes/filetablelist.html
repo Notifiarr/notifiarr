@@ -1,6 +1,7 @@
 {{- /* This is imported by configfiles and logfiles. */}}
 {{- range $file := . }}
-<table class="table table-bordered fileinfo-table" style="display:none;table-layout:fixed;" id="fileinfo-{{$file.ID}}" data-url="{{base}}ws" data-name="{{$file.Name}}" data-id="{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
+<table class="table table-bordered fileinfo-table" style="display:none;table-layout:fixed;" id="fileinfo-{{$file.ID}}" data-url="{{base}}ws"
+    data-name="{{$file.Name}}" data-id="{{$file.ID}}" data-used="{{$file.Used}}" data-filename="{{$file.Path}}">
     <tr>
         <th style="width:15%;">Path</th>
         <td style="word-wrap:break-word;">{{$file.Path}}</td>

@@ -47,7 +47,10 @@
                     <div style="float: left;font-size:40px;"><i class="fas fa-tasks"></i></div>
                     <h3 style="margin-bottom:-45px">Check Configuration</h3>
                     <div style="float: right;">
-                        <button id="services-Checks-addbutton" onclick="addServiceCheck();" data-prefix="Services" data-names='["Name","Type","Value","Expect","Interval","Timeout"]' type="button" class="add-new-item-button btn btn-primary"><i class="fa fa-plus"></i></button>
+                        <button id="services-Checks-addbutton" onclick="addServiceCheck();" data-prefix="Services" type="button"
+                            data-names='["Name","Type","Value","Expect","Interval","Timeout"]' class="add-new-item-button btn btn-primary">
+                        <i class="fa fa-plus"></i>
+                    </button>
                     </div>
                 </td>
                 <td class="tablet-hide desktop-hide">
@@ -86,13 +89,18 @@
                 </thead>
                 <tbody id="services-Checks-container">
                 {{- range $index, $svc := .Config.Service}}
-                    <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services" data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
+                    <input disabled style="display: none;" class="client-parameter services-Checks{{$index}}-deleted" data-group="services"
+                        data-label="Checks {{instance $index}} Deleted" data-original="false" value="false">
                     <tr class="services-Checks" id="services-Checks-{{$index}}">
                         <td style="white-space:nowrap;">
                             <div class="btn-group" role="group" style="display:flex;">
-                                <button onclick="removeInstance('services-Checks', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;"><i class="fa fa-minus"></i></button>
+                                <button onclick="removeInstance('services-Checks', {{$index}})" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:18px;width:35px;">
+                                    <i class="fa fa-minus"></i>
+                                </button>
                                 <button id="checksIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                                <button onClick="testService($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                                <button onClick="testService($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;">
+                                    <i class="fas fa-check-double"></i>
+                                </button>
                             </div>
                         </td>
                         <td>
@@ -107,7 +115,9 @@
                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_NAME" $.Flags.EnvPrefix $index}}</span>
                                     </div>
                                     {{- end}}
-                                    <input type="text" id="Service.{{$index}}.Name" name="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Name" data-original="{{(index $.Input.Service $index).Name}}" value="{{(index $.Input.Service $index).Name}}">
+                                    <input type="text" id="Service.{{$index}}.Name" name="Service.{{$index}}.Name" data-index="{{$index}}" data-app="checks"
+                                        class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Name"
+                                        data-original="{{(index $.Input.Service $index).Name}}" value="{{(index $.Input.Service $index).Name}}">
                                 </div>
                             </div>
                         </td>
@@ -123,7 +133,9 @@
                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_TYPE" $.Flags.EnvPrefix $index}}</span>
                                     </div>
                                     {{- end}}
-                                    <select id="Service.{{$index}}.Type" name="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));" data-app="checks" class="client-parameter form-control input-sm serviceTypeSelect" data-group="services" data-label="Check {{instance $index}} Type" data-original="{{$svc.Type}}" value="{{$svc.Type}}">
+                                    <select id="Service.{{$index}}.Type" name="Service.{{$index}}.Type" data-index="{{$index}}" onChange="checkTypeChange($(this));"
+                                        data-app="checks" class="client-parameter form-control input-sm serviceTypeSelect" data-group="services" data-label="Check {{instance $index}} Type"
+                                        data-original="{{$svc.Type}}" value="{{$svc.Type}}">
                                         <option value="process"{{if eq $svc.Type "process"}} selected{{end}}>Process</option>
                                         <option value="http"{{if eq $svc.Type "http"}} selected{{end}}>HTTP</option>
                                         <option value="tcp"{{if eq $svc.Type "tcp"}} selected{{end}}>TCP Port</option>
@@ -145,14 +157,18 @@
                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_CHECK" $.Flags.EnvPrefix $index}}</span>
                                     </div>
                                     {{- end}}
-                                    <input type="text" id="Service.{{$index}}.Value" name="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Value" data-original="{{(index $.Input.Service $index).Value}}" value="{{(index $.Input.Service $index).Value}}">
+                                    <input type="text" id="Service.{{$index}}.Value" name="Service.{{$index}}.Value" data-index="{{$index}}" data-app="checks"
+                                        class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Value"
+                                        data-original="{{(index $.Input.Service $index).Value}}" value="{{(index $.Input.Service $index).Value}}">
                                 </div>
                             </div>
                         </td>
                         <td>
                             <div class="form-group" style="width:100%">
                                 <div class="input-group" style="width:100%">
-                                    <input id="Service.{{$index}}.Expect" name="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm serviceProcessParamExpect" data-group="services" data-label="Check {{instance $index}} Expect" data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="display:none;">
+                                    <input id="Service.{{$index}}.Expect" name="Service.{{$index}}.Expect" data-index="{{$index}}" data-app="checks"
+                                        class="client-parameter form-control input-sm serviceProcessParamExpect" data-group="services" data-label="Check {{instance $index}} Expect"
+                                        data-original="{{$svc.Expect}}" value="{{$svc.Expect}}" style="display:none;">
                                     {{- if (locked (printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index)) }}
                                     <div style="width:30px; max-width:30px;" class="input-group-addon input-sm">
                                         <div style="display:none;" class="dialogText">
@@ -162,7 +178,8 @@
                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_EXPECT" $.Flags.EnvPrefix $index}}</span>
                                     </div>
                                     {{- end}}
-                                    <select multiple id="Service.{{$index}}.Expect.StatusCode" onChange="checkExpectChange($(this));" data-index="{{$index}}" data-app="checks" style="width:100%;{{if ne $svc.Type "http"}}display:none;{{end}}" class="form-control input-sm serviceHTTPParam">
+                                    <select multiple id="Service.{{$index}}.Expect.StatusCode" onChange="checkExpectChange($(this));" data-index="{{$index}}" data-app="checks"
+                                        style="width:100%;{{if ne $svc.Type "http"}}display:none;{{end}}" class="form-control input-sm serviceHTTPParam">
                                         <option value="SSL"{{if and (eq $svc.Type "http") (contains $svc.Expect "SSL")}} selected{{end}}>SSL: Validate Certificate</option>
                                         <option value="100"{{if and (eq $svc.Type "http") (contains $svc.Expect "100")}} selected{{end}}>100: Continue</option>
                                         <option value="101"{{if and (eq $svc.Type "http") (contains $svc.Expect "101")}} selected{{end}}>101: SwitchingProtocols</option>
@@ -227,10 +244,17 @@
                                         <option value="510"{{if and (eq $svc.Type "http") (contains $svc.Expect "510")}} selected{{end}}>510: NotExtended</option>
                                         <option value="511"{{if and (eq $svc.Type "http") (contains $svc.Expect "511")}} selected{{end}}>511: NetworkAuthenticationRequired</option>
                                     </select>
-                                    <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Count of packets to sent." class="form-control input-sm servicePingParam servicePingParamCount" value="{{cutindex $svc.Expect ":" "3" 0}}" style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
-                                    <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Packets that must be received." class="form-control input-sm servicePingParam servicePingParamMin" value="{{cutindex $svc.Expect ":" "2" 1}}" style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
-                                    <input type="number" min="100" max=10000 onChange="checkExpectChange($(this));" title="Interval in milliseconds between packets." class="form-control input-sm servicePingParam servicePingParamInt" value="{{cutindex $svc.Expect ":" "500" 2}}" style="width:40%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
-                                    <select onChange="checkExpectChange($(this));" style="width:40%;{{if ne $svc.Type "process"}}display:none;{{end}}" class="form-control input-sm serviceProcessParam serviceProcessParamSelector">
+                                    <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Count of packets to sent."
+                                        class="form-control input-sm servicePingParam servicePingParamCount" value="{{cutindex $svc.Expect ":" "3" 0}}"
+                                        style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
+                                    <input type="number" min="1" max=50 onChange="checkExpectChange($(this));" title="Packets that must be received."
+                                        class="form-control input-sm servicePingParam servicePingParamMin" value="{{cutindex $svc.Expect ":" "2" 1}}"
+                                        style="width:30%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
+                                    <input type="number" min="100" max=10000 onChange="checkExpectChange($(this));" title="Interval in milliseconds between packets."
+                                        class="form-control input-sm servicePingParam servicePingParamInt" value="{{cutindex $svc.Expect ":" "500" 2}}"
+                                        style="width:40%;{{if and (ne $svc.Type "ping") (ne $svc.Type "icmp")}}display:none;{{end}}">
+                                    <select onChange="checkExpectChange($(this));" style="width:40%;{{if ne $svc.Type "process"}}display:none;{{end}}"
+                                        class="form-control input-sm serviceProcessParam serviceProcessParamSelector">
                                         <option value="">None</option>
                                         <option value="restart"{{if contains $svc.Expect "restart"}} selected{{end}}>
                                             Restarts
@@ -239,8 +263,12 @@
                                             Running
                                         </option>
                                     </select>
-                                    <input type="number" min="0" onChange="checkExpectChange($(this));" title="Minimum number of processes allowed to run." class="form-control input-sm serviceProcessParam serviceProcessParamMin" value="{{min $svc.Expect}}" style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
-                                    <input type="number" min="0" onChange="checkExpectChange($(this));" title="Maximum number of processes allowed to run." class="form-control input-sm serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}" style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
+                                    <input type="number" min="0" onChange="checkExpectChange($(this));" title="Minimum number of processes allowed to run."
+                                        class="form-control input-sm serviceProcessParam serviceProcessParamMin" value="{{min $svc.Expect}}"
+                                        style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
+                                    <input type="number" min="0" onChange="checkExpectChange($(this));" title="Maximum number of processes allowed to run."
+                                        class="form-control input-sm serviceProcessParam serviceProcessParamMax" value="{{max $svc.Expect}}"
+                                        style="width:30%;{{if ne $svc.Type "process"}}display:none;{{end}}"{{if contains $svc.Expect "running"}} disabled{{end}}>
                                     <input disabled type="text" data-app="checks" value="unused" class="form-control input-sm serviceTCPParam" style="{{if ne $svc.Type "tcp"}}display:none;{{end}}">
                                 </div>
                             </div>
@@ -257,7 +285,8 @@
                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_INTERVAL" $.Flags.EnvPrefix $index}}</span>
                                     </div>
                                     {{- end}}
-                                    <select type="select" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}">
+                                    <select type="select" id="Service.{{$index}}.Interval" name="Service.{{$index}}.Interval" data-index="{{$index}}" data-app="checks" data-group="services"
+                                        class="client-parameter form-control input-sm" data-label="Check {{instance $index}} Interval" data-original="{{$svc.Interval}}">
 {{template "includes/intervaloptions.html" $svc.Interval}}
                                     </select>
                                 </div>
@@ -275,7 +304,8 @@
                                         <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_SERVICE_%d_TIMEOUT" $.Flags.EnvPrefix $index}}</span>
                                     </div>
                                     {{- end}}
-                                    <select type="select" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" class="client-parameter form-control input-sm" data-group="services" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}">
+                                    <select type="select" id="Service.{{$index}}.Timeout" name="Service.{{$index}}.Timeout" data-index="{{$index}}" data-app="checks" data-group="services"
+                                        class="client-parameter form-control input-sm" data-label="Check {{instance $index}} Timeout" data-original="{{$svc.Timeout}}">
                                         <!-- option value="-1s">Disabled</option -->
                                         <option value="0s">No Timeout</option>
                                         {{- range $i := one259 }}

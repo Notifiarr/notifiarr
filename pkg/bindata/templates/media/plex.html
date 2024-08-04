@@ -24,7 +24,8 @@
         </td>
         <td>
             <div style="display:none;" class="dialogText">
-                You may find directions for locating your Plex token at this <a target="_new" href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/">Plex Article</a>.
+                You may find directions for locating your Plex token at this
+                <a target="_new" href="https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/">Plex Article</a>.
             </div>
             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
             <span class="dialogTitle">Plex Token</span>
@@ -35,7 +36,10 @@
             <span class="dialogTitle">Interval</span>
         </td>
         <td>
-            <div style="display:none;" class="dialogText">This controls the maximum duration a request to this application may elapse. Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.</div>
+            <div style="display:none;" class="dialogText">
+                This controls the maximum duration a request to this application may elapse.
+                Selecting <b>No Timeout</b> can be dangerous. Selecting <b>Disabled</b> completely disables the instance.
+            </div>
             <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
             <span class="dialogTitle">Timeout</span>
         </td>
@@ -45,7 +49,9 @@
     <tr{{if (lt .Config.Apps.Plex.Timeout.Seconds (add 0 0))}} class="bk-danger"{{end}}>
         <td>
             <div class="btn-group" role="group" style="display:flex;font-size:18px;">
-                <button onClick="testInstance($(this), 'Plex', '1')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;"><i class="fas fa-check-double"></i></button>
+                <button onClick="testInstance($(this), 'Plex', '1')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;">
+                    <i class="fas fa-check-double"></i>
+                </button>
             </div>
         </td>
         <td>
@@ -68,7 +74,8 @@
                             class="client-parameter form-control input-sm" data-group="media" data-label="Plex URL"
                             data-original="{{.Input.Apps.Plex.URL}}" value="{{.Input.Apps.Plex.URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains .Config.Apps.Plex.URL "https://")}}display:none;{{end}}" id="PlexSSL" class="input-group-addon input-sm">
-                            <input type="checkbox" id="Apps.Plex.ValidSSL" name="Apps.Plex.ValidSSL" data-app="Plex" class="client-parameter" data-group="media" data-label="Plex SSL" data-original="{{.Config.Apps.Plex.ValidSSL}}" {{if .Config.Apps.Plex.ValidSSL}}checked {{end}}value="true">
+                            <input type="checkbox" id="Apps.Plex.ValidSSL" name="Apps.Plex.ValidSSL" data-app="Plex" class="client-parameter" data-group="media"
+                                data-label="Plex SSL" data-original="{{.Config.Apps.Plex.ValidSSL}}" {{if .Config.Apps.Plex.ValidSSL}}checked {{end}}value="true">
                         </div>
                     </div>
                 </div>
@@ -90,7 +97,9 @@
                         <input type="password" autocomplete="off" id="Apps.Plex.Token" name="Apps.Plex.Token" data-app="Plex"
                             class="client-parameter form-control input-sm" data-group="media" data-label="Plex Token"
                             data-original="{{.Input.Apps.Plex.Token}}" value="{{.Input.Apps.Plex.Token}}">
-                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Plex.Token', $(this).find('i'));"><i class="fas fa-low-vision secret-input"></i></div>
+                        <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Plex.Token', $(this).find('i'));">
+                            <i class="fas fa-low-vision secret-input"></i>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -108,7 +117,8 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_INTERVAL" .Flags.EnvPrefix}}</span>
                         </div>
                         {{- end}}
-                        <select type="select" id="Apps.Plex.Interval" name="Apps.Plex.Interval" class="client-parameter form-control input-sm"data-group="media" data-label="Plex Interval" data-original="{{.Config.Apps.Plex.Interval}}">
+                        <select type="select" id="Apps.Plex.Interval" name="Apps.Plex.Interval" class="client-parameter form-control input-sm"
+                            data-group="media" data-label="Plex Interval" data-original="{{.Config.Apps.Plex.Interval}}">
 {{template "includes/intervaloptions.html" $.Config.Apps.Plex.Interval}}
                         </select>
                     </div>
@@ -128,7 +138,8 @@
                             <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_PLEX_TIMEOUT" .Flags.EnvPrefix}}</span>
                         </div>
                         {{- end}}
-                        <select type="select" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm" data-group="media" data-label="Plex Timeout" data-original="{{.Config.Apps.Plex.Timeout}}">
+                        <select type="select" id="Plex.Timeout" name="Plex.Timeout" class="client-parameter form-control input-sm"
+                            data-group="media" data-label="Plex Timeout" data-original="{{.Config.Apps.Plex.Timeout}}">
                             <option value="-1s" {{if eq $.Config.Apps.Plex.Timeout.Seconds (add -1 0)}}selected {{end}}>Disabled</option>
                             {{- range $i := one259 }}
                             <option {{if eq $.Config.Apps.Plex.Timeout.Seconds $i}}selected {{end}}value="{{$i}}s">{{$i}} second{{if not (eq $i (add 0 1))}}s{{end}}</option>

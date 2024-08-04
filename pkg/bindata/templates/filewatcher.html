@@ -67,7 +67,10 @@
                     <span class="dialogTitle">FIFO Pipe</span>
                 </td>
                 <td style="min-width:110px;width:110px;">
-                    <div style="display:none;" class="dialogText">Enabling this will skip watching the file if it does not exist when the application starts. <b>Watching files that do not exist is still buggy and may not work at all.</b></div>
+                    <div style="display:none;" class="dialogText">
+                        Enabling this will skip watching the file if it does not exist when the application starts.
+                         <b>Watching files that do not exist is still buggy and may not work at all.</b>
+                    </div>
                     <a onClick="dialog($(this), 'right')" class="help-icon far fa-question-circle"></a>
                     <span class="dialogTitle">Must Exist</span>
                 </td>
@@ -80,14 +83,21 @@
         </thead>
         <tbody id="files-WatchFiles-container">
         {{- range $index, $app := .Config.WatchFiles}}
-            <input disabled style="display: none;" class="client-parameter files-WatchFiles{{$index}}-deleted" data-group="files" data-label="Files {{instance $index}} Deleted" data-original="false" value="false">
+            <input disabled style="display: none;" class="client-parameter files-WatchFiles{{$index}}-deleted" data-group="files"
+                data-label="Files {{instance $index}} Deleted" data-original="false" value="false">
             <tr class="files-WatchFiles" id="files-WatchFiles-{{$index}}">
                 <td style="white-space:nowrap;" id="activeFileCell{{$index}}" class="{{if $app.Active}}bk-brand{{else}}bk-danger{{end}}">
                     <div class="btn-group" role="group" style="display:flex;font-size:18px;">
-                        <button onclick="removeInstance('files-WatchFiles', '{{$index}}')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;"><i class="fa fa-trash-alt"></i></button>
+                        <button onclick="removeInstance('files-WatchFiles', '{{$index}}')" type="button" class="delete-item-button btn btn-danger btn-sm" style="font-size:16px;width:35px;">
+                            <i class="fa fa-trash-alt"></i>
+                        </button>
                         <button id="WatchFilesIndexLabel{{$index}}" class="btn btn-sm" style="font-size:18px;width:35px;pointer-events:none;">{{instance $index}}</button>
-                        <button onClick="stopFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if not $app.Active}}display:none;{{end}}"><i class="fas fa-stop-circle text-danger"></i></button>
-                        <button onClick="startFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if $app.Active}}display:none;{{end}}"><i class="fas fa-play-circle text-primary"></i></button>
+                        <button onClick="stopFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if not $app.Active}}display:none;{{end}}">
+                            <i class="fas fa-stop-circle text-danger"></i>
+                        </button>
+                        <button onClick="startFileWatch($(this), '{{$index}}')" type="button" class="btn btn-success btn-sm checkInstanceBtn" style="font-size:18px;{{if $app.Active}}display:none;{{end}}">
+                            <i class="fas fa-play-circle text-primary"></i>
+                        </button>
                     </div>
                 </td>
                 <td>
@@ -103,10 +113,12 @@
                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_PATH" $.Flags.EnvPrefix $index}}</span>
                                 </div>
                                 {{- end}}
-                                <input type="text" id="WatchFiles.{{$index}}.Path" name="WatchFiles.{{$index}}.Path" data-index="{{$index}}" 
+                                <input type="text" id="WatchFiles.{{$index}}.Path" name="WatchFiles.{{$index}}.Path" data-index="{{$index}}"
                                     data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Name"
                                     data-original="{{(index $.Input.WatchFiles $index).Path}}" value="{{(index $.Input.WatchFiles $index).Path}}">
-                                <div onClick="browseFiles('#WatchFiles\\.{{$index}}\\.Path');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm"><a class="help-icon fas fa-folder-open"></a></div>
+                                <div onClick="browseFiles('#WatchFiles\\.{{$index}}\\.Path');" style="max-width:35px;width:35px;cursor:pointer;font-size:16px;" class="input-group-addon input-sm">
+                                    <a class="help-icon fas fa-folder-open"></a>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -164,7 +176,9 @@
                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_POLL" $.Flags.EnvPrefix $index}}</span>
                                 </div>
                                 {{- end}}
-                                <select autocomplete="off" id="WatchFiles.{{$index}}.Poll" name="WatchFiles.{{$index}}.Poll" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Poll" data-original="{{$app.Poll}}" value="{{$app.Poll}}">
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.Poll" name="WatchFiles.{{$index}}.Poll" data-index="{{$index}}" data-app="WatchFiles"
+                                    class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Poll"
+                                    data-original="{{$app.Poll}}" value="{{$app.Poll}}">
                                     <option {{if $app.Poll}}selected {{end}}value="true">Enabled</option>
                                     <option {{if not $app.Poll}}selected {{end}}value="false">Disabled</option>
                                 </select>
@@ -185,7 +199,9 @@
                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_PIPE" $.Flags.EnvPrefix $index}}</span>
                                 </div>
                                 {{- end}}
-                                <select autocomplete="off" id="WatchFiles.{{$index}}.Pipe" name="WatchFiles.{{$index}}.Pipe" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Pipe" data-original="{{$app.Pipe}}" value="{{$app.Pipe}}">
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.Pipe" name="WatchFiles.{{$index}}.Pipe" data-index="{{$index}}" data-app="WatchFiles"
+                                    class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} Pipe"
+                                    data-original="{{$app.Pipe}}" value="{{$app.Pipe}}">
                                     <option {{if $app.Pipe}}selected {{end}}value="true">Enabled</option>
                                     <option {{if not $app.Pipe}}selected {{end}}value="false">Disabled</option>
                                 </select>
@@ -206,7 +222,9 @@
                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_MUST_EXIST" $.Flags.EnvPrefix $index}}</span>
                                 </div>
                                 {{- end}}
-                                <select autocomplete="off" id="WatchFiles.{{$index}}.MustExist" name="WatchFiles.{{$index}}.MustExist" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} MustExist" data-original="{{$app.MustExist}}" value="{{$app.MustExist}}">
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.MustExist" name="WatchFiles.{{$index}}.MustExist" data-index="{{$index}}"
+                                    data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} MustExist"
+                                    data-original="{{$app.MustExist}}" value="{{$app.MustExist}}">
                                     <option {{if $app.MustExist}}selected {{end}}value="true">Enabled</option>
                                     <option {{if not $app.MustExist}}selected {{end}}value="false">Disabled</option>
                                 </select>
@@ -227,7 +245,9 @@
                                     <span class="dialogTitle" style="display:none;">Variable: {{printf "%s_WATCH_FILES_%d_LOG_MATCH" $.Flags.EnvPrefix $index}}</span>
                                 </div>
                                 {{- end}}
-                                <select autocomplete="off" id="WatchFiles.{{$index}}.LogMatch" name="WatchFiles.{{$index}}.LogMatch" data-index="{{$index}}" data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} LogMatch" data-original="{{$app.LogMatch}}" value="{{$app.LogMatch}}">
+                                <select autocomplete="off" id="WatchFiles.{{$index}}.LogMatch" name="WatchFiles.{{$index}}.LogMatch" data-index="{{$index}}"
+                                    data-app="WatchFiles" class="client-parameter form-control input-sm" data-group="files" data-label="Files {{instance $index}} LogMatch"
+                                    data-original="{{$app.LogMatch}}" value="{{$app.LogMatch}}">
                                     <option {{if $app.LogMatch}}selected {{end}}value="true">Enabled</option>
                                     <option {{if not $app.LogMatch}}selected {{end}}value="false">Disabled</option>
                                 </select>
@@ -244,9 +264,18 @@
 <h3><i class="fas fa-vial"></i> Regular Expression Tester</h3>
 <div class="table-responsive">
     <table class="table bk-dark">
-        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Expression</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestRegex" name="regexTestRegex" placeholder="(?i)(error|warning|panic)"></td></tr>
-        <tr><td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Test String</td><td><input class="form-control input-sm regex-parameter" type="text" id="regexTestLine" name="regexTestLine" placeholder="2059/01/23 16:20:32 [INFO] Log Line goes here"></td></tr>
-        <tr><td><button onClick="testRegex();" class="btn btn-sm btn-success" style="width:100%;font-size:14px;"><i class="fas fa-check-double"></i> Test Regex</button></td><td></td></tr>
+        <tr>
+            <td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Expression</td>
+            <td><input class="form-control input-sm regex-parameter" type="text" id="regexTestRegex" name="regexTestRegex" placeholder="(?i)(error|warning|panic)"></td>
+        </tr>
+        <tr>
+            <td style="width:110px;vertical-align:middle;font-size:16px;" class="text-center">Test String</td>
+            <td><input class="form-control input-sm regex-parameter" type="text" id="regexTestLine" name="regexTestLine" placeholder="2059/01/23 16:20:32 [INFO] Log Line goes here"></td>
+        </tr>
+        <tr>
+            <td><button onClick="testRegex();" class="btn btn-sm btn-success" style="width:100%;font-size:14px;"><i class="fas fa-check-double"></i> Test Regex</button></td>
+            <td></td>
+        </tr>
     </table>
 </div>
 {{- /* end of filewatcher (leave this comment) */ -}}
