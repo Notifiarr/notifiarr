@@ -113,7 +113,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Radarr.{{$index}}.Name" name="Apps.Radarr.{{$index}}.Name" data-index="{{$index}}" data-app="Radarr"
                             class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Name"
-                            data-original="{{$app.Name}}" value="{{$app.Name}}">
+                            data-original="{{(index $.Input.Apps.Radarr $index).Name}}" value="{{(index $.Input.Apps.Radarr $index).Name}}">
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Radarr.{{$index}}.URL" name="Apps.Radarr.{{$index}}.URL" onChange="showhttps($(this).val(), '#Radarr{{$index}}SSL');"
                             data-index="{{$index}}" data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} URL"
-                            data-original="{{$app.URL}}" value="{{$app.URL}}">
+                            data-original="{{(index $.Input.Apps.Radarr $index).URL}}" value="{{(index $.Input.Apps.Radarr $index).URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Radarr{{$index}}SSL" class="input-group-addon input-sm">
                             <input type="checkbox" id="Apps.Radarr.{{$index}}.ValidSSL" name="Apps.Radarr.{{$index}}.ValidSSL" data-index="{{$index}}"
                                 data-app="Radarr" class="client-parameter"data-group="starr" data-label="Radarr {{instance $index}} SSL"
@@ -158,7 +158,7 @@
                         {{- end}}
                         <input type="password" autocomplete="new-password" id="Apps.Radarr.{{$index}}.APIKey" name="Apps.Radarr.{{$index}}.APIKey" data-index="{{$index}}"
                             data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} API Key"
-                            data-original="{{$app.APIKey}}" value="{{$app.APIKey}}">
+                            data-original="{{(index $.Input.Apps.Radarr $index).APIKey}}" value="{{(index $.Input.Apps.Radarr $index).APIKey}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.APIKey', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>
@@ -181,7 +181,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Radarr.{{$index}}.Username" name="Apps.Radarr.{{$index}}.Username" data-index="{{$index}}" data-app="Radarr"
                             class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Username"
-                            data-original="{{$app.Username}}" value="{{$app.Username}}">
+                            data-original="{{(index $.Input.Apps.Radarr $index).Username}}" value="{{(index $.Input.Apps.Radarr $index).Username}}">
                     </div>
                 </div>
             </div>
@@ -202,7 +202,7 @@
                             {{- end}}
                             <input type="password" autocomplete="new-password" id="Apps.Radarr.{{$index}}.Password" name="Apps.Radarr.{{$index}}.Password" data-index="{{$index}}"
                                 data-app="Radarr" class="client-parameter form-control input-sm" data-group="starr" data-label="Radarr {{instance $index}} Password"
-                                data-original="{{$app.Password}}" value="{{$app.Password}}">
+                                data-original="{{(index $.Input.Apps.Radarr $index).Password}}" value="{{(index $.Input.Apps.Radarr $index).Password}}">
                             <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Radarr.{{$index}}.Password', $(this).find('i'));">
                                 <i class="fas fa-low-vision secret-input"></i>
                             </div>

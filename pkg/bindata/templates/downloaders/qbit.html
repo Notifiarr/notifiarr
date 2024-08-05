@@ -91,7 +91,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Qbit.{{$index}}.Name" name="Apps.Qbit.{{$index}}.Name" data-index="{{$index}}" data-app="Qbit"
                             class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Name"
-                            data-original="{{$app.Name}}" value="{{$app.Name}}">
+                            data-original="{{(index $.Input.Apps.Qbit $index).Name}}" value="{{(index $.Input.Apps.Qbit $index).Name}}">
                     </div>
                 </div>
             </form>
@@ -111,7 +111,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Qbit.{{$index}}.URL" onChange="showhttps($(this).val(), '#Qbit{{$index}}SSL');" name="Apps.Qbit.{{$index}}.URL" data-index="{{$index}}"
                             data-app="Qbit" class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} URL"
-                            data-original="{{$app.URL}}" value="{{$app.URL}}">
+                            data-original="{{(index $.Input.Apps.Qbit $index).URL}}" value="{{(index $.Input.Apps.Qbit $index).URL}}">
                         <div style="width:30px; max-width:30px;{{if not (contains $app.URL "https://")}}display:none;{{end}}" id="Qbit{{$index}}SSL" class="input-group-addon input-sm">
                             <input type="checkbox" id="Apps.Qbit.{{$index}}.ValidSSL" name="Apps.Qbit.{{$index}}.ValidSSL" data-index="{{$index}}" data-app="Qbit"
                                 class="client-parameter" data-group="download" data-label="Qbit {{instance $index}} SSL"
@@ -136,7 +136,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Qbit.{{$index}}.User" name="Apps.Qbit.{{$index}}.User" data-index="{{$index}}" data-app="Qbit"
                             class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} User"
-                            data-original="{{$app.User}}" value="{{$app.User}}">
+                            data-original="{{(index $.Input.Apps.Qbit $index).User}}" value="{{(index $.Input.Apps.Qbit $index).User}}">
                     </div>
                 </div>
             </form>
@@ -156,7 +156,7 @@
                         {{- end}}
                         <input type="password" autocomplete="off" id="Apps.Qbit.{{$index}}.Pass" name="Apps.Qbit.{{$index}}.Pass" data-index="{{$index}}" data-app="Qbit"
                             class="client-parameter form-control input-sm" data-group="download" data-label="Qbit {{instance $index}} Pass"
-                            data-original="{{$app.Pass}}" value="{{$app.Pass}}">
+                            data-original="{{(index $.Input.Apps.Qbit $index).Pass}}" value="{{(index $.Input.Apps.Qbit $index).Pass}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Qbit.{{$index}}.Pass', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>
