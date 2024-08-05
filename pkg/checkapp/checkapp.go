@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/gorilla/mux"
+	"golift.io/cnfgfile"
 )
 
 const (
@@ -36,6 +37,15 @@ func Test(orig *configfile.Config, writer http.ResponseWriter, req *http.Request
 
 	if err := mnd.ConfigPostDecoder.Decode(&posted, req.PostForm); err != nil {
 		http.Error(writer, "Decoding POST data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if _, err := cnfgfile.Parse(&posted, &cnfgfile.Opts{
+		Name:          mnd.Title,
+		TransformPath: configfile.ExpandHomedir,
+		Prefix:        "filepath:",
+	}); err != nil {
+		http.Error(writer, "Parsing extra config filepaths: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
