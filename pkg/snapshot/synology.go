@@ -102,14 +102,13 @@ func getSynoHAStats() (map[string]string, error) {
 		"remote-name", "remote-role", "rnode-status", "remote-status", "remote-ip",
 	}
 
-	output := make(map[string]string)                  // This is the returned value.
-	cmd := exec.Command("sudo", synoha, "placeholder") // Reuse *exec.Cmd to save memory.
-	cmd.Stderr = io.Discard                            // Do not care about error output.
-	cmdout := bytes.Buffer{}                           // Reuse buffer for every command.
-	cmd.Stdout = &cmdout                               // Use buffer for command output.
+	output := make(map[string]string) // This is the returned value.
+	cmdout := bytes.Buffer{}          // Reuse buffer for every command.
 
 	for _, arg := range cmds {
-		cmd.Args[2] = "--" + arg // replace the last argument with the correct value.
+		cmd := exec.Command("sudo", synoha, "--"+arg)
+		cmd.Stderr = io.Discard // Do not care about error output.
+		cmd.Stdout = &cmdout    // Use buffer for command output.
 
 		if err := cmd.Run(); err != nil {
 			return nil, fmt.Errorf("synoha failed: %w", err)
