@@ -35,12 +35,12 @@ type Synology struct {
 */
 
 // GetSynology checks if the app is running on a Synology, and gets system info.
-func GetSynology() (*Synology, error) { //nolint:cyclop
+func GetSynology(snapshot bool) (*Synology, error) { //nolint:cyclop
 	if !mnd.IsSynology {
 		return nil, ErrNotSynology
 	}
 
-	synoHA, err := getSynoHAStats()
+	synoHA, err := getSynoHAStats(snapshot)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,11 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 // getSynoHAStats uses `sudo synoha` to pull high-availability disk statuses.
 // This package is not installed on most systems,
 // this function ends at the LookPath in that case.
-func getSynoHAStats() (map[string]string, error) {
+func getSynoHAStats(run bool) (map[string]string, error) {
+	if !run {
+		return nil, nil //nolint:nilnil
+	}
+
 	synoha, err := exec.LookPath("synoha")
 	if err != nil {
 		// If the tool doesn't exist, bail without an error.
@@ -106,6 +110,8 @@ func getSynoHAStats() (map[string]string, error) {
 	cmdout := bytes.Buffer{}          // Reuse buffer for every command.
 
 	for _, arg := range cmds {
+		cmdout.Reset()
+
 		cmd := exec.Command("sudo", synoha, "--"+arg)
 		cmd.Stderr = io.Discard // Do not care about error output.
 		cmd.Stdout = &cmdout    // Use buffer for command output.
