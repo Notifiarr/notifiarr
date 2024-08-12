@@ -2,10 +2,12 @@ package snapshot
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -18,11 +20,12 @@ var ErrNotSynology = errors.New("the running host is not a Synology")
 //
 //nolint:tagliatelle
 type Synology struct {
-	Build   string `json:"last_admin_login_build"` // 254263
-	Manager string `json:"manager"`                // Synology DiskStation
-	Vendor  string `json:"vender"`                 // Synology Inc.
-	Model   string `json:"upnpmodelname"`          // DS1517+
-	Version string `json:"udc_check_state"`        // 6.2.3
+	Build   string            `json:"last_admin_login_build"` // 254263
+	Manager string            `json:"manager"`                // Synology DiskStation
+	Vendor  string            `json:"vender"`                 // Synology Inc.
+	Model   string            `json:"upnpmodelname"`          // DS1517+
+	Version string            `json:"udc_check_state"`        // 6.2.3
+	HA      map[string]string `json:"ha"`
 }
 
 /*
@@ -37,6 +40,11 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 		return nil, ErrNotSynology
 	}
 
+	synoHA, err := getSynoHAStats()
+	if err != nil {
+		return nil, err
+	}
+
 	file, err := os.Open(mnd.Synology)
 	if err != nil {
 		return nil, fmt.Errorf("opening synology conf: %w", err)
@@ -46,7 +54,7 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 	// Start reading from the file with a reader.
 	var (
 		reader = bufio.NewReader(file)
-		syn    = &Synology{}
+		syn    = &Synology{HA: synoHA}
 	)
 
 	for {
@@ -77,6 +85,41 @@ func GetSynology() (*Synology, error) { //nolint:cyclop
 	}
 
 	return syn, nil
+}
+
+// getSynoHAStats uses `sudo synoha` to pull high-availability disk statuses.
+// This package is not installed on most systems,
+// this function ends at the LookPath in that case.
+func getSynoHAStats() (map[string]string, error) {
+	synoha, err := exec.LookPath("synoha")
+	if err != nil {
+		// If the tool doesn't exist, bail without an error.
+		return nil, nil //nolint:nilerr,nilnil // Callers must handle this.
+	}
+
+	cmds := []string{ // Add more if you need more.
+		"status", "local-role", "local-name", "lnode-status", "local-status",
+		"remote-name", "remote-role", "rnode-status", "remote-status", "remote-ip",
+	}
+
+	output := make(map[string]string)                  // This is the returned value.
+	cmd := exec.Command("sudo", synoha, "placeholder") // Reuse *exec.Cmd to save memory.
+	cmd.Stderr = io.Discard                            // Do not care about error output.
+	cmdout := bytes.Buffer{}                           // Reuse buffer for every command.
+	cmd.Stdout = &cmdout                               // Use buffer for command output.
+
+	for _, arg := range cmds {
+		cmd.Args[2] = "--" + arg // replace the last argument with the correct value.
+
+		if err := cmd.Run(); err != nil {
+			return nil, fmt.Errorf("synoha failed: %w", err)
+		}
+
+		// Put this command's output into the output map using the arg-name as key.
+		output[arg] = strings.TrimSpace(cmdout.String()) // Remove final newline from output.
+	}
+
+	return output, nil
 }
 
 // SetInfo writes synology data INTO the provided InfoStat.
