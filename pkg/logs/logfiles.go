@@ -228,8 +228,10 @@ func (l *LogConfig) GetActiveLogFilePaths() []string {
 	}
 
 	for cust := range customLog {
-		if name := customLog[cust].File.Name(); name != "" {
-			logFiles = append(logFiles, name)
+		if customLog[cust] != nil && customLog[cust].File != nil {
+			if name := customLog[cust].File.Name(); name != "" {
+				logFiles = append(logFiles, name)
+			}
 		}
 	}
 
