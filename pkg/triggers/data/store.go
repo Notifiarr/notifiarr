@@ -9,7 +9,14 @@ import (
 
 // store provides a shared concurrency-safe data cache for our triggers (and web server).
 // This cache is also immune from being purged during reload.
-var store = cache.New(cache.Config{PruneInterval: time.Minute}) //nolint:gochecknoglobals
+//
+//nolint:gochecknoglobals,mnd
+var store = cache.New(cache.Config{
+	RequestAccuracy: 15 * time.Second,
+	PruneInterval:   5 * time.Minute,
+	PruneAfter:      time.Hour,
+	MaxUnused:       1 << 62,
+})
 
 // Save a piece of data in the cache.
 func Save(key string, data interface{}) {

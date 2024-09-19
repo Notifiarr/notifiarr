@@ -98,6 +98,7 @@ type Snapshot struct {
 	MySQL      map[string]*MySQLServerData    `json:"mysql,omitempty"`
 	Nvidia     []*NvidiaOutput                `json:"nvidia,omitempty"`
 	Sensors    []*IPMISensor                  `json:"ipmiSensors"`
+	Synology   *Synology                      `json:"synology,omitempty"`
 }
 
 // RaidData contains raid information from mdstat and/or megacli.
@@ -160,10 +161,11 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 		errs = append(errs, err...)
 	}
 
-	if syn, err := GetSynology(); err != nil && !errors.Is(err, ErrNotSynology) {
+	var err error
+	if snap.Synology, err = GetSynology(true); err != nil && !errors.Is(err, ErrNotSynology) {
 		errs = append(errs, err)
-	} else if syn != nil {
-		syn.SetInfo(snap.System.InfoStat)
+	} else if snap.Synology != nil {
+		snap.Synology.SetInfo(snap.System.InfoStat)
 	}
 
 	if err := snap.getDisksUsage(ctx, c.DiskUsage, c.AllDrives); len(err) != 0 {
