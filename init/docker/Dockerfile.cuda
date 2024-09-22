@@ -3,7 +3,7 @@
 # https://github.com/golift/application-builder
 #
 
-FROM golang:1-bullseye as builder
+FROM golang:1.22.7-bullseye AS builder
 
 # Build speed magic! 
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
@@ -40,7 +40,7 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
     -X \"golift.io/version.Revision=${ITERATION}\" \
     -X \"golift.io/version.Version=${VERSION}\""
 
-FROM nvidia/cuda:12.5.1-base-ubuntu22.04
+FROM nvidia/cuda:12.6.1-base-ubuntu22.04
 
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
