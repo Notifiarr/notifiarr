@@ -63,7 +63,7 @@
                         {{- end}}
                         <input type="text" id="Apps.Tautulli.Name" name="Apps.Tautulli.Name"
                             class="client-parameter form-control input-sm"data-group="media" data-label="Tautulli Name"
-                            {{if .Input.Apps.Tautulli}} data-original="{{.Input.Apps.Tautulli.Name}}" value="{{.Input.Apps.Tautulli.Name}}"{{end}}>
+                            data-original="{{if .Input.Apps.Tautulli}}{{.Input.Apps.Tautulli.Name}}{{end}}" value="{{if .Input.Apps.Tautulli}}{{.Input.Apps.Tautulli.Name}}{{end}}">
                     </div>
                 </div>
             </form>
@@ -107,7 +107,7 @@
                         {{- end}}
                         <input type="password" autocomplete="off" id="Apps.Tautulli.APIKey" name="Apps.Tautulli.APIKey"
                             data-app="Tautulli" class="client-parameter form-control input-sm" data-group="media" data-label="Tautulli API Key"
-                            {{if .Input.Apps.Tautulli}} data-original="{{.Input.Apps.Tautulli.APIKey}}" value="{{.Input.Apps.Tautulli.APIKey}}"{{end}}>
+                            data-original="{{if .Input.Apps.Tautulli}}{{.Input.Apps.Tautulli.APIKey}}{{end}}" value="{{if .Input.Apps.Tautulli}}{{.Input.Apps.Tautulli.APIKey}}{{end}}">
                         <div style="width:35px; max-width:35px;" class="input-group-addon input-sm" onClick="togglePassword('Apps.Tautulli.APIKey', $(this).find('i'));">
                             <i class="fas fa-low-vision secret-input"></i>
                         </div>
