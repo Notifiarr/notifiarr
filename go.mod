@@ -36,10 +36,10 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
 	github.com/vearutop/statigz v1.4.3
-	golang.org/x/crypto v0.27.0
+	golang.org/x/crypto v0.28.0
 	golang.org/x/mod v0.21.0
-	golang.org/x/sys v0.25.0
-	golang.org/x/text v0.18.0
+	golang.org/x/sys v0.26.0
+	golang.org/x/text v0.19.0
 	golang.org/x/time v0.6.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.3
