@@ -41,6 +41,9 @@ func (a *Apps) sonarrHandlers() { //nolint:funlen
 	a.HandleAPIpath(starr.Sonarr, "/customformats/{cfid:[0-9]+}", sonarrUpdateCustomFormat, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/customformats/{cfid:[0-9]+}", sonarrDeleteCustomFormat, "DELETE")
 	a.HandleAPIpath(starr.Sonarr, "/customformats/all", sonarrDeleteAllCustomFormats, "DELETE")
+	a.HandleAPIpath(starr.Sonarr, "/importlist", sonarrGetImportLists, "GET")
+	a.HandleAPIpath(starr.Sonarr, "/importlist", sonarrAddImportList, "POST")
+	a.HandleAPIpath(starr.Sonarr, "/importlist/{ilid:[0-9]+}", sonarrUpdateImportList, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/qualitydefinitions", sonarrGetQualityDefinitions, "GET")
 	a.HandleAPIpath(starr.Sonarr, "/qualitydefinition", sonarrUpdateQualityDefinition, "PUT")
 	a.HandleAPIpath(starr.Sonarr, "/rootFolder", sonarrRootFolders, "GET")
@@ -1110,6 +1113,82 @@ func sonarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 		Deleted: deleted,
 		Errors:  errs,
 	}
+}
+
+// @Description  Returns all Import Lists from Sonarr.
+// @Summary      Get Sonarr Import Lists
+// @Tags         Sonarr
+// @Produce      json
+// @Param        instance  path   int64  true  "instance ID"
+// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.ImportListOutput}  "import list list"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/importlist [get]
+// @Security     ApiKeyAuth
+func sonarrGetImportLists(req *http.Request) (int, interface{}) {
+	ilist, err := getSonarr(req).GetImportListsContext(req.Context())
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "getting import lists", err)
+	}
+
+	return http.StatusOK, ilist
+}
+
+// @Description  Updates an Import List in Sonarr.
+// @Summary      Update Sonarr Import List
+// @Tags         Sonarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        listID  path   int64  true  "Import List ID"
+// @Param        PUT body sonarr.ImportListInput  true  "Updated Import Listcontent"
+// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.ImportListOutput}  "import list returns"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/importlist/{listID} [put]
+// @Security     ApiKeyAuth
+func sonarrUpdateImportList(req *http.Request) (int, interface{}) {
+	var ilist sonarr.ImportListInput
+	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
+		return apiError(http.StatusBadRequest, "decoding payload", err)
+	}
+
+	ilist.ID, _ = strconv.ParseInt(mux.Vars(req)["ilid"], mnd.Base10, mnd.Bits64)
+
+	output, err := getSonarr(req).UpdateImportListContext(req.Context(), &ilist, false)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "updating import list", err)
+	}
+
+	return http.StatusOK, output
+}
+
+// @Description  Creates a new Import List in Sonarr.
+// @Summary      Create Sonarr Import List
+// @Tags         Sonarr
+// @Produce      json
+// @Accept       json
+// @Param        instance  path   int64  true  "instance ID"
+// @Param        POST body sonarr.ImportListInput  true  "New Import List"
+// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.ImportListOutput}  "import list returns"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/sonarr/{instance}/importlist [post]
+// @Security     ApiKeyAuth
+func sonarrAddImportList(req *http.Request) (int, interface{}) {
+	var ilist sonarr.ImportListInput
+	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
+		return apiError(http.StatusBadRequest, "decoding payload", err)
+	}
+
+	output, err := getSonarr(req).AddImportListContext(req.Context(), &ilist)
+	if err != nil {
+		return apiError(http.StatusInternalServerError, "creating import list", err)
+	}
+
+	return http.StatusOK, output
 }
 
 // @Description  Returns all Quality Definitions from Sonarr.
