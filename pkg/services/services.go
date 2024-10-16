@@ -207,6 +207,7 @@ func (c *Config) runServiceChecker() { //nolint:cyclop
 		case event := <-c.checkChan:
 			c.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
+
 			if c.runCheck(event.Service, true, time.Now()) {
 				c.SendResults(&Results{What: event.Source, Svcs: c.GetResults()})
 			}
