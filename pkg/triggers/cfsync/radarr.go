@@ -49,17 +49,17 @@ func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) err
 func (c *cmd) syncRadarr(ctx context.Context, input *common.ActionInput) {
 	info := clientinfo.Get()
 	if info == nil || len(info.Actions.Sync.RadarrInstances) < 1 {
-		c.Debugf("[%s requested] Cannot sync Radarr profiles and formats. Website provided 0 instances.", input.Type)
+		c.Printf("[%s requested] Cannot sync Radarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Radarr) < 1 {
-		c.Debugf("[%s requested] Cannot sync Radarr profiles and formats. No Radarr instances configured.", input.Type)
+		c.Printf("[%s requested] Cannot sync Radarr profiles and formats. No Radarr instances configured.", input.Type)
 		return
 	}
 
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
 		if !app.Enabled() || !info.Actions.Sync.RadarrInstances.Has(instance) {
-			c.Debugf("[%s requested] Profiles and formats sync skipping Radarr instance %d. Not in sync list: %v",
+			c.Printf("[%s requested] Profiles and formats sync skipping Radarr instance %d. Not in sync list: %v",
 				input.Type, instance, info.Actions.Sync.RadarrInstances)
 			continue
 		}
