@@ -485,10 +485,9 @@ Run `notifiarr --ps` to view the process list from Notifiarr's point of view.
 
 ## Reverse Proxy
 
-You'll need to expose this application to the Internet, so Notifiarr.com
-can make connections to it. While you can certainly poke a hole your firewall
-and send the traffic directly to this app, it is recommended that you put it
-behind a reverse proxy. It's pretty easy.
+It is **not required nor recommend** to expose this application to the Internet. While you can certainly poke a hole your firewall
+and send the traffic directly to expose the app if you truly need to do so, it is recommended that you put it
+behind a reverse proxy or use a VPN - such as Tailscale - to connect to your device securely. For a Reverse Porxy - it's pretty easy.
 
 You'll want to tune the `upstreams` and `urlbase` settings for your environment.
 If your reverse proxy IP is `192.168.3.45` then set `upstreams = ["192.168.3.45/32"]`.
