@@ -67,6 +67,12 @@ func (s *Server) GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //no
 		}
 	}
 
+	// TrueNAS adds junk to the hostname.
+	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "talos") {
+		hostInfo.Hostname = "requestrr-talos"
+	}
+
+
 	if s.Config.HostID != "" {
 		hostInfo.HostID = s.Config.HostID
 	}
