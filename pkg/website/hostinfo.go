@@ -72,7 +72,6 @@ func (s *Server) GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //no
 		hostInfo.Hostname = "requestrr-talos"
 	}
 
-
 	if s.Config.HostID != "" {
 		hostInfo.HostID = s.Config.HostID
 	}
