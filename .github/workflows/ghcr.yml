@@ -2,7 +2,7 @@ name: ghcr-docker-builds
 on:
   push:
     branches:
-      - unstable
+      - main
     tags:
       - v*
 permissions:
