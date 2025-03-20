@@ -1,6 +1,6 @@
 module github.com/Notifiarr/notifiarr
 
-go 1.22.0
+go 1.23.0
 
 toolchain go1.24.1
 
@@ -38,7 +38,7 @@ require (
 	github.com/vearutop/statigz v1.4.3
 	golang.org/x/crypto v0.31.0
 	golang.org/x/mod v0.21.0
-	golang.org/x/sys v0.28.0
+	golang.org/x/sys v0.31.0
 	golang.org/x/text v0.21.0
 	golang.org/x/time v0.6.0
 	golift.io/cache v0.0.2
