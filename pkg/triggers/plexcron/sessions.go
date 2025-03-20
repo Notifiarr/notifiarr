@@ -66,7 +66,7 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 }
 
 // plexSessionTracker checks for state changes between the previous session pull
-// and the current session pull. if changes are present, a timestmp is added.
+// and the current session pull. if changes are present, a timestamp is added.
 func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Sessions) {
 	now := time.Now()
 	info := clientinfo.Get()

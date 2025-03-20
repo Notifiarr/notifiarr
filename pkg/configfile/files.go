@@ -10,7 +10,7 @@ import (
 
 // First string is default config file.
 // It is created (later) if no config files are found.
-func defaultLocactions() (string, []string) { //nolint:cyclop,funlen
+func defaultLocactions() (string, []string) { //nolint:cyclop
 	defaultUnixConf := ""
 
 	switch {

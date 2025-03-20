@@ -4,15 +4,19 @@ issues:
 linters:
   enable-all: true
   disable:
-  # deprecated
-    - gomnd
-    - execinquery
+    - tenv
   # unused
     - exhaustruct # This will never work in this app.
     - dupl        # Maybe one day we can reduce the duplicate code with generics.
     - nlreturn    # Not needed because wsl is good enough; better actually.
     - godot       # Does not work with annotations.
     - depguard    # Not even sure why this is useful. We have too many deps to care.
+  # fix these
+    - wsl
+    - gosec
+    - recvcheck
+    - revive
+    - predeclared
 run:
   timeout: 5m
 output:

@@ -75,7 +75,7 @@ func (c *Client) runWebServer() {
 		err = c.server.ListenAndServe()
 	}
 
-	if err != nil && !errors.Is(http.ErrServerClosed, err) {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		c.Errorf("Web Server Failed: %v (shutting down)", err)
 		c.sigkil <- os.Kill // stop the app.
 	}

@@ -44,7 +44,7 @@ func (c *cmd) sendSessionPlaying(ctx context.Context, session *plex.Session, ses
 // This is because "playing" and "resume" was originally written around Plex Webhooks.
 // And then we decided to make this work without webhooks. Since the website already
 // knows how to deal with the webhook, we are converting a session into that same payload.
-func convertSessionsToWebhook(session *plex.Session, event string) *plex.IncomingWebhook { //nolint:funlen
+func convertSessionsToWebhook(session *plex.Session, event string) *plex.IncomingWebhook {
 	return &plex.IncomingWebhook{
 		Event:  event,
 		User:   true,
