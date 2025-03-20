@@ -193,6 +193,7 @@ func (s *Config) GetHistory(ctx context.Context) (*History, error) {
 
 	params := url.Values{}
 	params.Add("output", "json")
+	params.Add("archive", "1")
 	params.Add("mode", "history")
 	params.Add("apikey", s.APIKey)
 

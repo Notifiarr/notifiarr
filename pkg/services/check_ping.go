@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-ping/ping"
+	ping "github.com/prometheus-community/pro-bing"
 )
 
 // Custom errors.

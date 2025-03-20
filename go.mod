@@ -13,7 +13,6 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
-	github.com/go-ping/ping v1.2.0
 	github.com/go-sql-driver/mysql v1.9.0
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
@@ -29,6 +28,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mrobinsn/go-rtorrent v1.8.0
 	github.com/nxadm/tail v1.4.11
+	github.com/prometheus-community/pro-bing v0.6.1
 	github.com/shirou/gopsutil/v4 v4.25.2
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
