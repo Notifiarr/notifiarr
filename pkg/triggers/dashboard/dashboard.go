@@ -38,12 +38,12 @@ const (
 
 // Sortable holds data about any Starr item. Kind of a generic data store.
 type Sortable struct {
-	id      int64
+	Date    time.Time `json:"date"`
 	Name    string    `json:"name"`
 	Sub     string    `json:"subName,omitempty"`
-	Date    time.Time `json:"date"`
-	Season  int       `json:"season,omitempty"`
-	Episode int       `json:"episode,omitempty"`
+	id      int64
+	Season  int `json:"season,omitempty"`
+	Episode int `json:"episode,omitempty"`
 }
 
 // SortableList allows sorting a list.
@@ -53,16 +53,16 @@ type SortableList []*Sortable
 type State struct {
 	// Shared
 	Error    string        `json:"error"`
+	Name     string        `json:"name"`
+	Next     SortableList  `json:"next,omitempty"`
+	Latest   SortableList  `json:"latest,omitempty"`
 	Instance int           `json:"instance"`
 	Missing  int64         `json:"missing,omitempty"`
 	Size     int64         `json:"size"`
 	Percent  float64       `json:"percent,omitempty"`
 	Upcoming int64         `json:"upcoming,omitempty"`
-	Next     SortableList  `json:"next,omitempty"`
-	Latest   SortableList  `json:"latest,omitempty"`
 	OnDisk   int64         `json:"onDisk,omitempty"`
 	Elapsed  cnfg.Duration `json:"elapsed"` // How long it took.
-	Name     string        `json:"name"`
 	// Radarr
 	Movies int64 `json:"movies,omitempty"`
 	// Sonarr
@@ -93,6 +93,7 @@ type State struct {
 
 // States is our compiled states for the dashboard.
 type States struct {
+	Plex     any      `json:"plexSessions"`
 	Lidarr   []*State `json:"lidarr"`
 	Radarr   []*State `json:"radarr"`
 	Readarr  []*State `json:"readarr"`
@@ -103,7 +104,6 @@ type States struct {
 	Deluge   []*State `json:"deluge"`
 	SabNZB   []*State `json:"sabnzbd"`
 	Xmission []*State `json:"transmission"`
-	Plex     any      `json:"plexSessions"`
 }
 
 // New configures the library.

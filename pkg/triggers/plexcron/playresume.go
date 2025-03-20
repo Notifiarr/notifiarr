@@ -50,15 +50,15 @@ func convertSessionsToWebhook(session *plex.Session, event string) *plex.Incomin
 		User:   true,
 		Rating: session.Rating,
 		Account: struct {
-			ID    int    `json:"id"`
 			Thumb string `json:"thumb"`
 			Title string `json:"title"`
+			ID    int    `json:"id"`
 		}{Title: session.User.Title},
 		Player: struct {
-			Local         bool   `json:"local"`
 			PublicAddress string `json:"publicAddress"`
 			Title         string `json:"title"`
 			UUID          string `json:"uuid"`
+			Local         bool   `json:"local"`
 		}{Title: session.Player.Title},
 		Metadata: plex.WebhookMetadata{
 			LibrarySectionType:    "", // does not exist
