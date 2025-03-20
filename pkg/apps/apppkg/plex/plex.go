@@ -25,9 +25,9 @@ type Server struct {
 }
 
 type Config struct {
+	Client *http.Client `json:"-"     toml:"-"     xml:"-"`
 	URL    string       `json:"url"   toml:"url"   xml:"url"`
 	Token  string       `json:"token" toml:"token" xml:"token"`
-	Client *http.Client `json:"-"     toml:"-"     xml:"-"`
 }
 
 // New turns a config into a server.

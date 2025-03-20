@@ -96,9 +96,9 @@ func (c *Cmd) getRtorrentState(instance int, rTorrent *apps.RtorrentConfig) (*St
 }
 
 type rTorrentData struct {
+	Torrents  []*RtorrentTorrent
 	DownTotal int
 	UpTotal   int
-	Torrents  []*RtorrentTorrent
 }
 
 func getRtorrentData(rTorrent *apps.RtorrentConfig) (*rTorrentData, error) {
@@ -126,15 +126,15 @@ func getRtorrentData(rTorrent *apps.RtorrentConfig) (*rTorrentData, error) {
 }
 
 type RtorrentTorrent struct {
-	Name      string
-	Message   string
-	Active    bool // inactive/active
-	Size      int  // Total Size in bytes
-	UpRate    int
-	DownRate  int
-	Completed int // Bytes Completed.
 	Started   time.Time
 	Finished  time.Time
+	Name      string
+	Message   string
+	Size      int // Total Size in bytes
+	UpRate    int
+	DownRate  int
+	Completed int  // Bytes Completed.
+	Active    bool // inactive/active
 }
 
 func rTorrentTorrents(rTorrent *apps.RtorrentConfig) ([]*RtorrentTorrent, error) {
