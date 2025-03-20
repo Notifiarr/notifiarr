@@ -24,7 +24,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hekmon/transmissionrpc/v3 v3.0.0
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
-	github.com/jackpal/gateway v1.0.15
+	github.com/jackpal/gateway v1.0.16
 	github.com/jaypipes/ghw v0.13.0
 	github.com/jxeng/shortcut v1.0.2
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
@@ -107,7 +107,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
-	golang.org/x/net v0.29.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
