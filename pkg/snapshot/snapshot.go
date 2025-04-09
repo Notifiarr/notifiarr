@@ -244,7 +244,7 @@ func runCommand(cmd *exec.Cmd, waitg *sync.WaitGroup) error {
 
 	stderr := &bytes.Buffer{}
 	cmd.Stderr = stderr
-	err := cmd.Run() //nolint:ifshort
+	err := cmd.Run()
 
 	waitg.Wait()
 
