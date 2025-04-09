@@ -181,6 +181,7 @@ windows: notifiarr.amd64.exe
 notifiarr.amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
 	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
+	bash init/windows/signexe.sh $(OUTPUTDIR)/$@
 
 ####################
 ##### Packages #####
