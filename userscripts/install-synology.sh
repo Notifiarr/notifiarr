@@ -149,9 +149,14 @@ fi
 mkdir -p /etc/notifiarr /var/log/notifiarr
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
 if [ ! -f "${CONFIGFILE}" ]; then
-  echo "${P} Downloading config file ${CONFIGFILE}"
-  $WGET https://docs.notifiarr.com/configs/notifiarr-synology.conf > "${CONFIGFILE}"
+  echo "${P} Generating config file ${CONFIGFILE}"
+  echo " " > "${CONFIGFILE}"
+  DN_LOG_FILE="/var/log/notifiarr/app.log" \
+    DN_HTTP_LOG="/var/log/notifiarr/http.log" \
+    /usr/bin/notifiarr --config "${CONFIGFILE}" --write "${CONFIGFILE}.new"
+  mv "${CONFIGFILE}.new" "${CONFIGFILE}"
 fi
+
 echo "${P} Setting permissions/ownership on: /usr/bin/notifiarr /var/log/notifiarr"
 chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
 chown -R notifiarr: /var/log/notifiarr /etc/notifiarr
