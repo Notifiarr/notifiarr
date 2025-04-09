@@ -16,7 +16,7 @@ func (c *Cmd) getRtorrentStates() []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Rtorrent {
-		if !app.Enabled() {
+		if !app.Enabled() || !c.Enabled.Rtorrent {
 			continue
 		}
 

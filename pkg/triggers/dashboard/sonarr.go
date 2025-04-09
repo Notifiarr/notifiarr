@@ -15,7 +15,7 @@ func (c *Cmd) getSonarrStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Sonarr {
-		if !app.Enabled() {
+		if !app.Enabled() || !c.Enabled.Sonarr {
 			continue
 		}
 
