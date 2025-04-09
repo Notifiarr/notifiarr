@@ -113,7 +113,7 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 		if _, ok := val.Interface().(time.Time); ok {
 			input.Type = website.EventCron
 		} else if input, ok = val.Interface().(*ActionInput); !ok {
-			input.Type = "unknown"
+			input = &ActionInput{Type: "unknown"}
 		}
 
 		mnd.TimerEvents.Add(string(input.Type)+"&&"+string(action.Name), 1)
