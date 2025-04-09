@@ -126,7 +126,7 @@ func getMySQL(ctx context.Context, mysql *MySQLConfig) (MySQLProcesses, MySQLSta
 func scanMySQLProcessList(ctx context.Context, dbase *sql.DB) (MySQLProcesses, error) {
 	mnd.Apps.Add("MySQL&&Process List Queries", 1)
 
-	rows, err := dbase.QueryContext(ctx, "SHOW FULL PROCESSLIST") //nolint:execinquery
+	rows, err := dbase.QueryContext(ctx, "SHOW FULL PROCESSLIST")
 	if err != nil {
 		mnd.Apps.Add("MySQL&&Errors", 1)
 		return nil, fmt.Errorf("getting processes: %w", err)

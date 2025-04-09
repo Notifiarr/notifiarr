@@ -1,23 +1,40 @@
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
-    - tenv
-  # unused
     - exhaustruct # This will never work in this app.
     - dupl        # Maybe one day we can reduce the duplicate code with generics.
     - nlreturn    # Not needed because wsl is good enough; better actually.
     - godot       # Does not work with annotations.
     - depguard    # Not even sure why this is useful. We have too many deps to care.
-  # fix these
-    - wsl
+    # fix these.
     - gosec
+    - predeclared
     - recvcheck
     - revive
-    - predeclared
-run:
-  timeout: 5m
-output:
-  sort-results: true
+    - wsl
+    - staticcheck
+  exclusions:
+    presets:
+    - comments
+    - std-error-handling
+    - common-false-positives
+    - legacy
+    rules:
+      # Exclude some linters from running on auto-generated files.
+      - path: "pkg/bindata/docs/*"
+        linters:
+          - lll
+          - gochecknoinits
+          - gochecknoglobals
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports

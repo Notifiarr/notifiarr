@@ -121,7 +121,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 
 	host, err := c.GetHostInfo(ctx)
 	if err == nil {
-		err = errors.New("") //nolint:goerr113
+		err = errors.New("") //nolint:err113
 	}
 
 	split := strings.Split(c.Config.BindAddr, ":")

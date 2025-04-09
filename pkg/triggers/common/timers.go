@@ -113,7 +113,7 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 		if _, ok := val.Interface().(time.Time); ok {
 			input.Type = website.EventCron
 		} else if input, ok = val.Interface().(*ActionInput); !ok {
-			input.Type = "unknown"
+			input = &ActionInput{Type: "unknown"}
 		}
 
 		mnd.TimerEvents.Add(string(input.Type)+"&&"+string(action.Name), 1)
@@ -129,7 +129,7 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 
 func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action *Action) {
 	if input.Type == website.EventUser && action.Name != "" {
-		if err := ui.Toast(string(action.Name)); err != nil {
+		if err := ui.Toast("%s", string(action.Name)); err != nil {
 			c.Errorf("Displaying toast notification: %v", err)
 		}
 	}

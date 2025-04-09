@@ -38,7 +38,7 @@ func (c *Client) StartWebServer(ctx context.Context) {
 	smx.Handle(path.Join(c.Config.URLBase, "ui", "ws"), c.Config.Router) // websockets cannot go through the apache logger.
 
 	// Create a server.
-	c.server = &http.Server{ //nolint: exhaustivestruct
+	c.server = &http.Server{
 		Handler:           smx,
 		Addr:              c.Config.BindAddr,
 		IdleTimeout:       mnd.DefaultTimeout,

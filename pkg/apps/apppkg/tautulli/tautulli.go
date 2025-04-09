@@ -48,7 +48,7 @@ func (c *Config) GetURLInto(ctx context.Context, params url.Values, into interfa
 		return nil
 	}()
 	if err != nil {
-		return fmt.Errorf("%s", strings.ReplaceAll(err.Error(), c.APIKey, "<redacted>")) //nolint:goerr113
+		return fmt.Errorf("%s", strings.ReplaceAll(err.Error(), c.APIKey, "<redacted>")) //nolint:err113
 	}
 
 	return nil

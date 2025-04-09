@@ -95,6 +95,7 @@ func (c *cmd) create() {
 
 	switch c.AutoUpdate {
 	case "off", "no", "disabled", "disable", "false", "", "-", "0", "0s":
+		c.stop = true
 		return
 	case "hourly":
 		dur = time.Hour
