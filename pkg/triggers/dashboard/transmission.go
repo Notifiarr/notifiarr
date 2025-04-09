@@ -15,7 +15,7 @@ func (c *Cmd) getTransmissionStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Transmission {
-		if !app.Enabled() {
+		if !app.Enabled() || !c.Enabled.Transmission {
 			continue
 		}
 

@@ -15,7 +15,7 @@ func (c *Cmd) getReadarrStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Readarr {
-		if !app.Enabled() {
+		if !app.Enabled() || !c.Enabled.Readarr {
 			continue
 		}
 

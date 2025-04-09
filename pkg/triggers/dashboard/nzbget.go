@@ -16,7 +16,7 @@ func (c *Cmd) getNZBGetStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.NZBGet {
-		if !app.Enabled() {
+		if !app.Enabled() || !c.Enabled.NZBGet {
 			continue
 		}
 

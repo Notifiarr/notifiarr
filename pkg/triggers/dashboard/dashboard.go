@@ -23,6 +23,7 @@ const randomMilliseconds = 2500
 type Cmd struct {
 	*common.Config
 	PlexCron *plexcron.Action
+	Enabled  clientinfo.DashConfig
 }
 
 // Action contains the exported methods for this package.
@@ -127,6 +128,7 @@ func (c *Cmd) create() {
 	if ci := clientinfo.Get(); ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
 		dur = (time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond) +
 			ci.Actions.Dashboard.Interval.Duration
+		c.Enabled = ci.Actions.Dashboard
 
 		c.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
 	}

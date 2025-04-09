@@ -14,7 +14,7 @@ func (c *Cmd) getSabNZBStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.SabNZB {
-		if !app.Enabled() {
+		if !app.Enabled() || !c.Enabled.SabNZB {
 			continue
 		}
 

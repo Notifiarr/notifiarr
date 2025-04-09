@@ -15,7 +15,7 @@ func (c *Cmd) getLidarrStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Lidarr {
-		if !app.Enabled() {
+		if !app.Enabled() || !c.Enabled.Lidarr {
 			continue
 		}
 

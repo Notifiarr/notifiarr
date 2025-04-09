@@ -87,7 +87,18 @@ type MdbListConfig struct {
 
 // DashConfig is the configuration returned from the notifiarr website for the dashboard configuration.
 type DashConfig struct {
-	Interval cnfg.Duration `json:"interval"` // how often to fire.
+	Interval     cnfg.Duration `json:"interval"` // how often to fire.
+	Deluge       bool          `json:"deluge"`
+	Lidarr       bool          `json:"lidarr"`
+	Qbit         bool          `json:"qbit"`
+	Radarr       bool          `json:"radarr"`
+	Readarr      bool          `json:"readarr"`
+	Sonarr       bool          `json:"sonarr"`
+	Plex         bool          `json:"plex"`
+	SabNZB       bool          `json:"sabnzbd"`
+	NZBGet       bool          `json:"nzbget"`
+	Rtorrent     bool          `json:"rtorrent"`
+	Transmission bool          `json:"transmission"`
 }
 
 // AppConfig is the data that comes from the website for each Starr app.
