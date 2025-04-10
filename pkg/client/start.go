@@ -206,7 +206,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 
 	// write new config file to temporary path.
 	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig")
-	if _, err := c.Config.Write(ctx, destFile, false); err != nil { // write our config file template.
+	if _, err := c.Config.Write(ctx, destFile, true); err != nil { // write our config file template.
 		c.Errorf("writing new (temporary) config file: %v", err)
 	}
 
@@ -216,8 +216,11 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	}
 
 	go func() {
-		_, _ = ui.Warning("Your Web UI password was set to " + newPassword +
-			" and was also printed in the log file:" + c.Config.LogFile)
+		open, _ := ui.Question("http://127.0.0/1:5454 - Your Web UI password was set to "+newPassword+
+			" and was also printed in the log file:"+c.Config.LogFile+"\n\nOpen Web UI?\n", false)
+		if open {
+			_ = ui.OpenURL("http://127.0.0.1:5454")
+		}
 	}()
 }
 
