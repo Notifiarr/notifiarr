@@ -60,6 +60,8 @@ jobs:
     env:
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
       SLIPPERS: ${{ secrets.SLIPPERS }}
+      EXE_SIGNING_KEY: ${{ secrets.EXE_SIGNING_KEY }}
+      EXE_SIGNING_KEY_PASSWORD: ${{ secrets.EXE_SIGNING_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -78,7 +80,7 @@ jobs:
       - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         id: release
         run: |
-          sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools
+          sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools osslsigncode
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
