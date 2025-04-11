@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -176,12 +177,12 @@ func (c *Client) start(ctx context.Context, msgs []string, newPassword string) e
 		return err
 	}
 
-	clientInfo := c.configureServices(ctx)
-
 	if newPassword != "" {
 		// If newPassword is set it means we need to write out a new config file for a new installation. Do that now.
 		c.makeNewConfigFile(ctx, newPassword)
 	}
+
+	clientInfo := c.configureServices(ctx)
 
 	if ui.HasGUI() {
 		// This starts the web server and calls os.Exit() when done.
@@ -196,13 +197,31 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 	defer cancel()
 
-	_, _ = c.Config.Write(ctx, c.Flags.ConfigFile, false)
-	_ = ui.OpenFile(c.Flags.ConfigFile)
-	_, _ = ui.Warning("A new configuration file was created @ " +
-		c.Flags.ConfigFile + " - it should open in a text editor. " +
-		"Please edit the file and reload this application using the tray menu. " +
-		"Your Web UI password was set to " + newPassword +
-		" and was also printed in the log file '" + c.Config.LogFile + "' and/or app output.")
+	c.Config.APIKey, _, _ = ui.Entry("Enter 'All' API Key from notifiarr.com", "api-key-from-notifiarr.com")
+	if c.Config.ValidAPIKey() != nil {
+		c.Config.APIKey = "api-key-from-notifiarr.com"
+	} else {
+		c.Input.APIKey = c.Config.APIKey
+	}
+
+	// write new config file to temporary path.
+	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig")
+	if _, err := c.Config.Write(ctx, destFile, true); err != nil { // write our config file template.
+		c.Errorf("writing new (temporary) config file: %v", err)
+	}
+
+	// move new config file to existing config file.
+	if err := os.Rename(destFile, c.Flags.ConfigFile); err != nil {
+		c.Errorf("renaming temporary config file: %v", err)
+	}
+
+	go func() {
+		open, _ := ui.Question("http://127.0.0/1:5454 - Your Web UI password was set to "+newPassword+
+			" and was also printed in the log file:"+c.Config.LogFile+"\n\nOpen Web UI?\n", false)
+		if open {
+			_ = ui.OpenURL("http://127.0.0.1:5454")
+		}
+	}()
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running configuration.
