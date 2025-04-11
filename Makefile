@@ -6,6 +6,7 @@
 IGNORED:=$(shell bash -c "source settings.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > /tmp/.metadata.make")
 
 BUILD_FLAGS=-tags osusergo,netgo
+WINDOWS_BUILD_FLAGS=-tags osusergo
 GOFLAGS=-trimpath -mod=readonly -modcacherw
 CGO_CPPFLAGS=$(CPPFLAGS)
 CGO_CFLAGS=$(CFLAGS)
@@ -180,7 +181,7 @@ exe: notifiarr.amd64.exe
 windows: notifiarr.amd64.exe
 notifiarr.amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
-	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
+	GOOS=windows GOARCH=amd64 go build $(WINDOWS_BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
 	bash init/windows/signexe.sh $(OUTPUTDIR)/$@
 
 ####################
