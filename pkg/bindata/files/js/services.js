@@ -107,9 +107,12 @@ function addServiceCheck()
     for (i = 2 ; i < 60 ; i++) {
         options += '<option value="'+i+'s">'+i+' seconds</option>';
     }
-    options += '<option selected value="1m">1 minute</option>';
-    for (i = 1 ; i < 60 ; i++) {
-        options += '<option value="1m'+i+'s">1 min '+i+' sec</option>';
+
+    for (j = 1 ; j < 6 ; j++) {
+        options += '<option selected value="'+j+'m">'+j+' minute'+(j!=1?'s':'')+'</option>';
+        for (i = 1 ; i < 60 ; i++) {
+            options += '<option value="'+j+'m'+i+'s">'+j+' min '+i+' sec</option>';
+        }
     }
 
     const row = '<tr class="bk-success services-Checks newRow" id="services-Checks-'+ index +'">'+
