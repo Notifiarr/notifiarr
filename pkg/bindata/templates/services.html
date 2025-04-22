@@ -315,6 +315,22 @@
                                         {{- range $i := one259 }}
                                         <option {{if eq $svc.Timeout.Seconds (add 60 $i)}}selected {{end}}value="1m{{$i}}s">1 min {{$i}} sec</option>
                                         {{- end}}
+                                        <option {{if eq $svc.Timeout.Seconds (add 60 60)}}selected {{end}}value="2m">2 minutes</option>
+                                        {{- range $i := one259 }}
+                                        <option {{if eq $svc.Timeout.Seconds (add 120 $i)}}selected {{end}}value="2m{{$i}}s">2 min {{$i}} sec</option>
+                                        {{- end}}
+                                        <option {{if eq $svc.Timeout.Seconds (add 120 60)}}selected {{end}}value="3m">3 minutes</option>
+                                        {{- range $i := one259 }}
+                                        <option {{if eq $svc.Timeout.Seconds (add 180 $i)}}selected {{end}}value="3m{{$i}}s">3 min {{$i}} sec</option>
+                                        {{- end}}
+                                        <option {{if eq $svc.Timeout.Seconds (add 180 60)}}selected {{end}}value="4m">4 minutes</option>
+                                        {{- range $i := one259 }}
+                                        <option {{if eq $svc.Timeout.Seconds (add 240 $i)}}selected {{end}}value="4m{{$i}}s">4 min {{$i}} sec</option>
+                                        {{- end}}
+                                        <option {{if eq $svc.Timeout.Seconds (add 240 60)}}selected {{end}}value="5m">5 minutes</option>
+                                        {{- range $i := one259 }}
+                                        <option {{if eq $svc.Timeout.Seconds (add 300 $i)}}selected {{end}}value="5m{{$i}}s">5 min {{$i}} sec</option>
+                                        {{- end}}
                                     </select>
                                 </div>
                             </div>
