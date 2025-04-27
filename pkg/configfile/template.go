@@ -643,13 +643,13 @@ retries = {{.Retries}}
   days_of_month = [{{range $s := $item.DaysOfMonth}}{{$s}},{{end}}]
   months        = [{{range $s := $item.Months}}{{$s}},{{end}}]
   at_times      = [{{range $s := $item.AtTimes}}[{{range $j := $s}}{{$j}},{{end}}],{{end}}]
-  {{range $query, $values := $item.Query}}
+  {{- if $item.Query}}
   [endpoint.query]
-  {{- range $vals := $values}}
-    {{$query}} = [{{range $s := $vals}}"{{$s}}",{{end}}]{{end}}{{end}}
-  {{range $header, $values := $item.Header}}
+  {{- range $query, $values := $item.Query}}
+    {{$query}} = [{{range $s := $values}}"{{$s}}",{{end}}]{{end}}{{end}}
+  {{- if $item.Header}}
   [endpoint.header]
-  {{- range $vals := $values}}
-    {{$header}} = [{{range $s := $vals}}"{{$s}}",{{end}}]{{end}}{{end}}{{end}}
+  {{- range $header, $values := $item.Header}}
+    {{$header}} = [{{range $s := $values}}"{{$s}}",{{end}}]{{end}}{{end}}{{end}}
 {{end}}{{end}}
 `

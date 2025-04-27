@@ -137,7 +137,9 @@ func (s *Schedule) getURLBody(ctx context.Context) (http.Header, int, string, er
 		return nil, 0, "", fmt.Errorf("creating request: %w", err)
 	}
 
-	req.Header = s.Header
+	for header, value := range s.Header {
+		req.Header[header] = value
+	}
 
 	resp, err := s.client.Do(req)
 	if err != nil {
