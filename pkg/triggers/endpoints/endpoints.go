@@ -1,6 +1,7 @@
 // Package endpoints allows the user to configure a list of urls, along with cron schedules.
-// The app then polls the urls according to their schedule. The URL response is sent to the
-// website for parsing and notification handling. "Endpoint URL Passthrough" is the name.
+// The app then polls the urls according to their schedule. The URL response is gzipped,
+// base64 encoded then sent to the website for parsing and notification handling.
+// "Endpoint URL Passthrough" is the name.
 package endpoints
 
 import (
