@@ -356,7 +356,7 @@ func (c *Config) Write(ctx context.Context, file string, encode bool) (string, e
 
 	var writer io.Writer = newFile
 
-	if encode && os.Getenv("DN_ENCODE_CONFIG_FILE") != "false" {
+	if encode && os.Getenv("DN_ENCODE_CONFIG_FILE") != mnd.False {
 		bzWr, err := bzip2.NewWriter(newFile, &bzip2.WriterConfig{Level: 1})
 		if err != nil {
 			return "", fmt.Errorf("encoding config file: %w", err)

@@ -124,7 +124,7 @@ func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 	}
 
 	s.conf.SendData(&website.Request{
-		Route:      website.TestRoute,
+		Route:      website.EndpointRoute,
 		Event:      input.Type,
 		LogPayload: true,
 		Payload:    map[string]any{"gzb64": body, "header": header, "status": code},

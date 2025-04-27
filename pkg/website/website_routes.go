@@ -135,6 +135,7 @@ const (
 	CorruptRoute  Route = notifiRoute + "/corruption"
 	BackupRoute   Route = notifiRoute + "/backup"
 	TestRoute     Route = notifiRoute + "/test"
+	EndpointRoute Route = notifiRoute + "/endpoint"
 	PkgRoute      Route = notifiRoute + "/packageManager"
 	LogLineRoute  Route = notifiRoute + "/logWatcher"
 	CommandRoute  Route = notifiRoute + "/command"
