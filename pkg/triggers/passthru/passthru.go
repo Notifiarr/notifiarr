@@ -11,9 +11,12 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
+
+const globalTimeout = 5 * time.Minute
 
 // Action contains the exported methods for this package.
 type Action struct {
@@ -25,12 +28,12 @@ type Action struct {
 // Endpoint contains the cronjob definition and url query parameters.
 // This is the input data to poll a url on a frequency.
 type Endpoint struct {
-	Query  url.Values
-	Header http.Header
-	URL    string
-	Method string
-	Body   string
-	url    string // url + query
+	Query  url.Values  `json:"query"  toml:"query"  xml:"query"  yaml:"query"`
+	Header http.Header `json:"header" toml:"header" xml:"header" yaml:"header"`
+	URL    string      `json:"url"    toml:"url"    xml:"url"    yaml:"url"`
+	Method string      `json:"method" toml:"method" xml:"method" yaml:"method"`
+	Body   string      `json:"body"   toml:"body"   xml:"body"   yaml:"body"`
+	url    string      // url + query
 	common.CronJob
 }
 
@@ -83,11 +86,13 @@ func (t *Schedule) run(ctx context.Context, input *common.ActionInput) {
 	}
 
 	t.conf.SendData(&website.Request{
-		Route: website.TestRoute,
-		Event: website.EventSched,
+		Route:      website.TestRoute,
+		Event:      website.EventSched,
+		LogPayload: true,
 		Payload: map[string]any{
 			"gzb64body": base64.StdEncoding.EncodeToString(body.Bytes()),
 			"headers":   resp.Header,
+			"status":    resp.StatusCode,
 		},
 	})
 }
@@ -106,11 +111,18 @@ func (a *Action) Create() {
 var _ = common.Create(&Action{})
 
 func (a *Action) create() {
-	httpClient := &http.Client{Timeout: 5 * time.Minute}
+	httpClient := &http.Client{
+		Timeout:   globalTimeout,
+		Transport: apps.NewMetricsRoundTripper("passthrough", nil),
+	}
 
 	for _, endpoint := range a.urls {
 		if endpoint.url = endpoint.URL; len(endpoint.Query) > 0 {
 			endpoint.url += "?" + endpoint.Query.Encode()
+		}
+
+		if endpoint.Method == "" {
+			endpoint.Method = http.MethodGet
 		}
 
 		schedule := &Schedule{

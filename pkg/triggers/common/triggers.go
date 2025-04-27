@@ -150,44 +150,6 @@ func (c *Config) Add(action ...*Action) {
 	c.list = append(c.list, action...)
 }
 
-func (a *Action) newCron(cron gocron.Scheduler) {
-	var def gocron.JobDefinition
-	switch a.J.Frequency {
-	case Custom:
-		def = gocron.CronJob(
-			fmt.Sprintf("%s %s %s %s %s %s",
-				JoinOrZero(a.J.AtTimes.Seconds()),
-				JoinOrZero(a.J.AtTimes.Minutes()),
-				JoinOrZero(a.J.AtTimes.Hours()),
-				JoinOrStar(a.J.DaysOfMonth),
-				JoinOrStar(a.J.Months),
-				JoinOrStar(a.J.DaysOfWeek),
-			), true)
-	case Minutely:
-		def = gocron.CronJob(fmt.Sprintf("%s * * * * *", JoinOrZero(a.J.AtTimes.Seconds())), true)
-	case Hourly:
-		def = gocron.CronJob(
-			fmt.Sprintf("%s %s * * * *", JoinOrZero(a.J.AtTimes.Seconds()), JoinOrZero(a.J.AtTimes.Minutes())),
-			true,
-		)
-	case Daily:
-		def = gocron.DailyJob(1, a.J.AtTimes.AtTimes())
-	case Weekly:
-		def = gocron.WeeklyJob(1, a.J.DaysOfTheWeek(), a.J.AtTimes.AtTimes())
-	case Monthly:
-		def = gocron.MonthlyJob(1, a.J.DaysOfTheMonths(), a.J.AtTimes.AtTimes())
-	}
-
-	var err error
-
-	a.job, err = cron.NewJob(def, gocron.NewTask(
-		func() { a.C <- &ActionInput{Type: website.EventSched} },
-	))
-	if err != nil {
-		panic(fmt.Sprint("THIS IS A BUG, please report it: ", err))
-	}
-}
-
 // Stop shuts down the loop/goroutine that handles all triggers and timers.
 func (c *Config) Stop(event website.EventType) {
 	// Neither of these if statements should ever fire. That's a bug somewhere else.

@@ -66,7 +66,7 @@ type Config struct {
 	Service    []*services.Service    `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
 	EnableApt  bool                   `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
 	WatchFiles []*filewatch.WatchFile `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
-	Endpoints  []*passthru.Endpoint   `json:"endpoints"   toml:"endpoints"     xml:"endpoints"     yaml:"endpoints"`
+	Endpoints  []*passthru.Endpoint   `json:"endpoints"   toml:"endpoint"      xml:"endpoint"      yaml:"endpoints"`
 	Commands   []*commands.Command    `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
 	*logs.LogConfig
 	*apps.Apps
