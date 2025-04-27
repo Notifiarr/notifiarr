@@ -19,6 +19,7 @@ type EventType string
 // These are all our known event types.
 const (
 	EventCron    EventType = "cron"
+	EventSched   EventType = "schedule"
 	EventGUI     EventType = "gui"
 	EventUser    EventType = "user"
 	EventAPI     EventType = "api"

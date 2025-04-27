@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"github.com/go-co-op/gocron/v2"
 	"golift.io/cnfg"
 )
 
@@ -30,6 +31,7 @@ type Config struct {
 	*website.Server // send trigger responses to website.
 	Snapshot        *snapshot.Config
 	Apps            *apps.Apps
+	Scheduler       gocron.Scheduler
 	*logs.Logger
 	stop     *Action        // Triggered by calling Stop()
 	list     []*Action      // List of action triggers
@@ -97,9 +99,11 @@ type TriggerName string
 type Action struct {
 	Name TriggerName
 	D    cnfg.Duration                       // how often the timer fires, sets ticker.
+	J    *CronJob                            // If provided, D is ignored.
 	Fn   func(context.Context, *ActionInput) // most actions use this for triggers.
 	C    chan *ActionInput                   // if provided, D is optional.
 	t    *time.Ticker                        // if provided, C is optional.
+	job  gocron.Job                          // created if J is non-nil .
 	Hide bool                                // prevent logging.
 }
 
@@ -108,7 +112,7 @@ type Services interface {
 	RunChecks(et website.EventType)
 }
 
-// Exec runs a trigger. This is abastraction method used in a bunch of places.
+// Exec runs a trigger. This is abstraction method is used in a bunch of places.
 func (c *Config) Exec(input *ActionInput, name TriggerName) bool {
 	trig := c.Get(name)
 	if c.stop == nil || trig == nil || trig.C == nil {
@@ -136,12 +140,52 @@ func (c *Config) Get(name TriggerName) *Action {
 // actions are timers or triggers, or both.
 func (c *Config) Add(action ...*Action) {
 	for _, a := range action {
-		if a.D.Duration != 0 {
+		if a.J != nil {
+			a.newCron(c.Scheduler)
+		} else if a.D.Duration != 0 {
 			a.t = time.NewTicker(a.D.Duration)
 		}
 	}
 
 	c.list = append(c.list, action...)
+}
+
+func (a *Action) newCron(cron gocron.Scheduler) {
+	var def gocron.JobDefinition
+	switch a.J.Frequency {
+	case Custom:
+		def = gocron.CronJob(
+			fmt.Sprintf("%s %s %s %s %s %s",
+				JoinOrZero(a.J.AtTimes.Seconds()),
+				JoinOrZero(a.J.AtTimes.Minutes()),
+				JoinOrZero(a.J.AtTimes.Hours()),
+				JoinOrStar(a.J.DaysOfMonth),
+				JoinOrStar(a.J.Months),
+				JoinOrStar(a.J.DaysOfWeek),
+			), true)
+	case Minutely:
+		def = gocron.CronJob(fmt.Sprintf("%s * * * * *", JoinOrZero(a.J.AtTimes.Seconds())), true)
+	case Hourly:
+		def = gocron.CronJob(
+			fmt.Sprintf("%s %s * * * *", JoinOrZero(a.J.AtTimes.Seconds()), JoinOrZero(a.J.AtTimes.Minutes())),
+			true,
+		)
+	case Daily:
+		def = gocron.DailyJob(1, a.J.AtTimes.AtTimes())
+	case Weekly:
+		def = gocron.WeeklyJob(1, a.J.DaysOfTheWeek(), a.J.AtTimes.AtTimes())
+	case Monthly:
+		def = gocron.MonthlyJob(1, a.J.DaysOfTheMonths(), a.J.AtTimes.AtTimes())
+	}
+
+	var err error
+
+	a.job, err = cron.NewJob(def, gocron.NewTask(
+		func() { a.C <- &ActionInput{Type: website.EventSched} },
+	))
+	if err != nil {
+		panic(fmt.Sprint("THIS IS A BUG, please report it: ", err))
+	}
 }
 
 // Stop shuts down the loop/goroutine that handles all triggers and timers.

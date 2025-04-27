@@ -22,11 +22,13 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/mdblist"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/passthru"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/snapcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/starrqueue"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"github.com/go-co-op/gocron/v2"
 )
 
 // Config is the required input data. Everything is mandatory.
@@ -35,6 +37,7 @@ type Config struct {
 	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
+	Endpoints  []*passthru.Endpoint
 	LogFiles   []string
 	Commands   []*commands.Command
 	ClientInfo *clientinfo.Config
@@ -49,21 +52,21 @@ type Config struct {
 // Any action here will automatically have its interface methods called.
 type Actions struct {
 	*common.Config
-	// Order is important here.
-	PlexCron   *plexcron.Action
+	AutoUpdate *autoupdate.Action
 	Backups    *backups.Action
 	CFSync     *cfsync.Action
+	Commands   *commands.Action
 	CronTimer  *crontimer.Action
 	Dashboard  *dashboard.Action
+	EmptyTrash *emptytrash.Action
+	FileUpload *fileupload.Action
 	FileWatch  *filewatch.Action
 	Gaps       *gaps.Action
+	MDbList    *mdblist.Action
+	Passthru   *passthru.Action
+	PlexCron   *plexcron.Action
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
-	Commands   *commands.Action
-	EmptyTrash *emptytrash.Action
-	MDbList    *mdblist.Action
-	FileUpload *fileupload.Action
-	AutoUpdate *autoupdate.Action
 }
 
 // New turns a populated Config into a pile of Actions.
@@ -76,24 +79,26 @@ func New(config *Config) *Actions {
 		CI:       config.ClientInfo,
 		Services: config.Services,
 	}
+	common.Scheduler, _ = gocron.NewScheduler()
 	plex := plexcron.New(common, config.Apps.Plex)
 
 	return &Actions{
-		PlexCron:   plex,
+		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
 		Backups:    backups.New(common),
 		CFSync:     cfsync.New(common),
+		Commands:   commands.New(common, config.Commands),
+		Config:     common,
 		CronTimer:  crontimer.New(common),
 		Dashboard:  dashboard.New(common, plex),
+		EmptyTrash: emptytrash.New(common),
+		FileUpload: fileupload.New(common),
 		FileWatch:  filewatch.New(common, config.WatchFiles, config.LogFiles),
 		Gaps:       gaps.New(common),
+		MDbList:    mdblist.New(common),
+		Passthru:   passthru.New(common, config.Endpoints),
+		PlexCron:   plex,
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
-		Commands:   commands.New(common, config.Commands),
-		EmptyTrash: emptytrash.New(common),
-		MDbList:    mdblist.New(common),
-		FileUpload: fileupload.New(common),
-		Config:     common,
-		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
 	}
 }
 
@@ -130,7 +135,7 @@ func (a *Actions) Stop(event website.EventType) {
 
 	actions := reflect.ValueOf(a).Elem()
 	// Stop them in reverse order they were started.
-	for i := actions.NumField() - 1; i >= 0; i-- {
+	for i := range actions.NumField() {
 		if !actions.Field(i).CanInterface() {
 			continue
 		}

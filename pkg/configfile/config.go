@@ -27,6 +27,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/passthru"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -65,6 +66,7 @@ type Config struct {
 	Service    []*services.Service    `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
 	EnableApt  bool                   `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
 	WatchFiles []*filewatch.WatchFile `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
+	Endpoints  []*passthru.Endpoint   `json:"endpoints"   toml:"endpoints"     xml:"endpoints"     yaml:"endpoints"`
 	Commands   []*commands.Command    `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
 	*logs.LogConfig
 	*apps.Apps
@@ -249,6 +251,7 @@ func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 		UnstableCh: c.UnstableCh,
 		Services:   c.Services,
 		Logger:     logger,
+		Endpoints:  c.Endpoints,
 	})
 	clientinfo.CmdList = triggers.Commands.List()
 

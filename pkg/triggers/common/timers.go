@@ -97,9 +97,12 @@ func (c *Config) printStartupLog() {
 // That means only 1 action can run at a time. If c.Serial is set to true, then
 // some of those actions (especially dashboard) will spawn their own go routines.
 func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []reflect.SelectCase) {
+	c.Scheduler.Start()
+
 	defer func() {
 		c.CapturePanic()
 		c.stopTimerLoop(actions)
+		_ = c.Scheduler.Shutdown()
 	}()
 
 	// This is how you watch a slice of reflect.SelectCase.
