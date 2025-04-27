@@ -58,11 +58,11 @@ type triggerOutput struct {
 // @Router       /api/triggers [get]
 // @Security     ApiKeyAuth
 func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
-	triggers, timers := a.GatherTriggerInfo()
+	triggers, timers, _ := a.GatherTriggerInfo()
 	temp := make(map[string]*trigger) // used to dedup.
 
 	for name, dur := range triggers {
-		if dur.Duration == 0 {
+		if dur.String() == "0" {
 			temp[name] = &trigger{Name: name}
 		} else {
 			temp[name] = &trigger{Name: name, Dur: dur.String()}

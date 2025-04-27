@@ -10,7 +10,8 @@ import (
 )
 
 // Frequency sets the base "how-often" a CronJob is executed.
-type Frequency int
+// See the Frequency constants.
+type Frequency uint
 
 // Frequency values that are known and work.
 const (
@@ -37,7 +38,7 @@ type CronJob struct {
 	// Frequency to configure the job. Pass 0 disable the cron.
 	Frequency Frequency `json:"frequency" toml:"frequency" xml:"frequency" yaml:"frequency"`
 	// Interval for Daily, Weekly and Monthly Frequencies. 1 = every day/week/month, 2 = every other, and so on.
-	Interval int `json:"interval" toml:"interval" xml:"interval" yaml:"interval"`
+	Interval uint `json:"interval" toml:"interval" xml:"interval" yaml:"interval"`
 	// AtTimes is a list of 'hours, minutes, seconds' to schedule for Daily/Weekly/Monthly frequencies.
 	// Also used in Minutely and Hourly schedules, a bit awkwardly.
 	AtTimes AtTimes `json:"atTimes" toml:"at_times" xml:"at_times" yaml:"atTimes"`
@@ -49,9 +50,47 @@ type CronJob struct {
 	Months []uint `json:"months" toml:"months" xml:"months" yaml:"months"`
 }
 
+// String attempts to turn a CronJob into a string.
+func (c *CronJob) String() string {
+	switch c.Frequency {
+	default:
+		fallthrough
+	case DeadCron:
+		return "Schedule Disabled"
+	case Minutely:
+		return fmt.Sprintf("Every minute at seconds %v", c.AtTimes.seconds())
+	case Hourly:
+		return fmt.Sprintf("Every hour at minutes %v", c.AtTimes.minutes())
+	case Daily:
+		return fmt.Sprintf("Every %d day(s) at times (h:m:s) %v", c.Interval, c.AtTimes)
+	case Weekly:
+		return fmt.Sprintf("Days of week %v every %d week(s) at times (h:m:s) %v", c.DaysOfWeek, c.Interval, c.AtTimes)
+	case Monthly:
+		return fmt.Sprintf("Days of month %v every %d month(s) at times (h:m:s) %v", c.DaysOfMonth, c.Interval, c.AtTimes)
+	}
+}
+
 func (c *CronJob) fix() { //nolint:cyclop
 	if c.Interval == 0 {
 		c.Interval = 1
+	}
+
+	if c.Frequency > Monthly {
+		c.Frequency = DeadCron // oops.
+	}
+
+	for _, times := range c.AtTimes {
+		if times[fieldHours] > maxHours {
+			times[fieldHours] = maxHours
+		}
+
+		if times[fieldMinutes] > maxMinSec {
+			times[fieldMinutes] = maxMinSec
+		}
+
+		if times[fieldSeconds] > maxMinSec {
+			times[fieldSeconds] = maxMinSec
+		}
 	}
 
 	for idx, m := range c.Months {
@@ -77,18 +116,6 @@ func (a AtTimes) AtTimes() func() []gocron.AtTime {
 	output := []gocron.AtTime{}
 
 	for _, times := range a {
-		if times[fieldHours] > maxHours {
-			times[fieldHours] = maxHours
-		}
-
-		if times[fieldMinutes] > maxMinSec {
-			times[fieldMinutes] = maxMinSec
-		}
-
-		if times[fieldSeconds] > maxMinSec {
-			times[fieldSeconds] = maxMinSec
-		}
-
 		output = append(output, gocron.NewAtTime(times[fieldHours], times[fieldMinutes], times[fieldSeconds]))
 	}
 
@@ -96,11 +123,11 @@ func (a AtTimes) AtTimes() func() []gocron.AtTime {
 }
 
 func (a AtTimes) minutes() string {
-	return joinOrZero(a.getField(fieldMinutes))
+	return joinOr(a.getField(fieldMinutes), "0")
 }
 
 func (a AtTimes) seconds() string {
-	return joinOrZero(a.getField(fieldSeconds))
+	return joinOr(a.getField(fieldSeconds), "0")
 }
 
 const (
@@ -132,17 +159,9 @@ func (a AtTimes) getField(field field) []uint {
 	return output
 }
 
-func joinOrStar[T []int | []uint | []time.Weekday](input T) string {
+func joinOr[T []int | []uint | []time.Weekday](input T, or string) string {
 	if len(input) == 0 {
-		return "*"
-	}
-
-	return strings.Trim(strings.ReplaceAll(fmt.Sprint(input), " ", ","), "[]")
-}
-
-func joinOrZero(input []uint) string {
-	if len(input) == 0 {
-		return "0"
+		return or
 	}
 
 	return strings.Trim(strings.ReplaceAll(fmt.Sprint(input), " ", ","), "[]")
@@ -163,29 +182,31 @@ func (c *CronJob) daysOfTheWeek() func() []time.Weekday {
 	return func() []time.Weekday { return c.DaysOfWeek }
 }
 
+func (a *Action) cronExec() {
+	a.C <- &ActionInput{Type: website.EventCron}
+}
+
 func (a *Action) newCron(cron gocron.Scheduler) {
 	var def gocron.JobDefinition
 	switch a.J.fix(); a.J.Frequency {
+	default:
+		fallthrough
 	case DeadCron:
 		return
 	case Minutely:
 		def = gocron.CronJob(a.J.AtTimes.seconds()+" * * * * *", true)
 	case Hourly:
-		def = gocron.CronJob(a.J.AtTimes.seconds()+" "+a.J.AtTimes.minutes()+" * * * *", true)
+		def = gocron.CronJob(a.J.AtTimes.minutes()+" * * * *", false)
 	case Daily:
-		def = gocron.DailyJob(1, a.J.AtTimes.AtTimes())
+		def = gocron.DailyJob(a.J.Interval, a.J.AtTimes.AtTimes())
 	case Weekly:
-		def = gocron.WeeklyJob(1, a.J.daysOfTheWeek(), a.J.AtTimes.AtTimes())
+		def = gocron.WeeklyJob(a.J.Interval, a.J.daysOfTheWeek(), a.J.AtTimes.AtTimes())
 	case Monthly:
-		def = gocron.MonthlyJob(1, a.J.daysOfTheMonths(), a.J.AtTimes.AtTimes())
+		def = gocron.MonthlyJob(a.J.Interval, a.J.daysOfTheMonths(), a.J.AtTimes.AtTimes())
 	}
 
 	var err error
-
-	a.job, err = cron.NewJob(def, gocron.NewTask(
-		func() { a.C <- &ActionInput{Type: website.EventSched} },
-	))
-	if err != nil {
+	if a.job, err = cron.NewJob(def, gocron.NewTask(a.cronExec)); err != nil {
 		panic(fmt.Sprint("THIS IS A BUG, please report it: ", err))
 	}
 }

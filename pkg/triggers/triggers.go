@@ -18,11 +18,11 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/crontimer"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/emptytrash"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/fileupload"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/mdblist"
-	"github.com/Notifiarr/notifiarr/pkg/triggers/passthru"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/snapcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/starrqueue"
@@ -37,7 +37,7 @@ type Config struct {
 	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
-	Endpoints  []*passthru.Endpoint
+	Endpoints  []*endpoints.Endpoint
 	LogFiles   []string
 	Commands   []*commands.Command
 	ClientInfo *clientinfo.Config
@@ -63,7 +63,7 @@ type Actions struct {
 	FileWatch  *filewatch.Action
 	Gaps       *gaps.Action
 	MDbList    *mdblist.Action
-	Passthru   *passthru.Action
+	Endpoints  *endpoints.Action
 	PlexCron   *plexcron.Action
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
@@ -95,7 +95,7 @@ func New(config *Config) *Actions {
 		FileWatch:  filewatch.New(common, config.WatchFiles, config.LogFiles),
 		Gaps:       gaps.New(common),
 		MDbList:    mdblist.New(common),
-		Passthru:   passthru.New(common, config.Endpoints),
+		Endpoints:  endpoints.New(common, config.Endpoints),
 		PlexCron:   plex,
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
