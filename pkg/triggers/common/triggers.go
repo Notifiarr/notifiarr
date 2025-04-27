@@ -11,6 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -99,7 +100,7 @@ type TriggerName string
 type Action struct {
 	Name TriggerName
 	D    cnfg.Duration                       // how often the timer fires, sets ticker.
-	J    *CronJob                            // If provided, D is ignored.
+	J    *scheduler.CronJob                  // If provided, D is ignored.
 	Fn   func(context.Context, *ActionInput) // most actions use this for triggers.
 	C    chan *ActionInput                   // if provided, D is optional.
 	t    *time.Ticker                        // if provided, C is optional.
@@ -141,7 +142,7 @@ func (c *Config) Get(name TriggerName) *Action {
 func (c *Config) Add(action ...*Action) {
 	for _, a := range action {
 		if a.J != nil {
-			a.newCron(c.Scheduler)
+			a.job = a.J.New(c.Scheduler, func() { a.C <- &ActionInput{Type: website.EventCron} })
 		} else if a.D.Duration != 0 {
 			a.t = time.NewTicker(a.D.Duration)
 		}

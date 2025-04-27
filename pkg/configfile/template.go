@@ -593,6 +593,7 @@ retries = {{.Retries}}
 
 ## The Endpoint URL Passthrough feature allows you to configure the client to poll
 ## any URL and send the response to the Notifiarr website for notification processing.
+## @name          - Defaults to URL. Name is used in logs and to identify this endpoint remotely.
 ## @url           - Required URL to poll. Query is optional here, can be added in query param.
 ## @method        - defaults to GET. Can use POST, PUT, etc.
 ## @body          - For POST and PUT this is the body payload that is sent.
@@ -610,6 +611,7 @@ retries = {{.Retries}}
 ## Full Example Follows (remove the leading # hashes to use it):
 ##
 #[[endpoint]]
+#  name          = "My Example"
 #  url           = "http://example.com"
 #  method        = "GET"
 #  body          = ''
@@ -630,6 +632,7 @@ retries = {{.Retries}}
 {{- range $item := .Endpoints}}{{if $item}}
 
 [[endpoint]]
+  name          = "{{$item.Name}}"
   url           = "{{$item.URL}}"
   method        = "{{$item.Method}}"
   body          = '''{{$item.Body}}'''

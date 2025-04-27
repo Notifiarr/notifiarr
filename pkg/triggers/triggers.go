@@ -19,6 +19,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/emptytrash"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/fileupload"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
@@ -37,7 +38,7 @@ type Config struct {
 	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
-	Endpoints  []*endpoints.Endpoint
+	Endpoints  []*epconfig.Endpoint
 	LogFiles   []string
 	Commands   []*commands.Command
 	ClientInfo *clientinfo.Config

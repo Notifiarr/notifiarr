@@ -1,11 +1,10 @@
-package common
+package scheduler
 
 import (
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/go-co-op/gocron/v2"
 )
 
@@ -182,31 +181,29 @@ func (c *CronJob) daysOfTheWeek() func() []time.Weekday {
 	return func() []time.Weekday { return c.DaysOfWeek }
 }
 
-func (a *Action) cronExec() {
-	a.C <- &ActionInput{Type: website.EventCron}
-}
-
-func (a *Action) newCron(cron gocron.Scheduler) {
+func (c *CronJob) New(cron gocron.Scheduler, cmd func()) gocron.Job { //nolint:ireturn // it's what we have.
 	var def gocron.JobDefinition
-	switch a.J.fix(); a.J.Frequency {
+	switch c.fix(); c.Frequency {
 	default:
 		fallthrough
 	case DeadCron:
-		return
+		return nil
 	case Minutely:
-		def = gocron.CronJob(a.J.AtTimes.seconds()+" * * * * *", true)
+		def = gocron.CronJob(c.AtTimes.seconds()+" * * * * *", true)
 	case Hourly:
-		def = gocron.CronJob(a.J.AtTimes.minutes()+" * * * *", false)
+		def = gocron.CronJob(c.AtTimes.minutes()+" * * * *", false)
 	case Daily:
-		def = gocron.DailyJob(a.J.Interval, a.J.AtTimes.AtTimes())
+		def = gocron.DailyJob(c.Interval, c.AtTimes.AtTimes())
 	case Weekly:
-		def = gocron.WeeklyJob(a.J.Interval, a.J.daysOfTheWeek(), a.J.AtTimes.AtTimes())
+		def = gocron.WeeklyJob(c.Interval, c.daysOfTheWeek(), c.AtTimes.AtTimes())
 	case Monthly:
-		def = gocron.MonthlyJob(a.J.Interval, a.J.daysOfTheMonths(), a.J.AtTimes.AtTimes())
+		def = gocron.MonthlyJob(c.Interval, c.daysOfTheMonths(), c.AtTimes.AtTimes())
 	}
 
-	var err error
-	if a.job, err = cron.NewJob(def, gocron.NewTask(a.cronExec)); err != nil {
-		panic(fmt.Sprint("THIS IS A BUG, please report it: ", err))
+	job, err := cron.NewJob(def, gocron.NewTask(cmd))
+	if err != nil {
+		panic(fmt.Sprint("[scheduler] THIS IS A BUG, please report it: ", err))
 	}
+
+	return job
 }
