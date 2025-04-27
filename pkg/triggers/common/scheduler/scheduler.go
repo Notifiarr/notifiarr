@@ -181,7 +181,7 @@ func (c *CronJob) daysOfTheWeek() func() []time.Weekday {
 	return func() []time.Weekday { return c.DaysOfWeek }
 }
 
-func (c *CronJob) New(cron gocron.Scheduler, cmd func()) gocron.Job { //nolint:ireturn // it's what we have.
+func (c *CronJob) New(cron gocron.Scheduler, cmd func()) gocron.Job { //nolint:ireturn,nolintlint // it's what we have.
 	var def gocron.JobDefinition
 	switch c.fix(); c.Frequency {
 	default:
