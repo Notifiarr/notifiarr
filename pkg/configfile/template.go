@@ -596,6 +596,8 @@ retries = {{.Retries}}
 ## @name          - Defaults to URL. Name is used in logs and to identify this endpoint remotely.
 ## @url           - Required URL to poll. Query is optional here, can be added in query param.
 ## @method        - defaults to GET. Can use POST, PUT, etc.
+## @template      - Helps the website identify which template to parse this data into.
+##                  Setting this to "false" will skip sending the response to the website.
 ## @body          - For POST and PUT this is the body payload that is sent.
 ## @follow        - Follow redirects? Default is false, do not follow 301/302s.
 ## @frequency     - 0: no schedule, 1: minutely, 2: hourly, 3: daily, 4: weekly, 5: monthly
@@ -614,6 +616,7 @@ retries = {{.Retries}}
 #  name          = "My Example"
 #  url           = "http://example.com"
 #  method        = "GET"
+#  template      = "pihole"
 #  body          = ''
 #  follow        = false
 #  frequency     = 1
@@ -635,6 +638,7 @@ retries = {{.Retries}}
   name          = "{{$item.Name}}"
   url           = "{{$item.URL}}"
   method        = "{{$item.Method}}"
+  template      = "{{$item.Template}}"
   body          = '''{{$item.Body}}'''
   follow        = {{$item.Follow}}
   frequency     = {{$item.Frequency}}

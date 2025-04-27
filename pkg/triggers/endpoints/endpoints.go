@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -123,11 +124,22 @@ func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 		return
 	}
 
+	if s.Template == mnd.False {
+		return // template is false, do not send anything to website.
+	}
+
 	s.conf.SendData(&website.Request{
 		Route:      website.EndpointRoute,
 		Event:      input.Type,
 		LogPayload: true,
-		Payload:    map[string]any{"gzb64": body, "header": header, "status": code},
+		Payload: map[string]any{
+			"name":     s.Name,
+			"url":      s.URL,
+			"template": s.Template,
+			"gzb64":    body,
+			"header":   header,
+			"status":   code,
+		},
 	})
 }
 
