@@ -621,9 +621,9 @@ retries = {{.Retries}}
 #  follow        = false
 #  frequency     = 1
 #  interval      = 1
-#  days_of_week  = 0
-#  days_of_month = 1
-#  months        = 1
+#  days_of_week  = [0]
+#  days_of_month = [1]
+#  months        = [1]
 #  at_times      = [[0,0,0]]
 #  [endpoint.header]
 #    x-api-key = ["abc123"]
