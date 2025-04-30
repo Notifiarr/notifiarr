@@ -1,4 +1,3 @@
-//nolint:gochecknoglobals,wrapcheck
 package frontend
 
 //go:generate npm install
@@ -9,6 +8,7 @@ import (
 	"net/http"
 )
 
+//nolint:gochecknoglobals
 var (
 	handler http.Handler
 	root    fs.FS
@@ -16,6 +16,7 @@ var (
 	embedded embed.FS
 )
 
+//nolint:gochecknoinits
 func init() {
 	root, _ = fs.Sub(embedded, "dist")
 	handler = http.FileServer(http.FS(root))
@@ -34,12 +35,14 @@ func (w *responseWriter) WriteHeader(status int) {
 
 func (w *responseWriter) Write(p []byte) (int, error) {
 	if w.Status != http.StatusNotFound {
-		return w.ResponseWriter.Write(p)
+		return w.ResponseWriter.Write(p) //nolint:wrapcheck
 	}
 
 	return len(p), nil
 }
 
+// IndexHandler returns an asset from the file system if it exists, otherwise the index page.
+// Useful for a single page app.
 func IndexHandler(resp http.ResponseWriter, req *http.Request) {
 	response := &responseWriter{ResponseWriter: resp}
 	handler.ServeHTTP(response, req)
