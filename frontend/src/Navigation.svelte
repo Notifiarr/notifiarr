@@ -6,4 +6,3 @@
 <Card body color="success" outline>
     <h1>Welcome, {$profile?.username}!</h1>
 </Card>
-

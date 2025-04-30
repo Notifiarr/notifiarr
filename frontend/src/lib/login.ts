@@ -49,4 +49,3 @@ export async function login(name: string, password: string): Promise<string | nu
     return `Login failed: ${(err)}`
   }
 }
-

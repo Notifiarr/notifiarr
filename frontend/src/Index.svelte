@@ -1,9 +1,9 @@
-<script lang="ts">  
+<script lang="ts">
   import { Button, Card, CardBody, CardFooter, CardHeader, Input, Navbar, NavbarBrand, Styles } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg'
   import { profile, fetchProfile, login } from './lib/login'
   import Navigation from './Navigation.svelte'
-  
+
   let username = ''
   let password = ''
   let loginFailedMsg = ''
@@ -18,7 +18,7 @@
 
     isLoading = true
     loginFailedMsg = ''
-    
+
     try {
       const error = await login(username, password)
       if (error) loginFailedMsg = error
@@ -48,10 +48,10 @@
     </Card>
 
   {:then}
-    {#if $profile}
-      <Navigation /><!-- This is the main page, after logging in. -->
+    {#if $profile}<!-- This is the main page, after logging in. -->
+      <Navigation />
 
-    {:else}
+    {:else}<!-- This is the login page, before logging in. -->
       <Card body theme="light" color="info" outline>
         {#if loginFailedMsg}
           <div class="error-message">{loginFailedMsg}</div>

@@ -1,3 +1,4 @@
+//nolint:gochecknoglobals,wrapcheck
 package frontend
 
 //go:generate npm install

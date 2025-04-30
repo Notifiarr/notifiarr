@@ -164,6 +164,7 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 	http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 }
 
+// Profile is the data returned by the profile GET endpoint.
 type Profile struct {
 	Username string `json:"username"`
 }
@@ -173,9 +174,12 @@ func (c *Client) handleProfile(w http.ResponseWriter, r *http.Request) {
 	username, _ := c.getUserName(r)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(&Profile{
+
+	if err := json.NewEncoder(w).Encode(&Profile{
 		Username: username,
-	})
+	}); err != nil {
+		c.Errorf("Writing HTTP Response: %v", err)
+	}
 }
 
 // getFileDeleteHandler deletes log and config files.

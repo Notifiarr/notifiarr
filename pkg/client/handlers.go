@@ -55,7 +55,8 @@ func (c *Client) httpHandlers() {
 		return
 	}
 
-	c.Config.Router.PathPrefix(path.Join(base, "/assets/")).Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), gzip(frontend.IndexHandler)))
+	c.Config.Router.PathPrefix(path.Join(base, "/assets/")).
+		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), gzip(frontend.IndexHandler)))
 	c.Config.Router.PathPrefix(path.Join(base, "/files/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
 	c.Config.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")
