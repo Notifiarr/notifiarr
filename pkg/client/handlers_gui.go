@@ -17,6 +17,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/checkapp"
@@ -50,7 +51,7 @@ const (
 	fileSourceLogs = "logs"
 )
 
-// userNameValue is used a context value key.
+// userNameValue is used as a context value key.
 type userNameValue int
 
 //nolint:gochecknoglobals // used as context value key.
@@ -123,7 +124,6 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
 	loggedinUsername, _ := c.getUserName(request)
 	providedUsername := request.FormValue("name")
-
 	switch {
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
@@ -136,7 +136,12 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
 		c.setSession(providedUsername, response)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
-		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+
+		if c.newUI {
+			http.Error(response, "Logged in", http.StatusOK)
+		} else { // support the old interface.
+			http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+		}
 	default: // Start over.
 		c.indexPage(request.Context(), response, request, "Invalid Password")
 	}
@@ -157,6 +162,20 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 		MaxAge: -1,
 	})
 	http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+}
+
+type Profile struct {
+	Username string `json:"username"`
+}
+
+// handleProfile returns the current user's username in a JSON response.
+func (c *Client) handleProfile(w http.ResponseWriter, r *http.Request) {
+	username, _ := c.getUserName(r)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(&Profile{
+		Username: username,
+	})
 }
 
 // getFileDeleteHandler deletes log and config files.
@@ -793,7 +812,11 @@ func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, re
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 
-	c.renderTemplate(ctx, response, request, "index.html", msg)
+	if c.newUI {
+		frontend.IndexHandler(response, request)
+	} else {
+		c.renderTemplate(ctx, response, request, "index.html", msg)
+	}
 }
 
 func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
