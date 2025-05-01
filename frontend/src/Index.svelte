@@ -1,5 +1,15 @@
 <script lang="ts">
-  import { Button, Card, CardBody, CardFooter, CardHeader, Input, Navbar, NavbarBrand, Styles } from '@sveltestrap/sveltestrap'
+  import {
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Input,
+    Navbar,
+    NavbarBrand,
+    Styles,
+  } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg'
   import { profile, fetchProfile, login } from './lib/login'
   import Navigation from './Navigation.svelte'
@@ -18,33 +28,37 @@
     isLoading = true
     loginFailedMsg = ''
 
-    try { loginFailedMsg = (await login(username, password) ?? '') }
-    catch (err) { loginFailedMsg = `An unexpected error occurred: ${err}` }
-    finally { isLoading = false }
+    try {
+      loginFailedMsg = (await login(username, password)) ?? ''
+    } catch (err) {
+      loginFailedMsg = `An unexpected error occurred: ${err}`
+    } finally {
+      isLoading = false
+    }
   }
 </script>
 
 <svelte:head>
-  <title>{$profile?'': 'Login - '}Notifiarr Client</title>
-  <link rel="icon" type="image/png" href={logo}/>
+  <title>{$profile ? '' : 'Login - '}Notifiarr Client</title>
+  <link rel="icon" type="image/png" href={logo} />
 </svelte:head>
 
-<Styles/>
+<Styles />
 
 <main>
   <Navbar>
-    <NavbarBrand href="#"><h1><img src={logo} height="60" alt="Notifiarr" /> Notifiarr Client</h1></NavbarBrand>
+    <NavbarBrand href="#">
+      <h1><img src={logo} height="60" alt="Notifiarr" /> Notifiarr Client</h1>
+    </NavbarBrand>
   </Navbar>
 
   {#await fetchProfile()}
     <Card body theme="light" color="warning" outline>
       <div>Loading...</div>
     </Card>
-
   {:then}
     {#if $profile}<!-- This is the main page, after logging in. -->
       <Navigation />
-
     {:else}<!-- This is the login page, before logging in. -->
       <Card body theme="light" color="info" outline>
         {#if loginFailedMsg}
@@ -53,12 +67,14 @@
         <form on:submit|preventDefault={handleLogin}>
           <Input type="text" name="username" placeholder="Username" bind:value={username} />
           <Input type="password" name="password" placeholder="Password" bind:value={password} />
-          <Button type="submit" disabled={isLoading}>{isLoading ? 'Logging in...' : 'Login'}</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </Button>
         </form>
       </Card>
     {/if}
-
-  {:catch error} <!-- error fetching profile (ie. timeout) -->
+  {:catch error}
+    <!-- error fetching profile (ie. timeout) -->
     <Card body theme="light" color="danger" outline>
       <CardHeader>ERROR</CardHeader>
       <CardBody>{error.message}</CardBody>

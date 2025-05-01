@@ -7,7 +7,7 @@
     Container,
     Row,
     Col,
-    Button
+    Button,
   } from '@sveltestrap/sveltestrap'
   import { profile } from './lib/login'
   import Configuration from './configuration/Index.svelte'
@@ -42,7 +42,7 @@
     { component: Endpoints, id: 'endpoints', name: 'Endpoints', icon: '🔌' },
     { component: Commands, id: 'commands', name: 'Commands', icon: '🖥️' },
     { component: ServiceChecks, id: 'serviceChecks', name: 'Services', icon: '✓' },
-  ];
+  ]
 
   const insights = [
     { component: Triggers, id: 'triggers', name: 'Triggers', icon: '⚡' },
@@ -51,7 +51,7 @@
     { component: Metrics, id: 'metrics', name: 'Metrics', icon: '📈' },
     { component: LogFiles, id: 'logFiles', name: 'Log Files', icon: '📝' },
     { component: System, id: 'system', name: 'System', icon: '🖧' },
-  ];
+  ]
 
   const others = [
     { component: Profile, id: 'profile', name: 'Profile', icon: '👤' },
@@ -76,8 +76,8 @@
   $: isOpen = innerWidth > 767
 
   // Set the component based on the active page. Dig it out of settings, others and insights.
-  $: PageComponent = settings.concat(insights, others).
-    find(page => page.id === activePage)?.component || Landing
+  $: PageComponent =
+    settings.concat(insights, others).find((page) => page.id === activePage)?.component || Landing
 </script>
 
 <svelte:window bind:innerWidth />
@@ -86,7 +86,7 @@
   <Container fluid class="mt-3">
     <!-- Mobile Menu Toggle Button -->
     <div class="mobile-toggle-container d-md-none mb-3">
-      <Button color="light" class="sidebar-toggle" on:click={()=>isOpen = !isOpen}>
+      <Button color="light" class="sidebar-toggle" on:click={() => (isOpen = !isOpen)}>
         {isOpen ? '✕ Hide' : '☰ Show'} Menu
       </Button>
     </div>
@@ -99,8 +99,12 @@
           <Nav vertical pills class="nav-custom">
             {#each settings as page}
               <NavItem>
-                <NavLink href={urlBase + page.id} class="nav-link-custom" active={activePage === page.id}
-                  on:click={(e) => navigateTo(e, page.id)}>
+                <NavLink
+                  href={urlBase + page.id}
+                  class="nav-link-custom"
+                  active={activePage === page.id}
+                  on:click={(e) => navigateTo(e, page.id)}
+                >
                   <span class="nav-icon">{page.icon}</span>
                   <span class="nav-text">{page.name}</span>
                 </NavLink>
@@ -114,8 +118,12 @@
           <Nav vertical pills class="nav-custom">
             {#each insights as page}
               <NavItem>
-                <NavLink href={urlBase + page.id} class="nav-link-custom" active={activePage === page.id}
-                  on:click={(e) => navigateTo(e, page.id)}>
+                <NavLink
+                  href={urlBase + page.id}
+                  class="nav-link-custom"
+                  active={activePage === page.id}
+                  on:click={(e) => navigateTo(e, page.id)}
+                >
                   <span class="nav-icon">{page.icon}</span>
                   <span class="nav-text">{page.name}</span>
                 </NavLink>
@@ -127,8 +135,12 @@
             <div class="section-divider"></div>
             <Nav vertical pills class="nav-custom">
               <NavItem>
-                <NavLink href={urlBase + "profile"} class="nav-link-custom" active={activePage === "profile"}
-                  on:click={(e) => navigateTo(e, "profile")}>
+                <NavLink
+                  href={urlBase + 'profile'}
+                  class="nav-link-custom"
+                  active={activePage === 'profile'}
+                  on:click={(e) => navigateTo(e, 'profile')}
+                >
                   <span class="profile-icon">{$profile?.username?.charAt(0).toUpperCase()}</span>
                   <span class="profile-name nav-text">{$profile?.username}</span>
                 </NavLink>
@@ -139,7 +151,7 @@
       </div>
 
       <!-- Content Area -->
-       <Col md={isOpen ? '9' : '12'} lg={10}>
+      <Col md={isOpen ? '9' : '12'} lg={10}>
         <svelte:component this={PageComponent} />
       </Col>
     </Row>
@@ -161,7 +173,7 @@
 
   .section-divider {
     height: 1px;
-    background-color: rgba(0,0,0,0.1);
+    background-color: rgba(0, 0, 0, 0.1);
     margin: 12px 0;
     width: 100%;
   }
@@ -248,7 +260,7 @@
     gap: 8px;
     width: 100%;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
   @media (max-width: 767.98px) {
@@ -264,7 +276,7 @@
       padding: 10px;
       background: rgb(203, 255, 237);
       transition: transform 0.3s ease;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     }
   }
 </style>

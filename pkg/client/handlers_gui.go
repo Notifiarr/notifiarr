@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -176,7 +175,6 @@ type Profile struct {
 // handleProfile returns the current user's username in a JSON response.
 func (c *Client) handleProfile(w http.ResponseWriter, r *http.Request) {
 	username, _ := c.getUserName(r)
-	log.Println("handleProfile", username)
 
 	if err := json.NewEncoder(w).Encode(&Profile{
 		Username: username,
