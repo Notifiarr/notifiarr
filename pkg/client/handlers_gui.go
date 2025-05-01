@@ -417,7 +417,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		c.reloadAppNow()
 	default:
 		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, authHeader)
-		request = c.setSession(request.Header.Get(authHeader), response, request)
+		c.setSession(request.Header.Get(authHeader), response, request)
 		http.Error(response, "Enabled WebUI proxy authentication. Header: "+authHeader, http.StatusOK)
 		c.reloadAppNow()
 	}
@@ -451,7 +451,7 @@ func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request
 	}
 
 	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, username)
-	request = c.setSession(username, response, request)
+	c.setSession(username, response, request)
 	http.Error(response, "Trust Profile saved.", http.StatusOK)
 	c.reloadAppNow()
 }
