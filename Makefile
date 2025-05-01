@@ -6,6 +6,7 @@
 IGNORED:=$(shell bash -c "source settings.sh ; env | grep -v BASH_FUNC | sed 's/=/:=/;s/^/export /' > /tmp/.metadata.make")
 
 BUILD_FLAGS=-tags osusergo,netgo
+WINDOWS_BUILD_FLAGS=-tags osusergo
 GOFLAGS=-trimpath -mod=readonly -modcacherw
 CGO_CPPFLAGS=$(CPPFLAGS)
 CGO_CFLAGS=$(CFLAGS)
@@ -120,10 +121,13 @@ rsrc.syso: init/windows/application.ico init/windows/manifest.xml
 	go run github.com/akavel/rsrc@latest -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
 
 generate: pkg/bindata/docs/api_docs.go
+	go generate ./frontend
 pkg/bindata/docs/api_docs.go:
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/docs
 
+dev: notifiarr
+	$(OUTPUTDIR)/notifiarr
 ####################
 ##### Binaries #####
 ####################
@@ -180,7 +184,8 @@ exe: notifiarr.amd64.exe
 windows: notifiarr.amd64.exe
 notifiarr.amd64.exe: generate rsrc.syso main.go
 	# Building windows 64-bit x86 binary.
-	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
+	GOOS=windows GOARCH=amd64 go build $(WINDOWS_BUILD_FLAGS) -o $(OUTPUTDIR)/$@ -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) $(WINDOWS_LDFLAGS)"
+	bash init/windows/signexe.sh $(OUTPUTDIR)/$@
 
 ####################
 ##### Packages #####

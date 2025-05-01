@@ -1,3 +1,7 @@
+// Package crontimer is used to kick off events on the website.
+// Instead of run a cron on the website that polls every client,
+// we run the cron on the client, so each of them polls the website.
+// Crons are added here solely by the website in the startup payload.
 package crontimer
 
 import (
