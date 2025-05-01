@@ -7,6 +7,7 @@ linters:
     - nlreturn    # Not needed because wsl is good enough; better actually.
     - godot       # Does not work with annotations.
     - depguard    # Not even sure why this is useful. We have too many deps to care.
+    - funcorder
     # fix these.
     - gosec
     - predeclared

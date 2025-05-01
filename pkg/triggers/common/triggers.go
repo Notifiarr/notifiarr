@@ -11,9 +11,11 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"github.com/go-co-op/gocron/v2"
 	"golift.io/cnfg"
 )
 
@@ -30,6 +32,7 @@ type Config struct {
 	*website.Server // send trigger responses to website.
 	Snapshot        *snapshot.Config
 	Apps            *apps.Apps
+	Scheduler       gocron.Scheduler
 	*logs.Logger
 	stop     *Action        // Triggered by calling Stop()
 	list     []*Action      // List of action triggers
@@ -97,9 +100,11 @@ type TriggerName string
 type Action struct {
 	Name TriggerName
 	D    cnfg.Duration                       // how often the timer fires, sets ticker.
+	J    *scheduler.CronJob                  // If provided, D is ignored.
 	Fn   func(context.Context, *ActionInput) // most actions use this for triggers.
 	C    chan *ActionInput                   // if provided, D is optional.
 	t    *time.Ticker                        // if provided, C is optional.
+	job  gocron.Job                          // created if J is non-nil .
 	Hide bool                                // prevent logging.
 }
 
@@ -108,7 +113,7 @@ type Services interface {
 	RunChecks(et website.EventType)
 }
 
-// Exec runs a trigger. This is abastraction method used in a bunch of places.
+// Exec runs a trigger. This is abstraction method is used in a bunch of places.
 func (c *Config) Exec(input *ActionInput, name TriggerName) bool {
 	trig := c.Get(name)
 	if c.stop == nil || trig == nil || trig.C == nil {
@@ -136,7 +141,9 @@ func (c *Config) Get(name TriggerName) *Action {
 // actions are timers or triggers, or both.
 func (c *Config) Add(action ...*Action) {
 	for _, a := range action {
-		if a.D.Duration != 0 {
+		if a.J != nil {
+			a.job = a.J.New(c.Scheduler, func() { a.C <- &ActionInput{Type: website.EventCron} })
+		} else if a.D.Duration != 0 {
 			a.t = time.NewTicker(a.D.Duration)
 		}
 	}

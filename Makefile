@@ -121,10 +121,13 @@ rsrc.syso: init/windows/application.ico init/windows/manifest.xml
 	go run github.com/akavel/rsrc@latest -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
 
 generate: pkg/bindata/docs/api_docs.go
+	go generate ./frontend
 pkg/bindata/docs/api_docs.go:
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/docs
 
+dev: notifiarr
+	$(OUTPUTDIR)/notifiarr
 ####################
 ##### Binaries #####
 ####################
