@@ -3,6 +3,7 @@ import { fetchWithTimeout } from './util'
 
 interface Profile {
   username: string
+  urlBase: string
 }
 
 export const profile = writable<Profile | null>(null)
@@ -37,8 +38,9 @@ export async function login(name: string, password: string): Promise<string | nu
       return `Login failed: Invalid username or password`
     }
 
+    // The login call returns the profile data, so we can set the store and be ready to go.
     // Loading the profile signals to the index page to load the navigation bar.
-    await fetchProfile()
+    profile.set(await response.json())
 
     return null
   } catch (err) {

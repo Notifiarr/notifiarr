@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -104,14 +105,14 @@ func (c *Client) getUserName(request *http.Request) (string, bool) {
 	return cookieValue["username"], false
 }
 
-func (c *Client) setSession(userName string, response http.ResponseWriter) {
+func (c *Client) setSession(userName string, response http.ResponseWriter, request *http.Request) *http.Request {
 	value := map[string]string{
 		"username": userName,
 	}
 
 	encoded, err := c.cookies.Encode("session", value)
 	if err != nil {
-		return
+		return request
 	}
 
 	http.SetCookie(response, &http.Cookie{
@@ -119,6 +120,8 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 		Value: encoded,
 		Path:  "/",
 	})
+
+	return request.WithContext(context.WithValue(request.Context(), userNameStr, []any{userName, true}))
 }
 
 func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
@@ -134,11 +137,11 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	case len(request.FormValue("password")) < minPasswordLen:
 		c.indexPage(request.Context(), response, request, "Invalid Password Length")
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
-		c.setSession(providedUsername, response)
+		request = c.setSession(providedUsername, response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
 
 		if c.newUI {
-			http.Error(response, "Logged in", http.StatusOK)
+			c.handleProfile(response, request)
 		} else { // support the old interface.
 			http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 		}
@@ -167,16 +170,17 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 // Profile is the data returned by the profile GET endpoint.
 type Profile struct {
 	Username string `json:"username"`
+	URLBase  string `json:"urlBase"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
 func (c *Client) handleProfile(w http.ResponseWriter, r *http.Request) {
 	username, _ := c.getUserName(r)
-
-	w.Header().Set("Content-Type", "application/json")
+	log.Println("handleProfile", username)
 
 	if err := json.NewEncoder(w).Encode(&Profile{
 		Username: username,
+		URLBase:  c.Config.URLBase,
 	}); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)
 	}
@@ -413,7 +417,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		c.reloadAppNow()
 	default:
 		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, authHeader)
-		c.setSession(request.Header.Get(authHeader), response)
+		request = c.setSession(request.Header.Get(authHeader), response, request)
 		http.Error(response, "Enabled WebUI proxy authentication. Header: "+authHeader, http.StatusOK)
 		c.reloadAppNow()
 	}
@@ -447,7 +451,7 @@ func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request
 	}
 
 	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, username)
-	c.setSession(username, response)
+	request = c.setSession(username, response, request)
 	http.Error(response, "Trust Profile saved.", http.StatusOK)
 	c.reloadAppNow()
 }
