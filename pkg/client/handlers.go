@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/CAFxX/httpcompression"
+	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -27,9 +28,14 @@ func (c *Client) httpHandlers() {
 		return compress(handler)
 	}
 
-	// 404 (or redirect to base path) everything else
 	defer func() {
-		c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
+		if c.newUI {
+			// SPA gets all the requests so it can handle its own page router.
+			c.Config.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler))
+		} else {
+			// 404 (or redirect to base path) everything else
+			c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
+		}
 	}()
 
 	base := path.Join("/", c.Config.URLBase)
@@ -49,6 +55,8 @@ func (c *Client) httpHandlers() {
 		return
 	}
 
+	c.Config.Router.PathPrefix(path.Join(base, "/assets/")).
+		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), gzip(frontend.IndexHandler)))
 	c.Config.Router.PathPrefix(path.Join(base, "/files/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
 	c.Config.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")
@@ -79,6 +87,7 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/services/check/{service}", c.handleServicesCheck).Methods("GET")
 	gui.HandleFunc("/services/{action:stop|start}", c.handleServicesStopStart).Methods("GET")
 	gui.HandleFunc("/shutdown", c.handleShutdown).Methods("GET")
+	gui.HandleFunc("/profile", c.handleProfile).Methods("GET")
 	gui.HandleFunc("/template/{template}", c.getTemplatePageHandler).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}/{content}", c.triggers.Handler).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}", c.triggers.Handler).Methods("GET")
