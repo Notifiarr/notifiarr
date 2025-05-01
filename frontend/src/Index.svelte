@@ -8,7 +8,6 @@
   let password = ''
   let loginFailedMsg = ''
   let isLoading = false
-  let profileFetch = fetchProfile()
 
   async function handleLogin() {
     if (!username || !password) {
@@ -19,14 +18,9 @@
     isLoading = true
     loginFailedMsg = ''
 
-    try {
-      const error = await login(username, password)
-      if (error) loginFailedMsg = error
-    } catch (err) {
-      loginFailedMsg = `An unexpected error occurred: ${err}`
-    } finally {
-      isLoading = false
-    }
+    try { loginFailedMsg = (await login(username, password) ?? '') }
+    catch (err) { loginFailedMsg = `An unexpected error occurred: ${err}` }
+    finally { isLoading = false }
   }
 </script>
 
@@ -42,7 +36,7 @@
     <NavbarBrand href="#"><h1><img src={logo} height="60" alt="Notifiarr" /> Notifiarr Client</h1></NavbarBrand>
   </Navbar>
 
-  {#await profileFetch}
+  {#await fetchProfile()}
     <Card body theme="light" color="warning" outline>
       <div>Loading...</div>
     </Card>

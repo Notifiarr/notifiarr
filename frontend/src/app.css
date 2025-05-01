@@ -5,7 +5,6 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,32 +12,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 html, body {
   margin: 0;
-  height: 100%;
+  min-height: 100%;
+  height: 100vh;
 }
 
 body {
   background-image: url(../src/assets/lightbg.svg);
-  background-size: #b9c8f3;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-#app {
-  margin: 0 auto;
+  background-color: #b9c8f3;
+  background-position: center;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: background-image 0.4s;
 }
 
 body.dark-mode {
