@@ -1,10 +1,5 @@
 <script lang="ts">
-  import {
-    Card,
-    CardHeader,
-    CardBody,
-    CardFooter
-  } from '@sveltestrap/sveltestrap';
+  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
 </script>
 
 <Card class="mb-4">

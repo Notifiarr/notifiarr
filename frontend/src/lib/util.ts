@@ -18,6 +18,5 @@ export async function fetchWithTimeout(url: string, options: RequestInit = {}, t
 }
 
 export function trimPrefix(str: string, prefix: string) {
-  if (str.startsWith(prefix)) return str.slice(prefix.length)
-  return str
+  return str.slice(str.startsWith(prefix) ? prefix.length : 0)
 }

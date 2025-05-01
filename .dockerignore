@@ -5,6 +5,7 @@
 init
 examples
 .github
+.vscode
 userscripts
 README.md
 Makefile
