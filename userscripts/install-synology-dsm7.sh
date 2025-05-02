@@ -3,20 +3,23 @@
 
 set -e
 
+# Check for root privileges
+if [ "$EUID" -ne 0 ]; then
+  echo "This script must be run as root or with sudo."
+  exit 1
+fi
+
 echo "Detecting system architecture..."
 ARCH=$(uname -m)
 case "$ARCH" in
   x86_64 | amd64) 
-    ARCH_NAME="x86_64"
-    BINARY_NAME="amd64.linux.gz"
+    ARCH_NAME="amd64"
     ;;
   aarch64 | arm64) 
-    ARCH_NAME="arm64-v8"
-    BINARY_NAME="arm64.linux.gz"
+    ARCH_NAME="arm64"
     ;;
   armv7* | armv6* | armhf) 
     ARCH_NAME="arm"
-    BINARY_NAME="arm.linux.gz"
     ;;
   *) 
     echo "Unsupported architecture: $ARCH"
@@ -26,7 +29,7 @@ esac
 
 echo "Fetching latest Notifiarr release metadata..."
 RELEASE_JSON=$(curl -sSL https://api.github.com/repos/Notifiarr/notifiarr/releases/latest)
-PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -Eo "https://[^\"]+${ARCH_NAME}.*\.tar\.gz" | head -n 1)
+PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -o "https://[^\"]*notifiarr\.${ARCH_NAME//./\\.}\.linux\.gz" | head -n 1)
 PACKAGE=$(basename "$PACKAGE_URL")
 
 if [ -z "$PACKAGE_URL" ]; then
@@ -42,10 +45,12 @@ if ! curl -L -o "$PACKAGE" "$PACKAGE_URL"; then
 fi
 
 echo "Extracting Notifiarr package..."
-if ! tar -xzf "$PACKAGE"; then
+if ! gunzip -c "$PACKAGE" > /usr/bin/notifiarr; then
   echo "Failed to extract Notifiarr package."
   exit 1
 fi
+
+chmod +x /usr/bin/notifiarr
 rm -f "$PACKAGE"
 
 echo "Installing or updating Notifiarr binary..."
@@ -53,35 +58,29 @@ if [ -f /usr/bin/notifiarr ]; then
   echo "Stopping existing Notifiarr service..."
   pkill -f "/usr/bin/notifiarr" || true
 fi
-mv usr/bin/notifiarr /usr/bin/notifiarr
-chmod +x /usr/bin/notifiarr
-[ -d usr ] && rm -rf usr
 
 echo "Creating or updating config and log directories..."
-mkdir -p /etc/notifiarr /var/log/notifiarr
+mkdir -p /etc/notifiarr /volume1/@appdata/notifiarr/lognotifiarr
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
 if [ ! -f "${CONFIGFILE}" ]; then
   echo "Generating config file ${CONFIGFILE}"
   echo " " > "${CONFIGFILE}"
-  export DN_LOG_FILE="/var/log/notifiarr/app.log"
-  export DN_HTTP_LOG="/var/log/notifiarr/http.log"
+  export DN_LOG_FILE="/volume1/@appdata/notifiarr/lognotifiarr/app.log"
+  export DN_HTTP_LOG="/volume1/@appdata/notifiarr/lognotifiarr/http.log"
   /usr/bin/notifiarr --config "${CONFIGFILE}" --write "${CONFIGFILE}.new"
   mv "${CONFIGFILE}.new" "${CONFIGFILE}"
 else
   echo "Config file already exists. Skipping generation."
 fi
 
-echo "Setting permissions/ownership on: /usr/bin/notifiarr /var/log/notifiarr"
-chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
-chmod 0750 /var/log/notifiarr
-chown -R notifiarr: /var/log/notifiarr /etc/notifiarr
-
 echo "Creating 'notifiarr' user if missing..."
-id notifiarr >/dev/null 2>&1 || {
+if ! id notifiarr >/dev/null 2>&1; then
   synouser --add notifiarr "" Notifiarr 0 "" 0
-  synouser --disable notifiarr
-}
-chown -R notifiarr: /var/log/notifiarr /etc/notifiarr
+fi
+
+echo "Setting permissions/ownership on: /usr/bin/notifiarr /volume1/@appdata/notifiarr/lognotifiarr"
+chmod 0750 /usr/bin/notifiarr /volume1/@appdata/notifiarr/lognotifiarr
+chown -R notifiarr:notifiarr /volume1/@appdata/notifiarr/lognotifiarr /etc/notifiarr
 
 echo "Adding sudoers entry for smartctl..."
 sed -i '/notifiarr/d' /etc/sudoers
@@ -110,7 +109,7 @@ echo "Installing or updating daily auto-update cron job..."
 CRON_SCRIPT="/usr/bin/update-notifiarr.sh"
 CRON_FILE="/etc/cron.d/update-notifiarr"
 
-curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh
+curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology-dsm7.sh
 chmod +x "$CRON_SCRIPT"
 echo "10 3 * * * root /bin/bash $CRON_SCRIPT >> /dev/null 2>&1" > "$CRON_FILE"
 
