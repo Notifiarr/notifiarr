@@ -6,31 +6,27 @@ set -e
 echo "Detecting system architecture..."
 ARCH=$(uname -m)
 case "$ARCH" in
-  x86_64 | amd64) ARCH_NAME="x86_64" ;;
-  aarch64 | arm64) ARCH_NAME="arm64-v8" ;;
-  armv7* | armv6* | armhf) ARCH_NAME="armhf" ;;
-  *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+  x86_64 | amd64) 
+    ARCH_NAME="x86_64"
+    BINARY_NAME="amd64.linux.gz"
+    ;;
+  aarch64 | arm64) 
+    ARCH_NAME="arm64-v8"
+    BINARY_NAME="arm64.linux.gz"
+    ;;
+  armv7* | armv6* | armhf) 
+    ARCH_NAME="arm"
+    BINARY_NAME="arm.linux.gz"
+    ;;
+  *) 
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+    ;;
 esac
-
-echo "Checking for opkg..."
-if ! command -v opkg >/dev/null 2>&1; then
-  echo "opkg is not installed. Please install Entware: https://github.com/Entware/Entware/wiki/Install-on-Synology-NAS"
-  exit 1
-fi
-
-echo "Installing zstd via opkg..."
-opkg update
-opkg install zstd
-
-echo "Verifying zstd..."
-if ! command -v zstd >/dev/null 2>&1; then
-  echo "zstd installation failed."
-  exit 1
-fi
 
 echo "Fetching latest Notifiarr release metadata..."
 RELEASE_JSON=$(curl -sSL https://api.github.com/repos/Notifiarr/notifiarr/releases/latest)
-PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -Eo "https://[^\"]+${ARCH_NAME}.*\.pkg\.tar\.zst" | head -n 1)
+PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -Eo "https://[^\"]+${ARCH_NAME}.*\.tar\.gz" | head -n 1)
 PACKAGE=$(basename "$PACKAGE_URL")
 
 if [ -z "$PACKAGE_URL" ]; then
@@ -40,47 +36,58 @@ fi
 
 echo "Downloading Notifiarr package: $PACKAGE_URL"
 cd /tmp
-curl -L -o "$PACKAGE" "$PACKAGE_URL"
-
-echo "Extracting Notifiarr package..."
-if tar --help | grep -q -- '--zstd'; then
-  tar --zstd -xf "$PACKAGE"
-else
-  FALLBACK_TAR="${PACKAGE%.zst}"
-  zstd -d "$PACKAGE" -o "$FALLBACK_TAR"
-  tar -xf "$FALLBACK_TAR"
-  rm -f "$FALLBACK_TAR"
+if ! curl -L -o "$PACKAGE" "$PACKAGE_URL"; then
+  echo "Failed to download Notifiarr package."
+  exit 1
 fi
 
-echo "Installing Notifiarr binary..."
+echo "Extracting Notifiarr package..."
+if ! tar -xzf "$PACKAGE"; then
+  echo "Failed to extract Notifiarr package."
+  exit 1
+fi
+rm -f "$PACKAGE"
+
+echo "Installing or updating Notifiarr binary..."
+if [ -f /usr/bin/notifiarr ]; then
+  echo "Stopping existing Notifiarr service..."
+  pkill -f "/usr/bin/notifiarr" || true
+fi
 mv usr/bin/notifiarr /usr/bin/notifiarr
 chmod +x /usr/bin/notifiarr
-rm -rf usr "$PACKAGE"
+[ -d usr ] && rm -rf usr
 
-echo "Creating config and log directories..."
-mkdir -p /etc/notifiarr /volume1/data
-chown -R root:root /etc/notifiarr /volume1/data
-chmod 755 /volume1/data
-
+echo "Creating or updating config and log directories..."
+mkdir -p /etc/notifiarr /var/log/notifiarr
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
-echo "Downloading clean default config from GitHub..."
-curl -sSLo "$CONFIGFILE" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/examples/notifiarr.conf.example
+if [ ! -f "${CONFIGFILE}" ]; then
+  echo "Generating config file ${CONFIGFILE}"
+  echo " " > "${CONFIGFILE}"
+  export DN_LOG_FILE="/var/log/notifiarr/app.log"
+  export DN_HTTP_LOG="/var/log/notifiarr/http.log"
+  /usr/bin/notifiarr --config "${CONFIGFILE}" --write "${CONFIGFILE}.new"
+  mv "${CONFIGFILE}.new" "${CONFIGFILE}"
+else
+  echo "Config file already exists. Skipping generation."
+fi
 
-echo "Fixing log_file path in config..."
-sed -i 's|^\(log_file\s*=\s*\).*|\1"/volume1/data/notifiarr.log"|' "$CONFIGFILE"
+echo "Setting permissions/ownership on: /usr/bin/notifiarr /var/log/notifiarr"
+chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
+chmod 0750 /var/log/notifiarr
+chown -R notifiarr: /var/log/notifiarr /etc/notifiarr
 
 echo "Creating 'notifiarr' user if missing..."
 id notifiarr >/dev/null 2>&1 || {
-  PASS=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 32)
-  synouser --add notifiarr "$PASS" Notifiarr 0 support@notifiarr.com 0
+  synouser --add notifiarr "" Notifiarr 0 "" 0
+  synouser --disable notifiarr
 }
-chown notifiarr /volume1/data
+chown -R notifiarr: /var/log/notifiarr /etc/notifiarr
 
 echo "Adding sudoers entry for smartctl..."
 sed -i '/notifiarr/d' /etc/sudoers
 echo 'notifiarr ALL=(root) NOPASSWD:/bin/smartctl *' >> /etc/sudoers
 
-echo "Creating DSM boot startup script..."
+echo "Creating or updating DSM boot startup script..."
 cat << 'EOF' > /usr/local/etc/rc.d/notifiarr.sh
 #!/bin/sh
 case "$1" in
@@ -99,38 +106,13 @@ EOF
 chmod +x /usr/local/etc/rc.d/notifiarr.sh
 /usr/local/etc/rc.d/notifiarr.sh start
 
-echo "Installing daily auto-update cron job..."
+echo "Installing or updating daily auto-update cron job..."
 CRON_SCRIPT="/usr/bin/update-notifiarr.sh"
-CRON_LOG="/volume1/data/notifiarr-updates.log"
 CRON_FILE="/etc/cron.d/update-notifiarr"
 
 curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology.sh
 chmod +x "$CRON_SCRIPT"
-echo "10 3 * * * root /bin/bash $CRON_SCRIPT >> $CRON_LOG 2>&1" > "$CRON_FILE"
-
-echo "Installing weekly log rotation script..."
-LOGROTATE_SCRIPT="/usr/bin/rotate-notifiarr-logs.sh"
-cat << 'EOF' > "$LOGROTATE_SCRIPT"
-#!/bin/sh
-LOG_DIR="/volume1/data"
-LOG_FILE="notifiarr.log"
-MAX_BACKUPS=4
-
-cd "$LOG_DIR" || exit 1
-
-if [ -f "$LOG_FILE" ]; then
-  TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-  cp "$LOG_FILE" "$LOG_FILE.$TIMESTAMP"
-  gzip "$LOG_FILE.$TIMESTAMP"
-  : > "$LOG_FILE"
-fi
-
-# Cleanup old backups
-ls -t "$LOG_FILE."*.gz 2>/dev/null | tail -n +$((MAX_BACKUPS + 1)) | xargs -r rm -f
-EOF
-
-chmod +x "$LOGROTATE_SCRIPT"
-grep -q rotate-notifiarr-logs /etc/cron.d/update-notifiarr || echo "0 4 * * 0 root /bin/sh $LOGROTATE_SCRIPT" >> /etc/cron.d/update-notifiarr
+echo "10 3 * * * root /bin/bash $CRON_SCRIPT >> /dev/null 2>&1" > "$CRON_FILE"
 
 echo "Running final install verification..."
 fail() { echo "FAILED: $1"; exit 1; }
@@ -147,9 +129,8 @@ fi
 checkfile "$CONFIGFILE"
 check /usr/local/etc/rc.d/notifiarr.sh
 grep -q update-notifiarr "$CRON_FILE" && echo "OK: Cron job is installed" || fail "Cron job not found"
-echo "OK: Log file should be at /volume1/data/notifiarr.log"
 
-echo "Installation complete. Notifiarr is running, persistent, auto-updating, and safely logging to /volume1/data."
+echo "Installation or update complete. Notifiarr is running, persistent, and auto-updating."
 echo "Please edit /etc/notifiarr/notifiarr.conf and then restart the service with:"
 echo "/usr/local/etc/rc.d/notifiarr.sh stop"
 echo "/usr/local/etc/rc.d/notifiarr.sh start"
