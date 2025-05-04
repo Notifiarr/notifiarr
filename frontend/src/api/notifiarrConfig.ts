@@ -19,7 +19,7 @@ export enum Weekday {
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.Config>
  */
-export interface Config {
+export interface Config extends LogConfig, Apps {
   hostId: string;
   uiPassword: string;
   bindAddr: string;
@@ -37,8 +37,6 @@ export interface Config {
   watchFiles?: (null | WatchFile)[];
   endpoints?: (null | Endpoint)[];
   commands?: (null | Command)[];
-  LogConfig?: LogConfig;
-  Apps?: Apps;
 };
 
 /**
@@ -209,9 +207,7 @@ export interface Apps {
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.SonarrConfig>
  */
-export interface SonarrConfig extends ExtraConfig {
-  Config?: StarrConfig;
-};
+export interface SonarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ExtraConfig>
@@ -243,37 +239,27 @@ export interface StarrConfig {
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.RadarrConfig>
  */
-export interface RadarrConfig extends ExtraConfig {
-  Config?: StarrConfig;
-};
+export interface RadarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.LidarrConfig>
  */
-export interface LidarrConfig extends ExtraConfig {
-  Config?: StarrConfig;
-};
+export interface LidarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ReadarrConfig>
  */
-export interface ReadarrConfig extends ExtraConfig {
-  Config?: StarrConfig;
-};
+export interface ReadarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ProwlarrConfig>
  */
-export interface ProwlarrConfig extends ExtraConfig {
-  Config?: StarrConfig;
-};
+export interface ProwlarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.DelugeConfig>
  */
-export interface DelugeConfig extends ExtraConfig {
-  Config?: DelugeConfig0;
-};
+export interface DelugeConfig extends ExtraConfig, DelugeConfig0 {};
 
 /**
  * Config is the data needed to poll Deluge.
@@ -290,9 +276,7 @@ export interface DelugeConfig0 {
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.QbitConfig>
  */
-export interface QbitConfig extends ExtraConfig {
-  Config?: QbitConfig0;
-};
+export interface QbitConfig extends ExtraConfig, QbitConfig0 {};
 
 /**
  * Config is the input data needed to return a Qbit struct.
@@ -319,9 +303,7 @@ export interface RtorrentConfig extends ExtraConfig {
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.SabNZBConfig>
  */
-export interface SabNZBConfig extends ExtraConfig {
-  Config?: SabnzbdConfig;
-};
+export interface SabNZBConfig extends ExtraConfig, SabnzbdConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd.Config>
@@ -334,9 +316,7 @@ export interface SabnzbdConfig {
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.NZBGetConfig>
  */
-export interface NZBGetConfig extends ExtraConfig {
-  Config?: NzbgetConfig;
-};
+export interface NZBGetConfig extends ExtraConfig, NzbgetConfig {};
 
 /**
  * Config is the input data needed to return a NZBGet struct.
@@ -374,9 +354,7 @@ export interface TautulliConfig0 {
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.PlexConfig>
  */
-export interface PlexConfig extends ExtraConfig {
-  Config?: PlexConfig0;
-};
+export interface PlexConfig extends PlexConfig0, ExtraConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Config>
