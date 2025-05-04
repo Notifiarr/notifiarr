@@ -241,8 +241,6 @@ github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUz
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd/go.mod h1:hPqNNc0+uJM6H+SuU8sEs5K5IQeKccPqeSjfgcKGgPk=
-github.com/shirou/gopsutil/v4 v4.25.3 h1:SeA68lsu8gLggyMbmCn8cmp97V1TI9ld9sVzAUcKcKE=
-github.com/shirou/gopsutil/v4 v4.25.3/go.mod h1:xbuxyoZj+UsgnZrENu3lQivsngRR5BdjbJwf2fv4szA=
 github.com/shirou/gopsutil/v4 v4.25.4 h1:cdtFO363VEOOFrUCjZRh4XVJkb548lyF0q0uTeMqYPw=
 github.com/shirou/gopsutil/v4 v4.25.4/go.mod h1:xbuxyoZj+UsgnZrENu3lQivsngRR5BdjbJwf2fv4szA=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
@@ -453,6 +451,8 @@ golift.io/datacounter v1.0.4 h1:b2gLQCs8WYRtKjOMG0qM82rF1o0+oKUXB9QH7kjmxZ4=
 golift.io/datacounter v1.0.4/go.mod h1:79Yf1ucynYvZzVS/hpfrAFt6y/w82FMlOJgh+MBaZvs=
 golift.io/deluge v0.10.1 h1:wu1GzXsDYzWGnRl4mNEd2IeY0O7+jhYJ4IKBPfDEanM=
 golift.io/deluge v0.10.1/go.mod h1:i6h0V+nRzG4XymHQ5kC4d4Z6JZw2M83gMqcZhWgiD1k=
+golift.io/goty v0.0.0-20250504194040-e173074e4021 h1:qSdlNfdWuLehFHV2idfux1LyNil+u4qcFuZEW8YZf8Y=
+golift.io/goty v0.0.0-20250504194040-e173074e4021/go.mod h1:CJxZ2ML/T1BmKurWdZv2046tq2FNVprjFFdhscSvphE=
 golift.io/mulery v0.0.8 h1:0D57orumzv9QORLLfTi4ao7uIACSyXkGSze32xLc04Q=
 golift.io/mulery v0.0.8/go.mod h1:4qn4yK/A4GdSKjl4pKBK0ORVHTF466Zfsy8YI0+9dps=
 golift.io/nzbget v0.1.5 h1:TE/TPldaLr/Qy5wy+7R4Lvur1SosOpjTLs6BLK3TMrU=

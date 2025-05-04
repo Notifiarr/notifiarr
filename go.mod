@@ -43,6 +43,7 @@ require (
 	golift.io/cnfgfile v0.0.0-20240713024420-a5436d84eb48
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
+	golift.io/goty v0.0.0-20250504194040-e173074e4021
 	golift.io/mulery v0.0.8
 	golift.io/nzbget v0.1.5
 	golift.io/qbit v0.0.0-20240715191156-11930ac2546e
