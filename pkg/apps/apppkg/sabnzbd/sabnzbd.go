@@ -19,9 +19,9 @@ import (
 var ErrUnknownByteType = errors.New("unknown byte type")
 
 type Config struct {
-	URL          string `toml:"url"     xml:"url"`
-	APIKey       string `toml:"api_key" xml:"api_key"`
-	*http.Client `json:"-"       toml:"-"      xml:"-"`
+	URL    string       `json:"url"    toml:"url"     xml:"url"`
+	APIKey string       `json:"apiKey" toml:"api_key" xml:"api-key"`
+	Client *http.Client `json:"-"      toml:"-"       xml:"-"`
 }
 
 // QueueSlots has the following data structure.

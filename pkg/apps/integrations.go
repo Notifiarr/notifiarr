@@ -23,7 +23,7 @@ import (
 
 type PlexConfig struct {
 	*plex.Config
-	*plex.Server
+	*plex.Server `json:"-" toml:"-" xml:"-"`
 	ExtraConfig
 }
 
@@ -232,10 +232,10 @@ func (c *QbitConfig) Enabled() bool {
 
 type RtorrentConfig struct {
 	ExtraConfig
-	*xmlrpc.Client
-	URL  string `json:"url"  toml:"url"  xml:"url"`
-	User string `json:"user" toml:"user" xml:"user"`
-	Pass string `json:"pass" toml:"pass" xml:"pass"`
+	*xmlrpc.Client `json:"-" toml:"-" xml:"-"`
+	URL            string `json:"url"  toml:"url"  xml:"url"`
+	User           string `json:"user" toml:"user" xml:"user"`
+	Pass           string `json:"pass" toml:"pass" xml:"pass"`
 }
 
 func (a *Apps) setupRtorrent() error {
