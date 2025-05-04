@@ -232,7 +232,7 @@ func (c *QbitConfig) Enabled() bool {
 
 type RtorrentConfig struct {
 	ExtraConfig
-	*xmlrpc.Client `json:"-" toml:"-" xml:"-"`
+	*xmlrpc.Client `json:"-"    toml:"-"    xml:"-"`
 	URL            string `json:"url"  toml:"url"  xml:"url"`
 	User           string `json:"user" toml:"user" xml:"user"`
 	Pass           string `json:"pass" toml:"pass" xml:"pass"`
