@@ -16,7 +16,7 @@ import (
 // Config is the Tautulli configuration.
 type Config struct {
 	URL    string       `json:"url"    toml:"url"     xml:"url"`
-	APIKey string       `json:"apiKey" toml:"api_key" xml:"api-key"`
+	APIKey string       `json:"apiKey" toml:"api_key" xml:"api_key"`
 	Client *http.Client `json:"-"      toml:"-"       xml:"-"`
 }
 
