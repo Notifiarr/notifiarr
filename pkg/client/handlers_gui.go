@@ -168,8 +168,8 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 
 // Profile is the data returned by the profile GET endpoint.
 type Profile struct {
-	Username string `json:"username"`
-	URLBase  string `json:"urlBase"`
+	Username string             `json:"username"`
+	Config   *configfile.Config `json:"config"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
@@ -178,7 +178,7 @@ func (c *Client) handleProfile(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(&Profile{
 		Username: username,
-		URLBase:  c.Config.URLBase,
+		Config:   c.Config,
 	}); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)
 	}
@@ -640,7 +640,19 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// update config.
-	if err = c.mergeAndValidateNewConfig(config, request); err != nil {
+	if request.Header.Get("Content-Type") == "application/json" {
+		if err = json.NewDecoder(request.Body).Decode(&config); err != nil {
+			c.Errorf("[gui '%s' requested] Decoding POSTed Config: %v", user, err)
+			http.Error(response, "Error decoding POSTed Config: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = c.validateNewConfig(config)
+	} else {
+		err = c.mergeAndValidateNewConfig(config, request)
+	}
+
+	if err != nil {
 		c.Errorf("[gui '%s' requested] Validating POSTed Config: %v", user, err)
 		http.Error(response, err.Error(), http.StatusBadRequest)
 
@@ -649,12 +661,12 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 	// Check app integration configs before saving.
 	config.Apps.Logger = c.Logger
-	if err := config.Apps.Setup(); err != nil {
+	if err = config.Apps.Setup(); err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 		return
 	}
 
-	if err := c.saveNewConfig(request.Context(), config); err != nil {
+	if err = c.saveNewConfig(request.Context(), config); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 

@@ -67,7 +67,7 @@
   }
 
   // Used to auto-navigate.
-  $: urlBase = $profile?.urlBase || '/'
+  $: urlBase = $profile?.config.urlbase || '/'
   $: parts = trimPrefix(window.location.pathname, urlBase).split('/')
   $: activePage = parts.length > 0 ? parts[0] : 'landing'
 
