@@ -1,12 +1,46 @@
 import { writable } from 'svelte/store'
 import { fetchWithTimeout } from './util'
+import { checkReloaded, postUi } from '../api/fetch'
+import type { Config } from '../api/notifiarrConfig'
+import { toast } from '@zerodevx/svelte-toast'
 
 interface Profile {
   username: string
-  urlBase: string
+  config: Config
 }
 
-export const profile = writable<Profile | null>(null)
+function createProfileStore() {
+  const { subscribe, set, update } = writable<Profile | null>(null)
+
+  return {
+    subscribe,
+    set,
+    update,
+    async updateConfig(config: Config) {
+      try {
+        // Send the config to the server using postUi
+        const response = await postUi('reconfig', JSON.stringify(config), false)
+        if (!response) throw new Error('Failed to save configuration')
+
+        // Update the local store with the new config
+        update(profile => profile ? { ...profile, config } : null)
+        toast.push('Configuration updated: '+response)
+
+        // TODO: move both of these into the svelte caller.
+        // TODO: so we can visualize the update, reload, check and profile fetch.
+        // Wait for the server to reload
+        await checkReloaded()
+        await fetchProfile()
+
+      } catch (error) {
+        toast.push('Configuration update failed: ' + error)
+        throw error instanceof Error ? error : new Error('An unknown error occurred')
+      }
+    }
+  }
+}
+
+export const profile = createProfileStore()
 
 export async function fetchProfile() {
   try {
@@ -48,6 +82,6 @@ export async function login(name: string, password: string): Promise<string | nu
       return 'Login request timed out'
     }
 
-    return `Login failed: ${(err)}`
+    return `Login failed: ${err}`
   }
 }
