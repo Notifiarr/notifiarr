@@ -748,9 +748,9 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	config.Snapshot.Plugins.MySQL = nil
 	config.Snapshot.Plugins.Nvidia = nil
 
-	for k, v := range request.PostForm {
-		c.Errorf("Config Post: %s = %+v", k, v)
-	}
+	// for k, v := range request.PostForm {
+	// 	c.Errorf("Config Post: %s = %+v", k, v)
+	// }
 
 	// Decode the POST'd data directly into the mostly-empty config struct.
 	if err := mnd.ConfigPostDecoder.Decode(config, request.PostForm); err != nil {
