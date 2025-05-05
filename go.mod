@@ -35,7 +35,7 @@ require (
 	github.com/vearutop/statigz v1.5.0
 	golang.org/x/crypto v0.37.0
 	golang.org/x/mod v0.24.0
-	golang.org/x/sys v0.32.0
+	golang.org/x/sys v0.33.0
 	golang.org/x/text v0.24.0
 	golang.org/x/time v0.11.0
 	golift.io/cache v0.0.2
