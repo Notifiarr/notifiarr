@@ -1,6 +1,5 @@
 import { get } from "svelte/store"
-import { fetchWithTimeout } from "../lib/util"
-import { profile } from "../lib/login"
+import { profile } from "./profile"
 
 export const LoggedOut = new Error('logged out')
 
@@ -89,4 +88,23 @@ async function request(
 
   if (json) return response.json()
   return response.text()
+}
+
+export async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 5000): Promise<Response> {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      mode: 'same-origin',
+      signal: controller.signal,
+      redirect: 'manual',
+    })
+    clearTimeout(id)
+    return response
+  } catch (error) {
+    clearTimeout(id)
+    throw error
+  }
 }

@@ -1,10 +1,13 @@
 {
   "useTabs": false,
   "singleQuote": true,
-  "printWidth": 100,
+  "printWidth": 90,
   "tabWidth": 2,
   "overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }],
   "svelteStrictMode": true,
   "semi": false,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "bracketSameLine": true,
+  "arrowParens": "avoid",
+  "objectWrap": "collapse"
 }

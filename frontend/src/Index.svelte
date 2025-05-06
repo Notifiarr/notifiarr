@@ -11,8 +11,10 @@
     Styles,
   } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg'
-  import { profile, fetchProfile, login } from './lib/login'
+  import { profile, fetchProfile } from './api/profile'
+  import { login } from './api/login'
   import Navigation from './Navigation.svelte'
+  import { SvelteToast } from '@zerodevx/svelte-toast'
 
   let username = ''
   let password = ''
@@ -39,11 +41,12 @@
 </script>
 
 <svelte:head>
-  <title>{$profile ? '' : 'Login - '}Notifiarr Client</title>
+  <title>{$profile.loggedIn ? '' : 'Login - '}Notifiarr Client</title>
   <link rel="icon" type="image/png" href={logo} />
 </svelte:head>
 
 <Styles />
+<SvelteToast />
 
 <main>
   <Navbar>
@@ -57,7 +60,7 @@
       <div>Loading...</div>
     </Card>
   {:then}
-    {#if $profile}<!-- This is the main page, after logging in. -->
+    {#if $profile.loggedIn}<!-- This is the main page, after logging in. -->
       <Navigation />
     {:else}<!-- This is the login page, before logging in. -->
       <Card body theme="light" color="info" outline>

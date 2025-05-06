@@ -1,6 +1,6 @@
 <script>
   import { Card } from '@sveltestrap/sveltestrap'
-  import { profile } from './lib/login'
+  import { profile } from './api/profile'
 </script>
 
 <Card body color="success" outline class="mb-3">

@@ -8,8 +8,9 @@
     Row,
     Col,
     Button,
+    Fade,
   } from '@sveltestrap/sveltestrap'
-  import { profile } from './lib/login'
+  import { profile } from './api/profile'
   import Configuration from './configuration/Index.svelte'
   import SiteTunnel from './siteTunnel/Index.svelte'
   import StarrApps from './starrApps/Index.svelte'
@@ -63,7 +64,7 @@
     activePage = pageId
     window.history.replaceState({}, '', `${urlBase}${pageId}`)
     // Auto-collapse sidebar on mobile after navigation
-    isOpen = innerWidth > 767
+    isOpen = windowWidth >= 992
   }
 
   // Used to auto-navigate.
@@ -72,20 +73,21 @@
   $: activePage = parts.length > 0 ? parts[0] : 'landing'
 
   // Used for sidebar collapse state.
-  let innerWidth = 1200
-  $: isOpen = innerWidth > 767
+  let windowWidth = 1000
+  $: isOpen = windowWidth >= 992
 
   // Set the component based on the active page. Dig it out of settings, others and insights.
   $: PageComponent =
-    settings.concat(insights, others).find((page) => page.id === activePage)?.component || Landing
+    settings.concat(insights, others).find(page => page.id === activePage)?.component ||
+    Landing
 </script>
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth={windowWidth} />
 
 <div class="navigation">
   <Container fluid class="mt-3">
     <!-- Mobile Menu Toggle Button -->
-    <div class="mobile-toggle-container d-md-none mb-3">
+    <div class="mobile-toggle-container d-lg-none mb-3">
       <Button color="light" class="sidebar-toggle" on:click={() => (isOpen = !isOpen)}>
         {isOpen ? '✕ Hide' : '☰ Show'} Menu
       </Button>
@@ -93,7 +95,7 @@
 
     <Row>
       <!-- Navigation Sidebar -->
-      <div class={`sidebar-col col-md-3 col-lg-2 ${!isOpen ? 'd-none' : 'd-block'}`}>
+      <Fade class="sidebar-col col" {isOpen}>
         <Card body color="light" class="sidebar-card">
           <p class="navheader">Settings</p>
           <Nav vertical pills class="nav-custom">
@@ -103,8 +105,7 @@
                   href={urlBase + page.id}
                   class="nav-link-custom"
                   active={activePage === page.id}
-                  on:click={(e) => navigateTo(e, page.id)}
-                >
+                  on:click={e => navigateTo(e, page.id)}>
                   <span class="nav-icon">{page.icon}</span>
                   <span class="nav-text">{page.name}</span>
                 </NavLink>
@@ -122,8 +123,7 @@
                   href={urlBase + page.id}
                   class="nav-link-custom"
                   active={activePage === page.id}
-                  on:click={(e) => navigateTo(e, page.id)}
-                >
+                  on:click={e => navigateTo(e, page.id)}>
                   <span class="nav-icon">{page.icon}</span>
                   <span class="nav-text">{page.name}</span>
                 </NavLink>
@@ -139,21 +139,20 @@
                   href={urlBase + 'profile'}
                   class="nav-link-custom"
                   active={activePage === 'profile'}
-                  on:click={(e) => navigateTo(e, 'profile')}
-                >
-                  <span class="profile-icon">{$profile?.username?.charAt(0).toUpperCase()}</span>
-                  <span class="profile-name nav-text">{$profile?.username}</span>
+                  on:click={e => navigateTo(e, 'profile')}>
+                  <span class="profile-icon">
+                    {$profile.username.charAt(0).toUpperCase()}
+                  </span>
+                  <span class="profile-name nav-text">{$profile.username}</span>
                 </NavLink>
               </NavItem>
             </Nav>
           </div>
         </Card>
-      </div>
+      </Fade>
 
       <!-- Content Area -->
-      <Col md={isOpen ? '9' : '12'} lg={10}>
-        <svelte:component this={PageComponent} />
-      </Col>
+      <Col><svelte:component this={PageComponent} /></Col>
     </Row>
   </Container>
 </div>
@@ -263,12 +262,16 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
-  @media (max-width: 767.98px) {
+  .navigation :global(.sidebar-col) {
+    min-width: 230px;
+    max-width: 230px;
+  }
+
+  @media (max-width: 991.98px) {
     .navigation :global(.sidebar-col) {
       position: fixed;
       z-index: 1020;
       width: 85%;
-      max-width: 230px;
       max-height: 100vh;
       overflow-y: auto;
       top: 0;
