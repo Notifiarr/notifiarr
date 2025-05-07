@@ -64,6 +64,7 @@ func (c *Client) httpHandlers() {
 	c.httpGuiHandlers(base, compress)
 }
 
+//nolint:funlen // oh well.
 func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler) http.Handler) {
 	// gui is used for authorized paths. All these paths have a prefix of /ui.
 	gui := c.Config.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()

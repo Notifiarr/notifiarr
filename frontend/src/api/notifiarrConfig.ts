@@ -28,7 +28,7 @@ export interface Profile {
   isDarwin: boolean;
   isDocker: boolean;
   isUnstable: boolean;
-  isFreeBSD: boolean;
+  isFreeBsd: boolean;
   isSynology: boolean;
   loggedIn: boolean;
 };

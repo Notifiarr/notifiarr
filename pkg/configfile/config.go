@@ -77,7 +77,7 @@ type Config struct {
 
 type UIConfig struct {
 	DarkMode bool   `json:"darkMode" toml:"dark_mode" xml:"dark_mode" yaml:"darkMode"`
-	Language string `json:"language" toml:"language" xml:"language" yaml:"language"`
+	Language string `json:"language" toml:"language"  xml:"language"  yaml:"language"`
 }
 
 // NewConfig returns a fresh config with only defaults and a logger ready to go.

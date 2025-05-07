@@ -177,7 +177,7 @@ type Profile struct {
 	IsDarwin   bool                   `json:"isDarwin"`
 	IsDocker   bool                   `json:"isDocker"`
 	IsUnstable bool                   `json:"isUnstable"`
-	IsFreeBSD  bool                   `json:"isFreeBSD"`
+	IsFreeBSD  bool                   `json:"isFreeBsd"`
 	IsSynology bool                   `json:"isSynology"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
 	LoggedIn bool `json:"loggedIn"`
