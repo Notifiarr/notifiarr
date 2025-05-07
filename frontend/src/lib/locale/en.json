@@ -1,0 +1,232 @@
+{
+    "words": {
+        "select-option": {
+            "Enabled": "Enabled",
+            "Disabled": "Disabled",
+            "minute": "minute",
+            "minutes": "minutes",
+            "hour": "hour",
+            "hours": "hours",
+            "second": "second",
+            "seconds": "seconds",
+            "megabytes": "megabytes",
+            "bytes": "bytes",
+            "Daily": "Daily",
+            "custom": "custom"
+        }
+    },
+    "phrases": {
+        "ConfigurationSaved": "Configuration saved!",
+        "SavingConfiguration": "Saving configuration...",
+        "SaveConfiguration": "Save Configuration",
+        "ConfigureNotifiarrClientSettings": "Configure your Notifiarr client settings here.",
+        "Every12Hours": "Every 12 hours",
+        "Every6Hours": "Every 6 hours",
+        "Every3Hours": "Every 3 hours"
+    },
+    "config": {
+        "errors": {
+            "LoginFailedInvalidCreds": "Login failed: Invalid username or password",
+            "LoginRequestTimedOut": "Login request timed out",
+            "LoginFailed": "Login failed:",
+            "ProfileReqTimedOut": "Profile request timed out",
+            "AnUnknownErrorOccurred": "An unknown error occurred",
+            "ConfigUpdateFailed": "Configuration update failed"
+        },
+        "titles": {
+            "Configuration": "Configuration",
+            "General": "General",
+            "Network": "Network",
+            "System": "System",
+            "WatchFile": "Watch File",
+            "Endpoint": "Endpoint",
+            "Command": "Command",
+            "SSLConfiguration": "SSL Configuration",
+            "Services": "Services",
+            "Logging": "Logging"
+        },
+        "apiKey": {
+            "label": "API Key",
+            "description": "API key from your Notifiarr.com account.",
+            "tooltip": "Find this by logging into Notifiarr.com, go to Profile then API Keys.",
+            "placeholder": "Enter your API key here"
+        },
+        "extraKeys": {
+            "label": "Extra Keys",
+            "description": "Additional API keys for third-party integrations. Separate with newlines.",
+            "placeholder": "One per line..."
+        },
+        "bindAddr": {
+            "label": "Bind Address",
+            "description": "IP and port the app will listen on. Use 0.0.0.0 to listen on all interfaces.",
+            "placeholder": "0.0.0.0:5454"
+        },
+        "sslKeyFile": {
+            "label": "SSL Key File",
+            "description": "Path to SSL key file",
+            "placeholder": "/path/to/ssl-key.pem",
+            "tooltip": "This application can serve HTTPS. Enable that by specifying a certificate file path and key file path."
+        },
+        "sslCertFile": {
+            "label": "SSL Certificate File",
+            "description": "Path to SSL certificate file",
+            "placeholder": "/path/to/ssl-cert.pem",
+            "tooltip": "This application can serve HTTPS. Enable that by specifying a certificate file path and key file path."
+        },
+        "debug": {
+            "label": "Debug Logging",
+            "description": "Enable or disable debug logging.",
+            "tooltip": "Enabling Debug will write a lot more data to the log. Use Max Body settings to control payloads sizes."
+        },
+        "quiet": {
+            "label": "Quiet Logging",
+            "description": "Enable or disable quiet logging.",
+            "tooltip": "Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too."
+        },
+        "logFile": {
+            "label": "Application Log File",
+            "description": "Path to the application log file.",
+            "placeholder": "/path/to/notifiarr.log"
+        },
+        "httpLog": {
+            "label": "HTTP Log File",
+            "description": "Path to the HTTP log file.",
+            "placeholder": "/path/to/http-notifiarr.log",
+            "tooltip": "Setting a log file path here will make the application write the HTTP logs to a dedicated file. The file format is in apache log. Highly recommended."
+        },
+        "debugLog": {
+            "label": "Debug Log File",
+            "description": "Path to the debug log file.",
+            "placeholder": "/path/to/debug-notifiarr.log",
+            "tooltip": "Setting a log file path here will make the application write the debug logs to a dedicated file. Debug logs are written to the application log file when this is unset."
+        },
+        "maxBody": {
+            "label": "Max Body Size",
+            "description": "Maximum body size for HTTP requests.",
+            "tooltip": "When debug is enabled, this setting limits the amount of payload data written to the log, to or from Notifiarr.com."
+        },
+        "logFileMb": {
+            "label": "Log File Size",
+            "description": "Maximum size of the log file before rotation.",
+            "tooltip": "When rotation is enabled (setting Max Log File Count higher than 1), this setting controls how large a file must be to trigger rotation."
+        },
+        "logFiles": {
+            "label": "Log File Count",
+            "description": "Number of log files to keep.",
+            "tooltip": "When this setting is 0 or 1, log file rotation is disabled. This setting applies to all log files, and will keep this many of each on disk."
+        },
+        "noUploads": {
+            "label": "Deny Uploads",
+            "description": "<b>Disabled</b> allows Notifiarr.com administrators to make this client upload log files to the website. <b>Enabled</b> prevents log file uploads..",
+            "tooltip": "This setting controls the Notifiarr.com website and Notifiarr administrators' ability to trigger this client to upload log files to the website. Sometimes we need to see log entries while diagnosing problems and this trigger allows us to make the client upload the app and debug log files."
+        },
+        "snapshot": {
+            "timeout": {
+                "label": "Timeout",
+                "description": "Timeout for snapshot operations."
+            }
+        },
+        "services": {
+            "enabled": {
+                "label": "Service Checks",
+                "description": "Enable or disable service checks.",
+                "tooltip": "Disable or enable monitoring all network and service checks right here."
+            },
+            "parallel": {
+                "label": "Parallel Checks",
+                "description": "Number of parallel service checks.",
+                "tooltip": "Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this."
+            },
+            "interval": {
+                "label": "Update Interval",
+                "description": "Update interval for service checks.",
+                "tooltip": "Subscribers can update more often."
+            },
+            "logFile": {
+                "label": "Services Log File",
+                "description": "Path to the services log file.",
+                "tooltip": "The log file is used to store the service check results. If left unset, the service check output is written to the application log file.",
+                "placeholder": "/path/to/services-notifiarr.log"
+            }
+        },
+        "ui": {
+            "darkMode": {
+                "label": "Dark Mode",
+                "description": "Enable or disable dark mode."
+            },
+            "language": {
+                "label": "Language",
+                "description": "Language of the application frontend."
+            }
+        },
+        "watchFile": {
+            "path": {
+                "label": "File Path",
+                "description": "Path to the file to watch."
+            }
+        },
+        "endpoint": {
+            "name": {
+                "label": "Name",
+                "description": "Name of the endpoint."
+            }
+        },
+        "command": {
+            "name": {
+                "label": "Name",
+                "description": "Name of the command."
+            }
+        },
+        "service": {
+            "name": {
+                "label": "Name",
+                "description": "Name of the service."
+            }
+        },
+        "urlbase": {
+            "label": "URL Base",
+            "description": "This application serves HTTP on / by default. You can change that by typing in something else here.",
+            "placeholder": "/notifiarr/",
+            "tooltip": "Example: /notifiarr/"
+        },
+        "hostId": {
+            "label": "Host ID",
+            "description": "The Host ID parameter is used to uniquely identify this client installation.",
+            "tooltip": "Changing this value is discouraged; it should be found automatically. Do not copy this value to another Notifiarr client installation."
+        },
+        "serial": {
+            "label": "Parallel Threads",
+            "description": "Disabling this setting will make the application use fewer go routines (threads) when gathering data from configured applications.",
+            "tooltip": "Spreads out CPU usage and lowers memory footprint."
+        },
+        "retries": {
+            "label": "Retries",
+            "description": "Sometimes connections to Notifiarr.com fail. This controls how many times each request will be attempted in case of failures.",
+            "tooltip": "Default: 4 (setting 0 uses default of 4)"
+        },
+        "apt": {
+            "label": "APT Hook",
+            "description": "The Notifiarr Debian (and Ubuntu) packages include an APT integration.",
+            "tooltip": "The Notifiarr Debian (and Ubuntu) packages include an APT integration. This integration invokes every time an <b class='text-warning'>apt</b> command is executed. To enable it, set this field to Enabled, and then <b>enable the Package Manager integration on Notifiarr.com.</b> This feature does not require the client to be running; it only requires the client deb package to be installed. This does not work on RHEL or non-Debian Linux."
+        },
+        "timeout": {
+            "label": "Timeout",
+            "description": "This is the timeout for API requests to Notifiarr.com."
+        },
+        "fileMode": {
+            "label": "Log File Unix Mode",
+            "description": "This is the unix file mode used when writing new log files.",
+            "tooltip": "Recommended values in order of openness: 0600, 0640, 0644"
+        },
+        "autoUpdate": {
+            "label": "Auto Update",
+            "description": "This is how often the application will check for updates. When one is found it will be installed automatically.",
+            "tooltip": "This only works on Windows."
+        },
+        "unstableCh": {
+            "label": "Unstable Channel",
+            "description": "Enabling the unstable updates channel will make the application check the unstable website for auto-updates instead of GitHub.",
+            "tooltip": "Only available to users with developer access."
+        }
+    }
+}

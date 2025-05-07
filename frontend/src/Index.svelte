@@ -68,8 +68,16 @@
           <div class="error-message">{loginFailedMsg}</div>
         {/if}
         <form on:submit|preventDefault={handleLogin}>
-          <Input type="text" name="username" placeholder="Username" bind:value={username} />
-          <Input type="password" name="password" placeholder="Password" bind:value={password} />
+          <Input
+            type="text"
+            name="username"
+            placeholder="Username"
+            bind:value={username} />
+          <Input
+            type="password"
+            name="password"
+            placeholder="Password"
+            bind:value={password} />
           <Button type="submit" disabled={isLoading}>
             {isLoading ? 'Logging in...' : 'Login'}
           </Button>

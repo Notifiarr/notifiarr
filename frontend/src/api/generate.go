@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/client"
 	"golift.io/cnfg"
 	"golift.io/goty"
 	"golift.io/goty/gotydoc"
@@ -47,7 +47,7 @@ func main() {
 	}) // only 1 for now.
 
 	log.Println("==> parsing config struct")
-	goat.Parse(configfile.Config{})
+	goat.Parse(client.Profile{})
 
 	log.Println("==> splitting packages")
 	vendorPkgs, localPkgs := splitPkgs(goat.Pkgs())

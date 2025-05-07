@@ -22,6 +22,7 @@
     "@sveltestrap/sveltestrap": "^7.1.0",
     "@zerodevx/svelte-toast": "^0.9.6",
     "prettier": "^3.5.3",
-    "prettier-plugin-svelte": "^3.3.3"
+    "prettier-plugin-svelte": "^3.3.3",
+    "svelte-i18n": "^4.0.1"
   }
 }

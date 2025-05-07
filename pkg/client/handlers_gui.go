@@ -29,6 +29,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/swaggo/swag"
@@ -168,17 +169,36 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 
 // Profile is the data returned by the profile GET endpoint.
 type Profile struct {
-	Username string             `json:"username"`
-	Config   *configfile.Config `json:"config"`
+	Username   string                 `json:"username"`
+	Config     configfile.Config      `json:"config"`
+	ClientInfo *clientinfo.ClientInfo `json:"clientInfo"`
+	IsWindows  bool                   `json:"isWindows"`
+	IsLinux    bool                   `json:"isLinux"`
+	IsDarwin   bool                   `json:"isDarwin"`
+	IsDocker   bool                   `json:"isDocker"`
+	IsUnstable bool                   `json:"isUnstable"`
+	IsFreeBSD  bool                   `json:"isFreeBSD"`
+	IsSynology bool                   `json:"isSynology"`
+	// LoggedIn is only used by the front end. Backend does not set or use it.
+	LoggedIn bool `json:"loggedIn"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
 func (c *Client) handleProfile(w http.ResponseWriter, r *http.Request) {
 	username, _ := c.getUserName(r)
+	ci := clientinfo.Get()
 
 	if err := json.NewEncoder(w).Encode(&Profile{
-		Username: username,
-		Config:   c.Config,
+		Username:   username,
+		Config:     *c.Config,
+		ClientInfo: ci,
+		IsWindows:  mnd.IsWindows,
+		IsLinux:    mnd.IsLinux,
+		IsDarwin:   mnd.IsDarwin,
+		IsFreeBSD:  mnd.IsFreeBSD,
+		IsDocker:   mnd.IsDocker,
+		IsUnstable: mnd.IsUnstable,
+		IsSynology: mnd.IsSynology,
 	}); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)
 	}
@@ -674,15 +694,21 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// reload.
-	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
+	reload := " Not Reloading!"
 
-	c.Lock()
-	c.reloading = true
-	c.Unlock()
+	if mux.Vars(request)["noreload"] != "true" {
+		defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
+
+		c.Lock()
+		c.reloading = true
+		c.Unlock()
+
+		reload = "Reloading in 5 seconds..."
+	}
 
 	// respond.
-	c.Printf("[gui '%s' requested] Updated Configuration.", user)
-	http.Error(response, "Config Saved. Reloading in 5 seconds...", http.StatusOK)
+	c.Printf("[gui '%s' requested] Updated Configuration.%s", user, reload)
+	http.Error(response, "Config Saved."+reload, http.StatusOK)
 }
 
 // saveNewConfig takes a fully built (copy) of config data, and saves it as the config file.

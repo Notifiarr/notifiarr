@@ -17,6 +17,23 @@ export enum Weekday {
 };
 
 /**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
+ */
+export interface Profile {
+  username: string;
+  config: Config;
+  clientInfo?: ClientInfo;
+  isWindows: boolean;
+  isLinux: boolean;
+  isDarwin: boolean;
+  isDocker: boolean;
+  isUnstable: boolean;
+  isFreeBSD: boolean;
+  isSynology: boolean;
+  loggedIn: boolean;
+};
+
+/**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.Config>
  */
 export interface Config extends LogConfig, Apps {
@@ -37,6 +54,7 @@ export interface Config extends LogConfig, Apps {
   watchFiles?: (null | WatchFile)[];
   endpoints?: (null | Endpoint)[];
   commands?: (null | Command)[];
+  ui: UIConfig;
 };
 
 /**
@@ -163,6 +181,14 @@ export interface CmdconfigConfig {
   log: boolean;
   notify: boolean;
   args: number;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.UIConfig>
+ */
+export interface UIConfig {
+  darkMode: boolean;
+  language: string;
 };
 
 /**
@@ -364,21 +390,162 @@ export interface PlexConfig0 {
   token: string;
 };
 
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.ClientInfo>
+ */
+export interface ClientInfo {
+  user: {
+    id?: any;
+    welcome: string;
+    subscriber: boolean;
+    patron: boolean;
+    devAllowed: boolean;
+    dateFormat: PHPDate;
+    stopLogs: boolean;
+    tunnelUrl: string;
+    tunnels?: string[];
+    mulery?: (null | MuleryServer)[];
+  };
+  actions: {
+    plex: ClientinfoPlexConfig;
+    apps: AllAppConfigs;
+    dashboard: DashConfig;
+    sync: SyncConfig;
+    mdblist: MdbListConfig;
+    gaps: GapsConfig;
+    custom?: (null | CronConfig)[];
+    snapshot: SnapshotConfig;
+  };
+  integrityCheck: boolean;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.PHPDate>
+ */
+export interface PHPDate {};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.MuleryServer>
+ */
+export interface MuleryServer {
+  tunnel: string;
+  socket: string;
+  location: string;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.PlexConfig>
+ */
+export interface ClientinfoPlexConfig {
+  interval: string;
+  trackSessions: boolean;
+  accountMap: string;
+  noActivity: boolean;
+  activityDelay: string;
+  cooldown: string;
+  seriesPc: number;
+  moviesPc: number;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.AllAppConfigs>
+ */
+export interface AllAppConfigs {
+  lidarr?: (null | AppConfig)[];
+  prowlarr?: (null | AppConfig)[];
+  radarr?: (null | AppConfig)[];
+  readarr?: (null | AppConfig)[];
+  sonarr?: (null | AppConfig)[];
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.AppConfig>
+ */
+export interface AppConfig {
+  instance: number;
+  name: string;
+  corrupt: string;
+  backup: string;
+  interval: string;
+  stuck: boolean;
+  finished: boolean;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.DashConfig>
+ */
+export interface DashConfig {
+  interval: string;
+  deluge: boolean;
+  lidarr: boolean;
+  qbit: boolean;
+  radarr: boolean;
+  readarr: boolean;
+  sonarr: boolean;
+  plex: boolean;
+  sabnzbd: boolean;
+  nzbget: boolean;
+  rtorrent: boolean;
+  transmission: boolean;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.SyncConfig>
+ */
+export interface SyncConfig {
+  interval: string;
+  lidarrInstances?: number[];
+  radarrInstances?: number[];
+  sonarrInstances?: number[];
+  lidarrSync?: string[];
+  sonarrSync?: string[];
+  radarrSync?: string[];
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.MdbListConfig>
+ */
+export interface MdbListConfig {
+  interval: string;
+  radarr?: number[];
+  sonarr?: number[];
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.GapsConfig>
+ */
+export interface GapsConfig {
+  instances?: number[];
+  interval: string;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.CronConfig>
+ */
+export interface CronConfig {
+  name: string;
+  interval: string;
+  endpoint: string;
+  description: string;
+};
+
 // Packages parsed:
 //   1. github.com/Notifiarr/notifiarr/pkg/apps
 //   2. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
 //   3. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
 //   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
-//   5. github.com/Notifiarr/notifiarr/pkg/configfile
-//   6. github.com/Notifiarr/notifiarr/pkg/logs
-//   7. github.com/Notifiarr/notifiarr/pkg/services
-//   8. github.com/Notifiarr/notifiarr/pkg/snapshot
-//   9. github.com/Notifiarr/notifiarr/pkg/triggers/commands
-//  10. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
-//  11. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
-//  12. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
-//  13. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
-//  14. golift.io/deluge
-//  15. golift.io/nzbget
-//  16. golift.io/qbit
-//  17. golift.io/starr
+//   5. github.com/Notifiarr/notifiarr/pkg/client
+//   6. github.com/Notifiarr/notifiarr/pkg/configfile
+//   7. github.com/Notifiarr/notifiarr/pkg/logs
+//   8. github.com/Notifiarr/notifiarr/pkg/services
+//   9. github.com/Notifiarr/notifiarr/pkg/snapshot
+//  10. github.com/Notifiarr/notifiarr/pkg/triggers/commands
+//  11. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
+//  12. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
+//  13. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
+//  14. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
+//  15. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
+//  16. golift.io/deluge
+//  17. golift.io/nzbget
+//  18. golift.io/qbit
+//  19. golift.io/starr

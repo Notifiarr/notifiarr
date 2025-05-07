@@ -68,10 +68,16 @@ type Config struct {
 	WatchFiles []*filewatch.WatchFile `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
 	Endpoints  []*epconfig.Endpoint   `json:"endpoints"   toml:"endpoint"      xml:"endpoint"      yaml:"endpoints"`
 	Commands   []*commands.Command    `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
+	UIConf     UIConfig               `json:"ui"          toml:"ui"            xml:"ui"            yaml:"ui"`
 	*logs.LogConfig
 	*apps.Apps
 	*website.Server `json:"-" toml:"-" xml:"-" yaml:"-"`
 	Allow           AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
+}
+
+type UIConfig struct {
+	DarkMode bool   `json:"darkMode" toml:"dark_mode" xml:"dark_mode" yaml:"darkMode"`
+	Language string `json:"language" toml:"language" xml:"language" yaml:"language"`
 }
 
 // NewConfig returns a fresh config with only defaults and a logger ready to go.
