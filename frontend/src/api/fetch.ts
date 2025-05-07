@@ -1,5 +1,5 @@
-import { get } from "svelte/store"
-import { profile } from "./profile"
+import { get } from 'svelte/store'
+import { profile } from './profile'
 
 export const LoggedOut = new Error('logged out')
 
@@ -10,7 +10,7 @@ export const LoggedOut = new Error('logged out')
  * @returns A promise that resolves to the response body as either text or JSON.
  */
 export async function getUi(uri: string, json: boolean = true): Promise<string | null> {
-  return await request('ui/'+uri, 'GET', null, json)
+  return await request('ui/' + uri, 'GET', null, json)
 }
 
 /**
@@ -20,8 +20,12 @@ export async function getUi(uri: string, json: boolean = true): Promise<string |
  * @param json Whether to parse the response as JSON.
  * @returns A promise that resolves to the response body as either text or JSON.
  */
-export async function postUi(uri: string, body: BodyInit, json: boolean = true): Promise<string | null> {
-  return await request('ui/'+uri, 'POST', body, json)
+export async function postUi(
+  uri: string,
+  body: BodyInit,
+  json: boolean = true,
+): Promise<string | null> {
+  return await request('ui/' + uri, 'POST', body, json)
 }
 
 /**
@@ -31,7 +35,7 @@ export async function postUi(uri: string, body: BodyInit, json: boolean = true):
  * @returns A promise that resolves to the response body as either text or JSON.
  */
 export async function getApi(uri: string, json: boolean = true): Promise<string | null> {
-  return await request('api/'+uri, 'GET', null, json)
+  return await request('api/' + uri, 'GET', null, json)
 }
 
 /**
@@ -41,8 +45,12 @@ export async function getApi(uri: string, json: boolean = true): Promise<string 
  * @param json Whether to parse the response as JSON.
  * @returns A promise that resolves to the response body as either text or JSON.
  */
-export async function postApi(uri: string, body: BodyInit, json: boolean = true): Promise<string | null> {
-  return await request('api/'+uri, 'POST', body, json)
+export async function postApi(
+  uri: string,
+  body: BodyInit,
+  json: boolean = true,
+): Promise<string | null> {
+  return await request('api/' + uri, 'POST', body, json)
 }
 
 /**
@@ -51,10 +59,11 @@ export async function postApi(uri: string, body: BodyInit, json: boolean = true)
  * @returns A promise that resolves when the server has reloaded the page.
  */
 export async function checkReloaded() {
-  return new Promise<void>(async (resolve) => {
+  return new Promise<void>(async resolve => {
     await setTimeout(async () => {
       const checkReload = async (attempts = 0) => {
-        if (attempts > 19) throw new Error('Server reload check timed out after 20 attempts')
+        if (attempts > 19)
+          throw new Error('Server reload check timed out after 20 attempts')
         try {
           await getUi('ping', false)
           resolve()
@@ -71,7 +80,7 @@ async function request(
   uri: string,
   method: string = 'GET',
   body: BodyInit | null = null,
-  json: boolean = true
+  json: boolean = true,
 ): Promise<string | null> {
   const urlBase = get(profile)?.config.urlbase || ''
 
@@ -83,14 +92,20 @@ async function request(
   const response = await fetchWithTimeout(urlBase + uri, { method, headers, body })
   if (response.status === 403) throw LoggedOut
 
-  if (!response.ok) throw new Error('Failed to fetch ' + uri + ': ' +
-    response.status + ' ' + response.statusText + ': ' + response.text())
+  if (!response.ok)
+    throw new Error(
+      `Failed to fetch ${uri}: ${response.status} ${response.statusText}: ${response.text()}`,
+    )
 
   if (json) return response.json()
   return response.text()
 }
 
-export async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 5000): Promise<Response> {
+export async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeout = 5000,
+): Promise<Response> {
   const controller = new AbortController()
   const id = setTimeout(() => controller.abort(), timeout)
 

@@ -8,34 +8,33 @@ import { failure, success } from '../lib/util'
 
 export const profile = createProfileStore()
 
-let timeoutMsg = "Profile request timed out"
-let unknownErrorMsg = "An unknown error occurred"
-let configUpdateFailedMsg = "Configuration update failed"
-let configurationSaved = "Configuration saved!"
+let timeoutMsg = 'Profile request timed out'
+let unknownErrorMsg = 'An unknown error occurred'
+let configUpdateFailedMsg = 'Configuration update failed'
+let configurationSaved = 'Configuration saved!'
 // Translate our messages.
 isReady.subscribe(ready => {
-  if (ready) _.subscribe(val => {
-    timeoutMsg = val("config.errors.ProfileReqTimedOut")
-    unknownErrorMsg = val("config.errors.AnUnknownErrorOccurred")
-    configUpdateFailedMsg = val("config.errors.ConfigUpdateFailed")
-    configurationSaved = val("phrases.ConfigurationSaved")
-  })
+  if (ready)
+    _.subscribe(val => {
+      timeoutMsg = val('config.errors.ProfileReqTimedOut')
+      unknownErrorMsg = val('config.errors.AnUnknownErrorOccurred')
+      configUpdateFailedMsg = val('config.errors.ConfigUpdateFailed')
+      configurationSaved = val('phrases.ConfigurationSaved')
+    })
 })
 
 export async function fetchProfile() {
   try {
     const response = await fetchWithTimeout('/ui/profile')
-    if (!response.ok) {
-      profile.set({} as Profile)
-    } else {
+    if (!response.ok) profile.set({} as Profile)
+    else {
       const data = await response.json()
       data.loggedIn = true
       profile.set(data)
     }
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') {
+    if (error instanceof DOMException && error.name === 'AbortError')
       throw new Error(timeoutMsg)
-    }
     profile.set({} as Profile)
     throw error
   }
@@ -64,11 +63,10 @@ function createProfileStore() {
         // Wait for the server to reload
         await checkReloaded()
         await fetchProfile()
-
       } catch (error) {
         failure(configUpdateFailedMsg + ': ' + error)
         throw error instanceof Error ? error : new Error(unknownErrorMsg)
       }
-    }
+    },
   }
 }

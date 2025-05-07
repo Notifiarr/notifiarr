@@ -12,11 +12,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-  -webkit-appearance:initial;
-}
-
-html, body {
+html,
+body {
   margin: 0;
   min-height: 100%;
   height: 100vh;
