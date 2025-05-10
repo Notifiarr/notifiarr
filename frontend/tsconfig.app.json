@@ -18,5 +18,5 @@
     "moduleDetection": "force",
     "composite": true
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "src/**/*.svg"]
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte", "src/**/*.svg", "src/**/locale/*.json"]
 }

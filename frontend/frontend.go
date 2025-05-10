@@ -29,6 +29,7 @@ type responseWriter struct {
 
 func (w *responseWriter) WriteHeader(status int) {
 	if w.Status = status; status != http.StatusNotFound {
+		w.ResponseWriter.Header().Set("Cache-Control", "max-age=31536000")
 		w.ResponseWriter.WriteHeader(status)
 	}
 }

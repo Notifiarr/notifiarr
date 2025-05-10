@@ -1,7 +1,6 @@
 import { mount } from 'svelte'
-import './app.css'
-import Index from './Index.svelte'
+import '/src/app.css'
+import Index from '/src/Index.svelte'
+import '/src/lib/locale'
 
-export default mount(Index, {
-  target: document.getElementById('notifiarr')!,
-})
+export default mount(Index, { target: document.getElementById('notifiarr')! })

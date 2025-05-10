@@ -158,6 +158,11 @@ serial = {{.Serial}}
 ## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
 retries = {{.Retries}}
 
+## The version of the config file. The app uses this to verify the config
+## version the front-end updates is not older than the back-end version.
+version = {{.Version}}
+
+
 ##################
 # Starr Settings #
 ##################

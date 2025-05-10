@@ -44,6 +44,14 @@ func (c *Config) setupPassword() error {
 	return c.UIPassword.Set(pass)
 }
 
+func (t AuthType) Type() string {
+	return map[AuthType]string{
+		AuthPassword: "password",
+		AuthHeader:   "header",
+		AuthNone:     "noauth",
+	}[t]
+}
+
 func (t AuthType) String() string {
 	return map[AuthType]string{
 		AuthPassword: "Password",
