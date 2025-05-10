@@ -32,11 +32,11 @@ func (c *Client) httpHandlers() {
 		if c.newUI {
 			// SPA gets all the requests so it can handle its own page router.
 			c.Config.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
-			c.Config.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler))
-		} else {
-			// 404 (or redirect to base path) everything else
+			c.Config.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
 			c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
 		}
+		// 404 (or redirect to base path) everything else
+		c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
 	}()
 
 	base := path.Join("/", c.Config.URLBase)

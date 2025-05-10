@@ -9,42 +9,40 @@
     Alert,
     Row,
     Col,
-    Icon,
-    type InputType,
+    Badge,
+    Spinner,
   } from '@sveltestrap/sveltestrap'
-  import { profile } from '../api/profile'
-  import ConfigInput from '../lib/Input.svelte'
+  import { fetchProfile, profile } from '../api/profile'
+  import Input from '../lib/Input.svelte'
   import { _ } from '../lib/Translate.svelte'
+  import { checkReloaded } from '../api/fetch'
+  import { darkMode } from '../lib/darkmode.svelte'
 
+  $: theme = $darkMode ? 'dark' : 'light'
   // Local state that syncs with profile store.
   $: c = { ...$profile.config }
   // Convert array to newline-separated string for textarea
   $: extraKeys = c.extraKeys?.join('\n') + '\n' || ''
   $: rows = extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length
 
-  // Helper function to toggle password visibility
-  let showPass = false
-  let passType: InputType = 'password'
-  function togglePass(e: Event | undefined) {
-    e?.preventDefault()
-    passType = (showPass = !showPass) ? 'text' : 'password'
-  }
-
   // Form submission status
-  let isSubmitting = false
+  let formSubmitted = ''
   let submitError: string | null = null
   let submitSuccess = false
 
   // Handle form submission
   async function submit(event: Event) {
     event.preventDefault()
-    isSubmitting = true
+    formSubmitted = $_('phrases.SavingConfiguration')
     submitError = null
     submitSuccess = false
     c.extraKeys = extraKeys.split('\n').filter(key => key.trim() !== '')
 
     try {
-      await profile.updateConfig(c)
+      await profile.writeConfig(c)
+      formSubmitted = $_('phrases.Reloading')
+      await checkReloaded()
+      await fetchProfile()
       submitSuccess = true
     } catch (error) {
       submitError =
@@ -52,44 +50,41 @@
           ? error.message
           : $_('config.errors.AnUnknownErrorOccurred')
     } finally {
-      isSubmitting = false
+      formSubmitted = ''
     }
   }
 </script>
 
 <div id="config" class="mb-2 pb-2">
-  <Card>
+  <Card {theme}>
     <CardHeader>
-      <h2>{$_('config.titles.Configuration')}</h2>
+      <h2>
+        {$_('config.titles.Configuration')}
+        <Badge style="font-size: 9px; vertical-align: top;" color="secondary">
+          {$_('phrases.Version', { values: { version: c.version } })}</Badge>
+      </h2>
       <p class="text-muted">{$_('phrases.ConfigureNotifiarrClientSettings')}</p>
     </CardHeader>
     <CardBody>
       <!-- General Section -->
       <h3 class="mb-2">{$_('config.titles.General')}</h3>
-      <ConfigInput id="config.apiKey" type={passType} bind:value={c.apiKey}>
-        <InputGroupText slot="post" class="toggle-button-container">
-          <Button color="link" class="p-0 toggle-button" on:click={togglePass}>
-            <Icon name={showPass ? 'eye-slash' : 'eye'} />
-          </Button>
-        </InputGroupText>
-      </ConfigInput>
-      <ConfigInput id="config.extraKeys" type="textarea" bind:value={extraKeys} {rows} />
-      <ConfigInput id="config.hostId" bind:value={c.hostId} />
+      <Input id="config.apiKey" type="password" bind:value={c.apiKey} />
+      <Input id="config.extraKeys" type="textarea" bind:value={extraKeys} {rows} />
+      <Input id="config.hostId" bind:value={c.hostId} />
 
       <!-- Network Section -->
       <h3 class="mb-2">{$_('config.titles.Network')}</h3>
       <Row>
         <Col md={6}>
-          <ConfigInput id="config.bindAddr" bind:value={c.bindAddr} />
+          <Input id="config.bindAddr" bind:value={c.bindAddr} />
         </Col>
         <Col md={6}>
-          <ConfigInput id="config.urlbase" bind:value={c.urlbase} />
+          <Input id="config.urlbase" bind:value={c.urlbase} />
         </Col>
       </Row>
-
       <Row>
         <Col md={6}>
-          <ConfigInput
+          <Input
             id="config.timeout"
             type="select"
             bind:value={c.timeout}
@@ -102,7 +97,7 @@
             ]} />
         </Col>
         <Col md={6}>
-          <ConfigInput id="config.retries" type="number" bind:value={c.retries} min={0} />
+          <Input id="config.retries" type="number" bind:value={c.retries} min={0} />
         </Col>
       </Row>
 
@@ -110,11 +105,11 @@
       <h3 class="mb-2">{$_('config.titles.System')}</h3>
       <Row>
         <Col md={4}>
-          <ConfigInput id="config.serial" type="select" bind:value={c.serial} />
+          <Input id="config.serial" type="select" bind:value={c.serial} />
         </Col>
         {#if $profile.isWindows}
           <Col md={$profile.clientInfo?.user.devAllowed ? 4 : 8}>
-            <ConfigInput
+            <Input
               id="config.autoUpdate"
               type="select"
               bind:value={c.autoUpdate}
@@ -128,15 +123,12 @@
           </Col>
           {#if $profile.clientInfo?.user.devAllowed}
             <Col md={4}>
-              <ConfigInput
-                id="config.unstableCh"
-                type="select"
-                bind:value={c.unstableCh} />
+              <Input id="config.unstableCh" type="select" bind:value={c.unstableCh} />
             </Col>
           {/if}
         {:else}
           <Col md={4}>
-            <ConfigInput
+            <Input
               type="select"
               id="config.fileMode"
               bind:value={c.fileMode}
@@ -150,7 +142,7 @@
               ]} />
           </Col>
           <Col md={4}>
-            <ConfigInput id="config.apt" type="select" bind:value={c.apt} />
+            <Input id="config.apt" type="select" bind:value={c.apt} />
           </Col>
         {/if}
       </Row>
@@ -159,10 +151,10 @@
       <h3 class="mb-2">{$_('config.titles.SSLConfiguration')}</h3>
       <Row>
         <Col md={6}>
-          <ConfigInput id="config.sslKeyFile" bind:value={c.sslKeyFile} />
+          <Input id="config.sslKeyFile" bind:value={c.sslKeyFile} />
         </Col>
         <Col md={6}>
-          <ConfigInput id="config.sslCertFile" bind:value={c.sslCertFile} />
+          <Input id="config.sslCertFile" bind:value={c.sslCertFile} />
         </Col>
       </Row>
 
@@ -170,13 +162,13 @@
       <h3 class="mb-2">{$_('config.titles.Services')}</h3>
       <Row>
         <Col md={4}>
-          <ConfigInput
+          <Input
             id="config.services.enabled"
             type="select"
             bind:value={c.services!.disabled} />
         </Col>
         <Col md={4}>
-          <ConfigInput
+          <Input
             id="config.services.parallel"
             type="select"
             options={[
@@ -189,7 +181,7 @@
             bind:value={c.services!.parallel} />
         </Col>
         <Col md={4}>
-          <ConfigInput
+          <Input
             id="config.services.interval"
             type="select"
             bind:value={c.services!.interval}
@@ -207,32 +199,32 @@
       <h3 class="mb-2">{$_('config.titles.Logging')}</h3>
       <Row>
         <Col md={6}>
-          <ConfigInput id="config.logFile" bind:value={c.logFile} />
+          <Input id="config.logFile" bind:value={c.logFile} />
         </Col>
         <Col md={6}>
-          <ConfigInput id="config.services.logFile" bind:value={c.services!.logFile} />
+          <Input id="config.services.logFile" bind:value={c.services!.logFile} />
         </Col>
         <Col md={6}>
-          <ConfigInput id="config.httpLog" bind:value={c.httpLog} />
+          <Input id="config.httpLog" bind:value={c.httpLog} />
         </Col>
         <Col md={6}>
-          <ConfigInput id="config.debugLog" bind:value={c.debugLog} />
+          <Input id="config.debugLog" bind:value={c.debugLog} />
         </Col>
       </Row>
       <Row>
         <Col md={4}>
-          <ConfigInput id="config.debug" type="select" bind:value={c.debug} />
+          <Input id="config.debug" type="select" bind:value={c.debug} />
         </Col>
         <Col md={4}>
-          <ConfigInput id="config.quiet" type="select" bind:value={c.quiet} />
+          <Input id="config.quiet" type="select" bind:value={c.quiet} />
         </Col>
         <Col md={4}>
-          <ConfigInput id="config.noUploads" type="select" bind:value={c.noUploads} />
+          <Input id="config.noUploads" type="select" bind:value={c.noUploads} />
         </Col>
       </Row>
       <Row>
         <Col md={4}>
-          <ConfigInput
+          <Input
             id="config.maxBody"
             type="number"
             bind:value={c.maxBody}
@@ -241,10 +233,10 @@
             <InputGroupText slot="post">
               {$_('words.select-option.bytes')}
             </InputGroupText>
-          </ConfigInput>
+          </Input>
         </Col>
         <Col md={4}>
-          <ConfigInput
+          <Input
             id="config.logFileMb"
             type="number"
             min={1}
@@ -253,14 +245,10 @@
             <InputGroupText slot="post">
               {$_('words.select-option.megabytes')}
             </InputGroupText>
-          </ConfigInput>
+          </Input>
         </Col>
         <Col md={4}>
-          <ConfigInput
-            id="config.logFiles"
-            type="number"
-            min={0}
-            bind:value={c.logFiles} />
+          <Input id="config.logFiles" type="number" min={0} bind:value={c.logFiles} />
         </Col>
       </Row>
     </CardBody>
@@ -273,21 +261,34 @@
             color="primary"
             type="submit"
             class="mt-1"
-            disabled={isSubmitting}
+            disabled={formSubmitted !== ''}
             on:click={submit}>
-            {#if isSubmitting}
+            {#if formSubmitted}
               {$_('phrases.SavingConfiguration')}
             {:else}
-              {$_('phrases.SaveConfiguration')}
+              {$_('buttons.SaveConfiguration')}
             {/if}
           </Button>
         </Col>
         <Col>
           {#if submitError}
-            <Alert color="danger" class="mt-1 mb-1" dismissible>{submitError}</Alert>
+            <Alert
+              color="danger"
+              class="submit-alert"
+              dismissible
+              closeClassName="submit-alert-close">
+              {submitError}</Alert>
           {:else if submitSuccess}
-            <Alert color="success" class="mt-1 mb-1" dismissible>
-              {$_('phrases.ConfigurationSaved')}
+            <Alert
+              color="success"
+              class="submit-alert"
+              dismissible
+              closeClassName="submit-alert-close">
+              {$_('phrases.ConfigurationSaved')}</Alert>
+          {:else if formSubmitted}
+            <Alert color="warning" class="submit-alert">
+              <Spinner size="sm" />
+              {formSubmitted}
             </Alert>
           {/if}
         </Col>
@@ -298,7 +299,6 @@
 
 <style>
   #config h3 {
-    color: #031144;
     font-size: 1.5rem;
     font-weight: 500;
   }

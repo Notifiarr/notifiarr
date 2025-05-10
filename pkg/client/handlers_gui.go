@@ -29,7 +29,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/swaggo/swag"
@@ -165,43 +164,6 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 		MaxAge: -1,
 	})
 	http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
-}
-
-// Profile is the data returned by the profile GET endpoint.
-type Profile struct {
-	Username   string                 `json:"username"`
-	Config     configfile.Config      `json:"config"`
-	ClientInfo *clientinfo.ClientInfo `json:"clientInfo"`
-	IsWindows  bool                   `json:"isWindows"`
-	IsLinux    bool                   `json:"isLinux"`
-	IsDarwin   bool                   `json:"isDarwin"`
-	IsDocker   bool                   `json:"isDocker"`
-	IsUnstable bool                   `json:"isUnstable"`
-	IsFreeBSD  bool                   `json:"isFreeBsd"`
-	IsSynology bool                   `json:"isSynology"`
-	// LoggedIn is only used by the front end. Backend does not set or use it.
-	LoggedIn bool `json:"loggedIn"`
-}
-
-// handleProfile returns the current user's username in a JSON response.
-func (c *Client) handleProfile(w http.ResponseWriter, r *http.Request) {
-	username, _ := c.getUserName(r)
-	ci := clientinfo.Get()
-
-	if err := json.NewEncoder(w).Encode(&Profile{
-		Username:   username,
-		Config:     *c.Config,
-		ClientInfo: ci,
-		IsWindows:  mnd.IsWindows,
-		IsLinux:    mnd.IsLinux,
-		IsDarwin:   mnd.IsDarwin,
-		IsFreeBSD:  mnd.IsFreeBSD,
-		IsDocker:   mnd.IsDocker,
-		IsUnstable: mnd.IsUnstable,
-		IsSynology: mnd.IsSynology,
-	}); err != nil {
-		c.Errorf("Writing HTTP Response: %v", err)
-	}
 }
 
 // getFileDeleteHandler deletes log and config files.
@@ -396,82 +358,6 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 
 		return
 	}
-}
-
-func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	var (
-		currPass          = request.PostFormValue("Password")
-		authType          = request.PostFormValue("AuthType")
-		authHeader        = request.PostFormValue("AuthHeader")
-		currUser, dynamic = c.getUserName(request)
-	)
-
-	if !dynamic {
-		// If the auth is currently using a password, check the password.
-		if !c.checkUserPass(currUser, currPass) {
-			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
-			return
-		}
-	}
-
-	// Upstreams is only read on reload, but this is still not thread safe
-	// because two people could click save at the same time.
-	c.Lock()
-	c.Config.Upstreams = strings.Fields(request.PostFormValue("Upstreams"))
-	c.Unlock()
-
-	if authType == "password" {
-		c.handleProfilePostPassword(response, request)
-		return
-	}
-
-	switch err := c.setUserPass(request.Context(), authType, authHeader, ""); {
-	case err != nil:
-		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
-		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
-	case authType == "nopass":
-		c.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
-		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
-		c.reloadAppNow()
-	default:
-		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, authHeader)
-		c.setSession(request.Header.Get(authHeader), response, request)
-		http.Error(response, "Enabled WebUI proxy authentication. Header: "+authHeader, http.StatusOK)
-		c.reloadAppNow()
-	}
-}
-
-func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request *http.Request) {
-	currPass := request.PostFormValue("Password")
-	currUser, _ := c.getUserName(request)
-
-	username := request.PostFormValue("NewUsername")
-	if username == "" {
-		username = currUser
-	}
-
-	newPassw := request.PostFormValue("NewPassword")
-	if newPassw == "" {
-		newPassw = currPass
-	}
-
-	if len(newPassw) < minPasswordLen {
-		http.Error(response, fmt.Sprintf("New password must be at least %d characters.",
-			minPasswordLen), http.StatusBadRequest)
-		return
-	}
-
-	if err := c.setUserPass(request.Context(), "password", username, newPassw); err != nil {
-		c.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
-		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, username)
-	c.setSession(username, response, request)
-	http.Error(response, "Trust Profile saved.", http.StatusOK)
-	c.reloadAppNow()
 }
 
 func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http.Request) {

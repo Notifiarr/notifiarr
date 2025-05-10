@@ -2,18 +2,11 @@ import { fetchWithTimeout } from './fetch'
 import { profile } from './profile'
 import { _, isReady } from '../lib/Translate.svelte'
 
-let loginFailedInvalidCredsMsg = 'Login failed: Invalid username or password'
-let loginRequestTimedOutMsg = 'Login request timed out'
-let loginFailedMsg = 'Login failed:'
+let invalidCreds = 'Invalid username or password'
 
 // Translate our messages.
 isReady.subscribe(ready => {
-  if (ready)
-    _.subscribe(val => {
-      loginFailedInvalidCredsMsg = val('config.errors.LoginFailedInvalidCreds')
-      loginRequestTimedOutMsg = val('config.errors.LoginRequestTimedOut')
-      loginFailedMsg = val('config.errors.LoginFailed')
-    })
+  if (ready) _.subscribe(val => (invalidCreds = val('config.errors.InvalidCreds')))
 })
 
 export async function login(name: string, password: string): Promise<string | null> {
@@ -24,9 +17,7 @@ export async function login(name: string, password: string): Promise<string | nu
       body: new URLSearchParams({ name, password }),
     })
 
-    if (!response.ok) {
-      return loginFailedMsg
-    }
+    if (!response.ok) return `${invalidCreds} ${response.status} ${response.statusText}`
 
     // The login call returns the profile data, so we can set the store and be ready to go.
     // Loading the profile signals to the index page to load the navigation bar.
@@ -34,10 +25,6 @@ export async function login(name: string, password: string): Promise<string | nu
 
     return null
   } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') {
-      return loginRequestTimedOutMsg
-    }
-
-    return loginFailedMsg + ' ' + err
+    return `${err}`
   }
 }

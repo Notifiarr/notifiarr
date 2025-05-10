@@ -1,8 +1,7 @@
-import { get, writable } from 'svelte/store'
-import { fetchWithTimeout } from './fetch'
+import { get, writable, type Unsubscriber } from 'svelte/store'
+import { getUi } from './fetch'
 import { checkReloaded, postUi } from './fetch'
 import type { Config, Profile } from './notifiarrConfig'
-import { toast } from '@zerodevx/svelte-toast'
 import { _, isReady } from '../lib/Translate.svelte'
 import { failure, success } from '../lib/util'
 
@@ -23,50 +22,37 @@ isReady.subscribe(ready => {
     })
 })
 
+export async function updateProfile() {
+  const { ok, body } = await getUi('profile')
+  if (!ok) throw new Error(body)
+  body.loggedIn = true
+  profile.set(body)
+}
+
 export async function fetchProfile() {
-  try {
-    const response = await fetchWithTimeout('/ui/profile')
-    if (!response.ok) profile.set({} as Profile)
-    else {
-      const data = await response.json()
-      data.loggedIn = true
-      profile.set(data)
-    }
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError')
-      throw new Error(timeoutMsg)
-    profile.set({} as Profile)
-    throw error
-  }
+  const { ok, body } = await getUi('profile')
+  if (!ok) return profile.set({} as Profile)
+  body.loggedIn = true
+  profile.set(body)
 }
 
 function createProfileStore() {
   const { subscribe, set, update } = writable<Profile>({} as Profile)
+  return { subscribe, set, update, writeConfig }
+}
 
-  return {
-    subscribe,
-    set,
-    update,
-    async updateConfig(config: Config) {
-      try {
-        // Send the config to the server using postUi
-        const newConfig = { ...get(profile).config, ...config }
-        const response = await postUi('reconfig', JSON.stringify(newConfig), false)
-        if (!response) throw new Error(configUpdateFailedMsg)
+async function writeConfig(config: Config) {
+  try {
+    // Send the config to the server using postUi
+    const newConfig = { ...get(profile).config, ...config }
+    const { ok, body } = await postUi('reconfig', JSON.stringify(newConfig), false)
+    if (!ok) throw new Error(`${configUpdateFailedMsg}: ${body}`)
 
-        // Update the local store with the new config
-        update(profile => ({ ...profile, config }))
-        success(configurationSaved + ' ' + response)
-
-        // TODO: move both of these into the svelte caller.
-        // TODO: so we can visualize the update, reload, check and profile fetch.
-        // Wait for the server to reload
-        await checkReloaded()
-        await fetchProfile()
-      } catch (error) {
-        failure(configUpdateFailedMsg + ': ' + error)
-        throw error instanceof Error ? error : new Error(unknownErrorMsg)
-      }
-    },
+    // Update the local store with the new config
+    profile.update(profile => ({ ...profile, config }))
+    success(configurationSaved + ' ' + body)
+  } catch (error) {
+    failure(configUpdateFailedMsg + ': ' + error)
+    throw error instanceof Error ? error : new Error(unknownErrorMsg)
   }
 }

@@ -17,6 +17,15 @@ export enum Weekday {
 };
 
 /**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.AuthType>
+ */
+export enum AuthType {
+  password = 0,
+  header   = 1,
+  noauth   = 2,
+};
+
+/**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
  */
 export interface Profile {
@@ -30,7 +39,14 @@ export interface Profile {
   isUnstable: boolean;
   isFreeBsd: boolean;
   isSynology: boolean;
+  headers?: Record<string, null | string[]>;
+  fortune: string;
+  upstreamIp: string;
+  upstreamAllowed: boolean;
+  upstreamHeader: string;
+  upstreamType: AuthType;
   loggedIn: boolean;
+  updated: Date;
 };
 
 /**
@@ -54,7 +70,7 @@ export interface Config extends LogConfig, Apps {
   watchFiles?: (null | WatchFile)[];
   endpoints?: (null | Endpoint)[];
   commands?: (null | Command)[];
-  ui: UIConfig;
+  version: number;
 };
 
 /**
@@ -181,14 +197,6 @@ export interface CmdconfigConfig {
   log: boolean;
   notify: boolean;
   args: number;
-};
-
-/**
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.UIConfig>
- */
-export interface UIConfig {
-  darkMode: boolean;
-  language: string;
 };
 
 /**

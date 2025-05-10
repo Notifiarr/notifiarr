@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/client"
+	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"golift.io/cnfg"
 	"golift.io/goty"
 	"golift.io/goty/gotydoc"
@@ -44,8 +45,12 @@ func main() {
 		{Name: "Thursday", Value: time.Thursday},
 		{Name: "Friday", Value: time.Friday},
 		{Name: "Saturday", Value: time.Saturday},
-	}) // only 1 for now.
-
+	})
+	goat.Enums([]goty.Enum{
+		{Name: "password", Value: configfile.AuthPassword},
+		{Name: "header", Value: configfile.AuthHeader},
+		{Name: "noauth", Value: configfile.AuthNone},
+	})
 	log.Println("==> parsing config struct")
 	goat.Parse(client.Profile{})
 

@@ -21,6 +21,7 @@
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@sveltestrap/sveltestrap": "^7.1.0",
     "@zerodevx/svelte-toast": "^0.9.6",
+    "js-cookie": "^3.0.5",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.3.3",
     "svelte-i18n": "^4.0.1"

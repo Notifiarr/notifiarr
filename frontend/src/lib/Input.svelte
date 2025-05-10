@@ -1,3 +1,4 @@
+<!-- David Newhall II, May 2025, Notifiarr, LLC. -->
 <script lang="ts">
   import {
     Button,
@@ -14,12 +15,14 @@
 
   /** Must be unique. Identifies this component. */
   export let id: string
-  /** The label to display above the input. */
-  export let label: string = $_(`${id}.label`)
+  /** The name of the input. Defaults to the id. Pass undefined to not include a name. */
+  export let name: string = id
+  /** The label to display above the input. Must be present in translation if not undefined here. */
+  export let label: string | undefined = $_(`${id}.label`)
   /** The placeholder text to display in the input. */
-  export let placeholder: string = $_(`${id}.placeholder`)
-  /** The description to display below the input. */
-  export let description: string = $_(`${id}.description`)
+  export let placeholder: string | undefined = $_(`${id}.placeholder`)
+  /** The description to display below the input. Must be present in translation if not undefined here. */
+  export let description: string | undefined = $_(`${id}.description`)
   /** The type of input. Like `text` or `select`. */
   export let type: InputType = 'text'
   /** Used if you do not want this value changed directly. */
@@ -39,22 +42,25 @@
   /** Optional options for select input. */
   export let options: Option[] | undefined = undefined
 
-  type Option = { value: string | number | boolean; name: string }
+  type Option = { value: string | number | boolean; name: string; disabled?: boolean }
 
   let input: SvelteComponent
-
-  $: tooltip = $_(`${id}.tooltip`)
-  $: label = $_(`${id}.label`)
-  $: placeholder = $_(`${id}.placeholder`)
-  $: description = $_(`${id}.description`)
+  let showTooltip = false
 
   $: icon = showTooltip ? 'dash-circle' : 'question-circle'
+  $: currType = type
+  $: passIcon = currType === 'password' ? 'eye-slash' : 'eye'
   $: iconClass = showTooltip ? 'text-danger' : 'text-secondary'
+  $: placeholder = placeholder == id + '.placeholder' ? undefined : placeholder
 
-  let showTooltip = false
   function toggleTooltip(e: Event | undefined = undefined) {
     e?.preventDefault()
     showTooltip = !showTooltip
+  }
+
+  function togglePassword(e: Event | undefined = undefined) {
+    e?.preventDefault()
+    currType = currType === 'password' ? 'text' : 'password'
   }
 </script>
 
@@ -70,16 +76,19 @@
       <slot name="pre" />
       <Input
         {id}
-        {type}
+        {name}
+        type={currType}
         bind:this={input}
         bind:value
         bind:checked={value}
+        autocomplete={name.includes('noauto') ? 'off' : undefined}
         {placeholder}
         {readonly}
         {disabled}
         {rows}
         {min}
         {max}>
+        <!-- Create a boolean select option list. -->
         {#if typeof value === 'boolean' && type === 'select'}
           <option value={false} selected={value === false}>
             {$_('words.select-option.Disabled')}
@@ -88,20 +97,28 @@
             {$_('words.select-option.Enabled')}
           </option>
         {/if}
+        <!-- If the current value is not in the options list, add it. -->
         {#if options}
           {#if !options.map(o => o.value).includes(value)}
             <option {value} selected>
               {value} ({$_('words.select-option.custom')})
             </option>
           {/if}
-          {#each options as option}
-            <option value={option.value} selected={value === option.value}>
-              {option.name}
+          <!-- Create a select option list from input. -->
+          {#each options as o}
+            <option value={o.value} selected={value === o.value} disabled={o.disabled}>
+              {o.name}
             </option>
           {/each}
         {/if}
         <slot />
       </Input>
+      <!-- Including a password visibility toggler. -->
+      {#if type === 'password'}
+        <Button type="button" outline on:click={togglePassword}>
+          <Icon class="text-warning" name={passIcon} />
+        </Button>
+      {/if}
       <slot name="post" />
     </InputGroup>
 

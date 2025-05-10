@@ -2,7 +2,7 @@
 
 <script context="module" lang="ts">
   import { derived } from 'svelte/store'
-  import { _, date as dt, locale } from 'svelte-i18n'
+  import { _, date as dt, isLoading, locale } from 'svelte-i18n'
   export { _ } // pass it through
   export const isReady = derived(locale, $locale => typeof $locale === 'string')
 
@@ -19,6 +19,6 @@
   export let id: string
 </script>
 
-{#if $isReady == true}
+{#if $isReady === true && $isLoading === false}
   {@html $_(id, { values: { ...$$props } })}
 {/if}

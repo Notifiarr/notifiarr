@@ -15,23 +15,75 @@
             "custom": "custom"
         }
     },
+    "buttons": {
+        "Login": "Login",
+        "Confirm": "Confirm",
+        "Cancel": "Cancel",
+        "Save": "Save",
+        "SaveChanges": "Save Changes",
+        "SaveConfiguration": "Save Configuration"
+    },
     "phrases": {
+        "ERROR": "ERROR",
+        "LoggingIn": "Logging in...",
+        "LoggedIn": "Logged in!",
+        "Loading": "Loading...",
+        "BackEndUpdated": "Back-end updated {age} ago.",
+        "TryRefreshingThePage": "Try refreshing the page.",
         "ConfigurationSaved": "Configuration saved!",
         "SavingConfiguration": "Saving configuration...",
-        "SaveConfiguration": "Save Configuration",
         "ConfigureNotifiarrClientSettings": "Configure your Notifiarr client settings here.",
+        "Version": "Version {version}",
         "Every12Hours": "Every 12 hours",
         "Every6Hours": "Every 6 hours",
-        "Every3Hours": "Every 3 hours"
+        "Every3Hours": "Every 3 hours",
+        "HideMenu": "Hide Menu",
+        "ShowMenu": "Show Menu",
+        "Reloading": "Reloading...",
+        "FailedToReload": "Failed to reload: {error}",
+        "ConfirmReload": "Confirm Reload",
+        "ConfirmReloadBody": "Are you sure you want to reload the client?",
+        "ConfirmShutdown": "Confirm Shutdown",
+        "ConfirmShutdownBody": "Are you sure you want to shutdown the client? You will need to restart it from the host it runs on.",
+        "ShutdownSuccess": "Shutdown successful! Client stopped.",
+        "FailedToShutdown": "Failed to shutdown: {error} - Try reloading the page.",
+        "LoginHelp": "Login Help",
+        "LoginHelpBody": "If you've forgotten your password, please see the <a href='https://notifiarr.wiki/pages/client/gui/#forgotten-passwords' target='_new'>forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key."
+    },
+    "navigation": {
+        "titles": {
+            "Settings": "Settings",
+            "Insights": "Insights",
+            "Home": "Home",
+            "Configuration": "Configuration",
+            "SiteTunnel": "Site Tunnel",
+            "StarrApps": "Starr Apps",
+            "Downloaders": "Downloaders",
+            "MediaApps": "Media Apps",
+            "SnapshotApps": "Snapshot Apps",
+            "FileWatcher": "File Watcher",
+            "Endpoints": "Endpoints",
+            "Commands": "Commands",
+            "Services": "Services",
+            "Triggers": "Triggers",
+            "Integrations": "Integrations",
+            "Monitoring": "Monitoring",
+            "Metrics": "Metrics",
+            "LogFiles": "Log Files",
+            "System": "System",
+            "TrustProfile": "Trust Profile",
+            "Landing": "Landing"
+        }
     },
     "config": {
         "errors": {
-            "LoginFailedInvalidCreds": "Login failed: Invalid username or password",
+            "InvalidCreds": "Invalid username or password.",
             "LoginRequestTimedOut": "Login request timed out",
-            "LoginFailed": "Login failed:",
+            "LoginFailed": "Login failed: {error}",
             "ProfileReqTimedOut": "Profile request timed out",
             "AnUnknownErrorOccurred": "An unknown error occurred",
-            "ConfigUpdateFailed": "Configuration update failed"
+            "ConfigUpdateFailed": "Configuration update failed",
+            "PleaseEnterBothUsernameAndPassword": "Please enter both username and password."
         },
         "titles": {
             "Configuration": "Configuration",
@@ -43,7 +95,9 @@
             "Command": "Command",
             "SSLConfiguration": "SSL Configuration",
             "Services": "Services",
-            "Logging": "Logging"
+            "Logging": "Logging",
+            "Dark": "Dark",
+            "Light": "Light"
         },
         "apiKey": {
             "label": "API Key",
@@ -227,6 +281,67 @@
             "label": "Unstable Channel",
             "description": "Enabling the unstable updates channel will make the application check the unstable website for auto-updates instead of GitHub.",
             "tooltip": "Only available to users with developer access."
+        }
+    },
+    "profile": {
+        "title": {
+            "Authentication": "Authentication",
+            "Authorization": "Authorization"
+        },
+        "phrase": {
+            "ProfileDescription": "This page controls how you log into this Notifiarr client application.",
+            "ShowMoreDesc": "Three auth types are currently supported. Auth Proxy and No Password are only available if the current request comes from a valid, configured upstream IP address.",
+            "PasswordOnlyUsed": "Username and Password are only used if Auth Type is set to Password.",
+            "HeaderOnlyUsed": "Auth Header is only used if Auth Type is <b>not</b> set to Password.",
+            "AuthTypeChange": "If Auth Type changes, log out to complete the process.",
+            "ProfileUpdated": "Profile updated successfully!",
+            "EnterCurrentPassword": "Enter your current password to make changes.",
+            "FortuneDefault": "Without fortune, life is a blank page.",
+            "ProxyAuthDisabled": "Proxy authentication is disabled because your upstream ({upstreamIp}) is not in the allowed upstreams list.",
+            "Addit": "Add it.",
+            "SeeWikiForAuthProxyHelp": "See <a href='https://notifiarr.wiki/pages/client/reverseProxy/' target='_new'>the wiki</a> for instructions setting up an authentication proxy.",
+            "ShowMeMore": "Show me more.",
+            "ShowMeLess": "Show me less."
+        },
+        "authType": {
+            "label": "Auth Type",
+            "description": "Select how to authenticate with the client",
+            "options": {
+                "password": "Password: Local Username",
+                "header": "Auth Proxy: Header",
+                "noauth": "No Password (danger)"
+            },
+            "option_desc": {
+                "password": " This is the default auth type. Select the Password option to log into this application with a configured username and password. Only 1 username and password is supported. When selecting this option, you must fill in the username and new password fields. If this is the current auth type you must also fill in the current password field to make changes.",
+                "header": "Select this option to log into this application using an HTTP header that contains a username. This is commonly known as proxy authentication. We have <a href='https://notifiarr.wiki/pages/client/reverseProxy/' target='_new'>a wiki page</a> that provides instructions to configure Nginx for this feature. When selecting this option, you must also select a header for the auth proxy. If no headers are displayed, then no valid headers were provided by the upstream proxy.",
+                "noauth": "This configuration is not recommended. The No Password auth type allows any request from any configured <code>upstream IP</code>. It also works with an auth proxy to set the username. If no username is in the provided header, then it defaults to admin."
+            }
+        },
+        "upstreams": {
+            "label": "Upstreams",
+            "description": "Trusted proxy IP or CIDR networks. Separate networks with spaces.",
+            "placeholder": "127.0.0.1 ::1",
+            "tooltip": "If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you should add that proxy's IP here. You can also specify full networks. This controls which IP is written to the web server log file, requester or <span class='text-warning'>X-Forwarded-For</span> header. Required when using a request header for authentication, or when authentication is disabled."
+        },
+        "authHeader": {
+            "label": "Auth Header",
+            "description": "Select the header containing your username",
+            "tooltip": "This displays headers that are provided by the client or upstream that may be used for proxy authentication. This selection is used if Auth Type is set to Header. Choose the header that displays your proper username."
+        },
+        "username": {
+            "label": "Username",
+            "description": "Your login username",
+            "placeholder": "Default: admin"
+        },
+        "password": {
+            "label": "Current Password",
+            "description": "Your login password",
+            "placeholder": "Enter current password"
+        },
+        "newPass": {
+            "label": "New Password",
+            "description": "Your new login password",
+            "placeholder": "9 character minimum"
         }
     }
 }

@@ -32,20 +32,21 @@ export const failure = (m: string) =>
     },
   })
 
-// onInterval sets an interval and destroys it when it when the page changes.
-export function onInterval(callback: () => void, seconds: number) {
-  const interval = setInterval(callback, seconds * 1000)
-  onDestroy(() => clearInterval(interval))
-
-  return interval
-}
-
-// onOnce sets a timer and expires it after one invocation.
-export function onOnce(callback: () => void, seconds: number) {
-  const interval = setInterval(() => {
-    clearInterval(interval)
-    callback()
-  }, seconds * 1000)
-
-  return interval
+/** age converts a milliseconds counter into human readable: 13h 5m 45s */
+export function age(milliseconds: number, includeSeconds = false): string {
+  const seconds = Math.floor(milliseconds / 1000)
+  if (!seconds) return '0s'
+  const days = Math.floor(seconds / 86400)
+  const hours = Math.floor((seconds - days * 86400) / 3600)
+  const minutes = Math.floor((seconds - days * 86400 - hours * 3600) / 60)
+  const secs =
+    !includeSeconds && seconds > 60
+      ? 0
+      : Math.floor(seconds - days * 86400 - hours * 3600 - minutes * 60)
+  return (
+    (days > 0 ? days + 'd ' : '') +
+    (hours > 0 ? hours + 'h ' : '') +
+    (minutes > 0 ? minutes + 'm ' : '') +
+    (secs > 0 ? secs + 's ' : '')
+  ).trim()
 }

@@ -158,17 +158,10 @@ serial = {{.Serial}}
 ## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
 retries = {{.Retries}}
 
-#################
-## UI Settings ##
-#################
+## The version of the config file. The app uses this to verify the config
+## version the front-end updates is not older than the back-end version.
+version = {{.Version}}
 
-[ui]
-
-## Dark mode for the web UI. true/false
-dark_mode = {{.UIConf.DarkMode}}
-
-## Language for the web UI. Short code string like "en", "es", "fr", etc.
-language = "{{.UIConf.Language}}"
 
 ##################
 # Starr Settings #
