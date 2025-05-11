@@ -23,7 +23,7 @@
   // Local state that syncs with profile store.
   $: c = { ...$profile.config }
   // Convert array to newline-separated string for textarea
-  $: extraKeys = c.extraKeys?.join('\n') + '\n' || ''
+  $: extraKeys = (c.extraKeys?.join('\n') || '') + '\n'
   $: rows = extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length
 
   // Form submission status
