@@ -13,6 +13,8 @@ npm run build
 # Get all the locales. Remove the folder prefix and the '.json' suffix.
 locales=$(ls -1 src/lib/locale/*.json | sed 's#src/lib/locale/\(.*\)\.json#\1#g')
 
+echo "Creating locales.go..."
+
 # Create the locales.go file.
 cat <<EOF > locales.go
 package frontend
@@ -27,6 +29,8 @@ EOF
 for locale in $locales; do
   echo "\t\"$locale\"," >> locales.go
 done
+
+cat locales.go
 
 # Close the file.
 echo "}" >> locales.go
