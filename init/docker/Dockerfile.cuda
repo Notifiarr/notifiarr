@@ -5,7 +5,7 @@
 
 FROM golang:1.24.2-bullseye AS builder
 
-# Build speed magic! 
+# Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
 COPY main.go go.mod go.sum ./
@@ -14,7 +14,11 @@ COPY main.go go.mod go.sum ./
 RUN go mod download \
     && go run github.com/swaggo/swag/cmd/swag@latest -v
 
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash \
+    && apt install -y nodejs
+
 COPY pkg pkg
+COPY frontend frontend
 RUN go generate ./...
 
 ARG TARGETARCH

@@ -136,6 +136,14 @@ func (c *Client) getProfilePostData(request *http.Request) (*ProfilePost, error)
 		post.Username = request.PostFormValue("NewUsername")
 		post.NewPass = request.PostFormValue("NewPassword")
 		post.Upstreams = request.PostFormValue("Upstreams")
+		switch request.PostFormValue("AuthType") {
+		case "password":
+			post.AuthType = configfile.AuthPassword
+		case "nopass":
+			post.AuthType = configfile.AuthNone
+		case "header":
+			post.AuthType = configfile.AuthHeader
+		}
 		return post, nil
 	}
 

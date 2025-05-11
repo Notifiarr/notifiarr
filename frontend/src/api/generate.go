@@ -1,6 +1,6 @@
 // Package main is used to generate the backend data model as typescript interfaces.
 //
-//go:generate bash generate.sh
+//go:generate sh generate.sh
 package main
 
 import (

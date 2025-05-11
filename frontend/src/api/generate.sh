@@ -1,3 +1,4 @@
+#!/bin/sh
 # This vendors all the notifiarr dependencies so we can parse their docs.
 
 # This variable is used by the generate.go file.
