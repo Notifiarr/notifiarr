@@ -28,7 +28,7 @@
     authType: $profile?.upstreamType || Auth.password,
     upstreams: $profile?.config.upstreams?.join(' ') || '',
     newPass: '',
-    authHeader: $profile?.config.uiPassword.startsWith('webauth:')
+    header: $profile?.config.uiPassword.startsWith('webauth:')
       ? $profile?.config.uiPassword.split(':')[1]
       : '',
   }
@@ -76,7 +76,7 @@
     // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
     (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
     // Make sure they picked a header if header auth type is selected.
-    (form.authType === Auth.header && !form.authHeader) ||
+    (form.authType === Auth.header && !form.header) ||
     // Make sure they didn't enter a username that's not allowed.
     form.username == 'webauth' ||
     form.username == 'noauth' ||
@@ -188,21 +188,21 @@
         {#if form.authType === Auth.header}
           <Row>
             <Col md={8}>
-              <Input id="profile.authHeader" type="select" bind:value={form.authHeader}>
+              <Input id="profile.header" type="select" bind:value={form.header}>
                 {#each Object.entries($profile?.headers || {}) as [key, value]}
                   {#each value! as val}
                     <option
                       value={key}
-                      selected={form.authHeader.toLowerCase() === key.toLowerCase()}>
+                      selected={form.header.toLowerCase() === key.toLowerCase()}>
                       {key} ({val})
                     </option>
                   {/each}
                 {/each}
-                {#if form.authHeader === ''}
-                  <option value={form.authHeader} selected>(none)</option>
-                {:else if !$profile?.headers?.[form.authHeader]}
-                  <option value={form.authHeader} selected>
-                    {form.authHeader} (other)
+                {#if form.header === ''}
+                  <option value={form.header} selected>(none)</option>
+                {:else if !$profile?.headers?.[form.header]}
+                  <option value={form.header} selected>
+                    {form.header} (other)
                   </option>
                 {/if}
               </Input>

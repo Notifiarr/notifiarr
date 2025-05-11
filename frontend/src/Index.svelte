@@ -5,6 +5,7 @@
     CardBody,
     CardFooter,
     CardHeader,
+    CardTitle,
     Col,
     Container,
     Icon,
@@ -232,7 +233,7 @@
       <!-- Wait for translations to load. -->
       {#if !$isReady}
         <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-          <Card outline body {theme} color="info">
+          <Card outline {theme} color="notifiarr">
             <CardBody><Spinner /> Translateratating!...</CardBody>
           </Card>
         </Col>
@@ -240,7 +241,7 @@
         {#await fetchProfile()}
           <!-- Wait for profile to load. -->
           <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-            <Card outline body {theme} color="warning">
+            <Card outline {theme} color="notifiarr">
               <CardBody><Spinner /> {$_('phrases.Loading')}</CardBody>
             </Card>
           </Col>
@@ -251,39 +252,50 @@
           {:else}
             <!-- This is the login page, before logging in. -->
             <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-              <Card outline body {theme} class="mt-2" color="notifiarr">
-                <form on:submit|preventDefault={handleLogin}>
-                  <Input
-                    type="text"
-                    name="username"
-                    id="username"
-                    placeholder="Username"
-                    bind:value={username} />
-                  <Input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Password"
-                    class="my-1"
-                    bind:value={password} />
-                  <Button type="submit" disabled={isLoading} class="w-100">
-                    {#if isLoading}
-                      <Spinner size="sm" /> {$_('phrases.LoggingIn')}
-                    {:else}
-                      {$_('buttons.Login')}
-                    {/if}
-                  </Button>
-                  <a
-                    href="#showhelp"
-                    on:click={e => (e.preventDefault(), (showHelpModal = true))}>
-                    {$_('phrases.LoginHelp')}
-                  </a>
-                  {#if loginFailedMsg}
-                    <span class="error-message">
-                      {loginFailedMsg}
-                    </span>
-                  {/if}
-                </form>
+              <Card outline {theme} class="mt-2" color="notifiarr">
+                <CardHeader>
+                  <CardTitle>{$_('buttons.Login')}</CardTitle>
+                </CardHeader>
+                <CardBody>
+                  <form on:submit|preventDefault={handleLogin}>
+                    <Input
+                      type="text"
+                      name="username"
+                      id="username"
+                      placeholder="Username"
+                      bind:value={username} />
+                    <Input
+                      type="password"
+                      name="password"
+                      id="password"
+                      placeholder="Password"
+                      class="my-1"
+                      bind:value={password} />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={isLoading}
+                      class="w-100"
+                      color="success">
+                      {#if isLoading}
+                        <Spinner size="sm" />
+                        <span class="fs-5">{$_('phrases.LoggingIn')}</span>
+                      {:else}
+                        <span class="fs-5">{$_('buttons.Login')}</span>
+                      {/if}
+                    </Button>
+                    <CardFooter class="mt-2">
+                      <a
+                        href="#showhelp"
+                        on:click={e => (e.preventDefault(), (showHelpModal = true))}>
+                        {$_('phrases.LoginHelp')}
+                      </a>
+                      {#if loginFailedMsg}
+                        • <span class="text-danger">{loginFailedMsg}</span>
+                      {/if}
+                    </CardFooter>
+                  </form>
+                </CardBody>
               </Card>
             </Col>
           {/if}
@@ -291,7 +303,7 @@
           <Col xs={{ size: 10, offset: 1 }} md={{ size: 6, offset: 3 }}>
             <!-- error fetching profile (ie. timeout) -->
             <Card outline body {theme} color="danger">
-              <CardHeader>{$_('phrases.ERROR')}</CardHeader>
+              <CardHeader><CardTitle>{$_('phrases.ERROR')}</CardTitle></CardHeader>
               <CardBody>{error.message}</CardBody>
               <CardFooter>{$_('phrases.TryRefreshingThePage')}</CardFooter>
             </Card>
@@ -301,10 +313,3 @@
     </Row>
   </Container>
 </main>
-
-<style>
-  .error-message {
-    color: red;
-    margin-bottom: 1rem;
-  }
-</style>
