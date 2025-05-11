@@ -57,6 +57,8 @@ type userNameValue int
 //nolint:gochecknoglobals // used as context value key.
 var userNameStr = userNameValue(1)
 
+var ErrConfigVersionMismatch = fmt.Errorf("config version mismatch")
+
 func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
 		userName, dynamic := c.getUserName(request)
@@ -673,6 +675,11 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 }
 
 func (c *Client) validateNewConfig(config *configfile.Config) error {
+	if config.Version != c.Config.Version {
+		return fmt.Errorf("%w: provided: %d, running: %d",
+			ErrConfigVersionMismatch, config.Version, c.Config.Version)
+	}
+
 	for idx, cmd := range config.Commands {
 		if err := cmd.SetupRegexpArgs(); err != nil {
 			return fmt.Errorf("command %d '%s' failed setup: %w", idx+1, cmd.Name, err)
