@@ -1,14 +1,17 @@
 <script lang="ts">
   import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { darkMode } from '../lib/darkmode.svelte'
+  $: theme = $darkMode ? 'dark' : 'light'
 </script>
 
-<Card class="mb-4">
+<Card class="mb-2" {theme}>
   <CardHeader>
     <h2>Starr Apps</h2>
   </CardHeader>
   <CardBody>
     <p>
-      Monitor and manage your Starr application suite including Sonarr, Radarr, Lidarr, and more.
+      Monitor and manage your Starr application suite including Sonarr, Radarr, Lidarr,
+      and more.
     </p>
   </CardBody>
   <CardFooter>

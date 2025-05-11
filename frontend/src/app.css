@@ -60,7 +60,7 @@ body.dark-mode {
 /* https://www.fontshungry.com/beleren-font-family/ */
 @font-face {
   font-family: notifiarrFont;
-  src: url(/src/assets/Beleren2016SmallCaps-Bold.ttf);
+  src: url(/src/assets/fonts/Beleren2016SmallCaps-Bold.ttf);
 }
 
 .title-notifiarr {

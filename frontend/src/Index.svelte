@@ -5,6 +5,7 @@
     CardBody,
     CardFooter,
     CardHeader,
+    CardTitle,
     Col,
     Container,
     Icon,
@@ -17,7 +18,6 @@
     NavbarBrand,
     Row,
     Spinner,
-    Styles,
   } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg'
   import { profile, fetchProfile, updateProfile } from './api/profile'
@@ -64,16 +64,20 @@
   async function updateBackend() {
     clearInterval(updateTimer)
     updateTimer = 0
-    notification = '<span class="text-warning">Updating back-end...</span>'
+    notification = `<span class="text-warning">${$_('phrases.UpdatingBackEnd')}</span>`
     try {
       await updateProfile()
       timer()
     } catch (err) {
-      notification = `<span class="text-danger">Failed to update back-end. ${err}</span>`
+      notification = `<span class="text-danger">${$_('phrases.FailedToUpdateBackEnd', {
+        values: { error: `${err}` },
+      })}</span>`
     }
   }
 
-  async function handleLogin() {
+  async function handleLogin(e: Event) {
+    e.preventDefault()
+
     if (!username || !password) {
       loginFailedMsg = $_('config.errors.PleaseEnterBothUsernameAndPassword')
       return
@@ -109,7 +113,6 @@
   <link rel="icon" type="image/svg+xml" href={logo} />
 </svelte:head>
 
-<Styles />
 <SvelteToast />
 
 <main>
@@ -232,16 +235,19 @@
       <!-- Wait for translations to load. -->
       {#if !$isReady}
         <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-          <Card outline body {theme} color="info">
-            <CardBody><Spinner /> Translateratating!...</CardBody>
+          <Card outline {theme} color="notifiarr">
+            <CardBody class="text-nowrap fs-3">
+              <!-- This is before translations are loaded. This 'typo' is on purpose, sue me.-->
+              <Spinner /> Translateratating!...</CardBody>
           </Card>
         </Col>
       {:else}
         {#await fetchProfile()}
           <!-- Wait for profile to load. -->
           <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-            <Card outline body {theme} color="warning">
-              <CardBody><Spinner /> {$_('phrases.Loading')}</CardBody>
+            <Card outline {theme} color="notifiarr">
+              <CardBody class="text-nowrap fs-3">
+                <Spinner />{$_('phrases.Loading')}</CardBody>
             </Card>
           </Col>
         {:then}
@@ -251,39 +257,50 @@
           {:else}
             <!-- This is the login page, before logging in. -->
             <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-              <Card outline body {theme} class="mt-2" color="notifiarr">
-                <form on:submit|preventDefault={handleLogin}>
-                  <Input
-                    type="text"
-                    name="username"
-                    id="username"
-                    placeholder="Username"
-                    bind:value={username} />
-                  <Input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Password"
-                    class="my-1"
-                    bind:value={password} />
-                  <Button type="submit" disabled={isLoading} class="w-100">
-                    {#if isLoading}
-                      <Spinner size="sm" /> {$_('phrases.LoggingIn')}
-                    {:else}
-                      {$_('buttons.Login')}
+              <Card outline {theme} class="mt-2" color="notifiarr">
+                <CardHeader>
+                  <CardTitle>{$_('buttons.Login')}</CardTitle>
+                </CardHeader>
+                <CardBody>
+                  <form onsubmit={handleLogin}>
+                    <Input
+                      type="text"
+                      name="username"
+                      id="username"
+                      placeholder="Username"
+                      bind:value={username} />
+                    <Input
+                      type="password"
+                      name="password"
+                      id="password"
+                      placeholder="Password"
+                      class="my-1"
+                      bind:value={password} />
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={isLoading}
+                      class="w-100"
+                      color="success">
+                      {#if isLoading}
+                        <Spinner size="sm" />
+                        <span class="fs-5">{$_('phrases.LoggingIn')}</span>
+                      {:else}
+                        <span class="fs-5">{$_('buttons.Login')}</span>
+                      {/if}
+                    </Button>
+                  </form>
+                  <CardFooter class="mt-2">
+                    <a
+                      href="#showhelp"
+                      onclick={e => (e.preventDefault(), (showHelpModal = true))}>
+                      {$_('phrases.LoginHelp')}
+                    </a>
+                    {#if loginFailedMsg}
+                      • <span class="text-danger">{loginFailedMsg}</span>
                     {/if}
-                  </Button>
-                  <a
-                    href="#showhelp"
-                    on:click={e => (e.preventDefault(), (showHelpModal = true))}>
-                    {$_('phrases.LoginHelp')}
-                  </a>
-                  {#if loginFailedMsg}
-                    <span class="error-message">
-                      {loginFailedMsg}
-                    </span>
-                  {/if}
-                </form>
+                  </CardFooter>
+                </CardBody>
               </Card>
             </Col>
           {/if}
@@ -291,7 +308,7 @@
           <Col xs={{ size: 10, offset: 1 }} md={{ size: 6, offset: 3 }}>
             <!-- error fetching profile (ie. timeout) -->
             <Card outline body {theme} color="danger">
-              <CardHeader>{$_('phrases.ERROR')}</CardHeader>
+              <CardHeader><CardTitle>{$_('phrases.ERROR')}</CardTitle></CardHeader>
               <CardBody>{error.message}</CardBody>
               <CardFooter>{$_('phrases.TryRefreshingThePage')}</CardFooter>
             </Card>
@@ -301,10 +318,3 @@
     </Row>
   </Container>
 </main>
-
-<style>
-  .error-message {
-    color: red;
-    margin-bottom: 1rem;
-  }
-</style>
