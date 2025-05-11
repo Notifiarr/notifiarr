@@ -407,7 +407,7 @@ test: clean generate lint
 	go test -race -covermode=atomic ./...
 
 lint: generate
-	codespell -H -L vender,te -S .git,dist,node_modules,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum,*.json .
+	codespell -H -L vender,te -S .git,dist,node_modules,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum,package-lock.json .
 	# Checking lint.
 	golangci-lint version
 	GOOS=linux golangci-lint run

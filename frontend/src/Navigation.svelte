@@ -4,12 +4,19 @@
     Nav,
     NavItem,
     NavLink,
-    Container,
     Row,
     Col,
     Button,
+    Fade,
+    Dropdown,
+    DropdownToggle,
+    DropdownMenu,
+    DropdownItem,
+    Input,
+    Icon,
   } from '@sveltestrap/sveltestrap'
-  import { profile } from './lib/login'
+  import { profile } from './api/profile'
+  import { _ } from './lib/Translate.svelte'
   import Configuration from './configuration/Index.svelte'
   import SiteTunnel from './siteTunnel/Index.svelte'
   import StarrApps from './starrApps/Index.svelte'
@@ -28,134 +35,169 @@
   import System from './system/Index.svelte'
   import Profile from './profile/Index.svelte'
   import Landing from './Landing.svelte'
-  import { trimPrefix } from './lib/util'
+  import { ltrim } from './lib/util'
+  import { darkMode, toggleDarkMode } from './lib/darkmode.svelte'
 
+  $: theme = $darkMode ? 'dark' : 'light'
   // Page structure for navigation with icons
+  // id used for navigation AND translations.
   const settings = [
-    { component: Configuration, id: 'configuration', name: 'Configuration', icon: '⚙️' },
-    { component: SiteTunnel, id: 'siteTunnel', name: 'Site Tunnel', icon: '🔐' },
-    { component: StarrApps, id: 'starrApps', name: 'Starr Apps', icon: '✨' },
-    { component: DownloadApps, id: 'downloadApps', name: 'Downloaders', icon: '📥' },
-    { component: MediaApps, id: 'mediaApps', name: 'Media Apps', icon: '🎬' },
-    { component: SnapshotApps, id: 'snapshotApps', name: 'Snapshot', icon: '📸' },
-    { component: FileWatcher, id: 'fileWatcher', name: 'File Watcher', icon: '👁️' },
-    { component: Endpoints, id: 'endpoints', name: 'Endpoints', icon: '🔌' },
-    { component: Commands, id: 'commands', name: 'Commands', icon: '🖥️' },
-    { component: ServiceChecks, id: 'serviceChecks', name: 'Services', icon: '✓' },
+    { component: Configuration, id: 'Configuration', icon: '⚙️' },
+    { component: SiteTunnel, id: 'SiteTunnel', icon: '🔐' },
+    { component: StarrApps, id: 'StarrApps', icon: '✨' },
+    { component: DownloadApps, id: 'Downloaders', icon: '📥' },
+    { component: MediaApps, id: 'MediaApps', icon: '🎬' },
+    { component: SnapshotApps, id: 'SnapshotApps', icon: '📸' },
+    { component: FileWatcher, id: 'FileWatcher', icon: '👁️' },
+    { component: Endpoints, id: 'Endpoints', icon: '🔌' },
+    { component: Commands, id: 'Commands', icon: '🖥️' },
+    { component: ServiceChecks, id: 'Services', icon: '✓' },
   ]
 
   const insights = [
-    { component: Triggers, id: 'triggers', name: 'Triggers', icon: '⚡' },
-    { component: Integrations, id: 'integrations', name: 'Integrations', icon: '🔗' },
-    { component: Monitoring, id: 'monitoring', name: 'Monitoring', icon: '📊' },
-    { component: Metrics, id: 'metrics', name: 'Metrics', icon: '📈' },
-    { component: LogFiles, id: 'logFiles', name: 'Log Files', icon: '📝' },
-    { component: System, id: 'system', name: 'System', icon: '🖧' },
+    { component: Triggers, id: 'Triggers', icon: '⚡' },
+    { component: Integrations, id: 'Integrations', icon: '🔗' },
+    { component: Monitoring, id: 'Monitoring', icon: '📊' },
+    { component: Metrics, id: 'Metrics', icon: '📈' },
+    { component: LogFiles, id: 'LogFiles', icon: '📝' },
+    { component: System, id: 'System', icon: '🖧' },
   ]
 
   const others = [
-    { component: Profile, id: 'profile', name: 'Profile', icon: '👤' },
-    { component: Landing, id: 'landing', name: 'Landing', icon: '🏠' },
+    { component: Profile, id: 'TrustProfile', icon: '👤' },
+    { component: Landing, id: '', icon: '🏠' },
   ]
 
-  function navigateTo(event: Event, pageId: string): void {
+  /**
+   * Used to navigate to a page.
+   * @param event - from an onclick handler
+   * @param pageId - the id of the page to navigate to, ie profile, configuration, etc.
+   */
+  export function goto(event: Event, pid: string, subPages: string[] = []): void {
     event.preventDefault()
-    activePage = pageId
-    window.history.replaceState({}, '', `${urlBase}${pageId}`)
+    pid = pid.toLowerCase()
+    if (settings.concat(insights, others).find(p => p.id.toLowerCase() === pid))
+      activePage = pid
+    else activePage = ''
+
+    const query = new URLSearchParams(window.location.search)
+    const params = query.toString()
+    const uri = `${urlBase}${[pid, ...subPages].join('/')}${params ? `?${params}` : ''}`
+    window.history.replaceState({}, '', uri)
     // Auto-collapse sidebar on mobile after navigation
-    isOpen = innerWidth > 767
+    isOpen = windowWidth >= 992
   }
 
   // Used to auto-navigate.
   $: urlBase = $profile?.config.urlbase || '/'
-  $: parts = trimPrefix(window.location.pathname, urlBase).split('/')
-  $: activePage = parts.length > 0 ? parts[0] : 'landing'
+  $: parts = ltrim(window.location.pathname, urlBase).split('/')
+  $: activePage = parts.length > 0 ? parts[0] : ''
 
   // Used for sidebar collapse state.
-  let innerWidth = 1200
-  $: isOpen = innerWidth > 767
+  let windowWidth = 1000
+  $: isOpen = windowWidth >= 992
 
   // Set the component based on the active page. Dig it out of settings, others and insights.
   $: PageComponent =
-    settings.concat(insights, others).find((page) => page.id === activePage)?.component || Landing
+    settings.concat(insights, others).find(page => page.id.toLowerCase() === activePage)
+      ?.component || Landing
 </script>
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth={windowWidth} />
 
 <div class="navigation">
-  <Container fluid class="mt-3">
-    <!-- Mobile Menu Toggle Button -->
-    <div class="mobile-toggle-container d-md-none mb-3">
-      <Button color="light" class="sidebar-toggle" on:click={() => (isOpen = !isOpen)}>
-        {isOpen ? '✕ Hide' : '☰ Show'} Menu
-      </Button>
-    </div>
+  <!-- Mobile Menu Toggle Button -->
+  <Card color="warning" {theme} class="menu-toggle-wrapper d-lg-none mb-2 p-0" outline>
+    <Button size="sm" class="menu-toggle-button my-0" on:click={() => (isOpen = !isOpen)}>
+      {isOpen ? `✕ ${$_('phrases.HideMenu')}` : `☰ ${$_('phrases.ShowMenu')}`}
+    </Button>
+  </Card>
 
-    <Row>
-      <!-- Navigation Sidebar -->
-      <div class={`sidebar-col col-md-3 col-lg-2 ${!isOpen ? 'd-none' : 'd-block'}`}>
-        <Card body color="light" class="sidebar-card">
-          <p class="navheader">Settings</p>
-          <Nav vertical pills class="nav-custom">
-            {#each settings as page}
-              <NavItem>
-                <NavLink
-                  href={urlBase + page.id}
-                  class="nav-link-custom"
-                  active={activePage === page.id}
-                  on:click={(e) => navigateTo(e, page.id)}
-                >
-                  <span class="nav-icon">{page.icon}</span>
-                  <span class="nav-text">{page.name}</span>
-                </NavLink>
-              </NavItem>
-            {/each}
-          </Nav>
+  <Row>
+    <!-- Navigation Sidebar -->
+    <Fade class="sidebar-col col" {isOpen}>
+      <Card body class="sidebar-card" {theme}>
+        <!-- Settings -->
+        <p class="navheader">{$_('navigation.titles.Settings')}</p>
+        <Nav vertical pills class="nav-custom" {theme}>
+          {#each settings as page}
+            {@const pid = page.id.toLowerCase()}
+            <NavItem>
+              <NavLink
+                href={urlBase + pid}
+                class="nav-link-custom"
+                active={activePage === pid}
+                on:click={e => goto(e, pid)}>
+                <span class="nav-icon">{page.icon}</span>
+                <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
+              </NavLink>
+            </NavItem>
+          {/each}
+        </Nav>
 
+        <div class="section-divider"></div>
+
+        <!-- Insights -->
+        <p class="navheader">{$_('navigation.titles.Insights')}</p>
+        <Nav vertical pills class="nav-custom" {theme}>
+          {#each insights as page}
+            {@const pid = page.id.toLowerCase()}
+            <NavItem>
+              <NavLink
+                href={urlBase + pid}
+                class="nav-link-custom"
+                active={activePage === pid}
+                on:click={e => goto(e, pid)}>
+                <span class="nav-icon">{page.icon}</span>
+                <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
+              </NavLink>
+            </NavItem>
+          {/each}
+        </Nav>
+
+        <!-- Profile Dropdown -->
+        <div class="mt-auto pt-2">
           <div class="section-divider"></div>
-
-          <p class="navheader">Insights</p>
-          <Nav vertical pills class="nav-custom">
-            {#each insights as page}
-              <NavItem>
-                <NavLink
-                  href={urlBase + page.id}
+          <Nav vertical pills class="nav-custom" {theme}>
+            <Dropdown nav direction="up" class="ms-0">
+              <DropdownToggle
+                nav
+                class="dropdown-custom {activePage === 'trustprofile' ? 'active' : ''}">
+                <span class="text-uppercase profile-icon">
+                  {$profile.username.charAt(0).toUpperCase()}
+                </span>
+                <span>{$profile.username}</span>
+              </DropdownToggle>
+              <DropdownMenu>
+                <DropdownItem
                   class="nav-link-custom"
-                  active={activePage === page.id}
-                  on:click={(e) => navigateTo(e, page.id)}
-                >
-                  <span class="nav-icon">{page.icon}</span>
-                  <span class="nav-text">{page.name}</span>
-                </NavLink>
-              </NavItem>
-            {/each}
+                  active={activePage === 'trustprofile'}
+                  onclick={e => goto(e, 'trustprofile')}>
+                  <span class="nav-icon">👤</span>
+                  <span class="nav-text">{$_('navigation.titles.TrustProfile')}</span>
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem class="nav-link-custom" onclick={toggleDarkMode}>
+                  <Icon
+                    name={$darkMode ? 'sun' : 'moon'}
+                    class="me-3 text-{$darkMode ? 'warning' : 'primary'}" />
+                  {$darkMode ? $_('config.titles.Light') : $_('config.titles.Dark')}
+                  <Input
+                    type="switch"
+                    bind:checked={$darkMode}
+                    style="position: absolute; right: 5px;" />
+                </DropdownItem>
+                <!-- <DropdownItem class="nav-link-custom">Language</DropdownItem> -->
+              </DropdownMenu>
+            </Dropdown>
           </Nav>
+        </div>
+      </Card>
+    </Fade>
 
-          <div class="user-profile">
-            <div class="section-divider"></div>
-            <Nav vertical pills class="nav-custom">
-              <NavItem>
-                <NavLink
-                  href={urlBase + 'profile'}
-                  class="nav-link-custom"
-                  active={activePage === 'profile'}
-                  on:click={(e) => navigateTo(e, 'profile')}
-                >
-                  <span class="profile-icon">{$profile?.username?.charAt(0).toUpperCase()}</span>
-                  <span class="profile-name nav-text">{$profile?.username}</span>
-                </NavLink>
-              </NavItem>
-            </Nav>
-          </div>
-        </Card>
-      </div>
-
-      <!-- Content Area -->
-      <Col md={isOpen ? '9' : '12'} lg={10}>
-        <svelte:component this={PageComponent} />
-      </Col>
-    </Row>
-  </Container>
+    <!-- Content Area -->
+    <Col><svelte:component this={PageComponent} /></Col>
+  </Row>
 </div>
 
 <style>
@@ -193,10 +235,17 @@
     gap: 4px;
   }
 
+  .navigation :global(.dropdown-custom.active) {
+    background: linear-gradient(135deg, #1a73e8, #6c5ce7);
+    box-shadow: 0 2px 5px rgba(108, 92, 231, 0.2);
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    color: #f1f3f5;
+  }
+
   .navigation :global(.nav-link-custom) {
     display: flex;
     align-items: center;
-    padding: 8px 0px 8px 6px;
     border-radius: 8px;
     transition: all 0.2s ease;
   }
@@ -214,17 +263,6 @@
     justify-content: center;
   }
 
-  .nav-text {
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .user-profile {
-    margin-top: auto;
-    align-items: center;
-    padding: 8px 0px;
-  }
-
   .profile-icon {
     width: 24px;
     height: 24px;
@@ -235,48 +273,48 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    margin-right: 12px;
-  }
-
-  .profile-name {
-    font-weight: 500;
-    font-size: 14px;
+    margin-right: 6px;
   }
 
   /* Mobile styles */
-  .mobile-toggle-container {
+  .navigation :global(.menu-toggle-wrapper) {
     position: sticky;
     top: 0;
     z-index: 1010;
     padding: 5px;
-    background: rgba(255, 255, 255, 0.9);
     margin-bottom: 15px;
+    text-align: center;
+    border-radius: 3px;
   }
 
-  :global(.sidebar-toggle) {
+  .navigation :global(.menu-toggle-button) {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     width: 100%;
-    border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
-  @media (max-width: 767.98px) {
+  .navigation :global(.sidebar-col) {
+    min-width: 230px;
+    max-width: 230px;
+  }
+
+  @media (max-width: 991.98px) {
     .navigation :global(.sidebar-col) {
       position: fixed;
       z-index: 1020;
       width: 85%;
-      max-width: 230px;
       max-height: 100vh;
       overflow-y: auto;
       top: 0;
       left: 0;
-      padding: 10px;
-      background: rgb(203, 255, 237);
+      padding: 1px;
+      border-radius: 12px;
       transition: transform 0.3s ease;
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      background: rgba(118, 122, 126, 0.9);
     }
   }
 </style>

@@ -31,14 +31,16 @@ func (c *Client) httpHandlers() {
 	defer func() {
 		if c.newUI {
 			// SPA gets all the requests so it can handle its own page router.
-			c.Config.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler))
-		} else {
-			// 404 (or redirect to base path) everything else
+			c.Config.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
+			c.Config.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
 			c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
 		}
+		// 404 (or redirect to base path) everything else
+		c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
 	}()
 
 	base := path.Join("/", c.Config.URLBase)
+	frontend.URLBase = base
 
 	c.Config.Router.Handle("/favicon.ico", gzip(c.favIcon)).Methods("GET")
 	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")
@@ -63,6 +65,7 @@ func (c *Client) httpHandlers() {
 	c.httpGuiHandlers(base, compress)
 }
 
+//nolint:funlen // oh well.
 func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler) http.Handler) {
 	// gui is used for authorized paths. All these paths have a prefix of /ui.
 	gui := c.Config.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
@@ -81,6 +84,7 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/profile", c.handleProfilePost).Methods("POST")
 	gui.HandleFunc("/ps", c.handleProcessList).Methods("GET")
 	gui.HandleFunc("/regexTest", c.handleRegexTest).Methods("POST")
+	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST").Queries("noreload", "{noreload}")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
 	gui.HandleFunc("/reload", c.handleReload).Methods("GET")
 	gui.HandleFunc("/ping", c.handlePing).Methods("GET")

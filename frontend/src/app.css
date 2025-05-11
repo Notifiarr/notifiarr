@@ -12,14 +12,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   min-height: 100%;
   height: 100vh;
 }
 
+/* https://github.com/react-bootstrap/react-bootstrap/issues/6796 */
+.modal {
+  color: var(--bs-body-color);
+}
+
 body {
-  background-image: url(../src/assets/lightbg.svg);
+  background-image: url(/src/assets/lightbg.svg);
   background-color: #b9c8f3;
   background-position: center;
   background-attachment: fixed;
@@ -30,6 +36,49 @@ body {
 
 body.dark-mode {
   transition: background-image 0.4s;
-  background-image: url(../src/assets/darkbg.svg);
+  background-image: url(/src/assets/darkbg.svg);
   background-color: #1d3040;
+}
+
+/* The next two are used by the alerts that pop up when you click a save button.
+ * This makes the alert match the height of a lg button.
+*/
+.submit-alert-close {
+  position: absolute !important;
+  right: 0;
+  top: -5px !important;
+}
+
+.submit-alert {
+  margin: 2px 0px 0px 0;
+  padding: 10px 33px 10px 10px !important;
+  min-height: 50px;
+  max-height: fit-content;
+  font-size: 18px;
+}
+
+/* https://www.fontshungry.com/beleren-font-family/ */
+@font-face {
+  font-family: notifiarrFont;
+  src: url(/src/assets/Beleren2016SmallCaps-Bold.ttf);
+}
+
+.title-notifiarr {
+  font-family: notifiarrFont !important;
+  color: #3cd2a5;
+  text-shadow: 1px 1px 1px #828181;
+  vertical-align: bottom;
+}
+
+.border-notifiarr {
+  --bs-border-opacity: 1;
+  border-color: rgba(60, 210, 165, var(--bs-border-opacity)) !important;
+}
+
+.bg-notifiarr {
+  background-color: rgba(60, 210, 165, 1) !important;
+}
+
+.bg-notifiarr-subtle {
+  background-color: rgb(8, 104, 75, 1) !important;
 }

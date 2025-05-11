@@ -1,8 +1,11 @@
-import { get } from "svelte/store"
-import { fetchWithTimeout } from "../lib/util"
-import { profile } from "../lib/login"
-
+import { get } from 'svelte/store'
+import { urlbase } from './urlbase'
+import Cookies from 'js-cookie'
+import { ltrim, rtrim } from '../lib/util'
 export const LoggedOut = new Error('logged out')
+export const TimedOut = new Error('request timed out')
+
+export type BackendResponse = { ok: boolean; body: any }
 
 /**
  * Get a UI resource.
@@ -10,8 +13,8 @@ export const LoggedOut = new Error('logged out')
  * @param json Whether to parse the response as JSON.
  * @returns A promise that resolves to the response body as either text or JSON.
  */
-export async function getUi(uri: string, json: boolean = true): Promise<string | null> {
-  return await request('ui/'+uri, 'GET', null, json)
+export async function getUi(uri: string, json: boolean = true): Promise<BackendResponse> {
+  return await request('ui/' + uri, 'GET', null, json)
 }
 
 /**
@@ -21,8 +24,12 @@ export async function getUi(uri: string, json: boolean = true): Promise<string |
  * @param json Whether to parse the response as JSON.
  * @returns A promise that resolves to the response body as either text or JSON.
  */
-export async function postUi(uri: string, body: BodyInit, json: boolean = true): Promise<string | null> {
-  return await request('ui/'+uri, 'POST', body, json)
+export async function postUi(
+  uri: string,
+  body: BodyInit,
+  json: boolean = true,
+): Promise<BackendResponse> {
+  return await request('ui/' + uri, 'POST', body, json)
 }
 
 /**
@@ -31,8 +38,11 @@ export async function postUi(uri: string, body: BodyInit, json: boolean = true):
  * @param json Whether to parse the response as JSON.
  * @returns A promise that resolves to the response body as either text or JSON.
  */
-export async function getApi(uri: string, json: boolean = true): Promise<string | null> {
-  return await request('api/'+uri, 'GET', null, json)
+export async function getApi(
+  uri: string,
+  json: boolean = true,
+): Promise<BackendResponse> {
+  return await request('api/' + uri, 'GET', null, json)
 }
 
 /**
@@ -42,8 +52,12 @@ export async function getApi(uri: string, json: boolean = true): Promise<string 
  * @param json Whether to parse the response as JSON.
  * @returns A promise that resolves to the response body as either text or JSON.
  */
-export async function postApi(uri: string, body: BodyInit, json: boolean = true): Promise<string | null> {
-  return await request('api/'+uri, 'POST', body, json)
+export async function postApi(
+  uri: string,
+  body: BodyInit,
+  json: boolean = true,
+): Promise<BackendResponse> {
+  return await request('api/' + uri, 'POST', body, json)
 }
 
 /**
@@ -52,16 +66,14 @@ export async function postApi(uri: string, body: BodyInit, json: boolean = true)
  * @returns A promise that resolves when the server has reloaded the page.
  */
 export async function checkReloaded() {
-  return new Promise<void>(async (resolve) => {
+  return new Promise<void>(async resolve => {
     await setTimeout(async () => {
       const checkReload = async (attempts = 0) => {
-        if (attempts > 19) throw new Error('Server reload check timed out after 20 attempts')
-        try {
-          await getUi('ping', false)
-          resolve()
-        } catch {
-          await setTimeout(() => checkReload(attempts + 1), 300)
-        }
+        if (attempts > 19)
+          throw new Error('Server reload check timed out after 20 attempts')
+        const { ok } = await getUi('ping', false)
+        if (ok) return resolve()
+        await setTimeout(() => checkReload(attempts + 1), 300)
       }
       await checkReload()
     }, 600)
@@ -72,21 +84,51 @@ async function request(
   uri: string,
   method: string = 'GET',
   body: BodyInit | null = null,
-  json: boolean = true
-): Promise<string | null> {
-  const urlBase = get(profile)?.config.urlbase || ''
+  json: boolean = true,
+): Promise<BackendResponse> {
+  try {
+    const headers: Record<string, string> = {}
+    if (json) headers['Accept'] = 'application/json'
+    else headers['Accept'] = 'text/plain'
+    if (body) headers['Content-Type'] = 'application/json'
 
-  const headers: Record<string, string> = {}
-  if (json) headers['Accept'] = 'application/json'
-  else headers['Accept'] = 'text/plain'
-  if (body) headers['Content-Type'] = 'application/json'
+    uri = rtrim(get(urlbase), '/') + '/' + ltrim(uri, '/')
+    const response = await fetchWithTimeout(uri, { method, headers, body })
+    if (response.status === 403) throw LoggedOut
 
-  const response = await fetchWithTimeout(urlBase + uri, { method, headers, body })
-  if (response.status === 403) throw LoggedOut
+    if (!response.ok)
+      throw new Error(
+        `${method} ${uri} failed: ${response.status} ${response.statusText}: ${await response.text()}`,
+      )
 
-  if (!response.ok) throw new Error('Failed to fetch ' + uri + ': ' +
-    response.status + ' ' + response.statusText + ': ' + response.text())
+    if (json) return { ok: true, body: await response.json() }
+    return { ok: true, body: await response.text() }
+  } catch (error) {
+    return { ok: false, body: (error as Error).message }
+  }
+}
 
-  if (json) return response.json()
-  return response.text()
+export async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeout = 5000,
+): Promise<Response> {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      mode: 'same-origin',
+      signal: controller.signal,
+      redirect: 'manual',
+    })
+    clearTimeout(id)
+    return response
+  } catch (error) {
+    clearTimeout(id)
+    if (error instanceof DOMException && error.name === 'AbortError') throw TimedOut
+
+    throw error
+  }
 }
