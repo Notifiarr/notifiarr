@@ -65,16 +65,20 @@
   async function updateBackend() {
     clearInterval(updateTimer)
     updateTimer = 0
-    notification = '<span class="text-warning">Updating back-end...</span>'
+    notification = `<span class="text-warning">${$_('phrases.UpdatingBackEnd')}</span>`
     try {
       await updateProfile()
       timer()
     } catch (err) {
-      notification = `<span class="text-danger">Failed to update back-end. ${err}</span>`
+      notification = `<span class="text-danger">${$_('phrases.FailedToUpdateBackEnd', {
+        values: { error: `${err}` },
+      })}</span>`
     }
   }
 
-  async function handleLogin() {
+  async function handleLogin(e: Event) {
+    e.preventDefault()
+
     if (!username || !password) {
       loginFailedMsg = $_('config.errors.PleaseEnterBothUsernameAndPassword')
       return
@@ -234,7 +238,9 @@
       {#if !$isReady}
         <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
           <Card outline {theme} color="notifiarr">
-            <CardBody><Spinner /> Translateratating!...</CardBody>
+            <CardBody class="text-nowrap fs-3">
+              <!-- This is before translations are loaded. This 'typo' is on purpose, sue me.-->
+              <Spinner /> Translateratating!...</CardBody>
           </Card>
         </Col>
       {:else}
@@ -242,7 +248,8 @@
           <!-- Wait for profile to load. -->
           <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
             <Card outline {theme} color="notifiarr">
-              <CardBody><Spinner /> {$_('phrases.Loading')}</CardBody>
+              <CardBody class="text-nowrap fs-3">
+                <Spinner />{$_('phrases.Loading')}</CardBody>
             </Card>
           </Col>
         {:then}
@@ -257,7 +264,7 @@
                   <CardTitle>{$_('buttons.Login')}</CardTitle>
                 </CardHeader>
                 <CardBody>
-                  <form on:submit|preventDefault={handleLogin}>
+                  <form onsubmit={handleLogin}>
                     <Input
                       type="text"
                       name="username"
@@ -284,17 +291,17 @@
                         <span class="fs-5">{$_('buttons.Login')}</span>
                       {/if}
                     </Button>
-                    <CardFooter class="mt-2">
-                      <a
-                        href="#showhelp"
-                        on:click={e => (e.preventDefault(), (showHelpModal = true))}>
-                        {$_('phrases.LoginHelp')}
-                      </a>
-                      {#if loginFailedMsg}
-                        • <span class="text-danger">{loginFailedMsg}</span>
-                      {/if}
-                    </CardFooter>
                   </form>
+                  <CardFooter class="mt-2">
+                    <a
+                      href="#showhelp"
+                      onclick={e => (e.preventDefault(), (showHelpModal = true))}>
+                      {$_('phrases.LoginHelp')}
+                    </a>
+                    {#if loginFailedMsg}
+                      • <span class="text-danger">{loginFailedMsg}</span>
+                    {/if}
+                  </CardFooter>
                 </CardBody>
               </Card>
             </Col>

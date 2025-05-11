@@ -29,6 +29,8 @@
     "LoggedIn": "Logged in!",
     "Loading": "Loading...",
     "BackEndUpdated": "Back-end updated {age} ago.",
+    "UpdatingBackEnd": "Updating back-end...",
+    "FailedToUpdateBackEnd": "Failed to update back-end: {error}",
     "TryRefreshingThePage": "Try refreshing the page.",
     "ConfigurationSaved": "Configuration saved!",
     "SavingConfiguration": "Saving configuration...",
