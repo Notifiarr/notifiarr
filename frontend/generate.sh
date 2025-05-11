@@ -17,12 +17,13 @@ locales=$(ls -1 src/lib/locale/*.json | sed 's#src/lib/locale/\(.*\)\.json#\1#g'
 cat <<EOF > locales.go
 package frontend
 
+//nolint:gochecknoglobals
 var langs = []string{
 EOF
 
 # Add each locale to the file.
 for locale in $locales; do
-  echo "    \"$locale\"," >> locales.go
+  echo "\t\"$locale\"," >> locales.go
 done
 
 # Close the file.

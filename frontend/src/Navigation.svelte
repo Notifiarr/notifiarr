@@ -37,7 +37,8 @@
   import Landing from './Landing.svelte'
   import { ltrim } from './lib/util'
   import { darkMode, toggleDarkMode } from './lib/darkmode.svelte'
-  import { currentLocale } from './lib/locale'
+  import { currentLocale, setLocale } from './lib/locale/index.svelte'
+  import { Flags } from './lib/locale/index.svelte'
 
   $: theme = $darkMode ? 'dark' : 'light'
   // Page structure for navigation with icons
@@ -93,7 +94,8 @@
   $: urlBase = $profile?.config.urlbase || '/'
   $: parts = ltrim(window.location.pathname, urlBase).split('/')
   $: activePage = parts.length > 0 ? parts[0] : ''
-  $: locale = $profile.languages?.[currentLocale]?.[currentLocale]?.self
+  $: locale = $profile.languages?.[currentLocale()]?.[currentLocale()]?.self
+  $: newLang = currentLocale()
 
   // Used for sidebar collapse state.
   let windowWidth = 1000
@@ -178,7 +180,23 @@
                   <span class="nav-icon">👤</span>
                   <span class="nav-text">{$_('navigation.titles.TrustProfile')}</span>
                 </DropdownItem>
-                <DropdownItem divider />
+                {#if locale}
+                  <Input
+                    class="my-1"
+                    bsSize="sm"
+                    type="select"
+                    name="lang"
+                    bind:value={newLang}
+                    onchange={() => setLocale(newLang)}>
+                    {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
+                      <option value={code} selected={code === currentLocale()}>
+                        &nbsp;{Flags[code]}&nbsp; &nbsp; {lang.name}
+                      </option>
+                    {/each}
+                  </Input>
+                {:else}
+                  <DropdownItem divider />
+                {/if}
                 <DropdownItem class="nav-link-custom" onclick={toggleDarkMode}>
                   <Icon
                     name={$darkMode ? 'sun' : 'moon'}
@@ -189,12 +207,6 @@
                     bind:checked={$darkMode}
                     style="position: absolute; right: 5px;" />
                 </DropdownItem>
-                {#if locale}
-                  <DropdownItem class="nav-link-custom">
-                    <span class="nav-icon">🌐</span>
-                    <span class="nav-text">{locale}</span>
-                  </DropdownItem>
-                {/if}
               </DropdownMenu>
             </Dropdown>
           </Nav>

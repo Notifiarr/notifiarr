@@ -40,7 +40,8 @@ type responseWriter struct {
 }
 
 // Languages is a map of the available languages and their display names localized to the parent language.
-// The key is the parent language, and the value is a map of the available languages and their display names localized to the parent language.
+// The key is the parent language, and the value is a map of the available
+// languages and their display names localized to the parent language.
 type Languages map[string]map[string]LocalizedLanguage
 
 // LocalizedLanguage is a language and its display name localized to itself and another (parent) language.
