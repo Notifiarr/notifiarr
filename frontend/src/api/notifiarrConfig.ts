@@ -45,6 +45,7 @@ export interface Profile {
   upstreamAllowed: boolean;
   upstreamHeader: string;
   upstreamType: AuthType;
+  languages?: Record<string, null | Record<string, string>>;
   loggedIn: boolean;
   updated: Date;
 };
