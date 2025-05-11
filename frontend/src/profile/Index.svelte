@@ -88,7 +88,7 @@
     false
 </script>
 
-<Card class="mb-4" {theme}>
+<Card class="mb-2" {theme}>
   <CardHeader>
     <h2><Icon name="unlock-alt" /> {$_('navigation.titles.TrustProfile')}</h2>
     <p class="text-muted">{@html $_('profile.phrase.ProfileDescription')}</p>

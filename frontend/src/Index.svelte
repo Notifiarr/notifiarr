@@ -18,7 +18,6 @@
     NavbarBrand,
     Row,
     Spinner,
-    Styles,
   } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg'
   import { profile, fetchProfile, updateProfile } from './api/profile'
@@ -114,7 +113,6 @@
   <link rel="icon" type="image/svg+xml" href={logo} />
 </svelte:head>
 
-<Styles />
 <SvelteToast />
 
 <main>

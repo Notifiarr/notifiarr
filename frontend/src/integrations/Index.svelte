@@ -1,8 +1,10 @@
 <script lang="ts">
   import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { darkMode } from '../lib/darkmode.svelte'
+  $: theme = $darkMode ? 'dark' : 'light'
 </script>
 
-<Card class="mb-4">
+<Card class="mb-2" {theme}>
   <CardHeader>
     <h2>Integrations</h2>
   </CardHeader>

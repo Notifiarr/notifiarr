@@ -5,7 +5,7 @@
   $: theme = $darkMode ? 'dark' : 'light'
 </script>
 
-<Card color="notifiarr" outline class="mb-3" {theme}>
+<Card color="notifiarr" outline class="mb-2" {theme}>
   <CardHeader>
     <CardTitle>Welcome, {$profile?.username}!</CardTitle>
   </CardHeader>
