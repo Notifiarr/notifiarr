@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -57,7 +58,7 @@ type userNameValue int
 //nolint:gochecknoglobals // used as context value key.
 var userNameStr = userNameValue(1)
 
-var ErrConfigVersionMismatch = fmt.Errorf("config version mismatch")
+var ErrConfigVersionMismatch = errors.New("config version mismatch")
 
 func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
