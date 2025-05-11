@@ -1,6 +1,4 @@
-import { profile } from '../../api/profile'
 import { init, register, locale, getLocaleFromNavigator } from 'svelte-i18n'
-import type { Profile } from '../../api/notifiarrConfig'
 import { failure } from '../util'
 
 /*
@@ -9,20 +7,23 @@ https://phrase.com/blog/posts/how-to-localize-a-svelte-app-with-svelte-i18n/
 https://lokalise.com/blog/svelte-i18n/
 */
 
+// We support English primarily, so make that the default and fallback.
+const fallbackLocale = 'en'
+// We only support language codes, not country codes. Maybe one day.
+const initialLocale = getLocaleFromNavigator()?.split('-')[0] || fallbackLocale
+
+export let currentLocale = $state(initialLocale)
+
 export async function setLocale(newLocale: string) {
   try {
     await register(newLocale, async () => await import(`../locale/${newLocale}.json`))
     await locale.set(newLocale)
+    currentLocale = newLocale
   } catch (e) {
     console.error(`Error registering selected locale ${newLocale}:`, e)
     failure(`Error registering selected locale ${newLocale}: ${e}`)
   }
 }
-
-// We support English primarily, so make that the default and fallback.
-const fallbackLocale = 'en'
-// We only support language codes, not country codes. Maybe one day.
-const initialLocale = getLocaleFromNavigator()?.split('-')[0] || fallbackLocale
 
 async function initLocale() {
   try {

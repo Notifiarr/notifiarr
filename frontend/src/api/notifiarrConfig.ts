@@ -45,7 +45,7 @@ export interface Profile {
   upstreamAllowed: boolean;
   upstreamHeader: string;
   upstreamType: AuthType;
-  languages?: Record<string, null | Record<string, string>>;
+  languages?: Record<string, null | Record<string, LocalizedLanguage>>;
   loggedIn: boolean;
   updated: Date;
 };
@@ -538,23 +538,34 @@ export interface CronConfig {
   description: string;
 };
 
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/frontend.LocalizedLanguage>
+ */
+export interface LocalizedLanguage {
+  lang: string;
+  code: string;
+  name: string;
+  self: string;
+};
+
 // Packages parsed:
-//   1. github.com/Notifiarr/notifiarr/pkg/apps
-//   2. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
-//   3. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
-//   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
-//   5. github.com/Notifiarr/notifiarr/pkg/client
-//   6. github.com/Notifiarr/notifiarr/pkg/configfile
-//   7. github.com/Notifiarr/notifiarr/pkg/logs
-//   8. github.com/Notifiarr/notifiarr/pkg/services
-//   9. github.com/Notifiarr/notifiarr/pkg/snapshot
-//  10. github.com/Notifiarr/notifiarr/pkg/triggers/commands
-//  11. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
-//  12. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
-//  13. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
-//  14. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
-//  15. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
-//  16. golift.io/deluge
-//  17. golift.io/nzbget
-//  18. golift.io/qbit
-//  19. golift.io/starr
+//   1. github.com/Notifiarr/notifiarr/frontend
+//   2. github.com/Notifiarr/notifiarr/pkg/apps
+//   3. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
+//   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
+//   5. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
+//   6. github.com/Notifiarr/notifiarr/pkg/client
+//   7. github.com/Notifiarr/notifiarr/pkg/configfile
+//   8. github.com/Notifiarr/notifiarr/pkg/logs
+//   9. github.com/Notifiarr/notifiarr/pkg/services
+//  10. github.com/Notifiarr/notifiarr/pkg/snapshot
+//  11. github.com/Notifiarr/notifiarr/pkg/triggers/commands
+//  12. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
+//  13. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
+//  14. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
+//  15. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
+//  16. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
+//  17. golift.io/deluge
+//  18. golift.io/nzbget
+//  19. golift.io/qbit
+//  20. golift.io/starr

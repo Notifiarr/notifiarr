@@ -37,6 +37,7 @@
   import Landing from './Landing.svelte'
   import { ltrim } from './lib/util'
   import { darkMode, toggleDarkMode } from './lib/darkmode.svelte'
+  import { currentLocale } from './lib/locale'
 
   $: theme = $darkMode ? 'dark' : 'light'
   // Page structure for navigation with icons
@@ -92,6 +93,7 @@
   $: urlBase = $profile?.config.urlbase || '/'
   $: parts = ltrim(window.location.pathname, urlBase).split('/')
   $: activePage = parts.length > 0 ? parts[0] : ''
+  $: locale = $profile.languages?.[currentLocale]?.[currentLocale]?.self
 
   // Used for sidebar collapse state.
   let windowWidth = 1000
@@ -187,7 +189,12 @@
                     bind:checked={$darkMode}
                     style="position: absolute; right: 5px;" />
                 </DropdownItem>
-                <!-- <DropdownItem class="nav-link-custom">Language</DropdownItem> -->
+                {#if locale}
+                  <DropdownItem class="nav-link-custom">
+                    <span class="nav-icon">🌐</span>
+                    <span class="nav-text">{locale}</span>
+                  </DropdownItem>
+                {/if}
               </DropdownMenu>
             </Dropdown>
           </Nav>

@@ -4,7 +4,6 @@ package frontend
 
 import (
 	"embed"
-	"fmt"
 	"io/fs"
 	"net/http"
 	"strings"
@@ -42,15 +41,27 @@ type responseWriter struct {
 
 // Languages is a map of the available languages and their display names localized to the parent language.
 // The key is the parent language, and the value is a map of the available languages and their display names localized to the parent language.
-type Languages map[string]map[string]string
+type Languages map[string]map[string]LocalizedLanguage
+
+// LocalizedLanguage is a language and its display name localized to itself and another (parent) language.
+type LocalizedLanguage struct {
+	// Lang is the parent language code this language Name is localized to.
+	Lang string `json:"lang"`
+	// Code is the language code of the language.
+	Code string `json:"code"`
+	// Name is the display name of the language localized to the parent (Lang) language.
+	Name string `json:"name"`
+	// Self is the display name of the language localized in its own language.
+	Self string `json:"self"`
+}
 
 // Translations returns all the configured frontend languages.
-// The frontend uses this to populate the language dropdown localized to the current selected language.
+// The frontend uses this to populate the language dropdown localized to the currently selected language.
 func Translations() Languages {
 	output := make(Languages)
 
 	for _, parent := range langs {
-		output[parent] = map[string]string{}
+		output[parent] = map[string]LocalizedLanguage{}
 		curTag := language.MustParse(parent)
 
 		for _, name := range langs {
@@ -58,7 +69,12 @@ func Translations() Languages {
 			cur := display.Languages(curTag)
 			title := cases.Title(curTag)
 			selfTitle := cases.Title(lang)
-			output[parent][name] = fmt.Sprintf("%s (%s)", title.String(cur.Name(lang)), selfTitle.String(display.Self.Name(lang)))
+			output[parent][name] = LocalizedLanguage{
+				Code: name,
+				Name: title.String(cur.Name(lang)),
+				Self: selfTitle.String(display.Self.Name(lang)),
+				Lang: parent,
+			}
 		}
 	}
 
