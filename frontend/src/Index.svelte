@@ -31,6 +31,7 @@
   import { setLocale } from './lib/locale'
   import { onMount } from 'svelte'
   import { darkMode } from './lib/darkmode.svelte'
+  import { urlbase } from './api/urlbase'
 
   let username = ''
   let password = ''
@@ -123,10 +124,7 @@
           <Icon name="power" class="text-danger me-2" onclick={confirmShutdown} />
         </span>
       {/if}
-      <NavbarBrand
-        href={$profile.config?.urlbase}
-        onclick={e => navigate.goto(e, '')}
-        class="mb-0 pb-0">
+      <NavbarBrand href={$urlbase} onclick={e => navigate.goto(e, '')} class="mb-0 pb-0">
         <h1 class="m-0 lh-1" style="font-size: 40px;">
           <img src={logo} height="45" alt="Logo" />
           <span class="title-notifiarr">Notifiarr Client</span>

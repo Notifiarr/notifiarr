@@ -1,6 +1,7 @@
 import { get } from 'svelte/store'
-import { profile } from './profile'
-
+import { urlbase } from './urlbase'
+import Cookies from 'js-cookie'
+import { ltrim, rtrim } from '../lib/util'
 export const LoggedOut = new Error('logged out')
 export const TimedOut = new Error('request timed out')
 
@@ -86,14 +87,13 @@ async function request(
   json: boolean = true,
 ): Promise<BackendResponse> {
   try {
-    const urlBase = get(profile)?.config?.urlbase || ''
-
     const headers: Record<string, string> = {}
     if (json) headers['Accept'] = 'application/json'
     else headers['Accept'] = 'text/plain'
     if (body) headers['Content-Type'] = 'application/json'
 
-    const response = await fetchWithTimeout(urlBase + uri, { method, headers, body })
+    uri = rtrim(get(urlbase), '/') + '/' + ltrim(uri, '/')
+    const response = await fetchWithTimeout(uri, { method, headers, body })
     if (response.status === 403) throw LoggedOut
 
     if (!response.ok)

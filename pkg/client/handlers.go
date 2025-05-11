@@ -40,6 +40,7 @@ func (c *Client) httpHandlers() {
 	}()
 
 	base := path.Join("/", c.Config.URLBase)
+	frontend.URLBase = base
 
 	c.Config.Router.Handle("/favicon.ico", gzip(c.favIcon)).Methods("GET")
 	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")

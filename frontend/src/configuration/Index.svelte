@@ -17,6 +17,7 @@
   import { _ } from '../lib/Translate.svelte'
   import { checkReloaded } from '../api/fetch'
   import { darkMode } from '../lib/darkmode.svelte'
+  import { urlbase } from '../api/urlbase'
 
   $: theme = $darkMode ? 'dark' : 'light'
   // Local state that syncs with profile store.
@@ -41,6 +42,9 @@
     try {
       await profile.writeConfig(c)
       formSubmitted = $_('phrases.Reloading')
+      // Update local url base in case it changed.
+      // The backend will begin using another url base after the reload.
+      await urlbase.set(c.urlbase)
       await checkReloaded()
       await fetchProfile()
       submitSuccess = true

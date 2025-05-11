@@ -1,8 +1,11 @@
 import { toast } from '@zerodevx/svelte-toast'
-import { onDestroy } from 'svelte'
 
-export function trimPrefix(str: string, prefix: string) {
+export function ltrim(str: string, prefix: string) {
   return str.slice(str.startsWith(prefix) ? prefix.length : 0)
+}
+
+export function rtrim(str: string, suffix: string) {
+  return str.endsWith(suffix) ? str.slice(0, str.length - suffix.length) : str
 }
 
 export const success = (m: string) =>

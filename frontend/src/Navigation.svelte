@@ -35,7 +35,7 @@
   import System from './system/Index.svelte'
   import Profile from './profile/Index.svelte'
   import Landing from './Landing.svelte'
-  import { trimPrefix } from './lib/util'
+  import { ltrim } from './lib/util'
   import { darkMode, toggleDarkMode } from './lib/darkmode.svelte'
 
   $: theme = $darkMode ? 'dark' : 'light'
@@ -90,7 +90,7 @@
 
   // Used to auto-navigate.
   $: urlBase = $profile?.config.urlbase || '/'
-  $: parts = trimPrefix(window.location.pathname, urlBase).split('/')
+  $: parts = ltrim(window.location.pathname, urlBase).split('/')
   $: activePage = parts.length > 0 ? parts[0] : ''
 
   // Used for sidebar collapse state.
