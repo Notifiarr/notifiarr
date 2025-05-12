@@ -53,3 +53,7 @@ export function age(milliseconds: number, includeSeconds = false): string {
     (secs > 0 ? secs + 's ' : '')
   ).trim()
 }
+
+/** Add a delay anywhere in any async function. */
+export const delay = (ms: number): Promise<void> =>
+  new Promise(resolve => setTimeout(resolve, ms))

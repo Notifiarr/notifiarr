@@ -15,7 +15,7 @@
     Input,
     Icon,
   } from '@sveltestrap/sveltestrap'
-  import { profile } from './api/profile'
+  import { profile } from './api/profile.svelte'
   import { _ } from './lib/Translate.svelte'
   import Configuration from './configuration/Index.svelte'
   import SiteTunnel from './siteTunnel/Index.svelte'

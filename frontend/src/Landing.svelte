@@ -1,6 +1,6 @@
 <script>
   import { Card, CardBody, CardHeader, CardTitle } from '@sveltestrap/sveltestrap'
-  import { profile } from './api/profile'
+  import { profile } from './api/profile.svelte'
   import { darkMode } from './lib/darkmode.svelte'
   $: theme = $darkMode ? 'dark' : 'light'
 </script>

@@ -40,23 +40,6 @@ body.dark-mode {
   background-color: #1d3040;
 }
 
-/* The next two are used by the alerts that pop up when you click a save button.
- * This makes the alert match the height of a lg button.
-*/
-.submit-alert-close {
-  position: absolute !important;
-  right: 0;
-  top: -5px !important;
-}
-
-.submit-alert {
-  margin: 2px 0px 0px 0;
-  padding: 10px 33px 10px 10px !important;
-  min-height: 50px;
-  max-height: fit-content;
-  font-size: 18px;
-}
-
 /* https://www.fontshungry.com/beleren-font-family/ */
 @font-face {
   font-family: notifiarrFont;

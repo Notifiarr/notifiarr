@@ -20,13 +20,11 @@
     Spinner,
   } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg'
-  import { profile, fetchProfile, updateProfile } from './api/profile'
-  import { login } from './api/login'
+  import { profile } from './api/profile.svelte'
   import Navigation from './Navigation.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'
-  import { isReady } from './lib/Translate.svelte'
-  import { _ } from './lib/Translate.svelte'
-  import { age, success } from './lib/util'
+  import T, { isReady, _ } from './lib/Translate.svelte'
+  import { age, delay } from './lib/util'
   import { checkReloaded, getUi } from './api/fetch'
   import { setLocale } from './lib/locale/index.svelte'
   import { onMount } from 'svelte'
@@ -38,7 +36,6 @@
   let loginFailedMsg = ''
   let isLoading = false
   let navigate: Navigation
-  let updateTimer: number
   let notification = ''
   let showReloadModal = false
   let showShutdownModal = false
@@ -46,28 +43,17 @@
   let reload: any
   let shutdown: any
 
-  async function timer() {
-    if (!updateTimer) updateTimer = setInterval(timer, 1234)
-    if (!$profile.updated || !$isReady) return
-    const now = await Date.now()
-    const diff = now - (await new Date($profile.updated).getTime())
-    notification = $_('phrases.BackEndUpdated', { values: { age: age(diff) } })
-  }
-
-  $: if ($isReady && $profile?.loggedIn) timer()
-
   onMount(() => {
     const query = new URLSearchParams(window.location.search)
     if (query.get('lang')) setLocale(query.get('lang')!)
   })
 
   async function updateBackend() {
-    clearInterval(updateTimer)
-    updateTimer = 0
     notification = `<span class="text-warning">${$_('phrases.UpdatingBackEnd')}</span>`
     try {
-      await updateProfile()
-      timer()
+      await profile.refresh()
+      await delay(3456)
+      notification = ''
     } catch (err) {
       notification = `<span class="text-danger">${$_('phrases.FailedToUpdateBackEnd', {
         values: { error: `${err}` },
@@ -86,10 +72,11 @@
     isLoading = true
     loginFailedMsg = ''
 
-    loginFailedMsg = (await login(username, password)) ?? ''
+    loginFailedMsg = (await profile.login(username, password)) ?? ''
     if (!loginFailedMsg) {
       notification = $_('phrases.LoggedIn')
-      timer()
+      await delay(4567)
+      notification = ''
     } else {
       loginFailedMsg = $_('config.errors.LoginFailed', {
         values: { error: loginFailedMsg },
@@ -142,8 +129,12 @@
           <span class="text-nowrap">
             {#if $profile?.loggedIn}
               <Icon name="arrow-counterclockwise" onclick={updateBackend} />
+              {#if notification}
+                {@html notification}
+              {:else}
+                <T id="phrases.BackEndUpdated" age={age(profile.updatedAge)} />
+              {/if}
             {/if}
-            {@html notification}
           </span>
         </Card>
       </Col>
@@ -192,7 +183,6 @@
               {updateBackend()}
               {(showReloadModal = false)}
               {(reload = null)}
-              {success($_('phrases.ReloadSuccess'))}
             {:catch error}
               <!-- error waiting for reload to complete. -->
               {(showReloadModal = false)}
@@ -204,8 +194,6 @@
           {:else}
             <!-- reload command failed. prob logged out. -->
             {(showReloadModal = false)}
-            {clearInterval(updateTimer)}
-            {(updateTimer = 0)}
             {(notification = `<span class="text-danger">${$_('phrases.FailedToReload', {
               values: { error: result.body },
             })}</span>`)}
@@ -248,12 +236,12 @@
           </Card>
         </Col>
       {:else}
-        {#await fetchProfile()}
+        {#await profile.fetch()}
           <!-- Wait for profile to load. -->
           <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
             <Card outline {theme} color="notifiarr">
               <CardBody class="text-nowrap fs-3">
-                <Spinner />{$_('phrases.Loading')}</CardBody>
+                <Spinner /> {$_('phrases.Loading')}</CardBody>
             </Card>
           </Col>
         {:then}
