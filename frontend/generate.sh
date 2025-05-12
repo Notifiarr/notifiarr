@@ -27,10 +27,9 @@ EOF
 
 # Add each locale to the file.
 for locale in $locales; do
-  echo "\t\"$locale\"," >> locales.go
+ # We use a real tab in this string because windows sucks.
+ echo "	\"$locale\"," >> locales.go
 done
-
-cat locales.go
 
 # Close the file.
 echo "}" >> locales.go
