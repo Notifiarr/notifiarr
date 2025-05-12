@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -31,6 +32,7 @@ type Profile struct {
 	UpstreamAllowed bool                   `json:"upstreamAllowed"`
 	UpstreamHeader  string                 `json:"upstreamHeader"`
 	UpstreamType    configfile.AuthType    `json:"upstreamType"`
+	Languages       frontend.Languages     `json:"languages"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
 	LoggedIn bool      `json:"loggedIn"`
 	Updated  time.Time `json:"updated"`
@@ -60,6 +62,7 @@ func (c *Client) handleProfile(w http.ResponseWriter, req *http.Request) {
 		UpstreamHeader:  c.Config.UIPassword.Header(),
 		UpstreamType:    c.Config.UIPassword.Type(),
 		Updated:         time.Now().UTC(),
+		Languages:       frontend.Translations(),
 	}); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)
 	}

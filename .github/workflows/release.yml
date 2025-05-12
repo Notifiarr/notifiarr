@@ -8,9 +8,9 @@ on:
       - v*
   pull_request:
     branches:
-    - main
-    - unstable
-    - development
+      - main
+      - unstable
+      - development
 permissions:
   contents: read
 jobs:
@@ -28,7 +28,13 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
-        run: go generate ./...
+        run: |
+          # Swagger docs
+          go generate ./pkg/bindata/docs
+          # API definitions (needs swagger)
+          go generate ./frontend/src/api
+          # Frontend locales and dist build.
+          go generate ./frontend
       - name: make-signdmg
         env:
           APPLE_SIGNING_KEY: ${{ secrets.APPLE_SIGNING_KEY }}
@@ -66,12 +72,12 @@ jobs:
       - name: Configure Fast APT Mirror
         uses: vegardit/fast-apt-mirror.sh@v1
         with: # the following parameters are listed with their action default values and are optional
-          healthchecks:   5 # Number of mirrors from the mirrors list to check for availability and up-to-dateness
-          speedtests:     4 # Maximum number of healthy mirrors to test for speed
-          parallel:       2 # Number of parallel speed tests
+          healthchecks: 5 # Number of mirrors from the mirrors list to check for availability and up-to-dateness
+          speedtests: 4 # Maximum number of healthy mirrors to test for speed
+          parallel: 2 # Number of parallel speed tests
           sample-size: 1024 # Number of kilobytes to download during the speed from each mirror
-          sample-time:    3 # Maximum number of seconds within the sample download from a mirror must finish
-          country:       "us" # The country code for selecting Ubuntu mirrors. If not set, defaults to http://mirrors.ubuntu.com/mirrors.txt
+          sample-time: 3 # Maximum number of seconds within the sample download from a mirror must finish
+          country: 'us' # The country code for selecting Ubuntu mirrors. If not set, defaults to http://mirrors.ubuntu.com/mirrors.txt
       - uses: actions/checkout@v4
         with:
           # we need the whole thing so we can count commits.
@@ -128,7 +134,7 @@ jobs:
     name: GoLift Unstable Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: "Download files: ${{ matrix.files }}"
+      - name: 'Download files: ${{ matrix.files }}'
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.files }}

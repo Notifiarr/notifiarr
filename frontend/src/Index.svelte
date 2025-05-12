@@ -28,7 +28,7 @@
   import { _ } from './lib/Translate.svelte'
   import { age } from './lib/util'
   import { checkReloaded, getUi } from './api/fetch'
-  import { setLocale } from './lib/locale'
+  import { setLocale } from './lib/locale/index.svelte'
   import { onMount } from 'svelte'
   import { darkMode } from './lib/darkmode.svelte'
   import { urlbase } from './api/urlbase'
