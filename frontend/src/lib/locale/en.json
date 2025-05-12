@@ -46,6 +46,7 @@
     "FailedToReload": "Failed to reload: {error}",
     "ConfirmReload": "Confirm Reload",
     "ConfirmReloadBody": "Are you sure you want to reload the client?",
+    "ReloadSuccess": "Reload successful! Client reloaded.",
     "ConfirmShutdown": "Confirm Shutdown",
     "ConfirmShutdownBody": "Are you sure you want to shutdown the client? You will need to restart it from the host it runs on.",
     "ShutdownSuccess": "Shutdown successful! Client stopped.",

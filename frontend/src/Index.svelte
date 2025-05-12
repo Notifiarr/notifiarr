@@ -26,7 +26,7 @@
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import { isReady } from './lib/Translate.svelte'
   import { _ } from './lib/Translate.svelte'
-  import { age } from './lib/util'
+  import { age, success } from './lib/util'
   import { checkReloaded, getUi } from './api/fetch'
   import { setLocale } from './lib/locale/index.svelte'
   import { onMount } from 'svelte'
@@ -183,13 +183,18 @@
       {#if reload}
         {#await reload() then result}
           {#if result.ok}
+            <!-- reload success! -->
             {#await checkReloaded()}
+              <!-- wait for reload to complete. -->
               <ModalBody><Spinner size="sm" /> {$_('phrases.Reloading')}</ModalBody>
             {:then}
+              <!-- reload complete! -->
               {updateBackend()}
               {(showReloadModal = false)}
               {(reload = null)}
+              {success($_('phrases.ReloadSuccess'))}
             {:catch error}
+              <!-- error waiting for reload to complete. -->
               {(showReloadModal = false)}
               {(reload = null)}
               {(notification = `<span class="text-danger">${$_('phrases.FailedToReload', {
@@ -197,6 +202,7 @@
               })}</span>`)}
             {/await}
           {:else}
+            <!-- reload command failed. prob logged out. -->
             {(showReloadModal = false)}
             {clearInterval(updateTimer)}
             {(updateTimer = 0)}

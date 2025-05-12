@@ -182,15 +182,13 @@
                 </DropdownItem>
                 {#if locale}
                   <Input
-                    class="my-1"
-                    bsSize="sm"
+                    class="my-1 lang-select"
                     type="select"
-                    name="lang"
                     bind:value={newLang}
                     onchange={() => setLocale(newLang)}>
                     {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
                       <option value={code} selected={code === currentLocale()}>
-                        &nbsp;{Flags[code]}&nbsp; &nbsp; {lang.name}
+                        {Flags[code]}&nbsp;&nbsp; {lang.name}
                       </option>
                     {/each}
                   </Input>
@@ -335,5 +333,11 @@
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       background: rgba(118, 122, 126, 0.9);
     }
+  }
+
+  .navigation :global(.lang-select) {
+    padding: 1px 0px 1px 14px;
+    border: 0px;
+    font-size: 16px;
   }
 </style>
