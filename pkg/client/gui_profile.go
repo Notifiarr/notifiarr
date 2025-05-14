@@ -80,7 +80,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	if !dynamic {
 		// If the auth is currently using a password, check the password.
 		if !c.checkUserPass(currUser, post.Password) {
-			c.Errorf("[gui '%s' requested] Invalid existing (current) password provided. '%s'", currUser, post.Password)
+			c.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return
 		}
@@ -117,6 +117,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	}
 }
 
+// ProfilePost is the data sent to the profile POST endpoint when updating the trust profile.
 type ProfilePost struct {
 	Username  string              `json:"username"`
 	Password  string              `json:"password"`

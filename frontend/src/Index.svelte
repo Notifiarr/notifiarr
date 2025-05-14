@@ -29,7 +29,7 @@
   import { setLocale } from './lib/locale/index.svelte'
   import { onMount } from 'svelte'
   import { darkMode } from './lib/darkmode.svelte'
-  import { urlbase } from './api/urlbase'
+  import { urlbase } from './api/fetch'
 
   let username = ''
   let password = ''

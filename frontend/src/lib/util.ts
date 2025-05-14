@@ -1,13 +1,16 @@
 import { toast } from '@zerodevx/svelte-toast'
 
+/** Remove a prefix from a string. */
 export function ltrim(str: string, prefix: string) {
   return str.slice(str.startsWith(prefix) ? prefix.length : 0)
 }
 
+/** Remove a suffix from a string. */
 export function rtrim(str: string, suffix: string) {
   return str.endsWith(suffix) ? str.slice(0, str.length - suffix.length) : str
 }
 
+/** Show a success toast. */
 export const success = (m: string) =>
   toast.push(m, {
     theme: {
@@ -17,6 +20,7 @@ export const success = (m: string) =>
     },
   })
 
+/** Show a warning toast. */
 export const warning = (m: string) =>
   toast.push(m, {
     theme: {
@@ -26,6 +30,7 @@ export const warning = (m: string) =>
     },
   })
 
+/** Show a failure toast. */
 export const failure = (m: string) =>
   toast.push(m, {
     theme: {

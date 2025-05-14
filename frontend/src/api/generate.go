@@ -51,17 +51,17 @@ func main() {
 		{Name: "header", Value: configfile.AuthHeader},
 		{Name: "noauth", Value: configfile.AuthNone},
 	})
-	log.Println("==> parsing config struct")
-	goat.Parse(client.Profile{})
+	log.Println("==> parsing config structs")
+	goat.Parse(client.Profile{}, client.ProfilePost{})
 
 	log.Println("==> splitting packages")
 	vendorPkgs, localPkgs := splitPkgs(goat.Pkgs())
 
-	log.Println("==> adding vendor packages")
+	log.Printf("==> adding %d vendor packages", len(vendorPkgs))
 	docs.AddMust(vendorDir, vendorPkgs...) // `go mod vendor`
 
-	log.Println("==> adding local packages")
-	docs.AddMust(filepath.Dir(vendorDir), localPkgs...) // `git clone`
+	log.Printf("==> adding %d local packages", len(localPkgs))
+	docs.AddMust(filepath.Join(filepath.Dir(vendorDir), "../../../"), localPkgs...) // `git clone`
 
 	log.Println("==> writing output file")
 	if err := goat.Write(outputFileName, true); err != nil {
@@ -80,7 +80,7 @@ func splitPkgs(pkgs []string) ([]string, []string) {
 
 	for _, pkg := range pkgs {
 		if strings.HasPrefix(pkg, localPrefix) {
-			localPkgs = append(localPkgs, strings.TrimPrefix(pkg, localPrefix))
+			localPkgs = append(localPkgs, pkg)
 		} else {
 			vendorPkgs = append(vendorPkgs, pkg)
 		}

@@ -1,10 +1,15 @@
-import { get } from 'svelte/store'
-import { urlbase } from './urlbase'
+import { get, writable } from 'svelte/store'
 import { delay, ltrim, rtrim, success } from '../lib/util'
 import { _ } from 'svelte-i18n'
+import Cookies from 'js-cookie'
+
 export const LoggedOut = new Error('logged out')
 export const TimedOut = new Error('request timed out')
 
+/** The base URL of the backend's http interface. */
+export const urlbase = writable<string>(Cookies.get('urlbase') || '/')
+
+/** The response from the backend. We avoid throw exceptions in the wrapper methods, and return this object instead. */
 export type BackendResponse = { ok: boolean; body: any }
 
 /**
@@ -86,6 +91,7 @@ export async function checkReloaded(): Promise<void> {
   })
 }
 
+/** Internal abstraction for all the small public methods above. */
 async function request(
   uri: string,
   method: string = 'GET',
@@ -114,6 +120,7 @@ async function request(
   }
 }
 
+/** Generic fetch function with a timeout. */
 export async function fetchWithTimeout(
   url: string,
   options: RequestInit = {},

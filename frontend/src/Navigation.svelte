@@ -39,6 +39,7 @@
   import { darkMode, toggleDarkMode } from './lib/darkmode.svelte'
   import { currentLocale, setLocale } from './lib/locale/index.svelte'
   import { Flags } from './lib/locale/index.svelte'
+  import { urlbase } from './api/fetch'
 
   $: theme = $darkMode ? 'dark' : 'light'
   // Page structure for navigation with icons
@@ -84,16 +85,16 @@
 
     const query = new URLSearchParams(window.location.search)
     const params = query.toString()
-    const uri = `${urlBase}${[pid, ...subPages].join('/')}${params ? `?${params}` : ''}`
+    const uri = `${$urlbase}${[pid, ...subPages].join('/')}${params ? `?${params}` : ''}`
     window.history.replaceState({}, '', uri)
     // Auto-collapse sidebar on mobile after navigation
     isOpen = windowWidth >= 992
   }
 
   // Used to auto-navigate.
-  $: urlBase = $profile?.config.urlbase || '/'
-  $: parts = ltrim(window.location.pathname, urlBase).split('/')
+  $: parts = ltrim(ltrim(window.location.pathname, $urlbase), '/').split('/')
   $: activePage = parts.length > 0 ? parts[0] : ''
+  // Used for the language dropdown.
   $: locale = $profile.languages?.[currentLocale()]?.[currentLocale()]?.self
   $: newLang = currentLocale()
 
@@ -128,7 +129,7 @@
             {@const pid = page.id.toLowerCase()}
             <NavItem>
               <NavLink
-                href={urlBase + pid}
+                href={$urlbase + pid}
                 class="nav-link-custom"
                 active={activePage === pid}
                 on:click={e => goto(e, pid)}>
@@ -148,7 +149,7 @@
             {@const pid = page.id.toLowerCase()}
             <NavItem>
               <NavLink
-                href={urlBase + pid}
+                href={$urlbase + pid}
                 class="nav-link-custom"
                 active={activePage === pid}
                 on:click={e => goto(e, pid)}>

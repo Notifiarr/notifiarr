@@ -1,20 +1,10 @@
 import { get, writable, type Unsubscriber, type Writable } from 'svelte/store'
 import { checkReloaded, fetchWithTimeout, getUi } from './fetch'
 import { postUi } from './fetch'
-import type { AuthType, Config, Profile } from './notifiarrConfig'
+import type { Config, Profile, ProfilePost } from './notifiarrConfig'
 import { _ } from '../lib/Translate.svelte'
 import { failure, success } from '../lib/util'
-import { urlbase } from './urlbase'
-
-// TrustProfile is what the backend expects, and should be moved to a shared interface.
-interface TrustProfile {
-  username: string
-  password: string
-  authType: AuthType
-  upstreams: string
-  newPass: string
-  header: string
-}
+import { urlbase } from './fetch'
 
 class ConfigProfile {
   private profile: Writable<Profile>
@@ -61,12 +51,6 @@ class ConfigProfile {
     this.success = null
   }
 
-  private resetStatus() {
-    this.status = get(_)('phrases.SavingConfiguration')
-    this.error = ''
-    this.success = null
-  }
-
   private async waitForReload() {
     try {
       success(get(_)('phrases.ConfigurationSavedReloading'))
@@ -84,8 +68,11 @@ class ConfigProfile {
   }
 
   /** Use trustProfile to update the authZ/authN configuration on the backend and reload. */
-  public async trustProfile(form: TrustProfile) {
-    this.resetStatus()
+  public async trustProfile(form: ProfilePost) {
+    this.status = get(_)('phrases.SavingConfiguration')
+    this.error = ''
+    this.success = null
+
     const { ok, body } = await postUi('profile', JSON.stringify(form), false)
     if (!ok) {
       this.error = body
@@ -96,7 +83,10 @@ class ConfigProfile {
 
   /** Use writeConfig to update a partial configuration on the backend and reload. */
   public async writeConfig(config: Config) {
-    this.resetStatus()
+    this.status = get(_)('phrases.SavingConfiguration')
+    this.error = ''
+    this.success = null
+
     // Merge whatever was provided with the existing config.
     const newConfig = { ...get(this.profile).config, ...config }
     // Send the config to the server using postUi.
@@ -109,9 +99,6 @@ class ConfigProfile {
 
     // Update the local store with the new config.
     await this.set({ ...get(this.profile), config: newConfig })
-    // Update local url base in case it changed.
-    // The backend will begin using another url base after the reload.
-    await urlbase.set(newConfig.urlbase)
     await this.waitForReload()
   }
 
@@ -142,6 +129,9 @@ class ConfigProfile {
 
   private set(value: Profile) {
     this.updated = Date.now()
+    // Update local url base in case it changed.
+    // The backend will begin using another url base after the reload.
+    urlbase.set(value.config?.urlbase ?? '/')
     this.profile.set(value)
   }
 }
