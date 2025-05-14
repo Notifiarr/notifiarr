@@ -11,7 +11,7 @@ npm install
 npm run build
 
 # Get all the locales. Remove the folder prefix and the '.json' suffix.
-locales=$(ls -1 src/lib/locale/*.json | sed 's#src/lib/locale/\(.*\)\.json#\1#g')
+locales=$(ls -1 src/includes/locale/*.json | sed 's#src/includes/locale/\(.*\)\.json#\1#g')
 
 echo "Creating locales.go..."
 

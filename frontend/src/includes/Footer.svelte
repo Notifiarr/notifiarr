@@ -1,8 +1,8 @@
 <script lang="ts">
   import { Alert, Button, CardFooter, Col, Row } from '@sveltestrap/sveltestrap'
   import { profile } from '../api/profile.svelte'
-  import T, { _ } from '../lib/Translate.svelte'
-  import { age } from '../lib/util'
+  import T, { _ } from './Translate.svelte'
+  import { age } from './util'
 
   export let submit: (e: Event) => void
   export let successText: string = 'phrases.ConfigurationSaved'

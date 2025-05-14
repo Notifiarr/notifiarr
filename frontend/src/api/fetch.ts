@@ -1,5 +1,5 @@
 import { get, writable } from 'svelte/store'
-import { delay, ltrim, rtrim, success } from '../lib/util'
+import { delay, ltrim, rtrim, success } from '../includes/util'
 import { _ } from 'svelte-i18n'
 import Cookies from 'js-cookie'
 

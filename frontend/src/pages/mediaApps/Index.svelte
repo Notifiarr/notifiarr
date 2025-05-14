@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
-  import { theme } from '../../lib/theme.svelte'
+  import { theme } from '../../includes/theme.svelte'
 </script>
 
-<Card class="mb-2" {theme}>
+<Card class="mb-2" theme={$theme}>
   <CardHeader>
     <h2>Media Apps</h2>
   </CardHeader>

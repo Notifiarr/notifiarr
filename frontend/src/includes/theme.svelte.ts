@@ -28,7 +28,7 @@ class ThemeClass {
    */
   public toggle(e: Event) {
     e.preventDefault()
-    Theme.change(get(Theme).includes('dark') ? 'light' : 'dark')
+    theme.change(get(theme).includes('dark') ? 'light' : 'dark')
   }
 
   public change(newTheme: string) {
@@ -46,7 +46,5 @@ class ThemeClass {
   }
 }
 
-/** Use this to change the current theme or list all themes. */
-export const Theme = new ThemeClass()
-/** Use this to get the current theme. */
-export const theme = $derived(get(Theme))
+/** Use this to get or change the current theme or list all themes. */
+export const theme = new ThemeClass()

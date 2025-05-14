@@ -9,9 +9,9 @@
     Badge,
   } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
-  import Input from '../../lib/Input.svelte'
-  import { _ } from '../../lib/Translate.svelte'
-  import { theme } from '../../lib/theme.svelte'
+  import Input from '../../includes/Input.svelte'
+  import { _ } from '../../includes/Translate.svelte'
+  import { theme } from '../../includes/theme.svelte'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
 
@@ -33,7 +33,7 @@
 </script>
 
 <div id="config" class="mb-2 pb-2">
-  <Card {theme}>
+  <Card theme={$theme}>
     <CardHeader>
       <h2>
         {$_('config.titles.Configuration')}

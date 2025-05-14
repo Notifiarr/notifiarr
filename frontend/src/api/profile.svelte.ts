@@ -2,8 +2,8 @@ import { get, writable, type Unsubscriber, type Writable } from 'svelte/store'
 import { checkReloaded, fetchWithTimeout, getUi } from './fetch'
 import { postUi } from './fetch'
 import type { Config, Profile, ProfilePost } from './notifiarrConfig'
-import { _ } from '../lib/Translate.svelte'
-import { failure, success } from '../lib/util'
+import { _ } from '../includes/Translate.svelte'
+import { failure, success } from '../includes/util'
 import { urlbase } from './fetch'
 
 class ConfigProfile {

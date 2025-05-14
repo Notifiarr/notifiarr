@@ -9,10 +9,10 @@
     Fade,
   } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
-  import Input from '../../lib/Input.svelte'
-  import T, { _ } from '../../lib/Translate.svelte'
+  import Input from '../../includes/Input.svelte'
+  import T, { _ } from '../../includes/Translate.svelte'
   import { AuthType as Auth } from '../../api/notifiarrConfig'
-  import { theme } from '../../lib/theme.svelte'
+  import { theme } from '../../includes/theme.svelte'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
 
@@ -66,7 +66,7 @@
     false
 </script>
 
-<Card class="mb-2" {theme}>
+<Card class="mb-2" theme={$theme}>
   <CardHeader>
     <h2><Icon name="unlock-alt" /> {$_('navigation.titles.TrustProfile')}</h2>
     <p class="text-muted">{@html $_('profile.phrase.ProfileDescription')}</p>

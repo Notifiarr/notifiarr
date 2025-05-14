@@ -23,12 +23,12 @@
   import { profile } from './api/profile.svelte'
   import Navigation from './Navigation.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'
-  import T, { isReady, _ } from './lib/Translate.svelte'
-  import { age, delay } from './lib/util'
+  import T, { isReady, _ } from './includes/Translate.svelte'
+  import { age, delay } from './includes/util'
   import { checkReloaded, getUi } from './api/fetch'
-  import { setLocale } from './lib/locale/index.svelte'
+  import { setLocale } from './includes/locale/index.svelte'
   import { onMount } from 'svelte'
-  import { theme } from './lib/theme.svelte'
+  import { theme as thm } from './includes/theme.svelte'
   import { urlbase } from './api/fetch'
 
   let username = ''
@@ -88,6 +88,7 @@
 
   const confirmReload = () => (showReloadModal = true)
   const confirmShutdown = () => (showShutdownModal = true)
+  $: theme = $thm
 </script>
 
 <svelte:head>

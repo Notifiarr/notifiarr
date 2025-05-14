@@ -16,7 +16,7 @@
     Icon,
   } from '@sveltestrap/sveltestrap'
   import { profile } from './api/profile.svelte'
-  import { _ } from './lib/Translate.svelte'
+  import { _ } from './includes/Translate.svelte'
   import Configuration from './pages/configuration/Index.svelte'
   import SiteTunnel from './pages/siteTunnel/Index.svelte'
   import StarrApps from './pages/starrApps/Index.svelte'
@@ -35,11 +35,13 @@
   import System from './pages/system/Index.svelte'
   import Profile from './pages/profile/Index.svelte'
   import Landing from './Landing.svelte'
-  import { ltrim } from './lib/util'
-  import { Theme, theme } from './lib/theme.svelte'
-  import { currentLocale, setLocale } from './lib/locale/index.svelte'
-  import { Flags } from './lib/locale/index.svelte'
+  import { ltrim } from './includes/util'
+  import { theme as thm } from './includes/theme.svelte'
+  import { currentLocale, setLocale } from './includes/locale/index.svelte'
+  import { Flags } from './includes/locale/index.svelte'
   import { urlbase } from './api/fetch'
+
+  $: theme = $thm
 
   // Page structure for navigation with icons
   // id used for navigation AND translations.
@@ -180,22 +182,18 @@
                   <span class="nav-icon">👤</span>
                   <span class="nav-text">{$_('navigation.titles.TrustProfile')}</span>
                 </DropdownItem>
-                {#if locale}
-                  <Input
-                    class="my-1 lang-select"
-                    type="select"
-                    bind:value={newLang}
-                    onchange={() => setLocale(newLang)}>
-                    {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
-                      <option value={code} selected={code === currentLocale()}>
-                        {Flags[code]}&nbsp;&nbsp; {lang.name}
-                      </option>
-                    {/each}
-                  </Input>
-                {:else}
-                  <DropdownItem divider />
-                {/if}
-                <DropdownItem class="nav-link-custom" onclick={Theme.toggle}>
+                <Input
+                  class="my-1 lang-select"
+                  type="select"
+                  bind:value={newLang}
+                  onchange={() => setLocale(newLang)}>
+                  {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
+                    <option value={code} selected={code === currentLocale()}>
+                      {Flags[code]}&nbsp;&nbsp; {lang.name}
+                    </option>
+                  {/each}
+                </Input>
+                <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
                   <Icon
                     name={theme.includes('dark') ? 'sun' : 'moon'}
                     class="me-3 text-{theme.includes('dark') ? 'warning' : 'primary'}" />
