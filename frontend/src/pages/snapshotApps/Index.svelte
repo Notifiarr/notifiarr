@@ -1,0 +1,17 @@
+<script lang="ts">
+  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { darkMode } from '../../lib/darkmode.svelte'
+  $: theme = $darkMode ? 'dark' : 'light'
+</script>
+
+<Card class="mb-2" {theme}>
+  <CardHeader>
+    <h2>Snapshot Apps</h2>
+  </CardHeader>
+  <CardBody>
+    <p>Configure applications that provide system and application state snapshots.</p>
+  </CardBody>
+  <CardFooter>
+    <small class="text-muted">Set up and manage snapshot capabilities</small>
+  </CardFooter>
+</Card>

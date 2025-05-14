@@ -9,7 +9,7 @@ export const TimedOut = new Error('request timed out')
 /** The base URL of the backend's http interface. */
 export const urlbase = writable<string>(Cookies.get('urlbase') || '/')
 
-/** The response from the backend. We avoid throw exceptions in the wrapper methods, and return this object instead. */
+/** The response from the backend. We avoid throwing exceptions in the wrapper methods, and return this object instead. */
 export type BackendResponse = { ok: boolean; body: any }
 
 /**
