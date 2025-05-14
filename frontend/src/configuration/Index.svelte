@@ -3,21 +3,17 @@
     Card,
     CardHeader,
     CardBody,
-    CardFooter,
     InputGroupText,
-    Button,
-    Alert,
     Row,
     Col,
     Badge,
-    Spinner,
   } from '@sveltestrap/sveltestrap'
-  import { fetchProfile, profile } from '../api/profile'
+  import { profile } from '../api/profile.svelte'
   import Input from '../lib/Input.svelte'
   import { _ } from '../lib/Translate.svelte'
-  import { checkReloaded } from '../api/fetch'
   import { darkMode } from '../lib/darkmode.svelte'
-  import { urlbase } from '../api/urlbase'
+  import Footer from './Footer.svelte'
+  import { onMount } from 'svelte'
 
   $: theme = $darkMode ? 'dark' : 'light'
   // Local state that syncs with profile store.
@@ -26,37 +22,15 @@
   $: extraKeys = (c.extraKeys?.join('\n') || '') + '\n'
   $: rows = extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length
 
-  // Form submission status
-  let formSubmitted = ''
-  let submitError: string | null = null
-  let submitSuccess = false
-
   // Handle form submission
-  async function submit(event: Event) {
-    event.preventDefault()
-    formSubmitted = $_('phrases.SavingConfiguration')
-    submitError = null
-    submitSuccess = false
+  function submit(e: Event) {
+    e.preventDefault()
     c.extraKeys = extraKeys.split('\n').filter(key => key.trim() !== '')
-
-    try {
-      await profile.writeConfig(c)
-      formSubmitted = $_('phrases.Reloading')
-      // Update local url base in case it changed.
-      // The backend will begin using another url base after the reload.
-      await urlbase.set(c.urlbase)
-      await checkReloaded()
-      await fetchProfile()
-      submitSuccess = true
-    } catch (error) {
-      submitError =
-        error instanceof Error
-          ? error.message
-          : $_('config.errors.AnUnknownErrorOccurred')
-    } finally {
-      formSubmitted = ''
-    }
+    profile.writeConfig(c)
   }
+
+  // Clear the status messages when the component unmounts.
+  onMount(() => () => profile.clearStatus())
 </script>
 
 <div id="config" class="mb-2 pb-2">
@@ -256,48 +230,7 @@
         </Col>
       </Row>
     </CardBody>
-
-    <CardFooter>
-      <Row>
-        <Col style="max-width: fit-content;">
-          <Button
-            size="lg"
-            color="primary"
-            type="submit"
-            class="mt-1"
-            disabled={formSubmitted !== ''}
-            on:click={submit}>
-            {#if formSubmitted}
-              {$_('phrases.SavingConfiguration')}
-            {:else}
-              {$_('buttons.SaveConfiguration')}
-            {/if}
-          </Button>
-        </Col>
-        <Col>
-          {#if submitError}
-            <Alert
-              color="danger"
-              class="submit-alert"
-              dismissible
-              closeClassName="submit-alert-close">
-              {submitError}</Alert>
-          {:else if submitSuccess}
-            <Alert
-              color="success"
-              class="submit-alert"
-              dismissible
-              closeClassName="submit-alert-close">
-              {$_('phrases.ConfigurationSaved')}</Alert>
-          {:else if formSubmitted}
-            <Alert color="warning" class="submit-alert">
-              <Spinner size="sm" />
-              {formSubmitted}
-            </Alert>
-          {/if}
-        </Col>
-      </Row>
-    </CardFooter>
+    <Footer {submit} />
   </Card>
 </div>
 

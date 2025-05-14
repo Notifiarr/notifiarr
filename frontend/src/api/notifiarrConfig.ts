@@ -26,6 +26,7 @@ export enum AuthType {
 };
 
 /**
+ * Profile is the data returned by the profile GET endpoint.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
  */
 export interface Profile {
@@ -46,11 +47,15 @@ export interface Profile {
   upstreamHeader: string;
   upstreamType: AuthType;
   languages?: Record<string, null | Record<string, LocalizedLanguage>>;
+  /**
+   * LoggedIn is only used by the front end. Backend does not set or use it.
+   */
   loggedIn: boolean;
   updated: Date;
 };
 
 /**
+ * Config represents the data in our config file.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.Config>
  */
 export interface Config extends LogConfig, Apps {
@@ -75,6 +80,7 @@ export interface Config extends LogConfig, Apps {
 };
 
 /**
+ * Config determines which checks to run, etc.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Config>
  */
 export interface SnapshotConfig extends Plugins {
@@ -95,6 +101,7 @@ export interface SnapshotConfig extends Plugins {
 };
 
 /**
+ * Plugins is optional configuration for "plugins".
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Plugins>
  */
 export interface Plugins {
@@ -103,6 +110,7 @@ export interface Plugins {
 };
 
 /**
+ * NvidiaConfig is our input data.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.NvidiaConfig>
  */
 export interface NvidiaConfig {
@@ -112,16 +120,21 @@ export interface NvidiaConfig {
 };
 
 /**
+ * MySQLConfig allows us to gather a process list for the snapshot.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.MySQLConfig>
  */
 export interface MySQLConfig {
   name: string;
   host: string;
   timeout: string;
+  /**
+   * Only used by service checks, snapshot interval is used for mysql.
+   */
   interval: string;
 };
 
 /**
+ * Config for this Services plugin comes from a config file.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Config>
  */
 export interface ServicesConfig {
@@ -132,6 +145,7 @@ export interface ServicesConfig {
 };
 
 /**
+ * Service is a thing we check and report results for.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Service>
  */
 export interface Service {
@@ -145,6 +159,7 @@ export interface Service {
 };
 
 /**
+ * WatchFile is the input data needed to watch files.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/filewatch.WatchFile>
  */
 export interface WatchFile {
@@ -158,6 +173,8 @@ export interface WatchFile {
 };
 
 /**
+ * Endpoint contains the cronjob definition and url query parameters.
+ * This is the input data to poll a url on a frequency.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig.Endpoint>
  */
 export interface Endpoint extends CronJob {
@@ -172,18 +189,47 @@ export interface Endpoint extends CronJob {
 };
 
 /**
+ * CronJob defines when a job should run.
+ * When Frequency is set to:
+ * 0 `DeadCron` disables the schedule.
+ * 1 `Minutely` uses Seconds.
+ * 2 `Hourly` uses Minutes and Seconds.
+ * 3 `Daily` uses Hours, Minutes and Seconds.
+ * 4 `Weekly` uses DaysOfWeek, Hours, Minutes and Seconds.
+ * 5 `Monthly` uses DaysOfMonth, Hours, Minutes and Seconds.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler.CronJob>
  */
 export interface CronJob {
+  /**
+   * Frequency to configure the job. Pass 0 disable the cron.
+   */
   frequency: number;
+  /**
+   * Interval for Daily, Weekly and Monthly Frequencies. 1 = every day/week/month, 2 = every other, and so on.
+   */
   interval: number;
+  /**
+   * AtTimes is a list of 'hours, minutes, seconds' to schedule for Daily/Weekly/Monthly frequencies.
+   * Also used in Minutely and Hourly schedules, a bit awkwardly.
+   */
   atTimes?: (null | number[])[];
+  /**
+   * DaysOfWeek is a list of days to schedule. 0-6. 0 = Sunday.
+   */
   daysOfWeek?: Weekday[];
+  /**
+   * DaysOfMonth is a list of days to schedule. 1 to 31 or -31 to -1 to count backward.
+   */
   daysOfMonth?: number[];
+  /**
+   * Months to schedule. 1 to 12. 1 = January.
+   */
   months?: number[];
 };
 
 /**
+ * Command contains the input data for a defined command.
+ * It also contains some saved data about the command being run.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/commands.Command>
  */
 export interface Command extends CmdconfigConfig {};
@@ -201,6 +247,8 @@ export interface CmdconfigConfig {
 };
 
 /**
+ * LogConfig allows sending logs to rotating files.
+ * Setting an AppName will force log creation even if LogFile and HTTPLog are empty.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/logs.LogConfig>
  */
 export interface LogConfig {
@@ -216,6 +264,7 @@ export interface LogConfig {
 };
 
 /**
+ * Apps is the input configuration to relay requests to Starr apps.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.Apps>
  */
 export interface Apps {
@@ -240,6 +289,7 @@ export interface Apps {
 };
 
 /**
+ * SonarrConfig represents the input data for a Sonarr server.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.SonarrConfig>
  */
 export interface SonarrConfig extends ExtraConfig, StarrConfig {};
@@ -272,21 +322,25 @@ export interface StarrConfig {
 };
 
 /**
+ * RadarrConfig represents the input data for a Radarr server.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.RadarrConfig>
  */
 export interface RadarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
+ * LidarrConfig represents the input data for a Lidarr server.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.LidarrConfig>
  */
 export interface LidarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
+ * ReadarrConfig represents the input data for a Readarr server.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ReadarrConfig>
  */
 export interface ReadarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
+ * ProwlarrConfig represents the input data for a Prowlarr server.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ProwlarrConfig>
  */
 export interface ProwlarrConfig extends ExtraConfig, StarrConfig {};
@@ -365,6 +419,7 @@ export interface NzbgetConfig {
 };
 
 /**
+ * XmissionConfig is the Transmission input configuration.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.XmissionConfig>
  */
 export interface XmissionConfig extends ExtraConfig {
@@ -379,6 +434,7 @@ export interface XmissionConfig extends ExtraConfig {
 export interface TautulliConfig extends ExtraConfig, TautulliConfig0 {};
 
 /**
+ * Config is the Tautulli configuration.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli.Config>
  */
 export interface TautulliConfig0 {
@@ -400,6 +456,7 @@ export interface PlexConfig0 {
 };
 
 /**
+ * ClientInfo is the client's startup data received from the website.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.ClientInfo>
  */
 export interface ClientInfo {
@@ -429,11 +486,13 @@ export interface ClientInfo {
 };
 
 /**
+ * PHPDate allows us to easily convert a PHP date format in Go.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.PHPDate>
  */
 export interface PHPDate {};
 
 /**
+ * MuleryServer is data from the website. It's a tunnel's https and wss urls.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.MuleryServer>
  */
 export interface MuleryServer {
@@ -443,6 +502,7 @@ export interface MuleryServer {
 };
 
 /**
+ * PlexConfig is the website-derived configuration for Plex.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.PlexConfig>
  */
 export interface ClientinfoPlexConfig {
@@ -457,6 +517,7 @@ export interface ClientinfoPlexConfig {
 };
 
 /**
+ * AllAppConfigs is the configuration returned from the notifiarr website for Starr apps.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.AllAppConfigs>
  */
 export interface AllAppConfigs {
@@ -468,6 +529,7 @@ export interface AllAppConfigs {
 };
 
 /**
+ * AppConfig is the data that comes from the website for each Starr app.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.AppConfig>
  */
 export interface AppConfig {
@@ -481,6 +543,7 @@ export interface AppConfig {
 };
 
 /**
+ * DashConfig is the configuration returned from the notifiarr website for the dashboard configuration.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.DashConfig>
  */
 export interface DashConfig {
@@ -499,6 +562,7 @@ export interface DashConfig {
 };
 
 /**
+ * SyncConfig is the configuration returned from the notifiarr website for CF/RP TraSH sync.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.SyncConfig>
  */
 export interface SyncConfig {
@@ -512,6 +576,7 @@ export interface SyncConfig {
 };
 
 /**
+ * MdbListConfig contains the instances we send libraries for, and the interval we do it in.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.MdbListConfig>
  */
 export interface MdbListConfig {
@@ -521,6 +586,7 @@ export interface MdbListConfig {
 };
 
 /**
+ * GapsConfig is the configuration returned from the notifiarr website for Radarr Collection Gaps.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.GapsConfig>
  */
 export interface GapsConfig {
@@ -529,6 +595,8 @@ export interface GapsConfig {
 };
 
 /**
+ * CronConfig defines a custom GET timer from the website.
+ * Used to offload crons to clients.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.CronConfig>
  */
 export interface CronConfig {
@@ -539,13 +607,39 @@ export interface CronConfig {
 };
 
 /**
+ * LocalizedLanguage is a language and its display name localized to itself and another (parent) language.
  * @see golang: <github.com/Notifiarr/notifiarr/frontend.LocalizedLanguage>
  */
 export interface LocalizedLanguage {
+  /**
+   * Lang is the parent language code this language Name is localized to.
+   */
   lang: string;
+  /**
+   * Code is the language code of the language.
+   */
   code: string;
+  /**
+   * Name is the display name of the language localized to the parent (Lang) language.
+   */
   name: string;
+  /**
+   * Self is the display name of the language localized in its own language.
+   */
   self: string;
+};
+
+/**
+ * ProfilePost is the data sent to the profile POST endpoint when updating the trust profile.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.ProfilePost>
+ */
+export interface ProfilePost {
+  username: string;
+  password: string;
+  authType: AuthType;
+  header: string;
+  newPass: string;
+  upstreams: string;
 };
 
 // Packages parsed:

@@ -1,10 +1,15 @@
-import { get } from 'svelte/store'
-import { urlbase } from './urlbase'
+import { get, writable } from 'svelte/store'
+import { delay, ltrim, rtrim, success } from '../lib/util'
+import { _ } from 'svelte-i18n'
 import Cookies from 'js-cookie'
-import { ltrim, rtrim } from '../lib/util'
+
 export const LoggedOut = new Error('logged out')
 export const TimedOut = new Error('request timed out')
 
+/** The base URL of the backend's http interface. */
+export const urlbase = writable<string>(Cookies.get('urlbase') || '/')
+
+/** The response from the backend. We avoid throw exceptions in the wrapper methods, and return this object instead. */
 export type BackendResponse = { ok: boolean; body: any }
 
 /**
@@ -63,23 +68,30 @@ export async function postApi(
 /**
  * Check if the server has finished reloading its configuration. This is an UP check.
  * This is used to wait for the server to reload the page after a configuration change.
- * @returns A promise that resolves when the server has reloaded the page.
+ * @returns A promise that resolves when the server has reloaded and is available for requests.
  */
-export async function checkReloaded() {
-  return new Promise<void>(async resolve => {
-    await setTimeout(async () => {
-      const checkReload = async (attempts = 0) => {
-        if (attempts > 19)
-          throw new Error('Server reload check timed out after 20 attempts')
-        const { ok } = await getUi('ping', false)
-        if (ok) return resolve()
-        await setTimeout(() => checkReload(attempts + 1), 300)
-      }
-      await checkReload()
-    }, 600)
+export async function checkReloaded(): Promise<void> {
+  const checkReload = async () => {
+    if ((await getUi('ping', false)).ok) {
+      success(get(_)('phrases.ReloadSuccess'))
+      return true
+    }
+
+    return false
+  }
+
+  return new Promise(async (resolve, reject) => {
+    await delay(600) // initial delay
+    for (let i = 0; i < 20; i++) {
+      await delay(300) // delay between checks
+      if (await checkReload()) return resolve()
+    }
+
+    reject(new Error(get(_)('phrases.ReloadCheckTimedOut')))
   })
 }
 
+/** Internal abstraction for all the small public methods above. */
 async function request(
   uri: string,
   method: string = 'GET',
@@ -108,6 +120,7 @@ async function request(
   }
 }
 
+/** Generic fetch function with a timeout. */
 export async function fetchWithTimeout(
   url: string,
   options: RequestInit = {},

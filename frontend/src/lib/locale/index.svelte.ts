@@ -6,6 +6,12 @@ https://phrase.com/blog/posts/a-step-by-step-guide-to-svelte-localization-with-s
 https://phrase.com/blog/posts/how-to-localize-a-svelte-app-with-svelte-i18n/
 https://lokalise.com/blog/svelte-i18n/
 */
+
+/**
+ * Flags are the flags for the languages.
+ * They are close to a country, but not exactly.
+ * For example, "es" is "🇪🇸" for Spain, but "🇲🇽" for Mexico.
+ */
 export const Flags: Record<string, string> = {
   de: '🇩🇪',
   en: '🇺🇸',
