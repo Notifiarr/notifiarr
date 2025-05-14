@@ -16,32 +16,33 @@
     Icon,
   } from '@sveltestrap/sveltestrap'
   import { profile } from './api/profile.svelte'
-  import { _ } from './lib/Translate.svelte'
-  import Configuration from './configuration/Index.svelte'
-  import SiteTunnel from './siteTunnel/Index.svelte'
-  import StarrApps from './starrApps/Index.svelte'
-  import DownloadApps from './downloadApps/Index.svelte'
-  import MediaApps from './mediaApps/Index.svelte'
-  import SnapshotApps from './snapshotApps/Index.svelte'
-  import FileWatcher from './fileWatcher/Index.svelte'
-  import Endpoints from './endpoints/Index.svelte'
-  import Commands from './commands/Index.svelte'
-  import ServiceChecks from './serviceChecks/Index.svelte'
-  import Triggers from './triggers/Index.svelte'
-  import Integrations from './integrations/Index.svelte'
-  import Monitoring from './monitoring/Index.svelte'
-  import Metrics from './metrics/Index.svelte'
-  import LogFiles from './logFiles/Index.svelte'
-  import System from './system/Index.svelte'
-  import Profile from './profile/Index.svelte'
+  import { _ } from './includes/Translate.svelte'
+  import Configuration from './pages/configuration/Index.svelte'
+  import SiteTunnel from './pages/siteTunnel/Index.svelte'
+  import StarrApps from './pages/starrApps/Index.svelte'
+  import DownloadApps from './pages/downloadApps/Index.svelte'
+  import MediaApps from './pages/mediaApps/Index.svelte'
+  import SnapshotApps from './pages/snapshotApps/Index.svelte'
+  import FileWatcher from './pages/fileWatcher/Index.svelte'
+  import Endpoints from './pages/endpoints/Index.svelte'
+  import Commands from './pages/commands/Index.svelte'
+  import ServiceChecks from './pages/serviceChecks/Index.svelte'
+  import Triggers from './pages/triggers/Index.svelte'
+  import Integrations from './pages/integrations/Index.svelte'
+  import Monitoring from './pages/monitoring/Index.svelte'
+  import Metrics from './pages/metrics/Index.svelte'
+  import LogFiles from './pages/logFiles/Index.svelte'
+  import System from './pages/system/Index.svelte'
+  import Profile from './pages/profile/Index.svelte'
   import Landing from './Landing.svelte'
-  import { ltrim } from './lib/util'
-  import { darkMode, toggleDarkMode } from './lib/darkmode.svelte'
-  import { currentLocale, setLocale } from './lib/locale/index.svelte'
-  import { Flags } from './lib/locale/index.svelte'
+  import { ltrim } from './includes/util'
+  import { theme as thm } from './includes/theme.svelte'
+  import { currentLocale, setLocale } from './includes/locale/index.svelte'
+  import { Flags } from './includes/locale/index.svelte'
   import { urlbase } from './api/fetch'
 
-  $: theme = $darkMode ? 'dark' : 'light'
+  $: theme = $thm
+
   // Page structure for navigation with icons
   // id used for navigation AND translations.
   const settings = [
@@ -181,29 +182,28 @@
                   <span class="nav-icon">👤</span>
                   <span class="nav-text">{$_('navigation.titles.TrustProfile')}</span>
                 </DropdownItem>
-                {#if locale}
-                  <Input
-                    class="my-1 lang-select"
-                    type="select"
-                    bind:value={newLang}
-                    onchange={() => setLocale(newLang)}>
-                    {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
-                      <option value={code} selected={code === currentLocale()}>
-                        {Flags[code]}&nbsp;&nbsp; {lang.name}
-                      </option>
-                    {/each}
-                  </Input>
-                {:else}
-                  <DropdownItem divider />
-                {/if}
-                <DropdownItem class="nav-link-custom" onclick={toggleDarkMode}>
+                <Input
+                  class="my-1 lang-select"
+                  type="select"
+                  bind:value={newLang}
+                  onchange={() => setLocale(newLang)}>
+                  {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
+                    <option value={code} selected={code === currentLocale()}>
+                      {Flags[code]}&nbsp;&nbsp; {lang.name}
+                    </option>
+                  {/each}
+                </Input>
+                <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
                   <Icon
-                    name={$darkMode ? 'sun' : 'moon'}
-                    class="me-3 text-{$darkMode ? 'warning' : 'primary'}" />
-                  {$darkMode ? $_('config.titles.Light') : $_('config.titles.Dark')}
+                    name={theme.includes('dark') ? 'sun' : 'moon'}
+                    class="me-3 text-{theme.includes('dark') ? 'warning' : 'primary'}" />
+                  {theme.includes('dark')
+                    ? $_('config.titles.Light')
+                    : $_('config.titles.Dark')}
                   <Input
+                    disabled
                     type="switch"
-                    bind:checked={$darkMode}
+                    checked={theme.includes('dark')}
                     style="position: absolute; right: 5px;" />
                 </DropdownItem>
               </DropdownMenu>
