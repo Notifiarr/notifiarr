@@ -1,8 +1,8 @@
 import { get, readable, type Readable, type Unsubscriber } from 'svelte/store'
 import Cookies from 'js-cookie'
 
-const cookieName = 'theme'
 const themes = ['dark', 'light']
+const cookieName = 'theme'
 
 /** We save theme in a cookie and a svelte store, so it persists across page loads. */
 class ThemeClass {
