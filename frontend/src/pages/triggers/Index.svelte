@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
-  import { darkMode } from '../../lib/darkmode.svelte'
-  $: theme = $darkMode ? 'dark' : 'light'
+  import { theme } from '../../lib/theme.svelte'
 </script>
 
 <Card class="mb-2" {theme}>
@@ -9,9 +8,9 @@
     <h2>Triggers</h2>
   </CardHeader>
   <CardBody>
-    <p>Set up event-based triggers to automate actions based on system events.</p>
+    <p>Configure and manage event triggers for automation.</p>
   </CardBody>
   <CardFooter>
-    <small class="text-muted">Create automated workflows based on events</small>
+    <small class="text-muted">Set up automated responses to system events</small>
   </CardFooter>
 </Card>

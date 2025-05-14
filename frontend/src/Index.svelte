@@ -28,7 +28,7 @@
   import { checkReloaded, getUi } from './api/fetch'
   import { setLocale } from './lib/locale/index.svelte'
   import { onMount } from 'svelte'
-  import { darkMode } from './lib/darkmode.svelte'
+  import { theme } from './lib/theme.svelte'
   import { urlbase } from './api/fetch'
 
   let username = ''
@@ -88,11 +88,6 @@
 
   const confirmReload = () => (showReloadModal = true)
   const confirmShutdown = () => (showShutdownModal = true)
-
-  $: theme = $darkMode ? 'dark' : 'light'
-  $: $darkMode
-    ? window.document.body.classList.add('dark-mode')
-    : window.document.body.classList.remove('dark-mode')
 </script>
 
 <svelte:head>

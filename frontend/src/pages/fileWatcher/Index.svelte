@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
-  import { darkMode } from '../../lib/darkmode.svelte'
-  $: theme = $darkMode ? 'dark' : 'light'
+  import { theme } from '../../lib/theme.svelte'
 </script>
 
 <Card class="mb-2" {theme}>
@@ -9,10 +8,9 @@
     <h2>File Watcher</h2>
   </CardHeader>
   <CardBody>
-    <p>Set up and monitor file system events and triggers based on file changes.</p>
+    <p>Monitor and respond to changes in specified files and directories.</p>
   </CardBody>
   <CardFooter>
-    <small class="text-muted"
-      >Configure automated actions based on file system events</small>
+    <small class="text-muted">Track file system changes and trigger actions</small>
   </CardFooter>
 </Card>

@@ -11,11 +11,10 @@
   import { profile } from '../../api/profile.svelte'
   import Input from '../../lib/Input.svelte'
   import { _ } from '../../lib/Translate.svelte'
-  import { darkMode } from '../../lib/darkmode.svelte'
+  import { theme } from '../../lib/theme.svelte'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
 
-  $: theme = $darkMode ? 'dark' : 'light'
   // Local state that syncs with profile store.
   $: c = { ...$profile.config }
   // Convert array to newline-separated string for textarea

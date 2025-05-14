@@ -36,12 +36,11 @@
   import Profile from './pages/profile/Index.svelte'
   import Landing from './Landing.svelte'
   import { ltrim } from './lib/util'
-  import { darkMode, toggleDarkMode } from './lib/darkmode.svelte'
+  import { Theme, theme } from './lib/theme.svelte'
   import { currentLocale, setLocale } from './lib/locale/index.svelte'
   import { Flags } from './lib/locale/index.svelte'
   import { urlbase } from './api/fetch'
 
-  $: theme = $darkMode ? 'dark' : 'light'
   // Page structure for navigation with icons
   // id used for navigation AND translations.
   const settings = [
@@ -196,14 +195,17 @@
                 {:else}
                   <DropdownItem divider />
                 {/if}
-                <DropdownItem class="nav-link-custom" onclick={toggleDarkMode}>
+                <DropdownItem class="nav-link-custom" onclick={Theme.toggle}>
                   <Icon
-                    name={$darkMode ? 'sun' : 'moon'}
-                    class="me-3 text-{$darkMode ? 'warning' : 'primary'}" />
-                  {$darkMode ? $_('config.titles.Light') : $_('config.titles.Dark')}
+                    name={theme.includes('dark') ? 'sun' : 'moon'}
+                    class="me-3 text-{theme.includes('dark') ? 'warning' : 'primary'}" />
+                  {theme.includes('dark')
+                    ? $_('config.titles.Light')
+                    : $_('config.titles.Dark')}
                   <Input
+                    disabled
                     type="switch"
-                    bind:checked={$darkMode}
+                    checked={theme.includes('dark')}
                     style="position: absolute; right: 5px;" />
                 </DropdownItem>
               </DropdownMenu>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
-  import { darkMode } from '../../lib/darkmode.svelte'
-  $: theme = $darkMode ? 'dark' : 'light'
+  import { theme } from '../../lib/theme.svelte'
 </script>
 
 <Card class="mb-2" {theme}>
@@ -9,9 +8,9 @@
     <h2>Service Checks</h2>
   </CardHeader>
   <CardBody>
-    <p>Configure and monitor service health checks for various applications.</p>
+    <p>Monitor the health and status of your services and applications.</p>
   </CardBody>
   <CardFooter>
-    <small class="text-muted">Ensure your services are running properly</small>
+    <small class="text-muted">Track service availability and performance</small>
   </CardFooter>
 </Card>

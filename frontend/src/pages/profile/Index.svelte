@@ -12,11 +12,10 @@
   import Input from '../../lib/Input.svelte'
   import T, { _ } from '../../lib/Translate.svelte'
   import { AuthType as Auth } from '../../api/notifiarrConfig'
-  import { darkMode } from '../../lib/darkmode.svelte'
+  import { theme } from '../../lib/theme.svelte'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
 
-  $: theme = $darkMode ? 'dark' : 'light'
   $: upstreamIp = '<span class="text-danger">' + $profile?.upstreamIp + '</span>' // goes into a translation.
   // Form state, this is what we're sending to the backend.
   $: form = {
