@@ -4,7 +4,6 @@
     Button,
     Card,
     FormGroup,
-    Icon,
     Input,
     InputGroup,
     Label,
@@ -12,6 +11,13 @@
   } from '@sveltestrap/sveltestrap'
   import { _ } from './Translate.svelte'
   import type { SvelteComponent } from 'svelte'
+  import {
+    faCircleDot,
+    faEye,
+    faEyeSlash,
+    faQuestionCircle,
+  } from '@fortawesome/free-solid-svg-icons'
+  import Fa from 'svelte-fa'
 
   /** Must be unique. Identifies this component. */
   export let id: string
@@ -47,9 +53,9 @@
   let input: SvelteComponent
   let showTooltip = false
 
-  $: icon = showTooltip ? 'dash-circle' : 'question-circle'
+  $: icon = showTooltip ? faCircleDot : faQuestionCircle
   $: currType = type
-  $: passIcon = currType === 'password' ? 'eye-slash' : 'eye'
+  $: passIcon = currType === 'password' ? faEyeSlash : faEye
   $: iconClass = showTooltip ? 'text-danger' : 'text-secondary'
   $: placeholder = placeholder == id + '.placeholder' ? undefined : placeholder
 
@@ -70,7 +76,7 @@
     <InputGroup>
       {#if tooltip != id + '.tooltip'}
         <Button color="warning" on:click={toggleTooltip} outline>
-          <Icon class={iconClass} name={icon} />
+          <Fa {icon} class={iconClass} />
         </Button>
       {/if}
       <slot name="pre" />
@@ -116,7 +122,7 @@
       <!-- Including a password visibility toggler. -->
       {#if type === 'password'}
         <Button type="button" outline on:click={togglePassword}>
-          <Icon class="text-warning" name={passIcon} />
+          <Fa icon={passIcon} class="text-warning" />
         </Button>
       {/if}
       <slot name="post" />

@@ -13,7 +13,6 @@
     DropdownMenu,
     DropdownItem,
     Input,
-    Icon,
   } from '@sveltestrap/sveltestrap'
   import { profile } from './api/profile.svelte'
   import { _ } from './includes/Translate.svelte'
@@ -40,6 +39,8 @@
   import { currentLocale, setLocale } from './includes/locale/index.svelte'
   import { Flags } from './includes/locale/index.svelte'
   import { urlbase } from './api/fetch'
+  import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
+  import Fa from 'svelte-fa'
 
   $: theme = $thm
 
@@ -194,8 +195,8 @@
                   {/each}
                 </Input>
                 <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
-                  <Icon
-                    name={theme.includes('dark') ? 'sun' : 'moon'}
+                  <Fa
+                    icon={theme.includes('dark') ? faSun : faMoon}
                     class="me-3 text-{theme.includes('dark') ? 'warning' : 'primary'}" />
                   {theme.includes('dark')
                     ? $_('config.titles.Light')

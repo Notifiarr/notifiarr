@@ -1,13 +1,5 @@
 <script lang="ts">
-  import {
-    Card,
-    CardHeader,
-    CardBody,
-    Row,
-    Col,
-    Icon,
-    Fade,
-  } from '@sveltestrap/sveltestrap'
+  import { Card, CardHeader, CardBody, Row, Col, Fade } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Input from '../../includes/Input.svelte'
   import T, { _ } from '../../includes/Translate.svelte'
@@ -15,6 +7,8 @@
   import { theme } from '../../includes/theme.svelte'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
+  import Fa from 'svelte-fa'
+  import { faStar, faUnlockAlt } from '@fortawesome/free-solid-svg-icons'
 
   $: upstreamIp = '<span class="text-danger">' + $profile?.upstreamIp + '</span>' // goes into a translation.
   // Form state, this is what we're sending to the backend.
@@ -68,7 +62,7 @@
 
 <Card class="mb-2" theme={$theme}>
   <CardHeader>
-    <h2><Icon name="unlock-alt" /> {$_('navigation.titles.TrustProfile')}</h2>
+    <h2><Fa icon={faUnlockAlt} /> {$_('navigation.titles.TrustProfile')}</h2>
     <p class="text-muted">{@html $_('profile.phrase.ProfileDescription')}</p>
   </CardHeader>
 
@@ -77,26 +71,26 @@
     <CardBody>
       <ul class="mb-2 list-unstyled">
         <li>
-          <Icon name="star" class="text-secondary" />
+          <Fa icon={faStar} color="gray" />
           {@html $_('profile.phrase.PasswordOnlyUsed')}
         </li>
         <li>
-          <Icon name="star" class="text-secondary" />
+          <Fa icon={faStar} color="gray" />
           {@html $_('profile.phrase.HeaderOnlyUsed')}
         </li>
         <li>
-          <Icon name="star" class="text-secondary" />
+          <Fa icon={faStar} color="gray" />
           {@html $_('profile.phrase.AuthTypeChange')}
         </li>
         <li>
-          <Icon name="star" class="text-secondary" />
+          <Fa icon={faStar} color="gray" />
           {@html $_('profile.phrase.SeeWikiForAuthProxyHelp')}
         </li>
 
         <!-- Missing/Add upstream section -->
         {#if !$profile?.upstreamAllowed}
           <li>
-            <Icon name="star" class="text-danger" />
+            <Fa icon={faStar} color="#AA4B65" />
             <b><T id="profile.phrase.ProxyAuthDisabled" {upstreamIp} /></b>
             <a href="#addit" onclick={addit}>
               {$_('profile.phrase.Addit')}
@@ -106,7 +100,7 @@
 
         <!-- Show more toggle -->
         <li>
-          <Icon name="star" class="text-primary" />
+          <Fa icon={faStar} color="royalblue" />
           <a href="#toggle-more" onclick={toggleMore}>
             {showMore ? $_('profile.phrase.ShowMeLess') : $_('profile.phrase.ShowMeMore')}
           </a>

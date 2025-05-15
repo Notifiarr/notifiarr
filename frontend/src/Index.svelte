@@ -8,7 +8,6 @@
     CardTitle,
     Col,
     Container,
-    Icon,
     Input,
     Modal,
     ModalBody,
@@ -30,6 +29,12 @@
   import { onMount } from 'svelte'
   import { theme as thm } from './includes/theme.svelte'
   import { urlbase } from './api/fetch'
+  import Fa from 'svelte-fa'
+  import {
+    faArrowRotateForward,
+    faArrowRotateLeft,
+    faPowerOff,
+  } from '@fortawesome/free-solid-svg-icons'
 
   let username = ''
   let password = ''
@@ -48,7 +53,8 @@
     if (query.get('lang')) setLocale(query.get('lang')!)
   })
 
-  async function updateBackend() {
+  async function updateBackend(e?: Event) {
+    e?.preventDefault()
     notification = `<span class="text-warning">${$_('phrases.UpdatingBackEnd')}</span>`
     try {
       await profile.refresh()
@@ -86,8 +92,8 @@
     isLoading = false
   }
 
-  const confirmReload = () => (showReloadModal = true)
-  const confirmShutdown = () => (showShutdownModal = true)
+  const confirmReload = (e: Event) => (e.preventDefault(), (showReloadModal = true))
+  const confirmShutdown = (e: Event) => (e.preventDefault(), (showShutdownModal = true))
   $: theme = $thm
 </script>
 
@@ -103,11 +109,12 @@
     <Navbar {theme} class="mb-0 pb-0">
       {#if $profile.loggedIn}
         <span style="position: absolute; right: 0;" class="fs-3">
-          <Icon
-            name="bootstrap-reboot"
-            class="text-success me-1"
-            onclick={confirmReload} />
-          <Icon name="power" class="text-danger me-2" onclick={confirmShutdown} />
+          <a href="#reload" onclick={confirmReload}>
+            <Fa icon={faArrowRotateLeft} color="#33A5A4" class="me-1" />
+          </a>
+          <a href="#shutdown" onclick={confirmShutdown}>
+            <Fa icon={faPowerOff} color="#AA4B65" class="me-2" />
+          </a>
         </span>
       {/if}
       <NavbarBrand href={$urlbase} onclick={e => navigate.goto(e, '')} class="mb-0 pb-0">
@@ -124,7 +131,9 @@
         <Card color="transparent border-0" {theme}>
           <span class="text-nowrap">
             {#if $profile?.loggedIn}
-              <Icon name="arrow-counterclockwise" onclick={updateBackend} />
+              <a href="#reload" onclick={updateBackend}>
+                <Fa icon={faArrowRotateForward} color="#3cd2a5" class="me-1" />
+              </a>
               {#if notification}
                 {@html notification}
               {:else}
