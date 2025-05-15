@@ -123,7 +123,7 @@
   <Row>
     <!-- Navigation Sidebar -->
     <Fade class="sidebar-col col" {isOpen}>
-      <Card body class="sidebar-card" {theme}>
+      <Card body class="sidebar-card mb-2" {theme}>
         <!-- Settings -->
         <p class="navheader">{$_('navigation.titles.Settings')}</p>
         <Nav vertical pills class="nav-custom" {theme}>
