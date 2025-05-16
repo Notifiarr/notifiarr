@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Card, CardHeader, CardBody, Row, Col, Fade } from '@sveltestrap/sveltestrap'
+  import { Card, CardHeader, CardBody, Row, Col } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Input from '../../includes/Input.svelte'
   import T, { _ } from '../../includes/Translate.svelte'
@@ -7,8 +7,9 @@
   import { theme } from '../../includes/theme.svelte'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
-  import Fa from 'svelte-fa'
-  import { faStar, faUnlockAlt } from '@fortawesome/free-solid-svg-icons'
+  import Fa from '../../includes/Fa.svelte'
+  import { faSplotch, faUnlockAlt } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import { slide } from 'svelte/transition'
 
   $: upstreamIp = '<span class="text-danger">' + $profile?.upstreamIp + '</span>' // goes into a translation.
   // Form state, this is what we're sending to the backend.
@@ -71,26 +72,26 @@
     <CardBody>
       <ul class="mb-2 list-unstyled">
         <li>
-          <Fa icon={faStar} color="gray" />
+          <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
           {@html $_('profile.phrase.PasswordOnlyUsed')}
         </li>
         <li>
-          <Fa icon={faStar} color="gray" />
+          <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
           {@html $_('profile.phrase.HeaderOnlyUsed')}
         </li>
         <li>
-          <Fa icon={faStar} color="gray" />
+          <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
           {@html $_('profile.phrase.AuthTypeChange')}
         </li>
         <li>
-          <Fa icon={faStar} color="gray" />
+          <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
           {@html $_('profile.phrase.SeeWikiForAuthProxyHelp')}
         </li>
 
         <!-- Missing/Add upstream section -->
-        {#if !$profile?.upstreamAllowed}
+        {#if $profile?.upstreamAllowed}
           <li>
-            <Fa icon={faStar} color="#AA4B65" />
+            <Fa icon={faSplotch} c1="maroon" c2="salmon" d1="salmon" d2="maroon" />
             <b><T id="profile.phrase.ProxyAuthDisabled" {upstreamIp} /></b>
             <a href="#addit" onclick={addit}>
               {$_('profile.phrase.Addit')}
@@ -100,7 +101,7 @@
 
         <!-- Show more toggle -->
         <li>
-          <Fa icon={faStar} color="royalblue" />
+          <Fa icon={faSplotch} c1="darkblue" d1="lightblue" c2="royalblue" />
           <a href="#toggle-more" onclick={toggleMore}>
             {showMore ? $_('profile.phrase.ShowMeLess') : $_('profile.phrase.ShowMeMore')}
           </a>
@@ -109,17 +110,19 @@
 
       <!-- Show more section -->
       <Row>
-        <Fade isOpen={showMore}>
-          <Card body color="warning-subtle" class="my-1 pb-0">
-            <p>{@html $_('profile.phrase.ShowMoreDesc')}</p>
-            <h5>{$_('profile.authType.options.password')}</h5>
-            <p>{@html $_('profile.authType.option_desc.password')}</p>
-            <h5>{$_('profile.authType.options.header')}</h5>
-            <p>{@html $_('profile.authType.option_desc.header')}</p>
-            <h5>{$_('profile.authType.options.noauth')}</h5>
-            <p>{@html $_('profile.authType.option_desc.noauth')}</p>
-          </Card>
-        </Fade>
+        {#if showMore}
+          <div transition:slide={{ duration: 900 }}>
+            <Card body color="warning-subtle" class="my-1 pb-0">
+              <p>{@html $_('profile.phrase.ShowMoreDesc')}</p>
+              <h5>{$_('profile.authType.options.password')}</h5>
+              <p>{@html $_('profile.authType.option_desc.password')}</p>
+              <h5>{$_('profile.authType.options.header')}</h5>
+              <p>{@html $_('profile.authType.option_desc.header')}</p>
+              <h5>{$_('profile.authType.options.noauth')}</h5>
+              <p>{@html $_('profile.authType.option_desc.noauth')}</p>
+            </Card>
+          </div>
+        {/if}
       </Row>
 
       <!-- Authorization Section -->

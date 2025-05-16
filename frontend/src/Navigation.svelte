@@ -39,7 +39,7 @@
   import { currentLocale, setLocale } from './includes/locale/index.svelte'
   import { Flags } from './includes/locale/index.svelte'
   import { urlbase } from './api/fetch'
-  import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
+  import { faCloudMoonRain, faSun } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import Fa from 'svelte-fa'
 
   $: theme = $thm
@@ -196,7 +196,7 @@
                 </Input>
                 <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
                   <Fa
-                    icon={theme.includes('dark') ? faSun : faMoon}
+                    icon={theme.includes('dark') ? faSun : faCloudMoonRain}
                     class="me-3 text-{theme.includes('dark') ? 'warning' : 'primary'}" />
                   {theme.includes('dark')
                     ? $_('config.titles.Light')

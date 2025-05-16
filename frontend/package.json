@@ -26,10 +26,8 @@
     "vite": "^6.3.1"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-brands-svg-icons": "^6.7.2",
-    "@fortawesome/free-regular-svg-icons": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/sharp-duotone-regular-svg-icons": "^6.7.2",
+    "@fortawesome/sharp-duotone-solid-svg-icons": "^6.7.2",
     "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@sveltestrap/sveltestrap": "^7.1.0",
     "@zerodevx/svelte-toast": "^0.9.6",

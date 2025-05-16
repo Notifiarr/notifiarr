@@ -31,10 +31,10 @@
   import { urlbase } from './api/fetch'
   import Fa from 'svelte-fa'
   import {
-    faArrowRotateForward,
-    faArrowRotateLeft,
+    faArrowsRepeat,
+    faRotate,
     faPowerOff,
-  } from '@fortawesome/free-solid-svg-icons'
+  } from '@fortawesome/sharp-duotone-solid-svg-icons'
 
   let username = ''
   let password = ''
@@ -110,10 +110,18 @@
       {#if $profile.loggedIn}
         <span style="position: absolute; right: 0;" class="fs-3">
           <a href="#reload" onclick={confirmReload}>
-            <Fa icon={faArrowRotateLeft} color="#33A5A4" class="me-1" />
+            <Fa
+              icon={faRotate}
+              primaryColor="#33A000"
+              secondaryColor="#33A5A4"
+              class="me-1" />
           </a>
           <a href="#shutdown" onclick={confirmShutdown}>
-            <Fa icon={faPowerOff} color="#AA4B65" class="me-2" />
+            <Fa
+              icon={faPowerOff}
+              primaryColor="#AA4B65"
+              secondaryColor="red"
+              class="me-2" />
           </a>
         </span>
       {/if}
@@ -132,7 +140,11 @@
           <span class="text-nowrap">
             {#if $profile?.loggedIn}
               <a href="#reload" onclick={updateBackend}>
-                <Fa icon={faArrowRotateForward} color="#3cd2a5" class="me-1" />
+                <Fa
+                  icon={faArrowsRepeat}
+                  secondaryColor="#3cd2a5"
+                  primaryColor="green"
+                  class="me-1" />
               </a>
               {#if notification}
                 {@html notification}

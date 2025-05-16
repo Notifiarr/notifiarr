@@ -11,13 +11,13 @@
   } from '@sveltestrap/sveltestrap'
   import { _ } from './Translate.svelte'
   import type { SvelteComponent } from 'svelte'
+  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import {
-    faCircleDot,
     faEye,
     faEyeSlash,
-    faQuestionCircle,
-  } from '@fortawesome/free-solid-svg-icons'
-  import Fa from 'svelte-fa'
+    faArrowUpFromBracket,
+  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import Fa from './Fa.svelte'
 
   /** Must be unique. Identifies this component. */
   export let id: string
@@ -53,10 +53,8 @@
   let input: SvelteComponent
   let showTooltip = false
 
-  $: icon = showTooltip ? faCircleDot : faQuestionCircle
   $: currType = type
   $: passIcon = currType === 'password' ? faEyeSlash : faEye
-  $: iconClass = showTooltip ? 'text-danger' : 'text-secondary'
   $: placeholder = placeholder == id + '.placeholder' ? undefined : placeholder
 
   function toggleTooltip(e: Event | undefined = undefined) {
@@ -75,8 +73,22 @@
     <Label for={id}>{@html label}</Label>
     <InputGroup>
       {#if tooltip != id + '.tooltip'}
-        <Button color="warning" on:click={toggleTooltip} outline>
-          <Fa {icon} class={iconClass} />
+        <Button color="secondary" on:click={toggleTooltip} outline>
+          {#if showTooltip}
+            <Fa
+              icon={faArrowUpFromBracket}
+              c1="gray"
+              d1="gainsboro"
+              c2="orange"
+              scale="1.5x" />
+          {:else}
+            <Fa
+              icon={faQuestionCircle}
+              c1="gray"
+              d1="gainsboro"
+              c2="orange"
+              scale="1.5x" />
+          {/if}
         </Button>
       {/if}
       <slot name="pre" />
@@ -122,7 +134,13 @@
       <!-- Including a password visibility toggler. -->
       {#if type === 'password'}
         <Button type="button" outline on:click={togglePassword}>
-          <Fa icon={passIcon} class="text-warning" />
+          <Fa
+            icon={passIcon}
+            c1="royalblue"
+            c2="orange"
+            d1="orange"
+            d2="dodgerblue"
+            scale="1.5x" />
         </Button>
       {/if}
       <slot name="post" />

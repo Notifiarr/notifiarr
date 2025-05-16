@@ -19,7 +19,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash \
 
 COPY pkg pkg
 COPY frontend frontend
-RUN go generate ./...
+COPY frontend frontend
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN go generate ./...
 
 ARG TARGETARCH
 

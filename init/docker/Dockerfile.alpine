@@ -17,7 +17,7 @@ RUN go mod download \
 RUN apk add nodejs npm
 COPY pkg pkg
 COPY frontend frontend
-RUN go generate ./...
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN go generate ./...
 
 ARG TARGETARCH
 ARG TARGETOS
