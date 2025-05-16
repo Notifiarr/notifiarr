@@ -8,7 +8,6 @@
     CardTitle,
     Col,
     Container,
-    Icon,
     Input,
     Modal,
     ModalBody,
@@ -30,6 +29,12 @@
   import { onMount } from 'svelte'
   import { theme as thm } from './includes/theme.svelte'
   import { urlbase } from './api/fetch'
+  import Fa from './includes/Fa.svelte'
+  import {
+    faArrowsRepeat,
+    faRotate,
+    faPowerOff,
+  } from '@fortawesome/sharp-duotone-solid-svg-icons'
 
   let username = ''
   let password = ''
@@ -42,22 +47,27 @@
   let showHelpModal = false
   let reload: any
   let shutdown: any
+  let spin = false
 
   onMount(() => {
     const query = new URLSearchParams(window.location.search)
     if (query.get('lang')) setLocale(query.get('lang')!)
   })
 
-  async function updateBackend() {
+  async function updateBackend(e?: Event) {
+    e?.preventDefault()
     notification = `<span class="text-warning">${$_('phrases.UpdatingBackEnd')}</span>`
+    spin = true
     try {
       await profile.refresh()
-      await delay(3456)
+      await delay(2345)
       notification = ''
     } catch (err) {
       notification = `<span class="text-danger">${$_('phrases.FailedToUpdateBackEnd', {
         values: { error: `${err}` },
       })}</span>`
+    } finally {
+      spin = false
     }
   }
 
@@ -86,8 +96,8 @@
     isLoading = false
   }
 
-  const confirmReload = () => (showReloadModal = true)
-  const confirmShutdown = () => (showShutdownModal = true)
+  const confirmReload = (e: Event) => (e.preventDefault(), (showReloadModal = true))
+  const confirmShutdown = (e: Event) => (e.preventDefault(), (showShutdownModal = true))
   $: theme = $thm
 </script>
 
@@ -103,11 +113,18 @@
     <Navbar {theme} class="mb-0 pb-0">
       {#if $profile.loggedIn}
         <span style="position: absolute; right: 0;" class="fs-3">
-          <Icon
-            name="bootstrap-reboot"
-            class="text-success me-1"
-            onclick={confirmReload} />
-          <Icon name="power" class="text-danger me-2" onclick={confirmShutdown} />
+          <a href="#reload" onclick={confirmReload}>
+            <Fa icon={faRotate} c1="#33A000" c2="#33A5A4" class="me-1" />
+          </a>
+          <a href="#shutdown" onclick={confirmShutdown}>
+            <Fa
+              icon={faPowerOff}
+              c1="salmon"
+              c2="maroon"
+              d1="firebrick"
+              d2="palevioletred"
+              class="me-2" />
+          </a>
         </span>
       {/if}
       <NavbarBrand href={$urlbase} onclick={e => navigate.goto(e, '')} class="mb-0 pb-0">
@@ -124,7 +141,9 @@
         <Card color="transparent border-0" {theme}>
           <span class="text-nowrap">
             {#if $profile?.loggedIn}
-              <Icon name="arrow-counterclockwise" onclick={updateBackend} />
+              <a href="#reload" onclick={updateBackend}>
+                <Fa icon={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
+              </a>
               {#if notification}
                 {@html notification}
               {:else}

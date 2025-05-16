@@ -28,9 +28,14 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
+        env:
+          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
         run: |
           # Swagger docs
           go generate ./pkg/bindata/docs
+          # The API defs won't build without a dist folder, and the next step creates it for real.
+          mkdir -p ./frontend/dist
+          echo "Fake frontend build." > ./frontend/dist/index.html
           # API definitions (needs swagger)
           go generate ./frontend/src/api
           # Frontend locales and dist build.

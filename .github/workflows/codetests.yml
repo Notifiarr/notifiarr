@@ -18,11 +18,9 @@ jobs:
         run: |
           # Swagger docs
           go generate ./pkg/bindata/docs
-          # API definitions (needs swagger)
-          go generate ./frontend/src/api
-          # Frontend locales and dist build.
-          go generate ./frontend
-
+          # Fake frontend build.
+          mkdir -p ./frontend/dist
+          echo "Fake frontend build." > ./frontend/dist/index.html
       - name: go-test
         run: |
           go test ./pkg/...
@@ -55,10 +53,9 @@ jobs:
         run: |
           # Swagger docs
           GOOS=darwin go generate ./pkg/bindata/docs
-          # API definitions (needs swagger)
-          GOOS=darwin go generate ./frontend/src/api
-          # Frontend locales and dist build.
-          GOOS=darwin go generate ./frontend
+          # Fake frontend build.
+          mkdir -p ./frontend/dist
+          echo "Fake frontend build." > ./frontend/dist/index.html
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
@@ -80,13 +77,14 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
+        env:
+          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
         run: |
           # Swagger docs
           GOOS=linux go generate ./pkg/bindata/docs
-          # API definitions (needs swagger)
-          GOOS=linux go generate ./frontend/src/api
-          # Frontend locales and dist build.
-          GOOS=linux go generate ./frontend
+          # Fake frontend build.
+          mkdir -p ./frontend/dist
+          echo "Fake frontend build." > ./frontend/dist/index.html
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:

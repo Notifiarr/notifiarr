@@ -13,7 +13,7 @@
     DropdownMenu,
     DropdownItem,
     Input,
-    Icon,
+    Theme,
   } from '@sveltestrap/sveltestrap'
   import { profile } from './api/profile.svelte'
   import { _ } from './includes/Translate.svelte'
@@ -40,6 +40,8 @@
   import { currentLocale, setLocale } from './includes/locale/index.svelte'
   import { Flags } from './includes/locale/index.svelte'
   import { urlbase } from './api/fetch'
+  import { faCloudMoonRain, faSun } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import Fa from 'svelte-fa'
 
   $: theme = $thm
 
@@ -122,7 +124,7 @@
   <Row>
     <!-- Navigation Sidebar -->
     <Fade class="sidebar-col col" {isOpen}>
-      <Card body class="sidebar-card" {theme}>
+      <Card body class="sidebar-card mb-2" {theme}>
         <!-- Settings -->
         <p class="navheader">{$_('navigation.titles.Settings')}</p>
         <Nav vertical pills class="nav-custom" {theme}>
@@ -194,8 +196,8 @@
                   {/each}
                 </Input>
                 <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
-                  <Icon
-                    name={theme.includes('dark') ? 'sun' : 'moon'}
+                  <Fa
+                    icon={theme.includes('dark') ? faSun : faCloudMoonRain}
                     class="me-3 text-{theme.includes('dark') ? 'warning' : 'primary'}" />
                   {theme.includes('dark')
                     ? $_('config.titles.Light')
@@ -214,7 +216,7 @@
     </Fade>
 
     <!-- Content Area -->
-    <Col><svelte:component this={PageComponent} /></Col>
+    <Col><Theme {theme}><svelte:component this={PageComponent} /></Theme></Col>
   </Row>
 </div>
 

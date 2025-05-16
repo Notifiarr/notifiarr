@@ -4,7 +4,6 @@
     Button,
     Card,
     FormGroup,
-    Icon,
     Input,
     InputGroup,
     Label,
@@ -12,6 +11,14 @@
   } from '@sveltestrap/sveltestrap'
   import { _ } from './Translate.svelte'
   import type { SvelteComponent } from 'svelte'
+  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import {
+    faEye,
+    faEyeSlash,
+    faArrowUpFromBracket,
+  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import Fa from './Fa.svelte'
+  import { slide } from 'svelte/transition'
 
   /** Must be unique. Identifies this component. */
   export let id: string
@@ -47,10 +54,8 @@
   let input: SvelteComponent
   let showTooltip = false
 
-  $: icon = showTooltip ? 'dash-circle' : 'question-circle'
   $: currType = type
-  $: passIcon = currType === 'password' ? 'eye-slash' : 'eye'
-  $: iconClass = showTooltip ? 'text-danger' : 'text-secondary'
+  $: passIcon = currType === 'password' ? faEyeSlash : faEye
   $: placeholder = placeholder == id + '.placeholder' ? undefined : placeholder
 
   function toggleTooltip(e: Event | undefined = undefined) {
@@ -69,8 +74,22 @@
     <Label for={id}>{@html label}</Label>
     <InputGroup>
       {#if tooltip != id + '.tooltip'}
-        <Button color="warning" on:click={toggleTooltip} outline>
-          <Icon class={iconClass} name={icon} />
+        <Button color="secondary" on:click={toggleTooltip} outline>
+          {#if showTooltip}
+            <Fa
+              icon={faArrowUpFromBracket}
+              c1="gray"
+              d1="gainsboro"
+              c2="orange"
+              scale="1.5x" />
+          {:else}
+            <Fa
+              icon={faQuestionCircle}
+              c1="gray"
+              d1="gainsboro"
+              c2="orange"
+              scale="1.5x" />
+          {/if}
         </Button>
       {/if}
       <slot name="pre" />
@@ -116,16 +135,24 @@
       <!-- Including a password visibility toggler. -->
       {#if type === 'password'}
         <Button type="button" outline on:click={togglePassword}>
-          <Icon class="text-warning" name={passIcon} />
+          <Fa
+            icon={passIcon}
+            c1="royalblue"
+            c2="orange"
+            d1="orange"
+            d2="dodgerblue"
+            scale="1.5x" />
         </Button>
       {/if}
       <slot name="post" />
     </InputGroup>
 
     {#if showTooltip}
-      <Card body class="mt-1" color="warning" outline>
-        <p class="mb-0">{@html tooltip}</p>
-      </Card>
+      <div transition:slide>
+        <Card body class="mt-1" color="warning" outline>
+          <p class="mb-0">{@html tooltip}</p>
+        </Card>
+      </div>
     {/if}
 
     {#if description}
