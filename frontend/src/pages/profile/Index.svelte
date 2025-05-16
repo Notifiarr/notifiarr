@@ -4,7 +4,6 @@
   import Input from '../../includes/Input.svelte'
   import T, { _ } from '../../includes/Translate.svelte'
   import { AuthType as Auth } from '../../api/notifiarrConfig'
-  import { theme } from '../../includes/theme.svelte'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
   import Fa from '../../includes/Fa.svelte'
@@ -61,7 +60,7 @@
     false
 </script>
 
-<Card class="mb-2" theme={$theme}>
+<Card class="mb-2">
   <CardHeader>
     <h2><Fa icon={faUnlockAlt} /> {$_('navigation.titles.TrustProfile')}</h2>
     <p class="text-muted">{@html $_('profile.phrase.ProfileDescription')}</p>

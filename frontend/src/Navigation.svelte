@@ -13,6 +13,7 @@
     DropdownMenu,
     DropdownItem,
     Input,
+    Theme,
   } from '@sveltestrap/sveltestrap'
   import { profile } from './api/profile.svelte'
   import { _ } from './includes/Translate.svelte'
@@ -215,7 +216,7 @@
     </Fade>
 
     <!-- Content Area -->
-    <Col><svelte:component this={PageComponent} /></Col>
+    <Col><Theme {theme}><svelte:component this={PageComponent} /></Theme></Col>
   </Row>
 </div>
 

@@ -29,7 +29,7 @@
   import { onMount } from 'svelte'
   import { theme as thm } from './includes/theme.svelte'
   import { urlbase } from './api/fetch'
-  import Fa from 'svelte-fa'
+  import Fa from './includes/Fa.svelte'
   import {
     faArrowsRepeat,
     faRotate,
@@ -47,6 +47,7 @@
   let showHelpModal = false
   let reload: any
   let shutdown: any
+  let spin = false
 
   onMount(() => {
     const query = new URLSearchParams(window.location.search)
@@ -56,14 +57,17 @@
   async function updateBackend(e?: Event) {
     e?.preventDefault()
     notification = `<span class="text-warning">${$_('phrases.UpdatingBackEnd')}</span>`
+    spin = true
     try {
       await profile.refresh()
-      await delay(3456)
+      await delay(2345)
       notification = ''
     } catch (err) {
       notification = `<span class="text-danger">${$_('phrases.FailedToUpdateBackEnd', {
         values: { error: `${err}` },
       })}</span>`
+    } finally {
+      spin = false
     }
   }
 
@@ -110,17 +114,15 @@
       {#if $profile.loggedIn}
         <span style="position: absolute; right: 0;" class="fs-3">
           <a href="#reload" onclick={confirmReload}>
-            <Fa
-              icon={faRotate}
-              primaryColor="#33A000"
-              secondaryColor="#33A5A4"
-              class="me-1" />
+            <Fa icon={faRotate} c1="#33A000" c2="#33A5A4" class="me-1" />
           </a>
           <a href="#shutdown" onclick={confirmShutdown}>
             <Fa
               icon={faPowerOff}
-              primaryColor="#AA4B65"
-              secondaryColor="red"
+              c1="salmon"
+              c2="maroon"
+              d1="firebrick"
+              d2="palevioletred"
               class="me-2" />
           </a>
         </span>
@@ -140,11 +142,7 @@
           <span class="text-nowrap">
             {#if $profile?.loggedIn}
               <a href="#reload" onclick={updateBackend}>
-                <Fa
-                  icon={faArrowsRepeat}
-                  secondaryColor="#3cd2a5"
-                  primaryColor="green"
-                  class="me-1" />
+                <Fa icon={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
               </a>
               {#if notification}
                 {@html notification}

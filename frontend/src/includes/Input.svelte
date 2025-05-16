@@ -18,6 +18,7 @@
     faArrowUpFromBracket,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import Fa from './Fa.svelte'
+  import { slide } from 'svelte/transition'
 
   /** Must be unique. Identifies this component. */
   export let id: string
@@ -147,9 +148,11 @@
     </InputGroup>
 
     {#if showTooltip}
-      <Card body class="mt-1" color="warning" outline>
-        <p class="mb-0">{@html tooltip}</p>
-      </Card>
+      <div transition:slide>
+        <Card body class="mt-1" color="warning" outline>
+          <p class="mb-0">{@html tooltip}</p>
+        </Card>
+      </div>
     {/if}
 
     {#if description}
