@@ -1,6 +1,7 @@
 #!/bin/sh
 # This vendors all the notifiarr dependencies so we can parse their docs.
 
+set -e
 # This variable is used by the generate.go file.
 export VENDOR_DIR=../../../vendor
 [ ! -d "${VENDOR_DIR}" ] || EXISTS="true"

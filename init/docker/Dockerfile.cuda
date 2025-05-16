@@ -20,7 +20,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash \
 COPY pkg pkg
 COPY frontend frontend
 COPY frontend frontend
-RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN go generate ./...
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN \
+    go generate ./pkg/bindata/docs \
+    mkdir -p ./frontend/dist \
+    echo "Fake frontend build." > ./frontend/dist/index.html \
+    go generate ./frontend/src/api \
+    go generate ./frontend
 
 ARG TARGETARCH
 
