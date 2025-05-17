@@ -23,9 +23,12 @@
   import { slide } from 'svelte/transition'
   import Header from '../../includes/Header.svelte'
 
-  $: upstreamIp = '<span class="text-danger">' + $profile?.upstreamIp + '</span>' // goes into a translation.
+  // goes into a translation.
+  const upstreamIp = $derived(
+    '<span class="text-danger">' + $profile?.upstreamIp + '</span>',
+  )
   // Form state, this is what we're sending to the backend.
-  $: form = {
+  const form = $state({
     username: $profile?.username || '',
     password: '',
     authType: $profile?.upstreamType || Auth.password,
@@ -34,9 +37,9 @@
     header: $profile?.config.uiPassword.startsWith('webauth:')
       ? $profile?.config.uiPassword.split(':')[1]
       : '',
-  }
+  })
 
-  let showMore = false
+  let showMore = $state(false)
   const toggleMore = (e: Event) => (e.preventDefault(), (showMore = !showMore))
 
   async function submit(e: Event) {
@@ -55,22 +58,24 @@
   // Clear the status messages when the component unmounts.
   onMount(() => () => profile.clearStatus())
 
-  $: saveDisabled =
+  const saveDisabled =
     // If current auth type is password, make sure their password is entered.
-    ($profile?.upstreamType === Auth.password &&
-      (!form.password || form.password.length < 9)) ||
-    // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
-    (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
-    // Make sure they picked a header if header auth type is selected.
-    (form.authType === Auth.header && !form.header) ||
-    // Make sure they didn't enter a username that's not allowed.
-    form.username == 'webauth' ||
-    form.username == 'noauth' ||
-    form.username.includes(':') ||
-    // Cannot click save while the form is submitting.
-    (profile.status != '' && !profile.success) ||
-    // Enable the save button.
-    false
+    $derived(
+      ($profile?.upstreamType === Auth.password &&
+        (!form.password || form.password.length < 9)) ||
+        // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
+        (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
+        // Make sure they picked a header if header auth type is selected.
+        (form.authType === Auth.header && !form.header) ||
+        // Make sure they didn't enter a username that's not allowed.
+        form.username == 'webauth' ||
+        form.username == 'noauth' ||
+        form.username.includes(':') ||
+        // Cannot click save while the form is submitting.
+        (profile.status != '' && !profile.success) ||
+        // Enable the save button.
+        false,
+    )
 </script>
 
 <Header {page} />
@@ -134,7 +139,7 @@
     </Row>
 
     <!-- Authorization Section -->
-    <h3 class="my-2">{$_('profile.title.Authorization')}</h3>
+    <h4 class="my-2">{$_('profile.title.Authorization')}</h4>
     <Row>
       <Col md={6}>
         <Input
@@ -167,7 +172,7 @@
     <!-- We use a form here so you can press enter in a password field to save. -->
     <!-- Authentication Section -->
     {#if form.authType !== Auth.noauth}
-      <h3 class="mb-2">{$_('profile.title.Authentication')}</h3>
+      <h4 class="mb-2">{$_('profile.title.Authentication')}</h4>
       {#if form.authType === Auth.header}
         <Row>
           <Col md={8}>
@@ -238,10 +243,5 @@
 <style>
   .fortune {
     white-space: pre-wrap;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    font-weight: 500;
   }
 </style>

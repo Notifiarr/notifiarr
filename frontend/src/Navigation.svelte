@@ -38,7 +38,7 @@
   let isOpen = $derived(windowWidth >= 992)
   // Used to navigate.
   const activePage = writable('')
-  let ActivePage = $state(Landing)
+  let ActivePage = $state(Landing as Component)
 
   /**
    * Used to navigate to a page.
@@ -108,7 +108,7 @@
   import { faStarship, faSun } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import Fa from './includes/Fa.svelte'
   import { slide } from 'svelte/transition'
-  import { onMount } from 'svelte'
+  import { onMount, type Component } from 'svelte'
 
   let theme = $derived($thm)
   let newLang = $derived(currentLocale())

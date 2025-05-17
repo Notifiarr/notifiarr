@@ -78,3 +78,8 @@ body.dark-mode {
 .text-notifiarr {
   color: #3cd2a5 !important;
 }
+
+h4 {
+  font-size: 1.5rem !important;
+  font-weight: 450 !important;
+}

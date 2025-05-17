@@ -14,10 +14,11 @@
   import { CardBody } from '@sveltestrap/sveltestrap'
   import { profile } from './api/profile.svelte'
   import Header from './includes/Header.svelte'
+  import T from './includes/Translate.svelte'
 </script>
 
 <Header {page} />
 <CardBody>
-  <h4>Welcome, {$profile?.username}!</h4>
-  <p>Select a section from the navigation menu to get started.</p>
+  <h4><T id="phrases.Landing.Welcome" username={$profile?.username} /></h4>
+  <p><T id="phrases.Landing.SelectASection" /></p>
 </CardBody>

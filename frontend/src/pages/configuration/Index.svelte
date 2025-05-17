@@ -20,10 +20,12 @@
   import Header from '../../includes/Header.svelte'
 
   // Local state that syncs with profile store.
-  $: c = { ...$profile.config }
+  const c = $derived({ ...$profile.config })
   // Convert array to newline-separated string for textarea
-  $: extraKeys = (c.extraKeys?.join('\n') || '') + '\n'
-  $: rows = extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length
+  let extraKeys = $derived(c.extraKeys?.join('\n') || '')
+  const rows = $derived(
+    extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length,
+  )
 
   // Handle form submission
   function submit() {
@@ -38,13 +40,13 @@
 <Header {page} badge={$_('phrases.Version', { values: { version: c.version } })} />
 <CardBody>
   <!-- General Section -->
-  <h3 class="mb-2">{$_('config.titles.General')}</h3>
+  <h4 class="mb-2">{$_('config.titles.General')}</h4>
   <Input id="config.apiKey" type="password" bind:value={c.apiKey} />
   <Input id="config.extraKeys" type="textarea" bind:value={extraKeys} {rows} />
   <Input id="config.hostId" bind:value={c.hostId} />
 
   <!-- Network Section -->
-  <h3 class="mb-2">{$_('config.titles.Network')}</h3>
+  <h4 class="mb-2">{$_('config.titles.Network')}</h4>
   <Row>
     <Col md={6}>
       <Input id="config.bindAddr" bind:value={c.bindAddr} />
@@ -73,7 +75,7 @@
   </Row>
 
   <!-- System Section -->
-  <h3 class="mb-2">{$_('config.titles.System')}</h3>
+  <h4 class="mb-2">{$_('config.titles.System')}</h4>
   <Row>
     <Col md={4}>
       <Input id="config.serial" type="select" bind:value={c.serial} />
@@ -119,7 +121,7 @@
   </Row>
 
   <!-- SSL Section -->
-  <h3 class="mb-2">{$_('config.titles.SSLConfiguration')}</h3>
+  <h4 class="mb-2">{$_('config.titles.SSLConfiguration')}</h4>
   <Row>
     <Col md={6}>
       <Input id="config.sslKeyFile" bind:value={c.sslKeyFile} />
@@ -130,7 +132,7 @@
   </Row>
 
   <!-- Services Section -->
-  <h3 class="mb-2">{$_('config.titles.Services')}</h3>
+  <h4 class="mb-2">{$_('config.titles.Services')}</h4>
   <Row>
     <Col md={4}>
       <Input
@@ -167,7 +169,7 @@
   </Row>
 
   <!-- Logging Section -->
-  <h3 class="mb-2">{$_('config.titles.Logging')}</h3>
+  <h4 class="mb-2">{$_('config.titles.Logging')}</h4>
   <Row>
     <Col md={6}>
       <Input id="config.logFile" bind:value={c.logFile} />

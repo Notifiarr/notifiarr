@@ -53,7 +53,11 @@
     "ShutdownSuccess": "Shutdown successful! Client stopped.",
     "FailedToShutdown": "Failed to shutdown: {error} - Try reloading the page.",
     "LoginHelp": "Login Help",
-    "LoginHelpBody": "If you've forgotten your password, please see the <a href='https://notifiarr.wiki/pages/client/gui/#forgotten-passwords' target='_new'>forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key."
+    "LoginHelpBody": "If you've forgotten your password, please see the <a href='https://notifiarr.wiki/pages/client/gui/#forgotten-passwords' target='_new'>forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key.",
+    "Landing": {
+      "SelectASection": "Select a section from the navigation menu to get started.",
+      "Welcome": "Welcome, {username}!"
+    }
   },
   "navigation": {
     "titles": {
@@ -286,10 +290,10 @@
   "profile": {
     "title": { "Authentication": "Authentication", "Authorization": "Authorization" },
     "phrase": {
-      "ShowMoreDesc": "Three auth types are currently supported. Auth Proxy and No Password are only available if the current request comes from a valid, configured upstream IP address.",
-      "PasswordOnlyUsed": "Username and Password are only used if Auth Type is set to Password.",
-      "HeaderOnlyUsed": "Auth Header is only used if Auth Type is <b>not</b> set to Password.",
-      "AuthTypeChange": "If Auth Type changes, log out to complete the process.",
+      "ShowMoreDesc": "Three authentication types are currently supported. Auth Proxy and No Password are only available if the current request comes from a valid, configured upstream IP address.",
+      "PasswordOnlyUsed": "Username and Password are only used if Authentication Type is set to Password.",
+      "HeaderOnlyUsed": "Auth Header is only used if Authentication Type is <b>not</b> set to Password.",
+      "AuthTypeChange": "If Authentication Type changes, log out to complete the process.",
       "ProfileUpdated": "Profile updated successfully {age} ago!",
       "EnterCurrentPassword": "Enter your current password to make changes.",
       "ProxyAuthDisabled": "Proxy authentication is disabled because your upstream ({upstreamIp}) is not in the allowed upstreams list.",
@@ -299,7 +303,7 @@
       "ShowMeLess": "Show me less."
     },
     "authType": {
-      "label": "Auth Type",
+      "label": "Authentication Type",
       "description": "Select how to authenticate with the client",
       "options": {
         "password": "Password: Local Username",
@@ -307,9 +311,9 @@
         "noauth": "No Password (danger)"
       },
       "option_desc": {
-        "password": " This is the default auth type. Select the Password option to log into this application with a configured username and password. Only 1 username and password is supported. When selecting this option, you must fill in the username and new password fields. If this is the current auth type you must also fill in the current password field to make changes.",
+        "password": " This is the default authentication type. Select the Password option to log into this application with a configured username and password. Only 1 username and password is supported. When selecting this option, you must fill in the username and new password fields. If this is the current authentication type you must also fill in the current password field to make changes.",
         "header": "Select this option to log into this application using an HTTP header that contains a username. This is commonly known as proxy authentication. We have <a href='https://notifiarr.wiki/pages/client/reverseProxy/' target='_new'>a wiki page</a> that provides instructions to configure Nginx for this feature. When selecting this option, you must also select a header for the auth proxy. If no headers are displayed, then no valid headers were provided by the upstream proxy.",
-        "noauth": "This configuration is not recommended. The No Password auth type allows any request from any configured <code>upstream IP</code>. It also works with an auth proxy to set the username. If no username is in the provided header, then it defaults to admin."
+        "noauth": "This configuration is not recommended. The No Password authentication type allows any request from any configured <code>upstream IP</code>. It also works with an auth proxy to set the username. If no username is in the provided header, then it defaults to admin."
       }
     },
     "upstreams": {
@@ -321,7 +325,7 @@
     "header": {
       "label": "Auth Header",
       "description": "Select the header containing your username",
-      "tooltip": "This displays headers that are provided by the client or upstream that may be used for proxy authentication. This selection is used if Auth Type is set to Header. Choose the header that displays your proper username."
+      "tooltip": "This displays headers that are provided by the client or upstream that may be used for proxy authentication. This selection is used if Authentication Type is set to Header. Choose the header that displays your proper username."
     },
     "username": {
       "label": "Username",
