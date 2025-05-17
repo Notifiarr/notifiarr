@@ -18,7 +18,7 @@
     Row,
     Spinner,
   } from '@sveltestrap/sveltestrap'
-  import logo from './assets/notifiarr.svg'
+  import logo from './assets/notifiarr.svg?inline'
   import { profile } from './api/profile.svelte'
   import Navigation, { goto } from './Navigation.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'

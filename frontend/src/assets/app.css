@@ -25,7 +25,7 @@ body {
 }
 
 body {
-  background-image: url(/src/assets/lightbg.svg);
+  background-image: url(lightbg.svg?inline);
   background-color: #b9c8f3;
   background-position: center;
   background-attachment: fixed;
@@ -36,14 +36,14 @@ body {
 
 body.dark-mode {
   transition: background-image 0.4s;
-  background-image: url(/src/assets/darkbg.svg);
+  background-image: url(darkbg.svg?inline);
   background-color: #1d3040;
 }
 
 /* https://www.fontshungry.com/beleren-font-family/ */
 @font-face {
   font-family: notifiarrFont;
-  src: url(/src/assets/fonts/Beleren2016SmallCaps-Bold.ttf);
+  src: url(fonts/Beleren2016SmallCaps-Bold.ttf?inline);
 }
 
 .title-notifiarr {
