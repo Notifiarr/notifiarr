@@ -36,7 +36,6 @@
     "ConfigurationSavedReloading": "Configuration saved! Reloading client...",
     "ConfigurationSaved": "Configuration saved {age} ago!",
     "SavingConfiguration": "Saving configuration...",
-    "ConfigureNotifiarrClientSettings": "Configure your Notifiarr client settings here.",
     "Version": "Version {version}",
     "Every12Hours": "Every 12 hours",
     "Every6Hours": "Every 6 hours",
@@ -60,7 +59,6 @@
     "titles": {
       "Settings": "Settings",
       "Insights": "Insights",
-      "Home": "Home",
       "Configuration": "Configuration",
       "SiteTunnel": "Site Tunnel",
       "StarrApps": "Starr Apps",
@@ -78,7 +76,27 @@
       "LogFiles": "Log Files",
       "System": "System",
       "TrustProfile": "Trust Profile",
-      "Landing": "Landing"
+      "Landing": "Notifiarr Home"
+    },
+    "pageDescription": {
+      "Configuration": "Configure your Notifiarr client settings here.",
+      "SiteTunnel": "Select primary and secondary tunnel servers.",
+      "StarrApps": "Setup Starr integrations.",
+      "Downloaders": "Manage download clients.",
+      "MediaApps": "Manage media players and related services.",
+      "SnapshotApps": "Configure system snapshots.",
+      "FileWatcher": "Watch for file changes and trigger actions.",
+      "Endpoints": "Configure relay endpoints, timers and triggers.",
+      "Commands": "Set up and execute custom commands and scripts.",
+      "Services": "Set up and monitor network devices and services.",
+      "Triggers": "View and execute configured triggers.",
+      "Integrations": "View action statistics and for all integrations.",
+      "Monitoring": "View service and network health.",
+      "Metrics": "View metric totals for client configurations.",
+      "LogFiles": "View and manage client log files.",
+      "System": "View system and client information and.",
+      "TrustProfile": "Configure how you log into this Notifiarr client application.",
+      "Landing": "This is the greatest place on Earth!"
     }
   },
   "config": {
@@ -268,7 +286,6 @@
   "profile": {
     "title": { "Authentication": "Authentication", "Authorization": "Authorization" },
     "phrase": {
-      "ProfileDescription": "This page controls how you log into this Notifiarr client application.",
       "ShowMoreDesc": "Three auth types are currently supported. Auth Proxy and No Password are only available if the current request comes from a valid, configured upstream IP address.",
       "PasswordOnlyUsed": "Username and Password are only used if Auth Type is set to Password.",
       "HeaderOnlyUsed": "Auth Header is only used if Auth Type is <b>not</b> set to Password.",

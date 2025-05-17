@@ -1,3 +1,60 @@
+<script lang="ts" module>
+  import { urlbase } from './api/fetch'
+
+  // Page structure for navigation with icons
+  // id (from page) used for navigation AND translations.
+  const settings = [
+    { component: Configuration, ...ConfigP },
+    { component: SiteTunnel, ...SiteTunnelP },
+    { component: StarrApps, ...StarrAppsP },
+    { component: DownloadApps, ...DownloadAppsP },
+    { component: MediaApps, ...MediaAppsP },
+    { component: SnapshotApps, ...SnapshotAppsP },
+    { component: FileWatcher, ...FileWatcherPage },
+    { component: Endpoints, ...EndpointsPage },
+    { component: Commands, ...CommandsPage },
+    { component: ServiceChecks, ...ServicesP },
+  ]
+  const insights = [
+    { component: Triggers, ...TriggersP },
+    { component: Integrations, ...IntegrationsP },
+    { component: Monitoring, ...MonitoringP },
+    { component: Metrics, ...MetricsP },
+    { component: LogFiles, ...LogFilesP },
+    { component: System, ...SystemP },
+  ]
+  const others = [
+    { component: Profile, ...ProfilePage },
+    { component: Landing, ...LandingPage },
+  ]
+
+  // Used for sidebar collapse state.
+  let windowWidth = $state(1000)
+  let isOpen = $derived(windowWidth >= 992)
+  // Used to navigate.
+  const parts = $derived(ltrim(window.location.pathname, get(urlbase)).split('/'))
+  let activePage = $derived(parts.length > 0 ? parts[0] : '')
+
+  /**
+   * Used to navigate to a page.
+   * @param event - from an onclick handler
+   * @param pageId - the id of the page to navigate to, ie profile, configuration, etc.
+   */
+  export function goto(event: Event | null, pid: string, subPages: string[] = []): void {
+    event?.preventDefault()
+    if (settings.concat(insights, others).find(p => p.id === pid)) activePage = pid
+    else activePage = ''
+
+    const query = new URLSearchParams(window.location.search)
+    const params = query.toString()
+    const uri = `${get(urlbase)}${[pid, ...subPages].join('/').toLowerCase()}${params ? `?${params}` : ''}`
+    // TODO: track and make back button work.
+    window.history.replaceState({}, activePage, uri)
+    // Auto-collapse sidebar on mobile after navigation
+    isOpen = windowWidth >= 992
+  }
+</script>
+
 <script lang="ts">
   import {
     Card,
@@ -7,7 +64,6 @@
     Row,
     Col,
     Button,
-    Fade,
     Dropdown,
     DropdownToggle,
     DropdownMenu,
@@ -17,98 +73,42 @@
   } from '@sveltestrap/sveltestrap'
   import { profile } from './api/profile.svelte'
   import { _ } from './includes/Translate.svelte'
-  import Configuration from './pages/configuration/Index.svelte'
-  import SiteTunnel from './pages/siteTunnel/Index.svelte'
-  import StarrApps from './pages/starrApps/Index.svelte'
-  import DownloadApps from './pages/downloadApps/Index.svelte'
-  import MediaApps from './pages/mediaApps/Index.svelte'
-  import SnapshotApps from './pages/snapshotApps/Index.svelte'
-  import FileWatcher from './pages/fileWatcher/Index.svelte'
-  import Endpoints from './pages/endpoints/Index.svelte'
-  import Commands from './pages/commands/Index.svelte'
-  import ServiceChecks from './pages/serviceChecks/Index.svelte'
-  import Triggers from './pages/triggers/Index.svelte'
-  import Integrations from './pages/integrations/Index.svelte'
-  import Monitoring from './pages/monitoring/Index.svelte'
-  import Metrics from './pages/metrics/Index.svelte'
-  import LogFiles from './pages/logFiles/Index.svelte'
-  import System from './pages/system/Index.svelte'
-  import Profile from './pages/profile/Index.svelte'
-  import Landing from './Landing.svelte'
+  import Configuration, { page as ConfigP } from './pages/configuration/Index.svelte'
+  import SiteTunnel, { page as SiteTunnelP } from './pages/siteTunnel/Index.svelte'
+  import StarrApps, { page as StarrAppsP } from './pages/starrApps/Index.svelte'
+  import DownloadApps, { page as DownloadAppsP } from './pages/downloadApps/Index.svelte'
+  import MediaApps, { page as MediaAppsP } from './pages/mediaApps/Index.svelte'
+  import SnapshotApps, { page as SnapshotAppsP } from './pages/snapshotApps/Index.svelte'
+  import FileWatcher, { page as FileWatcherPage } from './pages/fileWatcher/Index.svelte'
+  import Endpoints, { page as EndpointsPage } from './pages/endpoints/Index.svelte'
+  import Commands, { page as CommandsPage } from './pages/commands/Index.svelte'
+  import ServiceChecks, { page as ServicesP } from './pages/serviceChecks/Index.svelte'
+  import Triggers, { page as TriggersP } from './pages/triggers/Index.svelte'
+  import Integrations, { page as IntegrationsP } from './pages/integrations/Index.svelte'
+  import Monitoring, { page as MonitoringP } from './pages/monitoring/Index.svelte'
+  import Metrics, { page as MetricsP } from './pages/metrics/Index.svelte'
+  import LogFiles, { page as LogFilesP } from './pages/logFiles/Index.svelte'
+  import System, { page as SystemP } from './pages/system/Index.svelte'
+  import Profile, { page as ProfilePage } from './pages/profile/Index.svelte'
+  import Landing, { page as LandingPage } from './Landing.svelte'
   import { ltrim } from './includes/util'
   import { theme as thm } from './includes/theme.svelte'
   import { currentLocale, setLocale } from './includes/locale/index.svelte'
   import { Flags } from './includes/locale/index.svelte'
-  import { urlbase } from './api/fetch'
-  import { faCloudMoonRain, faSun } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import Fa from 'svelte-fa'
+  import { faStarship, faSun } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import Fa from './includes/Fa.svelte'
+  import { slide } from 'svelte/transition'
+  import { get } from 'svelte/store'
 
-  $: theme = $thm
-
-  // Page structure for navigation with icons
-  // id used for navigation AND translations.
-  const settings = [
-    { component: Configuration, id: 'Configuration', icon: '⚙️' },
-    { component: SiteTunnel, id: 'SiteTunnel', icon: '🔐' },
-    { component: StarrApps, id: 'StarrApps', icon: '✨' },
-    { component: DownloadApps, id: 'Downloaders', icon: '📥' },
-    { component: MediaApps, id: 'MediaApps', icon: '🎬' },
-    { component: SnapshotApps, id: 'SnapshotApps', icon: '📸' },
-    { component: FileWatcher, id: 'FileWatcher', icon: '👁️' },
-    { component: Endpoints, id: 'Endpoints', icon: '🔌' },
-    { component: Commands, id: 'Commands', icon: '🖥️' },
-    { component: ServiceChecks, id: 'Services', icon: '✓' },
-  ]
-
-  const insights = [
-    { component: Triggers, id: 'Triggers', icon: '⚡' },
-    { component: Integrations, id: 'Integrations', icon: '🔗' },
-    { component: Monitoring, id: 'Monitoring', icon: '📊' },
-    { component: Metrics, id: 'Metrics', icon: '📈' },
-    { component: LogFiles, id: 'LogFiles', icon: '📝' },
-    { component: System, id: 'System', icon: '🖧' },
-  ]
-
-  const others = [
-    { component: Profile, id: 'TrustProfile', icon: '👤' },
-    { component: Landing, id: '', icon: '🏠' },
-  ]
-
-  /**
-   * Used to navigate to a page.
-   * @param event - from an onclick handler
-   * @param pageId - the id of the page to navigate to, ie profile, configuration, etc.
-   */
-  export function goto(event: Event, pid: string, subPages: string[] = []): void {
-    event.preventDefault()
-    pid = pid.toLowerCase()
-    if (settings.concat(insights, others).find(p => p.id.toLowerCase() === pid))
-      activePage = pid
-    else activePage = ''
-
-    const query = new URLSearchParams(window.location.search)
-    const params = query.toString()
-    const uri = `${$urlbase}${[pid, ...subPages].join('/')}${params ? `?${params}` : ''}`
-    window.history.replaceState({}, '', uri)
-    // Auto-collapse sidebar on mobile after navigation
-    isOpen = windowWidth >= 992
-  }
-
-  // Used to auto-navigate.
-  $: parts = ltrim(ltrim(window.location.pathname, $urlbase), '/').split('/')
-  $: activePage = parts.length > 0 ? parts[0] : ''
-  // Used for the language dropdown.
-  $: locale = $profile.languages?.[currentLocale()]?.[currentLocale()]?.self
-  $: newLang = currentLocale()
-
-  // Used for sidebar collapse state.
-  let windowWidth = 1000
-  $: isOpen = windowWidth >= 992
-
+  let theme = $derived($thm)
+  let newLang = $derived(currentLocale())
   // Set the component based on the active page. Dig it out of settings, others and insights.
-  $: PageComponent =
-    settings.concat(insights, others).find(page => page.id.toLowerCase() === activePage)
-      ?.component || Landing
+  const Page = $derived(
+    settings
+      .concat(insights, others)
+      .find(page => page.id.toLowerCase() === activePage.toLowerCase())?.component ||
+      Landing,
+  )
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} />
@@ -116,107 +116,123 @@
 <div class="navigation">
   <!-- Mobile Menu Toggle Button -->
   <Card color="warning" {theme} class="menu-toggle-wrapper d-lg-none mb-2 p-0" outline>
-    <Button size="sm" class="menu-toggle-button my-0" on:click={() => (isOpen = !isOpen)}>
+    <Button size="sm" class="menu-toggle-button my-0" onclick={() => (isOpen = !isOpen)}>
       {isOpen ? `✕ ${$_('phrases.HideMenu')}` : `☰ ${$_('phrases.ShowMenu')}`}
     </Button>
   </Card>
 
   <Row>
     <!-- Navigation Sidebar -->
-    <Fade class="sidebar-col col" {isOpen}>
-      <Card body class="sidebar-card mb-2" {theme}>
-        <!-- Settings -->
-        <p class="navheader">{$_('navigation.titles.Settings')}</p>
-        <Nav vertical pills class="nav-custom" {theme}>
-          {#each settings as page}
-            {@const pid = page.id.toLowerCase()}
-            <NavItem>
-              <NavLink
-                href={$urlbase + pid}
-                class="nav-link-custom"
-                active={activePage === pid}
-                on:click={e => goto(e, pid)}>
-                <span class="nav-icon">{page.icon}</span>
-                <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
-              </NavLink>
-            </NavItem>
-          {/each}
-        </Nav>
-
-        <div class="section-divider"></div>
-
-        <!-- Insights -->
-        <p class="navheader">{$_('navigation.titles.Insights')}</p>
-        <Nav vertical pills class="nav-custom" {theme}>
-          {#each insights as page}
-            {@const pid = page.id.toLowerCase()}
-            <NavItem>
-              <NavLink
-                href={$urlbase + pid}
-                class="nav-link-custom"
-                active={activePage === pid}
-                on:click={e => goto(e, pid)}>
-                <span class="nav-icon">{page.icon}</span>
-                <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
-              </NavLink>
-            </NavItem>
-          {/each}
-        </Nav>
-
-        <!-- Profile Dropdown -->
-        <div class="mt-auto pt-2">
-          <div class="section-divider"></div>
+    {#if isOpen}
+      <div class="sidebar-col col mb-2" transition:slide={{ duration: 475, axis: 'x' }}>
+        <Card body class="sidebar-card pb-2" {theme}>
+          <!-- Settings -->
+          <p class="navheader">{$_('navigation.titles.Settings')}</p>
           <Nav vertical pills class="nav-custom" {theme}>
-            <Dropdown nav direction="up" class="ms-0">
-              <DropdownToggle
-                nav
-                class="dropdown-custom {activePage === 'trustprofile' ? 'active' : ''}">
-                <span class="text-uppercase profile-icon">
-                  {$profile.username.charAt(0).toUpperCase()}
-                </span>
-                <span>{$profile.username}</span>
-              </DropdownToggle>
-              <DropdownMenu>
-                <DropdownItem
+            {#each settings as page}
+              <NavItem>
+                <NavLink
+                  href={$urlbase + page.id}
                   class="nav-link-custom"
-                  active={activePage === 'trustprofile'}
-                  onclick={e => goto(e, 'trustprofile')}>
-                  <span class="nav-icon">👤</span>
-                  <span class="nav-text">{$_('navigation.titles.TrustProfile')}</span>
-                </DropdownItem>
-                <Input
-                  class="my-1 lang-select"
-                  type="select"
-                  bind:value={newLang}
-                  onchange={() => setLocale(newLang)}>
-                  {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
-                    <option value={code} selected={code === currentLocale()}>
-                      {Flags[code]}&nbsp;&nbsp; {lang.name}
-                    </option>
-                  {/each}
-                </Input>
-                <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
-                  <Fa
-                    icon={theme.includes('dark') ? faSun : faCloudMoonRain}
-                    class="me-3 text-{theme.includes('dark') ? 'warning' : 'primary'}" />
-                  {theme.includes('dark')
-                    ? $_('config.titles.Light')
-                    : $_('config.titles.Dark')}
-                  <Input
-                    disabled
-                    type="switch"
-                    checked={theme.includes('dark')}
-                    style="position: absolute; right: 5px;" />
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+                  active={activePage.toLowerCase() === page.id.toLowerCase()}
+                  onclick={e => goto(e, page.id)}>
+                  <span class="nav-icon">
+                    <Fa {...page} scale="1.7x" />
+                  </span>
+                  <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
+                </NavLink>
+              </NavItem>
+            {/each}
           </Nav>
-        </div>
-      </Card>
-    </Fade>
+
+          <div class="section-divider"></div>
+
+          <!-- Insights -->
+          <p class="navheader">{$_('navigation.titles.Insights')}</p>
+          <Nav vertical pills class="nav-custom" {theme}>
+            {#each insights as page}
+              <NavItem>
+                <NavLink
+                  href={$urlbase + page.id}
+                  class="nav-link-custom"
+                  active={activePage.toLowerCase() === page.id.toLowerCase()}
+                  onclick={e => goto(e, page.id)}>
+                  <span class="nav-icon">
+                    <Fa {...page} scale="1.7x" />
+                  </span>
+                  <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
+                </NavLink>
+              </NavItem>
+            {/each}
+          </Nav>
+
+          <!-- Profile Dropdown -->
+          <div class="mt-auto pt-2">
+            <div class="section-divider"></div>
+            <Nav vertical pills class="nav-custom" {theme}>
+              <Dropdown nav direction="up" class="ms-0">
+                <DropdownToggle
+                  nav
+                  class="dropdown-custom {activePage.toLowerCase() === 'trustprofile'
+                    ? 'active'
+                    : ''}">
+                  <span class="text-uppercase profile-icon">
+                    {$profile.username.charAt(0).toUpperCase()}
+                  </span>
+                  <span>{$profile.username}</span>
+                </DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem
+                    class="nav-link-custom"
+                    active={activePage.toLowerCase() === 'trustprofile'}
+                    onclick={e => goto(e, 'TrustProfile')}>
+                    <span class="nav-icon"><Fa {...ProfilePage} scale="1.7x" /></span>
+                    <span class="nav-text">{$_('navigation.titles.TrustProfile')}</span>
+                  </DropdownItem>
+                  <Input
+                    class="my-1 lang-select"
+                    type="select"
+                    bind:value={newLang}
+                    onchange={() => setLocale(newLang)}>
+                    {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
+                      <option value={code} selected={code === currentLocale()}>
+                        {Flags[code]}&nbsp;&nbsp; {lang.name}
+                      </option>
+                    {/each}
+                  </Input>
+                  <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
+                    <Fa
+                      icon={faStarship}
+                      d={faSun}
+                      c1="green"
+                      c2="lightblue"
+                      d1="orange"
+                      d2="fuchsia"
+                      scale="1.3x"
+                      class="me-3" />
+                    {theme.includes('dark')
+                      ? $_('config.titles.Light')
+                      : $_('config.titles.Dark')}
+                    <Input
+                      disabled
+                      type="switch"
+                      checked={theme.includes('dark')}
+                      style="position: absolute; right: 5px;" />
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </Nav>
+          </div>
+        </Card>
+      </div>
+    {/if}
 
     <!-- Content Area -->
-    <Col><Theme {theme}><svelte:component this={PageComponent} /></Theme></Col>
+    <Col>
+      <Theme {theme}>
+        <Card class="mb-2" outline color="notifiarr"><Page /></Card>
+      </Theme>
+    </Col>
   </Row>
 </div>
 
@@ -277,10 +293,8 @@
 
   .nav-icon {
     margin-right: 12px;
-    font-size: 16px;
     display: inline-flex;
     width: 20px;
-    justify-content: center;
   }
 
   .profile-icon {
@@ -332,7 +346,7 @@
       left: 0;
       padding: 1px;
       border-radius: 12px;
-      transition: transform 0.3s ease;
+      transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       background: rgba(118, 122, 126, 0.9);
     }

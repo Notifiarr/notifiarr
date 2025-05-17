@@ -1,15 +1,25 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+<script lang="ts" context="module">
+  import { faChartLine } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  export const page = {
+    id: 'Metrics',
+    icon: faChartLine,
+    c1: 'darkgoldenrod',
+    c2: 'darkorange',
+    d1: 'darkkhaki',
+    d2: 'peachpuff',
+  }
 </script>
 
-<Card class="mb-2">
-  <CardHeader>
-    <h2>Metrics</h2>
-  </CardHeader>
-  <CardBody>
-    <p>View and analyze system and application performance metrics.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Monitor and analyze system performance data</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import Header from '../../includes/Header.svelte'
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<CardFooter>
+  <small class="text-muted">Detailed metrics and statistics</small>
+</CardFooter>

@@ -4,15 +4,38 @@
   import T, { _ } from './Translate.svelte'
   import { age } from './util'
 
-  export let submit: (e: Event) => void
-  export let successText: string = 'phrases.ConfigurationSaved'
-  export let saveButtonText: string = 'buttons.SaveConfiguration'
-  export let saveButtonDescription: string = ''
-  export let saveDisabled: boolean = false
+  type Props = {
+    /** The save button runs this function when clicked. */
+    submit: (e: Event) => void
+    /** The text to display when the save button is clicked. Must be translation key. */
+    successText?: string
+    /** The text to display on the save button. Must be translation key. */
+    saveButtonText?: string
+    /** The optionaldescription of the save button. Must be translation key. */
+    saveButtonDescription?: string
+    /** Whether the save button is disabled. */
+    saveDisabled?: boolean
+    /** The children to render. */
+    children?: () => any
+  }
+
+  let {
+    submit,
+    successText = 'phrases.ConfigurationSaved',
+    saveButtonText = 'buttons.SaveConfiguration',
+    saveButtonDescription = '',
+    saveDisabled = false,
+    children = undefined,
+  }: Props = $props()
+
+  async function onclick(e: Event) {
+    e.preventDefault()
+    await submit(e)
+  }
 </script>
 
 <CardFooter>
-  <div class="footer">
+  <div class="footer pb-2">
     <Row>
       <Col style="max-width: fit-content;">
         <!-- Save Button -->
@@ -22,7 +45,7 @@
           type="submit"
           class="mt-1"
           disabled={profile.status !== '' || saveDisabled}
-          onclick={(e: Event) => (e.preventDefault(), submit(e))}>
+          {onclick}>
           {profile.status ? $_('phrases.SavingConfiguration') : $_(saveButtonText)}
         </Button>
         <!-- Save Button Description -->
@@ -48,7 +71,7 @@
       </Col>
     </Row>
   </div>
-  <slot />
+  {@render children?.()}
 </CardFooter>
 
 <style>

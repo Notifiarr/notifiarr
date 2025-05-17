@@ -1,15 +1,25 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+<script lang="ts" context="module">
+  import { faPrintMagnifyingGlass } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  export const page = {
+    id: 'LogFiles',
+    icon: faPrintMagnifyingGlass,
+    c1: 'midnightblue',
+    c2: 'darkslategray',
+    d1: 'lightgreen',
+    d2: 'gold',
+  }
 </script>
 
-<Card class="mb-2">
-  <CardHeader>
-    <h2>Log Files</h2>
-  </CardHeader>
-  <CardBody>
-    <p>View and search through application and system log files for troubleshooting.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Access and analyze log data for diagnostics</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import Header from '../../includes/Header.svelte'
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<CardFooter>
+  <small class="text-muted">Log file management</small>
+</CardFooter>

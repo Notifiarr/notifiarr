@@ -65,3 +65,16 @@ body.dark-mode {
 .bg-notifiarr-subtle {
   background-color: rgb(8, 104, 75, 1) !important;
 }
+
+.text-bg-notifiarr {
+  color: #000000 !important;
+  background: radial-gradient(
+    circle,
+    rgba(60, 210, 165, 1) 37%,
+    rgba(94, 230, 216, 1) 100%
+  );
+}
+
+.text-notifiarr {
+  color: #3cd2a5 !important;
+}

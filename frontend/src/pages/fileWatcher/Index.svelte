@@ -1,15 +1,30 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+<script lang="ts" context="module">
+  import { faFileWaveform } from '@fortawesome/sharp-duotone-light-svg-icons'
+  export const page = {
+    id: 'FileWatcher',
+    icon: faFileWaveform,
+    d1: 'thistle',
+    d2: 'blue',
+    c1: 'sienna',
+    c2: 'moccasin',
+  }
 </script>
 
-<Card class="mb-2">
-  <CardHeader>
-    <h2>File Watcher</h2>
-  </CardHeader>
-  <CardBody>
-    <p>Monitor and respond to changes in specified files and directories.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Track file system changes and trigger actions</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import Footer from '../../includes/Footer.svelte'
+  import Header from '../../includes/Header.svelte'
+
+  // Handle form submission
+  function submit(e: Event) {
+    e.preventDefault()
+    // profile.writeConfig(c)
+  }
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<Footer {submit} />

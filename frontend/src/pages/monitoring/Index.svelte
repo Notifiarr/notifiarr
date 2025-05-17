@@ -1,15 +1,25 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+<script lang="ts" context="module">
+  import { faDisplayChartUpCircleCurrency } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  export const page = {
+    id: 'Monitoring',
+    icon: faDisplayChartUpCircleCurrency,
+    c1: 'darkslateblue',
+    c2: 'gainsboro',
+    d1: 'papayawhip',
+    d2: 'paleturquoise',
+  }
 </script>
 
-<Card class="mb-2">
-  <CardHeader>
-    <h2>Monitoring</h2>
-  </CardHeader>
-  <CardBody>
-    <p>Set up and view system and application monitoring dashboards.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Monitor the health and status of your systems</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import Header from '../../includes/Header.svelte'
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<CardFooter>
+  <small class="text-muted">System and application monitoring</small>
+</CardFooter>

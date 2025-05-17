@@ -1,15 +1,30 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+<script lang="ts" context="module">
+  import { faClapperboardPlay } from '@fortawesome/sharp-duotone-light-svg-icons'
+  export const page = {
+    id: 'MediaApps',
+    icon: faClapperboardPlay,
+    c1: 'indigo',
+    c2: 'blue',
+    d1: 'lightseagreen',
+    d2: 'antiquewhite',
+  }
 </script>
 
-<Card class="mb-2">
-  <CardHeader>
-    <h2>Media Apps</h2>
-  </CardHeader>
-  <CardBody>
-    <p>Configure and manage media server applications like Plex, Jellyfin, and Emby.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Manage your media server integrations</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import Footer from '../../includes/Footer.svelte'
+  import Header from '../../includes/Header.svelte'
+
+  // Handle form submission
+  function submit(e: Event) {
+    e.preventDefault()
+    // profile.writeConfig(c)
+  }
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<Footer {submit} />

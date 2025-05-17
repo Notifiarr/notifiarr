@@ -6,7 +6,7 @@
 
   type FaProps = ComponentProps<Fa>
 
-  interface Props extends FaProps {
+  export interface Props extends FaProps {
     /**
      * The icon to display in dark mode.
      */
@@ -36,4 +36,4 @@
   const icon = $derived(dark && d ? d : rest.icon)
 </script>
 
-<Fa {...rest} {icon} {primaryColor} {secondaryColor} />
+<Fa {...rest} {icon} {primaryColor} {secondaryColor} id={'fa-icon' + rest.id} />

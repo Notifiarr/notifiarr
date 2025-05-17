@@ -1,16 +1,31 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
-  import { theme } from '../../includes/theme.svelte'
+<script lang="ts" context="module">
+  import { faTerminal } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  export const page = {
+    id: 'Commands',
+    icon: faTerminal,
+    c1: 'green',
+    c2: 'darkgreen',
+    d1: 'seagreen',
+    d2: 'green',
+  }
 </script>
 
-<Card class="mb-2" theme={$theme}>
-  <CardHeader>
-    <h2>Commands</h2>
-  </CardHeader>
-  <CardBody>
-    <p>Set up and execute custom commands and scripts from the Notifiarr interface.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Manage automation through custom commands</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import { warning } from '../../includes/util'
+  import Footer from '../../includes/Footer.svelte'
+  import Header from '../../includes/Header.svelte'
+
+  // Handle form submission
+  function submit() {
+    warning('Not implemented')
+    // profile.writeConfig(c)
+  }
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<Footer {submit} />

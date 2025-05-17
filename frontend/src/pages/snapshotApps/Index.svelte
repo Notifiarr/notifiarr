@@ -1,15 +1,30 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+<script lang="ts" context="module">
+  import { faCameraRetro } from '@fortawesome/sharp-duotone-light-svg-icons'
+  export const page = {
+    id: 'SnapshotApps',
+    icon: faCameraRetro,
+    c1: 'burlywood',
+    c2: 'darkgray',
+    d1: 'burlywood',
+    d2: 'silver',
+  }
 </script>
 
-<Card class="mb-2">
-  <CardHeader>
-    <h2>Snapshot Apps</h2>
-  </CardHeader>
-  <CardBody>
-    <p>Configure applications that provide system and application state snapshots.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Set up and manage snapshot capabilities</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import Footer from '../../includes/Footer.svelte'
+  import Header from '../../includes/Header.svelte'
+
+  // Handle form submission
+  function submit(e: Event) {
+    e.preventDefault()
+    // profile.writeConfig(c)
+  }
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<Footer {submit} />

@@ -26,6 +26,7 @@
     "vite": "^6.3.1"
   },
   "dependencies": {
+    "@fortawesome/sharp-duotone-light-svg-icons": "^6.7.2",
     "@fortawesome/sharp-duotone-regular-svg-icons": "^6.7.2",
     "@fortawesome/sharp-duotone-solid-svg-icons": "^6.7.2",
     "@sveltejs/svelte-virtual-list": "^3.0.1",

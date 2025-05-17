@@ -20,7 +20,7 @@
   } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg'
   import { profile } from './api/profile.svelte'
-  import Navigation from './Navigation.svelte'
+  import Navigation, { goto } from './Navigation.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import T, { isReady, _ } from './includes/Translate.svelte'
   import { age, delay } from './includes/util'
@@ -36,18 +36,18 @@
     faPowerOff,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
 
-  let username = ''
-  let password = ''
-  let loginFailedMsg = ''
-  let isLoading = false
-  let navigate: Navigation
-  let notification = ''
-  let showReloadModal = false
-  let showShutdownModal = false
-  let showHelpModal = false
-  let reload: any
-  let shutdown: any
-  let spin = false
+  let username = $state('')
+  let password = $state('')
+  let loginFailedMsg = $state('')
+  let isLoading = $state(false)
+  let navigate: Navigation | undefined = $state()
+  let notification = $state('')
+  let showReloadModal = $state(false)
+  let showShutdownModal = $state(false)
+  let showHelpModal = $state(false)
+  let reload: any = $state()
+  let shutdown: any = $state()
+  let spin = $state(false)
 
   onMount(() => {
     const query = new URLSearchParams(window.location.search)
@@ -98,7 +98,7 @@
 
   const confirmReload = (e: Event) => (e.preventDefault(), (showReloadModal = true))
   const confirmShutdown = (e: Event) => (e.preventDefault(), (showShutdownModal = true))
-  $: theme = $thm
+  let theme = $derived($thm)
 </script>
 
 <svelte:head>
@@ -127,7 +127,7 @@
           </a>
         </span>
       {/if}
-      <NavbarBrand href={$urlbase} onclick={e => navigate.goto(e, '')} class="mb-0 pb-0">
+      <NavbarBrand href={$urlbase} onclick={e => goto(e, 'Landing')} class="mb-0 pb-0">
         <h1 class="m-0 lh-1" style="font-size: 40px;">
           <img src={logo} height="45" alt="Logo" />
           <span class="title-notifiarr">Notifiarr Client</span>
@@ -246,7 +246,7 @@
         <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
           <Card outline {theme} color="notifiarr">
             <CardBody class="text-nowrap fs-3">
-              <!-- This is before translations are loaded. This 'typo' is on purpose, sue me.-->
+              <!-- This is before translations are loaded. This 'typo' is on purpose, sue me. -->
               <Spinner /> Translateratating!...</CardBody>
           </Card>
         </Col>
@@ -315,7 +315,7 @@
           {/if}
         {:catch error}
           <Col xs={{ size: 10, offset: 1 }} md={{ size: 6, offset: 3 }}>
-            <!-- error fetching profile (ie. timeout) -->
+            <!-- error fetching profile (ie. timeout), but really this never happens. -->
             <Card outline body {theme} color="danger">
               <CardHeader><CardTitle>{$_('phrases.ERROR')}</CardTitle></CardHeader>
               <CardBody>{error.message}</CardBody>

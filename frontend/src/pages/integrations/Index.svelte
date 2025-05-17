@@ -1,15 +1,25 @@
-<script lang="ts">
-  import { Card, CardHeader, CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+<script lang="ts" context="module">
+  import { faLinkHorizontal } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  export const page = {
+    id: 'Integrations',
+    icon: faLinkHorizontal,
+    c1: 'purple',
+    c2: 'gray',
+    d1: 'magenta',
+    d2: 'white',
+  }
 </script>
 
-<Card class="mb-2">
-  <CardHeader>
-    <h2>Integrations</h2>
-  </CardHeader>
-  <CardBody>
-    <p>Configure third-party integrations and connectivity with external services.</p>
-  </CardBody>
-  <CardFooter>
-    <small class="text-muted">Connect Notifiarr with other platforms and services</small>
-  </CardFooter>
-</Card>
+<script lang="ts">
+  import { CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { _ } from '../../includes/Translate.svelte'
+  import Header from '../../includes/Header.svelte'
+</script>
+
+<Header {page} />
+<CardBody>
+  <p>TODO</p>
+</CardBody>
+<CardFooter>
+  <small class="text-muted">Integration statistics</small>
+</CardFooter>
