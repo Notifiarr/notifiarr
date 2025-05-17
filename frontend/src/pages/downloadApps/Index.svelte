@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faDownload } from '@fortawesome/sharp-duotone-regular-svg-icons'
   export const page = {
     id: 'Downloaders',
-    icon: faDownload,
+    i: faDownload,
     c1: 'brown',
     c2: 'lightsalmon',
     d1: 'coral',

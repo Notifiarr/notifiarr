@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faWebhook } from '@fortawesome/sharp-duotone-solid-svg-icons'
   export const page = {
     id: 'Endpoints',
-    icon: faWebhook,
+    i: faWebhook,
     c1: 'sandybrown',
     c2: 'saddlebrown',
     d1: 'lightcoral',

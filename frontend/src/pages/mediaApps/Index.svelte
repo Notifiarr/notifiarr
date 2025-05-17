@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faClapperboardPlay } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {
     id: 'MediaApps',
-    icon: faClapperboardPlay,
+    i: faClapperboardPlay,
     c1: 'indigo',
     c2: 'blue',
     d1: 'lightseagreen',

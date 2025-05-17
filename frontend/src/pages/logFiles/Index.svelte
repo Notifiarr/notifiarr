@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faPrintMagnifyingGlass } from '@fortawesome/sharp-duotone-solid-svg-icons'
   export const page = {
     id: 'LogFiles',
-    icon: faPrintMagnifyingGlass,
+    i: faPrintMagnifyingGlass,
     c1: 'midnightblue',
     c2: 'darkslategray',
     d1: 'lightgreen',

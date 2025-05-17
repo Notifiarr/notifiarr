@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faStars } from '@fortawesome/sharp-duotone-regular-svg-icons'
   export const page = {
     id: 'StarrApps',
-    icon: faStars,
+    i: faStars,
     c1: 'darkgoldenrod',
     c2: 'gold',
     d1: 'gold',

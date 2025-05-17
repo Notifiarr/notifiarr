@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faDisplayChartUpCircleCurrency } from '@fortawesome/sharp-duotone-regular-svg-icons'
   export const page = {
     id: 'Monitoring',
-    icon: faDisplayChartUpCircleCurrency,
+    i: faDisplayChartUpCircleCurrency,
     c1: 'darkslateblue',
     c2: 'gainsboro',
     d1: 'papayawhip',

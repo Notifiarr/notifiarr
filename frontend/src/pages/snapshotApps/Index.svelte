@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faCameraRetro } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {
     id: 'SnapshotApps',
-    icon: faCameraRetro,
+    i: faCameraRetro,
     c1: 'burlywood',
     c2: 'darkgray',
     d1: 'burlywood',

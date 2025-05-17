@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faFileWaveform } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {
     id: 'FileWatcher',
-    icon: faFileWaveform,
+    i: faFileWaveform,
     d1: 'thistle',
     d2: 'blue',
     c1: 'sienna',

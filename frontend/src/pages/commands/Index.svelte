@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faTerminal } from '@fortawesome/sharp-duotone-solid-svg-icons'
   export const page = {
     id: 'Commands',
-    icon: faTerminal,
+    i: faTerminal,
     c1: 'green',
     c2: 'darkgreen',
     d1: 'seagreen',

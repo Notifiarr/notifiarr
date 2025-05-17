@@ -9,54 +9,84 @@
     Label,
     type InputType,
   } from '@sveltestrap/sveltestrap'
-  import { _ } from './Translate.svelte'
-  import type { SvelteComponent } from 'svelte'
-  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import {
     faEye,
     faEyeSlash,
     faArrowUpFromBracket,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import { _ } from './Translate.svelte'
+  import type { SvelteComponent, Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
 
-  /** Must be unique. Identifies this component. */
-  export let id: string
-  /** The name of the input. Defaults to the id. Pass undefined to not include a name. */
-  export let name: string = id
-  /** The label to display above the input. Must be present in translation if not undefined here. */
-  export let label: string | undefined = $_(`${id}.label`)
-  /** The placeholder text to display in the input. */
-  export let placeholder: string | undefined = $_(`${id}.placeholder`)
-  /** The description to display below the input. Must be present in translation if not undefined here. */
-  export let description: string | undefined = $_(`${id}.description`)
-  /** The type of input. Like `text` or `select`. */
-  export let type: InputType = 'text'
-  /** Used if you do not want this value changed directly. */
-  export let readonly = false
-  /** Similar to readonly, but the input dims/greys out. */
-  export let disabled = false
-  /** Optional tooltip to bind to input. */
-  export let tooltip: string = $_(`${id}.tooltip`)
-  /** Optional value. Should only be used for binding. */
-  export let value: any = undefined
-  /** Optional rows for textarea. */
-  export let rows: number = 1
-  /** Optional min value for number input. */
-  export let min: number | undefined = undefined
-  /** Optional max value for number input. */
-  export let max: number | undefined = undefined
-  /** Optional options for select input. */
-  export let options: Option[] | undefined = undefined
+  interface Props {
+    /** Must be unique. Identifies this component. */
+    id: string
+    /** The name of the input. Defaults to the id. Pass undefined to not include a name. */
+    name?: string
+    /** The label to display above the input. Must be present in translation if not undefined here. */
+    label?: string
+    /** The placeholder text to display in the input. */
+    placeholder?: string
+    /** The description to display below the input. Must be present in translation if not undefined here. */
+    description?: string
+    /** The type of input. Like `text` or `select`. */
+    type?: InputType
+    /** Used if you do not want this value changed directly. */
+    readonly?: boolean
+    /** Similar to readonly, but the input dims/greys out. */
+    disabled?: boolean
+    /** Optional tooltip to bind to input. */
+    tooltip?: string
+    /** Optional value. Should only be used for binding. */
+    value?: any
+    /** Optional rows for textarea. */
+    rows?: number
+    /** Optional min value for number input. */
+    min?: number | undefined
+    /** Optional max value for number input. */
+    max?: number | undefined
+    /** Optional options for select input. */
+    options?: Option[] | undefined
+    /** Optional input-box prefix attachment. */
+    pre?: Snippet
+    /** Optional input-box suffix attachment. */
+    post?: Snippet
+    /** Optional children to render inside the input. Useful for select options. */
+    children?: Snippet
+  }
+
+  let {
+    id,
+    name = id,
+    label = $_(`${id}.label`),
+    placeholder = $bindable($_(`${id}.placeholder`)),
+    description = $_(`${id}.description`),
+    type = 'text',
+    readonly = false,
+    disabled = false,
+    tooltip = $_(`${id}.tooltip`),
+    value = $bindable(undefined),
+    rows = 1,
+    min = undefined,
+    max = undefined,
+    options = undefined,
+    pre,
+    children,
+    post,
+  }: Props = $props()
 
   type Option = { value: string | number | boolean; name: string; disabled?: boolean }
 
-  let input: SvelteComponent
-  let showTooltip = false
+  let input = $state<SvelteComponent>()
+  let showTooltip = $state(false)
 
-  $: currType = type
-  $: passIcon = currType === 'password' ? faEyeSlash : faEye
-  $: placeholder = placeholder == id + '.placeholder' ? undefined : placeholder
+  let currType = $derived(type)
+  let passIcon = $derived(currType === 'password' ? faEyeSlash : faEye)
+  $effect(() => {
+    placeholder = placeholder == id + '.placeholder' ? '' : placeholder
+  })
 
   function toggleTooltip(e: Event | undefined = undefined) {
     e?.preventDefault()
@@ -77,22 +107,17 @@
         <Button color="secondary" on:click={toggleTooltip} outline>
           {#if showTooltip}
             <Fa
-              icon={faArrowUpFromBracket}
+              i={faArrowUpFromBracket}
               c1="gray"
               d1="gainsboro"
               c2="orange"
               scale="1.5x" />
           {:else}
-            <Fa
-              icon={faQuestionCircle}
-              c1="gray"
-              d1="gainsboro"
-              c2="orange"
-              scale="1.5x" />
+            <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
           {/if}
         </Button>
       {/if}
-      <slot name="pre" />
+      {@render pre?.()}
       <Input
         {id}
         {name}
@@ -107,8 +132,24 @@
         {rows}
         {min}
         {max}>
-        <!-- Create a boolean select option list. -->
-        {#if typeof value === 'boolean' && type === 'select'}
+        {#if children}
+          {@render children()}
+        {:else if options}
+          <!-- render provided options. -->
+          {#if !options.map(o => o.value).includes(value)}
+            <!-- If the current value is not in the options list, add it. -->
+            <option {value} selected>
+              {value} ({$_('words.select-option.custom')})
+            </option>
+          {/if}
+          <!-- Create a select option list from `options` input. -->
+          {#each options as o}
+            <option value={o.value} selected={value === o.value} disabled={o.disabled}>
+              {o.name}
+            </option>
+          {/each}
+        {:else if typeof value === 'boolean' && type === 'select'}
+          <!-- Create a boolean select-option list. -->
           <option value={false} selected={value === false}>
             {$_('words.select-option.Disabled')}
           </option>
@@ -116,27 +157,13 @@
             {$_('words.select-option.Enabled')}
           </option>
         {/if}
-        <!-- If the current value is not in the options list, add it. -->
-        {#if options}
-          {#if !options.map(o => o.value).includes(value)}
-            <option {value} selected>
-              {value} ({$_('words.select-option.custom')})
-            </option>
-          {/if}
-          <!-- Create a select option list from input. -->
-          {#each options as o}
-            <option value={o.value} selected={value === o.value} disabled={o.disabled}>
-              {o.name}
-            </option>
-          {/each}
-        {/if}
-        <slot />
       </Input>
-      <!-- Including a password visibility toggler. -->
+
+      <!-- Include a password visibility toggler. -->
       {#if type === 'password'}
         <Button type="button" outline on:click={togglePassword}>
           <Fa
-            icon={passIcon}
+            i={passIcon}
             c1="royalblue"
             c2="orange"
             d1="orange"
@@ -144,7 +171,7 @@
             scale="1.5x" />
         </Button>
       {/if}
-      <slot name="post" />
+      {@render post?.()}
     </InputGroup>
 
     {#if showTooltip}

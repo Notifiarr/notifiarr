@@ -114,11 +114,11 @@
       {#if $profile.loggedIn}
         <span style="position: absolute; right: 0;" class="fs-3">
           <a href="#reload" onclick={confirmReload}>
-            <Fa icon={faRotate} c1="#33A000" c2="#33A5A4" class="me-1" />
+            <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-1" />
           </a>
           <a href="#shutdown" onclick={confirmShutdown}>
             <Fa
-              icon={faPowerOff}
+              i={faPowerOff}
               c1="salmon"
               c2="maroon"
               d1="firebrick"
@@ -127,7 +127,7 @@
           </a>
         </span>
       {/if}
-      <NavbarBrand href={$urlbase} onclick={e => goto(e, 'Landing')} class="mb-0 pb-0">
+      <NavbarBrand href={$urlbase} onclick={e => goto(e, '')} class="mb-0 pb-0">
         <h1 class="m-0 lh-1" style="font-size: 40px;">
           <img src={logo} height="45" alt="Logo" />
           <span class="title-notifiarr">Notifiarr Client</span>
@@ -142,7 +142,7 @@
           <span class="text-nowrap">
             {#if $profile?.loggedIn}
               <a href="#reload" onclick={updateBackend}>
-                <Fa icon={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
+                <Fa i={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
               </a>
               {#if notification}
                 {@html notification}

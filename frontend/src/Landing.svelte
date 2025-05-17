@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faHouseChimneyHeart } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {
     id: 'Landing',
-    icon: faHouseChimneyHeart,
+    i: faHouseChimneyHeart,
     c1: 'seagreen',
     c2: 'darkgreen',
     d1: 'lightblue',

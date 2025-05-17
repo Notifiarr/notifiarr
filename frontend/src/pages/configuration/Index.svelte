@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faFlaskGear } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {
     id: 'Configuration',
-    icon: faFlaskGear,
+    i: faFlaskGear,
     c1: 'slategray',
     c2: 'darkgreen',
     d1: 'gainsboro',
@@ -201,9 +201,11 @@
         bind:value={c.maxBody}
         min={500}
         max={500000}>
-        <InputGroupText slot="post">
-          {$_('words.select-option.bytes')}
-        </InputGroupText>
+        {#snippet post()}
+          <InputGroupText>
+            {$_('words.select-option.bytes')}
+          </InputGroupText>
+        {/snippet}
       </Input>
     </Col>
     <Col md={4}>
@@ -213,9 +215,11 @@
         min={1}
         max={999}
         bind:value={c.logFileMb}>
-        <InputGroupText slot="post">
-          {$_('words.select-option.megabytes')}
-        </InputGroupText>
+        {#snippet post()}
+          <InputGroupText>
+            {$_('words.select-option.megabytes')}
+          </InputGroupText>
+        {/snippet}
       </Input>
     </Col>
     <Col md={4}>

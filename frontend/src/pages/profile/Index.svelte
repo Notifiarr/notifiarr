@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faHouseLock } from '@fortawesome/sharp-duotone-regular-svg-icons'
   export const page = {
     id: 'TrustProfile',
-    icon: faHouseLock,
+    i: faHouseLock,
     c1: 'steelblue',
     c2: 'darkblue',
     d1: 'lightsteelblue',
@@ -80,26 +80,26 @@
   <CardBody>
     <ul class="mb-2 list-unstyled">
       <li>
-        <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
+        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
         {@html $_('profile.phrase.PasswordOnlyUsed')}
       </li>
       <li>
-        <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
+        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
         {@html $_('profile.phrase.HeaderOnlyUsed')}
       </li>
       <li>
-        <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
+        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
         {@html $_('profile.phrase.AuthTypeChange')}
       </li>
       <li>
-        <Fa icon={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
+        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
         {@html $_('profile.phrase.SeeWikiForAuthProxyHelp')}
       </li>
 
       <!-- Missing/Add upstream section -->
       {#if !$profile?.upstreamAllowed}
         <li>
-          <Fa icon={faSplotch} c1="maroon" c2="salmon" d1="salmon" d2="maroon" />
+          <Fa i={faSplotch} c1="maroon" c2="salmon" d1="salmon" d2="maroon" />
           <b><T id="profile.phrase.ProxyAuthDisabled" {upstreamIp} /></b>
           <a href="#addit" onclick={addit}>
             {$_('profile.phrase.Addit')}
@@ -109,7 +109,7 @@
 
       <!-- Show more toggle -->
       <li>
-        <Fa icon={faSplotch} c1="darkblue" d1="lightblue" c2="royalblue" />
+        <Fa i={faSplotch} c1="darkblue" d1="lightblue" c2="royalblue" />
         <a href="#toggle-more" onclick={toggleMore}>
           {showMore ? $_('profile.phrase.ShowMeLess') : $_('profile.phrase.ShowMeMore')}
         </a>

@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faBuildingCircleCheck } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {
     id: 'Services',
-    icon: faBuildingCircleCheck,
+    i: faBuildingCircleCheck,
     c1: 'steelblue',
     c2: 'coral',
     d1: 'wheat',

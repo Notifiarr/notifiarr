@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faSatellite } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {
     id: 'SiteTunnel',
-    icon: faSatellite,
+    i: faSatellite,
     c1: 'blue',
     c2: 'lightblue',
     d1: 'steelblue',

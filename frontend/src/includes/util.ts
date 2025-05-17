@@ -62,3 +62,6 @@ export function age(milliseconds: number, includeSeconds = false): string {
 /** Add a delay anywhere in any async function. */
 export const delay = (ms: number): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, ms))
+
+/** Check if two strings are equal, case insensitive. */
+export const iequals = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()

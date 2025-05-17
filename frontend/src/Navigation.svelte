@@ -1,8 +1,11 @@
 <script lang="ts" module>
   import { urlbase } from './api/fetch'
+  import { get, writable } from 'svelte/store'
 
   // Page structure for navigation with icons
-  // id (from page) used for navigation AND translations.
+  // 'id' (from page) is used for navigation AND translations.
+
+  // Settings header in navigation menu.
   const settings = [
     { component: Configuration, ...ConfigP },
     { component: SiteTunnel, ...SiteTunnelP },
@@ -15,6 +18,7 @@
     { component: Commands, ...CommandsPage },
     { component: ServiceChecks, ...ServicesP },
   ]
+  // Insights header in navigation menu.
   const insights = [
     { component: Triggers, ...TriggersP },
     { component: Integrations, ...IntegrationsP },
@@ -23,6 +27,7 @@
     { component: LogFiles, ...LogFilesP },
     { component: System, ...SystemP },
   ]
+  // Others do not show up in the navigation menu.
   const others = [
     { component: Profile, ...ProfilePage },
     { component: Landing, ...LandingPage },
@@ -32,26 +37,31 @@
   let windowWidth = $state(1000)
   let isOpen = $derived(windowWidth >= 992)
   // Used to navigate.
-  const parts = $derived(ltrim(window.location.pathname, get(urlbase)).split('/'))
-  let activePage = $derived(parts.length > 0 ? parts[0] : '')
+  const activePage = writable('')
+  let ActivePage = $state(Landing)
 
   /**
    * Used to navigate to a page.
-   * @param event - from an onclick handler
-   * @param pageId - the id of the page to navigate to, ie profile, configuration, etc.
+   * @param event - from an onclick handler, optional.
+   * @param pid - the id of the page to navigate to, ie profile, configuration, etc.
    */
   export function goto(event: Event | null, pid: string, subPages: string[] = []): void {
     event?.preventDefault()
-    if (settings.concat(insights, others).find(p => p.id === pid)) activePage = pid
-    else activePage = ''
-
+    navTo(new PopStateEvent('popstate', { state: { uri: pid } }))
     const query = new URLSearchParams(window.location.search)
     const params = query.toString()
     const uri = `${get(urlbase)}${[pid, ...subPages].join('/').toLowerCase()}${params ? `?${params}` : ''}`
-    // TODO: track and make back button work.
-    window.history.replaceState({}, activePage, uri)
-    // Auto-collapse sidebar on mobile after navigation
-    isOpen = windowWidth >= 992
+    window.history.pushState({ uri: get(activePage) }, '', uri)
+  }
+
+  // navTo is split from goto(), so we can call it from popstate.
+  // Call this on load and when the back button is clicked.
+  function navTo(e: PopStateEvent) {
+    e.preventDefault()
+    const newPage = e.state?.uri ?? ''
+    const page = settings.concat(insights, others).find(p => iequals(p.id, newPage))
+    activePage.set(page ? newPage : '')
+    ActivePage = page?.component || Landing
   }
 </script>
 
@@ -91,27 +101,27 @@
   import System, { page as SystemP } from './pages/system/Index.svelte'
   import Profile, { page as ProfilePage } from './pages/profile/Index.svelte'
   import Landing, { page as LandingPage } from './Landing.svelte'
-  import { ltrim } from './includes/util'
+  import { iequals, ltrim } from './includes/util'
   import { theme as thm } from './includes/theme.svelte'
   import { currentLocale, setLocale } from './includes/locale/index.svelte'
   import { Flags } from './includes/locale/index.svelte'
   import { faStarship, faSun } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import Fa from './includes/Fa.svelte'
   import { slide } from 'svelte/transition'
-  import { get } from 'svelte/store'
+  import { onMount } from 'svelte'
 
   let theme = $derived($thm)
   let newLang = $derived(currentLocale())
-  // Set the component based on the active page. Dig it out of settings, others and insights.
-  const Page = $derived(
-    settings
-      .concat(insights, others)
-      .find(page => page.id.toLowerCase() === activePage.toLowerCase())?.component ||
-      Landing,
-  )
+
+  onMount(() => {
+    // Navigate to the initial page based on the URL when the content mounts.
+    const parts = ltrim(window.location.pathname, get(urlbase)).split('/')
+    const state = { uri: parts.length > 0 ? parts[0] : '' }
+    navTo(new PopStateEvent('popstate', { state }))
+  })
 </script>
 
-<svelte:window bind:innerWidth={windowWidth} />
+<svelte:window bind:innerWidth={windowWidth} on:popstate={navTo} />
 
 <div class="navigation">
   <!-- Mobile Menu Toggle Button -->
@@ -134,7 +144,8 @@
                 <NavLink
                   href={$urlbase + page.id}
                   class="nav-link-custom"
-                  active={activePage.toLowerCase() === page.id.toLowerCase()}
+                  active={iequals($activePage, page.id)}
+                  disabled={iequals($activePage, page.id)}
                   onclick={e => goto(e, page.id)}>
                   <span class="nav-icon">
                     <Fa {...page} scale="1.7x" />
@@ -155,7 +166,8 @@
                 <NavLink
                   href={$urlbase + page.id}
                   class="nav-link-custom"
-                  active={activePage.toLowerCase() === page.id.toLowerCase()}
+                  active={iequals($activePage, page.id)}
+                  disabled={iequals($activePage, page.id)}
                   onclick={e => goto(e, page.id)}>
                   <span class="nav-icon">
                     <Fa {...page} scale="1.7x" />
@@ -173,7 +185,7 @@
               <Dropdown nav direction="up" class="ms-0">
                 <DropdownToggle
                   nav
-                  class="dropdown-custom {activePage.toLowerCase() === 'trustprofile'
+                  class="dropdown-custom {$activePage.toLowerCase() === 'trustprofile'
                     ? 'active'
                     : ''}">
                   <span class="text-uppercase profile-icon">
@@ -184,7 +196,8 @@
                 <DropdownMenu>
                   <DropdownItem
                     class="nav-link-custom"
-                    active={activePage.toLowerCase() === 'trustprofile'}
+                    active={iequals($activePage, 'TrustProfile')}
+                    disabled={iequals($activePage, 'TrustProfile')}
                     onclick={e => goto(e, 'TrustProfile')}>
                     <span class="nav-icon"><Fa {...ProfilePage} scale="1.7x" /></span>
                     <span class="nav-text">{$_('navigation.titles.TrustProfile')}</span>
@@ -202,7 +215,7 @@
                   </Input>
                   <DropdownItem class="nav-link-custom" onclick={thm.toggle}>
                     <Fa
-                      icon={faStarship}
+                      i={faStarship}
                       d={faSun}
                       c1="green"
                       c2="lightblue"
@@ -230,7 +243,9 @@
     <!-- Content Area -->
     <Col>
       <Theme {theme}>
-        <Card class="mb-2" outline color="notifiarr"><Page /></Card>
+        <Card class="mb-2" outline color="notifiarr">
+          <ActivePage />
+        </Card>
       </Theme>
     </Col>
   </Row>

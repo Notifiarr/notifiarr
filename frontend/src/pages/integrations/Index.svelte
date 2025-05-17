@@ -1,8 +1,8 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   import { faLinkHorizontal } from '@fortawesome/sharp-duotone-solid-svg-icons'
   export const page = {
     id: 'Integrations',
-    icon: faLinkHorizontal,
+    i: faLinkHorizontal,
     c1: 'purple',
     c2: 'gray',
     d1: 'magenta',
