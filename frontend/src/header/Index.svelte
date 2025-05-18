@@ -33,11 +33,7 @@
   import { profile } from '../api/profile.svelte'
   import { urlbase } from '../api/fetch'
   import { nav } from '../navigation/nav.svelte'
-  import {
-    faArrowsRepeat,
-    faRotate,
-    faPowerOff,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import { faArrowsRepeat } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import Fa from '../includes/Fa.svelte'
   import { Navbar, NavbarBrand, Row, Col, Card } from '@sveltestrap/sveltestrap'
   import logo from '../assets/notifiarr.svg?inline'
@@ -45,27 +41,16 @@
   import { age, delay } from '../includes/util'
   import Reload from './Reload.svelte'
   import Shutdown from './Shutdown.svelte'
-
-  let showShutdownModal = $state(false)
-  let showReloadModal = $state(false)
 </script>
 
 <!-- Top of the page. Logo and reload / shutdown buttons. -->
 <Navbar theme={$theme} class="mb-0 pb-0">
   {#if $profile.loggedIn}
     <span style="position: absolute; right: 0;" class="fs-3">
-      <a href="#reload" onclick={e => (e.preventDefault(), (showReloadModal = true))}>
-        <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-1" />
-      </a>
-      <a href="#shutdown" onclick={e => (e.preventDefault(), (showShutdownModal = true))}>
-        <Fa
-          i={faPowerOff}
-          c1="salmon"
-          c2="maroon"
-          d1="firebrick"
-          d2="palevioletred"
-          class="me-2" />
-      </a>
+      <!-- Reload Confirmation Link + Modal -->
+      <Reload />
+      <!-- Shutdown Confirmation Link + Modal -->
+      <Shutdown />
     </span>
   {/if}
   <NavbarBrand href={$urlbase} onclick={e => nav.goto(e, '')} class="mb-0 pb-0">
@@ -95,8 +80,3 @@
     </Card>
   </Col>
 </Row>
-
-<!-- Shutdown Confirmation Modal -->
-<Shutdown isOpen={showShutdownModal} toggle={() => (showShutdownModal = false)} />
-<!-- Reload Confirmation Modal -->
-<Reload isOpen={showReloadModal} toggle={() => (showReloadModal = false)} />

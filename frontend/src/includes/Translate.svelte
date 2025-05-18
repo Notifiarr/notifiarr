@@ -9,7 +9,7 @@
   let formatDate: (arg0: Date | number) => string // type is DateFormatter, but not sure how to import it.
   dt.subscribe(val => (formatDate = val))
 
-  export function date(date: string | Date): string {
+  export function date(date: string | Date | number): string {
     if (typeof date !== 'string') return formatDate(date)
     return formatDate(new Date(0).setUTCMilliseconds(Date.parse(date)))
   }

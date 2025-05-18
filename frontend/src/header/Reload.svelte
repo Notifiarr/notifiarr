@@ -11,13 +11,13 @@
   import { Spinner } from '@sveltestrap/sveltestrap'
   import { theme } from '../includes/theme.svelte'
   import { updateBackend, showMsg } from './Index.svelte'
+  import { faRotate } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import Fa from '../includes/Fa.svelte'
 
-  type Props = { isOpen: boolean; toggle: () => void }
-  const { isOpen = $bindable(false), toggle = $bindable(() => {}) }: Props = $props()
-
+  let isOpen = $state(false)
   let reloading = $state(false)
 
-  async function reloadBackendConfig(e?: Event) {
+  async function onclick(e?: Event) {
     e?.preventDefault()
     reloading = true
 
@@ -31,7 +31,7 @@
         </span>`,
       )
     } finally {
-      toggle() // close the modal
+      isOpen = false // close the modal
       reloading = false // reset modal state
     }
 
@@ -39,16 +39,19 @@
   }
 </script>
 
-<Modal {isOpen} {toggle} theme={$theme}>
+<a href="#reload" onclick={e => (e.preventDefault(), (isOpen = true))}>
+  <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-2" />
+</a>
+
+<Modal {isOpen} toggle={() => (isOpen = false)} theme={$theme}>
   <ModalHeader>{$_('phrases.ConfirmReload')}</ModalHeader>
   {#if reloading}
     <ModalBody><Spinner size="sm" /> {$_('phrases.Reloading')}</ModalBody>
   {:else}
     <ModalBody>{$_('phrases.ConfirmReloadBody')}</ModalBody>
     <ModalFooter>
-      <Button color="danger" onclick={reloadBackendConfig}>
-        {$_('buttons.Confirm')}</Button>
-      <Button color="secondary" onclick={toggle}>
+      <Button color="danger" {onclick}>{$_('buttons.Confirm')}</Button>
+      <Button color="secondary" onclick={() => (isOpen = false)}>
         {$_('buttons.Cancel')}</Button>
     </ModalFooter>
   {/if}

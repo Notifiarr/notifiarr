@@ -1,63 +1,77 @@
+<script lang="ts" module>
+  let sidebarOpen = $state(false)
+  export const closeSidebar = () => (sidebarOpen = false)
+  export const toggleSidebar = () => (sidebarOpen = !sidebarOpen)
+</script>
+
 <script lang="ts">
-  import { Card, Row, Col, Button, Theme } from '@sveltestrap/sveltestrap'
+  import { Card, Col, Button } from '@sveltestrap/sveltestrap'
   import { _ } from '../includes/Translate.svelte'
   import { nav } from './nav.svelte'
-  import { settings, insights } from './pages'
   import { theme } from '../includes/theme.svelte'
   import { slide } from 'svelte/transition'
   import { onMount } from 'svelte'
-  import ProfileMenu from './ProfileMenu.svelte'
-  import NavSection from './NavSection.svelte'
+  import Sidebar from './Sidebar.svelte'
 
+  const magicNumber = 1005
   // windowWidth is used for sidebar collapse state.
-  let windowWidth = $state(1000)
-  let isOpen = $derived(windowWidth >= 992)
+  let windowWidth = $state(magicNumber + 1)
+  const isMobile = $derived(windowWidth <= magicNumber)
+
   onMount(() => nav.onMount())
+  $effect(() => {
+    if (windowWidth < magicNumber) sidebarOpen = false
+  })
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} on:popstate={e => nav.popstate(e)} />
 
 <div class="menu-toggle-wrapper">
-  <!-- Mobile Menu Toggle Button -->
-  <Card color="warning" theme={$theme} class="toggle-card d-lg-none mb-2 p-0" outline>
-    <Button size="sm" class="toggle-button my-0" onclick={() => (isOpen = !isOpen)}>
-      {isOpen ? `✕ ${$_('phrases.HideMenu')}` : `☰ ${$_('phrases.ShowMenu')}`}
-    </Button>
-  </Card>
-</div>
-
-<Row>
-  <!-- Navigation Sidebar -->
-  {#if isOpen}
-    <div class="sidebar-col col mb-2" transition:slide={{ duration: 475, axis: 'x' }}>
-      <Card body class="sidebar-card pb-2" theme={$theme}>
-        <!-- Settings -->
-        <NavSection title="Settings" pages={settings} />
-        <div class="section-divider"></div>
-        <!-- Insights -->
-        <NavSection title="Insights" pages={insights} />
-        <!-- Profile Dropdown -->
-        <ProfileMenu />
+  {#if isMobile}
+    <!-- Mobile Menu Toggle Button -->
+    <div transition:slide style="overflow: visible">
+      <Card color="warning" theme={$theme} class="toggle-card mb-2 p-0" outline>
+        <Button size="sm" class="toggle-button my-0" onclick={toggleSidebar}>
+          {sidebarOpen ? `✕ ${$_('phrases.HideMenu')}` : `☰ ${$_('phrases.ShowMenu')}`}
+        </Button>
       </Card>
     </div>
   {/if}
+</div>
 
-  <!-- Content Area -->
-  <Col>
-    <Theme theme={$theme}>
-      <Card class="mb-2" outline color="notifiarr">
-        <nav.ActivePage />
-      </Card>
-    </Theme>
-  </Col>
-</Row>
+{#if sidebarOpen || !isMobile}
+  {@const flex = isMobile ? 'flex-col' : ''}
+  {@const transition = { duration: 600, axis: 'x' as const }}
+  <!-- Navigation Sidebar. -->
+  <div class="sidebar-col col mb-2 {flex}" transition:slide={transition}>
+    <Sidebar slide={transition} />
+  </div>
+{/if}
+
+<!-- Content Area -->
+<Col>
+  <Card class="mb-2" outline color="notifiarr" theme={$theme}>
+    <nav.ActivePage />
+  </Card>
+</Col>
 
 <style>
-  /* Mobile styles */
-  .menu-toggle-wrapper :global(.toggle-card) {
+  .sidebar-col {
+    min-width: 230px;
+    max-width: fit-content;
+    margin-right: 0px;
+  }
+
+  /* Mobile styles for menu toggler. */
+
+  .menu-toggle-wrapper {
     position: sticky;
-    top: 0;
+    top: 0px;
     z-index: 1010;
+    overflow-x: visible;
+  }
+
+  .menu-toggle-wrapper :global(.toggle-card) {
     padding: 5px;
     margin-bottom: 15px;
     text-align: center;
@@ -73,45 +87,18 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
-  .section-divider {
-    height: 1px;
-    background-color: rgba(0, 0, 0, 0.1);
-    margin: 12px 0;
-    width: 100%;
-  }
-
-  .sidebar-col {
-    min-width: 230px;
-    max-width: 230px;
-  }
-
-  .sidebar-col :global(.sidebar-card) {
-    position: sticky;
-    top: 20px;
-    border-radius: 12px;
-    padding: 10px 5px 10px 5px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    min-height: calc(100vh - 150px);
-    display: flex;
-    flex-direction: column;
+  /* Mobile styles for sidebar. Turns it into a fixed sidebar w/ toggler. */
+  .flex-col {
+    position: fixed;
+    z-index: 1020;
+    max-height: 100vh;
     overflow-y: auto;
-  }
-
-  @media (max-width: 991.98px) {
-    .sidebar-col {
-      position: fixed;
-      z-index: 1020;
-      width: 85%;
-      max-height: 100vh;
-      overflow-y: auto;
-      top: 0;
-      left: 0;
-      padding: 1px;
-      border-radius: 12px;
-      transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      background: rgba(118, 122, 126, 0.9);
-    }
+    top: 0;
+    left: 0;
+    padding: 1px;
+    border-radius: 12px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    background: rgba(118, 122, 126, 0.9);
   }
 
   /* These styles are used by ProfileMenu.svelte and NavSection.svelte */

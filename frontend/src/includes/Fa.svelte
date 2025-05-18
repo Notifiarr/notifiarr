@@ -29,11 +29,10 @@
     d2?: string
   }
 
-  const dark = $derived($theme.includes('dark'))
   const { d, c1, c2, d1 = c1, d2 = c2, ...rest }: Props = $props()
-  const primaryColor = $derived(dark ? d1 : c1)
-  const secondaryColor = $derived(dark ? d2 : c2)
-  const icon = $derived(dark && d ? d : rest.i)
+  const primaryColor = $derived(theme.isDark ? d1 : c1)
+  const secondaryColor = $derived(theme.isDark ? d2 : c2)
+  const icon = $derived(theme.isDark && d ? d : rest.i)
 </script>
 
 <Fa {...rest} {icon} {primaryColor} {secondaryColor} id={'fa-icon' + rest.id} />

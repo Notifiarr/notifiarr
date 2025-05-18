@@ -9,13 +9,19 @@
   import { getUi } from '../api/fetch'
   import { theme } from '../includes/theme.svelte'
   import { _ } from '../includes/Translate.svelte'
+  import { faPowerOff } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import Fa from '../includes/Fa.svelte'
 
-  type Props = { isOpen: boolean; toggle: () => void }
-  const { isOpen = $bindable(false), toggle = $bindable(() => {}) }: Props = $props()
+  let isOpen = $state(false)
   let shutdown: any = $state()
+  const onclick = () => (shutdown = async () => await getUi('shutdown', false))
 </script>
 
-<Modal {isOpen} {toggle} theme={$theme}>
+<a href="#shutdown" onclick={e => (e.preventDefault(), (isOpen = true))}>
+  <Fa i={faPowerOff} c1="salmon" c2="maroon" d1="firebrick" d2="red" class="me-2" />
+</a>
+
+<Modal {isOpen} toggle={() => (isOpen = false)} theme={$theme}>
   <ModalHeader>{$_('phrases.ConfirmShutdown')}</ModalHeader>
   {#if shutdown}
     <ModalBody>
@@ -30,11 +36,8 @@
   {:else}
     <ModalBody>{$_('phrases.ConfirmShutdownBody')}</ModalBody>
     <ModalFooter>
-      <Button
-        color="danger"
-        onclick={() => (shutdown = async () => await getUi('shutdown', false))}>
-        {$_('buttons.Confirm')}</Button>
-      <Button color="secondary" onclick={toggle}>
+      <Button color="danger" {onclick}>{$_('buttons.Confirm')}</Button>
+      <Button color="secondary" onclick={() => (isOpen = false)}>
         {$_('buttons.Cancel')}</Button>
     </ModalFooter>
   {/if}
