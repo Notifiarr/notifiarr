@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Alert, Button, CardFooter, Col, Row } from '@sveltestrap/sveltestrap'
+  import { Alert, Button, CardFooter, Col, Row, Spinner } from '@sveltestrap/sveltestrap'
   import { profile } from '../api/profile.svelte'
   import T, { _ } from './Translate.svelte'
   import { age } from './util'
@@ -41,11 +41,14 @@
         <!-- Save Button -->
         <Button
           size="lg"
-          color="primary"
+          color="notifiarr"
           type="submit"
           class="mt-1"
           disabled={profile.status !== '' || saveDisabled}
           {onclick}>
+          {#if profile.status}
+            <Spinner size="sm" />
+          {/if}
           {profile.status ? $_('phrases.SavingConfiguration') : $_(saveButtonText)}
         </Button>
         <!-- Save Button Description -->

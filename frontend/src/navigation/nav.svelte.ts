@@ -16,7 +16,6 @@ export interface Page extends FaProps {
 class Navigator {
   public ActivePage: Component = $state(Landing)
   private activePage = $state('')
-  private pages = allPages
 
   /** Call this in the onMount function of the parent component to set the initial page. */
   public onMount = () => {
@@ -51,10 +50,10 @@ class Navigator {
   )
 
   /** active returns true if the provided page id is currently selected. */
-  public active = (check: string): boolean => iequals(this.activePage, check)
+  public active = (page: string): boolean => iequals(this.activePage, page)
 
   private setActivePage = (newPage: string): string => {
-    const page = this.pages.find(p => iequals(p.id, newPage))
+    const page = allPages.find(p => iequals(p.id, newPage))
     this.ActivePage = page?.component || Landing
     return (this.activePage = page ? newPage : '')
   }

@@ -11,7 +11,7 @@
   const { title, pages }: Props = $props()
 </script>
 
-<p class="navheader">{$_('navigation.titles.' + title)}</p>
+<p class="nav-header">{$_('navigation.titles.' + title)}</p>
 <div class="nav-section">
   <Nav vertical pills class="nav-custom" theme={$theme}>
     {#each pages as page}
@@ -33,7 +33,7 @@
 </div>
 
 <style>
-  .navheader {
+  .nav-header {
     font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;

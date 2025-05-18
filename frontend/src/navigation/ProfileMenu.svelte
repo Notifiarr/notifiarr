@@ -20,7 +20,7 @@
 </script>
 
 <Nav vertical pills class="nav-custom" theme={$theme}>
-  <Dropdown nav direction="up" class="ms-0">
+  <Dropdown nav direction="up" class="ms-0" setActiveFromChild>
     <DropdownToggle
       class="dropdown-custom {nav.active(ProfilePage.id) ? 'active' : ''}"
       nav>
@@ -90,5 +90,6 @@
     padding: 1px 0px 1px 14px;
     border: 0px;
     font-size: 16px;
+    height: 32px;
   }
 </style>

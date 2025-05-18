@@ -64,9 +64,7 @@
             <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
               <!-- This is the login page, before logging in. -->
               <Card outline theme={$theme} class="mt-2" color="notifiarr">
-                <CardHeader>
-                  <CardTitle>{$_('buttons.Login')}</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>{$_('buttons.Login')}</CardTitle></CardHeader>
                 <Login {error} />
               </Card>
             </Col>

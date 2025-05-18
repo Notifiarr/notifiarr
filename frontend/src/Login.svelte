@@ -14,7 +14,6 @@
     CardBody,
     CardFooter,
     Input,
-    Fade,
   } from '@sveltestrap/sveltestrap'
 
   let username = $state('')
@@ -68,8 +67,8 @@
       placeholder="Password"
       class="my-1"
       bind:value={password} />
-    <Button type="submit" size="sm" disabled={isLoading} class="w-100" color="success">
-      <Fade isOpen={isLoading}><Spinner size="sm" /></Fade>
+    <Button type="submit" size="sm" disabled={isLoading} class="w-100" color="notifiarr">
+      {#if isLoading}<Spinner size="sm" />{/if}
       <span class="fs-5">{$_(isLoading ? 'phrases.LoggingIn' : 'buttons.Login')}</span>
     </Button>
   </form>

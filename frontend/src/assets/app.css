@@ -79,7 +79,40 @@ body.dark-mode {
   color: #3cd2a5 !important;
 }
 
+.btn-notifiarr {
+  color: #000000 !important;
+  background: radial-gradient(
+    circle,
+    rgba(60, 210, 165, 1) 37%,
+    rgba(94, 230, 216, 1) 100%
+  );
+  border-color: #03535a !important;
+  font-weight: 600;
+}
+
+.btn-notifiarr:hover {
+  background: radial-gradient(circle, rgb(54, 197, 154) 37%, rgb(79, 195, 185) 100%);
+}
+
 h4 {
   font-size: 1.5rem !important;
   font-weight: 450 !important;
+}
+
+/* Make links look notifiarr. */
+
+a {
+  color: #2fa582 !important;
+}
+
+a:hover {
+  color: #3cd2a5 !important;
+}
+
+.dark-mode a {
+  color: #3cd2a5 !important;
+}
+
+.dark-mode a:hover {
+  color: #2fa582 !important;
 }

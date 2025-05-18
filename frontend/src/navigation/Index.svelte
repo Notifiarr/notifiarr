@@ -9,7 +9,7 @@
   import { _ } from '../includes/Translate.svelte'
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
-  import { slide } from 'svelte/transition'
+  import { crossfade, slide } from 'svelte/transition'
   import { onMount } from 'svelte'
   import Sidebar from './Sidebar.svelte'
 
@@ -17,6 +17,8 @@
   // windowWidth is used for sidebar collapse state.
   let windowWidth = $state(magicNumber + 1)
   const isMobile = $derived(windowWidth <= magicNumber)
+  // Use this to limit the sidebar height to the content height.
+  let contentHeight = $state(0)
 
   onMount(() => nav.onMount())
   $effect(() => {
@@ -44,14 +46,18 @@
   {@const transition = { duration: 600, axis: 'x' as const }}
   <!-- Navigation Sidebar. -->
   <div class="sidebar-col col mb-2 {flex}" transition:slide={transition}>
-    <Sidebar slide={transition} />
+    <Sidebar slide={transition} height={contentHeight} />
   </div>
 {/if}
 
 <!-- Content Area -->
 <Col>
   <Card class="mb-2" outline color="notifiarr" theme={$theme}>
-    <nav.ActivePage />
+    {#key nav.ActivePage}
+      <div bind:clientHeight={contentHeight} transition:slide>
+        <nav.ActivePage />
+      </div>
+    {/key}
   </Card>
 </Col>
 
@@ -99,39 +105,5 @@
     border-radius: 12px;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     background: rgba(118, 122, 126, 0.9);
-  }
-
-  /* These styles are used by ProfileMenu.svelte and NavSection.svelte */
-
-  .sidebar-col :global(.nav-custom) {
-    gap: 4px;
-  }
-
-  .sidebar-col :global(.nav-link-custom) {
-    display: flex;
-    align-items: center;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-
-  .sidebar-col :global(.nav-link-custom.active) {
-    background: linear-gradient(135deg, #1a73e8, #6c5ce7);
-    box-shadow: 0 2px 5px rgba(108, 92, 231, 0.2);
-  }
-
-  .sidebar-col :global(.nav-icon) {
-    margin-right: 12px;
-    display: inline-flex;
-    width: 20px;
-  }
-
-  /* This is only in ProfileMenu.svelte, but shares a gradient with the above. */
-
-  .sidebar-col :global(.dropdown-custom.active) {
-    background: linear-gradient(135deg, #1a73e8, #6c5ce7);
-    box-shadow: 0 2px 5px rgba(108, 92, 231, 0.2);
-    transition: all 0.2s ease;
-    border-radius: 8px;
-    color: #f1f3f5;
   }
 </style>
