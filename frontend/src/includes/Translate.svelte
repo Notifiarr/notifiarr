@@ -6,7 +6,7 @@
   export { _ } // pass it through
   export const isReady = derived(locale, $locale => typeof $locale === 'string')
 
-  let formatDate: (arg0: Date | number) => string // type is DateFormatter, but not sure how to import it.
+  let formatDate: (date: Date | number) => string // type is DateFormatter, but not sure how to import it.
   dt.subscribe(val => (formatDate = val))
 
   export function date(date: string | Date | number): string {

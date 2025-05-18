@@ -22,8 +22,8 @@
 <Nav vertical pills class="nav-custom" theme={$theme}>
   <Dropdown nav direction="up" class="ms-0">
     <DropdownToggle
-      nav
-      class="dropdown-custom {nav.active('TrustProfile') ? 'active' : ''}">
+      class="dropdown-custom {nav.active(ProfilePage.id) ? 'active' : ''}"
+      nav>
       <span class="text-uppercase profile-icon">
         {$profile.username.charAt(0).toUpperCase()}
       </span>
