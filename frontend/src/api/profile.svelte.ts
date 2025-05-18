@@ -37,11 +37,15 @@ class ConfigProfile {
   }
 
   /** Use fetch to set initial profile data when logging in. */
-  public async fetch() {
+  public async fetch(): Promise<string> {
     const { ok, body } = await getUi('profile')
-    if (!ok) return this.set({} as Profile)
+    if (!ok) {
+      this.set({} as Profile)
+      return body // error message
+    }
     body.loggedIn = true
     this.set(body)
+    return ''
   }
 
   /** Clear the status messages. Use this for the alert toggles and unmount callbacks. */
@@ -57,8 +61,12 @@ class ConfigProfile {
       this.status = get(_)('phrases.Reloading')
       await checkReloaded()
       this.status = get(_)('phrases.UpdatingBackEnd')
-      await this.fetch()
-      this.success = new Date()
+      this.error = await this.fetch()
+      await (this.error == ''
+        ? (this.success = new Date())
+        : (this.error = get(_)('phrases.FailedToReload', {
+            values: { error: this.error },
+          })))
     } catch (e) {
       this.error = `${e}`
       failure(this.error)

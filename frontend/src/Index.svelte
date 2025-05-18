@@ -13,63 +13,30 @@
     ModalBody,
     ModalFooter,
     ModalHeader,
-    Navbar,
-    NavbarBrand,
     Row,
     Spinner,
   } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg?inline'
   import { profile } from './api/profile.svelte'
-  import Navigation, { goto } from './Navigation.svelte'
+  import Navigation from './navigation/Index.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'
-  import T, { isReady, _ } from './includes/Translate.svelte'
-  import { age, delay } from './includes/util'
-  import { checkReloaded, getUi } from './api/fetch'
+  import { isReady, _ } from './includes/Translate.svelte'
+  import { delay } from './includes/util'
   import { setLocale } from './includes/locale/index.svelte'
   import { onMount } from 'svelte'
-  import { theme as thm } from './includes/theme.svelte'
-  import { urlbase } from './api/fetch'
-  import Fa from './includes/Fa.svelte'
-  import {
-    faArrowsRepeat,
-    faRotate,
-    faPowerOff,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import { theme } from './includes/theme.svelte'
+  import MainHeader, { showMsg } from './header/Index.svelte'
 
   let username = $state('')
   let password = $state('')
   let loginFailedMsg = $state('')
   let isLoading = $state(false)
-  let navigate: Navigation | undefined = $state()
-  let notification = $state('')
-  let showReloadModal = $state(false)
-  let showShutdownModal = $state(false)
   let showHelpModal = $state(false)
-  let reload: any = $state()
-  let shutdown: any = $state()
-  let spin = $state(false)
 
   onMount(() => {
     const query = new URLSearchParams(window.location.search)
     if (query.get('lang')) setLocale(query.get('lang')!)
   })
-
-  async function updateBackend(e?: Event) {
-    e?.preventDefault()
-    notification = `<span class="text-warning">${$_('phrases.UpdatingBackEnd')}</span>`
-    spin = true
-    try {
-      await profile.refresh()
-      await delay(2345)
-      notification = ''
-    } catch (err) {
-      notification = `<span class="text-danger">${$_('phrases.FailedToUpdateBackEnd', {
-        values: { error: `${err}` },
-      })}</span>`
-    } finally {
-      spin = false
-    }
-  }
 
   async function handleLogin(e: Event) {
     e.preventDefault()
@@ -84,9 +51,9 @@
 
     loginFailedMsg = (await profile.login(username, password)) ?? ''
     if (!loginFailedMsg) {
-      notification = $_('phrases.LoggedIn')
+      showMsg($_('phrases.LoggedIn'))
       await delay(4567)
-      notification = ''
+      showMsg('')
     } else {
       loginFailedMsg = $_('config.errors.LoginFailed', {
         values: { error: loginFailedMsg },
@@ -95,10 +62,6 @@
 
     isLoading = false
   }
-
-  const confirmReload = (e: Event) => (e.preventDefault(), (showReloadModal = true))
-  const confirmShutdown = (e: Event) => (e.preventDefault(), (showShutdownModal = true))
-  let theme = $derived($thm)
 </script>
 
 <svelte:head>
@@ -110,127 +73,9 @@
 
 <main>
   <Container fluid class="mb-2">
-    <Navbar {theme} class="mb-0 pb-0">
-      {#if $profile.loggedIn}
-        <span style="position: absolute; right: 0;" class="fs-3">
-          <a href="#reload" onclick={confirmReload}>
-            <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-1" />
-          </a>
-          <a href="#shutdown" onclick={confirmShutdown}>
-            <Fa
-              i={faPowerOff}
-              c1="salmon"
-              c2="maroon"
-              d1="firebrick"
-              d2="palevioletred"
-              class="me-2" />
-          </a>
-        </span>
-      {/if}
-      <NavbarBrand href={$urlbase} onclick={e => goto(e, '')} class="mb-0 pb-0">
-        <h1 class="m-0 lh-1" style="font-size: 40px;">
-          <img src={logo} height="45" alt="Logo" />
-          <span class="title-notifiarr">Notifiarr Client</span>
-        </h1>
-      </NavbarBrand>
-    </Navbar>
-
-    <!-- Notification Center-->
-    <Row class="mt-0 mb-1 lh-1">
-      <Col class="fs-6 fs-lighter ms-3 fst-italic">
-        <Card color="transparent border-0" {theme}>
-          <span class="text-nowrap">
-            {#if $profile?.loggedIn}
-              <a href="#reload" onclick={updateBackend}>
-                <Fa i={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
-              </a>
-              {#if notification}
-                {@html notification}
-              {:else}
-                <T id="phrases.BackEndUpdated" age={age(profile.updatedAge)} />
-              {/if}
-            {/if}
-          </span>
-        </Card>
-      </Col>
-    </Row>
-
-    <!-- Shutdown Confirmation Modal -->
-    <Modal isOpen={showShutdownModal} {theme}>
-      <ModalHeader>{$_('phrases.ConfirmShutdown')}</ModalHeader>
-      {#if shutdown}
-        <ModalBody>
-          {#await shutdown() then result}
-            {#if result.ok}
-              <span class="text-danger">{$_('phrases.ShutdownSuccess')}</span>
-            {:else}
-              {$_('phrases.FailedToShutdown', { values: { error: result.body } })}
-            {/if}
-          {/await}
-        </ModalBody>
-      {:else}
-        <ModalBody>{$_('phrases.ConfirmShutdownBody')}</ModalBody>
-        <ModalFooter>
-          <Button
-            color="danger"
-            onclick={() => (shutdown = async () => await getUi('shutdown', false))}>
-            {$_('buttons.Confirm')}
-          </Button>
-          <Button color="secondary" onclick={() => (showShutdownModal = false)}>
-            {$_('buttons.Cancel')}
-          </Button>
-        </ModalFooter>
-      {/if}
-    </Modal>
-
-    <!-- Reload Confirmation Modal -->
-    <Modal isOpen={showReloadModal} toggle={() => (showReloadModal = false)} {theme}>
-      <ModalHeader>{$_('phrases.ConfirmReload')}</ModalHeader>
-      {#if reload}
-        {#await reload() then result}
-          {#if result.ok}
-            <!-- reload success! -->
-            {#await checkReloaded()}
-              <!-- wait for reload to complete. -->
-              <ModalBody><Spinner size="sm" /> {$_('phrases.Reloading')}</ModalBody>
-            {:then}
-              <!-- reload complete! -->
-              {updateBackend()}
-              {(showReloadModal = false)}
-              {(reload = null)}
-            {:catch error}
-              <!-- error waiting for reload to complete. -->
-              {(showReloadModal = false)}
-              {(reload = null)}
-              {(notification = `<span class="text-danger">${$_('phrases.FailedToReload', {
-                values: { error: error.message },
-              })}</span>`)}
-            {/await}
-          {:else}
-            <!-- reload command failed. prob logged out. -->
-            {(showReloadModal = false)}
-            {(notification = `<span class="text-danger">${$_('phrases.FailedToReload', {
-              values: { error: result.body },
-            })}</span>`)}
-            {(reload = null)}
-          {/if}
-        {/await}
-      {:else}
-        <ModalBody>{$_('phrases.ConfirmReloadBody')}</ModalBody>
-        <ModalFooter>
-          <Button
-            color="danger"
-            onclick={async () => (reload = async () => await getUi('reload', false))}>
-            {$_('buttons.Confirm')}</Button>
-          <Button color="secondary" onclick={() => (showReloadModal = false)}>
-            {$_('buttons.Cancel')}
-          </Button>
-        </ModalFooter>
-      {/if}
-    </Modal>
-
+    <MainHeader />
     <!-- Login Help Modal -->
-    <Modal isOpen={showHelpModal} toggle={() => (showHelpModal = false)} {theme}>
+    <Modal isOpen={showHelpModal} toggle={() => (showHelpModal = false)} theme={$theme}>
       <ModalHeader>{$_('phrases.LoginHelp')}</ModalHeader>
       <ModalBody>{@html $_('phrases.LoginHelpBody')}</ModalBody>
       <ModalFooter>
@@ -244,7 +89,7 @@
       <!-- Wait for translations to load. -->
       {#if !$isReady}
         <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-          <Card outline {theme} color="notifiarr">
+          <Card outline theme={$theme} color="notifiarr">
             <CardBody class="text-nowrap fs-3">
               <!-- This is before translations are loaded. This 'typo' is on purpose, sue me. -->
               <Spinner /> Translateratating!...</CardBody>
@@ -254,19 +99,19 @@
         {#await profile.fetch()}
           <!-- Wait for profile to load. -->
           <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-            <Card outline {theme} color="notifiarr">
+            <Card outline theme={$theme} color="notifiarr">
               <CardBody class="text-nowrap fs-3">
                 <Spinner /> {$_('phrases.Loading')}</CardBody>
             </Card>
           </Col>
-        {:then}
+        {:then error}
           {#if $profile.loggedIn}
             <!-- This is the main page, after logging in. -->
-            <Navigation bind:this={navigate} />
+            <Navigation />
           {:else}
             <!-- This is the login page, before logging in. -->
             <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
-              <Card outline {theme} class="mt-2" color="notifiarr">
+              <Card outline theme={$theme} class="mt-2" color="notifiarr">
                 <CardHeader>
                   <CardTitle>{$_('buttons.Login')}</CardTitle>
                 </CardHeader>
@@ -308,20 +153,14 @@
                     {#if loginFailedMsg}
                       • <span class="text-danger">{loginFailedMsg}</span>
                     {/if}
+                    {#if error}
+                      • <span class="text-danger">{error}</span>
+                    {/if}
                   </CardFooter>
                 </CardBody>
               </Card>
             </Col>
           {/if}
-        {:catch error}
-          <Col xs={{ size: 10, offset: 1 }} md={{ size: 6, offset: 3 }}>
-            <!-- error fetching profile (ie. timeout), but really this never happens. -->
-            <Card outline body {theme} color="danger">
-              <CardHeader><CardTitle>{$_('phrases.ERROR')}</CardTitle></CardHeader>
-              <CardBody>{error.message}</CardBody>
-              <CardFooter>{$_('phrases.TryRefreshingThePage')}</CardFooter>
-            </Card>
-          </Col>
         {/await}
       {/if}
     </Row>
