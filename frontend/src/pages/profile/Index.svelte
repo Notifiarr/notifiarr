@@ -11,22 +11,15 @@
 </script>
 
 <script lang="ts">
-  import { Card, CardBody, Row, Col } from '@sveltestrap/sveltestrap'
+  import { CardBody, Row, Col } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Input from '../../includes/Input.svelte'
-  import T, { _ } from '../../includes/Translate.svelte'
+  import { _ } from '../../includes/Translate.svelte'
   import { AuthType as Auth } from '../../api/notifiarrConfig'
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
-  import Fa from '../../includes/Fa.svelte'
-  import { faSplotch } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import { slide } from 'svelte/transition'
-  import Header from '../../includes/Header.svelte'
+  import Header from './Header.svelte'
 
-  // goes into a translation.
-  const upstreamIp = $derived(
-    '<span class="text-danger">' + $profile?.upstreamIp + '</span>',
-  )
   // Form state, this is what we're sending to the backend.
   const form = $state({
     username: $profile?.username || '',
@@ -38,9 +31,6 @@
       ? $profile?.config.uiPassword.split(':')[1]
       : '',
   })
-
-  let showMore = $state(false)
-  const toggleMore = (e: Event) => (e.preventDefault(), (showMore = !showMore))
 
   async function submit(e: Event) {
     e.preventDefault()
@@ -65,6 +55,10 @@
         (!form.password || form.password.length < 9)) ||
         // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
         (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
+        // If they changed the auth type to password from something else, make sure they entered a new password.
+        (form.authType === Auth.password &&
+          $profile?.upstreamType !== Auth.password &&
+          form.newPass.length < 9) ||
         // Make sure they picked a header if header auth type is selected.
         (form.authType === Auth.header && !form.header) ||
         // Make sure they didn't enter a username that's not allowed.
@@ -78,68 +72,12 @@
     )
 </script>
 
-<Header {page} />
-
+<Header {addit} />
+<!-- We use a form here so you can press enter in a password field to save. -->
 <form onsubmit={submit}>
-  <!-- Bullet Points-->
-  <CardBody>
-    <ul class="mb-2 list-unstyled">
-      <li>
-        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-        {@html $_('profile.phrase.PasswordOnlyUsed')}
-      </li>
-      <li>
-        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-        {@html $_('profile.phrase.HeaderOnlyUsed')}
-      </li>
-      <li>
-        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-        {@html $_('profile.phrase.AuthTypeChange')}
-      </li>
-      <li>
-        <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-        {@html $_('profile.phrase.SeeWikiForAuthProxyHelp')}
-      </li>
-
-      <!-- Missing/Add upstream section -->
-      {#if !$profile?.upstreamAllowed}
-        <li>
-          <Fa i={faSplotch} c1="maroon" c2="salmon" d1="salmon" d2="maroon" />
-          <b><T id="profile.phrase.ProxyAuthDisabled" {upstreamIp} /></b>
-          <a href="#addit" onclick={addit}>
-            {$_('profile.phrase.Addit')}
-          </a>
-        </li>
-      {/if}
-
-      <!-- Show more toggle -->
-      <li>
-        <Fa i={faSplotch} c1="darkblue" d1="lightblue" c2="royalblue" />
-        <a href="#toggle-more" onclick={toggleMore}>
-          {showMore ? $_('profile.phrase.ShowMeLess') : $_('profile.phrase.ShowMeMore')}
-        </a>
-      </li>
-    </ul>
-
-    <!-- Show more section -->
-    <Row>
-      {#if showMore}
-        <div transition:slide={{ duration: 900 }}>
-          <Card body color="warning-subtle" class="my-1 pb-0">
-            <p>{@html $_('profile.phrase.ShowMoreDesc')}</p>
-            <h5>{$_('profile.authType.options.password')}</h5>
-            <p>{@html $_('profile.authType.option_desc.password')}</p>
-            <h5>{$_('profile.authType.options.header')}</h5>
-            <p>{@html $_('profile.authType.option_desc.header')}</p>
-            <h5>{$_('profile.authType.options.noauth')}</h5>
-            <p>{@html $_('profile.authType.option_desc.noauth')}</p>
-          </Card>
-        </div>
-      {/if}
-    </Row>
-
+  <CardBody class="pt-0 mt-0">
     <!-- Authorization Section -->
-    <h4 class="my-2">{$_('profile.title.Authorization')}</h4>
+    <h4>{$_('profile.title.Authorization')}</h4>
     <Row>
       <Col md={6}>
         <Input
@@ -169,10 +107,9 @@
       </Col>
     </Row>
 
-    <!-- We use a form here so you can press enter in a password field to save. -->
     <!-- Authentication Section -->
     {#if form.authType !== Auth.noauth}
-      <h4 class="mb-2">{$_('profile.title.Authentication')}</h4>
+      <h4>{$_('profile.title.Authentication')}</h4>
       {#if form.authType === Auth.header}
         <Row>
           <Col md={8}>
@@ -227,6 +164,7 @@
       </Row>
     {/if}
   </CardBody>
+
   <!-- Form success/error section -->
   <Footer
     {submit}

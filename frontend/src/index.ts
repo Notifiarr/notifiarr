@@ -4,4 +4,4 @@ import '/src/assets/app.css'
 import '/src/includes/locale/index.svelte.ts'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-export default mount(Index, { target: document.getElementById('notifiarr')! })
+export default mount(Index, { target: document.getElementById('app')! })

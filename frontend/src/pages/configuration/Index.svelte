@@ -38,15 +38,15 @@
 </script>
 
 <Header {page} badge={$_('phrases.Version', { values: { version: c.version } })} />
-<CardBody>
+<CardBody class="pt-0 mt-0">
   <!-- General Section -->
-  <h4 class="mb-2">{$_('config.titles.General')}</h4>
+  <h4>{$_('config.titles.General')}</h4>
   <Input id="config.apiKey" type="password" bind:value={c.apiKey} />
   <Input id="config.extraKeys" type="textarea" bind:value={extraKeys} {rows} />
   <Input id="config.hostId" bind:value={c.hostId} />
 
   <!-- Network Section -->
-  <h4 class="mb-2">{$_('config.titles.Network')}</h4>
+  <h4>{$_('config.titles.Network')}</h4>
   <Row>
     <Col md={6}>
       <Input id="config.bindAddr" bind:value={c.bindAddr} />
@@ -75,7 +75,7 @@
   </Row>
 
   <!-- System Section -->
-  <h4 class="mb-2">{$_('config.titles.System')}</h4>
+  <h4>{$_('config.titles.System')}</h4>
   <Row>
     <Col md={4}>
       <Input id="config.serial" type="select" bind:value={c.serial} />
@@ -121,7 +121,7 @@
   </Row>
 
   <!-- SSL Section -->
-  <h4 class="mb-2">{$_('config.titles.SSLConfiguration')}</h4>
+  <h4>{$_('config.titles.SSLConfiguration')}</h4>
   <Row>
     <Col md={6}>
       <Input id="config.sslKeyFile" bind:value={c.sslKeyFile} />
@@ -132,7 +132,7 @@
   </Row>
 
   <!-- Services Section -->
-  <h4 class="mb-2">{$_('config.titles.Services')}</h4>
+  <h4>{$_('config.titles.Services')}</h4>
   <Row>
     <Col md={4}>
       <Input
@@ -169,7 +169,7 @@
   </Row>
 
   <!-- Logging Section -->
-  <h4 class="mb-2">{$_('config.titles.Logging')}</h4>
+  <h4>{$_('config.titles.Logging')}</h4>
   <Row>
     <Col md={6}>
       <Input id="config.logFile" bind:value={c.logFile} />

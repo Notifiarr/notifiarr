@@ -94,9 +94,16 @@ body.dark-mode {
   background: radial-gradient(circle, rgb(54, 197, 154) 37%, rgb(79, 195, 185) 100%);
 }
 
+/* Use h4 as sub header for input groups. */
 h4 {
   font-size: 1.5rem !important;
-  font-weight: 450 !important;
+  font-weight: 550 !important;
+  width: 98%;
+  border-bottom: 2px solid rgba(54, 197, 154, 0.4);
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(54, 197, 154, 0.5);
+  margin-bottom: 1rem !important;
+  margin-top: 1.5rem !important;
 }
 
 /* Make links look notifiarr. */

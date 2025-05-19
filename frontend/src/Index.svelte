@@ -1,3 +1,10 @@
+<!--
+  This is the main entry point for the Notifiarr client.
+  It is responsible for loading the profile (backend config) and displaying the main content.
+  It also dispatches the login process and the language selection.
+  It is the only component that should be rendered in the root element.
+  All other components are rendered in the main element.
+-->
 <script lang="ts">
   import {
     Card,
@@ -14,16 +21,14 @@
   import Navigation from './navigation/Index.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import { isReady, _ } from './includes/Translate.svelte'
-  import { setLocale } from './includes/locale/index.svelte'
+  import { locale } from './includes/locale/index.svelte'
   import { onMount } from 'svelte'
   import { theme } from './includes/theme.svelte'
   import MainHeader from './header/Index.svelte'
   import Login from './Login.svelte'
+  import { nav } from './navigation/nav.svelte'
 
-  onMount(() => {
-    const query = new URLSearchParams(window.location.search)
-    if (query.get('lang')) setLocale(query.get('lang')!)
-  })
+  onMount(() => locale.set(nav.getQuery('lang')))
 </script>
 
 <svelte:head>

@@ -550,7 +550,7 @@ func environ() map[string]string {
 	return out
 }
 
-func (c *Client) setUserPass(ctx context.Context, authType, username, password string) error {
+func (c *Client) setUserPass(ctx context.Context, authType configfile.AuthType, username, password string) error {
 	c.Lock()
 	defer c.Unlock()
 
@@ -559,11 +559,11 @@ func (c *Client) setUserPass(ctx context.Context, authType, username, password s
 	var err error
 
 	switch authType {
-	default:
+	case configfile.AuthPassword:
 		err = c.Config.UIPassword.Set(username + ":" + password)
-	case "header":
+	case configfile.AuthHeader:
 		err = c.Config.UIPassword.SetHeader(username)
-	case "nopass":
+	case configfile.AuthNone:
 		err = c.Config.UIPassword.SetNoAuth(username)
 	}
 

@@ -3,8 +3,8 @@
   import Fa, { type Props as FaProps } from './Fa.svelte'
   import { _ } from './Translate.svelte'
   import { get } from 'svelte/store'
-  type Props = { badge?: string; page: FaProps }
-  let { badge = undefined, page }: Props = $props()
+  type Props = { badge?: string; page: FaProps; children?: any }
+  let { badge = undefined, page, children }: Props = $props()
   const description: string = $derived(get(_)('navigation.pageDescription.' + page.id))
 </script>
 
@@ -16,6 +16,10 @@
   </h2>
   {#if description != 'navigation.pageDescription.' + page.id}
     {@html description}
+  {/if}
+  {#if children}
+    <hr />
+    {@render children()}
   {/if}
 </CardHeader>
 

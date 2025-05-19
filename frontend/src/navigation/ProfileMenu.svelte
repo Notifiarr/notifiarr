@@ -9,14 +9,16 @@
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
   import { _ } from '../includes/Translate.svelte'
-  import { currentLocale, setLocale, Flags } from '../includes/locale/index.svelte'
+  import { locale, Flags } from '../includes/locale/index.svelte'
   import { profile } from '../api/profile.svelte'
   import Fa from '../includes/Fa.svelte'
   import { Input } from '@sveltestrap/sveltestrap'
   import { faStarship, faSun } from '@fortawesome/sharp-duotone-light-svg-icons'
   import { page as ProfilePage } from '../pages/profile/Index.svelte'
+  import { closeSidebar } from './Index.svelte'
 
-  let newLang = $derived(currentLocale())
+  let newLang = $derived(locale.current)
+  const onchange = () => (locale.set(newLang), closeSidebar())
 </script>
 
 <Nav vertical pills class="nav-custom" theme={$theme}>
@@ -35,17 +37,13 @@
         active={nav.active(ProfilePage.id)}
         disabled={nav.active(ProfilePage.id)}
         onclick={e => nav.goto(e, ProfilePage.id)}>
-        <span class="nav-icon"><Fa {...ProfilePage} scale="1.7x" /></span>
-        {$_('navigation.titles.TrustProfile')}
+        <span class="nav-icon"><Fa {...ProfilePage} scale="1.3x" /></span>
+        {$_('navigation.titles.' + ProfilePage.id)}
       </DropdownItem>
       <span class="lang-wrapper">
-        <Input
-          class="my-1 lang-select"
-          type="select"
-          bind:value={newLang}
-          onchange={() => setLocale(newLang)}>
-          {#each Object.entries($profile.languages?.[currentLocale()] || {}) as [code, lang]}
-            <option value={code} selected={code === currentLocale()}>
+        <Input type="select" bind:value={newLang} {onchange}>
+          {#each Object.entries($profile.languages?.[locale.current] || {}) as [code, lang]}
+            <option value={code} selected={code === locale.current}>
               {Flags[code]}&nbsp;&nbsp; {lang.name}
             </option>
           {/each}
@@ -86,10 +84,12 @@
     margin-right: 6px;
   }
 
-  .lang-wrapper :global(.lang-select) {
+  .lang-wrapper :global(select) {
     padding: 1px 0px 1px 14px;
+    margin: 5px 0px 5px 0px;
     border: 0px;
     font-size: 16px;
     height: 32px;
+    min-width: 180px;
   }
 </style>

@@ -1,5 +1,6 @@
-import { init, register, locale, getLocaleFromNavigator } from 'svelte-i18n'
+import { init, register, locale as lang, getLocaleFromNavigator } from 'svelte-i18n'
 import { failure } from '../util'
+import { nav } from '../../navigation/nav.svelte'
 
 /*
 https://phrase.com/blog/posts/a-step-by-step-guide-to-svelte-localization-with-svelte-i18n-v3/
@@ -28,44 +29,52 @@ export const Flags: Record<string, string> = {
   zh_Hans: '🇨🇳',
 }
 
-// We support English primarily, so make that the default and fallback.
-const fallbackLocale = 'en'
-// We only support language codes, not country codes. Maybe one day.
-const initialLocale = getLocaleFromNavigator()?.split('-')[0] || fallbackLocale
+class Locale {
+  // We support English primarily, so make that the default and fallback.
+  private fallbackLocale = 'en'
+  /** Use this to get the current UI locale (translated language). */
+  public current: string = $state(this.fallbackLocale)
 
-let current = $state(initialLocale)
+  constructor() {
+    // We only support language codes, not country codes. Maybe one day.
+    const initialLocale = getLocaleFromNavigator()?.split('-')[0] || this.fallbackLocale
+    this.init(initialLocale, this.fallbackLocale)
+  }
 
-export const currentLocale = () => current
+  /** Use this to change the UI locale (translated language). */
+  public set = async (newLocale: string | null) => {
+    if (!newLocale) return
 
-export async function setLocale(newLocale: string) {
-  try {
-    await register(newLocale, async () => await import(`../locale/${newLocale}.json`))
-    await locale.set(newLocale)
-    current = newLocale
-    // Update the URL with the new locale.
-    const query = new URLSearchParams(window.location.search)
-    await query.set('lang', newLocale)
-    window.history.replaceState({}, '', `${window.location.pathname}?${query.toString()}`)
-  } catch (e) {
-    console.error(`Error registering selected locale ${newLocale}:`, e)
-    failure(`Error registering selected locale ${newLocale}: ${e}`)
+    try {
+      await register(newLocale, async () => await import(`../locale/${newLocale}.json`))
+      await lang.set(newLocale)
+      await nav.setQuery('lang', (this.current = newLocale))
+    } catch (e) {
+      this.error(`Error registering selected locale ${newLocale}: ${e}`)
+    }
+  }
+
+  private init = async (initial: string, fallback: string) => {
+    try {
+      await register(initial, async () => await import(`../locale/${initial}.json`))
+      await init({ fallbackLocale: fallback, initialLocale: initial })
+    } catch (e) {
+      this.error(`Error registering browser locale ${initial}: ${e}`)
+      // Load default locale.
+      try {
+        await register(fallback, async () => await import(`../locale/${fallback}.json`))
+        await init({ fallbackLocale: fallback, initialLocale: fallback })
+      } catch (e) {
+        this.error(`Error registering default locale ${fallback}: ${e}`)
+      }
+    }
+  }
+
+  private error = (message: string) => {
+    console.error(message)
+    failure(message)
   }
 }
 
-async function initLocale() {
-  try {
-    await register(
-      initialLocale,
-      async () => await import(`../locale/${initialLocale}.json`),
-    )
-    await init({ fallbackLocale, initialLocale })
-  } catch (e) {
-    failure(`Error registering browser locale ${initialLocale}: ${e}`)
-    console.error(`Error registering browser locale ${initialLocale}:`, e)
-    // Load default locale.
-    register(fallbackLocale, () => import(`../locale/${fallbackLocale}.json`))
-    init({ fallbackLocale, initialLocale: fallbackLocale })
-  }
-}
-
-initLocale()
+/** Use locale to get the current locale (translation language), or change it. */
+export const locale = new Locale()

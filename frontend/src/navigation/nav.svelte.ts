@@ -40,8 +40,25 @@ class Navigator {
     const params = new URLSearchParams(window.location.search).toString()
     const path = [pid, ...subPages].join('/').toLowerCase()
     const uri = `${get(urlbase)}${path}${params ? `?${params}` : ''}`
+    // Push the new page into the browser history.
     window.history.pushState({ uri: this.activePage }, '', uri)
   }
+
+  /**
+   * Used to set a query parameter in the url.
+   * @param key - the key to set.
+   * @param value - the value to set.
+   */
+  public setQuery = async (key: string, value: string) => {
+    const query = new URLSearchParams(window.location.search)
+    if (value === '') await query.delete(key)
+    else await query.set(key, value)
+    const uri = `${window.location.pathname}?${query.toString()}`
+    // Replace the current state with the new url + query.
+    await window.history.replaceState({ uri: this.activePage }, '', uri)
+  }
+
+  public getQuery = (key: string) => new URLSearchParams(window.location.search).get(key)
 
   // popstate is split from goto(), so we can call it from popstate.
   /**  Call this only when the back button is clicked. */

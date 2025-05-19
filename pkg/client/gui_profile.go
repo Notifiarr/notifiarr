@@ -101,7 +101,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		return
 	}
 
-	switch err := c.setUserPass(request.Context(), post.AuthType.Type(), post.Header, ""); {
+	switch err := c.setUserPass(request.Context(), post.AuthType, post.Header, ""); {
 	case err != nil:
 		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
@@ -172,7 +172,7 @@ func (c *Client) handleProfilePostPassword(
 		return
 	}
 
-	if err := c.setUserPass(request.Context(), "password", newUser, newPassw); err != nil {
+	if err := c.setUserPass(request.Context(), configfile.AuthPassword, newUser, newPassw); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
 		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
 

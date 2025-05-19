@@ -1,3 +1,9 @@
+<!--
+  This is the main navigation component.
+  It is responsible for displaying the sidebar and the content area.
+  This component, with the help of nav.svelte.ts keeps the window address bar accurate.
+  It also handles the sidebar toggle for mobile devices.
+-->
 <script lang="ts" module>
   let sidebarOpen = $state(false)
   export const closeSidebar = () => (sidebarOpen = false)
@@ -9,7 +15,7 @@
   import { _ } from '../includes/Translate.svelte'
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
-  import { crossfade, slide } from 'svelte/transition'
+  import { slide } from 'svelte/transition'
   import { onMount } from 'svelte'
   import Sidebar from './Sidebar.svelte'
 
