@@ -7,15 +7,15 @@ import (
 
 // PHPDate allows us to easily convert a PHP date format in Go.
 type PHPDate struct {
-	php string
-	fmt string
+	PHP string `json:"php"`
+	Fmt string `json:"fmt"`
 }
 
 // UnmarshalJSON turns a php date/time format into a golang struct.
 func (p *PHPDate) UnmarshalJSON(b []byte) error {
-	p.php = (strings.Trim(string(b), `"`))
-	for _, character := range p.php {
-		p.fmt += flip(string(character))
+	p.PHP = (strings.Trim(string(b), `"`))
+	for _, character := range p.PHP {
+		p.Fmt += flip(string(character))
 	}
 
 	return nil
@@ -23,17 +23,12 @@ func (p *PHPDate) UnmarshalJSON(b []byte) error {
 
 // String returns the golang date format for a php date/time format.
 func (p *PHPDate) String() string {
-	return p.fmt
-}
-
-// PHP returns the format for a php date/time.
-func (p *PHPDate) PHP() string {
-	return p.php
+	return p.Fmt
 }
 
 // Format returns the date, formatted.
 func (p *PHPDate) Format(date time.Time) string {
-	return date.Format(p.fmt)
+	return date.Format(p.Fmt)
 }
 
 // flip the character in the php date/time format string to a go format string.

@@ -27,9 +27,15 @@ export enum AuthType {
 
 /**
  * Profile is the data returned by the profile GET endpoint.
+ * Basically everything.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
  */
 export interface Profile {
+  /**
+   * Input       *configfile.Config             `json:"input"`
+   * Actions     *triggers.Actions              `json:"actions"`
+   * Tunnel      *mulery.Client                 `json:"tunnel"`
+   */
   username: string;
   config: Config;
   clientInfo?: ClientInfo;
@@ -52,6 +58,37 @@ export interface Profile {
    */
   loggedIn: boolean;
   updated: Date;
+  flags?: Flags;
+  dynamic: boolean;
+  webauth: boolean;
+  msg?: string;
+  logFileInfo?: LogFileInfos;
+  configFileInfo?: LogFileInfos;
+  expvar: AllData;
+  hostInfo?: InfoStat;
+  disks?: Record<string, null | Partition>;
+  proxyAllow: boolean;
+  poolStats?: Record<string, null | PoolSize>;
+  started: Date;
+  program: string;
+  version: string;
+  revision: string;
+  branch: string;
+  buildUser: string;
+  buildDate: string;
+  goVersion: string;
+  os: string;
+  arch: string;
+  binary: string;
+  environment?: Record<string, string>;
+  docker: boolean;
+  uid: number;
+  gid: number;
+  ip: string;
+  gateway: string;
+  ifName: string;
+  netmask: string;
+  md5: string;
 };
 
 /**
@@ -489,7 +526,10 @@ export interface ClientInfo {
  * PHPDate allows us to easily convert a PHP date format in Go.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.PHPDate>
  */
-export interface PHPDate {};
+export interface PHPDate {
+  php: string;
+  fmt: string;
+};
 
 /**
  * MuleryServer is data from the website. It's a tunnel's https and wss urls.
@@ -630,6 +670,119 @@ export interface LocalizedLanguage {
 };
 
 /**
+ * Flags are our CLI input flags.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.Flags>
+ */
+export interface Flags {
+  verReq: boolean;
+  longVerReq: boolean;
+  restart: boolean;
+  aptHook: boolean;
+  updated: boolean;
+  pslist: boolean;
+  fortune: boolean;
+  write: string;
+  reset: boolean;
+  curl: string;
+  configFile: string;
+  extraConf?: string[];
+  envPrefix: string;
+  headers?: string[];
+  staticDif: string;
+  delay: number;
+};
+
+/**
+ * LogFileInfos holds metadata about files.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/logs.LogFileInfos>
+ */
+export interface LogFileInfos {
+  dirs?: string[];
+  size: number;
+  list?: (null | LogFileInfo)[];
+};
+
+/**
+ * LogFileInfo is returned by GetAllLogFilePaths.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/logs.LogFileInfo>
+ */
+export interface LogFileInfo {
+  id: string;
+  name: string;
+  path: string;
+  size: number;
+  time: Date;
+  mode: number;
+  used: boolean;
+  user: string;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/mnd.AllData>
+ */
+export interface AllData {
+  logFiles?: Record<string, null | any>;
+  apiHits?: Record<string, null | any>;
+  httpRequests?: Record<string, null | any>;
+  timerEvents?: Record<string, null | Record<string, null | any>>;
+  timerCounts?: Record<string, null | any>;
+  website?: Record<string, null | any>;
+  serviceChecks?: Record<string, null | Record<string, null | any>>;
+  apps?: Record<string, null | Record<string, null | any>>;
+  fileWatcher?: Record<string, null | any>;
+};
+
+/**
+ * A HostInfoStat describes the host status.
+ * This is not in the psutil but it useful.
+ * @see golang: <github.com/shirou/gopsutil/v4/host.InfoStat>
+ */
+export interface InfoStat {
+  hostname: string;
+  uptime: number;
+  bootTime: number;
+  procs: number;
+  os: string;
+  platform: string;
+  platformFamily: string;
+  platformVersion: string;
+  kernelVersion: string;
+  kernelArch: string;
+  virtualizationSystem: string;
+  virtualizationRole: string;
+  hostId: string;
+};
+
+/**
+ * Partition is used for ZFS pools as well as normal Disk arrays.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Partition>
+ */
+export interface Partition {
+  name: string;
+  total: number;
+  free: number;
+  used: number;
+  fsType?: string;
+  readOnly?: boolean;
+  opts?: string[];
+};
+
+/**
+ * PoolSize represent the number of open connections per status.
+ * @see golang: <golift.io/mulery/client.PoolSize>
+ */
+export interface PoolSize {
+  Disconnects: number;
+  Connecting: number;
+  Idle: number;
+  Running: number;
+  Total: number;
+  LastConn: Date;
+  LastTry: Date;
+  Active: boolean;
+};
+
+/**
  * ProfilePost is the data sent to the profile POST endpoint when updating the trust profile.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.ProfilePost>
  */
@@ -651,15 +804,18 @@ export interface ProfilePost {
 //   6. github.com/Notifiarr/notifiarr/pkg/client
 //   7. github.com/Notifiarr/notifiarr/pkg/configfile
 //   8. github.com/Notifiarr/notifiarr/pkg/logs
-//   9. github.com/Notifiarr/notifiarr/pkg/services
-//  10. github.com/Notifiarr/notifiarr/pkg/snapshot
-//  11. github.com/Notifiarr/notifiarr/pkg/triggers/commands
-//  12. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
-//  13. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
-//  14. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
-//  15. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
-//  16. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
-//  17. golift.io/deluge
-//  18. golift.io/nzbget
-//  19. golift.io/qbit
-//  20. golift.io/starr
+//   9. github.com/Notifiarr/notifiarr/pkg/mnd
+//  10. github.com/Notifiarr/notifiarr/pkg/services
+//  11. github.com/Notifiarr/notifiarr/pkg/snapshot
+//  12. github.com/Notifiarr/notifiarr/pkg/triggers/commands
+//  13. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
+//  14. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
+//  15. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
+//  16. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
+//  17. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
+//  18. github.com/shirou/gopsutil/v4/host
+//  19. golift.io/deluge
+//  20. golift.io/mulery/client
+//  21. golift.io/nzbget
+//  22. golift.io/qbit
+//  23. golift.io/starr

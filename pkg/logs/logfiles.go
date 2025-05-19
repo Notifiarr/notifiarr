@@ -202,21 +202,21 @@ func (l *Logger) openHTTPLog() {
 
 // LogFileInfos holds metadata about files.
 type LogFileInfos struct {
-	Dirs []string
-	Size int64
-	List []*LogFileInfo
+	Dirs []string       `json:"dirs"`
+	Size int64          `json:"size"`
+	List []*LogFileInfo `json:"list"`
 }
 
 // LogFileInfo is returned by GetAllLogFilePaths.
 type LogFileInfo struct {
-	ID   string
-	Name string
-	Path string
-	Size int64
-	Time time.Time
-	Mode fs.FileMode
-	Used bool
-	User string
+	ID   string      `json:"id"`
+	Name string      `json:"name"`
+	Path string      `json:"path"`
+	Size int64       `json:"size"`
+	Time time.Time   `json:"time"`
+	Mode fs.FileMode `json:"mode"`
+	Used bool        `json:"used"`
+	User string      `json:"user"`
 }
 
 // GetActiveLogFilePaths returns the configured log file paths.

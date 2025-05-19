@@ -342,5 +342,67 @@
       "description": "Your new login password",
       "placeholder": "9 character minimum"
     }
+  },
+  "system": {
+    "BuildInformation": {
+      "title": "Build Information",
+      "Branch": "Branch",
+      "BuildUser": "Build User",
+      "BuildDate": "Build Date",
+      "GoVersion": "Go Version",
+      "Integrity": "Integrity"
+    },
+    "OperatingSystem": {
+      "title": "Operating System",
+      "Hostname": "Hostname",
+      "UniqueID": "Unique ID",
+      "Platform": "Platform",
+      "KernelVersion": "Kernel Version",
+      "VirtualizationSystem": "Virtualization System"
+    },
+    "ClientInformation": {
+      "title": "Client Information",
+      "Application": "Application",
+      "Version": "Version",
+      "Started": "Started",
+      "Uptime": "Uptime"
+    },
+    "StorageData": {
+      "title": "Storage Data",
+      "Total": "Total",
+      "Used": "Used",
+      "Free": "Free",
+      "FS": "FS",
+      "ro": "ro"
+    },
+    "NetworkInformation": {
+      "title": "Network Information",
+      "IPAddress": "IP Address",
+      "Gateway": "Gateway",
+      "Netmask": "Netmask",
+      "Interface": "Interface"
+    },
+    "StartupParams": {
+      "title": "Startup Parameters",
+      "BinaryPath": "Binary Path",
+      "ConfigFile": "Config File",
+      "EnvironmentPrefix": "Environment Prefix",
+      "ExtraConfigFiles": "Extra Config Files",
+      "CustomAssets": "Custom Assets",
+      "UserID": "User ID",
+      "GroupID": "Group ID",
+      "IPAddress": "IP Address"
+    },
+    "UserInformation": {
+      "title": "User Information",
+      "Patron": "Patron",
+      "Subscriber": "Subscriber",
+      "AbsoluteBadAss": "Absolute Bad Ass",
+      "YesYesYouAre": "Yes, yes you are! 💚",
+      "HellaAwesome": "Hella Awesome",
+      "YoureSoGifted": "You're so gifted, and we love you! 💜",
+      "DateFormat": "Date Format"
+    },
+    "EnvironmentVariables": { "title": "Environment Variables" }
   }
 }

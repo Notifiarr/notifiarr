@@ -192,4 +192,9 @@
   .input {
     margin-bottom: 1rem;
   }
+
+  .input :global(label) {
+    font-weight: 550;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
 </style>
