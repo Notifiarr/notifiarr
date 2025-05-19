@@ -123,3 +123,10 @@ a:hover {
 .dark-mode a:hover {
   color: #2fa582 !important;
 }
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid #3cd2a5 !important;
+  box-shadow: 0 0 10px #2fa582 !important;
+}

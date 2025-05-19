@@ -325,7 +325,7 @@
     "header": {
       "label": "Auth Header",
       "description": "Select the header containing your username",
-      "tooltip": "This displays headers that are provided by the client or upstream that may be used for proxy authentication. This selection is used if Authentication Type is set to Header. Choose the header that displays your proper username."
+      "tooltip": "This displays headers that are provided by the client or upstream that may be used for proxy authentication. This selection is used if Authentication Type is set to Header or No Password. Choose the header that displays your proper username. When using No Password, the header is used to set the username, but is not required."
     },
     "username": {
       "label": "Username",

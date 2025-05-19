@@ -108,47 +108,45 @@
     </Row>
 
     <!-- Authentication Section -->
-    {#if form.authType !== Auth.noauth}
-      <h4>{$_('profile.title.Authentication')}</h4>
-      {#if form.authType === Auth.header}
-        <Row>
-          <Col md={8}>
-            <Input id="profile.header" type="select" bind:value={form.header}>
-              {#each Object.entries($profile?.headers || {}) as [key, value]}
-                {#each value! as val}
-                  <option
-                    value={key}
-                    selected={form.header.toLowerCase() === key.toLowerCase()}>
-                    {key} ({val})
-                  </option>
-                {/each}
-              {/each}
-              {#if form.header === ''}
-                <option value={form.header} selected>(none)</option>
-              {:else if !$profile?.headers?.[form.header]}
-                <option value={form.header} selected>
-                  {form.header} (other)
+    <h4>{$_('profile.title.Authentication')}</h4>
+    {#if form.authType !== Auth.password}
+      <Row>
+        <Col md={8}>
+          <Input id="profile.header" type="select" bind:value={form.header}>
+            {#each Object.entries($profile?.headers || {}) as [key, value]}
+              {#each value! as val}
+                <option
+                  value={key}
+                  selected={form.header.toLowerCase() === key.toLowerCase()}>
+                  {key} ({val})
                 </option>
-              {/if}
-            </Input>
-          </Col>
-        </Row>
-      {:else if form.authType === Auth.password}
-        <Row>
-          <Col md={8}>
-            <Input
-              id="profile.newPass"
-              name="noautofill"
-              type="password"
-              bind:value={form.newPass} />
-          </Col>
-        </Row>
-        <Row>
-          <Col md={8}>
-            <Input id="profile.username" type="text" bind:value={form.username} />
-          </Col>
-        </Row>
-      {/if}
+              {/each}
+            {/each}
+            {#if form.header === ''}
+              <option value={form.header} selected>(none)</option>
+            {:else if !$profile?.headers?.[form.header]}
+              <option value={form.header} selected>
+                {form.header} (other)
+              </option>
+            {/if}
+          </Input>
+        </Col>
+      </Row>
+    {:else}
+      <Row>
+        <Col md={8}>
+          <Input
+            id="profile.newPass"
+            name="noautofill"
+            type="password"
+            bind:value={form.newPass} />
+        </Col>
+      </Row>
+      <Row>
+        <Col md={8}>
+          <Input id="profile.username" type="text" bind:value={form.username} />
+        </Col>
+      </Row>
     {/if}
 
     <!-- Current Password Section, shows up any time a password is configured in the backend. -->
