@@ -32,7 +32,7 @@
     /** The description to display below the input. Must be present in translation if not undefined here. */
     description?: string
     /** The type of input. Like `text` or `select`. */
-    type?: InputType
+    type?: InputType | 'interval' | 'timeout'
     /** Used if you do not want this value changed directly. */
     readonly?: boolean
     /** Similar to readonly, but the input dims/greys out. */
@@ -55,6 +55,8 @@
     post?: Snippet
     /** Optional children to render inside the input. Useful for select options. */
     children?: Snippet
+    /** Optional message to display below the input. */
+    msg?: Snippet
   }
 
   let {
@@ -75,6 +77,7 @@
     pre,
     children,
     post,
+    msg,
   }: Props = $props()
 
   type Option = { value: string | number | boolean; name: string; disabled?: boolean }
@@ -96,6 +99,42 @@
   function togglePassword(e: Event | undefined = undefined) {
     e?.preventDefault()
     currType = currType === 'password' ? 'text' : 'password'
+  }
+
+  if (type === 'interval') {
+    currType = 'select'
+    options = [
+      { value: '0s', name: $_('words.select-option.ChecksDisabled') },
+      { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
+      { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
+      { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
+      { value: '4m0s', name: '4 ' + $_('words.select-option.minutes') },
+      { value: '5m0s', name: '5 ' + $_('words.select-option.minutes') },
+      { value: '6m0s', name: '6 ' + $_('words.select-option.minutes') },
+      { value: '7m0s', name: '7 ' + $_('words.select-option.minutes') },
+      { value: '8m0s', name: '8 ' + $_('words.select-option.minutes') },
+      { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
+      { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
+      { value: '15m0s', name: '15 ' + $_('words.select-option.minutes') },
+      { value: '20m0s', name: '20 ' + $_('words.select-option.minutes') },
+      { value: '25m0s', name: '25 ' + $_('words.select-option.minutes') },
+      { value: '30m0s', name: '30 ' + $_('words.select-option.minutes') },
+    ]
+  }
+
+  if (type === 'timeout') {
+    currType = 'select'
+    options = [
+      { value: '-1s', name: $_('words.select-option.InstanceDisabled') },
+      { value: '0s', name: $_('words.select-option.NoTimeout') },
+      { value: '5s', name: '5 ' + $_('words.select-option.seconds') },
+      { value: '10s', name: '10 ' + $_('words.select-option.seconds') },
+      { value: '15s', name: '15 ' + $_('words.select-option.seconds') },
+      { value: '30s', name: '30 ' + $_('words.select-option.seconds') },
+      { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
+      { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
+      { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
+    ]
   }
 </script>
 
@@ -121,7 +160,7 @@
       <Input
         {id}
         {name}
-        type={currType}
+        type={currType as InputType}
         bind:this={input}
         bind:value
         bind:checked={value}
@@ -185,6 +224,7 @@
     {#if description}
       <small class="text-muted">{@html description}</small>
     {/if}
+    {@render msg?.()}
   </FormGroup>
 </div>
 

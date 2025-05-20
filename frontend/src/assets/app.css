@@ -94,6 +94,10 @@ body.dark-mode {
   background: radial-gradient(circle, rgb(54, 197, 154) 37%, rgb(79, 195, 185) 100%);
 }
 
+.btn-outline-notifiarr {
+  border-color: #3cd2a5 !important;
+}
+
 /* Use h4 as sub header for input groups. */
 h4 {
   font-size: 1.5rem !important;
@@ -131,4 +135,18 @@ select:focus,
 textarea:focus {
   outline: 3px solid #3cd2a5 !important;
   box-shadow: 0 0 10px #2fa582 !important;
+}
+
+.accordion {
+  --bs-accordion-active-bg: #b0d9c4ab !important;
+  --bs-accordion-active-color: #04482c !important;
+  --bs-accordion-bg: #cdf0cd42 !important;
+  --bs-accordion-border-color: #6cf878 !important;
+}
+
+.dark-mode .accordion {
+  --bs-accordion-active-bg: #03331f !important;
+  --bs-accordion-active-color: #9df6c8 !important;
+  --bs-accordion-bg: #212921 !important;
+  --bs-accordion-border-color: #659369 !important;
 }

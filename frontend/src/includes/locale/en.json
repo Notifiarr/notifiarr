@@ -12,7 +12,30 @@
       "megabytes": "megabytes",
       "bytes": "bytes",
       "Daily": "Daily",
-      "custom": "custom"
+      "custom": "custom",
+      "InstanceDisabled": "Instance Disabled",
+      "NoTimeout": "No Timeout",
+      "ChecksDisabled": "Checks Disabled"
+    },
+    "instance-options": {
+      "interval": {
+        "label": "Service Check Interval",
+        "description": "How often to service-check the instance."
+      },
+      "timeout": {
+        "label": "Request Timeout",
+        "description": "How long to wait for a response from the instance."
+      },
+      "validSsl": {
+        "label": "Validate SSL Certificate",
+        "description": "Checking the box makes sure the instance is using a valid SSL certificate."
+      },
+      "deletes": {
+        "label": "Delete Content",
+        "description": "This limits the number of delete requests that may be sent to this instance in an hour.",
+        "tooltip": "This controls how many delete requests are allowed per hour. A setting of 0 disables the ability to send delete requests. This refers to media deletes, but may include other actions. This is a throttle to prevent hackers from obliterating your content.",
+        "countPerHour": "{count} per hour"
+      }
     }
   },
   "buttons": {
@@ -404,5 +427,45 @@
       "DateFormat": "Date Format"
     },
     "EnvironmentVariables": { "title": "Environment Variables" }
+  },
+  "MediaApps": {
+    "Plex": {
+      "title": "Plex",
+      "description": "The Plex integration is comprehensive, and many of the settings are configured on the <a href='https://notifiarr.com/' target='_new'>Notifiarr.com website</a>.",
+      "name": {
+        "label": "Server Name",
+        "description": "Name of the Plex server.",
+        "placeholder": "Set automatically by server"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Plex server.",
+        "placeholder": "http://plex.server.tv:32400"
+      },
+      "token": {
+        "label": "Token",
+        "description": "Token for the Plex server.",
+        "placeholder": "pl3x-to_Ken",
+        "tooltip": "You may find directions for locating your Plex token at <a href='https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/' target='_new'>this Plex Article</a>."
+      }
+    },
+    "Tautulli": {
+      "title": "Tautulli",
+      "description": "Tautulli provides a feature that allows you to give your Plex users custom usernames. By integrating Notifiarr client with Tautulli, those custom usernames will be displayed in your chat server notifications. When not enabled, Plex usernames or email addresses are used instead. This is entirely optional. The Notifiarr website also provides this same feature and allows you to map Plex users to custom names. You may also add a Tuaitulli instance here simply to monitor it with service checks.",
+      "name": {
+        "label": "Tautulli Name",
+        "description": "Name of the Tautulli service."
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Tautulli service.",
+        "placeholder": "http://tautulli.server.tv:8181"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the Tautulli service.",
+        "placeholder": "tautulli-api-key"
+      }
+    }
   }
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 )
@@ -21,6 +22,14 @@ func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
 
 func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
 	app.Setup(0, nil)
+
+	if app.APIKey == "" {
+		return "Tautulli API Key is not set", http.StatusFailedDependency
+	}
+
+	if !strings.HasPrefix(app.URL, "http") {
+		return "Tautulli URL is not set, must begin with http(s)://", http.StatusFailedDependency
+	}
 
 	users, err := app.GetUsers(ctx)
 	if err != nil {

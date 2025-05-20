@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import { faClapperboardPlay } from '@fortawesome/sharp-duotone-light-svg-icons'
+
   export const page = {
     id: 'MediaApps',
     i: faClapperboardPlay,
@@ -11,20 +12,45 @@
 </script>
 
 <script lang="ts">
-  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { postUi, type BackendResponse } from '../../api/fetch'
+  import { profile } from '../../api/profile.svelte'
   import { _ } from '../../includes/Translate.svelte'
+  import { CardBody } from '@sveltestrap/sveltestrap'
+  import type { PlexConfig, TautulliConfig } from '../../api/notifiarrConfig'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
+  import Instances from '../../includes/Instances.svelte'
+  import plexLogo from '../../assets/logos/plex.png'
+  import tautulliLogo from '../../assets/logos/tautulli.png'
 
-  // Handle form submission
-  function submit(e: Event) {
-    e.preventDefault()
-    // profile.writeConfig(c)
+  let tautulli = $state($profile.config.tautulli)
+  let plex = $state($profile.config.plex)
+  const conf = $derived($profile.config)
+  const api = 'checkInstance/'
+
+  const plexApp = {
+    id: page.id + '.Plex',
+    logo: plexLogo,
+    hidden: ['deletes'],
+    disabled: ['name'],
+    test: async (plex: PlexConfig, id: number): Promise<BackendResponse> =>
+      await postUi(api + 'plex/' + id, JSON.stringify({ ...conf, plex }), false),
+  }
+
+  const tautulliApp = {
+    id: page.id + '.Tautulli',
+    logo: tautulliLogo,
+    hidden: ['deletes'],
+    test: async (tautulli: TautulliConfig, id: number): Promise<BackendResponse> =>
+      await postUi(api + 'tautulli/' + id, JSON.stringify({ ...conf, tautulli }), false),
   }
 </script>
 
 <Header {page} />
-<CardBody>
-  <p>TODO</p>
+
+<CardBody class="pt-0 mt-0">
+  <Instances bind:instances={plex} app={plexApp} />
+  <Instances bind:instances={tautulli} app={tautulliApp} />
 </CardBody>
-<Footer {submit} />
+
+<Footer submit={() => profile.writeConfig({ ...conf, tautulli, plex })} />
