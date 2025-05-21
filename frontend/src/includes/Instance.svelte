@@ -3,7 +3,7 @@
   import Input from './Input.svelte'
   import { Col, Row, Input as Box, Button, Alert } from '@sveltestrap/sveltestrap'
   import { _ } from './Translate.svelte'
-  import type { BackendResponse } from '../api/fetch'
+  import { postUi } from '../api/fetch'
   import {
     faCircleCheck,
     faCircleXmark,
@@ -13,11 +13,12 @@
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { delay } from './util'
+  import type { Config } from '../api/notifiarrConfig'
 
   export type App = {
     id: string
+    name: string
     logo: string
-    test: (data: any, id: number) => Promise<BackendResponse>
     disabled?: string[]
     hidden?: string[]
   }
@@ -43,12 +44,14 @@
   let body = $state('')
   let testing = $state(false)
 
-  const test = async (e: Event) => {
+  const checkInstance = async (e: Event) => {
     e.preventDefault()
     body = ''
     testing = true
     await delay(300) // satisfying spinner.
-    const res = await app.test(form, index)
+    const uri = 'checkInstance/' + app.name.toLowerCase() + '/' + index
+    const data = { ...({} as Config), [app.name.toLowerCase()]: form }
+    const res = await postUi(uri, JSON.stringify(data), false)
     ok = res.ok
     body = res.body
     testing = false
@@ -79,7 +82,7 @@
             type="button"
             outline
             color="notifiarr"
-            on:click={test}
+            onclick={checkInstance}
             disabled={testing}>
             {#if testing}
               <Fa i={faSpinner} c1="orange" spin scale={1.5} />
@@ -95,7 +98,7 @@
               type="button"
               outline
               color="notifiarr"
-              on:click={() => (form.validSsl = !form.validSsl)}>
+              onclick={() => (form.validSsl = !form.validSsl)}>
               <Box type="checkbox" bind:checked={form.validSsl} />
             </Button>
           {/if}

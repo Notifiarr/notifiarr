@@ -1,6 +1,5 @@
 <script lang="ts" module>
   import { faClapperboardPlay } from '@fortawesome/sharp-duotone-light-svg-icons'
-
   export const page = {
     id: 'MediaApps',
     i: faClapperboardPlay,
@@ -12,11 +11,9 @@
 </script>
 
 <script lang="ts">
-  import { postUi, type BackendResponse } from '../../api/fetch'
   import { profile } from '../../api/profile.svelte'
   import { _ } from '../../includes/Translate.svelte'
   import { CardBody } from '@sveltestrap/sveltestrap'
-  import type { PlexConfig, TautulliConfig } from '../../api/notifiarrConfig'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import Instances from '../../includes/Instances.svelte'
@@ -26,23 +23,20 @@
   let tautulli = $state($profile.config.tautulli)
   let plex = $state($profile.config.plex)
   const conf = $derived($profile.config)
-  const api = 'checkInstance/'
 
   const plexApp = {
+    name: 'Plex',
     id: page.id + '.Plex',
     logo: plexLogo,
     hidden: ['deletes'],
     disabled: ['name'],
-    test: async (plex: PlexConfig, id: number): Promise<BackendResponse> =>
-      await postUi(api + 'plex/' + id, JSON.stringify({ ...conf, plex }), false),
   }
 
   const tautulliApp = {
+    name: 'Tautulli',
     id: page.id + '.Tautulli',
     logo: tautulliLogo,
     hidden: ['deletes'],
-    test: async (tautulli: TautulliConfig, id: number): Promise<BackendResponse> =>
-      await postUi(api + 'tautulli/' + id, JSON.stringify({ ...conf, tautulli }), false),
   }
 </script>
 
