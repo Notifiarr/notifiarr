@@ -163,6 +163,8 @@ export interface NvidiaConfig {
 export interface MySQLConfig {
   name: string;
   host: string;
+  username: string;
+  password: string;
   timeout: string;
   /**
    * Only used by service checks, snapshot interval is used for mysql.

@@ -142,6 +142,7 @@ textarea:focus {
   --bs-accordion-active-color: #04482c !important;
   --bs-accordion-bg: #cdf0cd42 !important;
   --bs-accordion-border-color: #6cf878 !important;
+  --bs-accordion-active-border-color: #6cf878 !important;
 }
 
 .dark-mode .accordion {
@@ -149,4 +150,13 @@ textarea:focus {
   --bs-accordion-active-color: #9df6c8 !important;
   --bs-accordion-bg: #212921 !important;
   --bs-accordion-border-color: #659369 !important;
+  --bs-accordion-active-border-color: #659369 !important;
+}
+
+.dark-mode .accordion-body {
+  background-color: #212921 !important;
+}
+
+.accordion-body {
+  background-color: #cdf0cd42 !important;
 }

@@ -20,16 +20,15 @@
   import Header from '../../includes/Header.svelte'
 
   // Local state that syncs with profile store.
-  const c = $derived({ ...$profile.config })
+  const c = $state({ ...$profile.config })
   // Convert array to newline-separated string for textarea
-  let extraKeys = $derived(c.extraKeys?.join('\n') || '')
+  let extraKeys = $state($profile.config.extraKeys?.join('\n') ?? '')
   const rows = $derived(
     extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length,
   )
-
   // Handle form submission
   function submit() {
-    c.extraKeys = extraKeys.split('\n').filter(key => key.trim() !== '')
+    c.extraKeys = extraKeys.split(/\s+/).filter(key => key.trim() !== '')
     profile.writeConfig(c)
   }
 
@@ -41,18 +40,33 @@
 <CardBody class="pt-0 mt-0">
   <!-- General Section -->
   <h4>{$_('config.titles.General')}</h4>
-  <Input id="config.apiKey" type="password" bind:value={c.apiKey} />
-  <Input id="config.extraKeys" type="textarea" bind:value={extraKeys} {rows} />
-  <Input id="config.hostId" bind:value={c.hostId} />
+  <Input
+    id="config.apiKey"
+    type="password"
+    bind:value={c.apiKey}
+    original={$profile.config.apiKey} />
+  <Input
+    id="config.extraKeys"
+    type="textarea"
+    bind:value={extraKeys}
+    {rows}
+    original={$profile.config.extraKeys?.join('\n') ?? ''} />
+  <Input id="config.hostId" bind:value={c.hostId} original={$profile.config.hostId} />
 
   <!-- Network Section -->
   <h4>{$_('config.titles.Network')}</h4>
   <Row>
     <Col md={6}>
-      <Input id="config.bindAddr" bind:value={c.bindAddr} />
+      <Input
+        id="config.bindAddr"
+        bind:value={c.bindAddr}
+        original={$profile.config.bindAddr} />
     </Col>
     <Col md={6}>
-      <Input id="config.urlbase" bind:value={c.urlbase} />
+      <Input
+        id="config.urlbase"
+        bind:value={c.urlbase}
+        original={$profile.config.urlbase} />
     </Col>
   </Row>
   <Row>
@@ -67,10 +81,16 @@
           { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
           { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
           { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
-        ]} />
+        ]}
+        original={$profile.config.timeout} />
     </Col>
     <Col md={6}>
-      <Input id="config.retries" type="number" bind:value={c.retries} min={0} />
+      <Input
+        id="config.retries"
+        type="number"
+        bind:value={c.retries}
+        min={0}
+        original={$profile.config.retries} />
     </Col>
   </Row>
 
@@ -78,7 +98,11 @@
   <h4>{$_('config.titles.System')}</h4>
   <Row>
     <Col md={4}>
-      <Input id="config.serial" type="select" bind:value={c.serial} />
+      <Input
+        id="config.serial"
+        type="select"
+        bind:value={c.serial}
+        original={$profile.config.serial} />
     </Col>
     {#if $profile.isWindows}
       <Col md={$profile.clientInfo?.user.devAllowed ? 4 : 8}>
@@ -86,6 +110,7 @@
           id="config.autoUpdate"
           type="select"
           bind:value={c.autoUpdate}
+          original={$profile.config.autoUpdate}
           options={[
             { value: 'off', name: $_('words.select-option.Disabled') },
             { value: 'daily', name: $_('words.select-option.Daily') },
@@ -96,7 +121,11 @@
       </Col>
       {#if $profile.clientInfo?.user.devAllowed}
         <Col md={4}>
-          <Input id="config.unstableCh" type="select" bind:value={c.unstableCh} />
+          <Input
+            id="config.unstableCh"
+            type="select"
+            bind:value={c.unstableCh}
+            original={$profile.config.unstableCh} />
         </Col>
       {/if}
     {:else}
@@ -105,6 +134,7 @@
           type="select"
           id="config.fileMode"
           bind:value={c.fileMode}
+          original={$profile.config.fileMode}
           options={[
             { value: '0600', name: '0600 -rw-------' },
             { value: '0640', name: '0640 -rw-r-----' },
@@ -115,7 +145,11 @@
           ]} />
       </Col>
       <Col md={4}>
-        <Input id="config.apt" type="select" bind:value={c.apt} />
+        <Input
+          id="config.apt"
+          type="select"
+          bind:value={c.apt}
+          original={$profile.config.apt} />
       </Col>
     {/if}
   </Row>
@@ -124,10 +158,16 @@
   <h4>{$_('config.titles.SSLConfiguration')}</h4>
   <Row>
     <Col md={6}>
-      <Input id="config.sslKeyFile" bind:value={c.sslKeyFile} />
+      <Input
+        id="config.sslKeyFile"
+        bind:value={c.sslKeyFile}
+        original={$profile.config.sslKeyFile} />
     </Col>
     <Col md={6}>
-      <Input id="config.sslCertFile" bind:value={c.sslCertFile} />
+      <Input
+        id="config.sslCertFile"
+        bind:value={c.sslCertFile}
+        original={$profile.config.sslCertFile} />
     </Col>
   </Row>
 
@@ -138,7 +178,8 @@
       <Input
         id="config.services.enabled"
         type="select"
-        bind:value={c.services!.disabled} />
+        bind:value={c.services!.disabled}
+        original={$profile.config.services?.disabled} />
     </Col>
     <Col md={4}>
       <Input
@@ -151,7 +192,8 @@
           { value: 4, name: '4' },
           { value: 5, name: '5' },
         ]}
-        bind:value={c.services!.parallel} />
+        bind:value={c.services!.parallel}
+        original={$profile.config.services?.parallel} />
     </Col>
     <Col md={4}>
       <Input
@@ -164,7 +206,8 @@
           { value: '15m0s', name: '15 ' + $_('words.select-option.minutes') },
           { value: '20m0s', name: '20 ' + $_('words.select-option.minutes') },
           { value: '30m0s', name: '30 ' + $_('words.select-option.minutes') },
-        ]} />
+        ]}
+        original={$profile.config.services?.interval} />
     </Col>
   </Row>
 
@@ -172,27 +215,51 @@
   <h4>{$_('config.titles.Logging')}</h4>
   <Row>
     <Col md={6}>
-      <Input id="config.logFile" bind:value={c.logFile} />
+      <Input
+        id="config.logFile"
+        bind:value={c.logFile}
+        original={$profile.config.logFile} />
     </Col>
     <Col md={6}>
-      <Input id="config.services.logFile" bind:value={c.services!.logFile} />
+      <Input
+        id="config.services.logFile"
+        bind:value={c.services!.logFile}
+        original={$profile.config.services?.logFile} />
     </Col>
     <Col md={6}>
-      <Input id="config.httpLog" bind:value={c.httpLog} />
+      <Input
+        id="config.httpLog"
+        bind:value={c.httpLog}
+        original={$profile.config.httpLog} />
     </Col>
     <Col md={6}>
-      <Input id="config.debugLog" bind:value={c.debugLog} />
+      <Input
+        id="config.debugLog"
+        bind:value={c.debugLog}
+        original={$profile.config.debugLog} />
     </Col>
   </Row>
   <Row>
     <Col md={4}>
-      <Input id="config.debug" type="select" bind:value={c.debug} />
+      <Input
+        id="config.debug"
+        type="select"
+        bind:value={c.debug}
+        original={$profile.config.debug} />
     </Col>
     <Col md={4}>
-      <Input id="config.quiet" type="select" bind:value={c.quiet} />
+      <Input
+        id="config.quiet"
+        type="select"
+        bind:value={c.quiet}
+        original={$profile.config.quiet} />
     </Col>
     <Col md={4}>
-      <Input id="config.noUploads" type="select" bind:value={c.noUploads} />
+      <Input
+        id="config.noUploads"
+        type="select"
+        bind:value={c.noUploads}
+        original={$profile.config.noUploads} />
     </Col>
   </Row>
   <Row>
@@ -202,7 +269,8 @@
         type="number"
         bind:value={c.maxBody}
         min={500}
-        max={500000}>
+        max={500000}
+        original={$profile.config.maxBody}>
         {#snippet post()}
           <InputGroupText>
             {$_('words.select-option.bytes')}
@@ -216,7 +284,8 @@
         type="number"
         min={1}
         max={999}
-        bind:value={c.logFileMb}>
+        bind:value={c.logFileMb}
+        original={$profile.config.logFileMb}>
         {#snippet post()}
           <InputGroupText>
             {$_('words.select-option.megabytes')}
@@ -225,7 +294,12 @@
       </Input>
     </Col>
     <Col md={4}>
-      <Input id="config.logFiles" type="number" min={0} bind:value={c.logFiles} />
+      <Input
+        id="config.logFiles"
+        type="number"
+        min={0}
+        bind:value={c.logFiles}
+        original={$profile.config.logFiles} />
     </Col>
   </Row>
 </CardBody>

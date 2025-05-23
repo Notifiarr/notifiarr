@@ -1,19 +1,12 @@
 <script lang="ts">
   import { get } from 'svelte/store'
   import Input from './Input.svelte'
-  import { Col, Row, Input as Box, Button, Alert } from '@sveltestrap/sveltestrap'
+  import CheckedInput from './CheckedInput.svelte'
+  import { Col, Row, Button } from '@sveltestrap/sveltestrap'
   import { _ } from './Translate.svelte'
-  import { postUi } from '../api/fetch'
-  import {
-    faCircleCheck,
-    faCircleXmark,
-    faSpinner,
-  } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import { faCheckDouble } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import Fa from './Fa.svelte'
-  import { slide } from 'svelte/transition'
-  import { delay } from './util'
+  import { deepCopy, deepEqual } from './util'
   import type { Config } from '../api/notifiarrConfig'
+  import { slide } from 'svelte/transition'
 
   export type App = {
     id: string
@@ -21,11 +14,13 @@
     logo: string
     disabled?: string[]
     hidden?: string[]
+    empty?: any
+    merge: (index: number, form: Form) => Config
   }
 
   // This is a combination of all types supported: starr, downloaders, media, snapshot, etc.
   export type Form = {
-    name: string
+    name?: string
     url?: string
     host?: string
     username?: string
@@ -36,168 +31,264 @@
     interval?: string
     deletes?: number
     validSsl?: boolean
+    /* Nvidia only */
+    smiPath?: string
+    busIDs?: string[]
+    disabled?: boolean
   }
 
-  type Props = { form: Form; app: App; index: number }
-  let { form = $bindable(), app, index }: Props = $props()
-  let ok = $state(undefined as boolean | undefined)
-  let body = $state('')
-  let testing = $state(false)
-
-  const checkInstance = async (e: Event) => {
-    e.preventDefault()
-    body = ''
-    testing = true
-    await delay(300) // satisfying spinner.
-    const uri = 'checkInstance/' + app.name.toLowerCase() + '/' + index
-    const data = { ...({} as Config), [app.name.toLowerCase()]: form }
-    const res = await postUi(uri, JSON.stringify(data), false)
-    ok = res.ok
-    body = res.body
-    testing = false
+  type Props = {
+    form: Form
+    original: Form
+    app: App
+    index?: number
+    resetButton?: boolean
+    validate?: (id: string, index: number, value: any, reset?: boolean) => string
   }
+
+  let {
+    form = $bindable(),
+    original,
+    app,
+    index = 0,
+    resetButton = true,
+    validate,
+  }: Props = $props()
+
+  // Convert array to newline-separated string for textarea.
+  let busIds = $state(
+    typeof form.busIDs === 'undefined' ? undefined : form.busIDs?.join('\n'),
+  )
+
+  const feedback = $state<Record<string, string>>({})
+  const rows = $derived(
+    busIds ? (busIds.split('\n').length < 10 ? busIds?.split('\n').length : 1) : 1,
+  )
+
+  // Used a shorthand variable to set Col sizes.
+  const hasToken = $derived(
+    typeof form.token === 'string' || typeof form.apiKey === 'string',
+  )
+  const validateApp = (id: string, val: any) => validate?.(id, index, val) ?? ''
+  export const valid = () => Object.values(feedback).every(v => !v)
+
+  export const resetFeedback = () => {
+    // Calling validate with true at the end will delete all the feedback.
+    validate?.(app.id + '.all', index, 'reset', true)
+  }
+
+  // Reset the form and feedback.
+  export const reset = (e?: Event, deleted?: boolean) => {
+    e?.preventDefault()
+    // Copy form, and reset all the validators.
+    if (!deleted) form = deepCopy(original)
+    Object.keys(form).forEach(id => {
+      feedback[app.id + '.' + id] = deleted
+        ? ''
+        : (validate?.(app.id + '.' + id, index, form[id as keyof Form]) ?? '')
+    })
+  }
+
+  $effect(() => {
+    // Only update form variables if they existed prior to this effect.
+    if (typeof form.disabled !== 'undefined') form.busIDs = busIds?.split(/\s+/)
+  })
 </script>
 
-<!-- Top row, shows name and url or hostname/ip. -->
-<Row>
-  <Col lg={6} xl={4}>
-    <Input
-      id={app.id + '.name'}
-      type="text"
-      bind:value={form.name}
-      disabled={app.disabled?.includes('name')} />
-  </Col>
-  {#if typeof form.url === 'string' && !app.hidden?.includes('url')}
-    <Col lg={6} xl={4}>
-      <Input
-        id={app.id + '.url'}
-        type="text"
-        bind:value={form.url}
-        description={form.url?.startsWith('https://')
-          ? get(_)('words.instance-options.validSsl.description')
-          : undefined}
-        disabled={app.disabled?.includes('url')}>
-        {#snippet pre()}
-          <Button
-            type="button"
-            outline
-            color="notifiarr"
-            onclick={checkInstance}
-            disabled={testing}>
-            {#if testing}
-              <Fa i={faSpinner} c1="orange" spin scale={1.5} />
-            {:else}
-              <Fa i={faCheckDouble} c1="green" c2="cyan" scale={1.5} />
-            {/if}
-          </Button>
-        {/snippet}
-        <!-- If they type in an https:// url, add a checkbox to validate the SSL certificate. -->
-        {#snippet post()}
-          {#if form.url?.startsWith('https://')}
-            <Button
-              type="button"
-              outline
-              color="notifiarr"
-              onclick={() => (form.validSsl = !form.validSsl)}>
-              <Box type="checkbox" bind:checked={form.validSsl} />
-            </Button>
-          {/if}
-        {/snippet}
-        {#snippet msg()}
-          {#if body}
-            <div transition:slide>
-              <Alert
-                fade={false}
-                isOpen={!!body}
-                toggle={() => (body = '')}
-                color={ok ? 'success' : 'danger'}>
-                <Fa
-                  scale={1.5}
-                  i={ok ? faCircleCheck : faCircleXmark}
-                  c1={ok ? 'green' : 'firebrick'}
-                  c2="white"
-                  d2="black" /> &nbsp; {body}
-              </Alert>
-            </div>
-          {/if}
-        {/snippet}
-      </Input>
-    </Col>
-  {/if}
-  {#if typeof form.host === 'string' && !app.hidden?.includes('host')}
-    <Col lg={6} xl={4}>
-      <Input
-        id={app.id + '.host'}
-        type="text"
-        bind:value={form.host}
-        disabled={app.disabled?.includes('host')} />
-    </Col>
-  {/if}
-  {#if typeof form.apiKey === 'string'}
-    <Col lg={12} xl={4}>
-      <Input
-        id={app.id + '.apiKey'}
-        type="password"
-        bind:value={form.apiKey}
-        disabled={app.disabled?.includes('apiKey')} />
-    </Col>
-  {/if}
-  {#if typeof form.token === 'string' && !app.hidden?.includes('token')}
-    <Col lg={12} xl={4}>
-      <Input
-        id={app.id + '.token'}
-        type="password"
-        bind:value={form.token}
-        disabled={app.disabled?.includes('token')} />
-    </Col>
-  {/if}
-</Row>
+<div class="instance">
+  <!-- Top row, shows name and url or hostname/ip. -->
+  <Row>
+    {#if typeof form.name === 'string'}
+      <Col lg={6} xl={hasToken ? 4 : 6}>
+        <Input
+          id={app.id + '.name'}
+          bind:value={form.name}
+          bind:feedback={feedback[app.id + '.name']}
+          original={original?.name}
+          disabled={app.disabled?.includes('name')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+    {#if typeof form.url === 'string' && !app.hidden?.includes('url')}
+      <Col lg={6} xl={hasToken ? 4 : 6}>
+        <CheckedInput
+          id="url"
+          bind:feedback={feedback[app.id + '.url']}
+          bind:original
+          disabled={app.disabled?.includes('url')}
+          {app}
+          {form}
+          {index}
+          validate={validateApp} />
+      </Col>
+    {/if}
 
-<Row>
-  {#if typeof form.username === 'string'}
-    <Col lg={6} xl={4}>
-      <Input
-        id={app.id + '.username'}
-        type="text"
-        bind:value={form.username}
-        disabled={app.disabled?.includes('username')} />
-    </Col>
-  {/if}
-  {#if typeof form.password === 'string' && !app.hidden?.includes('password')}
-    <Col lg={6} xl={4}>
-      <Input
-        id={app.id + '.password'}
-        type="password"
-        bind:value={form.password}
-        disabled={app.disabled?.includes('password')} />
-    </Col>
-  {/if}
-</Row>
+    {#if typeof form.host === 'string' && !app.hidden?.includes('host')}
+      <Col lg={6} xl={hasToken ? 4 : 6}>
+        <CheckedInput
+          id="host"
+          bind:feedback={feedback[app.id + '.host']}
+          bind:original
+          disabled={app.disabled?.includes('host')}
+          {app}
+          {form}
+          {index}
+          validate={validateApp} />
+      </Col>
+    {/if}
+    {#if typeof form.apiKey === 'string'}
+      <Col lg={12} xl={4}>
+        <Input
+          id={app.id + '.apiKey'}
+          type="password"
+          bind:value={form.apiKey}
+          bind:feedback={feedback[app.id + '.apiKey']}
+          original={original?.apiKey}
+          disabled={app.disabled?.includes('apiKey')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+    {#if typeof form.token === 'string' && !app.hidden?.includes('token')}
+      <Col lg={12} xl={4}>
+        <Input
+          id={app.id + '.token'}
+          type="password"
+          bind:value={form.token}
+          bind:feedback={feedback[app.id + '.token']}
+          original={original?.token}
+          disabled={app.disabled?.includes('token')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+  </Row>
 
-<Row>
-  <Col md={!app.hidden?.includes('deletes') ? 4 : 6}>
-    <Input id="words.instance-options.timeout" type="timeout" bind:value={form.timeout} />
-  </Col>
-  <Col md={!app.hidden?.includes('deletes') ? 4 : 6}>
-    <Input
-      id="words.instance-options.interval"
-      type="interval"
-      bind:value={form.interval} />
-  </Col>
-  {#if !app.hidden?.includes('deletes')}
-    <Col md={4}>
-      <Input
-        id="words.instance-options.deletes"
-        type="select"
-        bind:value={form.deletes}
-        disabled={app.disabled?.includes('deletes')}>
-        <option value={0}>{get(_)('words.select-option.Disabled')}</option>
-        {#each ['1', '2', '5', '7', '10', '15', '20', '50', '100', '200'] as count}
-          <option value={count}>
-            {get(_)('words.instance-options.deletes.countPerHour', { values: { count } })}
+  <Row>
+    {#if typeof form.username === 'string'}
+      <Col lg={6} xl={6}>
+        <Input
+          id={app.id + '.username'}
+          bind:value={form.username}
+          bind:feedback={feedback[app.id + '.username']}
+          original={original?.username}
+          disabled={app.disabled?.includes('username')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+    {#if typeof form.password === 'string' && !app.hidden?.includes('password')}
+      <Col lg={6} xl={6}>
+        <Input
+          id={app.id + '.password'}
+          type="password"
+          bind:value={form.password}
+          bind:feedback={feedback[app.id + '.password']}
+          original={original?.password}
+          disabled={app.disabled?.includes('password')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+  </Row>
+
+  <Row>
+    {#if typeof form.timeout === 'string'}
+      <Col md={!app.hidden?.includes('deletes') ? 4 : 6}>
+        <Input
+          id="words.instance-options.timeout"
+          type="timeout"
+          bind:value={form.timeout}
+          bind:feedback={feedback[app.id + '.timeout']}
+          original={original?.timeout}
+          disabled={app.disabled?.includes('timeout')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+    {#if typeof form.interval === 'string'}
+      <Col md={!app.hidden?.includes('deletes') ? 4 : 6}>
+        <Input
+          id="words.instance-options.interval"
+          type="interval"
+          bind:value={form.interval}
+          bind:feedback={feedback[app.id + '.interval']}
+          original={original?.interval}
+          disabled={app.disabled?.includes('interval')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+    {#if !app.hidden?.includes('deletes')}
+      <Col md={4}>
+        <Input
+          id="words.instance-options.deletes"
+          type="select"
+          bind:value={form.deletes}
+          bind:feedback={feedback[app.id + '.deletes']}
+          original={original?.deletes}
+          disabled={app.disabled?.includes('deletes')}
+          validate={validateApp}>
+          <option value={0}>{get(_)('words.select-option.Disabled')}</option>
+          {#each ['1', '2', '5', '7', '10', '15', '20', '50', '100', '200'] as count}
+            <option value={count}>
+              {get(_)('words.instance-options.deletes.countPerHour', {
+                values: { count },
+              })}
+            </option>
+          {/each}
+        </Input>
+      </Col>
+    {/if}
+  </Row>
+
+  <Row>
+    {#if typeof form.disabled === 'boolean'}
+      <Col lg={4}>
+        <Input
+          id={app.id + '.disabled'}
+          type="select"
+          bind:value={form.disabled}
+          bind:feedback={feedback[app.id + '.disabled']}
+          original={original?.disabled}
+          disabled={app.disabled?.includes('disabled')}
+          validate={validateApp}>
+          <!-- These are backward on purpose.-->
+          <option value={false} selected={form.disabled === false}>
+            {$_('words.select-option.Enabled')}
           </option>
-        {/each}
-      </Input>
-    </Col>
+          <option value={true} selected={form.disabled === true}>
+            {$_('words.select-option.Disabled')}
+          </option>
+        </Input>
+      </Col>
+    {/if}
+    {#if typeof form.smiPath === 'string'}
+      <Col lg={4}>
+        <CheckedInput
+          id="smiPath"
+          bind:feedback={feedback[app.id + '.smiPath']}
+          bind:original
+          disabled={app.disabled?.includes('smiPath')}
+          {app}
+          {form}
+          {index}
+          {validate} />
+      </Col>
+      <Col lg={4}>
+        <Input
+          id={app.id + '.busIds'}
+          type="textarea"
+          {rows}
+          bind:value={busIds}
+          bind:feedback={feedback[app.id + '.busIds']}
+          original={original?.busIDs?.join('\n')}
+          disabled={app.disabled?.includes('busIds')}
+          validate={validateApp} />
+      </Col>
+    {/if}
+  </Row>
+
+  {#if resetButton && !deepEqual(form, original)}
+    <div class="mb-2" transition:slide>
+      <Button color="primary" outline onclick={reset} class="float-end">
+        {$_('buttons.ResetForm')}
+      </Button>
+      &nbsp;
+    </div>
   {/if}
-</Row>
+</div>

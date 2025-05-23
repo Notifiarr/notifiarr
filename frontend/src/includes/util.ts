@@ -76,3 +76,52 @@ export function formatBytes(bytes: number): string {
 
   return `${bytes.toFixed(2)} ${units[unitIndex]}`
 }
+
+/** Check if two objects are equal. */
+export const deepEqual = (obj1: any, obj2: any): boolean => {
+  if (
+    typeof obj1 !== 'object' ||
+    typeof obj2 !== 'object' ||
+    obj1 === null ||
+    obj2 === null
+  ) {
+    return obj1 === obj2
+  }
+
+  const keys1 = Object.keys(obj1)
+  const keys2 = Object.keys(obj2)
+  if (keys1.length !== keys2.length) {
+    return false
+  }
+
+  for (let key of keys1) {
+    if (!obj2.hasOwnProperty(key) || !deepEqual(obj1[key], obj2[key])) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/** Deep copy an object. */
+export const deepCopy = <T>(obj: T): T => {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepCopy(item)) as any
+  }
+
+  const copiedObj: { [key in keyof T]?: T[key] } = {}
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      copiedObj[key] = deepCopy(obj[key])
+    }
+  }
+
+  return copiedObj as T
+}
+
+export const maxLength = (str: string, max: number) =>
+  str.length > max ? str.slice(0, max) + ' ....' : str

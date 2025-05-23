@@ -45,7 +45,8 @@
     "Save": "Save",
     "Close": "Close",
     "SaveChanges": "Save Changes",
-    "SaveConfiguration": "Save Configuration"
+    "SaveConfiguration": "Save Configuration",
+    "ResetForm": "Reset Form"
   },
   "phrases": {
     "ERROR": "ERROR",
@@ -77,6 +78,18 @@
     "FailedToShutdown": "Failed to shutdown: {error} - Try reloading the page.",
     "LoginHelp": "Login Help",
     "LoginHelpBody": "If you've forgotten your password, please see the <a href='https://notifiarr.wiki/pages/client/gui/#forgotten-passwords' target='_new'>forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key.",
+    "Changed": "Changed",
+    "New": "New",
+    "Invalid": "Invalid",
+    "DeleteInstance": "Delete Instance",
+    "DeletedNumber": "Deleted {number}",
+    "ItsGone": "It's gone! Don't forget to save.",
+    "URLMustBeginWithHttp": "URL must begin with http:// or https://",
+    "NameMustNotBeEmpty": "Name must not be empty.",
+    "HostMustNotBeEmpty": "Host must not be empty.",
+    "UsernameMustNotBeEmpty": "Username must not be empty.",
+    "NameInUseByInstance": "This name is in use by instance {number}.",
+    "APIKeyMustBe32Characters": "API key must be 32 characters or longer.",
     "Landing": {
       "SelectASection": "Select a section from the navigation menu to get started.",
       "Welcome": "Welcome, {username}!"
@@ -111,7 +124,7 @@
       "StarrApps": "Setup Starr integrations.",
       "Downloaders": "Manage download clients.",
       "MediaApps": "Manage media players and related services.",
-      "SnapshotApps": "Configure system snapshots.",
+      "SnapshotApps": "Most snapshot configurations are on the Notifiarr.com website. Below you will find Application 'plugin' settings for the snapshot feature.",
       "FileWatcher": "Watch for file changes and trigger actions.",
       "Endpoints": "Configure relay endpoints, timers and triggers.",
       "Commands": "Set up and execute custom commands and scripts.",
@@ -465,6 +478,210 @@
         "label": "API Key",
         "description": "API key for the Tautulli service.",
         "placeholder": "tautulli-api-key"
+      }
+    }
+  },
+  "SnapshotApps": {
+    "MySQL": {
+      "title": "MySQL",
+      "description": "You may add MySQL credentials to your Notifiarr client configuration to snapshot MySQL service health. This feature snapshots <code>SHOW PROCESSLIST</code> and <code>SHOW STATUS</code> data. Access to a database is not required. Example Grant: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
+      "addInstance": "Add MySQL Server",
+      "name": {
+        "label": "Server Name",
+        "description": "Name of the MySQL server.",
+        "placeholder": "custom name for notifications"
+      },
+      "host": {
+        "label": "Host",
+        "description": "Host or IP address of the MySQL server.",
+        "placeholder": "127.0.0.1"
+      },
+      "port": {
+        "label": "Port",
+        "description": "Port of the MySQL server.",
+        "placeholder": "3306"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the MySQL server.",
+        "placeholder": "root"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the MySQL server.",
+        "placeholder": "password"
+      }
+    },
+    "Nvidia": {
+      "title": "Nvidia",
+      "description": "This integration displays Nvidia CUDA info in Snapshot notifications. To use this feature in Docker, you must use the CUDA image: <code>ghcr.io/notifiarr/notifiarr:cuda</code>",
+      "disabled": {
+        "label": "GPU Snapshots",
+        "description": "Enable or disable GPU snapshots."
+      },
+      "busIds": {
+        "label": "Bus IDs",
+        "description": "Comma separated list of bus IDs to snapshot.",
+        "placeholder": "0000:00:00.0,0000:00:00.1",
+        "tooltip": "This is the bus ID of the GPU. You can find this by running <code>nvidia-smi</code> and looking at the <code>Bus Id</code> column. Cards with other Bus IDs are ignored in the snapshot. Generally, just leave this blank. Add multiple with newlines."
+      },
+      "smiPath": {
+        "label": "nvidia-smi Path",
+        "description": "Path to the nvidia-smi command.",
+        "placeholder": "/usr/bin/nvidia-smi",
+        "tooltip": "If nvidia-smi (nvidia-smi.exe on Windows) is not in the PATH environment, then you may provide a full path to the binary here."
+      }
+    }
+  },
+  "StarrApps": {
+    "Radarr": {
+      "title": "Radarr",
+      "addInstance": "Add Radarr Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Radarr instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Radarr instance.",
+        "placeholder": "http://radarr.server.tv:7878"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the Radarr instance.",
+        "placeholder": "radarr-api-key"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Radarr instance.",
+        "placeholder": "admin",
+        "tooltip": "You only need a username and password if you want to check database backups since those cannot be downloaded through the API."
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Radarr instance.",
+        "placeholder": "password"
+      }
+    },
+    "Sonarr": {
+      "title": "Sonarr",
+      "addInstance": "Add Sonarr Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Sonarr instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Sonarr instance.",
+        "placeholder": "http://sonarr.server.tv:8989"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the Sonarr instance.",
+        "placeholder": "sonarr-api-key"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Sonarr instance.",
+        "placeholder": "admin",
+        "tooltip": "You only need a username and password if you want to check database backups since those cannot be downloaded through the API."
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Sonarr instance.",
+        "placeholder": "password"
+      }
+    },
+    "Readarr": {
+      "title": "Readarr",
+      "addInstance": "Add Readarr Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Readarr instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Readarr instance.",
+        "placeholder": "http://readarr.server.tv:8787"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the Readarr instance.",
+        "placeholder": "readarr-api-key"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Readarr instance.",
+        "placeholder": "admin",
+        "tooltip": "You only need a username and password if you want to check database backups since those cannot be downloaded through the API."
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Readarr instance.",
+        "placeholder": "password"
+      }
+    },
+    "Lidarr": {
+      "title": "Lidarr",
+      "addInstance": "Add Lidarr Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Lidarr instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Lidarr instance.",
+        "placeholder": "http://lidarr.server.tv:8686"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the Lidarr instance.",
+        "placeholder": "lidarr-api-key"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Lidarr instance.",
+        "placeholder": "admin",
+        "tooltip": "You only need a username and password if you want to check database backups since those cannot be downloaded through the API."
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Lidarr instance.",
+        "placeholder": "password"
+      }
+    },
+    "Prowlarr": {
+      "title": "Prowlarr",
+      "addInstance": "Add Prowlarr Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Prowlarr instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Prowlarr instance.",
+        "placeholder": "http://prowlarr.server.tv:9696"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the Prowlarr instance.",
+        "placeholder": "prowlarr-api-key"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Prowlarr instance.",
+        "placeholder": "admin",
+        "tooltip": "You only need a username and password if you want to check database backups since those cannot be downloaded through the API."
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Prowlarr instance.",
+        "placeholder": "password"
       }
     }
   }

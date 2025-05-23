@@ -127,12 +127,15 @@ pkg/bindata/docs/api_docs.go:
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/docs
 
-dev: notifiarr
-	DN_NEW_UI=true $(OUTPUTDIR)/notifiarr
 
 ####################
 ##### Binaries #####
 ####################
+
+dev: generate main.go
+	go build -race $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	DN_NEW_UI=true $(OUTPUTDIR)/notifiarr
+
 
 notifiarr: generate main.go
 	go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "

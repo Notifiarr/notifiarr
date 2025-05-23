@@ -6,12 +6,21 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
 
 func testMySQL(ctx context.Context, config *snapshot.MySQLConfig) (string, int) {
 	snaptest := &snapshot.Snapshot{}
+
+	if config.Host == "" {
+		return "Host is required", http.StatusBadRequest
+	}
+
+	if config.User == "" {
+		return "Username is required", http.StatusBadRequest
+	}
 
 	errs := snaptest.GetMySQL(ctx, []*snapshot.MySQLConfig{config}, 1)
 	if len(errs) > 0 {
@@ -23,7 +32,8 @@ func testMySQL(ctx context.Context, config *snapshot.MySQLConfig) (string, int) 
 		return msg, http.StatusBadGateway
 	}
 
-	return "Connection Successful!", http.StatusOK
+	return "Connection Successful! Processes: " +
+		strconv.Itoa(len(snaptest.MySQL[config.Host].Processes)), http.StatusOK
 }
 
 func testNvidia(ctx context.Context, config *snapshot.NvidiaConfig) (string, int) {

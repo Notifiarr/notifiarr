@@ -16,13 +16,42 @@
   import { CardBody } from '@sveltestrap/sveltestrap'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
-  import Instances from '../../includes/Instances.svelte'
   import plexLogo from '../../assets/logos/plex.png'
   import tautulliLogo from '../../assets/logos/tautulli.png'
+  import { deepCopy, deepEqual } from '../../includes/util'
+  import Instance, { type Form } from '../../includes/Instance.svelte'
+  import InstanceHeader from '../../includes/InstanceHeader.svelte'
+  import type { Config } from '../../api/notifiarrConfig'
 
   let tautulli = $state($profile.config.tautulli)
   let plex = $state($profile.config.plex)
-  const conf = $derived($profile.config)
+  let originalTautulli = $derived(deepCopy($profile.config.tautulli))
+  let originalPlex = $derived(deepCopy($profile.config.plex))
+  let invalid = $state<Record<number, Record<string, string>>>({})
+  let formChanged = $derived(
+    !deepEqual(plex, originalPlex) || !deepEqual(tautulli, originalTautulli),
+  )
+
+  const validate = (id: string, index: number, value: any) => {
+    if (!invalid[index]) invalid[index] = {}
+
+    if (id.endsWith('.url')) {
+      invalid[index][id] =
+        value.startsWith('http://') || value.startsWith('https://') || value === ''
+          ? ''
+          : $_('phrases.URLMustBeginWithHttp')
+    }
+    return invalid[index][id]
+  }
+
+  const merge = (index: number, form: Form) => {
+    return {
+      ...({} as Config),
+      // ugly but it works
+      [plexApp.name.toLowerCase()]: form,
+      [tautulliApp.name.toLowerCase()]: form,
+    }
+  }
 
   const plexApp = {
     name: 'Plex',
@@ -30,6 +59,8 @@
     logo: plexLogo,
     hidden: ['deletes'],
     disabled: ['name'],
+    validate,
+    merge,
   }
 
   const tautulliApp = {
@@ -37,14 +68,24 @@
     id: page.id + '.Tautulli',
     logo: tautulliLogo,
     hidden: ['deletes'],
+    validate,
+    merge,
   }
+
+  const allValid = $derived(
+    Object.values(invalid).every(v => Object.values(v).every(v => !v)),
+  )
 </script>
 
 <Header {page} />
 
 <CardBody class="pt-0 mt-0">
-  <Instances bind:instances={plex} app={plexApp} />
-  <Instances bind:instances={tautulli} app={tautulliApp} />
+  <InstanceHeader app={plexApp} changed={!deepEqual(plex, originalPlex)} />
+  <Instance bind:form={plex!} original={originalPlex!} app={plexApp} />
+  <InstanceHeader app={tautulliApp} changed={!deepEqual(tautulli, originalTautulli)} />
+  <Instance bind:form={tautulli!} original={originalTautulli!} app={tautulliApp} />
 </CardBody>
 
-<Footer submit={() => profile.writeConfig({ ...conf, tautulli, plex })} />
+<Footer
+  saveDisabled={!formChanged || !allValid}
+  submit={() => profile.writeConfig({ ...$profile.config, tautulli, plex })} />

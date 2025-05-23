@@ -3,6 +3,7 @@
   import {
     Button,
     Card,
+    FormFeedback,
     FormGroup,
     Input,
     InputGroup,
@@ -16,15 +17,14 @@
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { _ } from './Translate.svelte'
-  import type { SvelteComponent, Snippet } from 'svelte'
+  import { type SvelteComponent, type Snippet, onMount } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
+  import { deepEqual } from './util'
 
   interface Props {
     /** Must be unique. Identifies this component. */
     id: string
-    /** The name of the input. Defaults to the id. Pass undefined to not include a name. */
-    name?: string
     /** The label to display above the input. Must be present in translation if not undefined here. */
     label?: string
     /** The placeholder text to display in the input. */
@@ -33,22 +33,18 @@
     description?: string
     /** The type of input. Like `text` or `select`. */
     type?: InputType | 'interval' | 'timeout'
-    /** Used if you do not want this value changed directly. */
-    readonly?: boolean
-    /** Similar to readonly, but the input dims/greys out. */
-    disabled?: boolean
     /** Optional tooltip to bind to input. */
     tooltip?: string
     /** Optional value. Should only be used for binding. */
     value?: any
+    /** Optional original value. Used to check for changes.*/
+    original?: any
     /** Optional rows for textarea. */
     rows?: number
-    /** Optional min value for number input. */
-    min?: number | undefined
-    /** Optional max value for number input. */
-    max?: number | undefined
     /** Optional options for select input. */
     options?: Option[] | undefined
+    /** Optional validation function. */
+    validate?: (id: string, value: any) => string
     /** Optional input-box prefix attachment. */
     pre?: Snippet
     /** Optional input-box suffix attachment. */
@@ -57,34 +53,36 @@
     children?: Snippet
     /** Optional message to display below the input. */
     msg?: Snippet
+    /** Optional feedback to display below the input. Use this to reset it or view it. */
+    feedback?: string
+    /** Optional other attributes to apply to the input. */
+    [key: string]: any
   }
 
   let {
     id,
-    name = id,
     label = $_(`${id}.label`),
     placeholder = $bindable($_(`${id}.placeholder`)),
     description = $_(`${id}.description`),
     type = 'text',
-    readonly = false,
-    disabled = false,
     tooltip = $_(`${id}.tooltip`),
     value = $bindable(undefined),
-    rows = 1,
-    min = undefined,
-    max = undefined,
+    original = value,
     options = undefined,
+    validate,
     pre,
     children,
     post,
     msg,
+    feedback = $bindable(),
+    ...rest
   }: Props = $props()
 
   type Option = { value: string | number | boolean; name: string; disabled?: boolean }
 
   let input = $state<SvelteComponent>()
   let showTooltip = $state(false)
-
+  let changed = $derived(original !== undefined && !deepEqual(value, original))
   let currType = $derived(type)
   let passIcon = $derived(currType === 'password' ? faEyeSlash : faEye)
   $effect(() => {
@@ -136,14 +134,22 @@
       { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
     ]
   }
+
+  onMount(() => {
+    feedback = validate ? validate(id, value) : ''
+  })
+
+  if (!validate) validate = () => ''
+
+  const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
 </script>
 
 <div class="input">
   <FormGroup>
     <Label for={id}>{@html label}</Label>
-    <InputGroup>
+    <InputGroup class="has-validation">
       {#if tooltip != id + '.tooltip'}
-        <Button color="secondary" on:click={toggleTooltip} outline>
+        <Button color="secondary" onclick={toggleTooltip} outline>
           {#if showTooltip}
             <Fa
               i={faArrowUpFromBracket}
@@ -159,18 +165,15 @@
       {@render pre?.()}
       <Input
         {id}
-        {name}
+        oninput={() => (feedback = validate ? validate(id, value) : '')}
+        class="{inputClass} {changed ? 'changed' : ''}"
         type={currType as InputType}
         bind:this={input}
         bind:value
         bind:checked={value}
-        autocomplete={name.includes('noauto') ? 'off' : undefined}
+        autocomplete="off"
         {placeholder}
-        {readonly}
-        {disabled}
-        {rows}
-        {min}
-        {max}>
+        {...rest}>
         {#if children}
           {@render children()}
         {:else if options}
@@ -200,7 +203,7 @@
 
       <!-- Include a password visibility toggler. -->
       {#if type === 'password'}
-        <Button type="button" outline on:click={togglePassword}>
+        <Button type="button" outline onclick={togglePassword}>
           <Fa
             i={passIcon}
             c1="royalblue"
@@ -212,6 +215,7 @@
       {/if}
       {@render post?.()}
     </InputGroup>
+    <div class="text-danger">{feedback}</div>
 
     {#if showTooltip}
       <div transition:slide>
@@ -236,5 +240,9 @@
   .input :global(label) {
     font-weight: 550;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+
+  .input :global(.changed) {
+    background-color: rgba(205, 92, 92, 0.322);
   }
 </style>
